@@ -33,7 +33,6 @@ class CharacterClassSpecialtiesEquipped extends Model
     ];
 
     protected $appends = [
-        'specialty_damage',
         'increase_specialty_damage_per_level',
         'base_damage_mod',
         'base_ac_mod',
@@ -47,17 +46,6 @@ class CharacterClassSpecialtiesEquipped extends Model
         'skill_reduction',
         'resistance_reduction',
     ];
-
-    public function getSpecialtyDamageAttribute()
-    {
-        $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat);
-
-        $baseDamage = $this->gameClassSpecial->specialty_damage;
-        $addedDamage = $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;
-        $characterDamageStat = $damageStatAmount * $this->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
-
-        return $baseDamage + $addedDamage + $characterDamageStat;
-    }
 
     public function getBaseDamageModAttribute()
     {

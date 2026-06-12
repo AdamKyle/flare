@@ -166,14 +166,14 @@ class ItemTransferServiceTest extends TestCase
     }
 
 
-    public function testNotEnoughInventoryWhenTheItemToMoveTooHasGemsAndYouDoNotHaveTheInventorySpace()
+    public function testNotEnoughGemBagSpaceWhenTheItemToMoveToHasGems()
     {
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem();
 
         $itemToTransferFrom->sockets()->create([
             'gem_id' => $this->createGem()->id,
-            'item_id' => $itemToTransferTo->id,
+            'item_id' => $itemToTransferFrom->id,
         ]);
 
         $itemToTransferFrom->update([
@@ -202,7 +202,7 @@ class ItemTransferServiceTest extends TestCase
             'gold' => MaxCurrenciesValue::MAX_GOLD,
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'inventory_max' => 0,
+            'gem_bag_limit' => 0,
         ]);
 
         $character = $character->refresh();
@@ -214,7 +214,7 @@ class ItemTransferServiceTest extends TestCase
         );
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You do not have the inventory room to move the gems attached to: ' . $itemToTransferTo->affix_name . ' back into your gem bag.', $result['message']);
+        $this->assertEquals('You do not have room in your Gem Bag to move the gems attached to: ' . $itemToTransferTo->affix_name . '.', $result['message']);
     }
 
     public function testTransferItemAttributes()
@@ -594,7 +594,10 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals($transferredToItem->socket_count, 2);
         $this->assertEquals($transferredToItem->sockets->first()->gem_id, $gemToAttach->id);
 
-        $this->assertEquals(2, $character->gemBag->gemSlots()->where('gem_id', $gemToRemove->id)->first()->amount);
+        $returnedGemSlots = $character->gemBag->gemSlots()->where('gem_id', $gemToRemove->id)->get();
+
+        $this->assertEquals(2, $returnedGemSlots->count());
+        $this->assertTrue($returnedGemSlots->every(fn ($slot) => $slot->amount === 1));
     }
 
     public function testTransferItemAttributesWithGemsBeingReturnedAsNewEntries()

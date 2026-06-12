@@ -86,11 +86,16 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                                 success_message: result.data.message,
                             });
 
-                            const data = result.data;
-
-                            delete data.message;
-
-                            this.props.update_quests(data);
+                            this.props.update_quests({
+                                completed_quests: result.data.completed_quests,
+                                player_plane: result.data.player_plane,
+                                quests: result.data.quests,
+                                raid_quests: result.data.raid_quests,
+                                is_winter_event:
+                                    result.data.is_winter_event ?? false,
+                                is_delusional_memories:
+                                    result.data.is_delusional_memories ?? false,
+                            });
                         },
                         (error: AxiosError) => {
                             if (typeof error.response !== "undefined") {

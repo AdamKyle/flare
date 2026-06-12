@@ -20,26 +20,26 @@ export default class InventoryCountBreakdownModal extends React.Component<Invent
                 title={this.props.title}
             >
                 <p className="my-4">
-                    When it coems to inventory count, we do not count equipped
-                    items nor do we count items you have stashed away in{" "}
-                    <a href="/information/equipment-sets" target="_blank">
-                        sets <i className="fas fa-external-link-alt"></i>
-                    </a>
-                    . Below you will see a breakdown of your various bags, which
-                    includes your core inventory, that is things not in a set,
-                    not equipped and not alchemy or quest items, then we show
-                    you your usable items bag and finally your gem bag count.
-                    Add it all together and thats your current inventory count.
+                    Inventory counts are separated by bag type. Your main
+                    inventory does not count quest items, alchemy items, or
+                    gems. Each bag has its own limit based on total quantity.
                 </p>
                 <dl>
-                    <dt>Inventory bag count (non set, non equipped):</dt>
-                    <dd>
-                        {this.props.inventory_breakdown.inventory_bag_count}
-                    </dd>
-                    <dt>Usable item count:</dt>
-                    <dd>{this.props.inventory_breakdown.alchemy_item_count}</dd>
-                    <dt>Gem count:</dt>
-                    <dd>{this.props.inventory_breakdown.gem_bag_count}</dd>
+                    <dt>
+                        Inventory:{" "}
+                        {this.props.inventory_breakdown.inventory_count} /{" "}
+                        {this.props.inventory_breakdown.inventory_max}
+                    </dt>
+                    <dt>
+                        Alchemy Bag:{" "}
+                        {this.props.inventory_breakdown.alchemy_bag_count} /{" "}
+                        {this.props.inventory_breakdown.alchemy_bag_limit}
+                    </dt>
+                    <dt>
+                        Gem Bag: {this.props.inventory_breakdown.gem_bag_count}{" "}
+                        / {this.props.inventory_breakdown.gem_bag_limit}
+                    </dt>
+                    <dt>Quest Items: not counted</dt>
                 </dl>
             </Dialogue>
         );

@@ -3,14 +3,17 @@
 namespace Tests\Feature\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateExplorationLog;
 use Tests\Traits\CreateExplorationWarning;
 
 class ExplorationOutputControllerTest extends TestCase
 {
+    use CreateCharacterAutomation;
     use CreateExplorationLog;
     use CreateExplorationWarning;
     use RefreshDatabase;
@@ -34,10 +37,18 @@ class ExplorationOutputControllerTest extends TestCase
 
     public function testOutputReturnsActiveExplorationLog(): void
     {
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addSeconds(3),
+        ]);
+
         $log = $this->createExplorationLog([
             'character_id' => $this->character->id,
             'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
             'ended_at' => null,
+            'stopped_reason' => 'running',
         ]);
 
         $response = $this->actingAs($this->character->user)

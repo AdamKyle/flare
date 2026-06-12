@@ -313,22 +313,49 @@ export default class CharacterSheet extends React.Component<
                                     <div className="border-b-2 block lg:hidden border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                     <div>
                                         <dl>
-                                            <dt>Inventory Max:</dt>
+                                            <dt>Inventory:</dt>
                                             <dd>
+                                                {
+                                                    this.props.character
+                                                        .inventory_count
+                                                        .inventory_count
+                                                }
+                                                {" / "}
                                                 {
                                                     this.props.character
                                                         .inventory_count
                                                         .inventory_max
                                                 }
                                             </dd>
-                                            <dt>Inventory Count:</dt>
+                                            <dt>Alchemy Bag:</dt>
                                             <dd>
                                                 {
                                                     this.props.character
                                                         .inventory_count
+                                                        .alchemy_bag_count
+                                                }
+                                                {" / "}
+                                                {
+                                                    this.props.character
                                                         .inventory_count
+                                                        .alchemy_bag_limit
                                                 }
                                             </dd>
+                                            <dt>Gem Bag:</dt>
+                                            <dd>
+                                                {
+                                                    this.props.character
+                                                        .inventory_count
+                                                        .gem_bag_count
+                                                }
+                                                {" / "}
+                                                {
+                                                    this.props.character
+                                                        .inventory_count
+                                                        .gem_bag_limit
+                                                }
+                                            </dd>
+                                            <dt>Quest Items: not counted</dt>
                                         </dl>
                                         <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                         <OrangeButton

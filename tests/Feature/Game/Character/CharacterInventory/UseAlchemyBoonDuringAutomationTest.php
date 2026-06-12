@@ -32,9 +32,13 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
@@ -51,6 +55,7 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Used selected item.', $jsonData['message']);
         $this->assertNotEmpty($character->refresh()->boons);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('item_id', $item->id)->count());
     }
 
     public function testNonBoonUseDuringAutomationReturnsUnprocessable(): void

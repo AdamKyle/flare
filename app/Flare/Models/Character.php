@@ -26,6 +26,8 @@ class Character extends Model
         'game_race_id',
         'game_class_id',
         'inventory_max',
+        'alchemy_bag_limit',
+        'gem_bag_limit',
         'can_attack',
         'can_move',
         'can_craft',
@@ -72,6 +74,8 @@ class Character extends Model
      */
     protected $casts = [
         'inventory_max' => 'integer',
+        'alchemy_bag_limit' => 'integer',
+        'gem_bag_limit' => 'integer',
         'can_attack' => 'boolean',
         'can_move' => 'boolean',
         'can_craft' => 'boolean',
@@ -145,6 +149,11 @@ class Character extends Model
     public function gemBag()
     {
         return $this->hasOne(GemBag::class, 'character_id', 'id');
+    }
+
+    public function alchemyBag()
+    {
+        return $this->hasOne(AlchemyBag::class, 'character_id', 'id');
     }
 
     public function factions()
@@ -301,9 +310,9 @@ class Character extends Model
     }
 
     /**
-     * Gets the inventory count.
+     * Gets the main inventory count.
      *
-     * Excludes quest and equipped items.
+     * Excludes quest items, alchemy items, and gems.
      */
     public function getInventoryCount(): int
     {
@@ -313,37 +322,95 @@ class Character extends Model
             return 0;
         }
 
-        $slotCount = InventorySlot::where('inventory_slots.inventory_id', $inventoryId)
+        return InventorySlot::where('inventory_slots.inventory_id', $inventoryId)
             ->where('inventory_slots.equipped', false)
             ->join('items', function ($join) {
                 $join->on('items.id', '=', 'inventory_slots.item_id')
-                    ->where('items.type', '!=', 'quest');
+                    ->where('items.type', '!=', 'quest')
+                    ->where('items.type', '!=', 'alchemy')
+                    ->where('items.type', '!=', 'gem');
             })
             ->count();
-
-        $gemBag = $this->gemBag;
-
-        $gemAmount = 0;
-
-        if (! is_null($gemBag)) {
-            $gemAmount = GemBagSlot::where('gem_bag_id', $gemBag->id)->sum('amount');
-        }
-
-        return $slotCount + $gemAmount;
     }
 
     /**
-     * Is the inventory full?
+     * Gets the gem bag count as sum of all gem amounts.
+     */
+    public function getGemBagCount(): int
+    {
+        $gemBag = $this->gemBag;
+
+        if (is_null($gemBag)) {
+            return 0;
+        }
+
+        return (int) GemBagSlot::where('gem_bag_id', $gemBag->id)->sum('amount');
+    }
+
+    /**
+     * Gets the alchemy bag count as sum of all slot amounts.
+     */
+    public function getAlchemyBagCount(): int
+    {
+        $alchemyBag = $this->alchemyBag;
+
+        if (is_null($alchemyBag)) {
+            return 0;
+        }
+
+        return (int) AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)->sum('amount');
+    }
+
+    /**
+     * Is the main inventory full?
      */
     public function isInventoryFull(): bool
     {
-
         return $this->getInventoryCount() >= $this->inventory_max;
+    }
+
+    /**
+     * Is the gem bag full?
+     */
+    public function isGemBagFull(): bool
+    {
+        return $this->getGemBagCount() >= $this->gem_bag_limit;
+    }
+
+    /**
+     * Is the alchemy bag full?
+     */
+    public function isAlchemyBagFull(): bool
+    {
+        return $this->getAlchemyBagCount() >= $this->alchemy_bag_limit;
+    }
+
+    /**
+     * Can the given amount be added to the alchemy bag without exceeding the limit?
+     */
+    public function canAddToAlchemyBag(int $amount = 1): bool
+    {
+        if ($amount <= 0) {
+            return false;
+        }
+
+        return $this->getAlchemyBagCount() + $amount <= $this->alchemy_bag_limit;
+    }
+
+    /**
+     * Can the given amount be added to the gem bag without exceeding the limit?
+     */
+    public function canAddToGemBag(int $amount = 1): bool
+    {
+        if ($amount <= 0) {
+            return false;
+        }
+
+        return $this->getGemBagCount() + $amount <= $this->gem_bag_limit;
     }
 
     public function totalInventoryCount(): int
     {
-
         return $this->getInventoryCount();
     }
 

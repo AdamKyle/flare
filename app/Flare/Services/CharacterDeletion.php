@@ -18,6 +18,7 @@ use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
+use App\Flare\Models\AlchemyBag;
 use App\Flare\Models\GemBag;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\Inventory;
@@ -55,6 +56,10 @@ class CharacterDeletion
 
         if (! is_null($character->gemBag)) {
             $this->emptyCharacterGemBag($character->gemBag);
+        }
+
+        if (! is_null($character->alchemyBag)) {
+            $this->emptyCharacterAlchemyBag($character->alchemyBag);
         }
 
         if (! is_null($character->inventorySets)) {
@@ -121,6 +126,15 @@ class CharacterDeletion
         }
 
         $gemBag->delete();
+    }
+
+    protected function emptyCharacterAlchemyBag(AlchemyBag $alchemyBag): void
+    {
+        foreach ($alchemyBag->slots as $slot) {
+            $slot->delete();
+        }
+
+        $alchemyBag->delete();
     }
 
     protected function emptyCharacterInventorySets(Collection $inventorySets): void

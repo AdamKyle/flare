@@ -64,7 +64,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'move_down_monster_list_every' => 10,
             'previous_level' => $this->character->level,
             'current_level' => $this->character->level,

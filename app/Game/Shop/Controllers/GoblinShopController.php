@@ -32,8 +32,11 @@ class GoblinShopController extends Controller
 
     public function buyItem(Character $character, Item $item)
     {
+        if ($item->type === 'alchemy' && ! $this->goblinShopService->canBuyAlchemyItem($character)) {
+            return redirect()->back()->with('error', 'Your Alchemy Bag is full. Use or remove alchemy items before buying more.');
+        }
 
-        if ($character->isInventoryFull()) {
+        if ($item->type !== 'alchemy' && $character->isInventoryFull()) {
             return redirect()->back()->with('error', 'Your inventory is full. Cannot buy item.');
         }
 

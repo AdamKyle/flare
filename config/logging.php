@@ -51,6 +51,13 @@ return [
             'days' => 1,
         ],
 
+        'faction_loyalty' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/faction-loyalty.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],

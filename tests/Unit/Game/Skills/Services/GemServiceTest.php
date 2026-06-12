@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\GemBagSlot;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
@@ -70,7 +71,7 @@ class GemServiceTest extends TestCase
         $this->assertEquals('You do not have the required currencies to craft this item.', $result['message']);
     }
 
-    public function testCannotCraftWhenInventoryIsFull()
+    public function testCannotCraftWhenGemBagIsFull()
     {
         $character = $this->character->getCharacter();
 
@@ -78,13 +79,25 @@ class GemServiceTest extends TestCase
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
             'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
-            'inventory_max' => 0,
+            'gem_bag_limit' => 2,
+        ]);
+
+        GemBagSlot::create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id' => $this->createGem()->id,
+            'amount' => 1,
+        ]);
+
+        GemBagSlot::create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id' => $this->createGem()->id,
+            'amount' => 1,
         ]);
 
         $result = $this->gemService->generateGem($character, 1);
 
         $this->assertEquals(422, $result['status']);
-        $this->assertEquals('You do not have enough space in your inventory.', $result['message']);
+        $this->assertEquals('Your Gem Bag is full. Use or remove gems before crafting more.', $result['message']);
     }
 
     public function testCannotCraftWhenSkillLevelRequiredToHigh()
@@ -348,13 +361,9 @@ class GemServiceTest extends TestCase
         Event::assertDispatched(ServerMessageEvent::class);
     }
 
-    public function testCraftTheGemButIncreaseTheAmount()
+    public function testCraftingTheSameGemTwiceCreatesTwoSeparateSlots()
     {
         Event::fake();
-
-        $gemService = Mockery::mock(GemService::class, function (MockInterface $mock) {
-            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
-        });
 
         $gem = $this->createGem([
             'name' => 'Sample',
@@ -369,6 +378,10 @@ class GemServiceTest extends TestCase
 
         $gemBuilder = Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($gem) {
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('buildGem')->once()->andReturn($gem);
+        });
+
+        $gemService = Mockery::mock(GemService::class, function (MockInterface $mock) {
+            $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
         $gemService->__construct($gemBuilder);
@@ -391,9 +404,10 @@ class GemServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEquals(2, $character->gemBag->gemSlots->first()->amount);
-
         $this->assertEquals(200, $result['status']);
+        $this->assertEquals(2, $character->gemBag->gemSlots->count());
+        $this->assertEquals(1, $character->gemBag->gemSlots->first()->amount);
+        $this->assertEquals(1, $character->gemBag->gemSlots->last()->amount);
 
         Event::assertDispatched(UpdateSkillEvent::class);
         Event::assertDispatched(ServerMessageEvent::class);

@@ -8,7 +8,7 @@
     </dl>
     <p class="my-2">
         Vampires only care about raising their durability to do moore damage, and shields do just that. However, you should also invest in <a href="/information/enchanting" target="_blank"> Life stealing enchantments <i class="fas fa-external-link-alt"></i></a>
-        as you will be able to steal up to 99% of the enemies health in soe instances.
+        as you will be able to steal up to 75% of the enemies current health in some instances.
     </p>
     <p class="mb-2">
         Vampires do best with

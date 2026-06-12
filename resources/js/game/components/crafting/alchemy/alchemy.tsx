@@ -70,7 +70,9 @@ export default class Alchemy extends React.Component<any, any> {
             return {
                 label:
                     item.name +
-                    ", Gold Dust Cost: " +
+                    " (Owned: " +
+                    formatNumber(item.owned_amount ?? 0) +
+                    "), Gold Dust Cost: " +
                     formatNumber(item.gold_dust_cost) +
                     " Shards Cost: " +
                     formatNumber(item.shards_cost),

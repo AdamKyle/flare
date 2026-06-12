@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Automation\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
@@ -12,6 +13,7 @@ use App\Game\Automation\Services\ExplorationLogService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -186,7 +188,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(0, $output['output']['healing']);
         $this->assertEquals(0, $output['output']['blocked']);
         $this->assertEquals(0, $output['output']['duration']);
-        $this->assertNull($output['output']['reason']);
+        $this->assertEquals('running', $output['output']['reason']);
         $this->assertEquals('Exploration is running.', $output['output']['message']);
 
         Event::assertDispatched(ExplorationOutputUpdated::class, function (ExplorationOutputUpdated $event): bool {
@@ -582,5 +584,55 @@ class ExplorationLogServiceTest extends TestCase
             return is_null($event->type)
                 && is_null($event->output);
         });
+    }
+
+    public function testResolveOutputRepairsMissingAutomationAndReturnsWarningType(): void
+    {
+        Event::fake();
+        Log::shouldReceive('error')->once();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => 999999,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('warning', $output['type']);
+        $this->assertEquals('missing_automation', $output['output']['reason']);
+
+        $log->refresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertEquals('missing_automation', $log->stopped_reason);
+        $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function testResolveOutputDoesNotRepairWhenAutomationExists(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals($log->id, $output['output']['id']);
+
+        $log->refresh();
+
+        $this->assertNull($log->ended_at);
+        $this->assertEquals(0, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function testStartSetsStoppedReasonToRunning(): void
+    {
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->assertEquals('running', $log->stopped_reason);
     }
 }

@@ -83,7 +83,7 @@ class DelveExplorationControllerTest extends TestCase
             'monster_id' => $this->monster->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHours(8),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -130,7 +130,7 @@ class DelveExplorationControllerTest extends TestCase
             'monster_id' => $this->monster->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHours(8),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 

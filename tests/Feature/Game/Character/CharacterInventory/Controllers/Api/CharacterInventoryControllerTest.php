@@ -441,9 +441,13 @@ class CharacterInventoryControllerTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/inventory/use-item/'.$item->id);
@@ -451,6 +455,7 @@ class CharacterInventoryControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Used selected item.', $jsonData['message']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('item_id', $item->id)->count());
     }
 
     public function testDestroyAlchemyItem()

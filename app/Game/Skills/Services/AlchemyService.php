@@ -2,6 +2,8 @@
 
 namespace App\Game\Skills\Services;
 
+use App\Flare\Models\AlchemyBag;
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -47,7 +49,22 @@ class AlchemyService
             ->select('id', 'name', 'gold_dust_cost', 'shards_cost', 'type')
             ->get();
 
-        return $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);
+        $items = $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);
+
+        $alchemyBag = $character->alchemyBag;
+        $ownedAmounts = [];
+
+        if (! is_null($alchemyBag)) {
+            $ownedAmounts = AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+                ->pluck('amount', 'item_id')
+                ->toArray();
+        }
+
+        return $items->map(function ($item) use ($ownedAmounts) {
+            $item->owned_amount = $ownedAmounts[$item->id] ?? 0;
+
+            return $item;
+        });
     }
 
     public function fetchSkillXP(Character $character): array
@@ -180,20 +197,34 @@ class AlchemyService
 
     private function attemptToPickUpItem(Character $character, Item $item): bool
     {
-        if (! $character->isInventoryFull()) {
+        if (! $character->canAddToAlchemyBag(1)) {
+            event(new ServerMessageEvent($character->user, 'Your Alchemy Bag is full. Use or remove alchemy items before crafting more.'));
 
-            $slot = $character->inventory->slots()->create([
-                'item_id' => $item->id,
-                'inventory_id' => $character->inventory->id,
-            ]);
+            return false;
+        }
 
-            event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!', $slot->id, $slot->item->type));
+        $alchemyBag = AlchemyBag::firstOrCreate(['character_id' => $character->id]);
+
+        $existingSlot = AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+            ->where('item_id', $item->id)
+            ->first();
+
+        if (! is_null($existingSlot)) {
+            $existingSlot->update(['amount' => $existingSlot->amount + 1]);
+            event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!'));
 
             return true;
         }
 
-        ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::INVENTORY_IS_FULL);
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
-        return false;
+        event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!'));
+
+        return true;
     }
 }

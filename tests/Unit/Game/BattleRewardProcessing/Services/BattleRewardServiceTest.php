@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GameSkill;
 use App\Flare\Values\ItemEffectsValue;
+use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
@@ -36,11 +37,12 @@ use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateScheduledEvent;
 
 class BattleRewardServiceTest extends TestCase
 {
-    use CreateEvent, CreateExplorationLog, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase, CreateItem, CreateItemAffix, CreateScheduledEvent;
+    use CreateCharacterAutomation, CreateEvent, CreateExplorationLog, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase, CreateItem, CreateItemAffix, CreateScheduledEvent;
 
     private ?BattleRewardService $battleRewardService;
 
@@ -675,9 +677,16 @@ class BattleRewardServiceTest extends TestCase
             'copper_coins' => $character->copper_coins,
         ];
 
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addSeconds(3),
+        ]);
+
         $log = $this->createExplorationLog([
             'character_id' => $character->id,
             'user_id' => $character->user_id,
+            'character_automation_id' => $automation->id,
         ]);
 
         $monster = $this->createMonster([

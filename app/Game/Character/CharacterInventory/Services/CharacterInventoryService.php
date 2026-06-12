@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
@@ -274,16 +275,27 @@ class CharacterInventoryService
      */
     public function getUsableItems(): array
     {
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
+        $alchemyBag = $this->character->alchemyBag;
 
-        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->join('items', function ($join) {
-            $join->on('inventory_slots.item_id', '=', 'items.id')
-                ->where('items.type', 'alchemy');
-        })->select('inventory_slots.*')->get();
+        if (is_null($alchemyBag)) {
+            return [];
+        }
 
-        $slots = new LeagueCollection($slots, $this->usableItemTransformer);
+        return AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+            ->where('character_id', $this->character->id)
+            ->with('item')
+            ->get()
+            ->map(function (AlchemyBagSlot $slot) {
+                $item = $this->usableItemTransformer->transform($slot->item);
 
-        return $this->manager->createData($slots)->toArray();
+                return array_merge($item, [
+                    'id' => $slot->id,
+                    'item_id' => $slot->item_id,
+                    'slot_id' => $slot->id,
+                    'amount' => $slot->amount,
+                ]);
+            })
+            ->toArray();
     }
 
     /**
@@ -345,7 +357,7 @@ class CharacterInventoryService
         return $this->character
             ->inventory
             ->slots
-            ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->whereNotIn('item.type', ['quest', 'alchemy', 'gem'])
             ->whereNotIn('id', $slotsToIgnore)
             ->where('equipped', false)
             ->sortByDesc(fn($slot) => (float) $slot->item->getTotalPercentageForStat($this->character->damage_stat));
@@ -383,7 +395,7 @@ class CharacterInventoryService
         return $this->character
             ->inventory
             ->slots
-            ->whereNotIn('item.type', ['quest', 'alchemy', 'artifact'])
+            ->whereNotIn('item.type', ['quest', 'alchemy', 'gem', 'artifact'])
             ->where('equipped', false)
             ->sortBy('id')
             ->pluck('id')

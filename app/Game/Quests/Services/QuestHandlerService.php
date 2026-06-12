@@ -16,6 +16,7 @@ use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
+use App\Game\Events\Values\EventType;
 use App\Game\Quests\Traits\QuestDetails;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -203,8 +204,7 @@ class QuestHandlerService
 
     public function handInQuest(Character $character, Quest $quest)
     {
-
-        HandInQuest::dispatch($character, $quest);
+        HandInQuest::dispatchSync($character, $quest);
 
         $character = $character->refresh();
 
@@ -216,6 +216,8 @@ class QuestHandlerService
             'player_plane' => $character->map->gameMap->name,
             'quests' => $quests,
             'raid_quests' => $raidQuests,
+            'is_winter_event' => Event::where('type', EventType::WINTER_EVENT)->count() > 0,
+            'is_delusional_memories' => Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->count() > 0,
         ]);
     }
 

@@ -200,7 +200,8 @@ class AlchemyServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertCount(1, $character->inventory->slots);
+        $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->value('amount'));
+        $this->assertEquals(0, $character->inventory->slots()->where('item_id', $this->alchemyItem->id)->count());
     }
 
     public function testTransmute()
@@ -275,7 +276,10 @@ class AlchemyServiceTest extends TestCase
 
         $alchemyService->transmute($character, $this->alchemyItem->refresh()->id);
 
-        $this->assertCount(1, $character->inventory->slots);
+        $character = $character->refresh();
+
+        $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->value('amount'));
+        $this->assertEquals(0, $character->inventory->slots()->where('item_id', $this->alchemyItem->id)->count());
     }
 
     public function testTransmuteAndSucceedButInventoryIsFull()
@@ -295,20 +299,31 @@ class AlchemyServiceTest extends TestCase
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
             'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'inventory_max' => 0,
+            'alchemy_bag_limit' => 1,
         ]);
 
         $character = $character->refresh();
+
+        $otherAlchemyItem = $this->createItem([
+            'type' => 'alchemy',
+        ]);
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $otherAlchemyItem->id,
+            'amount' => 1,
+        ]);
 
         $alchemyService = $this->app->make(AlchemyService::class);
 
         $alchemyService->transmute($character, $this->alchemyItem->refresh()->id);
 
         Event::assertDispatched(function (ServerMessageEvent $event) {
-            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CharacterMessageTypes::INVENTORY_IS_FULL);
+            return $event->message === 'Your Alchemy Bag is full. Use or remove alchemy items before crafting more.';
         });
 
-        $this->assertCount(0, $character->inventory->slots);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->count());
+        $this->assertEquals(0, $character->inventory->slots()->where('item_id', $this->alchemyItem->id)->count());
     }
 
     public function testTransmuteAsAlchemist()
@@ -341,7 +356,8 @@ class AlchemyServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertCount(1, $character->inventory->slots);
+        $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->value('amount'));
+        $this->assertEquals(0, $character->inventory->slots()->where('item_id', $this->alchemyItem->id)->count());
         $this->assertGreaterThan($goldDustAfterOriginalCost, $character->gold_dust);
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }
@@ -376,7 +392,8 @@ class AlchemyServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertCount(1, $character->inventory->slots);
+        $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->value('amount'));
+        $this->assertEquals(0, $character->inventory->slots()->where('item_id', $this->alchemyItem->id)->count());
         $this->assertGreaterThan($goldDustAfterOriginalCost, $character->gold_dust);
         $this->assertGreaterThan($shardsAfterOriginalCost, $character->shards);
     }

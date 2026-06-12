@@ -124,6 +124,22 @@ class CraftingService
         ];
     }
 
+    public function getAlchemyBagCount(Character $character): array
+    {
+        return [
+            'current_count' => $character->getAlchemyBagCount(),
+            'max_inventory' => $character->alchemy_bag_limit,
+        ];
+    }
+
+    public function getGemBagCount(Character $character): array
+    {
+        return [
+            'current_count' => $character->getGemBagCount(),
+            'max_inventory' => $character->gem_bag_limit,
+        ];
+    }
+
     /**
      * Attempts to craft the item.
      *

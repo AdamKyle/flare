@@ -123,6 +123,27 @@ class Exploration implements ShouldQueue
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         if (is_null($automation)) {
+            if (! is_null($this->explorationLog)) {
+                Log::error('Exploration job found no matching automation for an open exploration log.', [
+                    'character_id' => $this->character->id,
+                    'automation_id' => $this->automationId,
+                    'exploration_log_id' => $this->explorationLog->id,
+                ]);
+
+                $this->explorationLogService->finalize($this->explorationLog, 'missing_automation');
+                $this->explorationWarningService->createWarning(
+                    $this->character,
+                    $this->explorationLog,
+                    'missing_automation',
+                    'Exploration ended because the automation was missing. Please report this as a bug.',
+                );
+
+                $character = $this->character->refresh();
+
+                event(new UpdateCharacterStatus($character));
+                event(new AutomationTimeOut($character->user, 0));
+            }
+
             return;
         }
 
@@ -678,7 +699,7 @@ class Exploration implements ShouldQueue
      * @param string|null $message
      * @return void
      */
-    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null, string $reason = 'error'): void
+    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null, string $reason = 'failed'): void
     {
         $automation->delete();
 
@@ -686,9 +707,16 @@ class Exploration implements ShouldQueue
 
         Cache::delete('can-character-survive-' . $this->character->id);
 
-        if (! is_null($message)) {
-            $this->sendOutEventLogUpdate($message);
+        if ($reason === 'failed') {
+            Log::error('Exploration automation cancelled due to an unexpected error.', [
+                'character_id' => $this->character->id,
+                'automation_id' => $automation->id,
+            ]);
         }
+
+        $warningMessage = $message ?? 'Exploration ended because an unexpected error occurred. Please report this as a bug.';
+
+        $this->sendOutEventLogUpdate($warningMessage);
 
         $character = $this->character->refresh();
 
@@ -698,7 +726,7 @@ class Exploration implements ShouldQueue
                 $character,
                 $this->explorationLog,
                 $reason,
-                $message ?? 'Exploration was cancelled.',
+                $warningMessage,
             );
         }
 

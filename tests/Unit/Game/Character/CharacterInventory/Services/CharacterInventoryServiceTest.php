@@ -108,12 +108,18 @@ class CharacterInventoryServiceTest extends TestCase
 
     public function testGetInventoryForUsableItems()
     {
-        $character = $this->character->inventoryManagement()
-            ->giveItem($this->createItem([
-                'type' => 'alchemy',
-                'usable' => true,
-            ]))
-            ->getCharacter();
+        $item = $this->createItem([
+            'type' => 'alchemy',
+            'usable' => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $result = $this->characterInventoryService->setCharacter($character)->getInventoryForType('usable_items');
 

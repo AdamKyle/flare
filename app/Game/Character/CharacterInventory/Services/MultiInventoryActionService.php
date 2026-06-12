@@ -96,7 +96,7 @@ class MultiInventoryActionService
         $slots = $character->inventory->slots()
             ->whereIn('id', $slotIds)
             ->whereHas('item', function ($query) {
-                return $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact', 'trinket']);
             })
             ->where('equipped', false)
             ->get();
@@ -121,7 +121,7 @@ class MultiInventoryActionService
     {
         $filteredSlots = $character->inventory->slots
             ->whereIn('id', $slotIds)
-            ->whereNotIn('item.type', ['alchemy', 'quest', 'trinket', 'artifact'])
+            ->whereNotIn('item.type', ['alchemy', 'gem', 'quest', 'trinket', 'artifact'])
             ->where('equipped', false)
             ->filter(function ($slot) {
                 return !is_null($slot->item->item_prefix_id) || !is_null($slot->item->item_suffix_id);
@@ -150,7 +150,7 @@ class MultiInventoryActionService
         $character->inventory->slots()
             ->whereIn('id', $slotIds)
             ->whereHas('item', function ($query) {
-                return $query->whereNotIn('type', ['alchemy', 'quest', 'artifact']);
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact']);
             })
             ->where('equipped', false)
             ->delete();

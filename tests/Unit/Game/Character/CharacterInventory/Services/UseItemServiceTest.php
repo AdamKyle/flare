@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
@@ -58,11 +59,16 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
 
-        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
 
         $character = $character->refresh();
 
@@ -74,7 +80,7 @@ class UseItemServiceTest extends TestCase
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
 
         $this->assertNotEmpty($character->boons);
-        $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
     }
 
     public function testDoNotGoOverMaxAmount()
@@ -91,9 +97,14 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -106,7 +117,7 @@ class UseItemServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+        $result = $this->useItemService->useSingleItemFromInventory($character, $item);
 
         $character = $character->refresh();
 
@@ -118,7 +129,7 @@ class UseItemServiceTest extends TestCase
         Event::assertNotDispatched(CharacterBoonsUpdateBroadcastEvent::class);
 
         $this->assertNotEmpty($character->boons);
-        $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+        $this->assertEquals(1, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
     }
 
     public function testDoNotUseItemWhenWouldGoAboveMaxEightHours()
@@ -136,9 +147,14 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -151,7 +167,7 @@ class UseItemServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+        $result = $this->useItemService->useSingleItemFromInventory($character, $item);
 
         $character = $character->refresh();
 
@@ -162,7 +178,7 @@ class UseItemServiceTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertNotEmpty($character->boons);
-        $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+        $this->assertEquals(1, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
     }
 
     public function testStackableBoonRefillsToEightHoursWhenTimeHasPassed()
@@ -182,9 +198,14 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -197,7 +218,7 @@ class UseItemServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+        $result = $this->useItemService->useSingleItemFromInventory($character, $item);
 
         $character = $character->refresh();
         $boon = $character->boons->first();
@@ -208,7 +229,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals('Used selected item.', $result['message']);
         $this->assertEquals(480, $boon->last_for_minutes);
         $this->assertEquals('2026-01-01 20:00:00', $boon->complete->toDateTimeString());
-        $this->assertNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
     }
 
     public function testDoNotUseItemWhenItemDoesNotStack()
@@ -226,9 +247,14 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -241,7 +267,7 @@ class UseItemServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $result = $this->useItemService->useSingleItemFromInventory($character, $character->inventory->slots->where('item.type', 'alchemy')->first()->item);
+        $result = $this->useItemService->useSingleItemFromInventory($character, $item);
 
         $character = $character->refresh();
 
@@ -252,7 +278,7 @@ class UseItemServiceTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertNotEmpty($character->boons);
-        $this->assertNotNull($character->inventory->slots->where('item.type', 'alchemy')->first());
+        $this->assertEquals(1, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
     }
 
     public function testPlayerDoesNotHaveItem()
@@ -269,7 +295,6 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
             ->getCharacter();
 
         $result = $this->useItemService->useSingleItemFromInventory($character, $item);
@@ -381,20 +406,24 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
-            ->giveItem($item)
             ->getCharacter();
 
-        $items = $character->inventory->slots->where('item.type', 'alchemy');
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
 
-        $result = $this->useItemService->useManyItemsFromInventory($character, $items->pluck('id')->toArray());
+        $result = $this->useItemService->useManyItemsFromInventory($character->refresh(), [$slot->id, $slot->id]);
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Used selected items.', $result['message']);
 
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
+
+        $character = $character->refresh();
 
         $this->assertEquals(2, $character->boons->first()->amount_used);
         $this->assertEquals(60, $character->boons->first()->last_for_minutes);
@@ -414,17 +443,16 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement();
+            ->getCharacter();
 
-        for ($i = 1; $i <= 10; $i++) {
-            $character->giveItem($item);
-        }
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 10,
+        ]);
 
-        $character = $character->getCharacter();
-
-        $slots = $character->inventory->slots->where('item.type', 'alchemy');
-
-        $result = $this->useItemService->useManyItemsFromInventory($character, $slots->pluck('id')->toArray());
+        $result = $this->useItemService->useManyItemsFromInventory($character->refresh(), array_fill(0, 10, $slot->id));
 
         $character = $character->refresh();
 
@@ -456,17 +484,16 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement();
+            ->getCharacter();
 
-        for ($i = 1; $i <= 20; $i++) {
-            $character->giveItem($item);
-        }
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 20,
+        ]);
 
-        $character = $character->getCharacter();
-
-        $slots = $character->inventory->slots->where('item.type', 'alchemy');
-
-        $result = $this->useItemService->useManyItemsFromInventory($character, $slots->pluck('id')->toArray());
+        $result = $this->useItemService->useManyItemsFromInventory($character->refresh(), array_fill(0, 20, $slot->id));
 
         $character = $character->refresh();
 
@@ -498,13 +525,14 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement();
+            ->getCharacter();
 
-        for ($i = 1; $i <= 8; $i++) {
-            $character->giveItem($item);
-        }
-
-        $character = $character->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 8,
+        ]);
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -515,11 +543,9 @@ class UseItemServiceTest extends TestCase
             'last_for_minutes' => 120,
         ]);
 
-        $slots = $character->inventory->slots->where('item.type', 'alchemy');
-
         $character = $character->refresh();
 
-        $result = $this->useItemService->useManyItemsFromInventory($character, $slots->pluck('id')->toArray());
+        $result = $this->useItemService->useManyItemsFromInventory($character, array_fill(0, 8, $slot->id));
 
         $character = $character->refresh();
 
@@ -535,7 +561,7 @@ class UseItemServiceTest extends TestCase
 
         $this->assertEquals(8, $boons[0]->amount_used);
         $this->assertEquals(480, $boons[0]->last_for_minutes);
-        $this->assertEquals(2, $character->inventory->slots->where('item.type', 'alchemy')->count());
+        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
     }
 
     public function testCannotAssignBoonsWhenYouAreMax()
@@ -552,13 +578,14 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement();
+            ->getCharacter();
 
-        for ($i = 1; $i <= 10; $i++) {
-            $character->giveItem($item);
-        }
-
-        $character = $character->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 10,
+        ]);
 
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -569,11 +596,9 @@ class UseItemServiceTest extends TestCase
             'last_for_minutes' => $item->lasts_for,
         ]);
 
-        $slots = $character->inventory->slots->where('item.type', 'alchemy');
-
         $character = $character->refresh();
 
-        $result = $this->useItemService->useManyItemsFromInventory($character, $slots->pluck('id')->toArray());
+        $result = $this->useItemService->useManyItemsFromInventory($character, array_fill(0, 10, $slot->id));
 
         $character = $character->refresh();
 
@@ -627,21 +652,25 @@ class UseItemServiceTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement();
+            ->getCharacter();
 
-        for ($i = 1; $i <= 2; $i++) {
-            $character->giveItem($itemOne);
-        }
+        $slotOne = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $itemOne->id,
+            'amount' => 2,
+        ]);
 
-        for ($i = 1; $i <= 8; $i++) {
-            $character->giveItem($itemTwo);
-        }
+        $slotTwo = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $itemTwo->id,
+            'amount' => 8,
+        ]);
 
-        $character = $character->getCharacter();
+        $ids = array_merge(array_fill(0, 2, $slotOne->id), array_fill(0, 8, $slotTwo->id));
 
-        $slots = $character->inventory->slots->where('item.type', 'alchemy');
-
-        $result = $this->useItemService->useManyItemsFromInventory($character, $slots->pluck('id')->toArray());
+        $result = $this->useItemService->useManyItemsFromInventory($character->refresh(), $ids);
 
         $character = $character->refresh();
 
@@ -661,6 +690,298 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(8, $boons[1]->amount_used);
         $this->assertEquals(80, $boons[1]->last_for_minutes);
 
-        $this->assertEquals(0, $character->inventory->slots->where('item.type', 'alchemy')->count());
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->count());
+    }
+
+    public function testUsingSingleAlchemyItemDecrementsAlchemyBagSlotAmountByOne(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(1, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+    }
+
+    public function testUsingSingleAlchemyItemDeletesAlchemyBagSlotRowWhenAmountReachesZero(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
+    }
+
+    public function testUsingManyAlchemyItemsDecrementsAlchemyBagSlotAmountByRequiredAmount(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 5,
+        ]);
+
+        $this->useItemService->useManyItemsFromInventory($character->refresh(), [$slot->id, $slot->id, $slot->id]);
+
+        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+    }
+
+    public function testUsingManyAlchemyItemsDeletesAlchemyBagSlotRowWhenAmountReachesZero(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $this->useItemService->useManyItemsFromInventory($character->refresh(), [$slot->id, $slot->id]);
+
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
+    }
+
+    public function testFillingUpBoonConsumesFromAlchemyBagSlotAmount(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 3,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 2,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+    }
+
+    public function testFillingUpBoonDeletesAlchemyBagSlotRowWhenAmountReachesZero(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 2,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
+    }
+
+    public function testFillingUpBoonPartiallyRefillsWhenAlchemyBagStackHasLessThanRequiredAmount(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(60),
+            'amount_used' => 3,
+            'last_for_minutes' => 60,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
+        $this->assertEquals('2026-01-01 14:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(120, $boon->last_for_minutes);
+        $this->assertEquals(3, $boon->amount_used);
+    }
+
+    public function testAlchemyUseNoLongerRequiresInventorySlotRow(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $this->assertEquals(0, $character->inventory->slots()->whereHas('item', fn ($q) => $q->where('type', 'alchemy'))->count());
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertNotEmpty($character->refresh()->boons);
+    }
+
+    public function testNormalNonAlchemyInventoryItemUseStillUsesInventorySlots(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'weapon',
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->assertEquals(1, $character->inventory->slots()->where('item_id', $item->id)->count());
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
+        $this->assertNotEmpty($character->refresh()->boons);
     }
 }

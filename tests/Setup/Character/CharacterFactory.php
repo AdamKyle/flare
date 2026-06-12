@@ -126,6 +126,8 @@ class CharacterFactory
 
         $this->createGemBag();
 
+        $this->createAlchemyBag();
+
         if ($assignBaseSkill) {
             $this->assignBaseSkills();
         }
@@ -135,8 +137,6 @@ class CharacterFactory
         }
 
         $this->createClassRanks();
-
-        $this->character->gemBag()->create(['character_id' => $this->character->id]);
 
         $character = $this->character->refresh();
 
@@ -782,7 +782,14 @@ class CharacterFactory
 
     protected function createGemBag()
     {
-        $this->character->gemBag()->create([
+        $this->character->gemBag()->firstOrCreate([
+            'character_id' => $this->character->id,
+        ]);
+    }
+
+    protected function createAlchemyBag(): void
+    {
+        $this->character->alchemyBag()->firstOrCreate([
             'character_id' => $this->character->id,
         ]);
     }

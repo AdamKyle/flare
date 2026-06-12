@@ -3,17 +3,19 @@
 namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
 
 class EventGoalServiceTest extends TestCase
 {
-    use CreateGlobalEventGoal, RefreshDatabase;
+    use CreateGameMap, CreateGlobalEventGoal, RefreshDatabase;
 
     private ?EventGoalsService $eventGoalService;
 
@@ -33,7 +35,16 @@ class EventGoalServiceTest extends TestCase
 
     public function testFetchCurrentEventGoalDataForResponse()
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
 
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,
@@ -68,7 +79,16 @@ class EventGoalServiceTest extends TestCase
 
     public function testFetchCurrentEventGoalData()
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
 
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,
@@ -102,7 +122,16 @@ class EventGoalServiceTest extends TestCase
 
     public function testFetchCurrentEventGoalDataWithCurrentKillCount()
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $character->map()->update([
+            'game_map_id' => $this->createGameMap([
+                'name' => MapNameValue::ICE_PLANE,
+                'only_during_event_type' => EventType::WINTER_EVENT,
+            ])->id,
+        ]);
+
+        $character = $character->refresh();
 
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,

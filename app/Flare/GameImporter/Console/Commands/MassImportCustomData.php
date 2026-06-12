@@ -2,12 +2,6 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\Announcement;
-use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\Character;
-use App\Flare\Models\Item;
-use App\Flare\Models\Monster;
-use App\Flare\Models\UnitInQueue;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -38,9 +32,8 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('import:game-data Quests');
-        Artisan::call('cleanup:dangling-character-data --apply');
-        Artisan::call('repair:quest-feature-rewards');
+        Artisan::call('repair:stuck-exploration-logs --apply');
+        Artisan::call('move:alchemy-and-gems-to-bags --apply');
 
         $this->importInformationSection();
 

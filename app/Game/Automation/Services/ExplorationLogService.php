@@ -9,6 +9,7 @@ use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
+use Illuminate\Support\Facades\Log;
 
 class ExplorationLogService
 {
@@ -21,6 +22,7 @@ class ExplorationLogService
             'monster_id' => $automation->monster_id,
             'attack_type' => $automation->attack_type,
             'started_at' => now(),
+            'stopped_reason' => 'running',
         ]);
 
         $this->broadcastOutputForCharacter($character);
@@ -229,7 +231,32 @@ class ExplorationLogService
             ->first();
 
         if (! is_null($activeLog)) {
-            return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
+            $automation = CharacterAutomation::where('id', $activeLog->character_automation_id)
+                ->where('character_id', $character->id)
+                ->first();
+
+            if (is_null($automation)) {
+                Log::error('Exploration log found active with no matching automation. Repairing.', [
+                    'character_id' => $character->id,
+                    'exploration_log_id' => $activeLog->id,
+                    'character_automation_id' => $activeLog->character_automation_id,
+                ]);
+
+                $activeLog->update([
+                    'ended_at' => now(),
+                    'stopped_reason' => 'missing_automation',
+                ]);
+
+                ExplorationWarning::create([
+                    'character_id' => $character->id,
+                    'user_id' => $character->user_id,
+                    'exploration_log_id' => $activeLog->id,
+                    'type' => 'missing_automation',
+                    'message' => 'Exploration ended because the automation was missing. Please report this as a bug.',
+                ]);
+            } else {
+                return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
+            }
         }
 
         $warning = ExplorationWarning::where('character_id', $character->id)

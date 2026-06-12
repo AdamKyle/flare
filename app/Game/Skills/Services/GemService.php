@@ -36,8 +36,8 @@ class GemService
             return $this->errorResult('You do not have the required currencies to craft this item.');
         }
 
-        if ($character->isInventoryFull()) {
-            return $this->errorResult('You do not have enough space in your inventory.');
+        if (! $character->canAddToGemBag(1)) {
+            return $this->errorResult('Your Gem Bag is full. Use or remove gems before crafting more.');
         }
 
         $character = $this->payForGem($character, $tier);
@@ -127,14 +127,6 @@ class GemService
     protected function giveGem(Character $character, int $tier): GemBagSlot
     {
         $gem = $this->gemBuilder->buildGem($tier);
-
-        $foundGem = $character->gemBag->gemSlots()->where('gem_id', $gem->id)->first();
-
-        if (! is_null($foundGem)) {
-            $foundGem->update(['amount' => $foundGem->amount + 1]);
-
-            return $foundGem->refresh();
-        }
 
         $gemSlot = $character->gemBag->gemSlots()->create([
             'character_id' => $character->id,
