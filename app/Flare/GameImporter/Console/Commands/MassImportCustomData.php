@@ -2,6 +2,7 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\ExplorationLog;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -35,12 +36,13 @@ class MassImportCustomData extends Command
         Artisan::call('repair:stuck-exploration-logs --apply');
         Artisan::call('move:alchemy-and-gems-to-bags --apply');
 
+        ExplorationLog::truncate();
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
         }
-
     }
 
     /**

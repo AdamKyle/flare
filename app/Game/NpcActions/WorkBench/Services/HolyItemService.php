@@ -2,6 +2,7 @@
 
 namespace App\Game\NpcActions\WorkBench\Services;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -25,7 +26,7 @@ class HolyItemService
 
         return $this->successResult([
             'items' => $this->fetchValidItems($slots)->reverse()->values(),
-            'alchemy_items' => $this->fetchAlchemyItems($slots)->values(),
+            'alchemy_items' => $this->fetchAlchemyItems($character)->values(),
         ]);
     }
 
@@ -35,13 +36,27 @@ class HolyItemService
 
         $inventory = Inventory::where('character_id', $character->id)->first();
         $itemSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
-        $alchemySlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['alchemy_item_id'])->first();
+        $alchemySlotQuery = AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag?->id)
+            ->where('character_id', $character->id)
+            ->with('item');
+
+        if (isset($params['alchemy_slot_id'])) {
+            $alchemySlotQuery->where('id', $params['alchemy_slot_id']);
+        } else {
+            $alchemySlotQuery->where('item_id', $params['alchemy_item_id'] ?? null);
+        }
+
+        $alchemySlot = $alchemySlotQuery->first();
+
+        if (is_null($itemSlot)) {
+            return $this->errorResult('No item found to apply the oil to.');
+        }
 
         if ($itemSlot->item->type === 'trinket' || $itemSlot->item->type === 'artifact') {
             return $this->errorResult('Trinkets and Artifacts cannot have holy oils applied.');
         }
 
-        if (is_null($alchemySlot)) {
+        if (is_null($alchemySlot) || ! $alchemySlot->item->can_use_on_other_items || is_null($alchemySlot->item->holy_level)) {
             return $this->errorResult(
                 'No alchemy items to apply. Craft some.'
             );
@@ -94,7 +109,7 @@ class HolyItemService
         return $stacksLeft > 0;
     }
 
-    protected function applyStack(InventorySlot $itemSlot, InventorySlot $alchemyItemSlot): InventorySlot
+    protected function applyStack(InventorySlot $itemSlot, AlchemyBagSlot $alchemyItemSlot): InventorySlot
     {
         $holyItemEffect = new ItemHolyValue($alchemyItemSlot->item->holy_level);
 
@@ -117,7 +132,7 @@ class HolyItemService
 
             $itemSlot->delete();
 
-            $alchemyItemSlot->delete();
+            $this->decrementAlchemySlot($alchemyItemSlot);
 
             return $inventory->slots()->create([
                 'inventory_id' => $inventory->id,
@@ -125,7 +140,7 @@ class HolyItemService
             ]);
         }
 
-        $alchemyItemSlot->delete();
+        $this->decrementAlchemySlot($alchemyItemSlot);
 
         $itemSlot->item->appliedHolyStacks()->create([
             'item_id' => $itemSlot->item->id,
@@ -136,11 +151,20 @@ class HolyItemService
         return $itemSlot->refresh();
     }
 
-    protected function fetchAlchemyItems(DBCollection $slots): Collection
+    protected function fetchAlchemyItems(Character $character): Collection
     {
-        return $slots->filter(function ($slot) {
-            return $slot->item->can_use_on_other_items;
-        });
+        if (is_null($character->alchemyBag)) {
+            return collect();
+        }
+
+        return $character->alchemyBag->slots()
+            ->where('character_id', $character->id)
+            ->whereHas('item', function ($query) {
+                $query->where('can_use_on_other_items', true)
+                    ->whereNotNull('holy_level');
+            })
+            ->with('item')
+            ->get();
     }
 
     protected function fetchValidItems(DBCollection $slots): Collection
@@ -155,5 +179,16 @@ class HolyItemService
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         return InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->where('inventory_slots.equipped', false)->get();
+    }
+
+    private function decrementAlchemySlot(AlchemyBagSlot $alchemySlot): void
+    {
+        if ($alchemySlot->amount <= 1) {
+            $alchemySlot->delete();
+
+            return;
+        }
+
+        $alchemySlot->update(['amount' => $alchemySlot->amount - 1]);
     }
 }

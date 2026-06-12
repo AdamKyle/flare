@@ -183,7 +183,7 @@ export default class InventoryTabSection extends React.Component<
 
         return [
             {
-                name: "Use many",
+                name: "Use Many",
                 icon_class: "ra ra-bottle-vapors",
                 on_click: () => this.manageUseManyItems(),
             },
@@ -351,6 +351,7 @@ export default class InventoryTabSection extends React.Component<
                         set_success_message={this.setSuccessMessage.bind(this)}
                         is_automation_running={this.props.is_automation_running}
                         view_port={this.props.view_port}
+                        manage_use_many={this.manageUseManyItems.bind(this)}
                     />
                 );
             case "gems":
@@ -403,7 +404,7 @@ export default class InventoryTabSection extends React.Component<
                                         this.switchTable("inventory"),
                                 },
                                 {
-                                    name: "Usable",
+                                    name: "Alchemy Bag",
                                     icon_class: "ra ra-bubbling-potion",
                                     on_click: () =>
                                         this.switchTable("usable-items"),

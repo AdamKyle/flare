@@ -30,6 +30,12 @@ class HolyItemsControllerTest extends TestCase
 
     public function testGetSmithingItems()
     {
+        $oil = $this->createItem([
+            'type' => 'alchemy',
+            'holy_level' => 5,
+            'can_use_on_other_items' => true,
+        ]);
+
         $character = $this->character->givePlayerLocation()
             ->inventoryManagement()
             ->giveItem(
@@ -37,14 +43,13 @@ class HolyItemsControllerTest extends TestCase
                     'holy_stacks' => 20,
                 ])
             )
-            ->giveItem(
-                $this->createItem([
-                    'type' => 'alchemy',
-                    'holy_level' => 5,
-                    'can_use_on_other_items' => true,
-                ])
-            )
             ->getCharacter();
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
 
         $response = $this->actingAs($character->user)
             ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench');
@@ -53,6 +58,7 @@ class HolyItemsControllerTest extends TestCase
 
         $this->assertCount(1, $jsonData['items']);
         $this->assertCount(1, $jsonData['alchemy_items']);
+        $this->assertEquals(1, $jsonData['alchemy_items'][0]['amount']);
     }
 
     public function testApplyOil()
@@ -65,13 +71,21 @@ class HolyItemsControllerTest extends TestCase
 
         $item = $item->refresh();
 
-        $character = $this->character->inventoryManagement()->giveItem(
-            $item
-        )->giveItem($this->createItem([
+        $oil = $this->createItem([
             'type' => 'alchemy',
             'holy_level' => 1,
             'can_use_on_other_items' => true,
-        ]))->getCharacter();
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem(
+            $item
+        )->getCharacter();
+
+        $alchemySlot = $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
 
         $character->update([
             'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
@@ -83,15 +97,11 @@ class HolyItemsControllerTest extends TestCase
             return $slot->item->type === 'weapon';
         })->first();
 
-        $alchemy = $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'alchemy';
-        })->first();
-
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/smithy-workbench/apply', [
                 '_token' => csrf_token(),
                 'item_id' => $slot->item->id,
-                'alchemy_item_id' => $alchemy->item->id,
+                'alchemy_slot_id' => $alchemySlot->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -104,5 +114,6 @@ class HolyItemsControllerTest extends TestCase
 
         $this->assertCount(1, $jsonData['items']);
         $this->assertCount(0, $jsonData['alchemy_items']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('id', $alchemySlot->id)->count());
     }
 }

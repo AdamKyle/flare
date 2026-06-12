@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
@@ -244,6 +245,18 @@ class CharacterInventoryController extends Controller
     public function useItem(Character $character, Item $item): JsonResponse
     {
         $result = $this->useItemService->useSingleItemFromInventory($character, $item);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function useAlchemyItem(Request $request, Character $character, AlchemyBagSlot $alchemyBagSlot): JsonResponse
+    {
+        $result = $request->boolean('use_all')
+            ? $this->useItemService->useAllAlchemyItems($character, $alchemyBagSlot)
+            : $this->useItemService->useSingleAlchemyItem($character, $alchemyBagSlot);
 
         $status = $result['status'];
         unset($result['status']);

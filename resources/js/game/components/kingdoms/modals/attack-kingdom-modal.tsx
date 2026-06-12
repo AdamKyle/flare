@@ -46,8 +46,9 @@ export default class AttackKingdomModal extends React.Component<
             selected_kingdoms: [],
             selected_units: [],
             selected_items: [],
-            total_damage: 0,
-            total_reduction: 0,
+            raw_item_damage: 0,
+            damage_after_defence: 0,
+            final_damage: 0,
             show_help_modal: false,
             help_type: "",
         };
@@ -149,11 +150,17 @@ export default class AttackKingdomModal extends React.Component<
     }
 
     useItemsOnKingdom() {
+        const selectedItems = [...this.state.selected_items];
+
         this.setState(
             {
                 loading: true,
                 success_message: "",
                 error_message: "",
+                selected_items: [],
+                raw_item_damage: 0,
+                damage_after_defence: 0,
+                final_damage: 0,
             },
             () => {
                 new Ajax()
@@ -164,7 +171,7 @@ export default class AttackKingdomModal extends React.Component<
                             this.props.character_id,
                     )
                     .setParameters({
-                        slots: this.state.selected_items,
+                        slots: selectedItems,
                     })
                     .doAjaxCall(
                         "post",
@@ -181,7 +188,9 @@ export default class AttackKingdomModal extends React.Component<
                                 const response: AxiosResponse = error.response;
 
                                 this.setState({
-                                    success_message: response.data.message,
+                                    error_message:
+                                        response.data.message ??
+                                        response.data.error,
                                 });
                             }
 
@@ -193,21 +202,26 @@ export default class AttackKingdomModal extends React.Component<
     }
 
     buildItemsSelection() {
-        return this.state.items_to_use.map((slot: KingdomDamageSlotItems) => {
-            return {
-                label: slot.item.affix_name,
-                value: slot.id.toString(),
-            };
-        });
+        return this.state.items_to_use.flatMap((slot: KingdomDamageSlotItems) =>
+            Array.from({ length: slot.amount ?? 1 }, (_, index) => ({
+                label:
+                    slot.item.affix_name +
+                    " (Amount: " +
+                    (slot.amount ?? 1) +
+                    ") #" +
+                    (index + 1),
+                value: slot.id + ":" + (index + 1),
+            })),
+        );
     }
 
     setItemsToUse(data: any) {
         const selectedItems: any = [];
-        let damage: number = 0;
+        let rawDamage: number = 0;
 
         data.forEach((selected: { label: string; value: string }) => {
             if (selected.value !== "Please select one or more items") {
-                const id = parseInt(selected.value, 10) || 0;
+                const id = parseInt(selected.value.split(":")[0], 10) || 0;
 
                 if (id !== 0) {
                     const foundItem = this.state.items_to_use.filter(
@@ -217,7 +231,7 @@ export default class AttackKingdomModal extends React.Component<
                     );
 
                     if (foundItem.length > 0) {
-                        damage += foundItem[0].item.kingdom_damage;
+                        rawDamage += foundItem[0].item.kingdom_damage;
 
                         selectedItems.push(id);
                     }
@@ -225,42 +239,42 @@ export default class AttackKingdomModal extends React.Component<
             }
         });
 
-        let reduction = 0;
-
-        if (this.props.kingdom_defence > 1) {
-            const defence = this.props.kingdom_defence - 1;
-
-            reduction = defence / 5;
-
-            if (reduction < 0.05) {
-                reduction = 0.05;
-            }
-
-            damage -= reduction;
-        }
+        const damageAfterDefence = Math.max(
+            0,
+            rawDamage - this.props.kingdom_defence,
+        );
+        const finalDamage = Math.max(
+            0,
+            damageAfterDefence -
+                damageAfterDefence * this.props.item_resistance,
+        );
 
         this.setState({
             selected_items: selectedItems,
-            total_damage: damage,
-            total_reduction: reduction,
+            raw_item_damage: rawDamage,
+            damage_after_defence: damageAfterDefence,
+            final_damage: finalDamage,
         });
     }
 
     getSelectedItems() {
-        const selectedItems = this.state.items_to_use.filter(
-            (item: KingdomDamageSlotItems) => {
-                // @ts-ignore
-                if (this.state.selected_items.includes(item.id)) {
-                    return item;
-                }
-            },
-        );
+        if (this.state.selected_items.length > 0) {
+            const selectedCounts: { [key: number]: number } = {};
 
-        if (selectedItems.length > 0) {
-            return selectedItems.map((slot: KingdomDamageSlotItems) => {
+            return this.state.selected_items.map((slotId: number) => {
+                selectedCounts[slotId] = (selectedCounts[slotId] ?? 0) + 1;
+                const slot = this.state.items_to_use.find(
+                    (item: KingdomDamageSlotItems) => item.id === slotId,
+                );
+
                 return {
-                    label: slot.item.affix_name,
-                    value: slot.id.toString(),
+                    label:
+                        slot.item.affix_name +
+                        " (Amount: " +
+                        (slot.amount ?? 1) +
+                        ") #" +
+                        selectedCounts[slotId],
+                    value: slotId + ":" + selectedCounts[slotId],
                 };
             });
         }
@@ -333,132 +347,65 @@ export default class AttackKingdomModal extends React.Component<
                                     />
                                     <div className="my-4">
                                         <dl>
-                                            <dt>Total Damage</dt>
+                                            <dt>Raw Item Damage</dt>
                                             <dd>
-                                                <div className="flex items-center mb-4">
-                                                    {(
-                                                        this.state
-                                                            .total_damage * 100
-                                                    ).toFixed(2)}
-                                                    %
-                                                    <div>
-                                                        <div className="ml-2">
-                                                            <button
-                                                                type={"button"}
-                                                                onClick={() =>
-                                                                    this.manageShowHelpDialogue(
-                                                                        "total_damage",
-                                                                    )
-                                                                }
-                                                                className="text-blue-500 dark:text-blue-300"
-                                                            >
-                                                                <i
-                                                                    className={
-                                                                        "fas fa-info-circle"
-                                                                    }
-                                                                ></i>{" "}
-                                                                Help
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                {(
+                                                    this.state.raw_item_damage *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
+                                            </dd>
+                                            <dt>Kingdom Total Defence</dt>
+                                            <dd>
+                                                {(
+                                                    this.props.kingdom_defence *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
+                                            </dd>
+                                            <dt>Damage After Defence</dt>
+                                            <dd>
+                                                {(
+                                                    this.state
+                                                        .damage_after_defence *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
+                                            </dd>
+                                            <dt>Item Resistance</dt>
+                                            <dd>
+                                                {(
+                                                    this.props.item_resistance *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
+                                            </dd>
+                                            <div className="col-span-2 my-2 border-t border-gray-300 dark:border-gray-600"></div>
+                                            <dt>Final Damage</dt>
+                                            <dd>
+                                                {(
+                                                    this.state.final_damage *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
                                             </dd>
                                             <dt>Building Damage</dt>
                                             <dd>
-                                                <div className="flex items-center mb-4">
-                                                    {(
-                                                        (this.state
-                                                            .total_damage /
-                                                            2) *
-                                                        100
-                                                    ).toFixed(2)}
-                                                    %
-                                                    <div>
-                                                        <div className="ml-2">
-                                                            <button
-                                                                type={"button"}
-                                                                onClick={() =>
-                                                                    this.manageShowHelpDialogue(
-                                                                        "building_damage",
-                                                                    )
-                                                                }
-                                                                className="text-blue-500 dark:text-blue-300"
-                                                            >
-                                                                <i
-                                                                    className={
-                                                                        "fas fa-info-circle"
-                                                                    }
-                                                                ></i>{" "}
-                                                                Help
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                {(
+                                                    (this.state.final_damage /
+                                                        2) *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
                                             </dd>
                                             <dt>Unit Damage</dt>
                                             <dd>
-                                                <div className="flex items-center mb-4">
-                                                    {(
-                                                        (this.state
-                                                            .total_damage /
-                                                            2) *
-                                                        100
-                                                    ).toFixed(2)}
-                                                    %
-                                                    <div>
-                                                        <div className="ml-2">
-                                                            <button
-                                                                type={"button"}
-                                                                onClick={() =>
-                                                                    this.manageShowHelpDialogue(
-                                                                        "unit_damage",
-                                                                    )
-                                                                }
-                                                                className="text-blue-500 dark:text-blue-300"
-                                                            >
-                                                                <i
-                                                                    className={
-                                                                        "fas fa-info-circle"
-                                                                    }
-                                                                ></i>{" "}
-                                                                Help
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </dd>
-                                            <dt className="text-red-600 dark:text-red-400">
-                                                Defending Kingdom Reduction
-                                            </dt>
-                                            <dd>
-                                                <div className="flex items-center mb-4">
-                                                    {(
-                                                        this.state
-                                                            .total_reduction *
-                                                        100
-                                                    ).toFixed(2)}{" "}
-                                                    %
-                                                    <div>
-                                                        <div className="ml-2">
-                                                            <button
-                                                                type={"button"}
-                                                                onClick={() =>
-                                                                    this.manageShowHelpDialogue(
-                                                                        "total_reduction",
-                                                                    )
-                                                                }
-                                                                className="text-blue-500 dark:text-blue-300"
-                                                            >
-                                                                <i
-                                                                    className={
-                                                                        "fas fa-info-circle"
-                                                                    }
-                                                                ></i>{" "}
-                                                                Help
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                {(
+                                                    (this.state.final_damage /
+                                                        2) *
+                                                    100
+                                                ).toFixed(2)}
+                                                %
                                             </dd>
                                         </dl>
                                     </div>

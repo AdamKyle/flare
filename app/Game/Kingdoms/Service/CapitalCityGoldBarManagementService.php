@@ -79,6 +79,10 @@ class CapitalCityGoldBarManagementService
 
     public function convertGoldBars(Character $character, Kingdom $kingdom, int $goldBars): array
     {
+        if ($goldBars < 1) {
+            return $this->errorResult('Amount to withdraw must be at least 1.');
+        }
+
         $allOtherKingdomsOnPlane = $character->kingdoms()
             ->where('id', '!=', $kingdom->id)
             ->where('game_map_id', $kingdom->game_map_id)

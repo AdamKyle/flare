@@ -4,6 +4,7 @@ export interface ItemDetailsModalProps {
     is_open: boolean;
     character_id: number;
     slot_id: number;
+    source?: string | null;
     is_automation_running: boolean;
     is_dead: boolean;
 

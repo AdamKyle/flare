@@ -3,6 +3,7 @@
 namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\ItemComparisonTransfromer;
@@ -85,6 +86,27 @@ class ComparisonService
         }
 
         return $viewData;
+    }
+
+    public function buildAlchemyBagComparisonData(Character $character, AlchemyBagSlot $slot): array
+    {
+        $item = new FractalItem($slot->item, new UsableItemTransformer);
+        $item = (new Manager)->createData($item)->toArray()['data'];
+        $item['slot_id'] = $slot->id;
+
+        return [
+            'details' => [],
+            'atonement' => [],
+            'itemToEquip' => $item,
+            'type' => 'alchemy',
+            'slotId' => $slot->id,
+            'characterId' => $character->id,
+            'bowEquipped' => false,
+            'setEquipped' => false,
+            'hammerEquipped' => false,
+            'staveEquipped' => false,
+            'setIndex' => 0,
+        ];
     }
 
     public function buildShopData(Character $character, Item $item, ?string $type = null)

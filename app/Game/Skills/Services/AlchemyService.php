@@ -211,19 +211,25 @@ class AlchemyService
 
         if (! is_null($existingSlot)) {
             $existingSlot->update(['amount' => $existingSlot->amount + 1]);
-            event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!'));
+            $alchemyBagSlot = $existingSlot->refresh();
 
-            return true;
+        } else {
+            $alchemyBagSlot = AlchemyBagSlot::create([
+                'alchemy_bag_id' => $alchemyBag->id,
+                'character_id' => $character->id,
+                'item_id' => $item->id,
+                'amount' => 1,
+            ]);
         }
 
-        AlchemyBagSlot::create([
-            'alchemy_bag_id' => $alchemyBag->id,
-            'character_id' => $character->id,
-            'item_id' => $item->id,
-            'amount' => 1,
-        ]);
-
-        event(new ServerMessageEvent($character->user, 'You manage to create: ' . $item->name . ' from gold dust!'));
+        event(new ServerMessageEvent(
+            $character->user,
+            'You manage to create: ' . $item->name . ' from gold dust!',
+            $alchemyBagSlot->id,
+            'alchemy_bag',
+            $item->id,
+            $item->name,
+        ));
 
         return true;
     }

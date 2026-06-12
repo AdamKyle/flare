@@ -26,11 +26,9 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
                 error_message: null,
             },
             () => {
-                const items = this.props.items
-                    .filter((item: UsableItemsDetails) =>
-                        this.state.selected_items.includes(item.slot_id),
-                    )
-                    .map((item: UsableItemsDetails) => item.slot_id);
+                const items = this.state.selected_items.map((value: string) =>
+                    parseInt(value.split(":")[0], 10),
+                );
 
                 new UseManyItems(items, this).useAllItems(
                     this.props.character_id,
@@ -58,16 +56,19 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
                 (item: UsableItemsDetails) =>
                     !item.damages_kingdoms && item.usable && item.can_stack,
             )
-            .map((item: UsableItemsDetails) => {
-                return {
+            .flatMap((item: UsableItemsDetails) =>
+                Array.from({ length: item.amount ?? 1 }, (_, index) => ({
                     label:
                         item.item_name +
-                        " Lasts for: " +
+                        " #" +
+                        (index + 1) +
+                        " - Lasts for: " +
                         item.lasts_for +
                         " minutes",
-                    value: item.slot_id,
-                };
-            });
+                    value: item.slot_id + ":" + (index + 1),
+                    slot_id: item.slot_id,
+                })),
+            );
     }
 
     defaultItem() {
@@ -75,20 +76,9 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
             return [];
         }
 
-        return this.props.items
-            .filter((item: UsableItemsDetails) =>
-                this.state.selected_items.includes(item.slot_id),
-            )
-            .map((item: UsableItemsDetails) => {
-                return {
-                    label:
-                        item.item_name +
-                        " Lasts for: " +
-                        item.lasts_for +
-                        " minutes",
-                    value: item.slot_id,
-                };
-            });
+        return this.buildItems().filter((item: any) =>
+            this.state.selected_items.includes(item.value),
+        );
     }
 
     render() {
@@ -96,7 +86,7 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
             <Dialogue
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
-                title={"Use many items"}
+                title={"Use Many Alchemy Bag Items"}
                 primary_button_disabled={this.state.loading}
                 secondary_actions={{
                     secondary_button_disabled: this.state.loading,
@@ -107,7 +97,7 @@ export default class InventoryUseManyItems extends React.Component<any, any> {
                 <div className="mb-5">
                     <p className="mt-4 mb-4 text-sky-700 dark:text-sky-500">
                         You may select up to 10 boons to apply to your self.
-                        Only usable items will be listed below.
+                        Only usable Alchemy Bag items will be listed below.
                     </p>
                     <p className="mb-4">
                         Boons stack on to of each other, making applying

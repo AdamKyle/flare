@@ -20,7 +20,7 @@ export default class WorkBench extends React.Component<any, any> {
             loading: true,
             applying_oil: false,
             selected_item: null,
-            selected_alchemy_item: null,
+            selected_alchemy_slot_id: null,
             selected_item_name: null,
             inventory_items: [],
             alchemy_items: [],
@@ -62,7 +62,7 @@ export default class WorkBench extends React.Component<any, any> {
                     .setRoute(url)
                     .setParameters({
                         item_id: this.state.selected_item,
-                        alchemy_item_id: this.state.selected_alchemy_item,
+                        alchemy_slot_id: this.state.selected_alchemy_slot_id,
                     })
                     .doAjaxCall(
                         "post",
@@ -72,6 +72,8 @@ export default class WorkBench extends React.Component<any, any> {
                                     applying_oil: false,
                                     inventory_items: result.data.items,
                                     alchemy_items: result.data.alchemy_items,
+                                    selected_alchemy_slot_id: null,
+                                    cost: 0,
                                 },
                                 () => {
                                     const foundItem =
@@ -148,7 +150,7 @@ export default class WorkBench extends React.Component<any, any> {
     setAlchemyItem(data: any) {
         const foundAlchemyItem = this.state.alchemy_items.filter(
             (slot: any) => {
-                return slot.item.id === data.value;
+                return slot.id === data.value;
             },
         );
 
@@ -158,7 +160,7 @@ export default class WorkBench extends React.Component<any, any> {
             },
         );
 
-        if (foundAlchemyItem.length === 0 && foundSelectedItem.length === 0) {
+        if (foundAlchemyItem.length === 0 || foundSelectedItem.length === 0) {
             return;
         }
 
@@ -169,7 +171,7 @@ export default class WorkBench extends React.Component<any, any> {
         const cost = baseCost * alchemyItem.holy_level;
 
         this.setState({
-            selected_alchemy_item: parseInt(data.value),
+            selected_alchemy_slot_id: parseInt(data.value),
             cost: cost,
         });
     }
@@ -203,22 +205,26 @@ export default class WorkBench extends React.Component<any, any> {
     buildAlchemicalItems() {
         return this.state.alchemy_items.map((slot: any) => {
             return {
-                label: slot.item.name,
-                value: slot.item.id,
+                label: slot.item.name + " (Amount: " + (slot.amount ?? 1) + ")",
+                value: slot.id,
             };
         });
     }
 
     selectedAlchemyItem() {
-        if (this.state.selected_alchemy_item !== null) {
+        if (this.state.selected_alchemy_slot_id !== null) {
             const foundItem = this.state.alchemy_items.filter((slot: any) => {
-                return slot.item.id === this.state.selected_alchemy_item;
+                return slot.id === this.state.selected_alchemy_slot_id;
             });
 
             if (foundItem.length > 0) {
                 return {
-                    label: foundItem[0].item.name,
-                    value: this.state.selected_alchemy_item,
+                    label:
+                        foundItem[0].item.name +
+                        " (Amount: " +
+                        (foundItem[0].amount ?? 1) +
+                        ")",
+                    value: this.state.selected_alchemy_slot_id,
                 };
             }
         }
@@ -234,7 +240,7 @@ export default class WorkBench extends React.Component<any, any> {
         return (
             this.state.loading ||
             this.state.selected_item === null ||
-            this.state.selected_alchemical_item === null ||
+            this.state.selected_alchemy_slot_id === null ||
             this.props.cannot_craft
         );
     }
@@ -296,7 +302,8 @@ export default class WorkBench extends React.Component<any, any> {
                                     menuPortalTarget={document.body}
                                     value={this.selectedAlchemyItem()}
                                 />
-                                {this.state.selected_alchemy_item !== null ? (
+                                {this.state.selected_alchemy_slot_id !==
+                                null ? (
                                     <div className="my-2">
                                         <dl>
                                             <dt>Gold Dust Cost:</dt>

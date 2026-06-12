@@ -50,6 +50,20 @@ export default class KingdomDetails extends React.Component<
                     );
                 },
                 (error: AxiosError) => {
+                    let errorMessage =
+                        "Unable to load this kingdom's details right now.";
+
+                    if (typeof error.response !== "undefined") {
+                        const response: AxiosResponse = error.response;
+
+                        errorMessage =
+                            response.data.message ??
+                            response.data.error ??
+                            errorMessage;
+                    }
+
+                    this.setState({ error_message: errorMessage });
+
                     console.error(error);
                 },
             );
@@ -124,6 +138,10 @@ export default class KingdomDetails extends React.Component<
     }
 
     render() {
+        if (this.state.error_message !== "") {
+            return <DangerAlert>{this.state.error_message}</DangerAlert>;
+        }
+
         if (this.state.kingdom_details === null) {
             return (
                 <div className={"h-40"}>
@@ -385,6 +403,9 @@ export default class KingdomDetails extends React.Component<
                         character_id={this.props.character_id}
                         kingdom_defence={
                             this.state.kingdom_details.defence_bonus
+                        }
+                        item_resistance={
+                            this.state.kingdom_details.item_resistance_bonus
                         }
                     />
                 ) : null}

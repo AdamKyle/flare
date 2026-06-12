@@ -71,39 +71,34 @@ class UseItemService
             $removedSomeItems = true;
         }
 
-        $alchemyBag = $character->alchemyBag;
         $uniqueIds = array_unique($itemsToUse);
-
-        $alchemySlots = $alchemyBag
-            ? $alchemyBag->slots()->whereIn('id', $uniqueIds)->get()->keyBy('id')
+        $alchemySlots = $character->alchemyBag
+            ? $character->alchemyBag->slots()->whereIn('id', $uniqueIds)->get()->keyBy('id')
             : collect();
 
-        $inventoryOnlyIds = collect($uniqueIds)->diff($alchemySlots->keys())->values()->all();
-        $inventorySlots = $character->inventory->slots()->whereIn('id', $inventoryOnlyIds)->get()->keyBy('id');
-
-        if ($alchemySlots->isEmpty() && $inventorySlots->isEmpty()) {
+        if ($alchemySlots->count() !== count($uniqueIds)) {
             return $this->errorResult('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?');
         }
 
-        $allItems = $alchemySlots->map(fn ($slot) => $slot->item)
-            ->merge($inventorySlots->map(fn ($slot) => $slot->item));
+        $requestedAmounts = array_count_values($itemsToUse);
 
-        if (! is_null($automation) && $allItems->contains(fn ($item) => ! $this->isAlchemyBoonItem($item))) {
+        foreach ($requestedAmounts as $slotId => $requestedAmount) {
+            if ($requestedAmount > $alchemySlots->get($slotId)->amount) {
+                return $this->errorResult('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?');
+            }
+        }
+
+        if (! is_null($automation) && $alchemySlots->contains(fn ($slot) => ! $this->isAlchemyBoonItem($slot->item))) {
             return $this->errorResult($this->automationItemUseMessage($automation));
         }
 
         foreach ($itemsToUse as $slotId) {
-            if ($alchemySlots->has($slotId)) {
-                $alchemySlot = AlchemyBagSlot::find($slotId);
-                if (! is_null($alchemySlot) && ! $this->useAlchemyBagItem($alchemySlot, $character)) {
-                    $removedSomeItems = true;
-                }
-            } elseif ($inventorySlots->has($slotId)) {
-                $inventorySlot = $inventorySlots->get($slotId);
-                if (! $this->useItem($inventorySlot, $character)) {
-                    $removedSomeItems = true;
-                }
+            $alchemySlot = $character->alchemyBag->slots()->find($slotId);
+
+            if (is_null($alchemySlot) || ! $this->useAlchemyBagItem($alchemySlot, $character)) {
+                $removedSomeItems = true;
             }
+
             $character = $character->refresh();
         }
 
@@ -119,11 +114,55 @@ class UseItemService
         $inventory = $this->characterInventoryService->setCharacter($character);
 
         return $this->successResult([
-            'message' => 'Used selected items.' . ($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.' : ''),
+            'message' => 'Used selected items.' . ($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.' : ''),
             'inventory' => [
                 'usable_items' => $inventory->getInventoryForType('usable_items'),
             ],
         ]);
+    }
+
+    public function useSingleAlchemyItem(Character $character, AlchemyBagSlot $slot): array
+    {
+        if (! $this->ownsAlchemyBagSlot($character, $slot)) {
+            return $this->errorResult('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?');
+        }
+
+        return $this->useSingleItemFromInventory($character, $slot->item);
+    }
+
+    public function useAllAlchemyItems(Character $character, AlchemyBagSlot $slot): array
+    {
+        if (! $this->ownsAlchemyBagSlot($character, $slot)) {
+            return $this->errorResult('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?');
+        }
+
+        if (! $this->isAlchemyBoonItem($slot->item) || ! $slot->item->can_stack || $slot->item->lasts_for <= 0) {
+            return $this->errorResult(
+                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
+            );
+        }
+
+        $currentBoonCount = $character->boons()->active()->sum('amount_used');
+        $remainingBoonUses = self::MAX_AMOUNT - $currentBoonCount;
+        $foundBoon = $character->boons()
+            ->active()
+            ->where('item_id', $slot->item_id)
+            ->where('last_for_minutes', '<=', self::MAX_TIME)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        $minutesLeft = is_null($foundBoon) || $foundBoon->complete->lessThanOrEqualTo(now())
+            ? 0
+            : (int) ceil(now()->diffInSeconds($foundBoon->complete) / 60);
+        $remainingDurationUses = (int) ceil(max(0, self::MAX_TIME - $minutesLeft) / $slot->item->lasts_for);
+        $amountToUse = min(self::MAX_AMOUNT, $remainingBoonUses, $remainingDurationUses, $slot->amount);
+
+        if ($amountToUse <= 0) {
+            return $this->errorResult(
+                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
+            );
+        }
+
+        return $this->useManyItemsFromInventory($character, array_fill(0, $amountToUse, $slot->id));
     }
 
     /**
@@ -198,7 +237,6 @@ class UseItemService
         $foundBoon = $character->boons()
             ->active()
             ->where('item_id', $slot->item_id)
-            ->where('last_for_minutes', '<=', self::MAX_TIME)
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -259,6 +297,7 @@ class UseItemService
         }
 
         $alchemyBagSlot = AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag?->id)
+            ->where('character_id', $character->id)
             ->where('item_id', $boon->item_id)
             ->first();
 
@@ -267,11 +306,18 @@ class UseItemService
         }
 
         $item = Item::find($boon->item_id);
-        $minutesLeft = $boon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($boon->complete) / 60);
-        $maxTime = $item->can_stack ? min(self::MAX_TIME, $boon->amount_used * $item->lasts_for) : $item->lasts_for;
-        $missing = $maxTime - $minutesLeft;
 
-        if ($missing <= 0) {
+        if (! $item->can_stack) {
+            return $this->errorResult(
+                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
+            );
+        }
+
+        $minutesLeft = $boon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($boon->complete) / 60);
+        $missing = self::MAX_TIME - $minutesLeft;
+        $remainingUses = self::MAX_AMOUNT - $boon->amount_used;
+
+        if ($missing <= 0 || $remainingUses <= 0) {
             return $this->errorResult(
                 'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
             );
@@ -284,7 +330,7 @@ class UseItemService
             return $this->errorResult('You do not have any more of that item.');
         }
 
-        $used = min($needed, $available);
+        $used = min($needed, $available, $remainingUses);
 
         if ($used <= 0) {
             return $this->errorResult('You do not have any more of that item.');
@@ -292,8 +338,9 @@ class UseItemService
 
         $timeAdded = min($missing, $used * $item->lasts_for);
 
-        $newAmount = $alchemyBagSlot->amount - $used;
-        if ($newAmount <= 0) {
+        $newAmount = max(0, $alchemyBagSlot->amount - $used);
+
+        if ($newAmount === 0) {
             $alchemyBagSlot->delete();
         } else {
             $alchemyBagSlot->update(['amount' => $newAmount]);
@@ -315,7 +362,6 @@ class UseItemService
         $foundBoon = $character->boons()
             ->active()
             ->where('item_id', $slot->item_id)
-            ->where('last_for_minutes', '<=', self::MAX_TIME)
             ->orderBy('created_at', 'desc')
             ->first();
 
@@ -349,7 +395,8 @@ class UseItemService
             return true;
         }
 
-        $completedAt = now()->addMinutes($slot->item->lasts_for);
+        $lastsForMinutes = min(self::MAX_TIME, $slot->item->lasts_for);
+        $completedAt = now()->addMinutes($lastsForMinutes);
 
         $boon = $character->boons()->create([
             'character_id' => $character->id,
@@ -357,7 +404,7 @@ class UseItemService
             'started' => now(),
             'complete' => $completedAt,
             'amount_used' => 1,
-            'last_for_minutes' => $slot->item->lasts_for,
+            'last_for_minutes' => $lastsForMinutes,
         ]);
 
         CharacterBoonJob::dispatch($boon->id)->delay($completedAt);
@@ -374,6 +421,14 @@ class UseItemService
         } else {
             $slot->update(['amount' => $slot->amount - 1]);
         }
+    }
+
+    private function ownsAlchemyBagSlot(Character $character, AlchemyBagSlot $slot): bool
+    {
+        return ! is_null($character->alchemyBag)
+            && $slot->alchemy_bag_id === $character->alchemyBag->id
+            && $slot->character_id === $character->id
+            && $slot->amount > 0;
     }
 
     private function activeAutomation(Character $character): ?CharacterAutomation

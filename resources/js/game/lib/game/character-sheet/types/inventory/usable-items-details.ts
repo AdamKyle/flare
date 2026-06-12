@@ -9,6 +9,8 @@ export default interface UsableItemsDetails extends DataTableBaseData {
 
     slot_id: number;
 
+    amount: number;
+
     item_id: number;
 
     type: string;

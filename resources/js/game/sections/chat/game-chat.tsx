@@ -222,6 +222,9 @@ export default class GameChat extends React.Component<
                         (Math.random() + 1).toString(36).substring(7),
                     message: event.message,
                     event_id: event.id,
+                    source: event.source,
+                    item_id: event.itemId,
+                    link_text: event.linkText,
                     time_stamp: DateTime.fromISO(
                         event.timeStamp,
                     ).toLocaleString(DateTime.DATETIME_MED),

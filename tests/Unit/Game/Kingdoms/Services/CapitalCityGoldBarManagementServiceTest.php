@@ -116,4 +116,50 @@ class CapitalCityGoldBarManagementServiceTest extends TestCase
             $result['message'],
         );
     }
+
+    public function testNegativeWithdrawIsRejectedWithoutChangingCharacterGoldOrKingdomGoldBars(): void
+    {
+        $factory = $this->characterFactory->createBaseCharacter()->givePlayerLocation()->updateCharacter(['gold' => 2000000000]);
+        $capitalCity = $factory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
+        $otherKingdom = $factory->kingdomManagement()->assignKingdom(['gold_bars' => 2])->getKingdom();
+        $character = $factory->getCharacter();
+
+        $result = resolve(CapitalCityGoldBarManagementService::class)
+            ->convertGoldBars($character, $capitalCity, -1);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame(2000000000, $character->refresh()->gold);
+        $this->assertSame(2, $otherKingdom->refresh()->gold_bars);
+    }
+
+    public function testZeroWithdrawIsRejected(): void
+    {
+        $factory = $this->characterFactory->createBaseCharacter()->givePlayerLocation();
+        $capitalCity = $factory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
+        $factory->kingdomManagement()->assignKingdom(['gold_bars' => 2])->getKingdom();
+        $character = $factory->getCharacter();
+
+        $result = resolve(CapitalCityGoldBarManagementService::class)
+            ->convertGoldBars($character, $capitalCity, 0);
+
+        $this->assertSame(422, $result['status']);
+    }
+
+    public function testPositiveWithdrawStillWorks(): void
+    {
+        Event::fake();
+
+        $factory = $this->characterFactory->createBaseCharacter()->givePlayerLocation()->updateCharacter(['gold' => 0]);
+        $capitalCity = $factory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
+        $otherKingdom = $factory->kingdomManagement()->assignKingdom(['gold_bars' => 2])->getKingdom();
+        $this->createGameBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
+        $character = $factory->getCharacter();
+
+        $result = resolve(CapitalCityGoldBarManagementService::class)
+            ->convertGoldBars($character, $capitalCity, 1);
+
+        $this->assertSame(200, $result['status']);
+        $this->assertSame(2000000000, $character->refresh()->gold);
+        $this->assertSame(1, $otherKingdom->refresh()->gold_bars);
+    }
 }

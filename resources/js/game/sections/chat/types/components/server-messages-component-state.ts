@@ -4,4 +4,6 @@ export default interface ServerMessagesComponentState {
     view_item: boolean;
 
     is_quest_item: boolean;
+
+    source: string | null;
 }

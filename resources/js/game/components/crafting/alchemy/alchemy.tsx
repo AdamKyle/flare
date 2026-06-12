@@ -10,7 +10,6 @@ import Select from "react-select";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import PrimaryButton from "../../ui/buttons/primary-button";
 import DangerButton from "../../ui/buttons/danger-button";
-import { isEqual } from "lodash";
 import { generateServerMessage } from "../../../lib/ajax/generate-server-message";
 import CraftingXp from "../base-components/skill-xp/crafting-xp";
 import InventoryCount from "../base-components/inventory-count/inventory_count";
@@ -70,9 +69,7 @@ export default class Alchemy extends React.Component<any, any> {
             return {
                 label:
                     item.name +
-                    " (Owned: " +
-                    formatNumber(item.owned_amount ?? 0) +
-                    "), Gold Dust Cost: " +
+                    ", Gold Dust Cost: " +
                     formatNumber(item.gold_dust_cost) +
                     " Shards Cost: " +
                     formatNumber(item.shards_cost),
@@ -118,8 +115,13 @@ export default class Alchemy extends React.Component<any, any> {
                     .doAjaxCall(
                         "post",
                         (result: AxiosResponse) => {
-                            const oldItems = JSON.parse(
-                                JSON.stringify(this.state.craftable_items),
+                            const unlockedItemIds = new Set(
+                                this.state.craftable_items.map(
+                                    (item: any) => item.id,
+                                ),
+                            );
+                            const hasNewItem = result.data.items.some(
+                                (item: any) => !unlockedItemIds.has(item.id),
                             );
 
                             this.setState(
@@ -131,7 +133,7 @@ export default class Alchemy extends React.Component<any, any> {
                                         result.data.inventory_count,
                                 },
                                 () => {
-                                    if (!isEqual(oldItems, result.data.items)) {
+                                    if (hasNewItem) {
                                         generateServerMessage(
                                             "new_items",
                                             "You have new Alchemy items to craft. Check the list!",

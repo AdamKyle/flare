@@ -701,6 +701,78 @@ export default class KingdomLogDetails extends React.Component<
                         </dd>
                     </dl>
 
+                    {this.props.log.status === "Bombs were dropped" &&
+                    this.props.log.additional_details?.item_damage_breakdown ? (
+                        <div className="my-4">
+                            <h3 className="mb-4">Item Damage Breakdown</h3>
+                            <dl>
+                                <dt>Raw Item Damage</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown
+                                            .raw_item_damage * 100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                                <dt>Kingdom Total Defence</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown
+                                            .kingdom_defence * 100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                                <dt>Damage After Defence</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown
+                                            .damage_after_defence * 100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                                <dt>Item Resistance</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown
+                                            .item_resistance * 100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                                <dt>Final Damage</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown
+                                            .final_damage * 100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                                <dt>Building Damage</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown
+                                            .building_damage * 100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                                <dt>Unit Damage</dt>
+                                <dd>
+                                    {(
+                                        this.props.log.additional_details
+                                            .item_damage_breakdown.unit_damage *
+                                        100
+                                    ).toFixed(2)}
+                                    %
+                                </dd>
+                            </dl>
+                        </div>
+                    ) : null}
+
                     <div
                         className={
                             "border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 " +

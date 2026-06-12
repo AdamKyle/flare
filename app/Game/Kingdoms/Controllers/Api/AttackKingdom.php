@@ -33,11 +33,13 @@ class AttackKingdom extends Controller
     {
         $kingdomsToSelect = $this->unitMovementService->getKingdomUnitTravelData($character, $kingdom);
 
-        $itemsToUse = $character->inventory->slots->filter(function ($slot) {
-            if ($slot->item->damages_kingdoms) {
-                return $slot->item;
-            }
-        });
+        $itemsToUse = $character->alchemyBag?->slots()
+            ->where('character_id', $character->id)
+            ->whereHas('item', function ($query) {
+                $query->where('damages_kingdoms', true);
+            })
+            ->with('item')
+            ->get() ?? collect();
 
         return response()->json([
             'kingdoms' => $kingdomsToSelect,

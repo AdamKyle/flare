@@ -9,12 +9,13 @@ use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class CharacterInventoryServiceTest extends TestCase
 {
-    use CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -482,33 +483,88 @@ class CharacterInventoryServiceTest extends TestCase
             'type' => 'alchemy',
         ]);
 
-        $character = $this->character->inventoryManagement()->giveItem($alchemyItem)->getCharacter();
+        $character = $this->character->getCharacter();
+        $slot = $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $alchemyItem->id,
+            'amount' => 2,
+        ]);
 
-        $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem($character->inventory->slots->where('item.type', '=', 'alchemy')->first()->id);
+        $result = $this->characterInventoryService->setCharacter($character)->destroyAlchemyItem($slot->id);
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Destroyed Alchemy Item: ' . $alchemyItem->name . '.', $result['message']);
-
-        $character = $character->refresh();
-
-        $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('id', $slot->id)->count());
     }
 
     public function testCanDeleteAllAlchemyItem()
     {
-        $alchemyItem = $this->createItem([
+        $firstAlchemyItem = $this->createItem([
+            'type' => 'alchemy',
+        ]);
+        $secondAlchemyItem = $this->createItem([
             'type' => 'alchemy',
         ]);
 
-        $character = $this->character->inventoryManagement()->giveItem($alchemyItem)->getCharacter();
+        $character = $this->character->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $firstAlchemyItem->id,
+            'amount' => 2,
+        ]);
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $secondAlchemyItem->id,
+            'amount' => 3,
+        ]);
+        $otherSlot = $otherCharacter->alchemyBag->slots()->create([
+            'character_id' => $otherCharacter->id,
+            'item_id' => $firstAlchemyItem->id,
+            'amount' => 4,
+        ]);
 
         $result = $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals('Destroyed All Alchemy Items.', $result['message']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->count());
+        $this->assertEquals(4, $otherSlot->refresh()->amount);
+    }
 
-        $character = $character->refresh();
+    public function testDestroyAllAlchemyItemsDoesNotTouchNormalOrQuestInventory(): void
+    {
+        $normalItem = $this->createItem([
+            'type' => WeaponTypes::WEAPON,
+        ]);
+        $questItem = $this->createItem([
+            'type' => 'quest',
+        ]);
+        $character = $this->character->inventoryManagement()
+            ->giveItem($normalItem)
+            ->giveItem($questItem)
+            ->getCharacter();
 
-        $this->assertEmpty($character->inventory->slots()->where('equipped', true)->get());
+        $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
+
+        $this->assertEquals(1, $character->inventory->slots()->where('item_id', $normalItem->id)->count());
+        $this->assertEquals(1, $character->inventory->slots()->where('item_id', $questItem->id)->count());
+    }
+
+    public function testDestroyAllAlchemyItemsDoesNotTouchGemBagSlots(): void
+    {
+        $gem = $this->createGem();
+        $character = $this->character->getCharacter();
+        $gemSlot = $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id' => $gem->id,
+            'amount' => 2,
+        ]);
+
+        $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
+
+        $this->assertEquals(2, $gemSlot->refresh()->amount);
     }
 }

@@ -227,6 +227,7 @@ export const buildLimitedColumns = (
         const columns = [
             {
                 name: "Name",
+                width: "160px",
                 selector: (row: { item_name: string }) => row.item_name,
                 cell: (row: any) => (
                     <ItemNameColorationButton item={row} on_click={onClick} />
@@ -236,7 +237,15 @@ export const buildLimitedColumns = (
 
         if (usableItem) {
             columns.push({
+                name: "Amount",
+                width: "75px",
+                selector: (row: any) => row.amount ?? 1,
+                cell: (row: any) => row.amount ?? 1,
+            });
+
+            columns.push({
                 name: "Can Stack",
+                width: "85px",
                 selector: (row: any) => "",
                 cell: (row: { can_stack: boolean }) => (
                     <span>{row.can_stack ? "Yes" : "No"}</span>
@@ -252,7 +261,12 @@ export const buildLimitedColumns = (
 
         if (typeof component !== "undefined") {
             columns.push({
-                name: "Actions",
+                name: usableItem ? (
+                    <span className="whitespace-nowrap">Actions</span>
+                ) : (
+                    "Actions"
+                ),
+                width: usableItem ? "150px" : undefined,
                 selector: (row: any) => "",
                 // @ts-ignore
                 cell: (row: any) => component.actions(row),
@@ -265,6 +279,7 @@ export const buildLimitedColumns = (
     const columns = [
         {
             name: "Name",
+            width: usableItem ? "160px" : undefined,
             selector: (row: { item_name: string }) => row.item_name,
             cell: (row: any) => (
                 <ItemNameColorationButton item={row} on_click={onClick} />
@@ -272,14 +287,32 @@ export const buildLimitedColumns = (
         },
         {
             name: "Description",
+            grow: usableItem ? 1 : undefined,
+            wrap: usableItem,
             selector: (row: { description: string }) => row.description,
-            cell: (row: any) => row.description,
+            cell: (row: any) => (
+                <span
+                    className={
+                        usableItem ? "whitespace-normal break-words" : ""
+                    }
+                >
+                    {row.description}
+                </span>
+            ),
         },
     ];
 
     if (usableItem) {
         columns.push({
+            name: "Amount",
+            width: "75px",
+            selector: (row: any) => row.amount ?? 1,
+            cell: (row: any) => row.amount ?? 1,
+        });
+
+        columns.push({
             name: "Can Stack",
+            width: "85px",
             selector: (row: any) => "",
             cell: (row: any) => (row.can_stack ? "Yes" : "No"),
         });
@@ -287,7 +320,12 @@ export const buildLimitedColumns = (
 
     if (typeof component !== "undefined") {
         columns.push({
-            name: "Actions",
+            name: usableItem ? (
+                <span className="whitespace-nowrap">Actions</span>
+            ) : (
+                "Actions"
+            ),
+            width: usableItem ? "150px" : undefined,
             selector: (row: any) => "",
             cell: (row: any) => component.actions(row),
         });

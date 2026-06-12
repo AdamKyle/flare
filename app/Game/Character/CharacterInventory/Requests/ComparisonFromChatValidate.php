@@ -25,6 +25,7 @@ class ComparisonFromChatValidate extends FormRequest
     {
         return [
             'id' => 'required',
+            'source' => 'nullable|string|in:alchemy_bag',
         ];
     }
 

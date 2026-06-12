@@ -19,4 +19,6 @@ export default interface UsableItemTable {
     is_automation_running: boolean;
 
     view_port: number;
+
+    manage_use_many: () => void;
 }

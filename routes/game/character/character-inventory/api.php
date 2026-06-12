@@ -23,6 +23,7 @@ Route::group(['middleware' => ['is.character.dead']], function () {
 
     Route::post('/character/{character}/inventory/use-many-items', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
     Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
+    Route::post('/character/{character}/inventory/use-alchemy-item/{alchemyBagSlot}', ['uses' => 'Api\CharacterInventoryController@useAlchemyItem']);
 
     Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);
     Route::post('/character/{character}/inventory/destroy-alchemy-item', ['uses' => 'Api\CharacterInventoryController@destroyAlchemyItem']);

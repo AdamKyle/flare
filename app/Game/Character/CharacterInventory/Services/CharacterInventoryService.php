@@ -668,9 +668,14 @@ class CharacterInventoryService
      */
     public function destroyAlchemyItem(int $slotId): array
     {
-        $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
-            return $slot->id === $slotId;
-        })->first();
+        $alchemyBag = $this->character->alchemyBag;
+        $slot = is_null($alchemyBag)
+            ? null
+            : AlchemyBagSlot::where('id', $slotId)
+                ->where('character_id', $this->character->id)
+                ->where('alchemy_bag_id', $alchemyBag->id)
+                ->with('item')
+                ->first();
 
         if (is_null($slot)) {
 
@@ -700,17 +705,18 @@ class CharacterInventoryService
      */
     public function destroyAllAlchemyItems(): array
     {
-        $slots = $this->character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'alchemy';
-        });
+        $alchemyBag = $this->character->alchemyBag;
 
-        foreach ($slots as $slot) {
-            $slot->delete();
+        if (! is_null($alchemyBag)) {
+            AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+                ->where('character_id', $this->character->id)
+                ->delete();
         }
 
         $character = $this->character->refresh();
 
         event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed All Alchemy Items.',

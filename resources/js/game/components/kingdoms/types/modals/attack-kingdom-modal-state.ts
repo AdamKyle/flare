@@ -21,9 +21,11 @@ export default interface AttackKingdomModalState {
 
     selected_items: number[] | [];
 
-    total_damage: number;
+    raw_item_damage: number;
 
-    total_reduction: number;
+    damage_after_defence: number;
+
+    final_damage: number;
 
     show_help_modal: boolean;
 

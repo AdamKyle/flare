@@ -17,6 +17,7 @@ export default class ItemComparisonAjax {
             )
             .setParameters({
                 id: component.props.slot_id,
+                source: component.props.source,
             })
             .doAjaxCall(
                 "get",

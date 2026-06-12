@@ -457,7 +457,7 @@ class UseItemServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.', $result['message']);
+        $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.', $result['message']);
 
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
@@ -498,7 +498,7 @@ class UseItemServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.', $result['message']);
+        $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.', $result['message']);
 
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
@@ -550,7 +550,7 @@ class UseItemServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your usable items section to see which ones are left.', $result['message']);
+        $this->assertEquals('Used selected items. Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.', $result['message']);
 
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
@@ -831,9 +831,9 @@ class UseItemServiceTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $item->id,
             'started' => now(),
-            'complete' => now()->addMinutes(30),
+            'complete' => now()->addMinutes(450),
             'amount_used' => 2,
-            'last_for_minutes' => 30,
+            'last_for_minutes' => 450,
         ]);
 
         $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
@@ -842,6 +842,9 @@ class UseItemServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+        $this->assertEquals('2026-01-01 20:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(480, $boon->last_for_minutes);
+        $this->assertEquals(2, $boon->amount_used);
     }
 
     public function testFillingUpBoonDeletesAlchemyBagSlotRowWhenAmountReachesZero(): void
@@ -872,9 +875,9 @@ class UseItemServiceTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $item->id,
             'started' => now(),
-            'complete' => now()->addMinutes(30),
+            'complete' => now()->addMinutes(450),
             'amount_used' => 2,
-            'last_for_minutes' => 30,
+            'last_for_minutes' => 450,
         ]);
 
         $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
@@ -883,6 +886,8 @@ class UseItemServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
+        $this->assertEquals('2026-01-01 20:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(480, $boon->last_for_minutes);
     }
 
     public function testFillingUpBoonPartiallyRefillsWhenAlchemyBagStackHasLessThanRequiredAmount(): void
@@ -927,6 +932,133 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals('2026-01-01 14:00:00', $boon->refresh()->complete->toDateTimeString());
         $this->assertEquals(120, $boon->last_for_minutes);
         $this->assertEquals(3, $boon->amount_used);
+    }
+
+    public function testFillingUpBoonCannotExceedTenTotalUses(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(60),
+            'amount_used' => 10,
+            'last_for_minutes' => 60,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+        $this->assertEquals(60, $boon->refresh()->last_for_minutes);
+    }
+
+    public function testFillingUpBoonUsesOnlyWhatFitsUnderEightHours(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 3,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(450),
+            'amount_used' => 2,
+            'last_for_minutes' => 450,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+        $this->assertEquals('2026-01-01 20:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(480, $boon->last_for_minutes);
+    }
+
+    public function testFillingUpNonStackableBoonIsRejected(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => false,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 1,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
+        $this->assertEquals('2026-01-01 12:30:00', $boon->refresh()->complete->toDateTimeString());
     }
 
     public function testAlchemyUseNoLongerRequiresInventorySlotRow(): void
@@ -983,5 +1115,173 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertEquals(0, $character->refresh()->inventory->slots()->where('item_id', $item->id)->count());
         $this->assertNotEmpty($character->refresh()->boons);
+    }
+
+    public function testUsingManyAlchemyItemsCannotConsumeMoreThanAvailable(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $result = $this->useItemService->useManyItemsFromInventory($character, [$slot->id, $slot->id, $slot->id]);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals(2, $slot->refresh()->amount);
+        $this->assertEmpty($character->refresh()->boons);
+    }
+
+    public function testUseAllConsumesMaximumTenItemsWhenDurationAllows(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 20,
+        ]);
+
+        $result = $this->useItemService->useAllAlchemyItems($character, $slot);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(10, $slot->refresh()->amount);
+        $this->assertEquals(10, $character->refresh()->boons->first()->amount_used);
+    }
+
+    public function testUseAllConsumesOnlyUpToEightHours(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 20,
+        ]);
+
+        $result = $this->useItemService->useAllAlchemyItems($character, $slot);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(12, $slot->refresh()->amount);
+        $this->assertEquals(480, $character->refresh()->boons->first()->last_for_minutes);
+    }
+
+    public function testUseAllConsumesOnlyAvailableStackAndDeletesIt(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 4,
+        ]);
+
+        $result = $this->useItemService->useAllAlchemyItems($character, $slot);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(0, AlchemyBagSlot::where('id', $slot->id)->count());
+        $this->assertEquals(4, $character->refresh()->boons->first()->amount_used);
+    }
+
+    public function testUseAllRejectsAnotherCharactersAlchemyBagSlot(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $otherCharacter->alchemyBag->id,
+            'character_id' => $otherCharacter->id,
+            'item_id' => $item->id,
+            'amount' => 5,
+        ]);
+
+        $result = $this->useItemService->useAllAlchemyItems($character, $slot);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals(5, $slot->refresh()->amount);
+        $this->assertEmpty($character->refresh()->boons);
+    }
+
+    public function testUseAllConsumesNothingWhenBoonIsAlreadyAtDurationCap(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 60,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 5,
+        ]);
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addHours(8),
+            'amount_used' => 8,
+            'last_for_minutes' => 480,
+        ]);
+
+        $result = $this->useItemService->useAllAlchemyItems($character->refresh(), $slot);
+
+        Carbon::setTestNow();
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
+        $this->assertEquals(5, $slot->refresh()->amount);
     }
 }

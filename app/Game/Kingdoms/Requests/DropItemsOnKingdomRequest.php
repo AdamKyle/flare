@@ -25,7 +25,7 @@ class DropItemsOnKingdomRequest extends FormRequest
     {
         return [
             'slots' => 'required|array',
-            'slots.*' => 'required|integer|exists:inventory_slots,id',
+            'slots.*' => 'required|integer|exists:alchemy_bag_slots,id',
         ];
     }
 

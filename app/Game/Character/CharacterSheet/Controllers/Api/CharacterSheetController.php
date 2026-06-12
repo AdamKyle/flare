@@ -288,9 +288,12 @@ class CharacterSheetController extends Controller
             $item['name'] = $boon->itemUsed->name;
 
             $boon->boon_applied = $item;
-            $boon->amount_left = $character->inventory->slots()
-                ->where('item_id', $boon->item_id)
-                ->count();
+            $boon->amount_left = is_null($character->alchemyBag)
+                ? 0
+                : $character->alchemyBag->slots()
+                    ->where('character_id', $character->id)
+                    ->where('item_id', $boon->item_id)
+                    ->sum('amount');
 
             return $boon;
         });

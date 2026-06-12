@@ -24,7 +24,7 @@ class WithdrawGoldBarsRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount_to_withdraw' => 'required|integer',
+            'amount_to_withdraw' => 'required|integer|min:1',
         ];
     }
 

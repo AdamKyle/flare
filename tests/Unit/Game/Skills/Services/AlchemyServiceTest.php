@@ -255,6 +255,8 @@ class AlchemyServiceTest extends TestCase
 
     public function testTransmuteAndSucceed()
     {
+        Event::fake();
+
         $this->instance(
             SkillCheckService::class,
             Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
@@ -280,6 +282,14 @@ class AlchemyServiceTest extends TestCase
 
         $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->value('amount'));
         $this->assertEquals(0, $character->inventory->slots()->where('item_id', $this->alchemyItem->id)->count());
+        $alchemyBagSlot = $character->alchemyBag->slots()->where('item_id', $this->alchemyItem->id)->first();
+
+        Event::assertDispatched(function (ServerMessageEvent $event) use ($alchemyBagSlot) {
+            return $event->id === $alchemyBagSlot->id
+                && $event->source === 'alchemy_bag'
+                && $event->itemId === $this->alchemyItem->id
+                && $event->linkText === $this->alchemyItem->name;
+        });
     }
 
     public function testTransmuteAndSucceedButInventoryIsFull()

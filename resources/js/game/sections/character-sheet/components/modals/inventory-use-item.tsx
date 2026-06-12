@@ -26,8 +26,8 @@ export default class InventoryUseItem extends React.Component<any, any> {
             .setRoute(
                 "character/" +
                     this.props.character_id +
-                    "/inventory/use-item/" +
-                    this.props.item.item_id,
+                    "/inventory/use-alchemy-item/" +
+                    this.props.item.slot_id,
             )
             .doAjaxCall(
                 "post",
