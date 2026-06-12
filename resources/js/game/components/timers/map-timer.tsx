@@ -1,4 +1,5 @@
-import React, { Fragment } from "react";
+import clsx from "clsx";
+import React from "react";
 import TimerProgressBar from "../ui/progress-bars/timer-progress-bar";
 import MapTimerProps from "./types/map-timer-props";
 
@@ -8,72 +9,40 @@ export default class MapTimer extends React.Component<MapTimerProps, {}> {
     }
 
     render() {
-        if (
-            this.props.automation_time_out !== 0 &&
-            this.props.time_left !== 0
-        ) {
-            return (
-                <Fragment>
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div>
-                            <TimerProgressBar
-                                time_remaining={this.props.time_left}
-                                time_out_label={"Movement Timeout"}
-                            />
-                        </div>
-                        <div>
-                            <TimerProgressBar
-                                time_remaining={this.props.automation_time_out}
-                                time_out_label={
-                                    this.props.automation_time_out_label
-                                }
-                            />
-                        </div>
-                    </div>
+        const activeTimerCount = [
+            this.props.time_left,
+            this.props.automation_time_out,
+            this.props.celestial_time_out,
+        ].filter((timeRemaining: number) => timeRemaining !== 0).length;
+
+        return (
+            <div
+                className={clsx("grid gap-2", {
+                    "grid-cols-2": activeTimerCount > 1,
+                })}
+            >
+                <div>
                     <TimerProgressBar
+                        key="movement-timer"
+                        time_remaining={this.props.time_left}
+                        time_out_label={"Movement Timeout"}
+                    />
+                </div>
+                <div>
+                    <TimerProgressBar
+                        key="automation-timer"
+                        time_remaining={this.props.automation_time_out}
+                        time_out_label={this.props.automation_time_out_label}
+                    />
+                </div>
+                <div>
+                    <TimerProgressBar
+                        key="celestial-timer"
                         time_remaining={this.props.celestial_time_out}
                         time_out_label={"Celestial Timeout"}
                     />
-                </Fragment>
-            );
-        }
-
-        if (this.props.celestial_time_out !== 0 && this.props.time_left !== 0) {
-            return (
-                <Fragment>
-                    <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div>
-                            <TimerProgressBar
-                                time_remaining={this.props.time_left}
-                                time_out_label={"Movement Timeout"}
-                            />
-                        </div>
-                        <div>
-                            <TimerProgressBar
-                                time_remaining={this.props.celestial_time_out}
-                                time_out_label={"Celestial Timeout"}
-                            />
-                        </div>
-                    </div>
-                </Fragment>
-            );
-        }
-
-        return (
-            <Fragment>
-                <TimerProgressBar
-                    time_remaining={this.props.automation_time_out}
-                    time_out_label={this.props.automation_time_out_label}
-                />
-                <TimerProgressBar
-                    time_remaining={this.props.time_left}
-                    time_out_label={"Movement"}
-                />
-                <TimerProgressBar
-                    time_remaining={this.props.celestial_time_out}
-                    time_out_label={"Celestial Timeout"}
-                />
-            </Fragment>
+                </div>
+            </div>
         );
     }
 }

@@ -58,6 +58,7 @@ export default class ActionsTimers extends React.Component<
                 >
                     <div>
                         <TimerProgressBar
+                            key="attack-timer"
                             time_remaining={this.state.attack_time_out}
                             time_out_label={"Attack Timeout"}
                             update_time_remaining={this.updateAttackTimer.bind(
@@ -67,6 +68,7 @@ export default class ActionsTimers extends React.Component<
                     </div>
                     <div>
                         <TimerProgressBar
+                            key="crafting-timer"
                             time_remaining={this.state.crafting_time_out}
                             time_out_label={"Crafting Timeout"}
                             update_time_remaining={this.updateCraftingTimer.bind(

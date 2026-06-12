@@ -3,8 +3,8 @@
 namespace App\Game\Battle\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Flare\ServerFight\Monster\BuildMonster;
@@ -79,7 +79,9 @@ class RaidBattleService
 
         $characterHealth = $character->getInformation()->buildHealth();
 
-        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
+        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)
+            ->where('raid_id', $raidBoss->raid_id)
+            ->first();
 
         $elementData = $serverMonster->getElementData();
 
@@ -222,7 +224,8 @@ class RaidBattleService
 
         $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss);
 
-        $raid = Raid::where('raid_boss_id', $monsterId)->first();
+        $raidBoss = $this->findCurrentRaidBoss($character, $monsterId);
+        $raid = is_null($raidBoss) ? null : $raidBoss->raid;
 
         $resultData['monster_current_health'] = 0;
 
@@ -266,7 +269,7 @@ class RaidBattleService
         }
 
         if ($isRaidBoss) {
-            $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
+            $raidBoss = $this->findCurrentRaidBoss($character, $monsterId);
 
             $fightData['monster'] = resolve(ServerMonster::class)->setMonster($raidBoss->raid_boss_deatils)
                 ->setHealth($raidBoss->boss_current_hp);
@@ -312,7 +315,8 @@ class RaidBattleService
 
             $this->handleRaidBossHealth($character, $monsterId, $isRaidBoss, $health);
 
-            $raid = Raid::where('raid_boss_id', $monsterId)->first();
+            $raidBoss = $this->findCurrentRaidBoss($character, $monsterId);
+            $raid = is_null($raidBoss) ? null : $raidBoss->raid;
 
             if (is_null($raid)) {
                 BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])
@@ -366,7 +370,12 @@ class RaidBattleService
             return;
         }
 
-        $raidBoss = RaidBoss::where('raid_boss_id', $monsterId)->first();
+        $raidBoss = $this->findCurrentRaidBoss($character, $monsterId);
+
+        if (is_null($raidBoss)) {
+            return;
+        }
+
         $oldHealth = $raidBoss->boss_current_hp;
 
         $currentHealth = max(empty($health) ? $this->monsterPlayerFight->getMonsterHealth() : $health['current_monster_health'], 0);
@@ -381,7 +390,9 @@ class RaidBattleService
      */
     private function updateRaidParticipation(Character $character, RaidBoss $raidBoss, int $oldHealth): void
     {
-        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
+        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)
+            ->where('raid_id', $raidBoss->raid_id)
+            ->first();
 
         $newHealth = $raidBoss->refresh()->boss_current_hp;
         $damageDealt = ($oldHealth - ($newHealth <= 0 ? 0 : $newHealth));
@@ -475,5 +486,21 @@ class RaidBattleService
     {
 
         return ! is_null($raidBoss->boss_max_hp) && ! is_null($raidBoss->boss_current_hp);
+    }
+
+    private function findCurrentRaidBoss(Character $character, int $monsterId): ?RaidBoss
+    {
+        $location = Location::where('game_map_id', $character->map->game_map_id)
+            ->where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->first();
+
+        if (is_null($location) || is_null($location->raid_id)) {
+            return null;
+        }
+
+        return RaidBoss::where('raid_id', $location->raid_id)
+            ->where('raid_boss_id', $monsterId)
+            ->first();
     }
 }

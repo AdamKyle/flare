@@ -26,6 +26,10 @@ export default class TimerProgressBar extends React.Component<
         this.initializeTimer();
     }
 
+    componentWillUnmount() {
+        clearInterval(this.interval);
+    }
+
     componentDidUpdate(
         prevProps: Readonly<TimerProgressBarProps>,
         prevState: Readonly<TimerProgressBarState>,
