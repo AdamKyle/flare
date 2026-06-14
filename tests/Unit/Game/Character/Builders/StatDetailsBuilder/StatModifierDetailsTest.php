@@ -189,6 +189,22 @@ class StatModifierDetailsTest extends TestCase
         $this->assertNotEmpty($data['masteries']);
     }
 
+    public function testBuildSpecificWeaponDamageBreakDownUsesValidWeaponTypes()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::MACE->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $data = $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown('weapon_damage', false);
+
+        $this->assertEquals(100, (int) str_replace(',', '', $data['total_damage_for_type']));
+    }
+
     public function testGetDamageForSpellDamageWhenNotVoided()
     {
         $character = $this->createCharacterForData($this->character);

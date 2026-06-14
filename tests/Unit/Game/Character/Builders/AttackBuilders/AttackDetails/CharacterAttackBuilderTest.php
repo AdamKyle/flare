@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -47,6 +48,49 @@ class CharacterAttackBuilderTest extends TestCase
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
 
         $this->assertGreaterThan(0, $attack['weapon_damage']);
+    }
+
+    public function testBuildAttackWeaponDamageIncludesGunDamage()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::GUN->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
+
+        $this->assertEquals(100, $attack['weapon_damage']);
+    }
+
+    public function testBuildAttackWeaponDamageExcludesRingSpellDamageAndSpellHealing()
+    {
+        $character = $this->character->inventoryManagement()
+            ->giveItem($this->createItem([
+                'type' => ItemType::GUN->value,
+                'base_damage' => 100,
+            ]), true, 'left-hand')
+            ->giveItem($this->createItem([
+                'type' => ItemType::RING->value,
+                'base_damage' => 1000,
+            ]), true, 'ring-one')
+            ->giveItem($this->createItem([
+                'type' => ItemType::SPELL_DAMAGE->value,
+                'base_damage' => 1000,
+            ]), true, 'spell-one')
+            ->giveItem($this->createItem([
+                'type' => ItemType::SPELL_HEALING->value,
+                'base_damage' => 1000,
+                'base_healing' => 1000,
+            ]), true, 'spell-two')
+            ->getCharacter();
+
+        $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
+
+        $this->assertLessThan(1000, $attack['weapon_damage']);
     }
 
     public function testBuildCastDamage()

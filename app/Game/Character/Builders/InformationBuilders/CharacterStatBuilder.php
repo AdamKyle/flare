@@ -340,10 +340,7 @@ class CharacterStatBuilder
     {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
-        $validWeaponTypes = array_diff(
-            array_column(ItemType::cases(), 'value'),
-            [ItemType::RING->value, ItemType::SPELL_DAMAGE->value, ItemType::SPELL_HEALING->value]
-        );
+        $validWeaponTypes = ItemType::validWeapons();
 
         $types = is_array($type) ? $type : [$type];
 
@@ -495,7 +492,7 @@ class CharacterStatBuilder
      */
     public function buildTotalAttack(): int
     {
-        $weaponDamage = $this->buildDamage('weapon') + $this->buildDamage('weapon');
+        $weaponDamage = $this->buildDamage(ItemType::validWeapons()) + $this->buildDamage(ItemType::validWeapons());
         $ringDamage = $this->buildDamage('ring') + $this->buildDamage('ring');
         $spellDamage = $this->buildDamage('spell-damage') + $this->buildDamage('spell-damage');
 

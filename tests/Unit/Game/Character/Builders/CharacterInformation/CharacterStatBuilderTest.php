@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Character\Builders\CharacterInformation;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
+use App\Flare\Transformers\CharacterStatDetailsTransformer;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
@@ -470,6 +471,273 @@ class CharacterStatBuilderTest extends TestCase
         $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::DAGGER->value);
 
         $this->assertGreaterThan(100, $damage);
+    }
+
+    public function testBuildDamageCountsStave()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::STAVE->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::STAVE->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsBow()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::BOW->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::BOW->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsDagger()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::DAGGER->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::DAGGER->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsScratchAwl()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::SCRATCH_AWL->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SCRATCH_AWL->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsMace()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::MACE->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::MACE->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsHammer()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::HAMMER->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::HAMMER->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsGun()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::GUN->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::GUN->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsFan()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::FAN->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::FAN->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsWand()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::WAND->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::WAND->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsCenser()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::CENSER->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::CENSER->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsClaw()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::CLAW->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::CLAW->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageCountsSword()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::SWORD->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::SWORD->value);
+
+        $this->assertEquals(100, $damage);
+    }
+
+    public function testBuildDamageForValidWeaponsExcludesRingSpellDamageAndSpellHealing()
+    {
+        $character = $this->character->inventoryManagement()
+            ->giveItem($this->createItem([
+                'type' => ItemType::MACE->value,
+                'base_damage' => 100,
+            ]), true, 'left-hand')
+            ->giveItem($this->createItem([
+                'type' => ItemType::RING->value,
+                'base_damage' => 1000,
+            ]), true, 'ring-one')
+            ->giveItem($this->createItem([
+                'type' => ItemType::SPELL_DAMAGE->value,
+                'base_damage' => 1000,
+            ]), true, 'spell-one')
+            ->giveItem($this->createItem([
+                'type' => ItemType::SPELL_HEALING->value,
+                'base_damage' => 1000,
+                'base_healing' => 1000,
+            ]), true, 'spell-two')
+            ->getCharacter();
+
+        $damage = $this->characterStatBuilder->setCharacter($character)->buildDamage(ItemType::validWeapons());
+
+        $this->assertLessThan(1000, $damage);
+    }
+
+    public function testBuildTotalAttackIncludesMaceDamage()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::MACE->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $totalAttack = $this->characterStatBuilder->setCharacter($character)->buildTotalAttack();
+
+        $this->assertEquals(200, $totalAttack);
+    }
+
+    public function testCharacterStatDetailsWeaponAttackIncludesMaceDamage()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::MACE->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $details = resolve(CharacterStatDetailsTransformer::class)->transform($character);
+
+        $this->assertEquals(100, $details['weapon_attack']);
+    }
+
+    public function testCharacterStatDetailsVoidedWeaponAttackIncludesMaceDamage()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::MACE->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $details = resolve(CharacterStatDetailsTransformer::class)->transform($character);
+
+        $this->assertGreaterThanOrEqual(100, $details['voided_weapon_attack']);
     }
 
     public function testWeaponDamageWithOutSkillVoided()

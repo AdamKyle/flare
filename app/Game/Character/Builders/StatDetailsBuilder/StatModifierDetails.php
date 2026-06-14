@@ -59,7 +59,7 @@ class StatModifierDetails
             case 'ac':
                 return $this->buildDefenceBreakDown($isVodied);
             case 'weapon_damage':
-                return $this->buildDamageBreakDown('weapon', $isVodied);
+                return $this->buildDamageBreakDown(ItemType::validWeapons(), $isVodied);
             case 'spell_damage':
                 return $this->buildDamageBreakDown('spell-damage', $isVodied);
             case 'ring_damage':
@@ -100,9 +100,14 @@ class StatModifierDetails
         return array_merge($details, $this->character->getInformation()->getDefenceBuilder()->buildDefenceBreakDownDetails($isVoided));
     }
 
-    public function buildDamageBreakDown(string $type, bool $isVoided): array
+    public function buildDamageBreakDown(string|array $type, bool $isVoided): array
     {
         $details = [];
+        $types = is_array($type) ? $type : [$type];
+        $isWeaponDamage = ! empty(array_intersect($types, ItemType::validWeapons()));
+        $isSpellDamage = in_array(ItemType::SPELL_DAMAGE->value, $types);
+        $isRingDamage = in_array(ItemType::RING->value, $types);
+        $isHealing = in_array(ItemType::SPELL_HEALING->value, $types);
 
         $damageStatAmount = $this->character->getInformation()->statMod($this->character->damage_stat, $isVoided);
 
@@ -112,13 +117,13 @@ class StatModifierDetails
         $details['non_equipped_percentage_of_stat_used'] = 0;
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
-        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($type, $isVoided));
+        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($types, $isVoided));
         $details['base_damage'] = 0;
 
         $equipped = $this->fetchEquipped($this->character);
 
         if (is_null($equipped)) {
-            if (in_array($type, ItemType::validWeapons())) {
+            if ($isWeaponDamage) {
                 if ($this->character->classType()->isAlcoholic()) {
                     $value = $damageStatAmount * 0.25;
 
@@ -137,7 +142,7 @@ class StatModifierDetails
                 }
             }
 
-            if ($type === ItemType::SPELL_DAMAGE->value && $this->character->classType()->isHeretic()) {
+            if ($isSpellDamage && $this->character->classType()->isHeretic()) {
                 $value = $damageStatAmount * 0.15;
 
                 $details['spell_damage_stat_amount_to_use'] = number_format(max($value, 5));
@@ -145,22 +150,22 @@ class StatModifierDetails
             }
         }
 
-        $classSpecialtyStat = match ($type) {
-            ItemType::SPELL_DAMAGE->value => 'base_spell_damage',
-            ItemType::SPELL_HEALING->value => 'base_healing',
+        $classSpecialtyStat = match (true) {
+            $isSpellDamage => 'base_spell_damage',
+            $isHealing => 'base_healing',
             default => 'base_damage',
         };
 
-        $details['class_bonus_details'] = $type === 'ring' ? null : $this->fetchClassBonusesEffecting('base_damage');
-        $details['boon_details'] = $type === 'ring' ? null : $this->fetchBoonDetails('base_damage');
-        $details['class_specialties'] = $type === 'ring' ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
-        $details['ancestral_item_skill_data'] = $type === 'ring' ? null : $this->fetchAncestralItemSkills('base_damage');
+        $details['class_bonus_details'] = $isRingDamage ? null : $this->fetchClassBonusesEffecting('base_damage');
+        $details['boon_details'] = $isRingDamage ? null : $this->fetchBoonDetails('base_damage');
+        $details['class_specialties'] = $isRingDamage ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
+        $details['ancestral_item_skill_data'] = $isRingDamage ? null : $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = match (true) {
-            in_array($type, ItemType::validWeapons()) => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
-            $type === ItemType::SPELL_DAMAGE->value => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
-            $type === ItemType::RING->value => $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown(),
-            $type === ItemType::SPELL_HEALING->value => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
+            $isWeaponDamage => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
+            $isSpellDamage => $this->character->getInformation()->getDamageBuilder()->buildSpellDamageBreakDownDetails($isVoided),
+            $isRingDamage => $this->character->getInformation()->getDamageBuilder()->buildRingDamageBreakDown(),
+            $isHealing => $this->character->getInformation()->getHealingBuilder()->getHealingBuilder($isVoided),
             default => [],
         };
 

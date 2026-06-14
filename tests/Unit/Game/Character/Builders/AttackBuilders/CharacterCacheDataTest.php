@@ -7,6 +7,7 @@ use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
@@ -173,5 +174,48 @@ class CharacterCacheDataTest extends TestCase
         $data = $this->characterCacheData->characterSheetCache($character);
 
         $this->assertNotEmpty($data);
+    }
+
+    public function testCharacterSheetCacheWeaponAttackIncludesClawDamage()
+    {
+        $item = $this->createItem([
+            'type' => ItemType::CLAW->value,
+            'base_damage' => 100,
+        ]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
+
+        $data = $this->characterCacheData->characterSheetCache($character);
+
+        $this->assertEquals(100, $data['weapon_attack']);
+    }
+
+    public function testCharacterSheetCacheWeaponAttackExcludesRingSpellDamageAndSpellHealing()
+    {
+        $character = $this->character->inventoryManagement()
+            ->giveItem($this->createItem([
+                'type' => ItemType::GUN->value,
+                'base_damage' => 100,
+            ]), true, 'left-hand')
+            ->giveItem($this->createItem([
+                'type' => ItemType::RING->value,
+                'base_damage' => 1000,
+            ]), true, 'ring-one')
+            ->giveItem($this->createItem([
+                'type' => ItemType::SPELL_DAMAGE->value,
+                'base_damage' => 1000,
+            ]), true, 'spell-one')
+            ->giveItem($this->createItem([
+                'type' => ItemType::SPELL_HEALING->value,
+                'base_damage' => 1000,
+                'base_healing' => 1000,
+            ]), true, 'spell-two')
+            ->getCharacter();
+
+        $data = $this->characterCacheData->characterSheetCache($character);
+
+        $this->assertLessThan(1000, $data['weapon_attack']);
     }
 }
