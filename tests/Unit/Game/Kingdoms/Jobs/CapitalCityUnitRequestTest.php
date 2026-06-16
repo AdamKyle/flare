@@ -211,6 +211,79 @@ class CapitalCityUnitRequestTest extends TestCase
         });
     }
 
+    public function testMassRecruitCreatesOneQueuePerKingdomAndUnitType(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $firstTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding()->getKingdom();
+        $secondTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 48,
+            'y_position' => 16,
+        ])->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $archers->id,
+            'required_level' => 1,
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [
+            [
+                'kingdom_id' => $firstTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+            [
+                'kingdom_id' => $secondTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+        ]))->handle(resolve(CapitalCityManagementService::class));
+
+        $queues = CapitalCityUnitQueue::orderBy('kingdom_id')->orderBy('id')->get();
+
+        $this->assertCount(4, $queues);
+        $this->assertEqualsCanonicalizing(
+            [$firstTargetKingdom->id, $firstTargetKingdom->id, $secondTargetKingdom->id, $secondTargetKingdom->id],
+            $queues->pluck('kingdom_id')->all()
+        );
+        $this->assertEqualsCanonicalizing(
+            [$spearmen->name, $archers->name, $spearmen->name, $archers->name],
+            $queues->map(fn (CapitalCityUnitQueue $queue) => $queue->unit_request_data[0]['name'])->all()
+        );
+        $this->assertTrue($queues->every(fn (CapitalCityUnitQueue $queue) => count($queue->unit_request_data) === 1));
+        Queue::assertPushed(CapitalCityUnitRequestMovement::class, 4);
+    }
+
     public function testUnitMovementRedispatchesContinuationOnLongRunningConnection(): void
     {
         Queue::fake();

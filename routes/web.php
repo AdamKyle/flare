@@ -11,6 +11,10 @@ Route::post('/request-submit', ['as' => 'un.ban.request.submit', 'uses' => 'Unba
 
 Route::group(['middleware' => 'update.player-activity'], function () {
     Route::get('/information/search', ['as' => 'info.search', 'uses' => 'InfoPageController@search']);
+    Route::get('/information/map-gems', ['as' => 'info.page.map-gems.list', 'uses' => 'InfoPageController@viewMapGems']);
+    Route::get('/information/location-gems', ['as' => 'info.page.location-gems.list', 'uses' => 'InfoPageController@viewLocationGems']);
+    Route::get('/information/map-gems/{gameMapGemParamters}', ['as' => 'info.page.map-gems.show', 'uses' => 'InfoPageController@viewMapGem']);
+    Route::get('/information/location-gems/{gameLocationGemParamters}', ['as' => 'info.page.location-gems.show', 'uses' => 'InfoPageController@viewLocationGem']);
     Route::get('/information/{pageName}', ['as' => 'info.page', 'uses' => 'InfoPageController@viewPage']);
     Route::get('/information/race/{race}', ['as' => 'info.page.race', 'uses' => 'InfoPageController@viewRace']);
     Route::get('/information/class/{class}', ['as' => 'info.page.class', 'uses' => 'InfoPageController@viewClass']);

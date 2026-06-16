@@ -18,10 +18,7 @@
             </div>
             <form class="mt-4" action="{{route('quests.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group mb-4">
-                    <label for="quests_import">Quests File</label>
-                    <input type="file" class="form-control" id="quests_import" aria-describedby="quests_import" name="quests_import">
-                </div>
+                <x-core.forms.file-upload label="Quests File" name="quests_import" />
                 <x-core.buttons.primary-button type="submit">Import Quests</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>

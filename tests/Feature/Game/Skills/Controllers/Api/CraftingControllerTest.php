@@ -3,7 +3,9 @@
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -204,6 +206,113 @@ class CraftingControllerTest extends TestCase
 
         $this->assertEquals('You must wait to craft again.', $jsonData['message']);
         $this->assertEquals(422, $response->status());
+    }
+
+    public function testBuccaneerForMyClassWeaponCraftingReturnsGuns(): void
+    {
+        $craftingSkill = GameSkill::where('name', 'Weapon Crafting')->first();
+
+        $buccaneerCharacter = (new CharacterFactory)
+            ->createBaseCharacter([], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ])
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+
+        $gun = $this->createItem([
+            'type' => ItemType::GUN->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        $response = $this->actingAs($buccaneerCharacter->user)
+            ->call('GET', '/api/craft-for-class/' . $buccaneerCharacter->id);
+
+        $response->assertOk();
+
+        $jsonData = json_decode($response->getContent(), true);
+        $itemIds = array_column($jsonData['items'], 'id');
+        $this->assertContains($gun->id, $itemIds);
+    }
+
+    public function testBuccaneerForMyClassWeaponCraftingDoesNotReturnShields(): void
+    {
+        $craftingSkill = GameSkill::where('name', 'Weapon Crafting')->first();
+
+        $buccaneerCharacter = (new CharacterFactory)
+            ->createBaseCharacter([], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ])
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+
+        $shield = $this->createItem([
+            'type' => ArmourType::SHIELD->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        $response = $this->actingAs($buccaneerCharacter->user)
+            ->call('GET', '/api/craft-for-class/' . $buccaneerCharacter->id);
+
+        $response->assertOk();
+
+        $jsonData = json_decode($response->getContent(), true);
+        $itemIds = array_column($jsonData['items'], 'id');
+        $this->assertNotContains($shield->id, $itemIds);
+    }
+
+    public function testBuccaneerForMyClassWeaponCraftingReturnsSuccessfulResponse(): void
+    {
+        $craftingSkill = GameSkill::where('name', 'Weapon Crafting')->first();
+
+        $buccaneerCharacter = (new CharacterFactory)
+            ->createBaseCharacter([], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ])
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+
+        $response = $this->actingAs($buccaneerCharacter->user)
+            ->call('GET', '/api/craft-for-class/' . $buccaneerCharacter->id);
+
+        $response->assertOk();
+
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('items', $jsonData);
+    }
+
+    public function testFighterForMyClassWeaponCraftingReturnsSwords(): void
+    {
+        $sword = $this->createItem([
+            'type' => ItemType::SWORD->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/craft-for-class/' . $this->character->id);
+
+        $response->assertOk();
+
+        $jsonData = json_decode($response->getContent(), true);
+        $itemIds = array_column($jsonData['items'], 'id');
+        $this->assertContains($sword->id, $itemIds);
     }
 
     public function testCraftItem()

@@ -50,17 +50,20 @@ class CapitalCityUnitManagementRequestHandler
             $queueData = $this->prepareQueueData($character, $kingdom, $data, $time);
             $unitRequests = $this->prepareUnitRequests($data['unit_requests'], $toKingdom);
 
-            $queueData['unit_request_data'] = $unitRequests;
+            collect($unitRequests)->each(function (array $unitRequest) use ($queueData, $character, $kingdom, $time) {
+                $queueData['unit_request_data'] = [$unitRequest];
 
-            $queue = CapitalCityUnitQueue::create($queueData);
+                $queue = CapitalCityUnitQueue::create($queueData);
 
-            Log::channel('capital_city_unit_recruitments')->info('Triggering events for createUnitRequests', [
-                '$queue' => $queue,
-                '$character' => $character->id,
-                '$kingdom' => $kingdom->id,
-            ]);
+                Log::channel('capital_city_unit_recruitments')->info('Triggering events for createUnitRequests', [
+                    '$queue' => $queue,
+                    '$character' => $character->id,
+                    '$kingdom' => $kingdom->id,
+                ]);
 
-            $this->triggerEvents($queue, $character, $kingdom, $time);
+                $this->triggerEvents($queue, $character, $kingdom, $time);
+            });
+
             $this->updateKingdomStatus($kingdom);
         });
 

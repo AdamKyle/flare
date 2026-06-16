@@ -510,14 +510,20 @@ const tabs = () => {
 
         // Trigger
         activeTabTrigger.classList.remove("active");
+        activeTabTrigger.setAttribute("aria-selected", "false");
+        activeTabTrigger.setAttribute("tabindex", "-1");
         trigger.classList.add("active");
+        trigger.setAttribute("aria-selected", "true");
+        trigger.setAttribute("tabindex", "0");
 
         // Tab
         // Close
         toggling = true;
 
         closeCollapse(activeTab, () => {
+            activeTab.setAttribute("aria-hidden", "true");
             openCollapse(targetedTab, () => {
+                targetedTab.setAttribute("aria-hidden", "false");
                 toggling = false;
             });
         });
@@ -745,4 +751,3 @@ const modal = () => {
 };
 
 modal();
-

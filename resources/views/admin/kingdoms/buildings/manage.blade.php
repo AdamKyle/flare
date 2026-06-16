@@ -51,6 +51,7 @@
                                 <x-core.forms.collection-select :model="$building"
                                                                 label="Passive Skill Required (Optional)"
                                                                 name="passive_skill_id"
+                                                                modelKey="passive_skill_id"
                                                                 key="name"
                                                                 value="id"
                                                                 :options="$passiveSkills"

@@ -16,10 +16,7 @@
             </div>
             <form class="mt-4" action="{{route('admin.guide-quests.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="mb-5">
-                    <label class="label block mb-2" for="guide_quests_import">Guide Quests File</label>
-                    <input id="guide_quests_import" type="file" class="form-control" name="guide_quests_import" />
-                </div>
+                <x-core.forms.file-upload label="Guide Quests File" name="guide_quests_import" />
                 <x-core.buttons.primary-button type="submit">Import Guide Quests</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>

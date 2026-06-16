@@ -71,15 +71,15 @@
                 @endif
                 <h5 class="mb-2 mt-2">Class Attack Bonus</h5>
                 <p class="mb-4">
-                    {{ $classBonus['description'] }}
+                    {{ $classBonus['description'] ?? 'No class attack bonus has been configured for this class yet.' }}
                 </p>
                 <dl className="mt-4">
                     <dt>Type:</dt>
-                    <dd>{{ $classBonus['type'] }}</dd>
+                    <dd>{{ $classBonus['type'] ?? 'N/A' }}</dd>
                     <dt>Base Chance:</dt>
-                    <dd>{{ $classBonus['base_chance'] * 100 }}%</dd>
+                    <dd>{{ isset($classBonus['base_chance']) ? $classBonus['base_chance'] * 100 : 0 }}%</dd>
                     <dt>Requirements:</dt>
-                    <dd>{{ $classBonus['requires'] }}</dd>
+                    <dd>{{ $classBonus['requires'] ?? 'N/A' }}</dd>
                 </dl>
 
                 <div class='border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3'></div>
@@ -170,6 +170,14 @@
 
                 @if ($class->type()->isApothecary())
                     @include('information.classes.partials.apothecary')
+                @endif
+
+                @if ($class->type()->isBuccaneer())
+                    @include('information.classes.partials.bucaneer')
+                @endif
+
+                @if ($class->type()->isBeastmaster())
+                    @include('information.classes.partials.beastmaster')
                 @endif
         </div>
     </x-core.cards.card-with-title>

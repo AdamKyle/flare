@@ -21,6 +21,7 @@ class ExplorationLogService
             'character_automation_id' => $automation->id,
             'monster_id' => $automation->monster_id,
             'attack_type' => $automation->attack_type,
+            'starting_level' => $character->level,
             'started_at' => now(),
             'stopped_reason' => 'running',
         ]);
@@ -291,6 +292,11 @@ class ExplorationLogService
     private function formatLogOutput(ExplorationLog $log): array
     {
         $currencies = $log->currencies_gained ?? [];
+
+        if (is_null($log->ended_at) && ! is_null($log->starting_level)) {
+            $currencies['levels_gained'] = max(0, $log->character()->value('level') - $log->starting_level);
+        }
+
         $monster = Monster::find($log->monster_id);
         $summary = $log->summary ?? [];
         $monsterSnapshot = is_array($summary['monster'] ?? null) ? $summary['monster'] : null;

@@ -25,10 +25,7 @@
             </div>
             <form class="mt-4" action="{{route('kingdoms.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group mb-4">
-                    <label class="label block mb-2" for="kingdom_import">Kingdom File</label>
-                    <input type="file" class="form-control" id="kingdom_import" aria-describedby="kingdom_import" name="kingdom_import">
-                </div>
+                <x-core.forms.file-upload label="Kingdom File" name="kingdom_import" />
                 <x-core.buttons.primary-button type="submit">Import Data</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>

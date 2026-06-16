@@ -5,8 +5,14 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\AlchemistsRavenousDream;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BeastStomp;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BloodyPuke;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BuccaneersBarrage;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BuccaneersDualGunBarrage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BookBindersFear;
+use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DevilsPiercingShot;
+use App\Flare\Values\ClassAttackValue;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleCast;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\DoubleHeal;
@@ -160,6 +166,26 @@ class SpecialAttacks extends BattleMessages
 
         if ($character->classType()->isApothecary()) {
             return $this->plagueSurge($character, $attackData);
+        }
+
+        if ($character->classType()->isBuccaneer()) {
+            $extraActionData = resolve(CharacterCacheData::class)->getCachedCharacterData($character, 'extra_action_chance');
+
+            if (isset($extraActionData['type']) && $extraActionData['type'] === ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE) {
+                return $this->buccaneersDualGunBarrage($character, $attackData);
+            }
+
+            return $this->buccaneersBarrage($character, $attackData);
+        }
+
+        if ($character->classType()->isBeastmaster()) {
+            $extraActionData = resolve(CharacterCacheData::class)->getCachedCharacterData($character, 'extra_action_chance');
+
+            if (isset($extraActionData['type']) && $extraActionData['type'] === ClassAttackValue::BEAST_STOMP) {
+                return $this->beastStomp($character, $attackData);
+            }
+
+            return $this->devilsPiercingShot($character, $attackData);
         }
 
         return null;
@@ -513,5 +539,83 @@ class SpecialAttacks extends BattleMessages
         $this->monsterHealth = $plagueSurge->getMonsterHealth();
 
         $plagueSurge->clearMessages();
+    }
+
+    /**
+     * Buccaneer's Barrage special attack.
+     *
+     * @return void
+     */
+    public function buccaneersBarrage(Character $character, array $attackData)
+    {
+        $buccaneersBarrage = resolve(BuccaneersBarrage::class);
+
+        $buccaneersBarrage->setIsRaidBoss($this->isRaidBoss);
+        $buccaneersBarrage->setCharacterHealth($this->characterHealth);
+        $buccaneersBarrage->setMonsterHealth($this->monsterHealth);
+        $buccaneersBarrage->handleAttack($character, $attackData);
+
+        $this->mergeMessages($buccaneersBarrage->getMessages());
+
+        $this->characterHealth = $buccaneersBarrage->getCharacterHealth();
+        $this->monsterHealth = $buccaneersBarrage->getMonsterHealth();
+
+        $buccaneersBarrage->clearMessages();
+    }
+
+    public function devilsPiercingShot(Character $character, array $attackData)
+    {
+        $devilsPiercingShot = resolve(DevilsPiercingShot::class);
+
+        $devilsPiercingShot->setIsRaidBoss($this->isRaidBoss);
+        $devilsPiercingShot->setCharacterHealth($this->characterHealth);
+        $devilsPiercingShot->setMonsterHealth($this->monsterHealth);
+        $devilsPiercingShot->handleAttack($character, $attackData);
+
+        $this->mergeMessages($devilsPiercingShot->getMessages());
+
+        $this->characterHealth = $devilsPiercingShot->getCharacterHealth();
+        $this->monsterHealth = $devilsPiercingShot->getMonsterHealth();
+
+        $devilsPiercingShot->clearMessages();
+    }
+
+    public function beastStomp(Character $character, array $attackData)
+    {
+        $beastStomp = resolve(BeastStomp::class);
+
+        $beastStomp->setIsRaidBoss($this->isRaidBoss);
+        $beastStomp->setCharacterHealth($this->characterHealth);
+        $beastStomp->setMonsterHealth($this->monsterHealth);
+        $beastStomp->handleAttack($character, $attackData);
+
+        $this->mergeMessages($beastStomp->getMessages());
+
+        $this->characterHealth = $beastStomp->getCharacterHealth();
+        $this->monsterHealth = $beastStomp->getMonsterHealth();
+
+        $beastStomp->clearMessages();
+    }
+
+    /**
+     * Buccaneer's Dual Gun Barrage special attack.
+     *
+     * @return void
+     */
+    public function buccaneersDualGunBarrage(Character $character, array $attackData)
+    {
+        $buccaneersDualGunBarrage = resolve(BuccaneersDualGunBarrage::class);
+
+        $buccaneersDualGunBarrage->setIsRaidBoss($this->isRaidBoss);
+        $buccaneersDualGunBarrage->setCharacterHealth($this->characterHealth);
+        $buccaneersDualGunBarrage->setMonsterHealth($this->monsterHealth);
+        $buccaneersDualGunBarrage->handleAttack($character, $attackData);
+
+        $this->mergeMessages($buccaneersDualGunBarrage->getMessages());
+
+        $this->characterHealth = $buccaneersDualGunBarrage->getCharacterHealth();
+        $this->monsterHealth = $buccaneersDualGunBarrage->getMonsterHealth();
+
+        $buccaneersDualGunBarrage->clearMessages();
     }
 }

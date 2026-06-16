@@ -811,7 +811,7 @@ class UseItemServiceTest extends TestCase
 
         $item = $this->createItem([
             'usable' => true,
-            'lasts_for' => 30,
+            'lasts_for' => 60,
             'type' => 'alchemy',
             'can_stack' => true,
         ]);
@@ -832,7 +832,7 @@ class UseItemServiceTest extends TestCase
             'item_id' => $item->id,
             'started' => now(),
             'complete' => now()->addMinutes(450),
-            'amount_used' => 2,
+            'amount_used' => 10,
             'last_for_minutes' => 450,
         ]);
 
@@ -844,7 +844,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
         $this->assertEquals('2026-01-01 20:00:00', $boon->refresh()->complete->toDateTimeString());
         $this->assertEquals(480, $boon->last_for_minutes);
-        $this->assertEquals(2, $boon->amount_used);
+        $this->assertEquals(10, $boon->amount_used);
     }
 
     public function testFillingUpBoonDeletesAlchemyBagSlotRowWhenAmountReachesZero(): void
@@ -855,7 +855,7 @@ class UseItemServiceTest extends TestCase
 
         $item = $this->createItem([
             'usable' => true,
-            'lasts_for' => 30,
+            'lasts_for' => 60,
             'type' => 'alchemy',
             'can_stack' => true,
         ]);
@@ -876,7 +876,7 @@ class UseItemServiceTest extends TestCase
             'item_id' => $item->id,
             'started' => now(),
             'complete' => now()->addMinutes(450),
-            'amount_used' => 2,
+            'amount_used' => 10,
             'last_for_minutes' => 450,
         ]);
 
@@ -934,7 +934,7 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(3, $boon->amount_used);
     }
 
-    public function testFillingUpBoonCannotExceedTenTotalUses(): void
+    public function testFillingUpBoonRestoresElapsedTimeAfterTenUses(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
 
@@ -971,9 +971,11 @@ class UseItemServiceTest extends TestCase
 
         Carbon::setTestNow();
 
-        $this->assertEquals(422, $result['status']);
-        $this->assertEquals(2, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->value('amount'));
-        $this->assertEquals(60, $boon->refresh()->last_for_minutes);
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
+        $this->assertEquals('2026-01-01 14:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(120, $boon->last_for_minutes);
+        $this->assertEquals(10, $boon->amount_used);
     }
 
     public function testFillingUpBoonUsesOnlyWhatFitsUnderEightHours(): void
@@ -1005,7 +1007,7 @@ class UseItemServiceTest extends TestCase
             'item_id' => $item->id,
             'started' => now(),
             'complete' => now()->addMinutes(450),
-            'amount_used' => 2,
+            'amount_used' => 10,
             'last_for_minutes' => 450,
         ]);
 

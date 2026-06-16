@@ -34,6 +34,8 @@ final class ItemTypeMapping
             'book binder'      => ItemType::SCRATCH_AWL->value,
             'apothecary'       => [ItemType::CENSER->value, ItemType::DAGGER->value],
             'alcoholic'        => ArmourType::SHIELD->value,
+            'buccaneer'        => [ItemType::GUN->value],
+            'beastmaster'      => [ItemType::BOW->value, ItemType::HAMMER->value],
             default            => null,
         };
     }

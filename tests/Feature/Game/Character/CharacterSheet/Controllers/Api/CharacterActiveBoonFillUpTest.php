@@ -541,10 +541,10 @@ class CharacterActiveBoonFillUpTest extends TestCase
             ->call('POST', '/api/character-sheet/'.$character->id.'/fill-up-boon/'.$boon->id);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('2026-01-01 18:00:00', $boon->refresh()->complete->toDateTimeString());
-        $this->assertEquals(360, $boon->last_for_minutes);
+        $this->assertEquals('2026-01-01 15:00:00', $boon->refresh()->complete->toDateTimeString());
+        $this->assertEquals(180, $boon->last_for_minutes);
         $this->assertEquals(3, $boon->amount_used);
-        $this->assertEquals(0, $character->alchemyBag->slots()->where('item_id', $item->id)->count());
+        $this->assertEquals(3, $character->alchemyBag->slots()->where('item_id', $item->id)->value('amount'));
     }
 
     public function testStackingFourTwoHourBoonsRefillCapsAtFourHundredEightyMinutes(): void
@@ -648,9 +648,9 @@ class CharacterActiveBoonFillUpTest extends TestCase
             'character_id' => $character->id,
             'item_id' => $item->id,
             'started' => now(),
-            'complete' => now()->addMinutes(180),
+            'complete' => now()->addMinutes(480),
             'amount_used' => 10,
-            'last_for_minutes' => 180,
+            'last_for_minutes' => 480,
         ]);
 
         $response = $this->actingAs($character->user)
@@ -665,7 +665,7 @@ class CharacterActiveBoonFillUpTest extends TestCase
         );
         $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $item->id)->value('amount'));
         $this->assertEquals(10, $boon->refresh()->amount_used);
-        $this->assertEquals('2026-01-01 15:00:00', $boon->complete->toDateTimeString());
+        $this->assertEquals('2026-01-01 20:00:00', $boon->complete->toDateTimeString());
     }
 
     private function createBoonItem(): Item

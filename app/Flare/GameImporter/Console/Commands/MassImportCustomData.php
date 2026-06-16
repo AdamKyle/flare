@@ -33,8 +33,7 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('repair:stuck-exploration-logs --apply');
-        Artisan::call('move:alchemy-and-gems-to-bags --apply');
+        Artisan::call('import:game-data "Core Imports"');
 
         ExplorationLog::truncate();
 

@@ -314,10 +314,10 @@ class UseItemService
         }
 
         $minutesLeft = $boon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($boon->complete) / 60);
-        $missing = self::MAX_TIME - $minutesLeft;
-        $remainingUses = self::MAX_AMOUNT - $boon->amount_used;
+        $maximumDuration = min(self::MAX_TIME, $boon->amount_used * $item->lasts_for);
+        $missing = $maximumDuration - $minutesLeft;
 
-        if ($missing <= 0 || $remainingUses <= 0) {
+        if ($missing <= 0) {
             return $this->errorResult(
                 'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
             );
@@ -330,7 +330,7 @@ class UseItemService
             return $this->errorResult('You do not have any more of that item.');
         }
 
-        $used = min($needed, $available, $remainingUses);
+        $used = min($needed, $available);
 
         if ($used <= 0) {
             return $this->errorResult('You do not have any more of that item.');
@@ -347,7 +347,7 @@ class UseItemService
         }
 
         $boon->update([
-            'complete' => $boon->complete->addMinutes($timeAdded),
+            'complete' => now()->addMinutes($minutesLeft + $timeAdded),
             'last_for_minutes' => $minutesLeft + $timeAdded,
         ]);
 

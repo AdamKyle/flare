@@ -5,22 +5,21 @@
 
     <input type="hidden" name="id" value="{{$modelId}}" />
 
-    <div class="tabs wizard wizard-style-2">
+    <div class="tabs wizard wizard-style-2 text-gray-900 dark:text-gray-100">
         {{$slot}}
 
-        <div class="mt-5">
-            <div class="btn-group">
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-2 sm:flex-row">
                 <button type="button" class="hover:bg-blue-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:text-white font-semibold
-      py-2 px-4 rounded-sm drop-shadow-sm mr-2" data-toggle="wizard"
+      w-full py-2 px-4 rounded-sm drop-shadow-sm sm:w-auto" data-toggle="wizard"
                         data-direction="previous">Previous</button>
                 <button type="button" class="hover:bg-blue-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-blue-600 dark:bg-blue-700 text-white dark:hover:text-white font-semibold
-      py-2 px-4 rounded-sm drop-shadow-sm mr-2" data-toggle="wizard"
+      w-full py-2 px-4 rounded-sm drop-shadow-sm sm:w-auto" data-toggle="wizard"
                         data-direction="next">Next</button>
 
             </div>
-            <button type="submit" class="float-right hover:bg-green-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-green-600 dark:bg-green-700 text-white dark:hover:text-white font-semibold
-      py-2 px-4 rounded-sm drop-shadow-sm mr-2">Save</button>
+            <button type="submit" class="hover:bg-green-700 hover:drop-shadow-md dark:text-white hover:text-gray-300 bg-green-600 dark:bg-green-700 text-white dark:hover:text-white font-semibold
+      w-full py-2 px-4 rounded-sm drop-shadow-sm sm:w-auto">Save</button>
         </div>
     </div>
 </form>
-

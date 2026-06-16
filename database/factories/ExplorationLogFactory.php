@@ -17,6 +17,7 @@ class ExplorationLogFactory extends Factory
             'character_automation_id' => 0,
             'monster_id' => 0,
             'attack_type' => 'attack',
+            'starting_level' => null,
             'started_at' => now(),
             'ended_at' => null,
             'stopped_reason' => null,

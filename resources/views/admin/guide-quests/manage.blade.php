@@ -48,7 +48,7 @@
                     </x-core.form-wizard.content>
 
                     <x-core.form-wizard.content target="tab-style-2-2">
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                             <div>
                                 <h3 class="mb-3">Required levels for completion</h3>
                                 <x-core.forms.input :model="$guideQuest" label="Required (Player) Level:"

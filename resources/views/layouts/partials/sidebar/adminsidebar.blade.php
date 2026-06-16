@@ -97,6 +97,10 @@
             <span class="ra ra-scroll-unfurled"></span>
             Maps
         </a>
+        <a href="{{route('admin.map-gems.list')}}">
+            <span class="fas fa-gem"></span>
+            Map Gems
+        </a>
         <a href="{{route('maps.upload')}}">
             <span class="fas fa-plus"></span>
             Upload New Map
@@ -106,6 +110,10 @@
         <a href="{{route('locations.list')}}">
             <span class="ra ra-compass"></span>
             Locations
+        </a>
+        <a href="{{route('admin.location-gems.list')}}">
+            <span class="fas fa-gem"></span>
+            Location Gems
         </a>
         <a href="{{route('locations.create')}}">
             <span class="fas fa-plus"></span>

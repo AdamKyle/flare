@@ -77,6 +77,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals($this->automation->id, $log->character_automation_id);
         $this->assertEquals($this->automation->monster_id, $log->monster_id);
         $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
+        $this->assertEquals($this->character->level, $log->starting_level);
         $this->assertNotNull($log->started_at);
         $this->assertNull($log->ended_at);
         $this->assertEquals(1, ExplorationLog::count());
@@ -270,6 +271,55 @@ class ExplorationLogServiceTest extends TestCase
                 && $event->output['totals']['fights'] === 4
                 && $event->output['damage']['weapon'] === 1500;
         });
+    }
+
+    public function testActiveOutputCalculatesLevelsGainedFromStartingLevel(): void
+    {
+        Event::fake();
+
+        $startingLevel = $this->character->level;
+        $this->service->start($this->character, $this->automation);
+        $this->character->update(['level' => $startingLevel + 1000]);
+
+        $output = $this->service->outputForCharacter($this->character->refresh());
+
+        $this->assertEquals(1000, $output['output']['currencies']['levels_gained']);
+        $this->assertEquals(1000, $output['output']['currencies_gained']['levels_gained']);
+    }
+
+    public function testActiveOutputIncludesLevelsGainedOutsideRewardProcessing(): void
+    {
+        Event::fake();
+
+        $startingLevel = $this->character->level;
+        $log = $this->service->start($this->character, $this->automation);
+        $log->update(['currencies_gained' => ['levels_gained' => 200]]);
+        $this->character->update(['level' => $startingLevel + 1000]);
+
+        $output = $this->service->outputForCharacter($this->character->refresh());
+
+        $this->assertEquals(1000, $output['output']['currencies']['levels_gained']);
+    }
+
+    public function testActiveOutputSupportsOldLogWithoutStartingLevel(): void
+    {
+        Event::fake();
+
+        $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $this->automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'starting_level' => null,
+            'started_at' => now(),
+            'currencies_gained' => ['levels_gained' => 12],
+        ]);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals(12, $output['output']['currencies']['levels_gained']);
     }
 
     public function testOutputExposesCurrentRoundCreaturesFromSummaryWithoutChangingCompletedFights(): void

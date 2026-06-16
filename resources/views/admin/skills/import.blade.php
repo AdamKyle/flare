@@ -9,10 +9,7 @@
         >
             <form class="mt-4" action="{{route('skills.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="mb-5">
-                    <label class="label block mb-2" for="skills_import">Items File</label>
-                    <input id="skills_import" type="file" class="form-control" name="skills_import" />
-                </div>
+                <x-core.forms.file-upload label="Items File" name="skills_import" />
                 <x-core.buttons.primary-button type="submit">Import Skills</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>

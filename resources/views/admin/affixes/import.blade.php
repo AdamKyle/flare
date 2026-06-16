@@ -15,10 +15,7 @@
             </div>
             <form class="mt-4" action="{{route('affixes.import-data')}}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="mb-5">
-                    <label class="label block mb-2" for="affixes_import">Affixes File</label>
-                    <input id="affixes_import" type="file" class="form-control" name="affixes_import" />
-                </div>
+                <x-core.forms.file-upload label="Affixes File" name="affixes_import" />
                 <x-core.buttons.primary-button type="submit">Import Affixes</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>

@@ -4,8 +4,11 @@ namespace App\Flare\Models;
 
 use App\Flare\Values\LocationType;
 use Database\Factories\LocationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Cache;
 
 class Location extends Model
@@ -63,6 +66,43 @@ class Location extends Model
         'delve_enemy_strength_increase' => 'float',
     ];
 
+    public function questItemDrops(): HasMany
+    {
+        return $this->hasMany(Item::class, 'drop_location_id', 'id')
+            ->where('type', 'quest');
+    }
+
+    public function scopeDropsQuestItems(Builder $query): Builder
+    {
+        return $query->whereHas('questItemDrops');
+    }
+
+    public function scopeEligibleForLocationGems(Builder $query): Builder
+    {
+        return $query->where(function (Builder $query) {
+            $query->whereHas('questItemDrops')
+                ->orWhereNotNull('type');
+        });
+    }
+
+    public function getNameWithMapAttribute(): string
+    {
+        return $this->name.' ('.$this->map->name.')';
+    }
+
+    public function getNameWithPlaneForLocationGemAttribute(): string
+    {
+        $planeName = $this->map?->name ?? '';
+
+        if (! is_null($this->type)) {
+            $typeName = LocationType::getNamedValues()[$this->type] ?? (string) $this->type;
+
+            return $this->name.' [Special Type: '.$typeName.'] ('.$planeName.')';
+        }
+
+        return $this->name.' ('.$planeName.')';
+    }
+
     public function questRewardItem()
     {
         return $this->hasOne(Item::class, 'id', 'quest_reward_item_id');
@@ -76,6 +116,11 @@ class Location extends Model
     public function raid()
     {
         return $this->hasOne(Raid::class, 'id', 'raid_id');
+    }
+
+    public function gemParamters(): HasOne
+    {
+        return $this->hasOne(GameLocationGemParamters::class);
     }
 
     public function requiredQuestItem()

@@ -47,6 +47,14 @@ class ClassAttackValue
 
     const PLAGUE_SURGE = 'plugue surge';
 
+    const BUCCANEERS_BARRAGE = 'buccaneers barrage';
+
+    const BUCCANEERS_DUAL_GUN_BARRAGE = 'buccaneers dual gun barrage';
+
+    const DEVILS_PIERCING_SHOT = 'devils piercing shot';
+
+    const BEAST_STOMP = 'beast stomp';
+
     private CharacterClassValue $classType;
 
     private Character $character;
@@ -162,6 +170,18 @@ class ClassAttackValue
 
         if ($this->classType->isApothecary()) {
             $this->buildPlagueSurge();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isBuccaneer()) {
+            $this->buildBuccaneersChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isBeastmaster()) {
+            $this->buildBeastmasterChance();
 
             return $this->addDisplayOnlyClassData();
         }
@@ -331,6 +351,50 @@ class ClassAttackValue
         $this->chance['amount'] = $this->getItemCollectionCountForTypes([
             ItemType::CENSER->value,
             ItemType::DAGGER->value,
+        ]);
+        $this->addClassBonusChance();
+    }
+
+    public function buildBeastmasterChance(): void
+    {
+        if ($this->hasItemTypeEquipped(ItemType::BOW->value)) {
+            $this->chance['type'] = self::DEVILS_PIERCING_SHOT;
+            $this->chance['only'] = ItemType::BOW->value;
+            $this->chance['class_name'] = 'Beastmaster';
+            $this->chance['has_item'] = true;
+            $this->chance['amount'] = $this->getItemCollection(ItemType::BOW->value)->count();
+            $this->addClassBonusChance();
+            return;
+        }
+
+        $this->chance['type'] = self::BEAST_STOMP;
+        $this->chance['only'] = ItemType::HAMMER->value;
+        $this->chance['class_name'] = 'Beastmaster';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::HAMMER->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::HAMMER->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildBuccaneersChance(): void
+    {
+        if ($this->hasMultipleOfSameType(ItemType::GUN->value, 2)) {
+            $this->chance['type'] = self::BUCCANEERS_DUAL_GUN_BARRAGE;
+            $this->chance['only'] = 'Two Guns';
+            $this->chance['class_name'] = 'Buccaneer';
+            $this->chance['has_item'] = true;
+            $this->chance['amount'] = 2;
+            $this->addClassBonusChance();
+            return;
+        }
+
+        $this->chance['type'] = self::BUCCANEERS_BARRAGE;
+        $this->chance['only'] = 'Gun and Shield';
+        $this->chance['class_name'] = 'Buccaneer';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::GUN->value)
+            && $this->hasItemTypeEquipped(ArmourType::SHIELD->value);
+        $this->chance['amount'] = $this->getItemCollectionCountForTypes([
+            ItemType::GUN->value,
+            ArmourType::SHIELD->value,
         ]);
         $this->addClassBonusChance();
     }

@@ -17,10 +17,7 @@
                     </x-core.alerts.info-alert>
                 </div>
 
-                <div class="mb-5">
-                    <label class="label block mb-2" for="raids">Raids File</label>
-                    <input id="raids" type="file" class="form-control" name="raids" />
-                </div>
+                <x-core.forms.file-upload label="Raids File" name="raids" />
                 <x-core.buttons.primary-button type="submit">Import Raids</x-core.buttons.primary-button>
             </form>
         </x-core.cards.card-with-title>

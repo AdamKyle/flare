@@ -245,6 +245,14 @@
                 <span class="fas fa-dungeon"></span>
                 Special Locations
             </a>
+            <a href="{{ route('info.page.map-gems.list') }}">
+                <span class="fas fa-gem"></span>
+                Map Gems
+            </a>
+            <a href="{{ route('info.page.location-gems.list') }}">
+                <span class="far fa-gem"></span>
+                Location Gems
+            </a>
             <hr />
             <h6 class="uppercase">Factions</h6>
             <a href="{{ route('info.page', ['pageName' => 'factions']) }}">
