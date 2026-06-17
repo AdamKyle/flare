@@ -105,7 +105,8 @@ class CapitalCityBuildingManagementRequestHandler
                 $toKingdom->id,
                 $toKingdom->name,
                 $type,
-                $this->formatQueueData($capitalCityBuildingQueue)
+                $this->formatQueueData($capitalCityBuildingQueue),
+                collect($buildingQueueData)->pluck('building_id')->map(fn ($buildingId) => (int) $buildingId)->values()->toArray()
             ));
         });
 
@@ -146,6 +147,12 @@ class CapitalCityBuildingManagementRequestHandler
                 ];
             })->toArray(),
             'total_time' => $totalTime,
+            'time_remaining' => $totalTime,
+            'timer_duration' => (int) max(0, $queue->started_at->diffInSeconds($queue->completed_at)),
+            'timer_started_at' => $queue->started_at->timestamp * 1000,
+            'started_at' => $queue->started_at->toIso8601String(),
+            'completed_at' => $queue->completed_at->toIso8601String(),
+            'completed_at_timestamp' => $queue->completed_at->timestamp * 1000,
             'phase_timer_label' => $this->phaseTimerLabel($queue->status),
             'queue_id' => $queue->id,
         ];
@@ -158,7 +165,6 @@ class CapitalCityBuildingManagementRequestHandler
             CapitalCityQueueStatus::REQUESTING,
             CapitalCityQueueStatus::BUILDING,
             CapitalCityQueueStatus::REPAIRING,
-            CapitalCityQueueStatus::PROCESSING,
         ], true);
     }
 

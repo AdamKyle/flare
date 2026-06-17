@@ -106,11 +106,61 @@ export default class CapitalCityBuildingUpgradeRepairTableEvent
                         .filter((kingdom: any) => kingdom.buildings.length > 0);
                 }
 
+                data = this.keepFadingKingdomsRendered(
+                    this.component.state.building_data,
+                    data,
+                );
+
                 this.component.setState({
                     loading: false,
                     building_data: data,
                 });
             },
         );
+    }
+
+    private keepFadingKingdomsRendered(
+        currentData: any[],
+        incomingData: any[],
+    ): any[] {
+        if (!this.component) {
+            return incomingData;
+        }
+
+        const fadingKingdomIds = this.component.state.fading_kingdom_ids;
+
+        if (fadingKingdomIds.size <= 0) {
+            return incomingData;
+        }
+
+        const incomingDataById = new Map(
+            incomingData
+                .filter(
+                    (kingdom: any) => !fadingKingdomIds.has(kingdom.kingdom_id),
+                )
+                .map((kingdom: any) => [kingdom.kingdom_id, kingdom]),
+        );
+
+        const mergedData = currentData
+            .map((kingdom: any) => {
+                if (fadingKingdomIds.has(kingdom.kingdom_id)) {
+                    return kingdom;
+                }
+
+                return incomingDataById.get(kingdom.kingdom_id) ?? null;
+            })
+            .filter((kingdom: any) => kingdom !== null);
+
+        incomingDataById.forEach((kingdom: any, kingdomId: number) => {
+            if (
+                !currentData.some(
+                    (current: any) => current.kingdom_id === kingdomId,
+                )
+            ) {
+                mergedData.push(kingdom);
+            }
+        });
+
+        return mergedData;
     }
 }

@@ -9,7 +9,12 @@ export interface KingdomWithUnitRequests {
     unit_requests: Unit[];
     status: QueueStatus;
     total_time: number;
+    time_remaining?: number;
+    timer_duration?: number;
     phase_timer_label?: string;
     timer_started_at?: number;
+    started_at?: string;
+    completed_at?: string;
+    completed_at_timestamp?: number;
     queue_ids?: number[];
 }

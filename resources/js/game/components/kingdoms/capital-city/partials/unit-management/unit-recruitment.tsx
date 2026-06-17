@@ -15,6 +15,7 @@ import CapitalCityUnitRecruitmentEventDefinition from "../../../event-listeners/
 import CapitalCityUnitRecruitmentQueueRequestEventDefinition from "../../../event-listeners/capital-city-unit-recruitment-queue-request-event-definition";
 import CapitalCityUnitRecruitmentQueueRequestEvent from "../../../event-listeners/capital-city-unit-recruitment-queue-request-event";
 import InfoAlert from "../../../../ui/alerts/simple-alerts/info-alert";
+import clsx from "clsx";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -43,6 +44,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
             global_bulk_value: "",
             unit_queue: [],
             bulk_input_values: {},
+            fading_kingdom_ids: new Set<number>(),
             items_per_page: MAX_ITEMS_PER_PAGE,
             current_page: 1,
         };
@@ -478,34 +480,49 @@ export default class UnitRecruitment extends React.Component<any, any> {
 
                 <div className="mb-4">
                     {this.getPaginatedData().map((kingdom: any) => (
-                        <KingdomCard
-                            kingdom={kingdom}
-                            manage_card_state={this.manageCardState.bind(this)}
-                            unit_queue={this.state.unit_queue}
-                            open_kingdom_ids={this.state.open_kingdom_ids}
-                            get_bulk_input_value={this.getBulkInputValue.bind(
-                                this,
-                            )}
-                            handle_bulk_manage_card_stateamount_change={this.handleBulkAmountChange.bind(
-                                this,
-                            )}
-                            is_bulk_queue_disabled={this.isBulkQueueDisabled.bind(
-                                this,
-                            )}
-                            fetch_units_to_show={this.fetchUnitsToShow.bind(
-                                this,
-                            )}
-                            get_unit_amount={this.getUnitAmount.bind(this)}
-                            handle_unit_amount_change={this.handleUnitAmountChange.bind(
-                                this,
-                            )}
-                            get_kingdom_queue_summary={this.getKingdomQueueSummary.bind(
-                                this,
-                            )}
-                            is_automation_locked={
-                                this.props.is_automation_locked
-                            }
-                        />
+                        <div
+                            key={kingdom.id}
+                            className={clsx("transition-opacity duration-300", {
+                                "opacity-0": this.state.fading_kingdom_ids.has(
+                                    kingdom.id,
+                                ),
+                                "opacity-100":
+                                    !this.state.fading_kingdom_ids.has(
+                                        kingdom.id,
+                                    ),
+                            })}
+                        >
+                            <KingdomCard
+                                kingdom={kingdom}
+                                manage_card_state={this.manageCardState.bind(
+                                    this,
+                                )}
+                                unit_queue={this.state.unit_queue}
+                                open_kingdom_ids={this.state.open_kingdom_ids}
+                                get_bulk_input_value={this.getBulkInputValue.bind(
+                                    this,
+                                )}
+                                handle_bulk_manage_card_stateamount_change={this.handleBulkAmountChange.bind(
+                                    this,
+                                )}
+                                is_bulk_queue_disabled={this.isBulkQueueDisabled.bind(
+                                    this,
+                                )}
+                                fetch_units_to_show={this.fetchUnitsToShow.bind(
+                                    this,
+                                )}
+                                get_unit_amount={this.getUnitAmount.bind(this)}
+                                handle_unit_amount_change={this.handleUnitAmountChange.bind(
+                                    this,
+                                )}
+                                get_kingdom_queue_summary={this.getKingdomQueueSummary.bind(
+                                    this,
+                                )}
+                                is_automation_locked={
+                                    this.props.is_automation_locked
+                                }
+                            />
+                        </div>
                     ))}
                 </div>
                 <Pagination

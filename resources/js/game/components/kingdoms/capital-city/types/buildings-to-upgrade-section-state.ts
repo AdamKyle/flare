@@ -10,6 +10,7 @@ export default interface BuildingsToUpgradeSectionState {
     building_data: KingdomWithBuildings[];
     filtered_building_data: KingdomWithBuildings[];
     open_kingdom_ids: Set<number>;
+    fading_kingdom_ids: Set<number>;
     sort_direction: "asc" | "desc";
     search_query: string;
     building_queue: BuildingQueue[];

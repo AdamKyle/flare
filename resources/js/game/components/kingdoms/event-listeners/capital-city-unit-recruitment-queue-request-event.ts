@@ -1,9 +1,6 @@
 import { Channel } from "laravel-echo";
 import { inject, injectable } from "tsyringe";
-import CapitalCityBuildingUpgradeRepairTableEventDefinition from "./capital-city-building-upgrade-repair-table-event-definition";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 import CoreEventListener from "../../../lib/game/event-listeners/core-event-listener";
-import CapitalCityBuildingQueueRequestEventDefinition from "./capital-city-building-queue-request-event-definition";
 import CapitalCityUnitRecruitmentQueueRequestEventDefinition from "./capital-city-unit-recruitment-queue-request-event-definition";
 import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 
@@ -63,16 +60,24 @@ export default class CapitalCityUnitRecruitmentQueueRequestEvent
 
                 if (event.type === "progress") {
                     const processedKingdomId = event.processed_kingdom_id;
-                    const itemsPerPage = this.component.state.items_per_page;
-                    const filteredUnitRecruitmentData =
-                        this.component.state.filtered_unit_recruitment_data.filter(
-                            (kingdom: any) => kingdom.id !== processedKingdomId,
-                        );
-                    const totalPages = Math.max(
-                        1,
-                        Math.ceil(
-                            filteredUnitRecruitmentData.length / itemsPerPage,
-                        ),
+                    const queuedUnitNames = this.fetchQueuedUnitNames(event);
+
+                    if (
+                        this.component.state.fading_kingdom_ids.has(
+                            processedKingdomId,
+                        )
+                    ) {
+                        this.component.setState({
+                            processing_request: false,
+                        });
+
+                        return;
+                    }
+
+                    const shouldFadeKingdom = this.kingdomShouldFade(
+                        this.component.state.unit_recruitment_data,
+                        processedKingdomId,
+                        queuedUnitNames,
                     );
                     const bulkInputValues = {
                         ...this.component.state.bulk_input_values,
@@ -80,18 +85,41 @@ export default class CapitalCityUnitRecruitmentQueueRequestEvent
 
                     delete bulkInputValues[processedKingdomId];
 
+                    if (shouldFadeKingdom) {
+                        this.fadeAndRemoveKingdom(
+                            processedKingdomId,
+                            queuedUnitNames,
+                            bulkInputValues,
+                        );
+
+                        return;
+                    }
+
+                    const unitRecruitmentData =
+                        this.removeQueuedUnitsFromKingdoms(
+                            this.component.state.unit_recruitment_data,
+                            processedKingdomId,
+                            queuedUnitNames,
+                        );
+                    const filteredUnitRecruitmentData =
+                        this.removeQueuedUnitsFromKingdoms(
+                            this.component.state.filtered_unit_recruitment_data,
+                            processedKingdomId,
+                            queuedUnitNames,
+                        );
+                    const totalPages = this.calculateTotalPages(
+                        filteredUnitRecruitmentData.length,
+                    );
+
                     this.component.setState({
                         processing_request: false,
-                        unit_recruitment_data:
-                            this.component.state.unit_recruitment_data.filter(
-                                (kingdom: any) =>
-                                    kingdom.id !== processedKingdomId,
-                            ),
+                        unit_recruitment_data: unitRecruitmentData,
                         filtered_unit_recruitment_data:
                             filteredUnitRecruitmentData,
-                        unit_queue: this.component.state.unit_queue.filter(
-                            (kingdom: any) =>
-                                kingdom.kingdom_id !== processedKingdomId,
+                        unit_queue: this.removeQueuedUnitsFromUnitQueue(
+                            this.component.state.unit_queue,
+                            processedKingdomId,
+                            queuedUnitNames,
                         ),
                         bulk_input_values: bulkInputValues,
                         current_page: Math.min(
@@ -128,5 +156,164 @@ export default class CapitalCityUnitRecruitmentQueueRequestEvent
                 this.component.setState(nextState);
             },
         );
+    }
+
+    private fetchQueuedUnitNames(event: any): string[] {
+        if (Array.isArray(event.queued_unit_names)) {
+            return event.queued_unit_names;
+        }
+
+        if (Array.isArray(event.queue_data?.unit_requests)) {
+            return event.queue_data.unit_requests.map(
+                (unitRequest: any) => unitRequest.unit_name,
+            );
+        }
+
+        return [];
+    }
+
+    private kingdomShouldFade(
+        kingdoms: any[],
+        processedKingdomId: number,
+        queuedUnitNames: string[],
+    ): boolean {
+        const kingdom = kingdoms.find(
+            (kingdom: any) => kingdom.id === processedKingdomId,
+        );
+
+        if (!kingdom) {
+            return false;
+        }
+
+        return (
+            kingdom.available_unit_types.filter(
+                (unitName: string) => !queuedUnitNames.includes(unitName),
+            ).length <= 0
+        );
+    }
+
+    private fadeAndRemoveKingdom(
+        processedKingdomId: number,
+        queuedUnitNames: string[],
+        bulkInputValues: any,
+    ): void {
+        if (!this.component) {
+            return;
+        }
+
+        const fadingKingdomIds = new Set(
+            this.component.state.fading_kingdom_ids,
+        );
+
+        fadingKingdomIds.add(processedKingdomId);
+
+        this.component.setState({
+            processing_request: false,
+            unit_queue: this.removeQueuedUnitsFromUnitQueue(
+                this.component.state.unit_queue,
+                processedKingdomId,
+                queuedUnitNames,
+            ),
+            bulk_input_values: bulkInputValues,
+            fading_kingdom_ids: fadingKingdomIds,
+        });
+
+        window.setTimeout(() => {
+            if (!this.component) {
+                return;
+            }
+
+            const unitRecruitmentData =
+                this.component.state.unit_recruitment_data.filter(
+                    (kingdom: any) => kingdom.id !== processedKingdomId,
+                );
+            const filteredUnitRecruitmentData =
+                this.component.state.filtered_unit_recruitment_data.filter(
+                    (kingdom: any) => kingdom.id !== processedKingdomId,
+                );
+            const nextFadingKingdomIds = new Set(
+                this.component.state.fading_kingdom_ids,
+            );
+
+            nextFadingKingdomIds.delete(processedKingdomId);
+
+            this.component.setState({
+                unit_recruitment_data: unitRecruitmentData,
+                filtered_unit_recruitment_data: filteredUnitRecruitmentData,
+                fading_kingdom_ids: nextFadingKingdomIds,
+                current_page: Math.min(
+                    this.component.state.current_page,
+                    this.calculateTotalPages(
+                        filteredUnitRecruitmentData.length,
+                    ),
+                ),
+            });
+        }, 300);
+    }
+
+    private calculateTotalPages(totalItems: number): number {
+        if (!this.component) {
+            return 1;
+        }
+
+        return Math.max(
+            1,
+            Math.ceil(totalItems / this.component.state.items_per_page),
+        );
+    }
+
+    private removeQueuedUnitsFromKingdoms(
+        kingdoms: any[],
+        processedKingdomId: number,
+        queuedUnitNames: string[],
+    ): any[] {
+        return kingdoms
+            .map((kingdom: any) => {
+                if (kingdom.id !== processedKingdomId) {
+                    return kingdom;
+                }
+
+                const availableUnitTypes = kingdom.available_unit_types.filter(
+                    (unitName: string) => !queuedUnitNames.includes(unitName),
+                );
+
+                if (availableUnitTypes.length <= 0) {
+                    return null;
+                }
+
+                return {
+                    ...kingdom,
+                    available_unit_types: availableUnitTypes,
+                };
+            })
+            .filter((kingdom: any) => kingdom !== null);
+    }
+
+    private removeQueuedUnitsFromUnitQueue(
+        unitQueue: any[],
+        processedKingdomId: number,
+        queuedUnitNames: string[],
+    ): any[] {
+        return unitQueue
+            .map((kingdomQueue: any) => {
+                if (kingdomQueue.kingdom_id !== processedKingdomId) {
+                    return kingdomQueue;
+                }
+
+                const unitRequests = kingdomQueue.unit_requests.filter(
+                    (unitRequest: any) =>
+                        !queuedUnitNames.includes(unitRequest.unit_name),
+                );
+
+                if (unitRequests.length <= 0) {
+                    return null;
+                }
+
+                return {
+                    ...kingdomQueue,
+                    unit_requests: unitRequests,
+                };
+            })
+            .filter((kingdomQueue: any) => kingdomQueue !== null);
     }
 }

@@ -23,16 +23,9 @@ export default class FetchUnitQueuesAjax {
             .doAjaxCall(
                 "get",
                 (result: AxiosResponse) => {
-                    const timerStartedAt = Date.now();
-
                     component.setState({
                         loading: false,
-                        unit_queues: result.data.unit_queues.map(
-                            (queue: any) => ({
-                                ...queue,
-                                timer_started_at: timerStartedAt,
-                            }),
-                        ),
+                        unit_queues: result.data.unit_queues,
                     });
                 },
                 (error: AxiosError) => {

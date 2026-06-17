@@ -37,7 +37,10 @@ export default class TimerProgressBar extends React.Component<
     ) {
         if (
             prevProps.time_remaining != this.props.time_remaining ||
-            prevProps.timer_started_at != this.props.timer_started_at
+            prevProps.timer_started_at != this.props.timer_started_at ||
+            prevProps.completed_at_timestamp !=
+                this.props.completed_at_timestamp ||
+            prevProps.timer_duration != this.props.timer_duration
         ) {
             clearInterval(this.interval);
 
@@ -55,18 +58,22 @@ export default class TimerProgressBar extends React.Component<
 
     initializeTimer() {
         const timeRemaining = this.getEffectiveTimeRemaining();
+        const duration = this.props.timer_duration ?? this.props.time_remaining;
 
         this.setState(
             {
                 time_left: timeRemaining,
-                percentage_left: timeRemaining > 0 ? 1.0 : 0.0,
+                percentage_left:
+                    timeRemaining > 0 && duration > 0
+                        ? timeRemaining / duration
+                        : 0.0,
                 time_left_label: this.getTimeLabel(timeRemaining),
                 initial_time: timeRemaining,
             },
             () => {
                 if (timeRemaining > 0 && this.state.time_left > 0) {
                     this.interval = setInterval(() => {
-                        let newTime = this.state.time_left - 1;
+                        let newTime = this.getEffectiveTimeRemaining();
 
                         if (newTime <= 0) {
                             this.setState({
@@ -84,10 +91,14 @@ export default class TimerProgressBar extends React.Component<
 
                             clearInterval(this.interval);
                         } else {
+                            const duration =
+                                this.props.timer_duration ??
+                                this.props.time_remaining;
+
                             this.setState({
                                 time_left: newTime,
                                 percentage_left:
-                                    newTime / this.props.time_remaining,
+                                    duration > 0 ? newTime / duration : 0,
                                 time_left_label: this.getTimeLabel(newTime),
                             });
                         }
@@ -100,6 +111,15 @@ export default class TimerProgressBar extends React.Component<
     }
 
     getEffectiveTimeRemaining(): number {
+        if (typeof this.props.completed_at_timestamp !== "undefined") {
+            return Math.max(
+                0,
+                Math.ceil(
+                    (this.props.completed_at_timestamp - Date.now()) / 1000,
+                ),
+            );
+        }
+
         if (typeof this.props.timer_started_at === "undefined") {
             return this.props.time_remaining;
         }
@@ -129,7 +149,7 @@ export default class TimerProgressBar extends React.Component<
     render() {
         if (
             (this.state.percentage_left <= 0 && this.state.time_left <= 0) ||
-            this.props.time_remaining === 0
+            this.getEffectiveTimeRemaining() <= 0
         ) {
             return null;
         }

@@ -5,8 +5,6 @@ namespace App\Game\Kingdoms\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Game\Automation\Services\AutomationRestrictionService;
-use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
-use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Requests\CapitalCityCancelBuildingRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
@@ -97,9 +95,17 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
+        $result = $this->capitalCityManagementService->sendoffBuildingRequests(
+            $character,
+            $kingdom,
+            $buildingUpgradeRequestsRequest->request_data,
+            $buildingUpgradeRequestsRequest->request_type
+        );
 
-        return response()->json([]);
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function fetchKingdomBuildingManagementQueues(Character $character, Kingdom $kingdom)
@@ -134,9 +140,16 @@ class CapitalCityManagementController extends Controller
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
+        $result = $this->capitalCityManagementService->sendOffUnitRecruitmentOrders(
+            $character,
+            $kingdom,
+            $recruitUnitRequestsRequest->request_data
+        );
 
-        return response()->json([]);
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom)

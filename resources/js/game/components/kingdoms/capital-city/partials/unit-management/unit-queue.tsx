@@ -307,6 +307,7 @@ export default class UnitQueue extends React.Component<
                                                     "text-blue-700 dark:text-500":
                                                         [
                                                             QueueStatus.REQUESTING,
+                                                            QueueStatus.PROCESSING,
                                                         ].includes(
                                                             kingdom.status,
                                                         ),
@@ -320,14 +321,22 @@ export default class UnitQueue extends React.Component<
                                         className={`fas fa-chevron-${this.state.open_kingdom_ids.has(kingdom.kingdom_id) ? "down" : "up"} text-gray-500 dark:text-gray-400`}
                                     />
                                 </div>
-                                <TimerProgressBar
-                                    time_remaining={kingdom.total_time}
-                                    timer_started_at={kingdom.timer_started_at}
-                                    time_out_label={
-                                        kingdom.phase_timer_label ??
-                                        "Processing"
-                                    }
-                                />
+                                {kingdom.status !== QueueStatus.PROCESSING ? (
+                                    <TimerProgressBar
+                                        time_remaining={kingdom.total_time}
+                                        timer_started_at={
+                                            kingdom.timer_started_at
+                                        }
+                                        completed_at_timestamp={
+                                            kingdom.completed_at_timestamp
+                                        }
+                                        timer_duration={kingdom.timer_duration}
+                                        time_out_label={
+                                            kingdom.phase_timer_label ??
+                                            "Processing"
+                                        }
+                                    />
+                                ) : null}
                             </div>
 
                             {this.state.open_kingdom_ids.has(

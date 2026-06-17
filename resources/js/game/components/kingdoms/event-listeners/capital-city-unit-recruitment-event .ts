@@ -58,12 +58,54 @@ export default class CapitalCityUnitRecruitmentEvent
                     return;
                 }
 
-                let data = event.kingdomUnitRecruitment;
+                let data = this.keepFadingKingdomsRendered(
+                    this.component.state.unit_recruitment_data,
+                    event.kingdomUnitRecruitment,
+                );
 
                 this.component.setState({
                     unit_recruitment_data: data,
                 });
             },
         );
+    }
+
+    private keepFadingKingdomsRendered(
+        currentData: any[],
+        incomingData: any[],
+    ): any[] {
+        if (!this.component) {
+            return incomingData;
+        }
+
+        const fadingKingdomIds = this.component.state.fading_kingdom_ids;
+
+        if (fadingKingdomIds.size <= 0) {
+            return incomingData;
+        }
+
+        const incomingDataById = new Map(
+            incomingData
+                .filter((kingdom: any) => !fadingKingdomIds.has(kingdom.id))
+                .map((kingdom: any) => [kingdom.id, kingdom]),
+        );
+
+        const mergedData = currentData
+            .map((kingdom: any) => {
+                if (fadingKingdomIds.has(kingdom.id)) {
+                    return kingdom;
+                }
+
+                return incomingDataById.get(kingdom.id) ?? null;
+            })
+            .filter((kingdom: any) => kingdom !== null);
+
+        incomingDataById.forEach((kingdom: any, kingdomId: number) => {
+            if (!currentData.some((current: any) => current.id === kingdomId)) {
+                mergedData.push(kingdom);
+            }
+        });
+
+        return mergedData;
     }
 }

@@ -388,15 +388,24 @@ export default class BuildingsInQueue extends React.Component<
                                         } text-gray-500 dark:text-gray-400`}
                                     />
                                 </div>
-                                <TimerProgressBar
-                                    time_remaining={queueGroup.total_time}
-                                    timer_started_at={
-                                        queueGroup.timer_started_at
-                                    }
-                                    time_out_label={
-                                        queueGroup.phase_timer_label
-                                    }
-                                />
+                                {queueGroup.status !==
+                                QueueStatus.PROCESSING ? (
+                                    <TimerProgressBar
+                                        time_remaining={queueGroup.total_time}
+                                        timer_started_at={
+                                            queueGroup.timer_started_at
+                                        }
+                                        completed_at_timestamp={
+                                            queueGroup.completed_at_timestamp
+                                        }
+                                        timer_duration={
+                                            queueGroup.timer_duration
+                                        }
+                                        time_out_label={
+                                            queueGroup.phase_timer_label
+                                        }
+                                    />
+                                ) : null}
                             </div>
                             {this.state.open_kingdom_ids.has(
                                 queueGroup.kingdom_id,

@@ -28,10 +28,12 @@ class UpdateCapitalCityUnitQueueRequest implements ShouldBroadcastNow
 
     public ?array $queueData;
 
+    public array $queuedUnitNames;
+
     /**
      * Create a new event instance.
      */
-    public function __construct(int $userId, bool $isLoading, string $message, string $type, ?int $processedKingdomId = null, ?string $processedKingdomName = null, ?array $queueData = null)
+    public function __construct(int $userId, bool $isLoading, string $message, string $type, ?int $processedKingdomId = null, ?string $processedKingdomName = null, ?array $queueData = null, array $queuedUnitNames = [])
     {
 
         $this->userId = $userId;
@@ -41,6 +43,7 @@ class UpdateCapitalCityUnitQueueRequest implements ShouldBroadcastNow
         $this->processedKingdomId = $processedKingdomId;
         $this->processedKingdomName = $processedKingdomName;
         $this->queueData = $queueData;
+        $this->queuedUnitNames = $queuedUnitNames;
     }
 
     /**
@@ -60,6 +63,7 @@ class UpdateCapitalCityUnitQueueRequest implements ShouldBroadcastNow
             'processed_kingdom_id' => $this->processedKingdomId,
             'processed_kingdom_name' => $this->processedKingdomName,
             'queue_data' => $this->queueData,
+            'queued_unit_names' => $this->queuedUnitNames,
         ];
     }
 }

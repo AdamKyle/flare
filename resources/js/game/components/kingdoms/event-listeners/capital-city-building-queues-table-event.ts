@@ -65,14 +65,8 @@ export default class CapitalCityBuildingQueuesTableEvent
                     return;
                 }
 
-                const timerStartedAt = Date.now();
-                let data = event.buildingQueueData.map((queue: any) => ({
-                    ...queue,
-                    timer_started_at: timerStartedAt,
-                }));
-
                 this.component.setState({
-                    building_queues: data,
+                    building_queues: event.buildingQueueData,
                 });
             },
         );
@@ -94,10 +88,7 @@ export default class CapitalCityBuildingQueuesTableEvent
                     return;
                 }
 
-                const queueData = {
-                    ...event.queue_data,
-                    timer_started_at: Date.now(),
-                };
+                const queueData = event.queue_data;
 
                 this.component.setState((prevState: any) => ({
                     building_queues: [

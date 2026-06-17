@@ -2,7 +2,6 @@ import { inject, injectable } from "tsyringe";
 import Ajax from "../../../lib/ajax/ajax";
 import AjaxInterface from "../../../lib/ajax/ajax-interface";
 import { AxiosError, AxiosResponse } from "axios";
-import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 import BuildingsInQueue from "../capital-city/buildings-in-queue";
 
 @injectable()
@@ -24,16 +23,9 @@ export default class FetchBuildingQueuesAjax {
             .doAjaxCall(
                 "get",
                 (result: AxiosResponse) => {
-                    const timerStartedAt = Date.now();
-
                     component.setState({
                         loading: false,
-                        building_queues: result.data.building_queues.map(
-                            (queue: any) => ({
-                                ...queue,
-                                timer_started_at: timerStartedAt,
-                            }),
-                        ),
+                        building_queues: result.data.building_queues,
                     });
                 },
                 (error: AxiosError) => {

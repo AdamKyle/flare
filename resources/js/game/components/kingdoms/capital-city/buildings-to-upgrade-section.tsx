@@ -19,6 +19,7 @@ import PrimaryButton from "../../ui/buttons/primary-button";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import CapitalCityBuildingQueueRequestEventDefinition from "../event-listeners/capital-city-building-queue-request-event-definition";
 import CapitalCityBuildingQueueRequestEvent from "../event-listeners/capital-city-building-queue-request-event";
+import clsx from "clsx";
 
 const MAX_ITEMS_PER_PAGE = 10;
 
@@ -43,6 +44,7 @@ export default class BuildingsToUpgradeSection extends React.Component<
             building_data: [],
             filtered_building_data: [],
             open_kingdom_ids: new Set(),
+            fading_kingdom_ids: new Set<number>(),
             sort_direction: "asc",
             search_query: "",
             building_queue: [],
@@ -236,7 +238,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
                     .map((kingdom: Kingdom) => (
                         <div
                             key={kingdom.kingdom_id}
-                            className="bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4"
+                            className={clsx(
+                                "bg-gray-100 dark:bg-gray-700 shadow-md rounded-lg overflow-hidden mb-4 transition-opacity duration-300",
+                                {
+                                    "opacity-0":
+                                        this.state.fading_kingdom_ids.has(
+                                            kingdom.kingdom_id,
+                                        ),
+                                    "opacity-100":
+                                        !this.state.fading_kingdom_ids.has(
+                                            kingdom.kingdom_id,
+                                        ),
+                                },
+                            )}
                         >
                             <div
                                 className="p-4 flex justify-between items-center cursor-pointer"

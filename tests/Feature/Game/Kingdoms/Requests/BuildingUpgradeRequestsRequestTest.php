@@ -3,10 +3,12 @@
 namespace Tests\Feature\Game\Kingdoms\Requests;
 
 use App\Flare\Models\BuildingInQueue;
-use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
+use App\Flare\Models\CapitalCityBuildingQueue;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
@@ -64,8 +66,9 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertOk();
-        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+        $response->assertStatus(422);
+        Queue::assertNotPushed(CapitalCityBuildingRequestMovement::class);
+        $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
     public function testCapitalCityRepairRejectsManuallyQueuedBuilding(): void
@@ -121,8 +124,9 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertOk();
-        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+        $response->assertStatus(422);
+        Queue::assertNotPushed(CapitalCityBuildingRequestMovement::class);
+        $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
     public function testCapitalCityRepairRejectsCapitalCityQueuedBuilding(): void
@@ -187,8 +191,9 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertOk();
-        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+        $response->assertStatus(422);
+        Queue::assertNotPushed(CapitalCityBuildingRequestMovement::class);
+        $this->assertSame(1, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
     public function testCapitalCityRepairAllowsCancellationRejectedCapitalCityQueuedBuilding(): void
@@ -198,6 +203,13 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Building Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
         $capitalCity = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
@@ -254,7 +266,8 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             ]);
 
         $response->assertOk();
-        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+        Queue::assertPushed(CapitalCityBuildingRequestMovement::class);
+        $this->assertSame(2, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
 
@@ -265,6 +278,13 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Building Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
         $capitalCity = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
@@ -299,7 +319,8 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             ]);
 
         $response->assertOk();
-        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+        Queue::assertPushed(CapitalCityBuildingRequestMovement::class);
+        $this->assertSame(1, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 
     public function testCapitalCityValidNonQueuedRepairDispatchesRequest(): void
@@ -309,6 +330,13 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_BUILD_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Building Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
         $capitalCity = $characterFactory
             ->kingdomManagement()
             ->assignKingdom([
@@ -346,6 +374,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
             ]);
 
         $response->assertOk();
-        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
+        Queue::assertPushed(CapitalCityBuildingRequestMovement::class);
+        $this->assertSame(1, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 }
