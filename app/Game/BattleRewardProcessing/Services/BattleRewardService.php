@@ -16,6 +16,7 @@ use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Flare\Models\ExplorationLog;
@@ -26,6 +27,8 @@ use Throwable;
 
 class BattleRewardService
 {
+    use SafelyBroadcastsEvents;
+
 
     /**
      * @var ?Character $characterId
@@ -312,7 +315,10 @@ class BattleRewardService
             return;
         }
 
-        event(new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)));
+        $this->safelyDispatchBroadcastEvent(
+            new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)),
+            ['character_id' => $this->character->id]
+        );
     }
 
     /**

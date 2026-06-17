@@ -17,6 +17,7 @@ use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
@@ -31,7 +32,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 
 class Exploration implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SafelyBroadcastsEvents, SerializesModels;
 
     const int MAX_ATTEMPTS = 10;
 
@@ -140,8 +141,9 @@ class Exploration implements ShouldQueue
 
                 $character = $this->character->refresh();
 
-                event(new UpdateCharacterStatus($character));
-                event(new AutomationTimeOut($character->user, 0));
+                $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $this->automationId];
+                $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+                $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
             }
 
             return;
@@ -684,9 +686,9 @@ class Exploration implements ShouldQueue
 
         $this->rewardPlayer($character);
 
-        event(new UpdateCharacterStatus($character));
-
-        event(new AutomationTimeOut($character->user, 0));
+        $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $this->automationId];
+        $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
 
         return;
     }
@@ -730,9 +732,9 @@ class Exploration implements ShouldQueue
             );
         }
 
-        event(new UpdateCharacterStatus($character));
-
-        event(new AutomationTimeOut($character->user, 0));
+        $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $automation->id];
+        $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
     }
 
     /**
@@ -783,7 +785,10 @@ class Exploration implements ShouldQueue
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
         if ($this->character->isLoggedIn()) {
-            event(new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
+            $this->safelyDispatchBroadcastEvent(
+                new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward),
+                ['character_id' => $this->character->id, 'automation_id' => $this->automationId]
+            );
         }
     }
 
@@ -804,7 +809,10 @@ class Exploration implements ShouldQueue
 
         $character->update(['gold' => $gold]);
 
-        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+        $this->safelyDispatchBroadcastEvent(
+            new UpdateCharacterCurrenciesEvent($character->refresh()),
+            ['character_id' => $this->character->id, 'automation_id' => $this->automationId]
+        );
 
         $this->sendOutEventLogUpdate('Gained 10k Gold for completing the exploration.', false, true);
     }

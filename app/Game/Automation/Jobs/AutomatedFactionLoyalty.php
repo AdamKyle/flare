@@ -23,6 +23,7 @@ use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Carbon\Carbon;
 use Exception;
@@ -35,7 +36,7 @@ use Illuminate\Support\Facades\Log;
 
 class AutomatedFactionLoyalty implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SafelyBroadcastsEvents, SerializesModels;
 
     public int $characterId;
 
@@ -679,11 +680,14 @@ class AutomatedFactionLoyalty implements ShouldQueue
             ->values()
             ->toArray();
 
-        event(new FactionLoyaltyAutomationWarningState(
-            $this->character->user,
-            count($warningNotices) > 0,
-            $warningNotices
-        ));
+        $this->safelyDispatchBroadcastEvent(
+            new FactionLoyaltyAutomationWarningState(
+                $this->character->user,
+                count($warningNotices) > 0,
+                $warningNotices
+            ),
+            ['character_id' => $this->characterId, 'automation_id' => $this->automationId]
+        );
     }
 
     /**
@@ -894,7 +898,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
         if (! is_null($this->character) && $this->character->isLoggedIn()) {
-            event(new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
+            $this->safelyDispatchBroadcastEvent(
+                new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward),
+                ['character_id' => $this->characterId, 'automation_id' => $this->automationId]
+            );
         }
     }
 
@@ -944,9 +951,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
             $this->characterAutomation->delete();
 
-            event(new UpdateCharacterStatus($this->character));
-            event(new AutomationTimeOut($this->character->user, 0));
-            event(new AutomationStatus($this->character->user, false));
+            $broadcastContext = ['character_id' => $this->characterId, 'automation_id' => $this->automationId];
+            $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($this->character), $broadcastContext);
+            $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($this->character->user, 0), $broadcastContext);
+            $this->safelyDispatchBroadcastEvent(new AutomationStatus($this->character->user, false), $broadcastContext);
 
             if ($sendCompletionMessages) {
                 $this->sendOutEventLogUpdate('The npc thanks you for your service.', true);
@@ -959,9 +967,10 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
         $this->character->currentAutomations()->delete();
 
-        event(new UpdateCharacterStatus($this->character));
-        event(new AutomationTimeOut($this->character->user, 0));
-        event(new AutomationStatus($this->character->user, false));
+        $broadcastContext = ['character_id' => $this->characterId, 'automation_id' => $this->automationId];
+        $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($this->character), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($this->character->user, 0), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationStatus($this->character->user, false), $broadcastContext);
     }
 
     /**

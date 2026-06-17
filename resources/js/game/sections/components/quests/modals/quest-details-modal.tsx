@@ -287,25 +287,80 @@ export default class QuestDetailsModal extends React.Component<any, any> {
         });
     }
 
-    getMonsterTypeForRenderingItem(requiredMonster: any): string {
-        let type = "Regular Monster";
+    renderDropSources(item: any) {
+        const sources: any[] = item.drop_sources ?? [];
 
-        if (requiredMonster.is_celestial_entity) {
-            type = "Celestial";
+        if (sources.length === 0) {
+            return null;
         }
 
-        if (requiredMonster.is_raid_monster) {
-            type = "Raid Monster";
-        }
+        const hasCelestial = sources.some(
+            (source: any) => source.source_type === "Celestial",
+        );
 
-        if (requiredMonster.is_raid_boss) {
-            type = "Raid Boss";
-        }
-
-        return type;
+        return (
+            <Fragment>
+                {hasCelestial ? (
+                    <div className="mb-4">
+                        <InfoAlert>
+                            <p className="mb-2">
+                                Some quests such as this one may have you
+                                fighting a Celestial entity. You can check the{" "}
+                                <a href="/information/npcs" target="_blank">
+                                    help docs (NPC&apos;s)
+                                </a>{" "}
+                                to find out, based on which plane, which
+                                Summoning NPC you need to speak to in order to
+                                conjure the entity, there is only one per plane.
+                            </p>
+                            <p>
+                                Celestial Entities below Dungeons plane, will
+                                not be included in the weekly spawn.
+                            </p>
+                        </InfoAlert>
+                    </div>
+                ) : null}
+                {sources.map((source: any, index: number) => (
+                    <dl key={index} className="mb-4">
+                        <dt>Obtained by killing</dt>
+                        <dd>
+                            {source.monster_name}{" "}
+                            {"(" + source.source_type + ")"}
+                        </dd>
+                        <dt>Resides on plane</dt>
+                        <dd>{source.map_name}</dd>
+                        {source.source_type === "Weekly Fight Monster" &&
+                        source.location_name ? (
+                            <Fragment>
+                                <dt>Required location</dt>
+                                <dd>{source.location_name}</dd>
+                                {source.location_x !== undefined &&
+                                source.location_y !== undefined ? (
+                                    <Fragment>
+                                        <dt>Location coordinates (X/Y)</dt>
+                                        <dd>
+                                            {source.location_x} /{" "}
+                                            {source.location_y}
+                                        </dd>
+                                    </Fragment>
+                                ) : null}
+                                {source.location_map ? (
+                                    <Fragment>
+                                        <dt>Location map</dt>
+                                        <dd>{source.location_map}</dd>
+                                    </Fragment>
+                                ) : null}
+                            </Fragment>
+                        ) : null}
+                    </dl>
+                ))}
+            </Fragment>
+        );
     }
 
     renderItem(item: any) {
+        const dropSources: any[] = item.drop_sources ?? [];
+
         return (
             <Fragment>
                 {item.drop_location_id !== null ? (
@@ -331,50 +386,39 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                         </InfoAlert>
                     </div>
                 ) : null}
-                {item.required_monster !== null ? (
-                    item.required_monster.is_celestial_entity ? (
-                        <div className="mb-4">
-                            <InfoAlert>
-                                <p className="mb-2">
-                                    Some quests such as this one may have you
-                                    fighting a Celestial entity. You can check
-                                    the{" "}
-                                    <a href="/information/npcs" target="_blank">
-                                        help docs (NPC's)
-                                    </a>{" "}
-                                    to find out, based on which plane, which
-                                    Summoning NPC you ned to speak to inorder to
-                                    conjure the entity, there is only one per
-                                    plane.
-                                </p>
-                                <p>
-                                    Celestial Entities below Dungeons plane,
-                                    will not be included in the weekly spawn.
-                                </p>
-                            </InfoAlert>
-                        </div>
-                    ) : null
+                {dropSources.length > 0 ? (
+                    this.renderDropSources(item)
+                ) : item.required_monster !== null ? (
+                    <dl>
+                        <dt>Obtained by killing</dt>
+                        <dd>
+                            {item.required_monster.name}{" "}
+                            {"(" +
+                                (item.required_monster.is_celestial_entity
+                                    ? "Celestial"
+                                    : item.required_monster.is_raid_boss
+                                      ? "Raid Boss"
+                                      : item.required_monster.is_raid_monster
+                                        ? "Raid Monster"
+                                        : "Regular Monster") +
+                                ")"}
+                        </dd>
+                        <dt>Resides on plane</dt>
+                        <dd>{item.required_monster.game_map.name}</dd>
+                        {this.renderPlaneAccessRequirements(
+                            item.required_monster.game_map,
+                        )}
+                    </dl>
+                ) : dropSources.length === 0 &&
+                  item.required_monster === null &&
+                  item.drop_location_id === null &&
+                  item.required_quest === null &&
+                  item.locations.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Source details unavailable.
+                    </p>
                 ) : null}
                 <dl>
-                    {item.required_monster !== null ? (
-                        <Fragment>
-                            <dt>Obtained by killing</dt>
-                            <dd>
-                                {item.required_monster.name}{" "}
-                                {"(" +
-                                    this.getMonsterTypeForRenderingItem(
-                                        item.required_monster,
-                                    ) +
-                                    ")"}
-                            </dd>
-                            <dt>Resides on plane</dt>
-                            <dd>{item.required_monster.game_map.name}</dd>
-                            {this.renderPlaneAccessRequirements(
-                                item.required_monster.game_map,
-                            )}
-                        </Fragment>
-                    ) : null}
-
                     {item.required_quest !== null ? (
                         <Fragment>
                             <dt>Obtained by completing</dt>

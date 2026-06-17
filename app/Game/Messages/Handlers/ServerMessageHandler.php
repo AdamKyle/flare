@@ -3,12 +3,14 @@
 namespace App\Game\Messages\Handlers;
 
 use App\Flare\Models\User;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\Concerns\BaseMessageType;
 
 class ServerMessageHandler
 {
+    use SafelyBroadcastsEvents;
 
     /**
      * @param ServerMessageBuilder $serverMessageBuilder
@@ -30,7 +32,7 @@ class ServerMessageHandler
     {
         $message = $this->serverMessageBuilder->buildWithAdditionalInformation($type, $forMessage, $newValue);
 
-        event(new ServerMessageEvent($user, $message));
+        $this->safelyDispatchBroadcastEvent(new ServerMessageEvent($user, $message), ['user_id' => $user->id]);
     }
 
     /**
@@ -48,7 +50,7 @@ class ServerMessageHandler
     {
         $message = $this->serverMessageBuilder->buildWithAdditionalInformation($type, $forMessage);
 
-        event(new ServerMessageEvent($user, $message, $id));
+        $this->safelyDispatchBroadcastEvent(new ServerMessageEvent($user, $message, $id), ['user_id' => $user->id]);
     }
 
     /**
@@ -60,6 +62,6 @@ class ServerMessageHandler
      */
     public function sendBasicMessage(User $user, string $message): void
     {
-        event(new ServerMessageEvent($user, $message));
+        $this->safelyDispatchBroadcastEvent(new ServerMessageEvent($user, $message), ['user_id' => $user->id]);
     }
 }

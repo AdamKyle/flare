@@ -471,6 +471,45 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
     }
 
+    public function testBeginAutomationCreatesExplorationLogWithStartingLevel(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->character->update(['level' => 15]);
+        $this->character = $this->character->refresh();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $log = ExplorationLog::where('character_id', $this->character->id)->first();
+
+        $this->assertNotNull($log);
+        $this->assertEquals(15, $log->starting_level);
+    }
+
+    public function testBeginAutomationCreatesCharacterAutomationWithoutStartingLevelColumn(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertNotNull($automation);
+        $this->assertFalse($automation->getConnection()->getSchemaBuilder()->hasColumn('character_automations', 'starting_level'));
+    }
+
     public function testBeginAutomationClearsOldExplorationWarningAndLog(): void
     {
         Queue::fake();

@@ -14,6 +14,7 @@ use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -27,6 +28,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class CharacterXPService
 {
+    use SafelyBroadcastsEvents;
+
     private Character $character;
 
     /**
@@ -72,7 +75,10 @@ class CharacterXPService
         $this->handleLevelUp();
 
         if (! $this->character->isLoggedIn()) {
-            event(new UpdateTopBarEvent($this->character->refresh()));
+            $this->safelyDispatchBroadcastEvent(
+                new UpdateTopBarEvent($this->character->refresh()),
+                ['character_id' => $this->character->id]
+            );
         }
 
         return $this;
@@ -364,7 +370,10 @@ class CharacterXPService
         $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
+        $this->safelyDispatchBroadcastEvent(
+            new UpdateBaseCharacterInformation($character->user, $characterData),
+            ['character_id' => $character->id]
+        );
     }
 
     /**
@@ -389,7 +398,10 @@ class CharacterXPService
         if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
             $xp += 10;
 
-            event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
+            $this->safelyDispatchBroadcastEvent(
+                new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'),
+                ['character_id' => $this->character->id]
+            );
         }
 
         return $xp;
