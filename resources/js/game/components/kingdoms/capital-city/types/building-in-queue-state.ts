@@ -12,4 +12,6 @@ export default interface BuildingInQueueState {
     view_port: number;
     dark_tables: boolean;
     cancelation_modal: BuildingManagementCancelation;
+    current_page: number;
+    items_per_page: number;
 }

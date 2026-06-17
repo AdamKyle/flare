@@ -10,4 +10,6 @@ export default interface UnitRecruitmentState {
     success_message: string;
     open_kingdom_ids: Set<number>;
     cancellation_modal: UnitRecruitmentCancellation;
+    current_page: number;
+    items_per_page: number;
 }

@@ -127,15 +127,44 @@ class CapitalCityProcessUnitRequestHandler
     private function processUnitRequests(CapitalCityUnitQueue $capitalCityUnitQueue, Kingdom $kingdom, array $requestData): array
     {
         $requestedAmountsByUnitName = [];
+        $unitNames = collect($requestData)->pluck('name')->filter()->unique()->values()->toArray();
+        $gameUnitsByName = GameUnit::whereIn('name', $unitNames)->get()->keyBy('name');
+        $gameBuildingRelationsByUnitId = GameBuildingUnit::whereIn('game_unit_id', $gameUnitsByName->pluck('id')->values()->toArray())
+            ->get()
+            ->keyBy('game_unit_id');
+        $buildingsByGameBuildingId = $kingdom->buildings()
+            ->whereIn('game_building_id', $gameBuildingRelationsByUnitId->pluck('game_building_id')->values()->toArray())
+            ->get()
+            ->keyBy('game_building_id');
 
         foreach ($requestData as $index => $unitRequest) {
             if ($unitRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
                 continue;
             }
 
-            $gameUnit = GameUnit::where('name', $unitRequest['name'])->first();
-            $gameBuildingRelation = GameBuildingUnit::where('game_unit_id', $gameUnit->id)->first();
-            $building = $kingdom->buildings()->where('game_building_id', $gameBuildingRelation->game_building_id)->first();
+            $gameUnit = $gameUnitsByName->get($unitRequest['name']);
+
+            if (is_null($gameUnit)) {
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
+            $gameBuildingRelation = $gameBuildingRelationsByUnitId->get($gameUnit->id);
+
+            if (is_null($gameBuildingRelation)) {
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
+
+            $building = $buildingsByGameBuildingId->get($gameBuildingRelation->game_building_id);
+
+            if (is_null($building)) {
+                $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
+
+                continue;
+            }
 
             if ($this->isBuildingLocked($building, $kingdom, $unitRequest['name'])) {
                 $requestData[$index]['secondary_status'] = CapitalCityQueueStatus::REJECTED;
@@ -304,9 +333,12 @@ class CapitalCityProcessUnitRequestHandler
             $filteredRequestData = collect($requestData)->filter(fn($item) => in_array($item['secondary_status'], [
                 CapitalCityQueueStatus::RECRUITING,
             ]))->toArray();
+            $gameUnitsByName = GameUnit::whereIn('name', collect($filteredRequestData)->pluck('name')->unique()->values()->toArray())
+                ->get()
+                ->keyBy('name');
 
             foreach ($filteredRequestData as $data) {
-                $gameUnit = GameUnit::where('name', $data['name'])->first();
+                $gameUnit = $gameUnitsByName->get($data['name']);
 
                 $totalTimeInSeconds += $this->unitService->getTotalTimeForUnitRecruitment($character, $gameUnit, $data['amount']);
             }

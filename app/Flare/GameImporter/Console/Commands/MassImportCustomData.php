@@ -34,8 +34,11 @@ class MassImportCustomData extends Command
     public function handle()
     {
         Artisan::call('import:game-data "Core Imports"');
+        Artisan::call('import:game-data "World Gems"');
+        Artisan::call('import:game-data "Skills"');
 
-        ExplorationLog::truncate();
+        Artisan::call('assign:new-skills');
+        Artisan::call('assign:new-class-ranks');
 
         $this->importInformationSection();
 

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use Illuminate\Support\Collection;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
@@ -46,6 +47,13 @@ class CapitalCityBuildingRequestHandler
         Kingdom $kingdom,
         array $buildingsToUpgradeOrRepair
     ): void {
+        $buildingIds = array_column($buildingsToUpgradeOrRepair, 'building_id');
+        $buildings = $kingdom->buildings()
+            ->whereIn('id', $buildingIds)
+            ->with('gameBuilding')
+            ->get()
+            ->keyBy('id');
+
         $timeTillFinished = 0;
         $timeToStart = now();
 
@@ -57,11 +65,11 @@ class CapitalCityBuildingRequestHandler
                 continue;
             }
 
-            if ($this->shouldRejectBuildingRequest($buildingRequest, $kingdom, $index, $buildingsToUpgradeOrRepair)) {
+            if ($this->shouldRejectBuildingRequest($buildingRequest, $kingdom, $index, $buildingsToUpgradeOrRepair, $buildings)) {
                 continue;
             }
 
-            $building = $kingdom->buildings()->find($buildingRequest['building_id']);
+            $building = $buildings->get((int) $buildingRequest['building_id']);
 
             if ($buildingRequest['type'] === 'upgrade' && $this->isInvalidUpgradeRequest($building, $buildingRequest)) {
                 $this->messages[] = $building->name . ' has been rejected: Building is already max level.';
@@ -117,9 +125,9 @@ class CapitalCityBuildingRequestHandler
      *
      * @return bool
      */
-    private function shouldRejectBuildingRequest(array $buildingRequest, Kingdom $kingdom, int $index, array &$buildingsToUpgradeOrRepair): bool
+    private function shouldRejectBuildingRequest(array $buildingRequest, Kingdom $kingdom, int $index, array &$buildingsToUpgradeOrRepair, Collection $buildings): bool
     {
-        $building = $kingdom->buildings()->where('id', $buildingRequest['building_id'])->first();
+        $building = $buildings->get((int) $buildingRequest['building_id']);
 
         if ($this->kingdomBuildingResourceValidation->isMissingResources($building)) {
             $buildingCosts = $this->kingdomBuildingResourceValidation->getCostsForBuilding($building);

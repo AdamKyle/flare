@@ -30,6 +30,7 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
+use App\Game\Skills\Console\Commands\AssignNewSkillsToPlayers;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -42,6 +43,9 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        $this->commands([
+            AssignNewSkillsToPlayers::class,
+        ]);
 
         $this->app->bind(ItemListCostTransformerService::class, function () {
             return new ItemListCostTransformerService;

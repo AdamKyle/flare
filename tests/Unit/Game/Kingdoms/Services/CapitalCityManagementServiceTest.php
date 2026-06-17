@@ -312,7 +312,9 @@ class CapitalCityManagementServiceTest extends TestCase
 
         $result = resolve(CapitalCityManagementService::class)->fetchUnitQueueData($character, $capitalCity);
 
-        $this->assertCount(2, $result);
+        $this->assertCount(1, $result);
+        $this->assertCount(2, $result[0]['unit_requests']);
+        $this->assertEqualsCanonicalizing([$travelingQueue->id, $recruitingQueue->id], $result[0]['queue_ids']);
         $this->assertNotNull(CapitalCityUnitQueue::find($travelingQueue->id));
         $this->assertNotNull(CapitalCityUnitQueue::find($recruitingQueue->id));
     }

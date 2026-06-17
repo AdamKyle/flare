@@ -62,8 +62,43 @@ export default class CapitalCityBuildingQueueRequestEvent
                     return;
                 }
 
+                if (event.type === "progress") {
+                    const processedKingdomId = event.processed_kingdom_id;
+                    const itemsPerPage = this.component.state.itemsPerPage;
+                    const filteredBuildingData =
+                        this.component.state.filtered_building_data.filter(
+                            (kingdom: any) =>
+                                kingdom.kingdom_id !== processedKingdomId,
+                        );
+                    const totalPages = Math.max(
+                        1,
+                        Math.ceil(filteredBuildingData.length / itemsPerPage),
+                    );
+
+                    this.component.setState({
+                        processing_request: false,
+                        building_data:
+                            this.component.state.building_data.filter(
+                                (kingdom: any) =>
+                                    kingdom.kingdom_id !== processedKingdomId,
+                            ),
+                        filtered_building_data: filteredBuildingData,
+                        building_queue:
+                            this.component.state.building_queue.filter(
+                                (kingdom: any) =>
+                                    kingdom.kingdomId !== processedKingdomId,
+                            ),
+                        current_page: Math.min(
+                            this.component.state.current_page,
+                            totalPages,
+                        ),
+                    });
+
+                    return;
+                }
+
                 const nextState: any = {
-                    processing_request: event.isLoading,
+                    processing_request: event.isLoading === true,
                 };
 
                 if (event.type === "success") {

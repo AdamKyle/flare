@@ -24,9 +24,16 @@ export default class FetchBuildingQueuesAjax {
             .doAjaxCall(
                 "get",
                 (result: AxiosResponse) => {
+                    const timerStartedAt = Date.now();
+
                     component.setState({
                         loading: false,
-                        building_queues: result.data.building_queues,
+                        building_queues: result.data.building_queues.map(
+                            (queue: any) => ({
+                                ...queue,
+                                timer_started_at: timerStartedAt,
+                            }),
+                        ),
                     });
                 },
                 (error: AxiosError) => {

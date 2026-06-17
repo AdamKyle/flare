@@ -14,6 +14,8 @@ export default class CapitalCityBuildingQueuesTableEvent
 
     private capitalCityBuildingUpgradeRepairTableEvent?: Channel;
 
+    private capitalCityBuildingQueueRequestEvent?: Channel;
+
     constructor(
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
@@ -32,6 +34,10 @@ export default class CapitalCityBuildingQueuesTableEvent
             this.capitalCityBuildingUpgradeRepairTableEvent = echo.private(
                 "capital-city-building-queue-data-" + this.userId,
             );
+
+            this.capitalCityBuildingQueueRequestEvent = echo.private(
+                "capital-city-building-queue-request-" + this.userId,
+            );
         } catch (e: any | unknown) {
             throw new Error(e);
         }
@@ -39,6 +45,7 @@ export default class CapitalCityBuildingQueuesTableEvent
 
     public listen(): void {
         this.listenForTableUpdate();
+        this.listenForProgressUpdate();
     }
 
     /**
@@ -58,11 +65,49 @@ export default class CapitalCityBuildingQueuesTableEvent
                     return;
                 }
 
-                let data = event.buildingQueueData;
+                const timerStartedAt = Date.now();
+                let data = event.buildingQueueData.map((queue: any) => ({
+                    ...queue,
+                    timer_started_at: timerStartedAt,
+                }));
 
                 this.component.setState({
                     building_queues: data,
                 });
+            },
+        );
+    }
+
+    protected listenForProgressUpdate() {
+        if (!this.capitalCityBuildingQueueRequestEvent) {
+            return;
+        }
+
+        this.capitalCityBuildingQueueRequestEvent.listen(
+            "Game.Kingdoms.Events.UpdateCapitalCityBuildingQueueRequest",
+            (event: any) => {
+                if (!this.component || event.type !== "progress") {
+                    return;
+                }
+
+                if (!event.queue_data) {
+                    return;
+                }
+
+                const queueData = {
+                    ...event.queue_data,
+                    timer_started_at: Date.now(),
+                };
+
+                this.component.setState((prevState: any) => ({
+                    building_queues: [
+                        ...prevState.building_queues.filter(
+                            (queue: any) =>
+                                queue.kingdom_id !== queueData.kingdom_id,
+                        ),
+                        queueData,
+                    ],
+                }));
             },
         );
     }

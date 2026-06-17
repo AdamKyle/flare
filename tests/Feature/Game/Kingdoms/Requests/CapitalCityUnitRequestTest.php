@@ -56,11 +56,8 @@ class CapitalCityUnitRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more units are already queued for recruitment.',
-        ]);
-        Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpUnitRequests::class);
     }
 
     public function testCapitalCityRecruitRejectsCapitalCityQueuedUnit(): void
@@ -111,11 +108,8 @@ class CapitalCityUnitRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more units are already queued for recruitment.',
-        ]);
-        Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpUnitRequests::class);
     }
 
     public function testCapitalCityValidNonQueuedRecruitmentDispatchesRequest(): void

@@ -28,8 +28,12 @@ export default class ProcessUnitRequestAjax {
                 "post",
                 (result: AxiosResponse) => {
                     component.setState({
+                        processing_request: false,
                         unit_queue: [],
                         bulk_input_values: {},
+                        info_message: "Unit recruitment orders were accepted.",
+                        success_message: null,
+                        error_message: null,
                     });
                 },
                 (error: AxiosError) => {

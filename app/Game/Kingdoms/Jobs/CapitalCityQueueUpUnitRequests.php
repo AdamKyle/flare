@@ -31,12 +31,18 @@ class CapitalCityQueueUpUnitRequests implements ShouldQueue
         if (is_null($kingdom)) {
             event(new UpdateCapitalCityUnitQueueRequest($character->user_id, false, "Something went wrong, the capital city kingdom doesn't seem to exist", 'error'));
 
+            return;
         }
 
-        event(new UpdateCapitalCityUnitQueueRequest($character->user_id, true, 'Sending off the requests. Please wait.', 'info'));
+        event(new UpdateCapitalCityUnitQueueRequest($character->user_id, false, 'Sending off the requests.', 'info'));
 
         $result = $capitalCityManagementService->sendOffUnitRecruitmentOrders($character, $kingdom, $this->requestData);
 
-        event(new UpdateCapitalCityUnitQueueRequest($character->user_id, false, $result['message'], 'success'));
+        event(new UpdateCapitalCityUnitQueueRequest(
+            $character->user_id,
+            false,
+            $result['message'],
+            $result['status'] === 200 ? 'success' : 'error'
+        ));
     }
 }

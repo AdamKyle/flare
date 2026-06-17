@@ -64,11 +64,8 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more buildings must be repaired before they can be upgraded.',
-        ]);
-        Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
     public function testCapitalCityRepairRejectsManuallyQueuedBuilding(): void
@@ -124,11 +121,8 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more buildings are already queued.',
-        ]);
-        Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
     public function testCapitalCityRepairRejectsCapitalCityQueuedBuilding(): void
@@ -193,11 +187,8 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more buildings are already queued.',
-        ]);
-        Queue::assertNotPushed(CapitalCityQueueUpBuildingRequests::class);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
     }
 
     public function testCapitalCityRepairAllowsCancellationRejectedCapitalCityQueuedBuilding(): void

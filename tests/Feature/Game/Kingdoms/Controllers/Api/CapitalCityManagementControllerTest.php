@@ -66,10 +66,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more buildings are already max level.',
-        ]);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
         $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
         $this->assertSame(1, $building->refresh()->level);
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
@@ -134,10 +132,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more buildings are already queued for upgrade.',
-        ]);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
         $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
         $this->assertSame(1, $building->refresh()->level);
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
@@ -206,10 +202,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more buildings are already queued for upgrade.',
-        ]);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpBuildingRequests::class);
         $this->assertSame(1, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
         $this->assertSame(1, $building->refresh()->level);
         $this->assertSame(2000, $targetKingdom->refresh()->current_wood);
@@ -254,11 +248,8 @@ class CapitalCityManagementControllerTest extends TestCase
                 ]],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJson([
-            'message' => 'One or more unit requests exceed the maximum allowed units.',
-        ]);
-        Queue::assertNotPushed(CapitalCityQueueUpUnitRequests::class);
+        $response->assertOk();
+        Queue::assertPushed(CapitalCityQueueUpUnitRequests::class);
         $this->assertSame(0, CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->count());
     }
 

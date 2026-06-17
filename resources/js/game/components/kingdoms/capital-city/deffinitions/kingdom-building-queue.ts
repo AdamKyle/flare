@@ -10,4 +10,5 @@ export default interface KingddomBuildingQueue {
     total_time: number;
     phase_timer_label: string;
     queue_id: number;
+    timer_started_at?: number;
 }

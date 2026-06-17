@@ -35,6 +35,12 @@ export default class ProcessUpgradeBuildingsAjax {
                 "post",
                 (result: AxiosResponse) => {
                     component.reset();
+                    component.setState({
+                        processing_request: false,
+                        info_message: "Building orders were accepted.",
+                        success_message: null,
+                        error_message: null,
+                    });
                 },
                 (error: AxiosError) => {
                     component.setState({

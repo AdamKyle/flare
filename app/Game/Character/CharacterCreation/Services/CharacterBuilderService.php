@@ -321,7 +321,7 @@ class CharacterBuilderService
      *
      * @throws Exception
      */
-    protected function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void
+    public function assignWeaponMasteriesToClassRanks(CharacterClassRank $classRank): void
     {
         foreach (ItemType::allWeaponTypes() as $type) {
             $classRank->weaponMasteries()->create([

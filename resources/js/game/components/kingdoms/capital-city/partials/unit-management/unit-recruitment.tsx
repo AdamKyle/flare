@@ -95,7 +95,17 @@ export default class UnitRecruitment extends React.Component<any, any> {
             prevState.filtered_unit_recruitment_data.length !=
             this.state.filtered_unit_recruitment_data.length
         ) {
-            this.setState({ current_page: 1 });
+            const totalPages = Math.max(
+                1,
+                Math.ceil(
+                    this.state.filtered_unit_recruitment_data.length /
+                        this.state.items_per_page,
+                ),
+            );
+
+            if (this.state.current_page > totalPages) {
+                this.setState({ current_page: totalPages });
+            }
         }
     }
 
@@ -500,7 +510,7 @@ export default class UnitRecruitment extends React.Component<any, any> {
                 </div>
                 <Pagination
                     on_page_change={this.handlePageChange.bind(this)}
-                    current_page={this.state.currentPage}
+                    current_page={this.state.current_page}
                     items_per_page={MAX_ITEMS_PER_PAGE}
                     total_items={
                         this.state.filtered_unit_recruitment_data.length

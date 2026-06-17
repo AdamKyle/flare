@@ -61,8 +61,50 @@ export default class CapitalCityUnitRecruitmentQueueRequestEvent
                     return;
                 }
 
+                if (event.type === "progress") {
+                    const processedKingdomId = event.processed_kingdom_id;
+                    const itemsPerPage = this.component.state.items_per_page;
+                    const filteredUnitRecruitmentData =
+                        this.component.state.filtered_unit_recruitment_data.filter(
+                            (kingdom: any) => kingdom.id !== processedKingdomId,
+                        );
+                    const totalPages = Math.max(
+                        1,
+                        Math.ceil(
+                            filteredUnitRecruitmentData.length / itemsPerPage,
+                        ),
+                    );
+                    const bulkInputValues = {
+                        ...this.component.state.bulk_input_values,
+                    };
+
+                    delete bulkInputValues[processedKingdomId];
+
+                    this.component.setState({
+                        processing_request: false,
+                        unit_recruitment_data:
+                            this.component.state.unit_recruitment_data.filter(
+                                (kingdom: any) =>
+                                    kingdom.id !== processedKingdomId,
+                            ),
+                        filtered_unit_recruitment_data:
+                            filteredUnitRecruitmentData,
+                        unit_queue: this.component.state.unit_queue.filter(
+                            (kingdom: any) =>
+                                kingdom.kingdom_id !== processedKingdomId,
+                        ),
+                        bulk_input_values: bulkInputValues,
+                        current_page: Math.min(
+                            this.component.state.current_page,
+                            totalPages,
+                        ),
+                    });
+
+                    return;
+                }
+
                 const nextState: any = {
-                    processing_request: event.isLoading,
+                    processing_request: event.isLoading === true,
                 };
 
                 if (event.type === "success") {

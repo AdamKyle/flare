@@ -2,8 +2,12 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomLog;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueRequest;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
+use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
@@ -511,11 +515,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             'buildingIds' => [$validBuilding->id, $maxLevelBuilding->id],
         ]], 'upgrade');
 
-        $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->first();
-
-        $this->assertNotNull($capitalCityBuildingQueue);
-        $this->assertCount(1, $capitalCityBuildingQueue->building_request_data);
-        $this->assertSame($validBuilding->id, $capitalCityBuildingQueue->building_request_data[0]['building_id']);
+        $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
         $this->assertSame(5000, $targetKingdom->refresh()->current_wood);
         $this->assertSame(5000, $targetKingdom->refresh()->current_clay);
         $this->assertSame(5000, $targetKingdom->refresh()->current_stone);
@@ -731,6 +731,543 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5000, $kingdom->refresh()->current_stone);
         $this->assertSame(5000, $kingdom->refresh()->current_iron);
         $this->assertSame(5000, $kingdom->refresh()->current_population);
+    }
+
+    public function testMassUpgradeRequestCreatesOneQueuePerKingdom(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $firstTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $secondTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 48,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::FARM,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $firstBuilding = $firstTargetKingdom->buildings()->first();
+        $secondBuilding = $secondTargetKingdom->buildings()->first();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $firstTargetKingdom->id, 'buildingIds' => [$firstBuilding->id]],
+            ['kingdomId' => $secondTargetKingdom->id, 'buildingIds' => [$secondBuilding->id]],
+        ], 'upgrade');
+
+        $this->assertSame(2, CapitalCityBuildingQueue::count());
+    }
+
+    public function testMassUpgradeRequestSetsCompletedAtAfterStartedAt(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $building = $targetKingdom->buildings()->first();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $targetKingdom->id, 'buildingIds' => [$building->id]],
+        ], 'upgrade');
+
+        $queue = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->first();
+
+        $this->assertNotNull($queue);
+        $this->assertTrue($queue->completed_at->greaterThan($queue->started_at));
+    }
+
+    public function testManualBuildingQueueBlocksBuildingFromCapitalCityRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $building = $targetKingdom->buildings()->first();
+
+        BuildingInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'building_id' => $building->id,
+            'to_level' => 2,
+            'type' => 0,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $targetKingdom->id, 'buildingIds' => [$building->id]],
+        ], 'upgrade');
+
+        $this->assertSame(0, CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->count());
+    }
+
+    public function testActiveTravelingCapitalCityQueueBlocksSameBuildingFromNewRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdomManagement = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ]);
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $building = $targetKingdom->buildings()->first();
+
+        $targetKingdomManagement->assignCapitalCityBuildingQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'building_request_data' => [[
+                'building_id' => $building->id,
+                'building_name' => $building->name,
+                'type' => 'upgrade',
+                'missing_costs' => [],
+                'secondary_status' => CapitalCityQueueStatus::TRAVELING,
+                'from_level' => 1,
+                'to_level' => 2,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::TRAVELING,
+            'started_at' => now(),
+            'completed_at' => now()->addMinutes(10),
+        ]);
+        $existingQueue = $targetKingdomManagement->getCapitalCityBuildingQueue();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $targetKingdom->id, 'buildingIds' => [$building->id]],
+        ], 'upgrade');
+
+        $queues = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->get();
+        $this->assertCount(1, $queues);
+        $this->assertSame($existingQueue->id, $queues->first()->id);
+    }
+
+    public function testBuildingUpgradeEventsFireOnceForMassRequestAcrossMultipleKingdoms(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $firstTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $secondTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 48,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::FARM,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $firstBuilding = $firstTargetKingdom->buildings()->first();
+        $secondBuilding = $secondTargetKingdom->buildings()->first();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $firstTargetKingdom->id, 'buildingIds' => [$firstBuilding->id]],
+            ['kingdomId' => $secondTargetKingdom->id, 'buildingIds' => [$secondBuilding->id]],
+        ], 'upgrade');
+
+        Event::assertDispatchedTimes(UpdateCapitalCityBuildingUpgrades::class, 1);
+        Event::assertDispatchedTimes(UpdateCapitalCityBuildingQueueTable::class, 1);
+    }
+
+    public function testBuildingUpgradePerKingdomProgressEventsFireForMassRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $firstTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $secondTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 48,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::FARM,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $firstBuilding = $firstTargetKingdom->buildings()->first();
+        $secondBuilding = $secondTargetKingdom->buildings()->first();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $firstTargetKingdom->id, 'buildingIds' => [$firstBuilding->id]],
+            ['kingdomId' => $secondTargetKingdom->id, 'buildingIds' => [$secondBuilding->id]],
+        ], 'upgrade');
+
+        Event::assertDispatchedTimes(UpdateCapitalCityBuildingQueueRequest::class, 2);
+    }
+
+    public function testBuildingRepairPerKingdomProgressEventsFireForMassRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $firstTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'current_durability' => 1,
+                'max_durability' => 100,
+            ])
+            ->getKingdom();
+        $secondTargetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 48,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::FARM,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'current_durability' => 1,
+                'max_durability' => 100,
+            ])
+            ->getKingdom();
+        $firstBuilding = $firstTargetKingdom->buildings()->first();
+        $secondBuilding = $secondTargetKingdom->buildings()->first();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $firstTargetKingdom->id, 'buildingIds' => [$firstBuilding->id]],
+            ['kingdomId' => $secondTargetKingdom->id, 'buildingIds' => [$secondBuilding->id]],
+        ], 'repair');
+
+        Event::assertDispatchedTimes(UpdateCapitalCityBuildingQueueRequest::class, 2);
+    }
+
+    public function testMassUpgradeRequestWithMultipleBuildingsPerKingdomCreatesQueueContainingAllEligibleBuildings(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->character->getCharacter();
+        $capitalCity = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'is_capital' => true,
+                'x_position' => 16,
+                'y_position' => 16,
+            ])
+            ->getKingdom();
+        $targetKingdom = $this->character
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 5000,
+                'current_clay' => 5000,
+                'current_stone' => 5000,
+                'current_iron' => 5000,
+                'current_population' => 5000,
+                'x_position' => 32,
+                'y_position' => 16,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::KEEP,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->assignBuilding([
+                'name' => BuildingCosts::FARM,
+                'max_level' => 5,
+                'stone_cost' => 100,
+                'clay_cost' => 100,
+                'wood_cost' => 100,
+                'iron_cost' => 100,
+                'steel_cost' => 0,
+                'required_population' => 10,
+            ], [
+                'level' => 1,
+            ])
+            ->getKingdom();
+        $buildings = $targetKingdom->buildings()->orderBy('id')->get();
+        $firstBuilding = $buildings->first();
+        $secondBuilding = $buildings->last();
+
+        $this->capitalCityBuildingManagement->createBuildingUpgradeRequestQueue($character, $capitalCity, [
+            ['kingdomId' => $targetKingdom->id, 'buildingIds' => [$firstBuilding->id, $secondBuilding->id]],
+        ], 'upgrade');
+
+        $queue = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->first();
+        $this->assertNotNull($queue);
+        $this->assertCount(2, $queue->building_request_data);
+        $buildingIds = array_column($queue->building_request_data, 'building_id');
+        $this->assertContains($firstBuilding->id, $buildingIds);
+        $this->assertContains($secondBuilding->id, $buildingIds);
     }
 
     public function testOverMaxQueueDataRejectsDuringProcessingWithoutSpendingOrMutating(): void

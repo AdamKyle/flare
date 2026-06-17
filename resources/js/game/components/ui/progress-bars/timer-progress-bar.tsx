@@ -35,7 +35,10 @@ export default class TimerProgressBar extends React.Component<
         prevState: Readonly<TimerProgressBarState>,
         snapshot?: any,
     ) {
-        if (prevProps.time_remaining != this.props.time_remaining) {
+        if (
+            prevProps.time_remaining != this.props.time_remaining ||
+            prevProps.timer_started_at != this.props.timer_started_at
+        ) {
             clearInterval(this.interval);
 
             this.initializeTimer();
@@ -51,15 +54,17 @@ export default class TimerProgressBar extends React.Component<
     }
 
     initializeTimer() {
+        const timeRemaining = this.getEffectiveTimeRemaining();
+
         this.setState(
             {
-                time_left: this.props.time_remaining,
-                percentage_left: this.props.time_remaining > 0 ? 1.0 : 0.0,
-                time_left_label: this.getTimeLabel(this.props.time_remaining),
-                initial_time: this.props.time_remaining,
+                time_left: timeRemaining,
+                percentage_left: timeRemaining > 0 ? 1.0 : 0.0,
+                time_left_label: this.getTimeLabel(timeRemaining),
+                initial_time: timeRemaining,
             },
             () => {
-                if (this.props.time_remaining > 0 && this.state.time_left > 0) {
+                if (timeRemaining > 0 && this.state.time_left > 0) {
                     this.interval = setInterval(() => {
                         let newTime = this.state.time_left - 1;
 
@@ -92,6 +97,18 @@ export default class TimerProgressBar extends React.Component<
                 }
             },
         );
+    }
+
+    getEffectiveTimeRemaining(): number {
+        if (typeof this.props.timer_started_at === "undefined") {
+            return this.props.time_remaining;
+        }
+
+        const elapsedSeconds = Math.floor(
+            (Date.now() - this.props.timer_started_at) / 1000,
+        );
+
+        return Math.max(0, this.props.time_remaining - elapsedSeconds);
     }
 
     getTimeLabel(newTime: number): string {

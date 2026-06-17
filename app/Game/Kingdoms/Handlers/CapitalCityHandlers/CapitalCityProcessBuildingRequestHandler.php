@@ -104,6 +104,13 @@ class CapitalCityProcessBuildingRequestHandler
         Kingdom $kingdom,
         array $requestData
     ): array {
+        $buildingIds = array_column($requestData, 'building_id');
+        $buildings = $kingdom->buildings()
+            ->whereIn('id', $buildingIds)
+            ->with('gameBuilding')
+            ->get()
+            ->keyBy('id');
+
         foreach ($requestData as $index => $buildingUpgradeRequest) {
             if ($buildingUpgradeRequest['secondary_status'] === CapitalCityQueueStatus::CANCELLED) {
                 $request[$index] = $buildingUpgradeRequest;
@@ -111,7 +118,7 @@ class CapitalCityProcessBuildingRequestHandler
                 continue;
             }
 
-            $building = $kingdom->buildings()->where('id', $buildingUpgradeRequest['building_id'])->first();
+            $building = $buildings->get((int) $buildingUpgradeRequest['building_id']);
             $buildingUpgradeRequest = $this->processPotentialResourceRequests(
                 $kingdom,
                 $building,

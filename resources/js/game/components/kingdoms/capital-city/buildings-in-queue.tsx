@@ -22,6 +22,9 @@ import BuildingInQueueProps from "./types/building-in-queue-props";
 import BuildingInQueueState from "./types/building-in-queue-state";
 import KingddomBuildingQueue from "./deffinitions/kingdom-building-queue";
 import BuildingInQueue from "./deffinitions/building-in-queue";
+import Pagination from "./components/pagination";
+
+const MAX_ITEMS_PER_PAGE = 10;
 
 export default class BuildingsInQueue extends React.Component<
     BuildingInQueueProps,
@@ -50,6 +53,8 @@ export default class BuildingsInQueue extends React.Component<
                 queue_id: null,
                 cancellation_type: null,
             },
+            current_page: 1,
+            items_per_page: MAX_ITEMS_PER_PAGE,
         };
 
         this.fetchBuildingQueueAjax = serviceContainer().fetch(
@@ -104,6 +109,16 @@ export default class BuildingsInQueue extends React.Component<
             this.setState({
                 filtered_building_queues: this.state.building_queues,
                 open_kingdom_ids: this.state.open_kingdom_ids,
+                current_page: Math.min(
+                    this.state.current_page,
+                    Math.max(
+                        1,
+                        Math.ceil(
+                            this.state.building_queues.length /
+                                this.state.items_per_page,
+                        ),
+                    ),
+                ),
             });
 
             return;
@@ -152,6 +167,15 @@ export default class BuildingsInQueue extends React.Component<
         this.setState({
             filtered_building_queues: filteredBuildingData,
             open_kingdom_ids: openKingdomIds,
+            current_page: Math.min(
+                this.state.current_page,
+                Math.max(
+                    1,
+                    Math.ceil(
+                        filteredBuildingData.length / this.state.items_per_page,
+                    ),
+                ),
+            ),
         });
     }
 
@@ -181,12 +205,13 @@ export default class BuildingsInQueue extends React.Component<
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>) {
         const searchTerm = event.target.value;
-        this.setState({ search_query: searchTerm });
+        this.setState({ search_query: searchTerm, current_page: 1 });
 
         if (searchTerm.length <= 0) {
             this.setState({
                 filtered_building_queues: this.state.building_queues,
                 open_kingdom_ids: new Set<number>(),
+                current_page: 1,
             });
 
             return;
@@ -198,6 +223,19 @@ export default class BuildingsInQueue extends React.Component<
     debouncedUpdateFilteredData = debounce(() => {
         this.updateFilteredBuildingData();
     }, 300);
+
+    handlePageChange(pageNumber: number): void {
+        this.setState({ current_page: pageNumber });
+    }
+
+    getPaginatedBuildingQueues(): KingddomBuildingQueue[] {
+        const { current_page, items_per_page, filtered_building_queues } =
+            this.state;
+        const startIndex = (current_page - 1) * items_per_page;
+        const endIndex = startIndex + items_per_page;
+
+        return filtered_building_queues.slice(startIndex, endIndex);
+    }
 
     openCancelModal(
         kingdomId: number,
@@ -282,7 +320,7 @@ export default class BuildingsInQueue extends React.Component<
                     />
                 )}
 
-                {this.state.filtered_building_queues.map(
+                {this.getPaginatedBuildingQueues().map(
                     (queueGroup: KingddomBuildingQueue) => (
                         <div key={queueGroup.kingdom_id} className="mb-4">
                             <div
@@ -352,6 +390,9 @@ export default class BuildingsInQueue extends React.Component<
                                 </div>
                                 <TimerProgressBar
                                     time_remaining={queueGroup.total_time}
+                                    timer_started_at={
+                                        queueGroup.timer_started_at
+                                    }
                                     time_out_label={
                                         queueGroup.phase_timer_label
                                     }
@@ -467,6 +508,13 @@ export default class BuildingsInQueue extends React.Component<
                         </div>
                     ),
                 )}
+
+                <Pagination
+                    on_page_change={this.handlePageChange.bind(this)}
+                    current_page={this.state.current_page}
+                    items_per_page={MAX_ITEMS_PER_PAGE}
+                    total_items={this.state.filtered_building_queues.length}
+                />
 
                 {this.state.cancelation_modal.open && (
                     <SendBuildingUpgradeCancellationRequestModal

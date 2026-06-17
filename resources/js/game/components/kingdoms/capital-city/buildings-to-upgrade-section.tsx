@@ -98,9 +98,19 @@ export default class BuildingsToUpgradeSection extends React.Component<
             prevState.filtered_building_data !==
             this.state.filtered_building_data
         ) {
-            this.setState({
-                current_page: 1,
-            });
+            const totalPages = Math.max(
+                1,
+                Math.ceil(
+                    this.state.filtered_building_data.length /
+                        this.state.itemsPerPage,
+                ),
+            );
+
+            if (this.state.current_page > totalPages) {
+                this.setState({
+                    current_page: totalPages,
+                });
+            }
         }
     }
 

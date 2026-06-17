@@ -20,6 +20,9 @@ import { UnitRecruitmentProps } from "../../types/unit-recruitment-props";
 import UnitRecruitmentState from "../../types/unit-recruitment-state";
 import Unit from "../../deffinitions/unit";
 import { KingdomWithUnitRequests } from "../../deffinitions/kingdom-with-unit-requests";
+import Pagination from "../../components/pagination";
+
+const MAX_ITEMS_PER_PAGE = 10;
 
 export default class UnitQueue extends React.Component<
     UnitRecruitmentProps,
@@ -56,6 +59,8 @@ export default class UnitQueue extends React.Component<
                 kingdom_id: null,
                 queue_id: null,
             },
+            current_page: 1,
+            items_per_page: MAX_ITEMS_PER_PAGE,
         };
     }
 
@@ -124,6 +129,15 @@ export default class UnitQueue extends React.Component<
         this.setState({
             filtered_unit_queues: filteredUnitData,
             open_kingdom_ids: openKingdomIds,
+            current_page: Math.min(
+                this.state.current_page,
+                Math.max(
+                    1,
+                    Math.ceil(
+                        filteredUnitData.length / this.state.items_per_page,
+                    ),
+                ),
+            ),
         });
     }
 
@@ -153,8 +167,21 @@ export default class UnitQueue extends React.Component<
 
     handleSearchChange(event: React.ChangeEvent<HTMLInputElement>): void {
         const searchTerm = event.target.value;
-        this.setState({ search_query: searchTerm });
+        this.setState({ search_query: searchTerm, current_page: 1 });
         this.debouncedUpdateFilteredData();
+    }
+
+    handlePageChange(pageNumber: number): void {
+        this.setState({ current_page: pageNumber });
+    }
+
+    getPaginatedUnitQueues(): KingdomWithUnitRequests[] {
+        const { current_page, items_per_page, filtered_unit_queues } =
+            this.state;
+        const startIndex = (current_page - 1) * items_per_page;
+        const endIndex = startIndex + items_per_page;
+
+        return filtered_unit_queues.slice(startIndex, endIndex);
     }
 
     renderUnitStatus(unit: any): string {
@@ -232,7 +259,7 @@ export default class UnitQueue extends React.Component<
                     aria-label="Search by kingdom or unit name"
                 />
 
-                {this.state.filtered_unit_queues.map(
+                {this.getPaginatedUnitQueues().map(
                     (kingdom: KingdomWithUnitRequests) => (
                         <div key={kingdom.kingdom_id} className="mb-4">
                             <div
@@ -295,7 +322,11 @@ export default class UnitQueue extends React.Component<
                                 </div>
                                 <TimerProgressBar
                                     time_remaining={kingdom.total_time}
-                                    time_out_label={"Total Time Left"}
+                                    timer_started_at={kingdom.timer_started_at}
+                                    time_out_label={
+                                        kingdom.phase_timer_label ??
+                                        "Processing"
+                                    }
                                 />
                             </div>
 
@@ -408,6 +439,13 @@ export default class UnitQueue extends React.Component<
                 {this.state.filtered_unit_queues.length <= 0 && (
                     <p>There are no units in queue</p>
                 )}
+
+                <Pagination
+                    on_page_change={this.handlePageChange.bind(this)}
+                    current_page={this.state.current_page}
+                    items_per_page={MAX_ITEMS_PER_PAGE}
+                    total_items={this.state.filtered_unit_queues.length}
+                />
 
                 {this.state.cancellation_modal.open ? (
                     <SendUnitRequestCancellationRequestModal

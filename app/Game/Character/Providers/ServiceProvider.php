@@ -3,7 +3,6 @@
 namespace App\Game\Character\Providers;
 
 use App\Game\Character\Console\Commands\AssignNewFactionsToCharacters;
-use App\Game\Character\Console\Commands\AssignNewSkillsToPlayers;
 use App\Game\Character\Console\Commands\CreateCharacterAttackDataCache;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -19,7 +18,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->commands([
             CreateCharacterAttackDataCache::class,
             AssignNewFactionsToCharacters::class,
-            AssignNewSkillsToPlayers::class,
         ]);
     }
 
