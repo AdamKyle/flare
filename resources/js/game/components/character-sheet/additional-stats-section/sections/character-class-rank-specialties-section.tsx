@@ -245,6 +245,8 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
             "Dancer",
             "Cleric",
             "Book Binder",
+            "Buccaneer",
+            "Beastmaster",
         ];
 
         if (addEquippable) {
