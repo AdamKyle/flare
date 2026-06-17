@@ -1,48 +1,74 @@
-import { inject, injectable } from "tsyringe";
-import Ajax from "../../../lib/ajax/ajax";
-import AjaxInterface from "../../../lib/ajax/ajax-interface";
+import { injectable } from "tsyringe";
 import { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
+import { flushSync } from "react-dom";
 import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
+import { runCapitalCityRequestBatches } from "./run-capital-city-request-batches";
 
 @injectable()
 export default class ProcessUnitRequestAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
-
     public processRequest(
         component: UnitRecruitment,
         characterId: number,
         kingdomId: number,
-        params: any,
+        params: any[],
     ): void {
-        this.ajax
-            .setRoute(
-                "kingdom/capital-city/recruit-unit-requests/" +
+        const batches: any[][] = [];
+        for (let i = 0; i < params.length; i += 5) {
+            batches.push(params.slice(i, i + 5));
+        }
+
+        runCapitalCityRequestBatches(
+            batches,
+            2,
+            (batch) => this.sendBatch(characterId, kingdomId, batch),
+            (batch) => {
+                flushSync(() => {
+                    this.applyAcceptedRequestState(component, batch);
+                });
+            },
+        )
+            .then(() => {
+                component.setState({
+                    processing_request: false,
+                });
+            })
+            .catch((error: AxiosError) => {
+                component.setState({
+                    processing_request: false,
+                });
+
+                if (typeof error.response !== "undefined") {
+                    const response: AxiosResponse = error.response;
+
+                    component.setState({
+                        error_message: response.data.message,
+                    });
+                }
+            });
+    }
+
+    private sendBatch(
+        characterId: number,
+        kingdomId: number,
+        batch: any[],
+    ): Promise<void> {
+        return axios
+            .post(
+                "/api/kingdom/capital-city/recruit-unit-requests/" +
                     characterId +
                     "/" +
                     kingdomId,
+                { request_data: batch },
+                { headers: { "Content-Type": "application/json" } },
             )
-            .setParameters({
-                request_data: params,
-            })
-            .doAjaxCall(
-                "post",
-                (result: AxiosResponse) => {
-                    this.applyAcceptedRequestState(component, params);
-                },
-                (error: AxiosError) => {
-                    component.setState({
-                        processing_request: false,
-                    });
-
-                    if (typeof error.response !== "undefined") {
-                        const response: AxiosResponse = error.response;
-
-                        component.setState({
-                            error_message: response.data.message,
-                        });
-                    }
-                },
-            );
+            .then(() => undefined)
+            .catch((error: AxiosError) => {
+                if (error.response?.status === 401) {
+                    window.location.reload();
+                }
+                throw error;
+            });
     }
 
     private applyAcceptedRequestState(
@@ -73,7 +99,6 @@ export default class ProcessUnitRequestAjax {
 
         if (fadingKingdomIds.size <= 0) {
             component.setState({
-                processing_request: false,
                 unit_recruitment_data: updatedUnitRecruitmentData,
                 filtered_unit_recruitment_data:
                     updatedFilteredUnitRecruitmentData,
@@ -106,7 +131,6 @@ export default class ProcessUnitRequestAjax {
         });
 
         component.setState({
-            processing_request: false,
             unit_recruitment_data: this.keepFadingKingdomsRendered(
                 component.state.unit_recruitment_data,
                 updatedUnitRecruitmentData,

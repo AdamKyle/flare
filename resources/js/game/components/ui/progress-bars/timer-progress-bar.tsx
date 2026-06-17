@@ -73,7 +73,17 @@ export default class TimerProgressBar extends React.Component<
             () => {
                 if (timeRemaining > 0 && this.state.time_left > 0) {
                     this.interval = setInterval(() => {
-                        let newTime = this.getEffectiveTimeRemaining();
+                        let newTime: number;
+
+                        if (
+                            typeof this.props.completed_at_timestamp !==
+                                "undefined" ||
+                            typeof this.props.timer_started_at !== "undefined"
+                        ) {
+                            newTime = this.getEffectiveTimeRemaining();
+                        } else {
+                            newTime = Math.max(0, this.state.time_left - 1);
+                        }
 
                         if (newTime <= 0) {
                             this.setState({

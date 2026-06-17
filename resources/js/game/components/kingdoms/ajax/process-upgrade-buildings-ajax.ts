@@ -1,18 +1,17 @@
-import { inject, injectable } from "tsyringe";
-import Ajax from "../../../lib/ajax/ajax";
-import AjaxInterface from "../../../lib/ajax/ajax-interface";
+import { injectable } from "tsyringe";
 import { AxiosError, AxiosResponse } from "axios";
+import axios from "axios";
+import { flushSync } from "react-dom";
 import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
+import { runCapitalCityRequestBatches } from "./run-capital-city-request-batches";
 
 @injectable()
 export default class ProcessUpgradeBuildingsAjax {
-    constructor(@inject(Ajax) private ajax: AjaxInterface) {}
-
     public sendBuildingRequests(
         component: BuildingsToUpgradeSection,
         characterId: number,
         kingdomId: number,
-        params: any,
+        params: any[],
     ): void {
         let requestType = "upgrade";
 
@@ -20,42 +19,67 @@ export default class ProcessUpgradeBuildingsAjax {
             requestType = "repair";
         }
 
-        this.ajax
-            .setRoute(
-                "kingdom/capital-city/upgrade-building-requests/" +
+        const batches: any[][] = [];
+        for (let i = 0; i < params.length; i += 5) {
+            batches.push(params.slice(i, i + 5));
+        }
+
+        runCapitalCityRequestBatches(
+            batches,
+            2,
+            (batch) =>
+                this.sendBatch(characterId, kingdomId, requestType, batch),
+            (batch) => {
+                flushSync(() => {
+                    this.applyAcceptedRequestState(component, batch);
+                });
+            },
+        )
+            .then(() => {
+                component.setState({
+                    processing_request: false,
+                    info_message: "Building orders were accepted.",
+                    success_message: null,
+                    error_message: null,
+                });
+            })
+            .catch((error: AxiosError) => {
+                component.setState({
+                    processing_request: false,
+                });
+
+                if (typeof error.response !== "undefined") {
+                    const response: AxiosResponse = error.response;
+
+                    component.setState({
+                        error_message: response.data.message,
+                    });
+                }
+            });
+    }
+
+    private sendBatch(
+        characterId: number,
+        kingdomId: number,
+        requestType: string,
+        batch: any[],
+    ): Promise<void> {
+        return axios
+            .post(
+                "/api/kingdom/capital-city/upgrade-building-requests/" +
                     characterId +
                     "/" +
                     kingdomId,
+                { request_data: batch, request_type: requestType },
+                { headers: { "Content-Type": "application/json" } },
             )
-            .setParameters({
-                request_data: params,
-                request_type: requestType,
-            })
-            .doAjaxCall(
-                "post",
-                (result: AxiosResponse) => {
-                    this.applyAcceptedRequestState(component, params);
-                    component.setState({
-                        processing_request: false,
-                        info_message: "Building orders were accepted.",
-                        success_message: null,
-                        error_message: null,
-                    });
-                },
-                (error: AxiosError) => {
-                    component.setState({
-                        processing_request: false,
-                    });
-
-                    if (typeof error.response !== "undefined") {
-                        const response: AxiosResponse = error.response;
-
-                        component.setState({
-                            error_message: response.data.message,
-                        });
-                    }
-                },
-            );
+            .then(() => undefined)
+            .catch((error: AxiosError) => {
+                if (error.response?.status === 401) {
+                    window.location.reload();
+                }
+                throw error;
+            });
     }
 
     private applyAcceptedRequestState(

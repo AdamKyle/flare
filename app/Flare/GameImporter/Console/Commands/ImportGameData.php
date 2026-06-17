@@ -156,9 +156,41 @@ class ImportGameData extends Command
             }
         }
 
+        if (isset($result['Core Imports'])) {
+            $result['Core Imports'] = $this->sortFilesByCustomOrder($result['Core Imports'], [
+                'Core Imports/game_races.xlsx',
+                'Core Imports/game_classes.xlsx',
+                'Core Imports/class-specials.xlsx',
+            ]);
+        }
+
         $result['Kingdoms'] = array_reverse($result['Kingdoms']);
 
         return $result;
+    }
+
+
+    /**
+     * Sort files by an explicit import order.
+     */
+    protected function sortFilesByCustomOrder(array $files, array $order): array
+    {
+        usort($files, function (string $firstFile, string $secondFile) use ($order) {
+            $firstIndex = array_search($firstFile, $order, true);
+            $secondIndex = array_search($secondFile, $order, true);
+
+            if ($firstIndex === false) {
+                $firstIndex = PHP_INT_MAX;
+            }
+
+            if ($secondIndex === false) {
+                $secondIndex = PHP_INT_MAX;
+            }
+
+            return $firstIndex <=> $secondIndex;
+        });
+
+        return $files;
     }
 
     /**
