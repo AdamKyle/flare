@@ -307,12 +307,6 @@ class UseItemService
 
         $item = Item::find($boon->item_id);
 
-        if (! $item->can_stack) {
-            return $this->errorResult(
-                'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
-            );
-        }
-
         $minutesLeft = $boon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($boon->complete) / 60);
         $maximumDuration = min(self::MAX_TIME, $boon->amount_used * $item->lasts_for);
         $missing = $maximumDuration - $minutesLeft;

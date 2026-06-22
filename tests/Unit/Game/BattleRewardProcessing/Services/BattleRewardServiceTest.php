@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GameSkill;
+use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
@@ -16,6 +17,7 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\BattleRewardProcessing\Services\BattleLocationRewardService;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
@@ -96,6 +98,92 @@ class BattleRewardServiceTest extends TestCase
         $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
         Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
+    }
+
+    public function testCharacterXpIsAwardedAfterCurrencyRewards(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeSkillXP');
+        $characterRewardService->shouldReceive('giveCurrencies')
+            ->once()
+            ->globally()
+            ->ordered()
+            ->andReturn([]);
+        $characterRewardService->shouldReceive('distributeCharacterXP')
+            ->once()
+            ->globally()
+            ->ordered();
+
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        Event::fake();
+        Queue::fake();
+
+        resolve(BattleRewardService::class)->setUp($character->id, $monster->id)->processRewards();
+    }
+
+    public function testCharacterXpIsAwardedAfterItemDrops(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+        $dropCheckService = Mockery::mock(DropCheckService::class);
+        $dropCheckService->shouldReceive('process')
+            ->once()
+            ->globally()
+            ->ordered()
+            ->andReturn([]);
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeSkillXP');
+        $characterRewardService->shouldReceive('giveCurrencies')->andReturn([]);
+        $characterRewardService->shouldReceive('distributeCharacterXP')
+            ->once()
+            ->globally()
+            ->ordered();
+
+        $this->instance(DropCheckService::class, $dropCheckService);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        Event::fake();
+        Queue::fake();
+
+        resolve(BattleRewardService::class)->setUp($character->id, $monster->id)->processRewards();
+    }
+
+    public function testCharacterXpIsAwardedAfterFactionLoyaltyBountyHandling(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+        ]);
+        $factionLoyaltyBountyHandler = Mockery::mock(FactionLoyaltyBountyHandler::class);
+        $factionLoyaltyBountyHandler->shouldReceive('handleBounty')
+            ->once()
+            ->globally()
+            ->ordered();
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeSkillXP');
+        $characterRewardService->shouldReceive('giveCurrencies')->andReturn([]);
+        $characterRewardService->shouldReceive('distributeCharacterXP')
+            ->once()
+            ->globally()
+            ->ordered();
+
+        $this->instance(FactionLoyaltyBountyHandler::class, $factionLoyaltyBountyHandler);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        Event::fake();
+        Queue::fake();
+
+        resolve(BattleRewardService::class)->setUp($character->id, $monster->id)->processRewards();
     }
 
     public function testShouldReceiveLessXpWhenTrainingASkill(): void

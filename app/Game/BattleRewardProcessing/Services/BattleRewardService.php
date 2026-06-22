@@ -122,7 +122,6 @@ class BattleRewardService
             $beforeSnapshot = $this->explorationRewardSnapshot();
         }
 
-        $this->handleAwardingXP();
         $this->handleAwardSkillPoints();
         $this->handleFactionPoints();
         $this->handleFactionLoyaltyBounty();
@@ -132,6 +131,7 @@ class BattleRewardService
         $this->handleWeeklyFightRewards();
         $this->handleSecondaryRewards();
         $this->handleGlobalEventParticipation();
+        $this->handleAwardingXP();
 
         if (! is_null($beforeSnapshot)) {
             $log = ExplorationLog::find($this->context['exploration_log_id']);

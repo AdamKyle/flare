@@ -7,6 +7,7 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
+use App\Flare\Values\AutomationType;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
@@ -26,13 +27,13 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AutomatedFactionLoyalty implements ShouldQueue
 {
@@ -45,6 +46,12 @@ class AutomatedFactionLoyalty implements ShouldQueue
     public int $factionLoyaltyAutomationId;
 
     public int $timeDelay;
+
+    public int $tries = 1;
+
+    public int $timeout = 120;
+
+    public bool $failOnTimeout = true;
 
     private ?Character $character = null;
 
@@ -128,6 +135,34 @@ class AutomatedFactionLoyalty implements ShouldQueue
         ]);
 
         if ($this->shouldBail()) {
+            return;
+        }
+
+        if ($this->hasNewerActiveFactionLoyaltyAutomation($newerActiveAutomationId)) {
+            Log::channel('faction_loyalty')->warning('Faction loyalty stale job skipped because a newer active automation exists.', [
+                'character_id' => $this->characterId,
+                'automation_id' => $this->automationId,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+                'newer_active_automation_id' => $newerActiveAutomationId,
+            ]);
+
+            return;
+        }
+
+        if (now()->greaterThanOrEqualTo($this->characterAutomation->completed_at)) {
+            Log::channel('faction_loyalty')->warning('Faction loyalty job bailing: character automation expired.', [
+                'character_id' => $this->characterId,
+                'character_name' => $this->character->name,
+                'automation_id' => $this->automationId,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+                'completed_at' => $this->characterAutomation->completed_at,
+            ]);
+
+            Log::warning('Faction loyalty automation bailing: character automation expired.', [
+                'character_id' => $this->characterId,
+                'automation_id' => $this->automationId,
+            ]);
+
             $this->endAutomation($characterCacheData);
 
             return;
@@ -218,8 +253,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 $factionLoyaltyAutomationFightLogger,
                 $characterCacheData
             );
-        } catch (Exception $exception) {
-            $this->handleAutomationException($exception, $characterCacheData);
+        } catch (Throwable $throwable) {
+            $this->handleAutomationException($throwable, $characterCacheData);
 
             return;
         }
@@ -230,7 +265,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
      *
      * @param FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator
      * @return FactionLoyaltyNpc|null
-     * @throws Exception
+     * @throws Throwable
      */
     private function resolveFactionLoyaltyNpc(FactionLoyaltyNpcTaskCoordinator $factionLoyaltyNpcTaskCoordinator): ?FactionLoyaltyNpc
     {
@@ -746,6 +781,35 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function recallJob(CharacterCacheData $characterCacheData): void
     {
+        $this->characterAutomation = CharacterAutomation::where('id', $this->automationId)
+            ->where('character_id', $this->characterId)
+            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->first();
+
+        if (is_null($this->characterAutomation)) {
+            return;
+        }
+
+        $this->factionLoyaltyAutomation = FactionLoyaltyAutomation::where('id', $this->factionLoyaltyAutomationId)
+            ->where('character_id', $this->characterId)
+            ->where('character_automation_id', $this->automationId)
+            ->first();
+
+        if (is_null($this->factionLoyaltyAutomation) || ! is_null($this->factionLoyaltyAutomation->completed_at)) {
+            return;
+        }
+
+        if ($this->hasNewerActiveFactionLoyaltyAutomation($newerActiveAutomationId)) {
+            Log::channel('faction_loyalty')->warning('Faction loyalty stale recall skipped because a newer active automation exists.', [
+                'character_id' => $this->characterId,
+                'automation_id' => $this->automationId,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+                'newer_active_automation_id' => $newerActiveAutomationId,
+            ]);
+
+            return;
+        }
+
         if (now()->greaterThanOrEqualTo($this->characterAutomation->completed_at)) {
             Log::channel('faction_loyalty')->info('Faction loyalty job reached automation completion time.', [
                 'character_id' => $this->character->id,
@@ -762,7 +826,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
         $delaySeconds = max(0, ($this->timeDelay * 60) - $this->roundStartedAt->diffInSeconds(now()));
 
-        Log::channel('faction_loyalty')->info('Faction loyalty job recalled.', [
+        Log::channel('faction_loyalty')->info('Faction loyalty recall dispatch requested.', [
             'character_id' => $this->character->id,
             'character_name' => $this->character->name,
             'automation_id' => $this->automationId,
@@ -778,6 +842,16 @@ class AutomatedFactionLoyalty implements ShouldQueue
             $this->factionLoyaltyAutomationId,
             $this->timeDelay
         )->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('faction_loyalty');
+
+        Log::channel('faction_loyalty')->info('Faction loyalty recall dispatch completed.', [
+            'character_id' => $this->character->id,
+            'character_name' => $this->character->name,
+            'automation_id' => $this->automationId,
+            'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+            'connection' => 'long_running',
+            'queue' => 'faction_loyalty',
+            'delay_seconds' => $delaySeconds,
+        ]);
     }
 
     /**
@@ -836,48 +910,42 @@ class AutomatedFactionLoyalty implements ShouldQueue
             return true;
         }
 
-        if (now()->greaterThanOrEqualTo($this->characterAutomation->completed_at)) {
-            Log::channel('faction_loyalty')->warning('Faction loyalty job bailing: character automation expired.', [
-                'character_id' => $this->characterId,
-                'character_name' => $this->character->name,
-                'automation_id' => $this->automationId,
-                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
-                'completed_at' => $this->characterAutomation->completed_at,
-            ]);
-
-            Log::warning('Faction loyalty automation bailing: character automation expired.', [
-                'character_id' => $this->characterId,
-                'automation_id' => $this->automationId,
-            ]);
-
-            return true;
-        }
-
         return false;
     }
 
     /**
      * Handle an automation exception.
      *
-     * @param Exception $exception
+     * @param Throwable $throwable
      * @param CharacterCacheData $characterCacheData
      * @return void
      */
-    private function handleAutomationException(Exception $exception, CharacterCacheData $characterCacheData): void
+    private function handleAutomationException(Throwable $throwable, CharacterCacheData $characterCacheData): void
     {
         $context = [
             'character_id' => $this->characterId,
             'character_name' => $this->character?->name,
             'automation_id' => $this->automationId,
             'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
-            'exception_class' => $exception::class,
-            'exception_message' => $exception->getMessage(),
-            'file' => $exception->getFile(),
-            'line' => $exception->getLine(),
+            'exception_class' => $throwable::class,
+            'exception_message' => $throwable->getMessage(),
+            'file' => $throwable->getFile(),
+            'line' => $throwable->getLine(),
         ];
 
         Log::error('Faction loyalty automation failed.', $context);
         Log::channel('faction_loyalty')->error('Faction loyalty automation failed.', $context);
+
+        if ($this->hasNewerActiveFactionLoyaltyAutomation($newerActiveAutomationId)) {
+            Log::channel('faction_loyalty')->warning('Faction loyalty stale exception cleanup skipped because a newer active automation exists.', [
+                'character_id' => $this->characterId,
+                'automation_id' => $this->automationId,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+                'newer_active_automation_id' => $newerActiveAutomationId,
+            ]);
+
+            return;
+        }
 
         $this->sendOutEventLogUpdate(
             'Something went wrong with faction loyalty automation. Automation canceled.',
@@ -914,7 +982,28 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function endAutomation(CharacterCacheData $characterCacheData, bool $sendCompletionMessages = true): void
     {
-        if (is_null($this->character)) {
+        if (
+            is_null($this->character)
+            || is_null($this->characterAutomation)
+            || $this->characterAutomation->id !== $this->automationId
+            || $this->characterAutomation->character_id !== $this->characterId
+            || $this->characterAutomation->type !== AutomationType::FACTION_LOYALTY
+            || is_null($this->factionLoyaltyAutomation)
+            || $this->factionLoyaltyAutomation->id !== $this->factionLoyaltyAutomationId
+            || $this->factionLoyaltyAutomation->character_id !== $this->characterId
+            || $this->factionLoyaltyAutomation->character_automation_id !== $this->automationId
+        ) {
+            return;
+        }
+
+        if ($this->hasNewerActiveFactionLoyaltyAutomation($newerActiveAutomationId)) {
+            Log::channel('faction_loyalty')->warning('Faction loyalty stale automation cleanup skipped because a newer active automation exists.', [
+                'character_id' => $this->characterId,
+                'automation_id' => $this->automationId,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+                'newer_active_automation_id' => $newerActiveAutomationId,
+            ]);
+
             return;
         }
 
@@ -936,41 +1025,105 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
         $this->character = $this->setCharacterCanCraft($this->character, true);
 
-        if (! is_null($this->factionLoyaltyAutomation)) {
-            $this->factionLoyaltyAutomation->update([
-                'completed_at' => now(),
-            ]);
-        }
+        $this->factionLoyaltyAutomation->update([
+            'completed_at' => now(),
+        ]);
 
-        if (! is_null($this->characterAutomation)) {
-            $characterCacheData->deleteCharacterSheet($this->character);
+        $characterCacheData->deleteCharacterSheet($this->character);
 
-            $this->characterAutomation->update([
-                'completed_at' => now(),
-            ]);
+        $this->characterAutomation->update([
+            'completed_at' => now(),
+        ]);
 
-            $this->characterAutomation->delete();
-
-            $broadcastContext = ['character_id' => $this->characterId, 'automation_id' => $this->automationId];
-            $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($this->character), $broadcastContext);
-            $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($this->character->user, 0), $broadcastContext);
-            $this->safelyDispatchBroadcastEvent(new AutomationStatus($this->character->user, false), $broadcastContext);
-
-            if ($sendCompletionMessages) {
-                $this->sendOutEventLogUpdate('The npc thanks you for your service.', true);
-
-                $this->sendOutEventLogUpdate('You have stopped helping the npc and can take a breather and relax until you decide that you want to help them out again. Crafting has been re-enabled.', true);
-            }
-
-            return;
-        }
-
-        $this->character->currentAutomations()->delete();
+        $this->characterAutomation->delete();
 
         $broadcastContext = ['character_id' => $this->characterId, 'automation_id' => $this->automationId];
         $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($this->character), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($this->character->user, 0), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationStatus($this->character->user, false), $broadcastContext);
+
+        if ($sendCompletionMessages) {
+            $this->sendOutEventLogUpdate('The npc thanks you for your service.', true);
+
+            $this->sendOutEventLogUpdate('You have stopped helping the npc and can take a breather and relax until you decide that you want to help them out again. Crafting has been re-enabled.', true);
+        }
+    }
+
+    public function failed(Throwable $throwable): void
+    {
+        $context = [
+            'character_id' => $this->characterId,
+            'automation_id' => $this->automationId,
+            'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+            'exception_class' => $throwable::class,
+            'exception_message' => $throwable->getMessage(),
+            'file' => $throwable->getFile(),
+            'line' => $throwable->getLine(),
+        ];
+
+        Log::error('Faction loyalty automation job failed.', $context);
+        Log::channel('faction_loyalty')->error('Faction loyalty automation job failed.', $context);
+
+        $characterAutomation = CharacterAutomation::where('id', $this->automationId)
+            ->where('character_id', $this->characterId)
+            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->first();
+
+        $factionLoyaltyAutomation = FactionLoyaltyAutomation::where('id', $this->factionLoyaltyAutomationId)
+            ->where('character_id', $this->characterId)
+            ->where('character_automation_id', $this->automationId)
+            ->first();
+
+        if (is_null($characterAutomation) || is_null($factionLoyaltyAutomation)) {
+            return;
+        }
+
+        if ($this->hasNewerActiveFactionLoyaltyAutomation($newerActiveAutomationId)) {
+            $staleContext = array_merge($context, [
+                'newer_active_automation_id' => $newerActiveAutomationId,
+            ]);
+
+            Log::warning('Faction loyalty stale failed-job cleanup skipped because a newer active automation exists.', $staleContext);
+            Log::channel('faction_loyalty')->warning('Faction loyalty stale failed-job cleanup skipped because a newer active automation exists.', $staleContext);
+
+            return;
+        }
+
+        $ownsActiveAutomation = $characterAutomation->completed_at->isFuture()
+            && is_null($factionLoyaltyAutomation->completed_at);
+
+        $factionLoyaltyAutomation->update([
+            'completed_at' => now(),
+        ]);
+
+        $characterAutomation->delete();
+
+        if (! $ownsActiveAutomation) {
+            return;
+        }
+
+        $character = Character::find($this->characterId);
+
+        if (! is_null($character)) {
+            $this->setCharacterCanCraft($character, true);
+        }
+    }
+
+    private function hasNewerActiveFactionLoyaltyAutomation(?int &$newerActiveAutomationId = null): bool
+    {
+        $newerActiveAutomationId = FactionLoyaltyAutomation::query()
+            ->where('character_id', $this->characterId)
+            ->whereNull('completed_at')
+            ->whereHas('characterAutomation', function ($query): void {
+                $query->where('character_id', $this->characterId)
+                    ->where('type', AutomationType::FACTION_LOYALTY)
+                    ->where('id', '>', $this->automationId)
+                    ->where('completed_at', '>', now());
+            })
+            ->orderByDesc('character_automation_id')
+            ->value('character_automation_id');
+
+        return ! is_null($newerActiveAutomationId);
     }
 
     /**
