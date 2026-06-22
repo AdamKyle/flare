@@ -4,6 +4,7 @@ namespace App\Admin\Requests;
 
 use App\Flare\Models\Item;
 use App\Game\Gems\Values\GemTypeValue;
+use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,7 +17,26 @@ class LocationGemParamtersManagementRequest extends FormRequest
 
     public function rules(): array
     {
-        $rangeRule = ['nullable', 'string', 'max:255', 'regex:/^\s*\d+\.\d+\s*-\s*\d+\.\d+\s*$/'];
+        $rangeRule = [
+            'nullable',
+            'string',
+            'max:255',
+            function (string $attribute, mixed $value, Closure $fail): void {
+                if (is_null($value) || trim($value) === '') {
+                    return;
+                }
+
+                $rangeValues = explode('-', $value, 2);
+
+                if (
+                    count($rangeValues) !== 2
+                    || ! is_numeric(trim($rangeValues[0]))
+                    || ! is_numeric(trim($rangeValues[1]))
+                ) {
+                    $fail('The range must contain two numeric values separated by a hyphen.');
+                }
+            },
+        ];
         $rangeFields = [
             'character_xp_bonus_range',
             'character_class_rank_xp_bonus_range',

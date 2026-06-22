@@ -2,19 +2,17 @@
 
 namespace App\Flare\Models;
 
-use Database\Factories\GameMapGemParamtersFactory;
+use Database\Factories\GameLocationGemParamterFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GameMapGemParamters extends Model
+class GameLocationGemParamter extends Model
 {
     use HasFactory;
 
-    protected $table = 'game_map_gem_paramters';
-
     protected $fillable = [
-        'game_map_id',
+        'location_id',
         'name',
         'description',
         'character_xp_bonus_range',
@@ -32,7 +30,6 @@ class GameMapGemParamters extends Model
         'mythic_item_drop_chance_increase_range',
         'cosmic_item_drop_chance_increase_range',
         'ascended_item_drop_chance_increase_range',
-        'character_power_reduction_range',
         'enemy_strength_increase_range',
         'enemy_healing_increase_range',
         'enemy_spell_evasion_range',
@@ -50,21 +47,39 @@ class GameMapGemParamters extends Model
         'faction_point_increase_range',
         'monster_atonement',
         'monster_atonement_range',
+        'rolled_gem_id',
+        'roll_count',
     ];
 
     protected $casts = [
-        'game_map_id' => 'integer',
+        'location_id' => 'integer',
         'crafting_skill_ids' => 'array',
         'monster_atonement' => 'integer',
+        'rolled_gem_id' => 'integer',
+        'roll_count' => 'integer',
     ];
 
-    public function gameMap(): BelongsTo
+    public function location(): BelongsTo
     {
-        return $this->belongsTo(GameMap::class);
+        return $this->belongsTo(Location::class);
     }
 
-    protected static function newFactory(): GameMapGemParamtersFactory
+    public function rolledGem(): BelongsTo
     {
-        return GameMapGemParamtersFactory::new();
+        return $this->belongsTo(Gem::class, 'rolled_gem_id');
+    }
+
+    public function rollableRangeFields(): array
+    {
+        return array_values(array_filter(
+            array_keys($this->getAttributes()),
+            fn (string $attribute): bool => str_ends_with($attribute, '_range')
+                && ! in_array($attribute, ['monster_atonement_range', 'character_power_reduction_range'], true),
+        ));
+    }
+
+    protected static function newFactory(): GameLocationGemParamterFactory
+    {
+        return GameLocationGemParamterFactory::new();
     }
 }

@@ -14,6 +14,7 @@ class RaidBossParticipationFactory extends Factory
         return [
             'character_id' => 0,
             'raid_id' => 0,
+            'raid_boss_id' => null,
             'attacks_left' => 5,
             'damage_dealt' => 0,
             'killed_boss' => false,

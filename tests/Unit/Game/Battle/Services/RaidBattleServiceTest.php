@@ -58,7 +58,13 @@ class RaidBattleServiceTest extends TestCase
         ]);
         RaidBossParticipation::create([
             'character_id' => $character->id,
-            'raid_id' => $oldRaid->id,
+            'raid_id' => $currentRaid->id,
+            'raid_boss_id' => RaidBoss::create([
+                'raid_id' => $currentRaid->id,
+                'raid_boss_id' => $monster->id,
+                'boss_max_hp' => 100,
+                'boss_current_hp' => 100,
+            ])->id,
             'attacks_left' => 0,
             'damage_dealt' => 100,
             'killed_boss' => false,
@@ -127,7 +133,7 @@ class RaidBattleServiceTest extends TestCase
         $currentLocation->update([
             'raid_id' => $currentRaid->id,
         ]);
-        RaidBoss::create([
+        $currentRaidBoss = RaidBoss::create([
             'raid_id' => $currentRaid->id,
             'raid_boss_id' => $monster->id,
             'boss_max_hp' => 100,
@@ -137,6 +143,12 @@ class RaidBattleServiceTest extends TestCase
         $oldParticipation = RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $oldRaid->id,
+            'raid_boss_id' => RaidBoss::create([
+                'raid_id' => $oldRaid->id,
+                'raid_boss_id' => $monster->id,
+                'boss_max_hp' => 100,
+                'boss_current_hp' => 100,
+            ])->id,
             'attacks_left' => 0,
             'damage_dealt' => 100,
             'killed_boss' => false,
@@ -194,6 +206,7 @@ class RaidBattleServiceTest extends TestCase
             ->first();
 
         $this->assertNotNull($currentParticipation);
+        $this->assertSame($currentRaidBoss->id, $currentParticipation->raid_boss_id);
         $this->assertSame(4, $currentParticipation->attacks_left);
         $this->assertSame(0, $oldParticipation->refresh()->attacks_left);
     }

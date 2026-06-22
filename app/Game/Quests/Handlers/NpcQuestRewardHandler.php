@@ -31,7 +31,12 @@ class NpcQuestRewardHandler
 
     public function processReward(Quest $quest, Npc $npc, Character $character): void
     {
+        $this->processNonXpRewards($quest, $npc, $character);
+        $this->processXpReward($quest, $character);
+    }
 
+    public function processNonXpRewards(Quest $quest, Npc $npc, Character $character): void
+    {
         if ($this->questHasRewardItem($quest)) {
             $this->giveItem($character, $quest, $npc);
         }
@@ -50,10 +55,6 @@ class NpcQuestRewardHandler
 
         if ($this->questRewardsShards($quest)) {
             $this->giveShards($character, $quest, $npc);
-        }
-
-        if ($this->questRewardsXP($quest)) {
-            $this->giveXP($character, $quest);
         }
 
         if ($this->questRewardsPassive($quest)) {
@@ -131,6 +132,13 @@ class NpcQuestRewardHandler
         }
     }
 
+    public function processXpReward(Quest $quest, Character $character): void
+    {
+        if ($this->questRewardsXP($quest)) {
+            $this->giveXP($character, $quest);
+        }
+    }
+
     public function questHasRewardItem(Quest $quest): bool
     {
         return ! is_null($quest->reward_item);
@@ -169,7 +177,7 @@ class NpcQuestRewardHandler
     public function giveXP(Character $character, Quest $quest): void
     {
         $character->update([
-            'xp' => $quest->reward_xp,
+            'xp' => $character->xp + $quest->reward_xp,
         ]);
 
         $character = $character->refresh();

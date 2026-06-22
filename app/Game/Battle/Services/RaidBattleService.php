@@ -81,6 +81,7 @@ class RaidBattleService
 
         $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)
             ->where('raid_id', $raidBoss->raid_id)
+            ->where('raid_boss_id', $raidBoss->id)
             ->first();
 
         $elementData = $serverMonster->getElementData();
@@ -392,6 +393,7 @@ class RaidBattleService
     {
         $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)
             ->where('raid_id', $raidBoss->raid_id)
+            ->where('raid_boss_id', $raidBoss->id)
             ->first();
 
         $newHealth = $raidBoss->refresh()->boss_current_hp;
@@ -412,11 +414,11 @@ class RaidBattleService
             $raidBossParticipation = $raidBossParticipation->refresh();
 
             if (! is_null($raidBossParticipation)) {
-                event(new UpdateRaidAttacksLeft($character->user_id, ($attacksLeft <= 0 ? 0 : $attacksLeft), $raidBossParticipation->damage_dealt));
+                event(new UpdateRaidAttacksLeft($character->user_id, ($attacksLeft <= 0 ? 0 : $attacksLeft), $raidBossParticipation->damage_dealt, $raidBoss->raid_boss_id));
             }
 
             if ($killedRaidBoss) {
-                event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt));
+                event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt, $raidBoss->raid_boss_id));
             }
 
             return;
@@ -425,6 +427,7 @@ class RaidBattleService
         $raidBossParticipation = RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $raidBoss->raid->id,
+            'raid_boss_id' => $raidBoss->id,
             'attacks_left' => 4,
             'damage_dealt' => $damageDealt,
             'killed_boss' => $killedRaidBoss,
@@ -433,12 +436,12 @@ class RaidBattleService
 
 
         if ($killedRaidBoss) {
-            event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt));
+            event(new UpdateRaidAttacksLeft($character->user_id, 0, $raidBossParticipation->damage_dealt, $raidBoss->raid_boss_id));
 
             return;
         }
 
-        event(new UpdateRaidAttacksLeft($character->user_id, 4, $raidBossParticipation->damage_dealt));
+        event(new UpdateRaidAttacksLeft($character->user_id, 4, $raidBossParticipation->damage_dealt, $raidBoss->raid_boss_id));
     }
 
     /**

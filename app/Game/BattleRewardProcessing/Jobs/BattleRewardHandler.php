@@ -4,6 +4,7 @@ namespace App\Game\BattleRewardProcessing\Jobs;
 
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\Core\Services\CharacterRewardLockService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,8 +37,10 @@ class BattleRewardHandler implements ShouldQueue
      * @return void
      * @throws Throwable
      */
-    public function handle(BattleRewardService $battleRewardService): void
+    public function handle(BattleRewardService $battleRewardService, CharacterRewardLockService $characterRewardLockService): void
     {
-        $battleRewardService->setUp($this->characterId, $this->monsterId)->setContext($this->context)->processRewards(true);
+        $characterRewardLockService->run($this->characterId, function () use ($battleRewardService): void {
+            $battleRewardService->setUp($this->characterId, $this->monsterId)->setContext($this->context)->processRewards(true);
+        });
     }
 }

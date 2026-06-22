@@ -38,17 +38,29 @@ class ResetDailyRaidAttackLimits extends Command
 
         $participationWasReset = false;
 
-        RaidBossParticipation::whereIn('raid_id', $eventRaidIds)
+        RaidBossParticipation::with('raidBoss')
+            ->whereIn('raid_id', $eventRaidIds)
             ->where('killed_boss', false)
             ->chunkById(250, function ($participationRecords) use (&$participationWasReset) {
                 foreach ($participationRecords as $record) {
+                    if ($record->attacks_left === 5) {
+                        continue;
+                    }
+
+                    $monsterIdForBroadcast = $record->raidBoss?->raid_boss_id;
+
                     $record->update([
                         'attacks_left' => 5,
                     ]);
 
                     $record = $record->refresh();
 
-                    event(new UpdateRaidAttacksLeft($record->character->user_id, 5, $record->damage_dealt));
+                    event(new UpdateRaidAttacksLeft(
+                        $record->character->user_id,
+                        5,
+                        $record->damage_dealt,
+                        $monsterIdForBroadcast,
+                    ));
 
                     $participationWasReset = true;
                 }

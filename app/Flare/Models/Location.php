@@ -120,7 +120,7 @@ class Location extends Model
 
     public function gemParamters(): HasOne
     {
-        return $this->hasOne(GameLocationGemParamters::class);
+        return $this->hasOne(GameLocationGemParamter::class);
     }
 
     public function requiredQuestItem()

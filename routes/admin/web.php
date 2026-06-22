@@ -23,9 +23,11 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/map-gems/create', ['as' => 'admin.map-gems.create', 'uses' => 'MapGemsController@create']);
     Route::get('/admin/map-gems/export-data', ['as' => 'admin.map-gems.export-data', 'uses' => 'MapGemsController@exportMapGems']);
     Route::get('/admin/map-gems/import-data', ['as' => 'admin.map-gems.import-data', 'uses' => 'MapGemsController@importMapGems']);
-    Route::get('/admin/map-gems/{gameMapGemParamters}/edit', ['as' => 'admin.map-gems.edit', 'uses' => 'MapGemsController@edit']);
-    Route::get('/admin/map-gems/{gameMapGemParamters}', ['as' => 'admin.map-gems.show', 'uses' => 'MapGemsController@show']);
+    Route::get('/admin/map-gems/{gameMapGemParamter}/edit', ['as' => 'admin.map-gems.edit', 'uses' => 'MapGemsController@edit']);
+    Route::get('/admin/map-gems/{gameMapGemParamter}/rolled', ['as' => 'admin.map-gems.rolled', 'uses' => 'MapGemsController@rolled']);
+    Route::get('/admin/map-gems/{gameMapGemParamter}', ['as' => 'admin.map-gems.show', 'uses' => 'MapGemsController@show']);
     Route::post('/admin/map-gems/store', ['as' => 'admin.map-gems.store', 'uses' => 'MapGemsController@store']);
+    Route::post('/admin/map-gems/{gameMapGemParamter}/roll', ['as' => 'admin.map-gems.roll', 'uses' => 'MapGemsController@roll']);
     Route::post('/admin/map-gems/export', ['as' => 'admin.map-gems.export', 'uses' => 'MapGemsController@export']);
     Route::post('/admin/map-gems/import', ['as' => 'admin.map-gems.import', 'uses' => 'MapGemsController@importData']);
 
@@ -44,9 +46,11 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/location-gems/create', ['as' => 'admin.location-gems.create', 'uses' => 'LocationGemsController@create']);
     Route::get('/admin/location-gems/export-data', ['as' => 'admin.location-gems.export-data', 'uses' => 'LocationGemsController@exportLocationGems']);
     Route::get('/admin/location-gems/import-data', ['as' => 'admin.location-gems.import-data', 'uses' => 'LocationGemsController@importLocationGems']);
-    Route::get('/admin/location-gems/{gameLocationGemParamters}/edit', ['as' => 'admin.location-gems.edit', 'uses' => 'LocationGemsController@edit']);
-    Route::get('/admin/location-gems/{gameLocationGemParamters}', ['as' => 'admin.location-gems.show', 'uses' => 'LocationGemsController@show']);
+    Route::get('/admin/location-gems/{gameLocationGemParamter}/edit', ['as' => 'admin.location-gems.edit', 'uses' => 'LocationGemsController@edit']);
+    Route::get('/admin/location-gems/{gameLocationGemParamter}/rolled', ['as' => 'admin.location-gems.rolled', 'uses' => 'LocationGemsController@rolled']);
+    Route::get('/admin/location-gems/{gameLocationGemParamter}', ['as' => 'admin.location-gems.show', 'uses' => 'LocationGemsController@show']);
     Route::post('/admin/location-gems/store', ['as' => 'admin.location-gems.store', 'uses' => 'LocationGemsController@store']);
+    Route::post('/admin/location-gems/{gameLocationGemParamter}/roll', ['as' => 'admin.location-gems.roll', 'uses' => 'LocationGemsController@roll']);
     Route::post('/admin/location-gems/export', ['as' => 'admin.location-gems.export', 'uses' => 'LocationGemsController@export']);
     Route::post('/admin/location-gems/import', ['as' => 'admin.location-gems.import', 'uses' => 'LocationGemsController@importData']);
 

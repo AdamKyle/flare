@@ -365,25 +365,64 @@ export default class QuestDetailsModal extends React.Component<any, any> {
             <Fragment>
                 {item.drop_location_id !== null ? (
                     <div className="mb-4">
-                        <InfoAlert>
-                            <p className="mb-2">
-                                Some items, such as this one, only drop when you
-                                are at a special location. These locations
-                                increase enemy strength making them more of a
-                                challenge.
-                            </p>
-                            <p className="mb-2">
-                                These items have a small chance to drop while
-                                your looting skill is capped at 45% here.
-                            </p>
-                            <p>
-                                <strong>
-                                    These items will not drop if you are using
-                                    Exploration. You must manually farm these
-                                    quest items.
-                                </strong>
-                            </p>
-                        </InfoAlert>
+                        {item.drop_location?.hours_to_drop &&
+                        item.drop_location.hours_to_drop > 0 ? (
+                            <InfoAlert>
+                                <p className="mb-2">
+                                    <strong>This is a delve location.</strong>
+                                </p>
+                                <p className="mb-2">
+                                    Delve locations are a special form of
+                                    automation where you have to survive for{" "}
+                                    {item.drop_location.hours_to_drop}{" "}
+                                    {item.drop_location.hours_to_drop === 1
+                                        ? "hour"
+                                        : "hours"}{" "}
+                                    before the quest items will start dropping.
+                                </p>
+                                <p className="mb-2">
+                                    Quest items at delve locations drop based on
+                                    your character&apos;s looting chance, with
+                                    no restrictions.
+                                </p>
+                                {item.drop_location
+                                    .delve_enemy_strength_increase !== null &&
+                                item.drop_location
+                                    .delve_enemy_strength_increase > 0 ? (
+                                    <p>
+                                        Delve locations are incredibly tough as
+                                        the monsters increase by{" "}
+                                        {(
+                                            item.drop_location
+                                                .delve_enemy_strength_increase *
+                                            100
+                                        ).toFixed(2)}
+                                        % every fight.
+                                    </p>
+                                ) : null}
+                            </InfoAlert>
+                        ) : (
+                            <InfoAlert>
+                                <p className="mb-2">
+                                    Some items, such as this one, only drop when
+                                    you are at a special location. These
+                                    locations increase enemy strength making
+                                    them more of a challenge.
+                                </p>
+                                <p className="mb-2">
+                                    These items have a small chance to drop
+                                    while your looting skill is capped at 45%
+                                    here.
+                                </p>
+                                <p>
+                                    <strong>
+                                        These items will not drop if you are
+                                        using Exploration. You must manually
+                                        farm these quest items.
+                                    </strong>
+                                </p>
+                            </InfoAlert>
+                        )}
                     </div>
                 ) : null}
                 {dropSources.length > 0 ? (

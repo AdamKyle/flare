@@ -2,7 +2,7 @@
 
 namespace App\Admin\Import\LocationGems\Sheets;
 
-use App\Flare\Models\GameLocationGemParamters;
+use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Location;
@@ -23,7 +23,7 @@ class LocationGemsSheet implements ToCollection
             $cleanData = $this->cleanData($data);
 
             if (! empty($cleanData)) {
-                GameLocationGemParamters::updateOrCreate(
+                GameLocationGemParamter::updateOrCreate(
                     ['location_id' => $cleanData['location_id']],
                     $cleanData,
                 );

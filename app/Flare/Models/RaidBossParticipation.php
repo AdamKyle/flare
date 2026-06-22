@@ -5,6 +5,7 @@ namespace App\Flare\Models;
 use Database\Factories\RaidBossParticipationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RaidBossParticipation extends Model
 {
@@ -17,6 +18,7 @@ class RaidBossParticipation extends Model
     protected $fillable = [
         'character_id',
         'raid_id',
+        'raid_boss_id',
         'attacks_left',
         'damage_dealt',
         'killed_boss',
@@ -24,6 +26,7 @@ class RaidBossParticipation extends Model
 
     protected $casts = [
         'attacks_left' => 'integer',
+        'raid_boss_id' => 'integer',
         'damage_dealt' => 'integer',
         'killed_boss' => 'boolean',
     ];
@@ -36,6 +39,11 @@ class RaidBossParticipation extends Model
     public function character()
     {
         return $this->hasOne(Character::class, 'id', 'character_id');
+    }
+
+    public function raidBoss(): BelongsTo
+    {
+        return $this->belongsTo(RaidBoss::class);
     }
 
     protected static function newFactory(): RaidBossParticipationFactory

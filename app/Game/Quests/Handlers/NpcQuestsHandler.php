@@ -83,7 +83,7 @@ class NpcQuestsHandler
         }
 
         if ($giveRewards) {
-            $this->npcQuestRewardHandler->processReward($quest, $npc, $character);
+            $this->npcQuestRewardHandler->processNonXpRewards($quest, $npc, $character);
 
             return;
         }

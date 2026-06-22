@@ -40,7 +40,7 @@ export default class ItemSkillDetails extends React.Component<
                             "/" +
                             this.props.skill_progression_data.item_id +
                             "/" +
-                            this.props.skill_progression_data.item_skill_id,
+                            this.props.skill_progression_data.id,
                     )
                     .doAjaxCall(
                         "post",
@@ -85,7 +85,7 @@ export default class ItemSkillDetails extends React.Component<
                             "/" +
                             this.props.skill_progression_data.item_id +
                             "/" +
-                            this.props.skill_progression_data.item_skill_id,
+                            this.props.skill_progression_data.id,
                     )
                     .doAjaxCall(
                         "post",

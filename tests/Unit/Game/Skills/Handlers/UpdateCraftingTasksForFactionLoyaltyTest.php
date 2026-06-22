@@ -2,13 +2,17 @@
 
 namespace Tests\Unit\Game\Skills\Handlers;
 
+use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Services\CharacterRewardLockService;
 use App\Game\Events\Values\EventType;
+use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -56,6 +60,29 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
 
         Event::assertNotDispatched(ServerMessageEvent::class);
         Event::assertNotDispatched(UpdateTopBarEvent::class);
+    }
+
+    public function testHandleCraftingTaskUsesCharacterRewardLockService(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->getCharacter();
+        $item = $this->createItem();
+        $characterRewardLockService = Mockery::mock(CharacterRewardLockService::class);
+        $characterRewardLockService->shouldReceive('run')
+            ->once()
+            ->with($character->id, Mockery::type('callable'))
+            ->andReturnUsing(function (int $characterId, callable $callback): mixed {
+                return $callback();
+            });
+        $handler = new UpdateCraftingTasksForFactionLoyalty(
+            Mockery::mock(RandomAffixGenerator::class),
+            Mockery::mock(FactionLoyaltyService::class),
+            $characterRewardLockService,
+        );
+
+        $handler->handleCraftingTask($character, $item);
     }
 
     public function testDoesNotHandleCraftingFactionLoyaltyWhenCharacterIsNotHelpingAnNpc()
@@ -397,6 +424,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->assertEquals(1000000, $character->gold);
         $this->assertEquals(1000, $character->gold_dust);
         $this->assertEquals(100, $character->shards);
+        $this->assertEquals(2, $character->level);
 
     }
 

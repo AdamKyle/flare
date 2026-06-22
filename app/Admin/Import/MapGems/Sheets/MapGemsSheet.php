@@ -3,7 +3,7 @@
 namespace App\Admin\Import\MapGems\Sheets;
 
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GameMapGemParamters;
+use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\GameSkill;
 use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Support\Collection;
@@ -22,7 +22,7 @@ class MapGemsSheet implements ToCollection
             $cleanData = $this->cleanData($data);
 
             if (! empty($cleanData)) {
-                GameMapGemParamters::updateOrCreate(
+                GameMapGemParamter::updateOrCreate(
                     ['game_map_id' => $cleanData['game_map_id']],
                     $cleanData,
                 );

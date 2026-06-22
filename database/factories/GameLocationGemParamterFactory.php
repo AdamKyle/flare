@@ -2,19 +2,25 @@
 
 namespace Database\Factories;
 
+use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GameMapGemParamters;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
 use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class GameMapGemParamtersFactory extends Factory
+class GameLocationGemParamterFactory extends Factory
 {
-    protected $model = GameMapGemParamters::class;
+    protected $model = GameLocationGemParamter::class;
 
     public function definition(): array
     {
         return [
-            'game_map_id' => GameMap::factory(),
+            'location_id' => function (): int {
+                $gameMap = GameMap::first() ?? GameMap::factory()->create();
+
+                return Location::factory()->create(['game_map_id' => $gameMap->id])->id;
+            },
             'name' => $this->faker->unique()->words(3, true),
             'description' => 'A generated gem parameter description.',
             'character_xp_bonus_range' => '0.01-1.0',
@@ -25,9 +31,20 @@ class GameMapGemParamtersFactory extends Factory
             'mythic_item_drop_chance_increase_range' => '0.01-1.0',
             'cosmic_item_drop_chance_increase_range' => '0.01-1.0',
             'ascended_item_drop_chance_increase_range' => '0.01-1.0',
-            'character_power_reduction_range' => '0.01-1.0',
             'monster_atonement' => GemTypeValue::FIRE,
             'monster_atonement_range' => '0.01-1.0',
+            'rolled_gem_id' => null,
+            'roll_count' => 0,
         ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (GameLocationGemParamter $gemParams) {
+            Item::factory()->create([
+                'type' => 'quest',
+                'drop_location_id' => $gemParams->location_id,
+            ]);
+        });
     }
 }

@@ -18,7 +18,9 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
@@ -249,6 +251,25 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         });
     }
 
+    public function testBeginAutomationLogsDispatchRequestedBeforeDispatchCompleted(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        Log::shouldReceive('channel')->andReturnSelf();
+        Log::shouldReceive('info')->withAnyArgs()->zeroOrMoreTimes()->byDefault();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Faction loyalty automation dispatch requested.', Mockery::type('array'))
+            ->ordered();
+        Log::shouldReceive('info')
+            ->once()
+            ->with('Faction loyalty automation dispatch completed.', Mockery::type('array'))
+            ->ordered();
+
+        $this->service->beginAutomation($this->character, $this->factionLoyaltyNpc, AttackTypeValue::ATTACK);
+    }
+
     public function testStopAutomationDeletesCharacterAutomation(): void
     {
         Event::fake();
@@ -273,6 +294,62 @@ class FactionLoyaltyAutomationServiceTest extends TestCase
         $this->service->stopAutomation($this->character);
 
         $this->assertNotNull($this->factionLoyaltyAutomation->refresh()->completed_at);
+    }
+
+    public function testStopAutomationCompletesFactionLoyaltyAutomationLinkedToExactActiveCharacterAutomation(): void
+    {
+        Event::fake();
+
+        $olderCharacterAutomation = CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now()->subMinute(),
+            'completed_at' => now()->addHours(7),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $olderFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
+            'character_automation_id' => $olderCharacterAutomation->id,
+            'character_id' => $this->character->id,
+            'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
+            'started_at' => now()->subMinute(),
+        ]);
+        $newerCharacterAutomation = CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHours(8),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $newerFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
+            'character_automation_id' => $newerCharacterAutomation->id,
+            'character_id' => $this->character->id,
+            'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
+            'started_at' => now(),
+        ]);
+
+        $this->service->stopAutomation($this->character);
+
+        $this->assertNotNull($newerFactionLoyaltyAutomation->refresh()->completed_at);
+        $this->assertNull($olderFactionLoyaltyAutomation->refresh()->completed_at);
+    }
+
+    public function testStopAutomationDoesNotDeleteUnrelatedCurrentAutomationRecords(): void
+    {
+        Event::fake();
+
+        $unrelatedAutomation = CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addHours(8),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $this->factionLoyaltyFactory->createAutomation();
+
+        $this->service->stopAutomation($this->character);
+
+        $this->assertNotNull($unrelatedAutomation->fresh());
     }
 
     public function testStopAutomationReEnablesCrafting(): void

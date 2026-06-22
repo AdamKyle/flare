@@ -91,6 +91,7 @@ class RaidBattleController extends Controller
 
         $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)
             ->where('raid_id', $raidBoss->raid_id)
+            ->where('raid_boss_id', $raidBoss->id)
             ->first();
 
         if (! is_null($raidBossParticipation)) {

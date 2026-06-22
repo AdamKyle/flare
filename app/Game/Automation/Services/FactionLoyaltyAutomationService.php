@@ -88,7 +88,7 @@ class FactionLoyaltyAutomationService
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
-        Log::channel('faction_loyalty')->info('Faction loyalty automation job dispatched.', [
+        Log::channel('faction_loyalty')->info('Faction loyalty automation dispatch requested.', [
             'character_id' => $character->id,
             'character_name' => $character->name,
             'automation_id' => $automation->id,
@@ -99,6 +99,16 @@ class FactionLoyaltyAutomationService
         ]);
 
         AutomatedFactionLoyalty::dispatch($character->id, $automation->id, $factionLoyaltyAutomation->id, self::TIME_DELAY)->delay(now()->addMinutes(self::TIME_DELAY))->onConnection('long_running')->onQueue('faction_loyalty');
+
+        Log::channel('faction_loyalty')->info('Faction loyalty automation dispatch completed.', [
+            'character_id' => $character->id,
+            'character_name' => $character->name,
+            'automation_id' => $automation->id,
+            'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
+            'connection' => 'long_running',
+            'queue' => 'faction_loyalty',
+            'delay_minutes' => self::TIME_DELAY,
+        ]);
     }
 
     /**
@@ -108,7 +118,11 @@ class FactionLoyaltyAutomationService
      * @return array
      */
     public function stopAutomation(Character $character): array {
-        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::FACTION_LOYALTY)->first();
+        $characterAutomation = CharacterAutomation::where('character_id', $character->id)
+            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('completed_at', '>', now())
+            ->orderByDesc('id')
+            ->first();
 
         if (is_null($characterAutomation)) {
             Log::channel('faction_loyalty')->warning('Faction loyalty automation stop requested but no active automation found.', [
@@ -123,8 +137,7 @@ class FactionLoyaltyAutomationService
             return $this->errorResult('Nope. You don\'t own that.');
         }
 
-        $factionLoyaltyAutomation = FactionLoyaltyAutomation::where('character_id', $character->id)
-            ->whereNull('completed_at')
+        $factionLoyaltyAutomation = FactionLoyaltyAutomation::where('character_automation_id', $characterAutomation->id)
             ->first();
 
         Log::channel('faction_loyalty')->info('Faction loyalty automation stopped by player.', [
