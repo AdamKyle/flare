@@ -8,12 +8,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGameLocationGemParamters;
-use Tests\Traits\CreateGameMapGemParamters;
+use Tests\Traits\CreateGameLocationGemParamter;
+use Tests\Traits\CreateGameMapGemParamter;
 
 class InfoGemParamtersControllerTest extends TestCase
 {
-    use CreateGameLocationGemParamters, CreateGameMapGemParamters, RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGameMapGemParamter, RefreshDatabase;
 
     public function testGuestCanViewMapGemsList(): void
     {
@@ -25,18 +25,18 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testGuestCanViewMapGemShow(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'crafting_skill_bonus_range' => '0.25-0.75',
             'description' => 'Public map gem description.',
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
-        $response->assertSee($gameMapGemParamters->name);
-        $response->assertSee($gameMapGemParamters->gameMap->name);
+        $response->assertSee($gameMapGemParamter->name);
+        $response->assertSee($gameMapGemParamter->gameMap->name);
         $response->assertSee('0.25-0.75');
         $response->assertSee('Public map gem description.');
         $response->assertSee('href="'.route('info.page.map-gems.list').'"', false);
@@ -52,18 +52,18 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testGuestCanViewLocationGemShow(): void
     {
-        $gameLocationGemParamters = $this->createGameLocationGemParamters([
+        $gameLocationGemParamter = $this->createGameLocationGemParamter([
             'crafting_skill_bonus_range' => '0.25-0.75',
             'description' => 'Public location gem description.',
         ]);
 
         $response = $this->call('GET', route('info.page.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]));
 
         $response->assertOk();
-        $response->assertSee($gameLocationGemParamters->name);
-        $response->assertSee($gameLocationGemParamters->location->name);
+        $response->assertSee($gameLocationGemParamter->name);
+        $response->assertSee($gameLocationGemParamter->location->name);
         $response->assertSee('0.25-0.75');
         $response->assertSee('Public location gem description.');
         $response->assertSee('href="'.route('info.page.location-gems.list').'"', false);
@@ -75,15 +75,15 @@ class InfoGemParamtersControllerTest extends TestCase
             ->createBaseCharacter(assignBaseSkill: false, assignPassiveSkills: false)
             ->getCharacter()
             ->user;
-        $gameMapGemParamters = $this->createGameMapGemParamters();
+        $gameMapGemParamter = $this->createGameMapGemParamter();
 
         $response = $this->actingAs($user)->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
         $response->assertDontSee(route('admin.map-gems.edit', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]), false);
     }
 
@@ -93,26 +93,26 @@ class InfoGemParamtersControllerTest extends TestCase
             ->createBaseCharacter(assignBaseSkill: false, assignPassiveSkills: false)
             ->getCharacter()
             ->user;
-        $gameLocationGemParamters = $this->createGameLocationGemParamters();
+        $gameLocationGemParamter = $this->createGameLocationGemParamter();
 
         $response = $this->actingAs($user)->call('GET', route('info.page.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]));
 
         $response->assertOk();
         $response->assertDontSee(route('admin.location-gems.edit', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]), false);
     }
 
     public function testMapGemShowDisplaysNotAvailableForEmptyDescription(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'description' => null,
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -121,12 +121,12 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testLocationGemShowDisplaysNotAvailableForEmptyDescription(): void
     {
-        $gameLocationGemParamters = $this->createGameLocationGemParamters([
+        $gameLocationGemParamter = $this->createGameLocationGemParamter([
             'description' => null,
         ]);
 
         $response = $this->call('GET', route('info.page.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]));
 
         $response->assertOk();
@@ -135,29 +135,29 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemsLivewireTableRendersWithRecord(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters();
+        $gameMapGemParamter = $this->createGameMapGemParamter();
 
         Livewire::test(MapGems::class)
-            ->assertSee($gameMapGemParamters->name)
+            ->assertSee($gameMapGemParamter->name)
             ->assertSee(route('info.page.map-gems.show', [
-                'gameMapGemParamters' => $gameMapGemParamters,
+                'gameMapGemParamter' => $gameMapGemParamter,
             ]), false);
     }
 
     public function testLocationGemsLivewireTableRendersWithRecord(): void
     {
-        $gameLocationGemParamters = $this->createGameLocationGemParamters();
+        $gameLocationGemParamter = $this->createGameLocationGemParamter();
 
         Livewire::test(LocationGems::class)
-            ->assertSee($gameLocationGemParamters->name)
+            ->assertSee($gameLocationGemParamter->name)
             ->assertSee(route('info.page.location-gems.show', [
-                'gameLocationGemParamters' => $gameLocationGemParamters,
+                'gameLocationGemParamter' => $gameLocationGemParamter,
             ]), false);
     }
 
     public function testMapGemShowFormatsBeneficialAndHarmfulRanges(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'description' => 'Formatting test description.',
             'character_xp_bonus_range' => '0.05-0.10',
             'enemy_strength_increase_range' => '0.05-0.10',
@@ -166,7 +166,7 @@ class InfoGemParamtersControllerTest extends TestCase
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -183,7 +183,7 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testLocationGemShowFormatsBeneficialAndHarmfulRanges(): void
     {
-        $gameLocationGemParamters = $this->createGameLocationGemParamters([
+        $gameLocationGemParamter = $this->createGameLocationGemParamter([
             'description' => 'Location formatting description.',
             'unique_item_drop_chance_increase_range' => '0.05-0.10',
             'enemy_counter_chance_range' => '0.05-0.10',
@@ -191,7 +191,7 @@ class InfoGemParamtersControllerTest extends TestCase
         ]);
 
         $response = $this->call('GET', route('info.page.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]));
 
         $response->assertOk();
@@ -210,7 +210,7 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemEmptyStatFieldsDoNotRenderAsNotAvailable(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'description' => 'Present description.',
             'character_xp_bonus_range' => null,
             'gold_gain_range' => null,
@@ -223,7 +223,7 @@ class InfoGemParamtersControllerTest extends TestCase
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -232,7 +232,7 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testLocationGemEmptyStatFieldsDoNotRenderAsNotAvailable(): void
     {
-        $gameLocationGemParamters = $this->createGameLocationGemParamters([
+        $gameLocationGemParamter = $this->createGameLocationGemParamter([
             'description' => 'Present location description.',
             'character_xp_bonus_range' => null,
             'gold_gain_range' => null,
@@ -244,7 +244,7 @@ class InfoGemParamtersControllerTest extends TestCase
         ]);
 
         $response = $this->call('GET', route('info.page.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]));
 
         $response->assertOk();
@@ -253,12 +253,12 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemOverviewDoesNotRenderEmptyMonsterAtonement(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'monster_atonement' => null,
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -267,12 +267,12 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemOverviewDoesNotRenderEmptyMonsterAtonementRange(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'monster_atonement_range' => null,
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -281,12 +281,12 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemOverviewDoesNotRenderEmptyCraftingSkills(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'crafting_skill_ids' => [],
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -295,10 +295,10 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemSectionWithNoVisibleFieldsDoesNotRenderItsCard(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters();
+        $gameMapGemParamter = $this->createGameMapGemParamter();
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -307,10 +307,10 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemSectionWithNoVisibleFieldsDoesNotRenderItsBlueInfoAlert(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters();
+        $gameMapGemParamter = $this->createGameMapGemParamter();
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -319,10 +319,10 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemShowLayoutIncludesItemsStartClass(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters();
+        $gameMapGemParamter = $this->createGameMapGemParamter();
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -331,10 +331,10 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemShowBlueInfoAlertsIncludeSelfStartClass(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters();
+        $gameMapGemParamter = $this->createGameMapGemParamter();
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -343,12 +343,12 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testMapGemDlUsesFourColumnGridWithNoInnerWrappers(): void
     {
-        $gameMapGemParamters = $this->createGameMapGemParamters([
+        $gameMapGemParamter = $this->createGameMapGemParamter([
             'character_xp_bonus_range' => '0.05-0.10',
         ]);
 
         $response = $this->call('GET', route('info.page.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
         ]));
 
         $response->assertOk();
@@ -358,12 +358,12 @@ class InfoGemParamtersControllerTest extends TestCase
 
     public function testLocationGemDlUsesFourColumnGridWithNoInnerWrappers(): void
     {
-        $gameLocationGemParamters = $this->createGameLocationGemParamters([
+        $gameLocationGemParamter = $this->createGameLocationGemParamter([
             'character_xp_bonus_range' => '0.05-0.10',
         ]);
 
         $response = $this->call('GET', route('info.page.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
         ]));
 
         $response->assertOk();

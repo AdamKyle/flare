@@ -2,7 +2,7 @@
 
 namespace App\Admin\Exports\LocationGems\Sheets;
 
-use App\Flare\Models\GameLocationGemParamters;
+use App\Flare\Models\GameLocationGemParamter;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -13,7 +13,7 @@ class LocationGemsSheet implements FromView, ShouldAutoSize, WithTitle
     public function view(): View
     {
         return view('admin.exports.location-gems.sheets.location-gems', [
-            'locationGems' => GameLocationGemParamters::with('location.map')->get(),
+            'locationGems' => GameLocationGemParamter::with('location.map')->get(),
         ]);
     }
 

@@ -6,10 +6,11 @@ use App\Admin\Exports\LocationGems\LocationGemsExport;
 use App\Admin\Import\LocationGems\LocationGemsImport;
 use App\Admin\Requests\LocationGemParamtersImportRequest;
 use App\Admin\Requests\LocationGemParamtersManagementRequest;
-use App\Flare\Models\GameLocationGemParamters;
+use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Location;
 use App\Flare\Values\MapNameValue;
+use App\Admin\Services\AdminGemRollService;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
@@ -20,6 +21,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LocationGemsController extends Controller
 {
+    public function __construct(private readonly AdminGemRollService $adminGemRollService)
+    {
+    }
+
     public function index(): View
     {
         return view('admin.location-gems.index');
@@ -28,17 +33,17 @@ class LocationGemsController extends Controller
     public function create(): View
     {
         return view('admin.location-gems.manage', [
-            'gameLocationGemParamters' => null,
+            'gameLocationGemParamter' => null,
             'locations' => $this->eligibleLocations(),
             'gemTypes' => GemTypeValue::getNames(),
             'craftingSkills' => GameSkill::where('can_train', false)->orderBy('name')->get(),
         ]);
     }
 
-    public function edit(GameLocationGemParamters $gameLocationGemParamters): View
+    public function edit(GameLocationGemParamter $gameLocationGemParamter): View
     {
         return view('admin.location-gems.manage', [
-            'gameLocationGemParamters' => $gameLocationGemParamters,
+            'gameLocationGemParamter' => $gameLocationGemParamter,
             'locations' => $this->eligibleLocations(),
             'gemTypes' => GemTypeValue::getNames(),
             'craftingSkills' => GameSkill::where('can_train', false)->orderBy('name')->get(),
@@ -79,16 +84,40 @@ class LocationGemsController extends Controller
             ->values();
     }
 
-    public function show(GameLocationGemParamters $gameLocationGemParamters): View
+    public function show(GameLocationGemParamter $gameLocationGemParamter): View
     {
         return view('admin.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters->load('location.map'),
+            'gameLocationGemParamter' => $gameLocationGemParamter->load('location.map'),
         ]);
+    }
+
+    public function rolled(GameLocationGemParamter $gameLocationGemParamter): View|RedirectResponse
+    {
+        $gameLocationGemParamter->load('location.map', 'rolledGem.rolledByUser');
+
+        if (is_null($gameLocationGemParamter->rolled_gem_id) || is_null($gameLocationGemParamter->rolledGem)) {
+            return response()
+                ->redirectToRoute('admin.location-gems.show', ['gameLocationGemParamter' => $gameLocationGemParamter->id])
+                ->with('error', 'No rolled gem is available for this location gem profile.');
+        }
+
+        return view('admin.location-gems.rolled', [
+            'gameLocationGemParamter' => $gameLocationGemParamter,
+        ]);
+    }
+
+    public function roll(GameLocationGemParamter $gameLocationGemParamter): RedirectResponse
+    {
+        $gem = $this->adminGemRollService->rollLocationGem($gameLocationGemParamter, auth()->user());
+
+        return response()
+            ->redirectToRoute('admin.location-gems.show', ['gameLocationGemParamter' => $gameLocationGemParamter->id])
+            ->with('success', 'Rolled '.$gem->name);
     }
 
     public function store(LocationGemParamtersManagementRequest $request): RedirectResponse
     {
-        $gameLocationGemParamters = null;
+        $gameLocationGemParamter = null;
         $validatedData = $request->validated();
         $validatedData['crafting_skill_ids'] = array_map(
             'intval',
@@ -96,19 +125,19 @@ class LocationGemsController extends Controller
         );
 
         if ($request->integer('id') !== 0) {
-            $gameLocationGemParamters = GameLocationGemParamters::find($request->integer('id'));
+            $gameLocationGemParamter = GameLocationGemParamter::find($request->integer('id'));
         }
 
-        if (is_null($gameLocationGemParamters)) {
-            $gameLocationGemParamters = GameLocationGemParamters::create($validatedData);
-            $message = 'Created '.$gameLocationGemParamters->name;
+        if (is_null($gameLocationGemParamter)) {
+            $gameLocationGemParamter = GameLocationGemParamter::create($validatedData);
+            $message = 'Created '.$gameLocationGemParamter->name;
         } else {
-            $gameLocationGemParamters->update($validatedData);
-            $message = 'Updated '.$gameLocationGemParamters->name;
+            $gameLocationGemParamter->update($validatedData);
+            $message = 'Updated '.$gameLocationGemParamter->name;
         }
 
         return response()
-            ->redirectToRoute('admin.location-gems.show', ['gameLocationGemParamters' => $gameLocationGemParamters->id])
+            ->redirectToRoute('admin.location-gems.show', ['gameLocationGemParamter' => $gameLocationGemParamter->id])
             ->with('success', $message);
     }
 

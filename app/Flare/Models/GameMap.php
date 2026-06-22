@@ -60,7 +60,7 @@ class GameMap extends Model
 
     public function gemParamters(): HasOne
     {
-        return $this->hasOne(GameMapGemParamters::class);
+        return $this->hasOne(GameMapGemParamter::class);
     }
 
     public function mapType(): MapNameValue

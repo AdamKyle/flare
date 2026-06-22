@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Automation\Jobs;
 
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
@@ -12,6 +13,9 @@ use App\Game\Automation\Enums\AutomatedCraftingResultType;
 use App\Game\Automation\Enums\FactionLoyaltyCoordinatorAction;
 use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Jobs\AutomatedFactionLoyalty;
+use App\Game\Automation\Events\AutomationStatus;
+use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
 use App\Game\Automation\Values\AutomatedCraftingResult;
 use Exception;
@@ -491,6 +495,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
 
     public function testFailedLogsAndCleansUpOnlyExactOwnedAutomation(): void
     {
+        Event::fake();
         Log::shouldReceive('channel')->once()->with('faction_loyalty')->andReturnSelf();
         Log::shouldReceive('error')
             ->twice()
@@ -507,6 +512,38 @@ class AutomatedFactionLoyaltyTest extends TestCase
 
         $this->assertNull($characterAutomation->fresh());
         $this->assertNotNull($factionLoyaltyAutomation->refresh()->completed_at);
+        $this->assertTrue($character->refresh()->can_craft);
+        $this->assertSame(1, FactionLoyaltyAutomationWarning::where(
+            'faction_loyalty_automation_id',
+            $factionLoyaltyAutomation->id,
+        )->count());
+        Event::assertDispatched(UpdateCharacterStatus::class);
+        Event::assertDispatched(AutomationTimeOut::class);
+        Event::assertDispatched(AutomationStatus::class);
+    }
+
+    public function testFailedCleanupDoesNotCreateDuplicateWarnings(): void
+    {
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
+        $characterAutomation = $factory->getCharacterAutomation();
+        $factionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
+        $job = new AutomatedFactionLoyalty(
+            $character->id,
+            $characterAutomation->id,
+            $factionLoyaltyAutomation->id,
+            1,
+        );
+
+        $job->failed(new Exception('Job failed.'));
+        $job->failed(new Exception('Job failed again.'));
+
+        $this->assertSame(1, FactionLoyaltyAutomationWarning::where(
+            'faction_loyalty_automation_id',
+            $factionLoyaltyAutomation->id,
+        )->count());
         $this->assertTrue($character->refresh()->can_craft);
     }
 

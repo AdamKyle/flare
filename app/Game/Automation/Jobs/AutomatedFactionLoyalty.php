@@ -33,6 +33,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class AutomatedFactionLoyalty implements ShouldQueue
@@ -62,6 +63,8 @@ class AutomatedFactionLoyalty implements ShouldQueue
     private ?FactionLoyaltyAutomation $factionLoyaltyAutomation = null;
 
     private ?FactionLoyaltyNpc $factionLoyaltyNpc = null;
+
+    private string $currentPhase = 'initializing';
 
     /**
      * Set up the job.
@@ -171,6 +174,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
         $this->roundStartedAt = now();
 
         try {
+            $this->currentPhase = 'resolving_npc';
             Log::channel('faction_loyalty')->info('Faction loyalty resolving NPC.', [
                 'character_id' => $this->character->id,
                 'character_name' => $this->character->name,
@@ -211,6 +215,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 'npc_name' => $this->factionLoyaltyNpc->npc?->real_name,
             ]);
 
+            $this->currentPhase = 'resolving_action';
             $factionLoyaltyAutomationAction = $this->resolveFactionLoyaltyAutomationAction($factionLoyaltyAutomationActionCoordinator);
 
             if (is_null($factionLoyaltyAutomationAction)) {
@@ -253,6 +258,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 $factionLoyaltyAutomationFightLogger,
                 $characterCacheData
             );
+            $this->currentPhase = 'action_completed';
         } catch (Throwable $throwable) {
             $this->handleAutomationException($throwable, $characterCacheData);
 
@@ -929,8 +935,11 @@ class AutomatedFactionLoyalty implements ShouldQueue
             'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
             'exception_class' => $throwable::class,
             'exception_message' => $throwable->getMessage(),
-            'file' => $throwable->getFile(),
-            'line' => $throwable->getLine(),
+            'exception_file' => $throwable->getFile(),
+            'exception_line' => $throwable->getLine(),
+            'trace' => $throwable->getTraceAsString(),
+            'current_phase' => $this->currentPhase,
+            'cancellation_reason' => 'unexpected_exception',
         ];
 
         Log::error('Faction loyalty automation failed.', $context);
@@ -948,10 +957,11 @@ class AutomatedFactionLoyalty implements ShouldQueue
         }
 
         $this->sendOutEventLogUpdate(
-            'Something went wrong with faction loyalty automation. Automation canceled.',
+            'Faction loyalty automation stopped because something went wrong. Please try again.',
             true
         );
 
+        $this->createFailureWarning('unexpected_exception');
         $this->endAutomation($characterCacheData, false);
     }
 
@@ -1057,8 +1067,11 @@ class AutomatedFactionLoyalty implements ShouldQueue
             'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
             'exception_class' => $throwable::class,
             'exception_message' => $throwable->getMessage(),
-            'file' => $throwable->getFile(),
-            'line' => $throwable->getLine(),
+            'exception_file' => $throwable->getFile(),
+            'exception_line' => $throwable->getLine(),
+            'trace' => $throwable->getTraceAsString(),
+            'current_phase' => $this->currentPhase,
+            'cancellation_reason' => 'queue_job_failed',
         ];
 
         Log::error('Faction loyalty automation job failed.', $context);
@@ -1092,6 +1105,11 @@ class AutomatedFactionLoyalty implements ShouldQueue
         $ownsActiveAutomation = $characterAutomation->completed_at->isFuture()
             && is_null($factionLoyaltyAutomation->completed_at);
 
+        $this->character = Character::find($this->characterId);
+        $this->characterAutomation = $characterAutomation;
+        $this->factionLoyaltyAutomation = $factionLoyaltyAutomation;
+        $this->createFailureWarning('queue_job_failed');
+
         $factionLoyaltyAutomation->update([
             'completed_at' => now(),
         ]);
@@ -1105,8 +1123,37 @@ class AutomatedFactionLoyalty implements ShouldQueue
         $character = Character::find($this->characterId);
 
         if (! is_null($character)) {
-            $this->setCharacterCanCraft($character, true);
+            $character = $this->setCharacterCanCraft($character, true);
+            Cache::delete('character-defence-'.$character->id);
+            Cache::delete('character-sheet-'.$character->id);
+
+            $broadcastContext = ['character_id' => $this->characterId, 'automation_id' => $this->automationId];
+            $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+            $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
+            $this->safelyDispatchBroadcastEvent(new AutomationStatus($character->user, false), $broadcastContext);
         }
+    }
+
+    private function createFailureWarning(string $type): void
+    {
+        if (is_null($this->character) || is_null($this->factionLoyaltyAutomation)) {
+            return;
+        }
+
+        FactionLoyaltyAutomationWarning::firstOrCreate(
+            [
+                'character_id' => $this->character->id,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomation->id,
+                'type' => $type,
+            ],
+            [
+                'faction_loyalty_automation_log_id' => $this->factionLoyaltyAutomation->log?->id,
+                'faction_loyalty_npc_id' => $this->factionLoyaltyAutomation->faction_loyalty_npc_id,
+                'message' => 'Faction loyalty automation stopped because something went wrong. Please try again.',
+            ],
+        );
+
+        $this->dispatchWarningState();
     }
 
     private function hasNewerActiveFactionLoyaltyAutomation(?int &$newerActiveAutomationId = null): bool

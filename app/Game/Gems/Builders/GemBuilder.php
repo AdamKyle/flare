@@ -73,7 +73,8 @@ class GemBuilder
      */
     protected function findExistingGem(array $data): ?Gem
     {
-        return Gem::where('name', $data['name'])
+        return Gem::character()
+            ->where('name', $data['name'])
             ->where('primary_atonement_type', $data['primary_atonement_type'])
             ->where('secondary_atonement_type', $data['secondary_atonement_type'])
             ->where('tertiary_atonement_type', $data['tertiary_atonement_type'])
@@ -94,6 +95,7 @@ class GemBuilder
     {
         return [
             'name' => $this->names[rand(0, count($this->names) - 1)],
+            'domain' => Gem::DOMAIN_CHARACTER,
             'tier' => $tier,
             'primary_atonement_type' => GemTypeValue::FIRE,
             'secondary_atonement_type' => GemTypeValue::WATER,

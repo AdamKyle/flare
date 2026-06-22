@@ -3,6 +3,8 @@
 namespace Tests\Console\Raids;
 
 use App\Flare\Models\RaidBossParticipation;
+use App\Flare\Models\RaidBoss;
+use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -64,7 +66,7 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function testResetsTwoRaidParticipationsForTheSameCharacterIndependently(): void
+    public function testResetsTwoBossParticipationsForTheSameCharacterIndependently(): void
     {
         Event::fake();
 
@@ -73,10 +75,6 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         $secondMonster = $this->createMonster();
         $item = $this->createItem();
         $firstLocation = $this->createLocation();
-        $secondLocation = $this->createLocation([
-            'x' => 32,
-            'y' => 32,
-        ]);
         $firstRaid = $this->createRaid([
             'raid_boss_id' => $firstMonster->id,
             'raid_monster_ids' => [$firstMonster->id],
@@ -84,12 +82,13 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
             'corrupted_location_ids' => [$firstLocation->id],
             'artifact_item_id' => $item->id,
         ]);
-        $secondRaid = $this->createRaid([
+        $firstRaidBoss = RaidBoss::create([
+            'raid_id' => $firstRaid->id,
+            'raid_boss_id' => $firstMonster->id,
+        ]);
+        $secondRaidBoss = RaidBoss::create([
+            'raid_id' => $firstRaid->id,
             'raid_boss_id' => $secondMonster->id,
-            'raid_monster_ids' => [$secondMonster->id],
-            'raid_boss_location_id' => $secondLocation->id,
-            'corrupted_location_ids' => [$secondLocation->id],
-            'artifact_item_id' => $item->id,
         ]);
 
         $this->createEvent([
@@ -98,22 +97,18 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
             'started_at' => now(),
             'ends_at' => now()->addDay(),
         ]);
-        $this->createEvent([
-            'raid_id' => $secondRaid->id,
-            'type' => EventType::RAID_EVENT,
-            'started_at' => now(),
-            'ends_at' => now()->addDay(),
-        ]);
         RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $firstRaid->id,
+            'raid_boss_id' => $firstRaidBoss->id,
             'attacks_left' => 0,
             'damage_dealt' => 100,
             'killed_boss' => false,
         ]);
         RaidBossParticipation::create([
             'character_id' => $character->id,
-            'raid_id' => $secondRaid->id,
+            'raid_id' => $firstRaid->id,
+            'raid_boss_id' => $secondRaidBoss->id,
             'attacks_left' => 2,
             'damage_dealt' => 50,
             'killed_boss' => false,
@@ -123,10 +118,12 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
 
         $this->assertSame(5, RaidBossParticipation::where('character_id', $character->id)
             ->where('raid_id', $firstRaid->id)
+            ->where('raid_boss_id', $firstRaidBoss->id)
             ->first()
             ->attacks_left);
         $this->assertSame(5, RaidBossParticipation::where('character_id', $character->id)
-            ->where('raid_id', $secondRaid->id)
+            ->where('raid_id', $firstRaid->id)
+            ->where('raid_boss_id', $secondRaidBoss->id)
             ->first()
             ->attacks_left);
     }
@@ -205,6 +202,61 @@ class ResetDailyRaidAttackLimitsTest extends TestCase
         Artisan::call('reset:daily-raid-attack-limits');
 
         Event::assertNotDispatched(GlobalMessageEvent::class);
+    }
+
+    public function testUpdateRaidAttacksLeftBroadcastsMonsterIdNotRaidBossPrimaryKey(): void
+    {
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+        $location = $this->createLocation();
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'raid_monster_ids' => [$monster->id],
+            'raid_boss_location_id' => $location->id,
+            'corrupted_location_ids' => [$location->id],
+            'artifact_item_id' => $item->id,
+        ]);
+        $this->createEvent([
+            'raid_id' => $raid->id,
+            'type' => EventType::RAID_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->addDay(),
+        ]);
+
+        RaidBoss::create([
+            'raid_id' => $raid->id,
+            'raid_boss_id' => $monster->id,
+        ]);
+
+        $raidBoss = RaidBoss::create([
+            'raid_id' => $raid->id,
+            'raid_boss_id' => $monster->id,
+        ]);
+
+        RaidBossParticipation::create([
+            'character_id' => $character->id,
+            'raid_id' => $raid->id,
+            'raid_boss_id' => $raidBoss->id,
+            'attacks_left' => 0,
+            'damage_dealt' => 500,
+            'killed_boss' => false,
+        ]);
+
+        Artisan::call('reset:daily-raid-attack-limits');
+
+        $this->assertSame(5, RaidBossParticipation::where('character_id', $character->id)
+            ->where('raid_id', $raid->id)
+            ->where('raid_boss_id', $raidBoss->id)
+            ->first()
+            ->attacks_left);
+
+        Event::assertDispatched(UpdateRaidAttacksLeft::class, function (UpdateRaidAttacksLeft $event) use ($monster, $raidBoss) {
+            return $event->raidBossId === $monster->id
+                && $event->raidBossId !== $raidBoss->id;
+        });
     }
 
     public function testDoNotresetRaidFightWhenRaidBossIsDead()

@@ -7,8 +7,9 @@ use App\Admin\Import\MapGems\MapGemsImport;
 use App\Admin\Requests\MapGemParamtersImportRequest;
 use App\Admin\Requests\MapGemParamtersManagementRequest;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GameMapGemParamters;
+use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\GameSkill;
+use App\Admin\Services\AdminGemRollService;
 use App\Game\Gems\Values\GemTypeValue;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
@@ -18,6 +19,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MapGemsController extends Controller
 {
+    public function __construct(private readonly AdminGemRollService $adminGemRollService)
+    {
+    }
+
     public function index(): View
     {
         return view('admin.map-gems.index');
@@ -26,33 +31,57 @@ class MapGemsController extends Controller
     public function create(): View
     {
         return view('admin.map-gems.manage', [
-            'gameMapGemParamters' => null,
+            'gameMapGemParamter' => null,
             'gameMaps' => GameMap::orderBy('name')->get(),
             'gemTypes' => GemTypeValue::getNames(),
             'craftingSkills' => GameSkill::where('can_train', false)->orderBy('name')->get(),
         ]);
     }
 
-    public function edit(GameMapGemParamters $gameMapGemParamters): View
+    public function edit(GameMapGemParamter $gameMapGemParamter): View
     {
         return view('admin.map-gems.manage', [
-            'gameMapGemParamters' => $gameMapGemParamters,
+            'gameMapGemParamter' => $gameMapGemParamter,
             'gameMaps' => GameMap::orderBy('name')->get(),
             'gemTypes' => GemTypeValue::getNames(),
             'craftingSkills' => GameSkill::where('can_train', false)->orderBy('name')->get(),
         ]);
     }
 
-    public function show(GameMapGemParamters $gameMapGemParamters): View
+    public function show(GameMapGemParamter $gameMapGemParamter): View
     {
         return view('admin.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters->load('gameMap'),
+            'gameMapGemParamter' => $gameMapGemParamter->load('gameMap'),
         ]);
+    }
+
+    public function rolled(GameMapGemParamter $gameMapGemParamter): View|RedirectResponse
+    {
+        $gameMapGemParamter->load('gameMap', 'rolledGem.rolledByUser');
+
+        if (is_null($gameMapGemParamter->rolled_gem_id) || is_null($gameMapGemParamter->rolledGem)) {
+            return response()
+                ->redirectToRoute('admin.map-gems.show', ['gameMapGemParamter' => $gameMapGemParamter->id])
+                ->with('error', 'No rolled gem is available for this map gem profile.');
+        }
+
+        return view('admin.map-gems.rolled', [
+            'gameMapGemParamter' => $gameMapGemParamter,
+        ]);
+    }
+
+    public function roll(GameMapGemParamter $gameMapGemParamter): RedirectResponse
+    {
+        $gem = $this->adminGemRollService->rollMapGem($gameMapGemParamter, auth()->user());
+
+        return response()
+            ->redirectToRoute('admin.map-gems.show', ['gameMapGemParamter' => $gameMapGemParamter->id])
+            ->with('success', 'Rolled '.$gem->name);
     }
 
     public function store(MapGemParamtersManagementRequest $request): RedirectResponse
     {
-        $gameMapGemParamters = null;
+        $gameMapGemParamter = null;
         $validatedData = $request->validated();
         $validatedData['crafting_skill_ids'] = array_map(
             'intval',
@@ -60,19 +89,19 @@ class MapGemsController extends Controller
         );
 
         if ($request->integer('id') !== 0) {
-            $gameMapGemParamters = GameMapGemParamters::find($request->integer('id'));
+            $gameMapGemParamter = GameMapGemParamter::find($request->integer('id'));
         }
 
-        if (is_null($gameMapGemParamters)) {
-            $gameMapGemParamters = GameMapGemParamters::create($validatedData);
-            $message = 'Created '.$gameMapGemParamters->name;
+        if (is_null($gameMapGemParamter)) {
+            $gameMapGemParamter = GameMapGemParamter::create($validatedData);
+            $message = 'Created '.$gameMapGemParamter->name;
         } else {
-            $gameMapGemParamters->update($validatedData);
-            $message = 'Updated '.$gameMapGemParamters->name;
+            $gameMapGemParamter->update($validatedData);
+            $message = 'Updated '.$gameMapGemParamter->name;
         }
 
         return response()
-            ->redirectToRoute('admin.map-gems.show', ['gameMapGemParamters' => $gameMapGemParamters->id])
+            ->redirectToRoute('admin.map-gems.show', ['gameMapGemParamter' => $gameMapGemParamter->id])
             ->with('success', $message);
     }
 

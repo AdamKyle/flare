@@ -6,9 +6,9 @@ use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
-use App\Flare\Models\GameLocationGemParamters;
+use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
-use App\Flare\Models\GameMapGemParamters;
+use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GameUnit;
@@ -134,17 +134,17 @@ class InfoPageController extends Controller
         return view('information.location-gems.index');
     }
 
-    public function viewMapGem(GameMapGemParamters $gameMapGemParamters): View
+    public function viewMapGem(GameMapGemParamter $gameMapGemParamter): View
     {
         return view('information.map-gems.show', [
-            'gameMapGemParamters' => $gameMapGemParamters->load('gameMap'),
+            'gameMapGemParamter' => $gameMapGemParamter->load('gameMap'),
         ]);
     }
 
-    public function viewLocationGem(GameLocationGemParamters $gameLocationGemParamters): View
+    public function viewLocationGem(GameLocationGemParamter $gameLocationGemParamter): View
     {
         return view('information.location-gems.show', [
-            'gameLocationGemParamters' => $gameLocationGemParamters->load('location.map'),
+            'gameLocationGemParamter' => $gameLocationGemParamter->load('location.map'),
         ]);
     }
 

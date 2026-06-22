@@ -44,7 +44,18 @@ export default class RaidFight extends React.Component<
         // @ts-ignore
         this.attacksLeftUpdate.listen(
             "Game.Battle.Events.UpdateRaidAttacksLeft",
-            (event: { attacksLeft: number; damageDealt: number }) => {
+            (event: {
+                attacksLeft: number;
+                damageDealt: number;
+                raidBossId?: number | null;
+            }) => {
+                if (
+                    event.raidBossId != null &&
+                    event.raidBossId !== this.props.monster_id
+                ) {
+                    return;
+                }
+
                 this.setState({
                     attacks_left: event.attacksLeft,
                     damage_dealt: event.damageDealt,

@@ -58,6 +58,13 @@ return [
             'days' => 14,
         ],
 
+        'exploration_automation' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/exploration-automation.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],

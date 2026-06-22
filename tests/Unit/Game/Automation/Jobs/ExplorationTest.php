@@ -12,6 +12,7 @@ use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
 use App\Game\Automation\Services\ExplorationAutomationService;
@@ -33,6 +34,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -1538,7 +1540,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
         Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -1584,7 +1588,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
         Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -1993,7 +1999,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
         Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -2818,7 +2826,9 @@ class ExplorationTest extends TestCase
         $automationId = $automation->id;
         $automation->delete();
 
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
         Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automationId, AttackTypeValue::ATTACK, 5);
 
@@ -2865,7 +2875,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
         Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -2940,5 +2952,84 @@ class ExplorationTest extends TestCase
         $this->assertNotNull($log->ended_at);
         $this->assertEquals('natural_end', $log->stopped_reason);
         $this->assertEquals(0, ExplorationLog::where('character_id', $this->character->id)->whereNull('ended_at')->count());
+    }
+
+    public function testFailedLogsAndCleansUpOnlyExactExplorationAutomation(): void
+    {
+        Event::fake();
+        Queue::fake();
+        Log::shouldReceive('channel')->once()->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')
+            ->twice()
+            ->with('Exploration automation failed.', Mockery::on(function (array $context): bool {
+                return isset(
+                    $context['exception_class'],
+                    $context['exception_message'],
+                    $context['exception_file'],
+                    $context['exception_line'],
+                    $context['trace'],
+                    $context['character_id'],
+                    $context['automation_id'],
+                    $context['cancellation_reason'],
+                );
+            }));
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+        ])->getCharacter();
+        $automation = $this->character->refresh()->currentAutomations()->first();
+        $unrelatedAutomation = CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        (new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1))
+            ->failed(new RuntimeException('Exploration failed.'));
+
+        $this->assertNull($automation->fresh());
+        $this->assertNotNull($unrelatedAutomation->fresh());
+        $this->assertNotNull($log->refresh()->ended_at);
+        $this->assertSame('queue_job_failed', $log->stopped_reason);
+        $this->assertSame(1, ExplorationWarning::where('exploration_log_id', $log->id)->count());
+        Event::assertDispatched(UpdateCharacterStatus::class);
+        Event::assertDispatched(AutomationTimeOut::class);
+        Event::assertDispatched(AutomationStatus::class);
+        Queue::assertNothingPushed();
+    }
+
+    public function testFailedCleanupIsIdempotent(): void
+    {
+        Event::fake();
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+        ])->getCharacter();
+        $automation = $this->character->refresh()->currentAutomations()->first();
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $job->failed(new RuntimeException('Exploration failed.'));
+        $job->failed(new RuntimeException('Exploration failed again.'));
+
+        $this->assertSame(1, ExplorationWarning::where('exploration_log_id', $log->id)->count());
+        $this->assertNotNull($log->refresh()->ended_at);
     }
 }

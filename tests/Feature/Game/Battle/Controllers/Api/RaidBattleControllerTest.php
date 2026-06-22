@@ -56,7 +56,13 @@ class RaidBattleControllerTest extends TestCase
         ]);
         RaidBossParticipation::create([
             'character_id' => $character->id,
-            'raid_id' => $oldRaid->id,
+            'raid_id' => $currentRaid->id,
+            'raid_boss_id' => RaidBoss::create([
+                'raid_id' => $currentRaid->id,
+                'raid_boss_id' => $monster->id,
+                'boss_max_hp' => 100,
+                'boss_current_hp' => 100,
+            ])->id,
             'attacks_left' => 0,
             'damage_dealt' => 100,
             'killed_boss' => false,

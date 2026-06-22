@@ -7,6 +7,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Raid;
+use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
@@ -52,7 +53,11 @@ class RaidBossRewardHandler implements ShouldQueue
 
             $raid = Raid::find($this->raidId);
 
-            $this->handleWhenRaidBossIsKilled($character, $raid->raidBoss);
+            $killedRaidBoss = RaidBoss::where('raid_id', $raid->id)
+                ->where('raid_boss_id', $this->monsterId)
+                ->firstOrFail();
+
+            $this->handleWhenRaidBossIsKilled($character, $killedRaidBoss->raidBoss);
 
             $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
@@ -72,27 +77,46 @@ class RaidBossRewardHandler implements ShouldQueue
         event(new GlobalMessageEvent($charater->name . ' Has slaughted: ' . $raidBoss->name . ' and has recieved a special Ancient gift from The Poet him self!'));
 
         $raid = Raid::find($this->raidId);
+        $raidBossRecord = RaidBoss::where('raid_id', $raid->id)
+            ->where('raid_boss_id', $raidBoss->id)
+            ->firstOrFail();
 
         $this->giveAncientReward($charater, $raid->artifact_item_id);
 
-        $this->giveGearReward($raid);
+        $this->giveGearReward($raid, $raidBossRecord);
 
-        RaidBossParticipation::chunkById(250, function ($participationRecords) {
-            foreach ($participationRecords as $record) {
-                $record->update([
-                    'attacks_left' => 0,
-                ]);
-
-                $record = $record->refresh();
-
-                event(new UpdateRaidAttacksLeft($record->character->user_id, 0, $record->damage_dealt));
-            }
-        });
+        $this->zeroKilledBossParticipations($raid, $raidBossRecord);
     }
 
-    private function giveGearReward(Raid $raid)
+    private function zeroKilledBossParticipations(Raid $raid, RaidBoss $raidBoss): void
     {
-        $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)->orderBy('damage_dealt', 'asc')->take(10)->get();
+        RaidBossParticipation::where('raid_id', $raid->id)
+            ->where('raid_boss_id', $raidBoss->id)
+            ->chunkById(250, function ($participationRecords) use ($raidBoss) {
+                foreach ($participationRecords as $record) {
+                    $record->update([
+                        'attacks_left' => 0,
+                    ]);
+
+                    $record = $record->refresh();
+
+                    event(new UpdateRaidAttacksLeft(
+                        $record->character->user_id,
+                        0,
+                        $record->damage_dealt,
+                        $raidBoss->raid_boss_id,
+                    ));
+                }
+            });
+    }
+
+    private function giveGearReward(Raid $raid, RaidBoss $raidBoss): void
+    {
+        $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)
+            ->where('raid_boss_id', $raidBoss->id)
+            ->orderBy('damage_dealt', 'asc')
+            ->take(10)
+            ->get();
 
         foreach ($raidParticipation as $participator) {
 

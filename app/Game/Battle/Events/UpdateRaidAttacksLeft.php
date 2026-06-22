@@ -24,6 +24,8 @@ class UpdateRaidAttacksLeft implements ShouldBroadcastNow
      */
     public int $damageDealt;
 
+    public ?int $raidBossId;
+
     /**
      * @var integer $userId
      */
@@ -33,11 +35,12 @@ class UpdateRaidAttacksLeft implements ShouldBroadcastNow
      * @param  int  $raidBossHealth
      * @param  User  $user
      */
-    public function __construct(int $userId, int $attacksLeft, int $damageDealt)
+    public function __construct(int $userId, int $attacksLeft, int $damageDealt, ?int $raidBossId = null)
     {
         $this->userId = $userId;
         $this->attacksLeft = $attacksLeft;
         $this->damageDealt = $damageDealt;
+        $this->raidBossId = $raidBossId;
     }
 
     /**

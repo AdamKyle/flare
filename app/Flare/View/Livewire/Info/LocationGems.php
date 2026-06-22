@@ -2,7 +2,7 @@
 
 namespace App\Flare\View\Livewire\Info;
 
-use App\Flare\Models\GameLocationGemParamters;
+use App\Flare\Models\GameLocationGemParamter;
 use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
@@ -17,7 +17,7 @@ class LocationGems extends DataTableComponent
 
     public function builder(): Builder
     {
-        return GameLocationGemParamters::query()->with('location.map');
+        return GameLocationGemParamter::query()->with('location.map');
     }
 
     public function columns(): array
@@ -28,10 +28,10 @@ class LocationGems extends DataTableComponent
                 ->searchable()
                 ->format(function ($value, $row) {
                     $routeKey = $row->getRouteKey();
-                    $route = route('info.page.location-gems.show', ['gameLocationGemParamters' => $routeKey]);
+                    $route = route('info.page.location-gems.show', ['gameLocationGemParamter' => $routeKey]);
 
                     if (auth()->check() && auth()->user()->hasRole('Admin')) {
-                        $route = route('admin.location-gems.show', ['gameLocationGemParamters' => $routeKey]);
+                        $route = route('admin.location-gems.show', ['gameLocationGemParamter' => $routeKey]);
                     }
 
                     return '<a href="'.$route.'">'.e($row->name).'</a>';
@@ -51,7 +51,7 @@ class LocationGems extends DataTableComponent
 
         if (auth()->check() && auth()->user()->hasRole('Admin')) {
             $columns[] = Column::make('Actions')
-                ->label(fn ($row) => '<a href="'.route('admin.location-gems.edit', ['gameLocationGemParamters' => $row->getRouteKey()]).'">Edit</a>')
+                ->label(fn ($row) => '<a href="'.route('admin.location-gems.edit', ['gameLocationGemParamter' => $row->getRouteKey()]).'">Edit</a>')
                 ->html();
         }
 
