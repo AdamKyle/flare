@@ -166,6 +166,8 @@ class DelveExploration implements ShouldQueue
 
             $delveAutomation->update([
                 'completed_at' => now(),
+                'ended_reason' => DelveOutcome::TIMEOUT->value,
+                'panel_dismissed_at' => null,
             ]);
 
             $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
@@ -187,6 +189,8 @@ class DelveExploration implements ShouldQueue
 
         $delveAutomation->update([
             'completed_at' => now(),
+            'ended_reason' => 'fight_failed',
+            'panel_dismissed_at' => null,
         ]);
 
         event(new AutomationTimeOut($this->character->user, 0));
@@ -389,6 +393,8 @@ class DelveExploration implements ShouldQueue
 
             $delveExploration->update([
                 'completed_at' => now(),
+                'ended_reason' => DelveOutcome::DIED->value,
+                'panel_dismissed_at' => null,
             ]);
 
             CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE)->delete();
@@ -480,6 +486,8 @@ class DelveExploration implements ShouldQueue
 
             $delveExploration->update([
                 'completed_at' => now(),
+                'ended_reason' => 'natural_end',
+                'panel_dismissed_at' => null,
             ]);
 
             event(new DelveStatusUpdated($this->character->user->id));
@@ -682,7 +690,11 @@ class DelveExploration implements ShouldQueue
         $delveAutomation = DelveExplorationModel::where('id', $this->delveAutomationId)->first();
 
         if (! is_null($delveAutomation) && is_null($delveAutomation->completed_at)) {
-            $delveAutomation->update(['completed_at' => now()]);
+            $delveAutomation->update([
+                'completed_at' => now(),
+                'ended_reason' => DelveOutcome::ERROR->value,
+                'panel_dismissed_at' => null,
+            ]);
         }
 
         if (! is_null($automation)) {

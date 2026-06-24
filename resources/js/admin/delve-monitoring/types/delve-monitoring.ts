@@ -45,6 +45,11 @@ export type DelveSummary = {
 export type DelveChartPoint = {
     period: string;
     runs: number;
+    active: number;
+    completed: number;
+    survived: number;
+    died: number;
+    timeout: number;
 };
 
 export type Paginated<T> = {
@@ -58,4 +63,6 @@ export type DelveFilters = {
     character_name: string;
     date_from: string;
     date_to: string;
+    status: string;
+    outcome: string;
 };

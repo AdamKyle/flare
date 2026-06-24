@@ -16,6 +16,7 @@ import {
     Paginated,
 } from "../types/delve-monitoring";
 import { DAY_OPTIONS } from "../values/filter-options";
+import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
 
 const emptyPage = <T,>(): Paginated<T> => ({
     data: [],
@@ -24,67 +25,11 @@ const emptyPage = <T,>(): Paginated<T> => ({
     total: 0,
 });
 
-const BAR_H = 160;
-const BAR_W = 600;
-const PAD_L = 48;
-const PAD_R = 16;
-const PAD_T = 10;
-const PAD_B = 32;
-const INNER_W = BAR_W - PAD_L - PAD_R;
-const INNER_H = BAR_H - PAD_T - PAD_B;
-
 function MonitorCard({ children }: { children: React.ReactNode }) {
     return (
         <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
             {children}
         </section>
-    );
-}
-
-function DelveBarChart({ points }: { points: DelveChartPoint[] }) {
-    const maxVal = Math.max(...points.map((p) => p.runs), 1);
-    const n = points.length;
-    const barW = n > 0 ? Math.max(2, INNER_W / n - 2) : 0;
-
-    return points.length === 0 ? (
-        <p className="text-sm text-gray-500">No data in this period.</p>
-    ) : (
-        <svg
-            viewBox={`0 0 ${BAR_W} ${BAR_H}`}
-            className="w-full"
-            style={{ minHeight: 100 }}
-        >
-            {points.map((p, i) => {
-                const barH = (p.runs / maxVal) * INNER_H;
-                const barX = PAD_L + (INNER_W * i) / Math.max(n, 1) - barW / 2;
-                const barY = PAD_T + INNER_H - barH;
-
-                return (
-                    <rect
-                        key={p.period}
-                        x={barX}
-                        y={barY}
-                        width={barW}
-                        height={barH}
-                        fill="#f97316"
-                        opacity={0.8}
-                    >
-                        <title>
-                            {p.period}: {p.runs}
-                        </title>
-                    </rect>
-                );
-            })}
-            <line
-                x1={PAD_L}
-                x2={PAD_L + INNER_W}
-                y1={PAD_T + INNER_H}
-                y2={PAD_T + INNER_H}
-                stroke="currentColor"
-                strokeOpacity={0.25}
-                strokeWidth={1}
-            />
-        </svg>
     );
 }
 
@@ -124,6 +69,9 @@ function PaginationControls({
 
 function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
     const [open, setOpen] = useState(false);
+    const [page, setPage] = useState(1);
+    const totalPages = Math.max(1, Math.ceil(logs.length / 10));
+    const rows = logs.slice((page - 1) * 10, page * 10);
 
     if (logs.length === 0) {
         return <span className="text-xs text-gray-400">No logs</span>;
@@ -149,7 +97,7 @@ function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {logs.map((log) => (
+                            {rows.map((log) => (
                                 <tr
                                     key={log.id}
                                     className="border-t dark:border-gray-700"
@@ -165,6 +113,37 @@ function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
                             ))}
                         </tbody>
                     </table>
+                    {totalPages > 1 && (
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-t p-2 text-xs dark:border-gray-700">
+                            <span className="text-gray-600 dark:text-gray-300">
+                                Page {page} of {totalPages}
+                            </span>
+                            <div className="flex gap-2">
+                                <button
+                                    className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
+                                    disabled={page <= 1}
+                                    onClick={() =>
+                                        setPage(
+                                            (currentPage) => currentPage - 1,
+                                        )
+                                    }
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
+                                    disabled={page >= totalPages}
+                                    onClick={() =>
+                                        setPage(
+                                            (currentPage) => currentPage + 1,
+                                        )
+                                    }
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </span>
@@ -175,6 +154,8 @@ const defaultFilters: DelveFilters = {
     character_name: "",
     date_from: "",
     date_to: "",
+    status: "",
+    outcome: "",
 };
 
 export default function DelveDashboard() {
@@ -224,6 +205,16 @@ export default function DelveDashboard() {
 
     useDelveMonitoringLiveRefresh(refresh);
 
+    const applyTableFilter = (nextFilters: Partial<DelveFilters>) => {
+        setFilters({ ...defaultFilters, ...nextFilters });
+        setPage(1);
+        window.setTimeout(() => {
+            document
+                .getElementById("delve-runs-table")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 0);
+    };
+
     return (
         <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
             {loading && (
@@ -249,21 +240,37 @@ export default function DelveDashboard() {
                     { label: "Died", value: summary.total_died },
                     { label: "Timeout", value: summary.total_timeout },
                 ].map(({ label, value }) => (
-                    <MonitorCard key={label}>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">
-                            {label}
-                        </div>
-                        <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                            {value}
-                        </div>
-                    </MonitorCard>
+                    <button
+                        key={label}
+                        type="button"
+                        className="text-left"
+                        onClick={() => {
+                            if (label === "Active") {
+                                applyTableFilter({ status: "active" });
+                            } else if (label === "Completed") {
+                                applyTableFilter({ status: "completed" });
+                            } else if (label === "Survived") {
+                                applyTableFilter({ outcome: "survived" });
+                            } else if (label === "Died") {
+                                applyTableFilter({ outcome: "died" });
+                            } else if (label === "Timeout") {
+                                applyTableFilter({ outcome: "timeout" });
+                            }
+                        }}
+                    >
+                        <MonitorCard>
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                                {label}
+                            </div>
+                            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                                {value}
+                            </div>
+                        </MonitorCard>
+                    </button>
                 ))}
             </div>
 
-            <MonitorCard>
-                <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                    Runs per Period
-                </h2>
+            <div>
                 <label className="mb-3 block text-sm font-medium">
                     Period
                     <select
@@ -279,8 +286,38 @@ export default function DelveDashboard() {
                         ))}
                     </select>
                 </label>
-                <DelveBarChart points={chart} />
-            </MonitorCard>
+                <MonitoringStatusChart
+                    title="Delve Runs per Period"
+                    description="Run, status, and outcome totals from retained Delve data."
+                    points={chart}
+                    series={[
+                        { key: "runs", label: "Runs", color: "#f97316" },
+                        { key: "active", label: "Active", color: "#3b82f6" },
+                        {
+                            key: "completed",
+                            label: "Completed",
+                            color: "#22c55e",
+                        },
+                        {
+                            key: "survived",
+                            label: "Survived",
+                            color: "#16a34a",
+                        },
+                        {
+                            key: "died",
+                            label: "Died",
+                            color: "#ef4444",
+                            dash: "6,3",
+                        },
+                        {
+                            key: "timeout",
+                            label: "Timeout",
+                            color: "#f59e0b",
+                            dash: "2,2",
+                        },
+                    ]}
+                />
+            </div>
 
             <MonitorCard>
                 <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
@@ -375,117 +412,119 @@ export default function DelveDashboard() {
                 )}
             </MonitorCard>
 
-            <MonitorCard>
-                <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                    Recent Runs
-                </h2>
-                <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                    <label className="text-sm font-medium">
-                        Character name
-                        <input
-                            className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
-                            type="text"
-                            value={filters.character_name}
-                            onChange={(e) => {
-                                setFilters({
-                                    ...filters,
-                                    character_name: e.target.value,
-                                });
-                                setPage(1);
-                            }}
-                        />
-                    </label>
-                    <label className="text-sm font-medium">
-                        Date from
-                        <input
-                            className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
-                            type="date"
-                            value={filters.date_from}
-                            onChange={(e) => {
-                                setFilters({
-                                    ...filters,
-                                    date_from: e.target.value,
-                                });
-                                setPage(1);
-                            }}
-                        />
-                    </label>
-                    <label className="text-sm font-medium">
-                        Date to
-                        <input
-                            className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
-                            type="date"
-                            value={filters.date_to}
-                            onChange={(e) => {
-                                setFilters({
-                                    ...filters,
-                                    date_to: e.target.value,
-                                });
-                                setPage(1);
-                            }}
-                        />
-                    </label>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full min-w-[700px] text-left text-sm">
-                        <thead>
-                            <tr className="border-b dark:border-gray-700">
-                                <th scope="col" className="p-2">
-                                    Character
-                                </th>
-                                <th scope="col" className="p-2">
-                                    Enemy strength
-                                </th>
-                                <th scope="col" className="p-2">
-                                    Started
-                                </th>
-                                <th scope="col" className="p-2">
-                                    Completed
-                                </th>
-                                <th scope="col" className="p-2">
-                                    Run logs
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {runs.data.map((run) => (
-                                <tr
-                                    className="border-t dark:border-gray-700"
-                                    key={run.id}
-                                >
-                                    <td className="p-2">
-                                        {run.character?.name ?? "—"}
-                                    </td>
-                                    <td className="p-2">
-                                        {run.increase_enemy_strength ?? "—"}
-                                    </td>
-                                    <td className="p-2">
-                                        {run.started_at ?? "—"}
-                                    </td>
-                                    <td className="p-2">
-                                        {run.completed_at ?? "Active"}
-                                    </td>
-                                    <td className="p-2">
-                                        <RunLogDetails
-                                            logs={run.delve_logs ?? []}
-                                        />
-                                    </td>
+            <div id="delve-runs-table">
+                <MonitorCard>
+                    <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                        Recent Runs
+                    </h2>
+                    <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                        <label className="text-sm font-medium">
+                            Character name
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                type="text"
+                                value={filters.character_name}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        character_name: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
+                        </label>
+                        <label className="text-sm font-medium">
+                            Date from
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                type="date"
+                                value={filters.date_from}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        date_from: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
+                        </label>
+                        <label className="text-sm font-medium">
+                            Date to
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                type="date"
+                                value={filters.date_to}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        date_to: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
+                        </label>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[700px] text-left text-sm">
+                            <thead>
+                                <tr className="border-b dark:border-gray-700">
+                                    <th scope="col" className="p-2">
+                                        Character
+                                    </th>
+                                    <th scope="col" className="p-2">
+                                        Enemy strength
+                                    </th>
+                                    <th scope="col" className="p-2">
+                                        Started
+                                    </th>
+                                    <th scope="col" className="p-2">
+                                        Completed
+                                    </th>
+                                    <th scope="col" className="p-2">
+                                        Run logs
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {runs.data.length === 0 && (
-                        <p className="p-4 text-center text-gray-600 dark:text-gray-300">
-                            No runs found.
-                        </p>
-                    )}
-                </div>
-                <PaginationControls
-                    currentPage={runs.current_page}
-                    lastPage={runs.last_page}
-                    onPageChange={setPage}
-                />
-            </MonitorCard>
+                            </thead>
+                            <tbody>
+                                {runs.data.map((run) => (
+                                    <tr
+                                        className="border-t dark:border-gray-700"
+                                        key={run.id}
+                                    >
+                                        <td className="p-2">
+                                            {run.character?.name ?? "—"}
+                                        </td>
+                                        <td className="p-2">
+                                            {run.increase_enemy_strength ?? "—"}
+                                        </td>
+                                        <td className="p-2">
+                                            {run.started_at ?? "—"}
+                                        </td>
+                                        <td className="p-2">
+                                            {run.completed_at ?? "Active"}
+                                        </td>
+                                        <td className="p-2">
+                                            <RunLogDetails
+                                                logs={run.delve_logs ?? []}
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {runs.data.length === 0 && (
+                            <p className="p-4 text-center text-gray-600 dark:text-gray-300">
+                                No runs found.
+                            </p>
+                        )}
+                    </div>
+                    <PaginationControls
+                        currentPage={runs.current_page}
+                        lastPage={runs.last_page}
+                        onPageChange={setPage}
+                    />
+                </MonitorCard>
+            </div>
         </div>
     );
 }

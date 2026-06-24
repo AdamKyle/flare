@@ -3,12 +3,14 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateUser;
 
 class LoginControllerTest extends TestCase
 {
-    use CreateUser, RefreshDatabase;
+    use CreateGuideQuest, CreateUser, RefreshDatabase;
 
     public function testLoginPasswordInputUsesCurrentPasswordAutocomplete(): void
     {
@@ -31,6 +33,30 @@ class LoginControllerTest extends TestCase
 
         $response->assertRedirectedTo('/');
         $this->seeIsAuthenticatedAs($user);
+    }
+
+    public function testUserCanLoginWhenGuideQuestRequiresDelvePackSizeWithoutDelveData(): void
+    {
+        $this->createGuideQuest([
+            'required_delve_pack_size' => 5,
+        ]);
+
+        $character = (new CharacterFactory)
+            ->setAttributesOnUserForCreation([
+                'email' => 'delve-login-test@example.com',
+                'guide_enabled' => true,
+            ])
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $response = $this->call('POST', route('login'), [
+            'email' => 'delve-login-test@example.com',
+            'password' => 'ReallyLongPassword',
+        ]);
+
+        $response->assertRedirectedTo('/');
+        $this->seeIsAuthenticatedAs($character->user);
     }
 
     public function testUserMarkedForDeletionCanLoginAndDeletionFlagIsCleared(): void

@@ -58,7 +58,7 @@ class ExplorationMonitoringService
         $days = $this->validatedDays($request->integer('days', 7));
 
         return ExplorationLog::where('started_at', '>=', now()->subDays($days))
-            ->selectRaw('DATE(started_at) as period, COUNT(*) as runs, SUM(kills) as kills, SUM(xp_gained) as xp')
+            ->selectRaw('DATE(started_at) as period, COUNT(*) as runs, SUM(kills) as kills, SUM(xp_gained) as xp, SUM(skill_xp_gained) as skill_xp, SUM(CASE WHEN ended_at IS NULL THEN 1 ELSE 0 END) as active, SUM(CASE WHEN ended_at IS NOT NULL THEN 1 ELSE 0 END) as completed')
             ->groupBy('period')
             ->orderBy('period')
             ->get()
@@ -67,6 +67,9 @@ class ExplorationMonitoringService
                 'runs' => (int) $row->runs,
                 'kills' => (int) $row->kills,
                 'xp' => (int) $row->xp,
+                'skill_xp' => (int) $row->skill_xp,
+                'active' => (int) $row->active,
+                'completed' => (int) $row->completed,
             ])
             ->all();
     }
@@ -81,6 +84,7 @@ class ExplorationMonitoringService
                 );
             })
             ->when($request->filled('stopped_reason'), fn (Builder $q) => $q->where('stopped_reason', 'like', '%' . $request->string('stopped_reason') . '%'))
+            ->when($request->boolean('stopped_by_player'), fn (Builder $q) => $q->where('stopped_by_player', true))
             ->when($request->filled('date_from'), fn (Builder $q) => $q->whereDate('started_at', '>=', $request->string('date_from')))
             ->when($request->filled('date_to'), fn (Builder $q) => $q->whereDate('started_at', '<=', $request->string('date_to')));
     }

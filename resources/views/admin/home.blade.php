@@ -110,17 +110,19 @@
                     </div>
                 </div>
             </x-core.cards.card>
-            <x-core.cards.card>
-                <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
-                <div class="mt-4 flex items-center justify-between">
-                    <div>
-                        <h4 class="text-lg font-semibold text-black dark:text-white">Application Logs</h4>
-                        <a href="{{ route('admin.monitoring.logs') }}" class="text-sm font-medium text-meta-7">
-                            View Logs Dashboard
-                        </a>
+            <div class="sm:col-span-2 xl:col-span-3">
+                <x-core.cards.card>
+                    <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
+                    <div class="mt-4 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-lg font-semibold text-black dark:text-white">Application Logs</h4>
+                            <a href="{{ route('admin.monitoring.logs') }}" class="text-sm font-medium text-meta-7">
+                                View Logs Dashboard
+                            </a>
+                        </div>
                     </div>
-                </div>
-            </x-core.cards.card>
+                </x-core.cards.card>
+            </div>
         </div>
 
         <div class="my-5">

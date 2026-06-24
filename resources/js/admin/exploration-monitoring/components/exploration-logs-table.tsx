@@ -56,6 +56,7 @@ export default function ExplorationLogsTable({
             title="Recent Exploration Runs"
             description="Completed and active exploration logs."
         >
+            <div id="exploration-logs-table" />
             <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 <label className="text-sm font-medium">
                     Character name
@@ -81,6 +82,7 @@ export default function ExplorationLogsTable({
                             onFiltersChange({
                                 ...filters,
                                 stopped_reason: e.target.value,
+                                stopped_by_player: false,
                             })
                         }
                     />

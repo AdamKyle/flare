@@ -81,14 +81,28 @@ class DelveMonitoringService
         $days = $this->validatedDays($request->integer('days', 7));
 
         return DelveExploration::where('started_at', '>=', now()->subDays($days))
-            ->selectRaw('DATE(started_at) as period, COUNT(*) as runs')
+            ->selectRaw('DATE(started_at) as period, COUNT(*) as runs, SUM(CASE WHEN completed_at IS NULL THEN 1 ELSE 0 END) as active, SUM(CASE WHEN completed_at IS NOT NULL THEN 1 ELSE 0 END) as completed')
             ->groupBy('period')
             ->orderBy('period')
             ->get()
-            ->map(fn ($row): array => [
-                'period' => $row->period,
-                'runs' => (int) $row->runs,
-            ])
+            ->map(function ($row): array {
+                $outcomes = DelveLog::whereHas('delveExploration', function (Builder $query) use ($row): void {
+                    $query->whereDate('started_at', $row->period);
+                })
+                    ->selectRaw('outcome, COUNT(*) as total')
+                    ->groupBy('outcome')
+                    ->pluck('total', 'outcome');
+
+                return [
+                    'period' => $row->period,
+                    'runs' => (int) $row->runs,
+                    'active' => (int) $row->active,
+                    'completed' => (int) $row->completed,
+                    'survived' => (int) ($outcomes['survived'] ?? 0),
+                    'died' => (int) ($outcomes['died'] ?? 0),
+                    'timeout' => (int) ($outcomes['timeout'] ?? 0),
+                ];
+            })
             ->all();
     }
 
@@ -102,7 +116,12 @@ class DelveMonitoringService
                 );
             })
             ->when($request->filled('date_from'), fn (Builder $q) => $q->whereDate('started_at', '>=', $request->string('date_from')))
-            ->when($request->filled('date_to'), fn (Builder $q) => $q->whereDate('started_at', '<=', $request->string('date_to')));
+            ->when($request->filled('date_to'), fn (Builder $q) => $q->whereDate('started_at', '<=', $request->string('date_to')))
+            ->when($request->string('status')->toString() === 'active', fn (Builder $q) => $q->whereNull('completed_at'))
+            ->when($request->string('status')->toString() === 'completed', fn (Builder $q) => $q->whereNotNull('completed_at'))
+            ->when($request->filled('outcome'), function (Builder $query) use ($request): void {
+                $query->whereHas('delveLogs', fn (Builder $q) => $q->where('outcome', $request->string('outcome')->toString()));
+            });
     }
 
     private function validatedDays(int $days): int

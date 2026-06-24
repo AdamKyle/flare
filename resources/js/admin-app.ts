@@ -3,52 +3,42 @@
  */
 import "./bootstrap";
 
-/**
- * When the administrator is logged in, load their chat.
- */
-import "./admin/admin-chat";
+if (document.getElementById("administrator-chat") !== null) {
+    void import("./admin/admin-chat");
+}
 
-/**
- * When the administrator visits their statistics dashboard.
- */
-import "./admin/statistics-dashboard";
+if (document.getElementById("administrator-statistics") !== null) {
+    void import("./admin/statistics-dashboard");
+}
 
-/**
- * When the administrator is managing the information help docs.
- */
-import "./admin/info-management/info-management-init";
+if (document.getElementById("info-management") !== null) {
+    void import("./admin/info-management/info-management-init");
+}
 
-/**
- * Renders the event calendar for the admin to manage.
- */
-import "./admin/calendar";
+if (document.getElementById("event-calendar") !== null) {
+    void import("./admin/calendar");
+}
 
-/**
- * Renders the map manager for the admin to place new locations.
- */
-import "./admin/map-manager-location";
+if (document.getElementById("map-manager") !== null) {
+    void import("./admin/map-manager-location");
+}
 
-/**
- * Renders the character reward queue dashboard on its admin page.
- */
-import "./admin/battle-reward-queue";
+if (document.getElementById("character-reward-queue") !== null) {
+    void import("./admin/battle-reward-queue");
+}
 
-/**
- * Renders the exploration monitoring dashboard on its admin page.
- */
-import "./admin/exploration-monitoring";
+if (document.getElementById("exploration-monitoring") !== null) {
+    void import("./admin/exploration-monitoring");
+}
 
-/**
- * Renders the faction loyalty monitoring dashboard on its admin page.
- */
-import "./admin/faction-loyalty-monitoring";
+if (document.getElementById("faction-loyalty-monitoring") !== null) {
+    void import("./admin/faction-loyalty-monitoring");
+}
 
-/**
- * Renders the delve monitoring dashboard on its admin page.
- */
-import "./admin/delve-monitoring";
+if (document.getElementById("delve-monitoring") !== null) {
+    void import("./admin/delve-monitoring");
+}
 
-/**
- * Renders the application logs dashboard on its admin page.
- */
-import "./admin/logs-dashboard";
+if (document.getElementById("logs-dashboard") !== null) {
+    void import("./admin/logs-dashboard");
+}

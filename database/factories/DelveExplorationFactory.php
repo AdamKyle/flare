@@ -26,6 +26,8 @@ class DelveExplorationFactory extends Factory
             'monster_id' => 0,
             'started_at' => now(),
             'completed_at' => now()->addHours(8),
+            'ended_reason' => null,
+            'panel_dismissed_at' => null,
             'attack_type' => 'attack',
             'increase_enemy_strength' => 0,
         ];

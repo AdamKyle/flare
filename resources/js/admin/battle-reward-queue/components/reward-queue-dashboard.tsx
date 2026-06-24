@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     fetchCharacterRewardQueue,
     fetchRewardQueueCharacters,
@@ -73,6 +73,7 @@ export default function RewardQueueDashboard() {
         failed_reason: "",
         source_id: "",
     });
+    const requestHistoryRef = useRef<HTMLDivElement>(null);
     const { staleQueues, repairing, refreshStaleQueues, repair } =
         useStaleRewardQueues();
 
@@ -190,7 +191,16 @@ export default function RewardQueueDashboard() {
                             onRepair={() => void repairQueues()}
                         />
                     )}
-                    <SummaryCards summary={summary} />
+                    <SummaryCards
+                        summary={summary}
+                        onFilter={(status) => {
+                            setFilters((prev) => ({ ...prev, status }));
+                            setRequestPage(1);
+                            requestHistoryRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                            });
+                        }}
+                    />
                     <div className="grid gap-4 xl:grid-cols-3">
                         <StatusVolumeChart
                             title="Last hour"
@@ -225,20 +235,22 @@ export default function RewardQueueDashboard() {
                                 points={detailCharts[days] ?? []}
                             />
                         ))}
-                    <RequestHistory
-                        selectedCharacter={selectedCharacter}
-                        requests={requests}
-                        filters={filters}
-                        onFiltersChange={(nextFilters) => {
-                            setFilters(nextFilters);
-                            setRequestPage(1);
-                        }}
-                        onClearCharacter={() => {
-                            setSelectedCharacter(null);
-                            setRequestPage(1);
-                        }}
-                        onPageChange={setRequestPage}
-                    />
+                    <div ref={requestHistoryRef}>
+                        <RequestHistory
+                            selectedCharacter={selectedCharacter}
+                            requests={requests}
+                            filters={filters}
+                            onFiltersChange={(nextFilters) => {
+                                setFilters(nextFilters);
+                                setRequestPage(1);
+                            }}
+                            onClearCharacter={() => {
+                                setSelectedCharacter(null);
+                                setRequestPage(1);
+                            }}
+                            onPageChange={setRequestPage}
+                        />
+                    </div>
                     <div>
                         <label className="mb-2 block text-sm font-medium">
                             Global status range

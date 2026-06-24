@@ -12,6 +12,7 @@ class ExplorationWarningService
     public function getState(Character $character): array
     {
         $warning = ExplorationWarning::where('character_id', $character->id)
+            ->whereNull('dismissed_at')
             ->orderByDesc('id')
             ->first();
 
@@ -52,38 +53,42 @@ class ExplorationWarningService
     {
         $warning = ExplorationWarning::where('character_id', $character->id)
             ->when(! is_null($warningId), fn ($query) => $query->where('id', $warningId))
+            ->whereNull('dismissed_at')
             ->orderByDesc('id')
             ->first();
 
-        $this->deleteWarningAndLog($character, $warning);
+        $this->dismissWarning($character, $warning);
     }
 
     public function dismissLatest(Character $character): array
     {
         $warning = ExplorationWarning::where('character_id', $character->id)
+            ->whereNull('dismissed_at')
             ->orderByDesc('id')
             ->first();
 
-        return $this->deleteWarningAndLog($character, $warning);
+        return $this->dismissWarning($character, $warning);
     }
 
     public function dismissSelected(Character $character, ExplorationWarning $warning): array
     {
-        return $this->deleteWarningAndLog($character, $warning);
+        return $this->dismissWarning($character, $warning);
     }
 
-    private function deleteWarningAndLog(Character $character, ?ExplorationWarning $warning): array
+    private function dismissWarning(Character $character, ?ExplorationWarning $warning): array
     {
         if (is_null($warning)) {
             return $this->getState($character);
         }
 
-        $log = $warning->explorationLog;
+        $warning->update([
+            'dismissed_at' => now(),
+        ]);
 
-        $warning->delete();
-
-        if (! is_null($log)) {
-            $log->delete();
+        if (! is_null($warning->exploration_log_id)) {
+            ExplorationLog::where('id', $warning->exploration_log_id)
+                ->whereNull('panel_dismissed_at')
+                ->update(['panel_dismissed_at' => now()]);
         }
 
         return $this->getState($character);

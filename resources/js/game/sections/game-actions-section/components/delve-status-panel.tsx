@@ -58,6 +58,10 @@ type CurrentFoe = {
 
 type DelveStatus = {
     active: boolean;
+    completed?: boolean;
+    completed_at?: string;
+    reason?: string;
+    message?: string;
     started_at?: string;
     elapsed_seconds?: number;
     increase_enemy_strength?: number;
@@ -143,6 +147,7 @@ export default function DelveStatusPanel({
     const [elapsed, setElapsed] = useState(0);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [stopping, setStopping] = useState(false);
+    const [dismissing, setDismissing] = useState(false);
     const [openSlotId, setOpenSlotId] = useState<number | null>(null);
     const [openItemId, setOpenItemId] = useState<number | null>(null);
     const [openItemName, setOpenItemName] = useState<string>("");
@@ -172,6 +177,21 @@ export default function DelveStatusPanel({
             },
             (_error: AxiosError) => {
                 setStopping(false);
+            },
+        );
+    }, [character_id]);
+
+    const dismissDelve = useCallback(() => {
+        setDismissing(true);
+        new Ajax().setRoute(`delve/${character_id}/dismiss`).doAjaxCall(
+            "post",
+            (response: { data: DelveStatus }) => {
+                setStatus(response.data);
+                setElapsed(response.data.elapsed_seconds ?? 0);
+                setDismissing(false);
+            },
+            (_error: AxiosError) => {
+                setDismissing(false);
             },
         );
     }, [character_id]);
@@ -215,7 +235,7 @@ export default function DelveStatusPanel({
         );
     }
 
-    if (!status || !status.active) {
+    if (!status || (!status.active && !status.completed)) {
         return null;
     }
 
@@ -224,6 +244,13 @@ export default function DelveStatusPanel({
         status.quest_item_drop_seconds_remaining ?? null;
     const dropHoursRequired = status.quest_item_drop_hours_required ?? null;
     const foe = status.current_foe;
+
+    const title = status.completed ? "Delve Ended" : "Delve In Progress";
+    const reason = status.reason
+        ? status.reason.replace(/_/g, " ")
+        : status.completed
+          ? "completed"
+          : "running";
 
     return (
         <div className="w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 overflow-hidden">
@@ -235,7 +262,7 @@ export default function DelveStatusPanel({
             >
                 <span className="flex w-full items-center justify-between gap-3">
                     <span className="font-bold text-sm uppercase tracking-wide">
-                        Delve In Progress
+                        {title}
                     </span>
                     <span className="flex items-center gap-2">
                         <span className="rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900 dark:text-orange-200">
@@ -253,6 +280,23 @@ export default function DelveStatusPanel({
 
             {!isCollapsed && (
                 <div className="p-4">
+                    {status.completed ? (
+                        <div className="mb-4">
+                            <p className="mb-1 text-sm">
+                                <span className="font-semibold text-gray-700 dark:text-gray-300">
+                                    Reason:{" "}
+                                </span>
+                                <span className="capitalize text-gray-900 dark:text-gray-100">
+                                    {reason}
+                                </span>
+                            </p>
+                            {status.message ? (
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    {status.message}
+                                </p>
+                            ) : null}
+                        </div>
+                    ) : null}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
                             <h4 className="text-sm font-semibold text-gray-800 dark:text-gray-200">
@@ -592,6 +636,16 @@ export default function DelveStatusPanel({
                             )}
                         </div>
                     </div>
+                    {status.completed ? (
+                        <div className="mt-4">
+                            <DangerButton
+                                button_label={"Close"}
+                                on_click={dismissDelve}
+                                disabled={dismissing}
+                                additional_css={""}
+                            />
+                        </div>
+                    ) : null}
                 </div>
             )}
 

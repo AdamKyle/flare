@@ -61,6 +61,22 @@ export default class ExplorationOutputSection extends React.Component<
         });
     }
 
+    dismissEnded(): void {
+        this.setState({ dismissing: true }, () => {
+            new Ajax()
+                .setRoute("exploration/" + this.props.character_id + "/dismiss")
+                .doAjaxCall(
+                    "post",
+                    () => {
+                        this.setState({ dismissing: false });
+                    },
+                    (_error: AxiosError) => {
+                        this.setState({ dismissing: false });
+                    },
+                );
+        });
+    }
+
     formatReason(reason: string): string {
         return startCase(reason.replace(/_/g, " "));
     }
@@ -474,8 +490,55 @@ export default class ExplorationOutputSection extends React.Component<
                         ) : null}
                         {this.renderOutputColumns(data)}
                         <DangerButton
-                            button_label={"Dismiss"}
+                            button_label={"Close"}
                             on_click={this.dismissWarning.bind(this)}
+                            disabled={this.state.dismissing}
+                            additional_css={""}
+                        />
+                    </>,
+                )}
+            </div>
+        );
+    }
+
+    renderEndedOutput(data?: Record<string, any>): React.ReactNode {
+        if (!data) {
+            return null;
+        }
+
+        const contentId = "exploration-output-ended-body";
+
+        return (
+            <div className="w-full border border-orange-500 dark:border-orange-400 rounded mt-3 overflow-hidden bg-white dark:bg-gray-800">
+                {this.renderCardHeader(
+                    "Exploration Ended",
+                    contentId,
+                    "orange",
+                )}
+                {this.renderCardBody(
+                    contentId,
+                    <>
+                        <p className="mb-1 text-sm">
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">
+                                Reason:{" "}
+                            </span>
+                            <span className="text-gray-900 dark:text-gray-100">
+                                {this.formatReason(
+                                    data.reason ??
+                                        data.stopped_reason ??
+                                        "completed",
+                                )}
+                            </span>
+                        </p>
+                        {data.message ? (
+                            <p className="mb-3 text-sm text-gray-700 dark:text-gray-300">
+                                {data.message}
+                            </p>
+                        ) : null}
+                        {this.renderOutputColumns(data)}
+                        <DangerButton
+                            button_label={"Close"}
+                            on_click={this.dismissEnded.bind(this)}
                             disabled={this.state.dismissing}
                             additional_css={""}
                         />
@@ -503,6 +566,10 @@ export default class ExplorationOutputSection extends React.Component<
 
         if (explorationOutput?.type === "warning" && data !== null) {
             return this.renderWarningOutput(data);
+        }
+
+        if (explorationOutput?.type === "ended" && data !== null) {
+            return this.renderEndedOutput(data);
         }
 
         return null;

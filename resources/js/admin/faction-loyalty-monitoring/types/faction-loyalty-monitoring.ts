@@ -39,6 +39,8 @@ export type FactionLoyaltySummary = {
 export type FactionLoyaltyChartPoint = {
     period: string;
     runs: number;
+    active: number;
+    completed: number;
 };
 
 export type Paginated<T> = {
@@ -52,5 +54,6 @@ export type FactionLoyaltyFilters = {
     character_name: string;
     date_from: string;
     date_to: string;
+    status: string;
     days: string;
 };

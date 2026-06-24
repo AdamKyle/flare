@@ -37,6 +37,9 @@ export type ExplorationChartPoint = {
     runs: number;
     kills: number;
     xp: number;
+    skill_xp: number;
+    active: number;
+    completed: number;
 };
 
 export type Paginated<T> = {
@@ -49,6 +52,7 @@ export type Paginated<T> = {
 export type ExplorationFilters = {
     character_name: string;
     stopped_reason: string;
+    stopped_by_player: boolean;
     date_from: string;
     date_to: string;
     days: string;

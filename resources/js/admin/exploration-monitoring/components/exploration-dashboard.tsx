@@ -18,7 +18,7 @@ import { DAY_OPTIONS } from "../values/filter-options";
 import ActiveExplorersTable from "./active-explorers-table";
 import ExplorationLogsTable from "./exploration-logs-table";
 import MonitoringCard from "./monitoring-card";
-import SimpleBarChart from "./simple-bar-chart";
+import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
 
 const emptyPage = <T,>(): Paginated<T> => ({
     data: [],
@@ -38,6 +38,7 @@ const emptySummary: ExplorationSummary = {
 const defaultFilters: ExplorationFilters = {
     character_name: "",
     stopped_reason: "",
+    stopped_by_player: false,
     date_from: "",
     date_to: "",
     days: "7",
@@ -85,6 +86,16 @@ export default function ExplorationDashboard() {
 
     useExplorationLiveRefresh(refresh);
 
+    const applyTableFilter = (nextFilters: Partial<ExplorationFilters>) => {
+        setFilters({ ...defaultFilters, ...nextFilters });
+        setLogPage(1);
+        window.setTimeout(() => {
+            document
+                .getElementById("exploration-logs-table")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 0);
+    };
+
     return (
         <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
             {loading && (
@@ -121,18 +132,29 @@ export default function ExplorationDashboard() {
                         value: summary.total_skill_xp_gained.toLocaleString(),
                     },
                 ].map(({ label, value }) => (
-                    <MonitoringCard key={label}>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">
-                            {label}
-                        </div>
-                        <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                            {value}
-                        </div>
-                    </MonitoringCard>
+                    <button
+                        key={label}
+                        type="button"
+                        className="text-left"
+                        onClick={() => {
+                            if (label === "Stopped by Player") {
+                                applyTableFilter({ stopped_by_player: true });
+                            }
+                        }}
+                    >
+                        <MonitoringCard>
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                                {label}
+                            </div>
+                            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                                {value}
+                            </div>
+                        </MonitoringCard>
+                    </button>
                 ))}
             </div>
 
-            <MonitoringCard title="Exploration Runs per Period">
+            <div>
                 <label className="mb-3 block text-sm font-medium">
                     Period
                     <select
@@ -148,15 +170,33 @@ export default function ExplorationDashboard() {
                         ))}
                     </select>
                 </label>
-                <SimpleBarChart
-                    title="Runs per day"
-                    points={chart.map((p) => ({
-                        period: p.period,
-                        value: p.runs,
-                    }))}
-                    color="#22c55e"
+                <MonitoringStatusChart
+                    title="Exploration Metrics per Period"
+                    description="Run, kill, XP, skill XP, active, and completed totals from exploration logs."
+                    points={chart}
+                    series={[
+                        { key: "runs", label: "Runs", color: "#22c55e" },
+                        { key: "kills", label: "Kills", color: "#16a34a" },
+                        { key: "xp", label: "XP", color: "#3b82f6" },
+                        {
+                            key: "skill_xp",
+                            label: "Skill XP",
+                            color: "#a855f7",
+                        },
+                        {
+                            key: "active",
+                            label: "Active",
+                            color: "#f59e0b",
+                            dash: "2,2",
+                        },
+                        {
+                            key: "completed",
+                            label: "Completed",
+                            color: "#14b8a6",
+                        },
+                    ]}
                 />
-            </MonitoringCard>
+            </div>
 
             <ActiveExplorersTable explorers={activeExplorers} />
 

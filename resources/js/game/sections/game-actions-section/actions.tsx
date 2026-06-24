@@ -563,6 +563,18 @@ export default class Actions extends React.Component<
     renderActionContent() {
         const celestialFight = this.renderCelestialFight();
         const actionSlot = this.renderActionSlot();
+        const automationPanel = !this.state.show_exploration ? (
+            <div className="grid gap-4">
+                <ExplorationOutputSection
+                    character_id={this.props.character.id}
+                    exploration_output={this.props.exploration_output}
+                />
+                <DelveStatusPanel
+                    character_id={this.props.character.id}
+                    user_id={this.props.character.user_id}
+                />
+            </div>
+        ) : null;
         let fightContent = null;
 
         if (this.state.show_exploration) {
@@ -586,6 +598,7 @@ export default class Actions extends React.Component<
         return (
             <div className="grid gap-4">
                 {fightContent}
+                {automationPanel}
                 {this.state.show_gambling_section ? (
                     <div className="mx-auto w-full md:w-2/3">
                         <GamblingSection
@@ -594,20 +607,6 @@ export default class Actions extends React.Component<
                                 this,
                             )}
                             is_small={false}
-                        />
-                    </div>
-                ) : null}
-                {!this.state.show_exploration ? (
-                    <ExplorationOutputSection
-                        character_id={this.props.character.id}
-                        exploration_output={this.props.exploration_output}
-                    />
-                ) : null}
-                {this.isDelveRunning() && !this.state.show_exploration ? (
-                    <div className="mt-3">
-                        <DelveStatusPanel
-                            character_id={this.props.character.id}
-                            user_id={this.props.character.user_id}
                         />
                     </div>
                 ) : null}

@@ -17,6 +17,11 @@ class ExplorationWarning extends Model
         'exploration_log_id',
         'type',
         'message',
+        'dismissed_at',
+    ];
+
+    protected $casts = [
+        'dismissed_at' => 'datetime',
     ];
 
     public function character(): BelongsTo

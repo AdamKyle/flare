@@ -206,12 +206,14 @@ class ExplorationLogService
             return;
         }
 
-        $log = $warning->explorationLog;
+        $warning->update([
+            'dismissed_at' => now(),
+        ]);
 
-        $warning->delete();
-
-        if (! is_null($log)) {
-            $log->delete();
+        if (! is_null($warning->exploration_log_id)) {
+            ExplorationLog::where('id', $warning->exploration_log_id)
+                ->whereNull('panel_dismissed_at')
+                ->update(['panel_dismissed_at' => now()]);
         }
 
         $this->broadcastOutputForCharacter($character);
@@ -222,6 +224,17 @@ class ExplorationLogService
         $output = $this->resolveOutputForCharacter($character);
 
         event(new ExplorationOutputUpdated($character->user, $output['type'], $output['output']));
+    }
+
+    public function dismissEndedLog(Character $character): void
+    {
+        ExplorationLog::where('character_id', $character->id)
+            ->whereNotNull('ended_at')
+            ->whereNull('panel_dismissed_at')
+            ->latest('ended_at')
+            ->first()?->update(['panel_dismissed_at' => now()]);
+
+        $this->broadcastOutputForCharacter($character);
     }
 
     private function resolveOutputForCharacter(Character $character): array
@@ -261,11 +274,22 @@ class ExplorationLogService
         }
 
         $warning = ExplorationWarning::where('character_id', $character->id)
+            ->whereNull('dismissed_at')
             ->latest()
             ->first();
 
         if (! is_null($warning)) {
             return ['type' => 'warning', 'output' => $this->formatWarningOutput($warning)];
+        }
+
+        $endedLog = ExplorationLog::where('character_id', $character->id)
+            ->whereNotNull('ended_at')
+            ->whereNull('panel_dismissed_at')
+            ->latest('ended_at')
+            ->first();
+
+        if (! is_null($endedLog)) {
+            return ['type' => 'ended', 'output' => $this->formatLogOutput($endedLog)];
         }
 
         return ['type' => null, 'output' => null];

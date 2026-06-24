@@ -1,7 +1,7 @@
 import { inject, injectable } from "tsyringe";
 import Ajax from "../../../../game/lib/ajax/ajax.js";
 import AjaxInterface from "../../../../game/lib/ajax/ajax-interface.js";
-import GuideQuest from "../modals/guide-quest";
+import type GuideQuest from "../modals/guide-quest";
 import { AxiosError, AxiosResponse, Method } from "axios";
 
 export enum GUIDE_QUEST_ACTIONS {

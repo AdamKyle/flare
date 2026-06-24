@@ -33,7 +33,18 @@ class DelveStatusService
             ->first();
 
         if (is_null($delve)) {
-            return ['active' => false];
+            $delve = DelveExploration::where('character_id', $character->id)
+                ->whereNotNull('completed_at')
+                ->whereNull('panel_dismissed_at')
+                ->with('monster')
+                ->latest('completed_at')
+                ->first();
+
+            if (is_null($delve)) {
+                return ['active' => false, 'completed' => false];
+            }
+
+            return $this->completedStatus($character, $delve);
         }
 
         $latestLog = $delve->delveLogs()->latest()->first();
@@ -45,6 +56,7 @@ class DelveStatusService
 
         return [
             'active' => true,
+            'completed' => false,
             'started_at' => $delve->started_at->toDateTimeString(),
             'elapsed_seconds' => $elapsedSeconds,
             'increase_enemy_strength' => $delve->increase_enemy_strength,
@@ -53,6 +65,51 @@ class DelveStatusService
             'quest_item_drop_seconds_remaining' => $countdown['seconds_remaining'],
             'quest_item_drop_available_at' => $countdown['available_at'],
             'quest_item_drop_available' => $countdown['available'],
+            'quest_items' => is_null($location) ? [] : $this->questItems($character, $location),
+            'reward_checkpoints' => $this->rewardCheckpoints($elapsedHours),
+            'monster_name' => $delve->monster?->name,
+            'enemy_stats_available' => $currentFoe['stats_available'],
+            'current_foe' => $currentFoe,
+        ];
+    }
+
+    public function dismissForCharacter(Character $character): void
+    {
+        $delve = DelveExploration::where('character_id', $character->id)
+            ->whereNotNull('completed_at')
+            ->whereNull('panel_dismissed_at')
+            ->latest('completed_at')
+            ->first();
+
+        if (is_null($delve)) {
+            return;
+        }
+
+        $delve->update([
+            'panel_dismissed_at' => now(),
+        ]);
+    }
+
+    private function completedStatus(Character $character, DelveExploration $delve): array
+    {
+        $latestLog = $delve->delveLogs()->latest()->first();
+        $elapsedSeconds = $delve->started_at->diffInSeconds($delve->completed_at);
+        $elapsedHours = $elapsedSeconds / 3600;
+        $location = $this->caveLocation($character);
+        $currentFoe = $this->currentFoe($delve, $latestLog);
+        $reason = $delve->ended_reason ?? $latestLog?->outcome ?? 'completed';
+
+        return [
+            'active' => false,
+            'completed' => true,
+            'id' => $delve->id,
+            'started_at' => $delve->started_at->toDateTimeString(),
+            'completed_at' => $delve->completed_at->toDateTimeString(),
+            'elapsed_seconds' => $elapsedSeconds,
+            'increase_enemy_strength' => $delve->increase_enemy_strength,
+            'increase_percentage' => round(($delve->increase_enemy_strength ?? 0) * 100, 2),
+            'reason' => $reason,
+            'message' => 'Delve ended.',
             'quest_items' => is_null($location) ? [] : $this->questItems($character, $location),
             'reward_checkpoints' => $this->rewardCheckpoints($elapsedHours),
             'monster_name' => $delve->monster?->name,

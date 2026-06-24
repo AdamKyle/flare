@@ -183,6 +183,91 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertFalse($response->json('active'));
     }
 
+    public function testStatusReturnsCompletedDelveUntilDismissed(): void
+    {
+        $delve = DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
+        ]);
+
+        DelveLog::factory()->create([
+            'character_id' => $this->character->id,
+            'delve_exploration_id' => $delve->id,
+            'outcome' => 'survived',
+            'pack_size' => 5,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/delve/' . $this->character->id . '/status');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertFalse($response->json('active'));
+        $this->assertTrue($response->json('completed'));
+        $this->assertSame('player_stopped', $response->json('reason'));
+        $this->assertEquals(1, DelveLog::where('delve_exploration_id', $delve->id)->where('pack_size', 5)->count());
+    }
+
+    public function testDismissHidesCompletedDelveWithoutDeletingLogs(): void
+    {
+        $delve = DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => 'died',
+            'panel_dismissed_at' => null,
+        ]);
+
+        $log = DelveLog::factory()->create([
+            'character_id' => $this->character->id,
+            'delve_exploration_id' => $delve->id,
+            'outcome' => 'died',
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/delve/' . $this->character->id . '/dismiss', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertFalse($response->json('active'));
+        $this->assertFalse($response->json('completed'));
+        $this->assertNotNull($delve->refresh()->panel_dismissed_at);
+        $this->assertEquals(1, DelveLog::where('id', $log->id)->where('delve_exploration_id', $delve->id)->count());
+    }
+
+    public function testNewDelveRunShowsAfterPreviousCompletedPanelWasDismissed(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHours(2),
+            'completed_at' => now()->subHour(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => now()->subMinutes(30),
+        ]);
+
+        $active = DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now(),
+            'completed_at' => null,
+            'panel_dismissed_at' => null,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/delve/' . $this->character->id . '/status');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue($response->json('active'));
+        $this->assertFalse($response->json('completed'));
+        $this->assertSame($active->monster_id, $response->json('current_foe.id'));
+    }
+
     public function testStatusReturnsActiveDataWhenDelveIsRunning(): void
     {
         DelveExploration::factory()->create([

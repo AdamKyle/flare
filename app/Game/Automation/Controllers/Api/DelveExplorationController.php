@@ -74,6 +74,13 @@ class DelveExplorationController extends Controller
         ]);
     }
 
+    public function dismiss(Character $character): JsonResponse
+    {
+        $this->delveStatusService->dismissForCharacter($character);
+
+        return response()->json($this->delveStatusService->statusForCharacter($character));
+    }
+
     public function stop(Character $character): JsonResponse
     {
 

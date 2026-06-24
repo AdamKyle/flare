@@ -1,8 +1,12 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
 import {
+    fetchBugChart,
     fetchLogEntries,
     fetchLogFiles,
     fetchLogSummary,
+    fetchSystemBugs,
+    pollLogs,
 } from "../ajax/logs-api";
 import {
     LogEntriesPage,
@@ -11,6 +15,7 @@ import {
     LogFilters,
     LogSummary,
     SEVERITIES,
+    SystemBugReport,
 } from "../types/logs-dashboard";
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -18,21 +23,13 @@ const SEVERITY_COLORS: Record<string, string> = {
     alert: "bg-red-600 text-white",
     critical: "bg-red-500 text-white",
     error: "bg-red-400 text-white",
+    fatal: "bg-red-700 text-white",
     warning: "bg-yellow-400 text-gray-900",
     notice: "bg-blue-400 text-white",
     info: "bg-blue-300 text-gray-900",
     debug: "bg-gray-300 text-gray-800",
     unknown: "bg-gray-200 text-gray-700",
 };
-
-const BAR_H = 100;
-const BAR_W = 600;
-const PAD_L = 48;
-const PAD_R = 16;
-const PAD_T = 8;
-const PAD_B = 28;
-const INNER_W = BAR_W - PAD_L - PAD_R;
-const INNER_H = BAR_H - PAD_T - PAD_B;
 
 function SeverityBadge({ severity }: { severity: string }) {
     const cls =
@@ -43,58 +40,6 @@ function SeverityBadge({ severity }: { severity: string }) {
         >
             {severity}
         </span>
-    );
-}
-
-function SummaryChart({
-    points,
-}: {
-    points: Array<{ period: string; count: number }>;
-}) {
-    if (points.length === 0)
-        return <p className="text-sm text-gray-500">No chart data.</p>;
-
-    const maxVal = Math.max(...points.map((p) => p.count), 1);
-    const n = points.length;
-    const barW = n > 0 ? Math.max(2, INNER_W / n - 1) : 0;
-
-    return (
-        <svg
-            viewBox={`0 0 ${BAR_W} ${BAR_H}`}
-            className="w-full"
-            style={{ minHeight: 80 }}
-        >
-            {points.map((p, i) => {
-                const h = (p.count / maxVal) * INNER_H;
-                const x = PAD_L + (INNER_W * i) / Math.max(n, 1) - barW / 2;
-                const y = PAD_T + INNER_H - h;
-
-                return (
-                    <rect
-                        key={p.period}
-                        x={x}
-                        y={y}
-                        width={barW}
-                        height={h}
-                        fill="#6366f1"
-                        opacity={0.8}
-                    >
-                        <title>
-                            {p.period}: {p.count}
-                        </title>
-                    </rect>
-                );
-            })}
-            <line
-                x1={PAD_L}
-                x2={PAD_L + INNER_W}
-                y1={PAD_T + INNER_H}
-                y2={PAD_T + INNER_H}
-                stroke="currentColor"
-                strokeOpacity={0.25}
-                strokeWidth={1}
-            />
-        </svg>
     );
 }
 
@@ -132,35 +77,176 @@ function PaginationControls({
     );
 }
 
-function LogEntryRow({ entry }: { entry: LogEntry }) {
-    const [expanded, setExpanded] = useState(false);
+function DetailBlock({
+    label,
+    value,
+    pre = false,
+}: {
+    label: string;
+    value: React.ReactNode;
+    pre?: boolean;
+}) {
+    if (value === null || value === undefined || value === "") {
+        return null;
+    }
 
     return (
-        <tr className="border-t align-top dark:border-gray-700">
-            <td className="p-2 text-xs text-gray-500 whitespace-nowrap">
-                {entry.timestamp ?? "—"}
-            </td>
-            <td className="p-2">
-                <SeverityBadge severity={entry.severity} />
-            </td>
-            <td className="p-2 text-xs">{entry.channel ?? "—"}</td>
-            <td className="p-2 text-sm">
-                <div>{entry.message}</div>
-                {entry.context && (
-                    <button
-                        className="mt-1 text-xs text-blue-500 underline"
-                        onClick={() => setExpanded(!expanded)}
+        <div>
+            <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                {label}
+            </dt>
+            <dd
+                className={
+                    pre
+                        ? "mt-1 max-h-72 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-all rounded bg-gray-100 p-2 text-xs dark:bg-gray-800"
+                        : "mt-1 break-words text-sm text-gray-900 dark:text-gray-100"
+                }
+            >
+                {value}
+            </dd>
+        </div>
+    );
+}
+
+function LogSidePeek({
+    entry,
+    onClose,
+}: {
+    entry: LogEntry;
+    onClose: () => void;
+}) {
+    const rawFormatted = (() => {
+        if (!entry.raw_log_entry) return null;
+        try {
+            return JSON.stringify(JSON.parse(entry.raw_log_entry), null, 2);
+        } catch {
+            return entry.raw_log_entry;
+        }
+    })();
+
+    return (
+        <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xl overflow-y-auto overflow-x-hidden border-l border-gray-200 bg-white p-5 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+            <div className="mb-4 flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <h3 className="text-lg font-semibold">Log Detail</h3>
+                    <p className="break-all text-sm text-gray-500">
+                        {entry.file_path ?? entry.channel ?? "Log entry"}
+                    </p>
+                </div>
+                <button
+                    className="shrink-0 rounded border border-gray-300 px-3 py-1 text-sm dark:border-gray-600"
+                    onClick={onClose}
+                >
+                    Close
+                </button>
+            </div>
+            <dl className="space-y-4">
+                <DetailBlock label="Timestamp" value={entry.timestamp} />
+                <DetailBlock
+                    label="Level"
+                    value={<SeverityBadge severity={entry.severity} />}
+                />
+                <DetailBlock
+                    label="Channel/File"
+                    value={entry.file_path ?? entry.channel}
+                />
+                <DetailBlock label="Message" value={entry.message} />
+                <DetailBlock
+                    label="Exception Class"
+                    value={entry.exception_class}
+                />
+                <DetailBlock
+                    label="File/Line"
+                    value={
+                        entry.exception_file
+                            ? `${entry.exception_file}${entry.exception_line ? `:${entry.exception_line}` : ""}`
+                            : null
+                    }
+                />
+                <DetailBlock label="Context" value={entry.context} pre />
+                <DetailBlock
+                    label="Stack Trace"
+                    value={entry.stack_trace}
+                    pre
+                />
+                <DetailBlock label="Raw Log Entry" value={rawFormatted} pre />
+            </dl>
+        </aside>
+    );
+}
+
+function BugSidePeek({
+    bug,
+    onClose,
+}: {
+    bug: SystemBugReport;
+    onClose: () => void;
+}) {
+    return (
+        <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xl overflow-y-auto border-l border-gray-200 bg-white p-5 shadow-xl dark:border-gray-700 dark:bg-gray-900">
+            <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                    <h3 className="text-lg font-semibold">{bug.title}</h3>
+                    <p className="text-sm text-gray-500">
+                        {bug.occurrence_count} occurrence
+                        {bug.occurrence_count === 1 ? "" : "s"}
+                    </p>
+                </div>
+                <button
+                    className="rounded border border-gray-300 px-3 py-1 text-sm dark:border-gray-600"
+                    onClick={onClose}
+                >
+                    Close
+                </button>
+            </div>
+            <dl className="space-y-4">
+                <DetailBlock label="Fingerprint" value={bug.fingerprint} />
+                <DetailBlock label="Status" value={bug.status} />
+                <DetailBlock label="Severity" value={bug.severity} />
+                <DetailBlock label="First Seen" value={bug.first_seen_at} />
+                <DetailBlock label="Last Seen" value={bug.last_seen_at} />
+                <DetailBlock
+                    label="Latest Message"
+                    value={bug.latest_message}
+                />
+                <DetailBlock
+                    label="Latest Stack Trace"
+                    value={bug.latest_stack_trace}
+                    pre
+                />
+                <DetailBlock
+                    label="Latest Raw Log Entry"
+                    value={bug.latest_raw_log_entry}
+                    pre
+                />
+            </dl>
+            <h4 className="mt-5 text-sm font-semibold">Occurrence History</h4>
+            <div className="mt-2 space-y-2">
+                {bug.occurrences.map((occurrence, index) => (
+                    <div
+                        key={`${occurrence.occurred_at ?? "unknown"}-${index}`}
+                        className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
                     >
-                        {expanded ? "Hide context" : "Show context"}
-                    </button>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <span>
+                                {occurrence.occurred_at ?? "Unknown time"}
+                            </span>
+                            {occurrence.level && (
+                                <SeverityBadge severity={occurrence.level} />
+                            )}
+                        </div>
+                        <p className="mt-1 text-gray-700 dark:text-gray-300">
+                            {occurrence.message}
+                        </p>
+                    </div>
+                ))}
+                {bug.occurrences.length === 0 && (
+                    <p className="text-sm text-gray-500">
+                        No occurrences loaded.
+                    </p>
                 )}
-                {expanded && entry.context && (
-                    <pre className="mt-1 max-w-xl overflow-x-auto rounded bg-gray-100 p-2 text-xs dark:bg-gray-800">
-                        {entry.context}
-                    </pre>
-                )}
-            </td>
-        </tr>
+            </div>
+        </aside>
     );
 }
 
@@ -190,6 +276,18 @@ export default function LogsDashboard() {
         by_severity: {},
         chart: [],
     });
+    const [newEntries, setNewEntries] = useState<LogEntry[]>([]);
+    const [bugs, setBugs] = useState<SystemBugReport[]>([]);
+    const [bugChart, setBugChart] = useState<
+        Array<{ period: string; occurrences: number }>
+    >([]);
+    const [bugRange, setBugRange] = useState(30);
+    const [selectedEntry, setSelectedEntry] = useState<LogEntry | null>(null);
+    const [selectedBug, setSelectedBug] = useState<SystemBugReport | null>(
+        null,
+    );
+
+    const tableRef = React.useRef<HTMLElement | null>(null);
 
     useEffect(() => {
         fetchLogFiles()
@@ -209,18 +307,23 @@ export default function LogsDashboard() {
             setError("");
 
             try {
-                const [entriesData, summaryData] = await Promise.all([
-                    fetchLogEntries(fileKey, f, p),
-                    fetchLogSummary(fileKey, f),
-                ]);
+                const [entriesData, summaryData, bugData, bugChartData] =
+                    await Promise.all([
+                        fetchLogEntries(fileKey, f, p),
+                        fetchLogSummary(fileKey, f),
+                        fetchSystemBugs(),
+                        fetchBugChart(bugRange),
+                    ]);
 
                 setEntries(entriesData);
                 setSummary(summaryData);
+                setBugs(bugData);
+                setBugChart(bugChartData);
             } catch {
                 setError("Could not load log entries.");
             }
         },
-        [],
+        [bugRange],
     );
 
     useEffect(() => {
@@ -229,17 +332,60 @@ export default function LogsDashboard() {
 
     useEffect(() => {
         if (!selectedFile) return;
+        void pollLogs(selectedFile, filters)
+            .then((payload) => {
+                setNewEntries(payload.entries);
+                setSummary(payload.summary);
+                setFiles(payload.files);
+                setBugs(payload.bugs);
+                setBugChart(payload.bug_chart);
+            })
+            .catch(() => {});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedFile]);
+
+    useEffect(() => {
+        if (!selectedFile) return;
         const interval = window.setInterval(() => {
-            void loadData(selectedFile, filters, page);
+            pollLogs(selectedFile, filters)
+                .then((payload) => {
+                    setNewEntries(payload.entries);
+                    setSummary(payload.summary);
+                    setFiles(payload.files);
+                    setBugs(payload.bugs);
+                    setBugChart(payload.bug_chart);
+                    void loadData(selectedFile, filters, page);
+                })
+                .catch(() => setError("Could not poll log entries."));
         }, 60000);
         return () => window.clearInterval(interval);
     }, [selectedFile, filters, page, loadData]);
+
+    const chartPoints = useMemo(
+        () =>
+            summary.chart.map((point) => ({
+                period: point.period,
+                entries: point.count,
+            })),
+        [summary.chart],
+    );
+
+    const setSeverityFilter = (severity: string) => {
+        setFilters({ ...filters, severity });
+        setPage(1);
+        window.setTimeout(() => {
+            tableRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "start",
+            });
+        }, 0);
+    };
 
     return (
         <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
             {loading && (
                 <p role="status" aria-live="polite">
-                    Loading log files…
+                    Loading log files...
                 </p>
             )}
             {error && (
@@ -290,31 +436,152 @@ export default function LogsDashboard() {
 
             {selectedFile && (
                 <>
-                    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
-                        <h2 className="mb-3 text-lg font-semibold">Summary</h2>
-                        <div className="mb-4 flex flex-wrap gap-2">
-                            {Object.entries(summary.by_severity).map(
-                                ([sev, cnt]) => (
-                                    <span
-                                        key={sev}
-                                        className={`rounded px-2 py-1 text-xs font-semibold ${SEVERITY_COLORS[sev] ?? SEVERITY_COLORS.unknown}`}
-                                    >
-                                        {sev}: {cnt}
+                    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <button
+                            className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                            onClick={() => setSeverityFilter("")}
+                        >
+                            <span className="text-sm text-gray-500">Total</span>
+                            <span className="mt-1 block text-2xl font-semibold">
+                                {summary.total}
+                            </span>
+                        </button>
+                        {Object.entries(summary.by_severity).map(
+                            ([sev, cnt]) => (
+                                <button
+                                    key={sev}
+                                    className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                                    onClick={() => setSeverityFilter(sev)}
+                                >
+                                    <span className="text-sm text-gray-500">
+                                        {sev}
                                     </span>
-                                ),
-                            )}
-                            {Object.keys(summary.by_severity).length === 0 && (
-                                <span className="text-sm text-gray-500">
-                                    No entries.
-                                </span>
-                            )}
-                        </div>
-                        <SummaryChart points={summary.chart} />
+                                    <span className="mt-1 block text-2xl font-semibold">
+                                        {cnt}
+                                    </span>
+                                </button>
+                            ),
+                        )}
                     </section>
 
+                    <MonitoringStatusChart
+                        title="Log Volume"
+                        description="Parsed log entries by day for the selected channel and filters."
+                        points={chartPoints}
+                        series={[
+                            {
+                                key: "entries",
+                                label: "Entries",
+                                color: "#4f46e5",
+                            },
+                        ]}
+                    />
+
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h2 className="text-lg font-semibold">
+                            System Error Occurrences
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                            {[7, 14, 30, 60, 120].map((days) => (
+                                <button
+                                    key={days}
+                                    className={[
+                                        "rounded border px-2 py-1 text-xs",
+                                        bugRange === days
+                                            ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                                            : "border-gray-300 dark:border-gray-600",
+                                    ].join(" ")}
+                                    onClick={() => setBugRange(days)}
+                                >
+                                    {days}d
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <MonitoringStatusChart
+                        title="Bug Occurrences"
+                        description="System error occurrences grouped by day."
+                        points={bugChart}
+                        series={[
+                            {
+                                key: "occurrences",
+                                label: "Occurrences",
+                                color: "#dc2626",
+                            },
+                        ]}
+                    />
                     <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
+                        <div className="mb-3">
+                            <h2 className="text-lg font-semibold">
+                                Grouped Bugs
+                            </h2>
+                        </div>
+                        <div className="mt-4 overflow-x-auto">
+                            <table className="w-full min-w-[760px] text-left text-sm">
+                                <thead>
+                                    <tr className="border-b dark:border-gray-700">
+                                        <th className="p-2">Bug</th>
+                                        <th className="p-2">Status</th>
+                                        <th className="p-2">Severity</th>
+                                        <th className="p-2">Occurrences</th>
+                                        <th className="p-2">Last Seen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {bugs.map((bug) => (
+                                        <tr
+                                            key={bug.id}
+                                            className="cursor-pointer border-t hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            onClick={() => {
+                                                setSelectedBug(bug);
+                                                setSelectedEntry(null);
+                                            }}
+                                        >
+                                            <td className="p-2">{bug.title}</td>
+                                            <td className="p-2">
+                                                {bug.status}
+                                            </td>
+                                            <td className="p-2">
+                                                {bug.severity ? (
+                                                    <SeverityBadge
+                                                        severity={bug.severity}
+                                                    />
+                                                ) : (
+                                                    "-"
+                                                )}
+                                            </td>
+                                            <td className="p-2">
+                                                {bug.occurrence_count}
+                                            </td>
+                                            <td className="p-2">
+                                                {bug.last_seen_at ?? "-"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {bugs.length === 0 && (
+                                <p className="p-4 text-center text-gray-600 dark:text-gray-300">
+                                    No system errors have been ingested.
+                                </p>
+                            )}
+                        </div>
+                    </section>
+
+                    {newEntries.length > 0 && (
+                        <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100">
+                            {newEntries.length} new log{" "}
+                            {newEntries.length === 1 ? "entry" : "entries"} read
+                            during the latest poll.
+                        </section>
+                    )}
+
+                    <section
+                        ref={tableRef}
+                        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5"
+                    >
                         <h2 className="mb-3 text-lg font-semibold">
-                            Log Entries
+                            Recent Logs
                         </h2>
                         <div className="mb-3 flex flex-wrap gap-2">
                             {[
@@ -417,32 +684,46 @@ export default function LogsDashboard() {
                             </label>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full min-w-[700px] text-left text-sm">
+                            <table className="w-full min-w-[840px] text-left text-sm">
                                 <thead>
                                     <tr className="border-b dark:border-gray-700">
-                                        <th
-                                            scope="col"
-                                            className="p-2 whitespace-nowrap"
-                                        >
+                                        <th className="p-2 whitespace-nowrap">
                                             Timestamp
                                         </th>
-                                        <th scope="col" className="p-2">
-                                            Severity
-                                        </th>
-                                        <th scope="col" className="p-2">
-                                            Channel
-                                        </th>
-                                        <th scope="col" className="p-2">
-                                            Message
-                                        </th>
+                                        <th className="p-2">Severity</th>
+                                        <th className="p-2">Channel</th>
+                                        <th className="p-2">Message</th>
+                                        <th className="p-2">Exception</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {entries.data.map((entry, idx) => (
-                                        <LogEntryRow
+                                        <tr
                                             key={`${entry.timestamp ?? "raw"}-${idx}`}
-                                            entry={entry}
-                                        />
+                                            className="cursor-pointer border-t align-top hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            onClick={() => {
+                                                setSelectedEntry(entry);
+                                                setSelectedBug(null);
+                                            }}
+                                        >
+                                            <td className="p-2 text-xs text-gray-500 whitespace-nowrap">
+                                                {entry.timestamp ?? "-"}
+                                            </td>
+                                            <td className="p-2">
+                                                <SeverityBadge
+                                                    severity={entry.severity}
+                                                />
+                                            </td>
+                                            <td className="p-2 text-xs">
+                                                {entry.channel ?? "-"}
+                                            </td>
+                                            <td className="p-2 text-sm">
+                                                {entry.message}
+                                            </td>
+                                            <td className="p-2 text-xs">
+                                                {entry.exception_class ?? "-"}
+                                            </td>
+                                        </tr>
                                     ))}
                                 </tbody>
                             </table>
@@ -459,6 +740,18 @@ export default function LogsDashboard() {
                         />
                     </section>
                 </>
+            )}
+            {selectedEntry && (
+                <LogSidePeek
+                    entry={selectedEntry}
+                    onClose={() => setSelectedEntry(null)}
+                />
+            )}
+            {selectedBug && (
+                <BugSidePeek
+                    bug={selectedBug}
+                    onClose={() => setSelectedBug(null)}
+                />
             )}
         </div>
     );

@@ -3,6 +3,8 @@
 namespace Tests\Unit\Admin\Services;
 
 use App\Admin\Services\MonitoredBugReportService;
+use App\Flare\Models\MonitoredSystemErrorOccurrence;
+use App\Flare\Models\MonitoredSystemErrorReport;
 use App\Flare\Models\SuggestionAndBugs;
 use App\Game\Core\Values\FeedbackType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -134,5 +136,146 @@ class MonitoredBugReportServiceTest extends TestCase
         $service->reportError('test-source', 'Something broke', [], 'RuntimeException');
 
         $this->assertSame(0, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
+    }
+
+    public function testFirstErrorCreatesSystemBugReportAndOccurrence(): void
+    {
+        $service = resolve(MonitoredBugReportService::class);
+
+        $service->reportLogEntry([
+            'timestamp' => '2026-06-24 12:00:00',
+            'severity' => 'error',
+            'channel' => 'local',
+            'message' => 'Something broke',
+            'exception_class' => 'RuntimeException',
+            'exception_file' => '/var/app/Auth.php',
+            'exception_line' => 45,
+            'stack_trace' => '#0 /var/app/Login.php(12): run()',
+            'raw_log_entry' => 'raw error',
+            'file_path' => storage_path('logs/laravel.log'),
+            'context_payload' => [],
+        ]);
+
+        $this->assertSame(1, MonitoredSystemErrorReport::count());
+        $this->assertSame(1, MonitoredSystemErrorOccurrence::count());
+        $this->assertSame(1, MonitoredSystemErrorReport::first()->occurrence_count);
+    }
+
+    public function testDuplicateErrorUpdatesExistingSystemBugAndCreatesOccurrence(): void
+    {
+        $service = resolve(MonitoredBugReportService::class);
+
+        $service->reportLogEntry([
+            'timestamp' => '2026-06-24 12:00:00',
+            'severity' => 'error',
+            'channel' => 'local',
+            'message' => 'Same error',
+            'exception_class' => 'RuntimeException',
+            'exception_file' => '/var/app/Auth.php',
+            'exception_line' => 45,
+            'stack_trace' => '#0 /var/app/Login.php(12): run()',
+            'raw_log_entry' => 'raw error one',
+            'file_path' => storage_path('logs/laravel.log'),
+            'context_payload' => [],
+        ]);
+        $service->reportLogEntry([
+            'timestamp' => '2026-06-24 12:01:00',
+            'severity' => 'error',
+            'channel' => 'local',
+            'message' => 'Same error',
+            'exception_class' => 'RuntimeException',
+            'exception_file' => '/var/app/Auth.php',
+            'exception_line' => 45,
+            'stack_trace' => '#0 /var/app/Login.php(12): run()',
+            'raw_log_entry' => 'raw error two',
+            'file_path' => storage_path('logs/laravel.log'),
+            'context_payload' => [],
+        ]);
+
+        $this->assertSame(1, MonitoredSystemErrorReport::count());
+        $this->assertSame(2, MonitoredSystemErrorOccurrence::count());
+        $this->assertSame(2, MonitoredSystemErrorReport::first()->occurrence_count);
+        $this->assertSame('raw error two', MonitoredSystemErrorReport::first()->latest_raw_log_entry);
+    }
+
+    public function testDifferentFingerprintCreatesSeparateSystemBugReport(): void
+    {
+        $service = resolve(MonitoredBugReportService::class);
+
+        $service->reportLogEntry([
+            'timestamp' => '2026-06-24 12:00:00',
+            'severity' => 'error',
+            'channel' => 'local',
+            'message' => 'First error',
+            'exception_class' => 'RuntimeException',
+            'exception_file' => '/var/app/Auth.php',
+            'exception_line' => 45,
+            'stack_trace' => '#0 /var/app/Login.php(12): run()',
+            'raw_log_entry' => 'raw error',
+            'file_path' => storage_path('logs/laravel.log'),
+            'context_payload' => [],
+        ]);
+        $service->reportLogEntry([
+            'timestamp' => '2026-06-24 12:00:00',
+            'severity' => 'error',
+            'channel' => 'local',
+            'message' => 'Second error',
+            'exception_class' => 'RuntimeException',
+            'exception_file' => '/var/app/Auth.php',
+            'exception_line' => 45,
+            'stack_trace' => '#0 /var/app/Login.php(12): run()',
+            'raw_log_entry' => 'raw error',
+            'file_path' => storage_path('logs/laravel.log'),
+            'context_payload' => [],
+        ]);
+
+        $this->assertSame(2, MonitoredSystemErrorReport::count());
+    }
+
+    public function testOccurrenceStoresFullCaptureContext(): void
+    {
+        $service = resolve(MonitoredBugReportService::class);
+
+        $service->reportLogEntry([
+            'timestamp' => '2026-06-24 12:00:00',
+            'severity' => 'critical',
+            'channel' => 'local',
+            'message' => 'Full capture',
+            'exception_class' => 'RuntimeException',
+            'exception_file' => '/var/app/Auth.php',
+            'exception_line' => 45,
+            'stack_trace' => '#0 /var/app/Login.php(12): run()',
+            'raw_log_entry' => 'raw full capture',
+            'file_path' => storage_path('logs/laravel.log'),
+            'context_payload' => [
+                'user_id' => 10,
+                'request_path' => '/login',
+                'job_class' => 'App\\Jobs\\LoginJob',
+                'queue' => 'default',
+                'token' => 'secret',
+            ],
+        ]);
+
+        $occurrence = MonitoredSystemErrorOccurrence::first();
+
+        $this->assertSame('critical', $occurrence->level);
+        $this->assertSame('local', $occurrence->channel);
+        $this->assertSame('Full capture', $occurrence->message);
+        $this->assertSame('RuntimeException', $occurrence->exception_class);
+        $this->assertSame('/var/app/Auth.php', $occurrence->exception_file);
+        $this->assertSame(45, $occurrence->exception_line);
+        $this->assertSame(10, $occurrence->user_id);
+        $this->assertSame('/login', $occurrence->request_path);
+        $this->assertSame('App\\Jobs\\LoginJob', $occurrence->job_class);
+        $this->assertSame('default', $occurrence->queue);
+        $this->assertSame('[REDACTED]', $occurrence->context['token']);
+    }
+
+    public function testUserSubmittedBugFactoryStillCreatesFeedbackBug(): void
+    {
+        SuggestionAndBugs::factory()->create(['type' => FeedbackType::BUG]);
+
+        $this->assertSame(1, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
+        $this->assertSame(0, MonitoredSystemErrorReport::count());
     }
 }

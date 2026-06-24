@@ -42,4 +42,26 @@ class AdminLogsDashboardController extends Controller
             $this->adminLogsDashboardService->summary($fileKey, $severity, $dateFrom, $dateTo),
         );
     }
+
+    public function poll(Request $request): JsonResponse
+    {
+        $fileKey = $request->string('file', 'laravel')->toString();
+        $severity = $request->string('severity', '')->toString();
+        $dateFrom = $request->string('date_from', '')->toString();
+        $dateTo = $request->string('date_to', '')->toString();
+
+        return response()->json(
+            $this->adminLogsDashboardService->poll($fileKey, $severity, $dateFrom, $dateTo),
+        );
+    }
+
+    public function bugs(): JsonResponse
+    {
+        return response()->json($this->adminLogsDashboardService->bugReports());
+    }
+
+    public function bugChart(Request $request): JsonResponse
+    {
+        return response()->json($this->adminLogsDashboardService->bugChart($request->integer('days', 30)));
+    }
 }

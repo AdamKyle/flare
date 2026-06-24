@@ -21,6 +21,8 @@ class DelveExploration extends Model
         'monster_id',
         'started_at',
         'completed_at',
+        'ended_reason',
+        'panel_dismissed_at',
         'attack_type',
         'increase_enemy_strength',
     ];
@@ -33,6 +35,7 @@ class DelveExploration extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
+        'panel_dismissed_at' => 'datetime',
         'increase_enemy_strength' => 'float',
     ];
 

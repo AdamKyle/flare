@@ -56,6 +56,8 @@ class DelveExplorationAutomationService
             'character_id' => $character->id,
             'monster_id' => $monsterId,
             'started_at' => now(),
+            'ended_reason' => null,
+            'panel_dismissed_at' => null,
             'attack_type' => $params['attack_type'],
         ]);
 
@@ -84,6 +86,8 @@ class DelveExplorationAutomationService
 
         DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first()->update([
             'completed_at' => now(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
         ]);
 
         $this->characterCacheData->deleteCharacterSheet($character);
