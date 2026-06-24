@@ -37,3 +37,7 @@ Broadcast::channel('exploration-output-{userId}', function ($user, $userId) {
 Broadcast::channel('exploration-warning-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+Broadcast::channel('delve-status-updated-{userId}', function ($user, $userId) {
+    return $user->id === (int) $userId;
+});

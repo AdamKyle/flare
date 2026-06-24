@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Quests\Jobs;
 
 use App\Flare\Models\Character;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Core\Services\CharacterRewardLockService;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Jobs\HandInQuest;
@@ -39,7 +38,7 @@ class HandInQuestTest extends TestCase
             ->twice()
             ->andReturn($rewardHandler);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler, resolve(CharacterRewardLockService::class));
+        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
 
         $this->assertEquals(1, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
         Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character, $quest, $npc): bool {
@@ -62,7 +61,7 @@ class HandInQuestTest extends TestCase
             ->andThrow(new Exception('Reward failed.'));
 
         try {
-            (new HandInQuest($character, $quest))->handle($npcQuestsHandler, resolve(CharacterRewardLockService::class));
+            (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
         } catch (Exception) {
         }
 
@@ -84,7 +83,7 @@ class HandInQuestTest extends TestCase
             ->andThrow(new Exception('Reward failed.'));
 
         try {
-            (new HandInQuest($character, $quest))->handle($npcQuestsHandler, resolve(CharacterRewardLockService::class));
+            (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
         } catch (Exception) {
         }
 
@@ -112,33 +111,7 @@ class HandInQuestTest extends TestCase
 
         $this->expectExceptionObject($exception);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler, resolve(CharacterRewardLockService::class));
-    }
-
-    public function testQuestHandInUsesCharacterRewardLockService(): void
-    {
-        Event::fake();
-
-        $npc = $this->createNpc();
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $quest = $this->createQuest(['npc_id' => $npc->id]);
-        $rewardHandler = Mockery::mock(NpcQuestRewardHandler::class);
-        $rewardHandler->shouldReceive('createquestQuestLog')->once();
-        $rewardHandler->shouldReceive('processXpReward')->once();
-
-        $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
-        $npcQuestsHandler->shouldReceive('handleNpcQuest')->once();
-        $npcQuestsHandler->shouldReceive('questRewardHandler')->twice()->andReturn($rewardHandler);
-
-        $characterRewardLockService = Mockery::mock(CharacterRewardLockService::class);
-        $characterRewardLockService->shouldReceive('run')
-            ->once()
-            ->with($character->id, Mockery::type('callable'))
-            ->andReturnUsing(function (int $characterId, callable $callback): void {
-                $callback();
-            });
-
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler, $characterRewardLockService);
+        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
     }
 
     public function testQuestCompletionLogIsWrittenBeforeXpRewardProcessing(): void
@@ -169,7 +142,7 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler->shouldReceive('handleNpcQuest')->once();
         $npcQuestsHandler->shouldReceive('questRewardHandler')->twice()->andReturn($rewardHandler);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler, resolve(CharacterRewardLockService::class));
+        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
     }
 
     public function testGlobalQuestCompletionEventHappensAfterQuestCompletionLogExists(): void
@@ -199,38 +172,6 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler->shouldReceive('handleNpcQuest')->once();
         $npcQuestsHandler->shouldReceive('questRewardHandler')->twice()->andReturn($rewardHandler);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler, resolve(CharacterRewardLockService::class));
-    }
-
-    public function testQuestXpProcessingCompletesBeforeRewardLockCallbackReturns(): void
-    {
-        Event::fake();
-
-        $npc = $this->createNpc();
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $quest = $this->createQuest(['npc_id' => $npc->id]);
-        $xpProcessed = false;
-        $rewardHandler = Mockery::mock(NpcQuestRewardHandler::class);
-        $rewardHandler->shouldReceive('createquestQuestLog')->once();
-        $rewardHandler->shouldReceive('processXpReward')
-            ->once()
-            ->andReturnUsing(function () use (&$xpProcessed): void {
-                $xpProcessed = true;
-            });
-
-        $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
-        $npcQuestsHandler->shouldReceive('handleNpcQuest')->once();
-        $npcQuestsHandler->shouldReceive('questRewardHandler')->twice()->andReturn($rewardHandler);
-
-        $characterRewardLockService = Mockery::mock(CharacterRewardLockService::class);
-        $characterRewardLockService->shouldReceive('run')
-            ->once()
-            ->andReturnUsing(function (int $characterId, callable $callback) use (&$xpProcessed): void {
-                $callback();
-
-                $this->assertTrue($xpProcessed);
-            });
-
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler, $characterRewardLockService);
+        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
     }
 }

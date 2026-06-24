@@ -14,6 +14,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
@@ -66,6 +67,8 @@ class DelveExplorationAutomationService
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
 
+        event(new DelveStatusUpdated($character->user->id));
+
         $this->startAutomation($character, $location, $automation->id, $delveExploration->id, $params);
     }
 
@@ -93,6 +96,7 @@ class DelveExplorationAutomationService
         event(new AutomationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
         event(new AutomationLogUpdate($character->user->id, 'Delve has been stopped at player request.'));
+        event(new DelveStatusUpdated($character->user->id));
     }
 
     public function setTimeDelay(Location $location): void

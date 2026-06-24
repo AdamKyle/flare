@@ -91,6 +91,19 @@ export default class ExplorationOutputSection extends React.Component<
         return isNaN(num) ? "0.00%" : (num * 100).toFixed(2) + "%";
     }
 
+    formatDurationCompact(seconds: number): string {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        if (h > 0) {
+            return `${h}h ${m}m ${s}s`;
+        }
+        if (m > 0) {
+            return `${m}m ${s}s`;
+        }
+        return `${s}s`;
+    }
+
     formatDuration(value: any): string {
         const seconds = Number(value);
 
@@ -312,7 +325,7 @@ export default class ExplorationOutputSection extends React.Component<
                   " creatures in the current round";
 
         return (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-3">
                     {this.renderMonsterTitle(data)}
                     {this.renderMonsterStats(data)}
@@ -338,17 +351,18 @@ export default class ExplorationOutputSection extends React.Component<
         title: string,
         contentId: string,
         color: "sky" | "orange",
+        durationLabel?: string | null,
     ): React.ReactNode {
         const colorClasses =
             color === "sky"
-                ? "bg-sky-100 text-sky-700 hover:bg-sky-200 focus:bg-sky-200 dark:bg-sky-900/60 dark:text-sky-300 dark:hover:bg-sky-900 dark:focus:bg-sky-900 border-sky-500 dark:border-sky-400"
+                ? "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:focus:bg-gray-600 border-gray-200 dark:border-gray-700"
                 : "bg-orange-100 text-orange-700 hover:bg-orange-200 focus:bg-orange-200 dark:bg-orange-900/60 dark:text-orange-300 dark:hover:bg-orange-900 dark:focus:bg-orange-900 border-orange-500 dark:border-orange-400";
 
         return (
             <button
                 type="button"
                 className={
-                    "w-full cursor-pointer border-b px-3 py-3 text-left focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-300 dark:focus:ring-sky-500 " +
+                    "w-full cursor-pointer border-b px-4 py-3 text-left focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-300 dark:focus:ring-gray-500 " +
                     colorClasses
                 }
                 aria-expanded={!this.state.collapsed}
@@ -360,13 +374,18 @@ export default class ExplorationOutputSection extends React.Component<
                         {title}
                     </span>
                     <span className="flex items-center gap-2">
+                        {durationLabel ? (
+                            <span className="rounded bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                                {durationLabel}
+                            </span>
+                        ) : null}
+                        <span aria-hidden="true" className="text-xs">
+                            {this.state.collapsed ? "▼" : "▲"}
+                        </span>
                         <span className="sr-only">
                             {this.state.collapsed
                                 ? "Expand exploration output"
                                 : "Collapse exploration output"}
-                        </span>
-                        <span aria-hidden="true" className="text-xs">
-                            {this.state.collapsed ? "▼" : "▲"}
                         </span>
                     </span>
                 </span>
@@ -389,7 +408,7 @@ export default class ExplorationOutputSection extends React.Component<
                 leaveFrom="max-h-[2000px] opacity-100"
                 leaveTo="max-h-0 opacity-0"
             >
-                <div id={contentId} className="p-3">
+                <div id={contentId} className="p-4">
                     {children}
                 </div>
             </Transition>
@@ -402,13 +421,19 @@ export default class ExplorationOutputSection extends React.Component<
         }
 
         const contentId = "exploration-output-active-body";
+        const durationSeconds = Number(data.duration);
+        const durationLabel =
+            !isNaN(durationSeconds) && durationSeconds > 0
+                ? this.formatDurationCompact(durationSeconds)
+                : null;
 
         return (
-            <div className="w-full border border-sky-500 dark:border-sky-400 rounded mt-3 overflow-hidden bg-white dark:bg-gray-800">
+            <div className="w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 mt-3 overflow-hidden">
                 {this.renderCardHeader(
                     "Exploration In Progress",
                     contentId,
                     "sky",
+                    durationLabel,
                 )}
                 {this.renderCardBody(contentId, this.renderOutputColumns(data))}
             </div>

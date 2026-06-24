@@ -27,6 +27,8 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Services\ExplorationWarningService;
+use App\Admin\Events\ExplorationMonitoringUpdated;
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Flare\Values\AutomationType;
@@ -732,6 +734,7 @@ class Exploration implements ShouldQueue
         $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $this->automationId];
         $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
+        event(new ExplorationMonitoringUpdated($this->character->id));
 
         return;
     }
@@ -774,6 +777,7 @@ class Exploration implements ShouldQueue
         $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationStatus($character->user, false), $broadcastContext);
+        event(new ExplorationMonitoringUpdated($this->character->id));
     }
 
     /**
@@ -822,6 +826,14 @@ class Exploration implements ShouldQueue
             ->first();
         $this->explorationLogService = new ExplorationLogService;
         $this->explorationWarningService = new ExplorationWarningService;
+
+        (new MonitoredBugReportService)->reportError(
+            'exploration-automation',
+            $throwable->getMessage(),
+            ['character_id' => $this->character->id, 'automation_id' => $this->automationId],
+            $throwable::class,
+            $this->character->id,
+        );
 
         $this->handleFailure($throwable, 'queue_job_failed');
     }
@@ -872,6 +884,7 @@ class Exploration implements ShouldQueue
         $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
         $this->safelyDispatchBroadcastEvent(new AutomationStatus($character->user, false), $broadcastContext);
+        event(new ExplorationMonitoringUpdated($this->character->id));
     }
 
     private function failureContext(

@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Jobs;
 
 use App\Game\BattleRewardProcessing\Jobs\BattleRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
-use App\Game\Core\Services\CharacterRewardLockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
@@ -29,17 +28,10 @@ class BattleRewardHandlerTest extends TestCase
         $battleRewardService->shouldReceive('setUp')->once()->with($characterId, $monsterId)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->with($context)->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
-        $characterRewardLockService = Mockery::mock(CharacterRewardLockService::class);
-        $characterRewardLockService->shouldReceive('run')
-            ->once()
-            ->with($characterId, Mockery::type('callable'))
-            ->andReturnUsing(function (int $lockedCharacterId, callable $callback): void {
-                $callback();
-            });
 
         $job = new BattleRewardHandler($characterId, $monsterId, $context);
 
-        $job->handle($battleRewardService, $characterRewardLockService);
+        $job->handle($battleRewardService);
     }
 
     public function testHandleUsesEmptyContextWhenNotProvided(): void
@@ -51,15 +43,9 @@ class BattleRewardHandlerTest extends TestCase
         $battleRewardService->shouldReceive('setUp')->once()->with($characterId, $monsterId)->andReturnSelf();
         $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
-        $characterRewardLockService = Mockery::mock(CharacterRewardLockService::class);
-        $characterRewardLockService->shouldReceive('run')
-            ->once()
-            ->andReturnUsing(function (int $lockedCharacterId, callable $callback): void {
-                $callback();
-            });
 
         $job = new BattleRewardHandler($characterId, $monsterId);
 
-        $job->handle($battleRewardService, $characterRewardLockService);
+        $job->handle($battleRewardService);
     }
 }

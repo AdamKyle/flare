@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
+use App\Flare\Models\CharacterBattleRewardRequest;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\AttackTypeValue;
@@ -9,6 +10,9 @@ use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -205,6 +209,7 @@ class GuideQuestServiceTest extends TestCase
 
     public function testHandInGuideQuestAndAlreadyHaveOneOfTheRequirements()
     {
+        Queue::fake();
 
         $guideQuestToHandIn = $this->createGuideQuest([
             'required_level' => 1,
@@ -220,6 +225,14 @@ class GuideQuestServiceTest extends TestCase
             ->getCharacter();
 
         $this->guideQuestService->handInQuest($character, $guideQuestToHandIn);
+
+        $request = CharacterBattleRewardRequest::firstOrFail();
+        $this->assertSame(BattleRewardRequestPriority::FIRST, $request->priority);
+        $this->assertSame(BattleRewardRequestSourceType::GUIDE_QUEST, $request->source_type);
+        $this->assertSame(
+            'guide_quest:' . $character->id . ':' . $guideQuestToHandIn->id,
+            $request->source_id,
+        );
 
         $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
 

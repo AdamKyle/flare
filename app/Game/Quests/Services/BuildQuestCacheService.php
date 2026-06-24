@@ -122,4 +122,20 @@ class BuildQuestCacheService
 
         return $raidQuests[$eventWithRaid->raid_id];
     }
+
+    public function fetchActiveRaidQuests(): array
+    {
+        $activeRaidQuests = [];
+        $raidEvents = Event::whereNotNull('raid_id')->get();
+
+        foreach ($raidEvents as $event) {
+            $quests = $this->fetchQuestsForRaid($event);
+
+            if (isset($quests[0])) {
+                $activeRaidQuests[] = $quests[0];
+            }
+        }
+
+        return $activeRaidQuests;
+    }
 }

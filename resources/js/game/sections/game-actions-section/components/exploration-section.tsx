@@ -1,4 +1,5 @@
 import React, { Fragment } from "react";
+import DelveStatusPanel from "./delve-status-panel";
 import ExplorationOutputSection from "./exploration-output-section";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import Select from "react-select";
@@ -531,19 +532,14 @@ export default class ExplorationSection extends React.Component<any, any> {
         if (this.props.character.is_delve_running) {
             return (
                 <Fragment>
-                    <WarningAlert additional_css={"mb-4 text-left"}>
-                        <p className="my-2">Delve is running.</p>
-                        <p className="my-2">Would you like to stop it?</p>
-                        <a href="/information/delve" target="_blank">
-                            See Delve Help{" "}
-                            <i className="fas fa-external-link-alt"></i>
-                        </a>{" "}
-                        for more details.
-                    </WarningAlert>
-
                     {this.state.loading ? <LoadingProgressBar /> : null}
 
-                    <div className="flex flex-wrap justify-center items-start gap-2">
+                    <DelveStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+
+                    <div className="flex flex-wrap justify-center items-start gap-2 mt-4">
                         <DangerButton
                             button_label={"Stop Delve"}
                             on_click={this.stopDelveExploration.bind(this)}
@@ -551,11 +547,17 @@ export default class ExplorationSection extends React.Component<any, any> {
                             additional_css={"h-10"}
                         />
                         <PrimaryButton
-                            button_label={"Close Delve"}
+                            button_label={"Close"}
                             on_click={this.closeExploration.bind(this)}
                             disabled={this.state.loading}
                             additional_css={"h-10"}
                         />
+                    </div>
+                    <div className="mt-3 text-center">
+                        <a href="/information/delve" target="_blank">
+                            See Delve Help{" "}
+                            <i className="fas fa-external-link-alt"></i>
+                        </a>
                     </div>
                 </Fragment>
             );

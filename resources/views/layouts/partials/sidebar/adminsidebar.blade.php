@@ -32,6 +32,31 @@
                 <span class="fas fa-clipboard-list"></span>
                 Chat Logs
             </a>
+            <hr />
+            <h6 class="uppercase">Character Reward Queue</h6>
+            <a href="{{route('admin.character-reward-queue')}}">
+                <span class="fas fa-layer-group"></span>
+                Reward Queues
+            </a>
+            <hr />
+            <h6 class="uppercase">Monitoring</h6>
+            <a href="{{route('admin.monitoring.exploration')}}">
+                <span class="fas fa-map-marked-alt"></span>
+                Exploration
+            </a>
+            <a href="{{route('admin.monitoring.faction-loyalty')}}">
+                <span class="fas fa-handshake"></span>
+                Faction Loyalty
+            </a>
+            <a href="{{route('admin.monitoring.delve')}}">
+                <span class="fas fa-dungeon"></span>
+                Delve
+            </a>
+            <a href="{{route('admin.monitoring.logs')}}">
+                <span class="fas fa-file-alt"></span>
+                Logs
+            </a>
+            <hr />
             <a href="{{route('admin.info-management')}}">
                 <span class="fas fa-feather"></span>
                 Information Management

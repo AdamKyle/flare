@@ -2,6 +2,8 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Admin\Events\FactionLoyaltyMonitoringUpdated;
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
@@ -259,6 +261,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
                 $characterCacheData
             );
             $this->currentPhase = 'action_completed';
+            event(new FactionLoyaltyMonitoringUpdated($this->characterId));
         } catch (Throwable $throwable) {
             $this->handleAutomationException($throwable, $characterCacheData);
 
@@ -1077,6 +1080,14 @@ class AutomatedFactionLoyalty implements ShouldQueue
         Log::error('Faction loyalty automation job failed.', $context);
         Log::channel('faction_loyalty')->error('Faction loyalty automation job failed.', $context);
 
+        (new MonitoredBugReportService)->reportError(
+            'faction-loyalty-automation',
+            $throwable->getMessage(),
+            ['character_id' => $this->characterId, 'automation_id' => $this->automationId],
+            $throwable::class,
+            $this->characterId,
+        );
+
         $characterAutomation = CharacterAutomation::where('id', $this->automationId)
             ->where('character_id', $this->characterId)
             ->where('type', AutomationType::FACTION_LOYALTY)
@@ -1131,6 +1142,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
             $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
             $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
             $this->safelyDispatchBroadcastEvent(new AutomationStatus($character->user, false), $broadcastContext);
+            event(new FactionLoyaltyMonitoringUpdated($this->characterId));
         }
     }
 
