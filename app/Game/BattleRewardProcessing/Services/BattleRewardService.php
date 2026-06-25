@@ -7,6 +7,7 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
+use Closure;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
@@ -83,6 +84,13 @@ class BattleRewardService
      * @param integer $monsterId
      * @return BattleRewardService
      */
+    public function withHeartbeatCallback(?Closure $callback): self
+    {
+        $this->characterRewardService->withHeartbeatCallback($callback);
+
+        return $this;
+    }
+
     public function setUp(int $characterId, int $monsterId): BattleRewardService
     {
 

@@ -230,6 +230,15 @@ return [
             'tries' => 5,
             'nice' => 0,
         ],
+        'supervisor-admin-monitoring' => [
+            'connection' => 'redis',
+            'queue' => ['admin_monitoring'],
+            'balance' => 'auto',
+            'maxProcesses' => 1,
+            'memory' => 128,
+            'tries' => 1,
+            'nice' => 0,
+        ],
     ],
 
     'environments' => [
@@ -300,6 +309,15 @@ return [
                 'tries' => 5,
                 'nice' => 0,
             ],
+            'supervisor-admin-monitoring' => [
+                'connection' => 'redis',
+                'queue' => ['admin_monitoring'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
+                'nice' => 0,
+            ],
         ],
 
         'local' => [
@@ -360,6 +378,15 @@ return [
                 'maxProcesses' => 25,
                 'memory' => 256,
                 'tries' => 5,
+                'nice' => 0,
+            ],
+            'supervisor-admin-monitoring' => [
+                'connection' => 'redis',
+                'queue' => ['admin_monitoring'],
+                'balance' => 'auto',
+                'maxProcesses' => 1,
+                'memory' => 128,
+                'tries' => 1,
                 'nice' => 0,
             ],
         ],

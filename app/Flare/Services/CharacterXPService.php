@@ -2,6 +2,7 @@
 
 namespace App\Flare\Services;
 
+use Closure;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -32,6 +33,8 @@ class CharacterXPService
 
     private Character $character;
 
+    private ?Closure $heartbeatCallback = null;
+
     /**
      * @param CharacterService $characterService
      * @param SkillService $skillService
@@ -57,6 +60,13 @@ class CharacterXPService
     public function setCharacter(Character $character): CharacterXPService
     {
         $this->character = $character;
+
+        return $this;
+    }
+
+    public function withHeartbeatCallback(?Closure $callback): self
+    {
+        $this->heartbeatCallback = $callback;
 
         return $this;
     }
@@ -303,6 +313,10 @@ class CharacterXPService
     {
 
         $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
+
+        if (! is_null($this->heartbeatCallback)) {
+            ($this->heartbeatCallback)();
+        }
 
         $this->character = $this->character->refresh();
 

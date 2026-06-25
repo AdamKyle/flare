@@ -15,9 +15,18 @@ export default function useExplorationLiveRefresh(refresh: () => void) {
     useEffect(() => {
         const channelName = "admin-monitoring-exploration";
         const channel = window.Echo?.private(channelName);
-        channel?.listen(".exploration.monitoring.updated", refresh);
+
+        let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+        const debounced = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(refresh, 500);
+        };
+
+        channel?.listen(".exploration.monitoring.updated", debounced);
 
         return () => {
+            clearTimeout(debounceTimer);
             window.Echo?.leave(channelName);
         };
     }, [refresh]);

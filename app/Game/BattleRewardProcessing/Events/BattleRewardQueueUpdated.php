@@ -3,11 +3,11 @@
 namespace App\Game\BattleRewardProcessing\Events;
 
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class BattleRewardQueueUpdated implements ShouldBroadcastNow
+class BattleRewardQueueUpdated implements ShouldBroadcast
 {
     use Dispatchable, SerializesModels;
 
@@ -17,6 +17,11 @@ class BattleRewardQueueUpdated implements ShouldBroadcastNow
         public readonly int $characterId,
         public readonly string $change,
     ) {}
+
+    public function broadcastQueue(): string
+    {
+        return 'admin_monitoring';
+    }
 
     public function broadcastOn(): PrivateChannel
     {

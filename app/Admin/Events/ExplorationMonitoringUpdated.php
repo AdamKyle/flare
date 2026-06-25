@@ -3,15 +3,20 @@
 namespace App\Admin\Events;
 
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ExplorationMonitoringUpdated implements ShouldBroadcastNow
+class ExplorationMonitoringUpdated implements ShouldBroadcast
 {
     use Dispatchable, SerializesModels;
 
     public function __construct(public readonly int $characterId) {}
+
+    public function broadcastQueue(): string
+    {
+        return 'admin_monitoring';
+    }
 
     public function broadcastOn(): PrivateChannel
     {

@@ -15,9 +15,18 @@ export default function useRewardQueueLiveRefresh(refresh: () => void) {
     useEffect(() => {
         const channelName = "admin-character-reward-queue";
         const channel = window.Echo?.private(channelName);
-        channel?.listen(".battle.reward.queue.updated", refresh);
+
+        let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+        const debounced = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(refresh, 500);
+        };
+
+        channel?.listen(".battle.reward.queue.updated", debounced);
 
         return () => {
+            clearTimeout(debounceTimer);
             window.Echo?.leave(channelName);
         };
     }, [refresh]);

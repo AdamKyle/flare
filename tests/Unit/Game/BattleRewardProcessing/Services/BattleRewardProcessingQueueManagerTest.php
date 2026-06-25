@@ -7,6 +7,7 @@ use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
+use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -133,6 +134,76 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
         $this->assertSame(BattleRewardRequestStatus::FAILED, $failed->status);
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $completed->refresh()->status);
         $this->assertSame(2, CharacterBattleRewardRequest::forCharacter($character->id)->count());
+    }
+
+    public function testMarkProcessingRefreshesHeartbeatBeforeRewardIsProcessed(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $state = CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(3),
+        ]);
+        CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'priority' => BattleRewardRequestPriority::SECOND,
+        ]);
+
+        resolve(BattleRewardProcessingQueueManager::class)->nextRequest($character->id);
+
+        $this->assertTrue($state->refresh()->heartbeat_at->isAfter(now()->subSeconds(5)));
+    }
+
+    public function testMarkCompletedRefreshesHeartbeatAfterRewardIsProcessed(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $state = CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(3),
+        ]);
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+        ]);
+
+        resolve(BattleRewardProcessingQueueManager::class)->markCompleted($request);
+
+        $this->assertTrue($state->refresh()->heartbeat_at->isAfter(now()->subSeconds(5)));
+    }
+
+    public function testAdminBroadcastEventIsDispatchedWhenMarkCompletedSucceeds(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
+
+        resolve(BattleRewardProcessingQueueManager::class)->markCompleted($request);
+
+        Event::assertDispatched(
+            BattleRewardQueueUpdated::class,
+            fn ($e) => $e->characterId === $character->id && $e->change === 'completed',
+        );
+    }
+
+    public function testMarkCompletedStatusPersistsWhenAdminBroadcastDispatchThrows(): void
+    {
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
+        Event::listen(BattleRewardQueueUpdated::class, function (): void {
+            throw new RuntimeException('broadcast queue unavailable');
+        });
+
+        resolve(BattleRewardProcessingQueueManager::class)->markCompleted($request);
+
+        $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
     }
 
     public function testStaleProcessorIsRecoveredWithoutRetryingAnUnknownPartialReward(): void

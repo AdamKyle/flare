@@ -6,6 +6,7 @@ use App\Flare\Builders\BuildCosmicItem;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\BuildUniqueItem;
 use App\Flare\Values\RandomAffixDetails;
+use Closure;
 use Exception;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
@@ -40,6 +41,13 @@ class CharacterRewardService
     public function setCharacter(Character $character): CharacterRewardService
     {
         $this->character = $character;
+
+        return $this;
+    }
+
+    public function withHeartbeatCallback(?Closure $callback): self
+    {
+        $this->characterXpService->withHeartbeatCallback($callback);
 
         return $this;
     }

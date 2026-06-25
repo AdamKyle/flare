@@ -15,9 +15,18 @@ export default function useDelveMonitoringLiveRefresh(refresh: () => void) {
     useEffect(() => {
         const channelName = "admin-monitoring-delve";
         const channel = window.Echo?.private(channelName);
-        channel?.listen(".delve.monitoring.updated", refresh);
+
+        let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+
+        const debounced = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(refresh, 500);
+        };
+
+        channel?.listen(".delve.monitoring.updated", debounced);
 
         return () => {
+            clearTimeout(debounceTimer);
             window.Echo?.leave(channelName);
         };
     }, [refresh]);

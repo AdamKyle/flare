@@ -6,9 +6,12 @@ use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Quest;
+use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
@@ -22,7 +25,7 @@ use Throwable;
 
 class ProcessCharacterBattleRewardQueue implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SafelyBroadcastsEvents, SerializesModels;
 
     private const MAX_REQUESTS = 50;
 
@@ -38,6 +41,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
     ): void {
         $startedAt = microtime(true);
         $processed = 0;
+        $heartbeatCallback = fn() => $queueManager->updateHeartbeat($this->characterId);
 
         while ($processed < self::MAX_REQUESTS && microtime(true) - $startedAt < self::MAX_SECONDS) {
             $request = $queueManager->nextRequest($this->characterId);
@@ -53,6 +57,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     BattleRewardRequestSourceType::BATTLE,
                     BattleRewardRequestSourceType::EXPLORATION,
                     BattleRewardRequestSourceType::AUTOMATION => $battleRewardService
+                        ->withHeartbeatCallback($heartbeatCallback)
                         ->setUp($this->characterId, (int) $payload['monster_id'])
                         ->setContext($payload['context'] ?? [])
                         ->processRewards(true),
@@ -70,6 +75,8 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         'No reward processor exists for future reward requests.',
                     ),
                 };
+
+                $this->dispatchFinalPlayerUpdates($request->source_type);
 
                 $queueManager->markCompleted($request);
             } catch (Throwable $exception) {
@@ -92,8 +99,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
 
             self::dispatch($this->characterId)
                 ->onConnection('battle_reward_processing')
-                ->onQueue('battle_reward_processing')
-                ->delay(now()->addSecond());
+                ->onQueue('battle_reward_processing');
 
             return;
         }
@@ -103,14 +109,34 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         if (! $markedInactive) {
             self::dispatch($this->characterId)
                 ->onConnection('battle_reward_processing')
-                ->onQueue('battle_reward_processing')
-                ->delay(now()->addSecond());
+                ->onQueue('battle_reward_processing');
 
             return;
         }
 
         if ($queueManager->hasPendingRequests($this->characterId)) {
             $queueManager->ensureProcessorRunning($this->characterId);
+        }
+    }
+
+    private function dispatchFinalPlayerUpdates(BattleRewardRequestSourceType $sourceType): void
+    {
+        $character = Character::find($this->characterId);
+
+        if (is_null($character)) {
+            return;
+        }
+
+        $this->safelyDispatchBroadcastEvent(
+            new UpdateTopBarEvent($character),
+            ['character_id' => $this->characterId]
+        );
+
+        if ($sourceType === BattleRewardRequestSourceType::AUTOMATION) {
+            $this->safelyDispatchBroadcastEvent(
+                new DelveStatusUpdated($character->user_id),
+                ['character_id' => $this->characterId]
+            );
         }
     }
 
