@@ -10,6 +10,7 @@ use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BattleRewardQueueRepairService
 {
@@ -42,8 +43,28 @@ class BattleRewardQueueRepairService
                     ->find($stateId);
 
                 if (is_null($state) || ! $this->queueManager->isQueueStateStale($state)) {
+                    Log::channel('reward_processing')->debug('Stale repair skipped: state no longer stale or missing.', [
+                        'queue_state_id' => $stateId,
+                    ]);
+
                     return null;
                 }
+
+                if ($this->queueManager->isProcessorLocked($state->character_id)) {
+                    Log::channel('reward_processing')->debug('Stale repair skipped: processor lock still held.', [
+                        'character_id' => $state->character_id,
+                        'queue_state_id' => $state->id,
+                        'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+                    ]);
+
+                    return null;
+                }
+
+                Log::channel('reward_processing')->warning('Stale repair detected: no live lock, heartbeat stale.', [
+                    'character_id' => $state->character_id,
+                    'queue_state_id' => $state->id,
+                    'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+                ]);
 
                 $failedCount = CharacterBattleRewardRequest::forCharacter($state->character_id)
                     ->processing()
@@ -52,6 +73,12 @@ class BattleRewardQueueRepairService
                         'failed_reason' => self::FAILED_REASON,
                         'completed_at' => now(),
                     ]);
+
+                Log::channel('reward_processing')->warning('Stale repair failed orphaned processing rows.', [
+                    'character_id' => $state->character_id,
+                    'queue_state_id' => $state->id,
+                    'failed_count' => $failedCount,
+                ]);
 
                 if ($failedCount > 0) {
                     $this->monitoredBugReportService->reportError(
@@ -76,6 +103,11 @@ class BattleRewardQueueRepairService
                     ]);
 
                     DB::afterCommit(function () use ($state): void {
+                        Log::channel('reward_processing')->info('Stale repair restarted processor for pending rows.', [
+                            'character_id' => $state->character_id,
+                            'queue_state_id' => $state->id,
+                        ]);
+
                         ProcessCharacterBattleRewardQueue::dispatch($state->character_id)
                             ->onConnection('battle_reward_processing')
                             ->onQueue('battle_reward_processing');
@@ -85,6 +117,11 @@ class BattleRewardQueueRepairService
                         'is_processing' => false,
                         'started_at' => null,
                         'heartbeat_at' => null,
+                    ]);
+
+                    Log::channel('reward_processing')->info('Stale repair cleared inactive queue state: no pending rows.', [
+                        'character_id' => $state->character_id,
+                        'queue_state_id' => $state->id,
                     ]);
                 }
 

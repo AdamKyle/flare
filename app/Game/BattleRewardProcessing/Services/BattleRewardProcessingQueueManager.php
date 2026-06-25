@@ -12,7 +12,10 @@ use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use Carbon\Carbon;
+use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class BattleRewardProcessingQueueManager
@@ -20,6 +23,17 @@ class BattleRewardProcessingQueueManager
     use SafelyBroadcastsEvents;
 
     private const STALE_AFTER_MINUTES = 5;
+
+    /**
+     * Must exceed MAX_SECONDS in the processor job to cover normal runs,
+     * but short enough that an abandoned lock does not block stale repair
+     * for a long time. The processor runs for at most ~20 seconds per batch,
+     * so 90 seconds gives comfortable headroom while still expiring well
+     * before the 5-minute stale heartbeat cutoff.
+     */
+    private const PROCESSOR_LOCK_SECONDS = 90;
+
+    public const ORPHANED_PROCESSING_FAILED_REASON = 'Orphaned processing request recovered after stale heartbeat and no live processor lock.';
 
     public function staleCutoff(): Carbon
     {
@@ -42,6 +56,13 @@ class BattleRewardProcessingQueueManager
     ): CharacterBattleRewardRequest {
         $characterId = $character instanceof Character ? $character->id : $character;
 
+        Log::channel('reward_processing')->debug('Enqueue entered.', [
+            'character_id' => $characterId,
+            'priority' => $priority->value,
+            'source_type' => $sourceType->value,
+            'source_id' => $sourceId,
+        ]);
+
         $request = CharacterBattleRewardRequest::create([
             'character_id' => $characterId,
             'priority' => $priority,
@@ -49,6 +70,12 @@ class BattleRewardProcessingQueueManager
             'source_id' => is_null($sourceId) ? null : (string) $sourceId,
             'handler_payload' => $handlerPayload,
             'status' => BattleRewardRequestStatus::PENDING,
+        ]);
+
+        Log::channel('reward_processing')->debug('Enqueue created request.', [
+            'character_id' => $characterId,
+            'request_id' => $request->id,
+            'status' => $request->status->value,
         ]);
 
         $this->safelyDispatchBroadcastEvent(
@@ -76,20 +103,89 @@ class BattleRewardProcessingQueueManager
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            $isStale = $this->isQueueStateStale($state);
+            $pendingCount = CharacterBattleRewardRequest::forCharacter($characterId)->pending()->count();
+            $processingCount = CharacterBattleRewardRequest::forCharacter($characterId)->processing()->count();
 
-            if ($state->is_processing && ! $isStale) {
+            Log::channel('reward_processing')->debug('Enqueue sees queue state.', [
+                'character_id' => $characterId,
+                'queue_state_id' => $state->id,
+                'is_processing' => $state->is_processing,
+                'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+                'pending_count' => $pendingCount,
+                'processing_count' => $processingCount,
+            ]);
+
+            if ($state->is_processing) {
+                $isStale = $this->isQueueStateStale($state);
+                $isLocked = $this->isProcessorLocked($characterId);
+
+                if ($isStale && ! $isLocked) {
+                    Log::channel('reward_processing')->warning('Enqueue detects stale/orphaned processing state. Recovering.', [
+                        'character_id' => $characterId,
+                        'queue_state_id' => $state->id,
+                        'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+                        'processing_count' => $processingCount,
+                        'lock_key' => 'character-reward-queue:' . $characterId,
+                        'lock_available' => true,
+                    ]);
+
+                    $failedCount = CharacterBattleRewardRequest::forCharacter($characterId)
+                        ->processing()
+                        ->update([
+                            'status' => BattleRewardRequestStatus::FAILED,
+                            'failed_reason' => self::ORPHANED_PROCESSING_FAILED_REASON,
+                            'completed_at' => now(),
+                        ]);
+
+                    Log::channel('reward_processing')->warning('Stale repair failed orphaned processing rows.', [
+                        'character_id' => $characterId,
+                        'failed_count' => $failedCount,
+                    ]);
+
+                    $state->update([
+                        'is_processing' => true,
+                        'started_at' => now(),
+                        'heartbeat_at' => now(),
+                    ]);
+
+                    DB::afterCommit(function () use ($characterId): void {
+                        Log::channel('reward_processing')->info('Enqueue wakes processor after orphaned recovery.', [
+                            'character_id' => $characterId,
+                        ]);
+
+                        ProcessCharacterBattleRewardQueue::dispatch($characterId)
+                            ->onConnection('battle_reward_processing')
+                            ->onQueue('battle_reward_processing');
+
+                        $this->safelyDispatchBroadcastEvent(
+                            new BattleRewardQueueUpdated($characterId, 'activated'),
+                        );
+                    });
+
+                    return true;
+                }
+
+                Log::channel('reward_processing')->debug('Enqueue decides processor already running.', [
+                    'character_id' => $characterId,
+                    'is_stale' => $isStale,
+                    'lock_available' => ! $isLocked,
+                ]);
+
                 return false;
             }
 
-            if ($isStale) {
-                CharacterBattleRewardRequest::forCharacter($characterId)
-                    ->processing()
-                    ->update([
-                        'status' => BattleRewardRequestStatus::FAILED,
-                        'failed_reason' => 'Processor heartbeat became stale before the request completed.',
-                        'completed_at' => now(),
-                    ]);
+            if ($this->isProcessorLocked($characterId)) {
+                Log::channel('reward_processing')->debug('Enqueue sees unlocked state but lock is held; marking processing.', [
+                    'character_id' => $characterId,
+                ]);
+
+                $state->update([
+                    'is_processing' => true,
+                    'started_at' => now(),
+                    'heartbeat_at' => now(),
+                ]);
+
+                return false;
             }
 
             $state->update([
@@ -99,9 +195,14 @@ class BattleRewardProcessingQueueManager
             ]);
 
             DB::afterCommit(function () use ($characterId): void {
+                Log::channel('reward_processing')->info('Enqueue wakes processor.', [
+                    'character_id' => $characterId,
+                ]);
+
                 ProcessCharacterBattleRewardQueue::dispatch($characterId)
                     ->onConnection('battle_reward_processing')
                     ->onQueue('battle_reward_processing');
+
                 $this->safelyDispatchBroadcastEvent(
                     new BattleRewardQueueUpdated($characterId, 'activated'),
                 );
@@ -109,6 +210,42 @@ class BattleRewardProcessingQueueManager
 
             return true;
         });
+    }
+
+    public function recoverOrphanedProcessingRequests(int $characterId): int
+    {
+        $state = CharacterBattleRewardQueueState::where('character_id', $characterId)->first();
+
+        if (is_null($state) || ! $this->isQueueStateStale($state)) {
+            Log::channel('reward_processing')->debug('recoverOrphanedProcessingRequests: skipped — heartbeat is fresh or queue state is missing.', [
+                'character_id' => $characterId,
+                'heartbeat_at' => $state?->heartbeat_at?->toIso8601String(),
+            ]);
+
+            return 0;
+        }
+
+        $count = CharacterBattleRewardRequest::forCharacter($characterId)
+            ->processing()
+            ->update([
+                'status' => BattleRewardRequestStatus::FAILED,
+                'failed_reason' => self::ORPHANED_PROCESSING_FAILED_REASON,
+                'completed_at' => now(),
+            ]);
+
+        if ($count > 0) {
+            $this->safelyDispatchBroadcastEvent(
+                new BattleRewardQueueUpdated($characterId, 'failed'),
+            );
+        }
+
+        Log::channel('reward_processing')->warning('recoverOrphanedProcessingRequests: stale heartbeat detected; failed orphaned processing rows.', [
+            'character_id' => $characterId,
+            'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+            'failed_count' => $count,
+        ]);
+
+        return $count;
     }
 
     public function nextRequest(int $characterId): ?CharacterBattleRewardRequest
@@ -121,8 +258,28 @@ class BattleRewardProcessingQueueManager
                 ->first();
 
             if (is_null($request)) {
+                Log::channel('reward_processing')->debug('Next request returns null: no pending rows.', [
+                    'character_id' => $characterId,
+                ]);
+
                 return null;
             }
+
+            if ($this->hasProcessingRequests($characterId)) {
+                Log::channel('reward_processing')->debug('Next request returns null: active processing row exists.', [
+                    'character_id' => $characterId,
+                    'pending_request_id' => $request->id,
+                ]);
+
+                return null;
+            }
+
+            Log::channel('reward_processing')->debug('Next request claim attempt.', [
+                'character_id' => $characterId,
+                'request_id' => $request->id,
+                'priority' => $request->priority?->value,
+                'source_type' => $request->source_type?->value,
+            ]);
 
             return $this->markProcessing($request);
         });
@@ -139,6 +296,15 @@ class BattleRewardProcessingQueueManager
         ]);
 
         $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_processing')->debug('Request marked processing.', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+            'source_type' => $request->source_type?->value,
+            'priority' => $request->priority?->value,
+            'started_at' => now()->toIso8601String(),
+        ]);
+
         $this->safelyDispatchBroadcastEvent(
             new BattleRewardQueueUpdated($request->character_id, 'processing'),
         );
@@ -155,6 +321,13 @@ class BattleRewardProcessingQueueManager
         ]);
 
         $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_processing')->debug('Request marked completed.', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+            'completed_at' => now()->toIso8601String(),
+        ]);
+
         $this->safelyDispatchBroadcastEvent(
             new BattleRewardQueueUpdated($request->character_id, 'completed'),
         );
@@ -173,6 +346,14 @@ class BattleRewardProcessingQueueManager
         ]);
 
         $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_processing')->warning('Request marked failed.', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+            'failed_reason' => $failedReason,
+            'completed_at' => now()->toIso8601String(),
+        ]);
+
         $this->safelyDispatchBroadcastEvent(
             new BattleRewardQueueUpdated($request->character_id, 'failed'),
         );
@@ -203,13 +384,32 @@ class BattleRewardProcessingQueueManager
             if ($hasPendingRequests) {
                 $state->update(['heartbeat_at' => now()]);
 
+                Log::channel('reward_processing')->debug('markQueueInactiveIfEmpty: pending rows remain, kept active.', [
+                    'character_id' => $characterId,
+                ]);
+
                 return false;
+            }
+
+            if ($this->hasProcessingRequests($characterId)) {
+                $state->update(['heartbeat_at' => now()]);
+
+                Log::channel('reward_processing')->debug('markQueueInactiveIfEmpty: processing row still active, kept active.', [
+                    'character_id' => $characterId,
+                ]);
+
+                return true;
             }
 
             $state->update([
                 'is_processing' => false,
                 'started_at' => null,
                 'heartbeat_at' => null,
+            ]);
+
+            Log::channel('reward_processing')->info('Processor marked inactive: queue is empty.', [
+                'character_id' => $characterId,
+                'queue_state_id' => $state->id,
             ]);
 
             DB::afterCommit(fn () => $this->safelyDispatchBroadcastEvent(
@@ -223,5 +423,33 @@ class BattleRewardProcessingQueueManager
     public function hasPendingRequests(int $characterId): bool
     {
         return CharacterBattleRewardRequest::forCharacter($characterId)->pending()->exists();
+    }
+
+    public function hasProcessingRequests(int $characterId): bool
+    {
+        return CharacterBattleRewardRequest::forCharacter($characterId)->processing()->exists();
+    }
+
+    public function processorLock(int $characterId): Lock
+    {
+        return Cache::lock($this->processorLockKey($characterId), self::PROCESSOR_LOCK_SECONDS);
+    }
+
+    public function isProcessorLocked(int $characterId): bool
+    {
+        $lock = $this->processorLock($characterId);
+
+        if (! $lock->get()) {
+            return true;
+        }
+
+        $lock->release();
+
+        return false;
+    }
+
+    private function processorLockKey(int $characterId): string
+    {
+        return 'character-reward-queue:' . $characterId;
     }
 }

@@ -228,6 +228,7 @@ return [
             'maxProcesses' => 25,
             'memory' => 256,
             'tries' => 5,
+            'timeout' => 300,
             'nice' => 0,
         ],
         'supervisor-admin-monitoring' => [
@@ -307,6 +308,7 @@ return [
                 'maxProcesses' => 25,
                 'memory' => 256,
                 'tries' => 5,
+                'timeout' => 300,
                 'nice' => 0,
             ],
             'supervisor-admin-monitoring' => [
@@ -378,6 +380,7 @@ return [
                 'maxProcesses' => 25,
                 'memory' => 256,
                 'tries' => 5,
+                'timeout' => 300,
                 'nice' => 0,
             ],
             'supervisor-admin-monitoring' => [

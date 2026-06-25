@@ -252,4 +252,17 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
         $this->assertFalse($data['can_access_queen']);
     }
+
+    public function testTransformReturnsFalseForMapTypeFieldsWhenCharacterMapIsNull(): void
+    {
+        $this->character->map()->delete();
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['can_access_hell_forged']);
+        $this->assertFalse($data['can_access_purgatory_chains']);
+        $this->assertFalse($data['can_access_labyrinth_oracle']);
+        $this->assertFalse($data['can_access_twisted_earth']);
+        $this->assertFalse($data['can_access_queen']);
+    }
 }

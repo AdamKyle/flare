@@ -373,12 +373,6 @@ export default function LogsDashboard() {
     const setSeverityFilter = (severity: string) => {
         setFilters({ ...filters, severity });
         setPage(1);
-        window.setTimeout(() => {
-            tableRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-            });
-        }, 0);
     };
 
     return (

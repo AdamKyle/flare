@@ -9,6 +9,7 @@ use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
+use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -954,5 +955,69 @@ class ExplorationLogServiceTest extends TestCase
 
         $this->assertEquals('active', $output['type']);
         $this->assertEquals($activeLog->id, $output['output']['id']);
+    }
+
+    public function testApplyRewardContextDoesNotThrowWhenExplorationWarningStateBroadcastFails(): void
+    {
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $this->app['events']->listen(ExplorationWarningState::class, function (): void {
+            throw new \RuntimeException('Simulated Pusher broadcast failure');
+        });
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $this->character,
+            [
+                'xp' => $this->character->xp,
+                'skill_id' => null,
+                'skill_xp' => 0,
+                'faction_id' => null,
+                'faction_points' => 0,
+                'level' => $this->character->level,
+                'gold' => $this->character->gold,
+                'gold_dust' => $this->character->gold_dust,
+                'shards' => $this->character->shards,
+                'copper_coins' => $this->character->copper_coins,
+            ],
+            ['total_xp' => 75],
+        );
+
+        $this->assertSame(75, $log->refresh()->xp_gained);
+    }
+
+    public function testApplyRewardContextDoesNotThrowWhenBroadcastOutputFails(): void
+    {
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $this->app['events']->listen(ExplorationOutputUpdated::class, function (): void {
+            throw new \RuntimeException('Simulated output broadcast failure');
+        });
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $this->character,
+            [
+                'xp' => $this->character->xp,
+                'skill_id' => null,
+                'skill_xp' => 0,
+                'faction_id' => null,
+                'faction_points' => 0,
+                'level' => $this->character->level,
+                'gold' => $this->character->gold,
+                'gold_dust' => $this->character->gold_dust,
+                'shards' => $this->character->shards,
+                'copper_coins' => $this->character->copper_coins,
+            ],
+            ['total_xp' => 100],
+        );
+
+        $this->assertSame(100, $log->refresh()->xp_gained);
     }
 }

@@ -11,6 +11,7 @@ use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use RuntimeException;
@@ -20,6 +21,12 @@ use Tests\TestCase;
 class BattleRewardProcessingQueueManagerTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function testRewardProcessingLogChannelExistsInConfig(): void
+    {
+        $this->assertNotNull(config('logging.channels.reward_processing'));
+        $this->assertSame('daily', config('logging.channels.reward_processing.driver'));
+    }
 
     public function testEnqueueCreatesPendingRequestAndStartsOneProcessor(): void
     {
@@ -206,7 +213,61 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
     }
 
-    public function testStaleProcessorIsRecoveredWithoutRetryingAnUnknownPartialReward(): void
+    public function testEnqueueDoesNotRecoverProcessingRequestWhenHeartbeatIsFresh(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now(),
+        ]);
+
+        $started = resolve(BattleRewardProcessingQueueManager::class)
+            ->ensureProcessorRunning($character);
+
+        $this->assertFalse($started);
+        $this->assertSame(BattleRewardRequestStatus::PROCESSING, $processingRequest->refresh()->status);
+        $this->assertNull($processingRequest->failed_reason);
+        Queue::assertNothingPushed();
+    }
+
+    public function testEnqueueDoesNotRecoverProcessingRequestWhenHeartbeatIsStalButLockIsHeld(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now()->subMinutes(10),
+        ]);
+        $lock = Cache::lock('character-reward-queue:' . $character->id, 60);
+        $lock->get();
+
+        $started = resolve(BattleRewardProcessingQueueManager::class)
+            ->ensureProcessorRunning($character);
+
+        $lock->release();
+
+        $this->assertFalse($started);
+        $this->assertSame(BattleRewardRequestStatus::PROCESSING, $processingRequest->refresh()->status);
+        $this->assertNull($processingRequest->failed_reason);
+        Queue::assertNothingPushed();
+    }
+
+    public function testEnsureProcessorRunningRecoversOrphanedRequestWhenHeartbeatIsStaleAndNoLockHeld(): void
     {
         Event::fake();
         Queue::fake();
@@ -227,7 +288,190 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
 
         $this->assertTrue($started);
         $this->assertSame(BattleRewardRequestStatus::FAILED, $processingRequest->refresh()->status);
-        $this->assertStringContainsString('heartbeat became stale', $processingRequest->failed_reason);
+        $this->assertSame(
+            BattleRewardProcessingQueueManager::ORPHANED_PROCESSING_FAILED_REASON,
+            $processingRequest->failed_reason,
+        );
         Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
+    }
+
+    public function testPendingRowsAreWokenImmediatelyAfterOrphanedRequestRecovery(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now()->subMinutes(10),
+        ]);
+        $pendingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 5, 'context' => []],
+        ]);
+
+        resolve(BattleRewardProcessingQueueManager::class)->ensureProcessorRunning($character);
+
+        $this->assertSame(BattleRewardRequestStatus::PENDING, $pendingRequest->refresh()->status);
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
+    }
+
+    public function testEnqueueRecoversStalOrphanedRequestWhenEnqueueingNewReward(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now()->subMinutes(10),
+        ]);
+
+        resolve(BattleRewardProcessingQueueManager::class)->enqueue(
+            $character,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::BATTLE,
+            55,
+            ['monster_id' => 55, 'context' => []],
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::FAILED, $processingRequest->refresh()->status);
+        $this->assertSame(
+            BattleRewardProcessingQueueManager::ORPHANED_PROCESSING_FAILED_REASON,
+            $processingRequest->failed_reason,
+        );
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
+    }
+
+    public function testEnqueueDoesNotDispatchDuplicateProcessorWhenCharacterLockIsHeld(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $manager = resolve(BattleRewardProcessingQueueManager::class);
+        $lock = Cache::lock('character-reward-queue:' . $character->id, 60);
+        $lock->get();
+
+        $manager->enqueue(
+            $character,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::BATTLE,
+            44,
+            ['monster_id' => 44, 'context' => []],
+        );
+
+        $lock->release();
+
+        Queue::assertNothingPushed();
+        $this->assertSame(BattleRewardRequestStatus::PENDING, CharacterBattleRewardRequest::forCharacter($character->id)->firstOrFail()->status);
+    }
+
+    public function testDifferentCharactersProcessingRowsDoNotBlockEachOther(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $firstCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $secondCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $firstCharacter->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $firstCharacter->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+        ]);
+
+        $manager = resolve(BattleRewardProcessingQueueManager::class);
+        $manager->enqueue(
+            $secondCharacter,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::BATTLE,
+            99,
+            ['monster_id' => 99],
+        );
+
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
+        $this->assertTrue(
+            CharacterBattleRewardQueueState::where('character_id', $secondCharacter->id)->firstOrFail()->is_processing,
+        );
+    }
+
+    public function testRecoverOrphanedProcessingRequestsReturnsZeroWhenHeartbeatIsFresh(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now(),
+        ]);
+
+        $recovered = resolve(BattleRewardProcessingQueueManager::class)
+            ->recoverOrphanedProcessingRequests($character->id);
+
+        $this->assertSame(0, $recovered);
+        $this->assertSame(BattleRewardRequestStatus::PROCESSING, $processingRequest->refresh()->status);
+        $this->assertNull($processingRequest->failed_reason);
+    }
+
+    public function testRecoverOrphanedProcessingRequestsFailsRowsWhenHeartbeatIsStale(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now()->subMinutes(10),
+        ]);
+
+        $recovered = resolve(BattleRewardProcessingQueueManager::class)
+            ->recoverOrphanedProcessingRequests($character->id);
+
+        $this->assertSame(1, $recovered);
+        $this->assertSame(BattleRewardRequestStatus::FAILED, $processingRequest->refresh()->status);
+        $this->assertSame(
+            BattleRewardProcessingQueueManager::ORPHANED_PROCESSING_FAILED_REASON,
+            $processingRequest->failed_reason,
+        );
+    }
+
+    public function testRecoverOrphanedProcessingRequestsReturnsZeroWhenQueueStateIsMissing(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now()->subMinutes(10),
+        ]);
+
+        $recovered = resolve(BattleRewardProcessingQueueManager::class)
+            ->recoverOrphanedProcessingRequests($character->id);
+
+        $this->assertSame(0, $recovered);
+        $this->assertSame(BattleRewardRequestStatus::PROCESSING, $processingRequest->refresh()->status);
     }
 }

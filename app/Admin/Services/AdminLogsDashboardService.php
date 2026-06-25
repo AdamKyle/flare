@@ -36,6 +36,10 @@ class AdminLogsDashboardService
                 'logs/capital-city-unit-recruitments-*.log',
             ],
         ],
+        'reward_processing' => [
+            'label' => 'Reward Processing',
+            'patterns' => ['logs/reward_processing.log', 'logs/reward_processing-*.log'],
+        ],
     ];
 
     private const LOG_START_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}[^\]]*)\]\s+([A-Za-z0-9_-]+)\.(EMERGENCY|ALERT|CRITICAL|ERROR|FATAL|WARNING|NOTICE|INFO|DEBUG):\s+(.+)$/is';

@@ -196,9 +196,6 @@ export default function RewardQueueDashboard() {
                         onFilter={(status) => {
                             setFilters((prev) => ({ ...prev, status }));
                             setRequestPage(1);
-                            requestHistoryRef.current?.scrollIntoView({
-                                behavior: "smooth",
-                            });
                         }}
                     />
                     <div className="grid gap-4 xl:grid-cols-3">

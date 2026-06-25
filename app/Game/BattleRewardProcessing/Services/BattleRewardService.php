@@ -24,6 +24,7 @@ use App\Flare\Models\ExplorationLog;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Skills\Services\SkillService;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class BattleRewardService
@@ -121,8 +122,19 @@ class BattleRewardService
     public function processRewards(bool $includeWinterEvent = false): void {
 
         if (is_null($this->character) || is_null($this->monster)) {
+            Log::channel('reward_processing')->debug('processRewards: skipped — character or monster is null.', [
+                'character_id' => $this->character?->id,
+                'monster_id' => $this->monster?->id,
+            ]);
+
             return;
         }
+
+        Log::channel('reward_processing')->debug('processRewards: entered.', [
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'has_exploration_log' => isset($this->context['exploration_log_id']),
+        ]);
 
         $beforeSnapshot = null;
 
@@ -130,22 +142,48 @@ class BattleRewardService
             $beforeSnapshot = $this->explorationRewardSnapshot();
         }
 
+        Log::channel('reward_processing')->debug('processRewards: handleAwardSkillPoints start.', ['character_id' => $this->character->id]);
         $this->handleAwardSkillPoints();
+
+        Log::channel('reward_processing')->debug('processRewards: handleFactionPoints start.', ['character_id' => $this->character->id]);
         $this->handleFactionPoints();
+
+        Log::channel('reward_processing')->debug('processRewards: handleFactionLoyaltyBounty start.', ['character_id' => $this->character->id]);
         $this->handleFactionLoyaltyBounty();
+
+        Log::channel('reward_processing')->debug('processRewards: handleCurrencyRewards start.', ['character_id' => $this->character->id]);
         $this->handleCurrencyRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleSpecificLocationRewards start.', ['character_id' => $this->character->id]);
         $this->handleSpecificLocationRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleItemDrops start.', ['character_id' => $this->character->id]);
         $this->handleItemDrops();
+
+        Log::channel('reward_processing')->debug('processRewards: handleWeeklyFightRewards start.', ['character_id' => $this->character->id]);
         $this->handleWeeklyFightRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleSecondaryRewards start.', ['character_id' => $this->character->id]);
         $this->handleSecondaryRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleGlobalEventParticipation start.', ['character_id' => $this->character->id]);
         $this->handleGlobalEventParticipation();
+
+        Log::channel('reward_processing')->debug('processRewards: handleAwardingXP start.', ['character_id' => $this->character->id]);
         $this->handleAwardingXP();
+
+        Log::channel('reward_processing')->debug('processRewards: all reward steps completed.', ['character_id' => $this->character->id]);
 
         if (! is_null($beforeSnapshot)) {
             $log = ExplorationLog::find($this->context['exploration_log_id']);
 
             if (! is_null($log)) {
                 $character = $this->character->refresh();
+
+                Log::channel('reward_processing')->debug('processRewards: applying exploration reward context.', [
+                    'character_id' => $character->id,
+                    'exploration_log_id' => $this->context['exploration_log_id'],
+                ]);
 
                 ExplorationLogService::applyRewardContext(
                     $log,
@@ -155,6 +193,8 @@ class BattleRewardService
                 );
             }
         }
+
+        Log::channel('reward_processing')->debug('processRewards: completed.', ['character_id' => $this->character->id]);
 
         if ($includeWinterEvent) {
             WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));

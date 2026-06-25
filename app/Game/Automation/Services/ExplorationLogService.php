@@ -168,8 +168,25 @@ class ExplorationLogService
             'currencies_gained' => $currenciesGained,
         ]);
 
-        event(new ExplorationWarningState($character->user, false, []));
-        (new self)->broadcastOutputForCharacter($character);
+        try {
+            event(new ExplorationWarningState($character->user, false, []));
+        } catch (\Throwable $throwable) {
+            Log::warning('ExplorationLogService::applyRewardContext failed to broadcast ExplorationWarningState.', [
+                'character_id' => $character->id,
+                'exception_class' => $throwable::class,
+                'exception_message' => $throwable->getMessage(),
+            ]);
+        }
+
+        try {
+            (new self)->broadcastOutputForCharacter($character);
+        } catch (\Throwable $throwable) {
+            Log::warning('ExplorationLogService::applyRewardContext failed to broadcast exploration output.', [
+                'character_id' => $character->id,
+                'exception_class' => $throwable::class,
+                'exception_message' => $throwable->getMessage(),
+            ]);
+        }
     }
 
     private static function addCurrencyDelta(array $currenciesGained, string $currency, int $currentValue, int $previousValue): array
