@@ -911,4 +911,36 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertSame(75, $response->json('current_foe.stats.max_spell_damage'));
         $this->assertSame(0.25, $response->json('current_foe.stats.healing_percentage'));
     }
+
+    public function testDismissSoftDismissesAllCompletedDelvesAtOnce(): void
+    {
+        $olderDelve = DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHours(3),
+            'completed_at' => now()->subHours(2),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
+        ]);
+
+        $newerDelve = DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => 'died',
+            'panel_dismissed_at' => null,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/delve/' . $this->character->id . '/dismiss', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertFalse($response->json('active'));
+        $this->assertFalse($response->json('completed'));
+        $this->assertNotNull($olderDelve->refresh()->panel_dismissed_at);
+        $this->assertNotNull($newerDelve->refresh()->panel_dismissed_at);
+    }
 }

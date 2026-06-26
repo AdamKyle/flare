@@ -510,7 +510,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertFalse($automation->getConnection()->getSchemaBuilder()->hasColumn('character_automations', 'starting_level'));
     }
 
-    public function testBeginAutomationClearsOldExplorationWarningAndLog(): void
+    public function testBeginAutomationSoftDismissesOldExplorationWarning(): void
     {
         Queue::fake();
         Event::fake();
@@ -536,8 +536,10 @@ class ExplorationAutomationServiceTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
-        $this->assertNull($oldWarning->fresh());
-        $this->assertNull(ExplorationLog::find($oldLog->id));
+        $this->assertNotNull($oldWarning->fresh());
+        $this->assertNotNull($oldWarning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($oldLog->id));
+        $this->assertNotNull(ExplorationLog::find($oldLog->id)->panel_dismissed_at);
     }
 
     public function testStopExplorationFinalizesLogWithPlayerStop(): void

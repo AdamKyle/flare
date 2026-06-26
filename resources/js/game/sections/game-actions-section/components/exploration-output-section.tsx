@@ -15,19 +15,73 @@ interface ExplorationOutputSectionProps {
 interface ExplorationOutputSectionState {
     dismissing: boolean;
     collapsed: boolean;
+    elapsed: number;
 }
 
 export default class ExplorationOutputSection extends React.Component<
     ExplorationOutputSectionProps,
     ExplorationOutputSectionState
 > {
+    private tickInterval: ReturnType<typeof setInterval> | null = null;
+
     constructor(props: ExplorationOutputSectionProps) {
         super(props);
 
         this.state = {
             dismissing: false,
             collapsed: false,
+            elapsed: 0,
         };
+    }
+
+    componentDidMount(): void {
+        this.syncTimer();
+    }
+
+    componentDidUpdate(prevProps: ExplorationOutputSectionProps): void {
+        const wasActive = prevProps.exploration_output?.type === "active";
+        const isActive = this.props.exploration_output?.type === "active";
+
+        if (!wasActive && isActive) {
+            this.setState(
+                {
+                    elapsed: Number(
+                        this.props.exploration_output?.output?.duration ?? 0,
+                    ),
+                },
+                () => this.syncTimer(),
+            );
+        } else if (wasActive && !isActive) {
+            this.syncTimer();
+        }
+    }
+
+    componentWillUnmount(): void {
+        if (this.tickInterval !== null) {
+            clearInterval(this.tickInterval);
+            this.tickInterval = null;
+        }
+    }
+
+    private syncTimer(): void {
+        const isActive = this.props.exploration_output?.type === "active";
+
+        if (isActive) {
+            if (this.tickInterval === null) {
+                const initialElapsed = Number(
+                    this.props.exploration_output?.output?.duration ?? 0,
+                );
+                this.setState({ elapsed: initialElapsed });
+                this.tickInterval = setInterval(() => {
+                    this.setState((prev) => ({ elapsed: prev.elapsed + 1 }));
+                }, 1000);
+            }
+        } else {
+            if (this.tickInterval !== null) {
+                clearInterval(this.tickInterval);
+                this.tickInterval = null;
+            }
+        }
     }
 
     toggleCollapsed(): void {
@@ -437,10 +491,9 @@ export default class ExplorationOutputSection extends React.Component<
         }
 
         const contentId = "exploration-output-active-body";
-        const durationSeconds = Number(data.duration);
         const durationLabel =
-            !isNaN(durationSeconds) && durationSeconds > 0
-                ? this.formatDurationCompact(durationSeconds)
+            this.state.elapsed > 0
+                ? this.formatDurationCompact(this.state.elapsed)
                 : null;
 
         return (

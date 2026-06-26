@@ -77,19 +77,18 @@ class ExplorationWarningService
 
     private function dismissWarning(Character $character, ?ExplorationWarning $warning): array
     {
-        if (is_null($warning)) {
-            return $this->getState($character);
-        }
+        ExplorationWarning::where('character_id', $character->id)
+            ->whereNull('dismissed_at')
+            ->get()
+            ->each(function (ExplorationWarning $explorationWarning): void {
+                $explorationWarning->update(['dismissed_at' => now()]);
 
-        $warning->update([
-            'dismissed_at' => now(),
-        ]);
-
-        if (! is_null($warning->exploration_log_id)) {
-            ExplorationLog::where('id', $warning->exploration_log_id)
-                ->whereNull('panel_dismissed_at')
-                ->update(['panel_dismissed_at' => now()]);
-        }
+                if (! is_null($explorationWarning->exploration_log_id)) {
+                    ExplorationLog::where('id', $explorationWarning->exploration_log_id)
+                        ->whereNull('panel_dismissed_at')
+                        ->update(['panel_dismissed_at' => now()]);
+                }
+            });
 
         return $this->getState($character);
     }

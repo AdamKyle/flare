@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Admin\Services\AdminLogsDashboardService;
-use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\MonitoredLogFileState;
 use App\Flare\Models\MonitoredSystemErrorOccurrence;
 use App\Flare\Models\MonitoredSystemErrorReport;
@@ -17,6 +16,39 @@ use Tests\Traits\CreateUser;
 class AdminLogsDashboardTest extends TestCase
 {
     use CreateRole, CreateUser, RefreshDatabase;
+
+    private string $tempLogDir;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->tempLogDir = sys_get_temp_dir() . '/flare-admin-logs-test-' . uniqid();
+        mkdir($this->tempLogDir, 0755, true);
+    }
+
+    public function tearDown(): void
+    {
+        foreach (glob($this->tempLogDir . '/*') ?: [] as $file) {
+            if (is_file($file)) {
+                chmod($file, 0644);
+                unlink($file);
+            }
+        }
+        if (is_dir($this->tempLogDir)) {
+            rmdir($this->tempLogDir);
+        }
+        parent::tearDown();
+    }
+
+    private function isolatedService(): AdminLogsDashboardService
+    {
+        return $this->app->make(AdminLogsDashboardService::class)->withLogRoot($this->tempLogDir);
+    }
+
+    private function bindIsolatedService(): void
+    {
+        $this->app->instance(AdminLogsDashboardService::class, $this->isolatedService());
+    }
 
     public function testNonAdminCannotAccessLogsDashboardPage(): void
     {
@@ -48,6 +80,7 @@ class AdminLogsDashboardTest extends TestCase
     public function testLogFilesApiReturnsWhitelistedFiles(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
+        $this->bindIsolatedService();
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/files');
 
@@ -59,18 +92,20 @@ class AdminLogsDashboardTest extends TestCase
         $this->assertContains('laravel', $keys);
         $this->assertContains('faction_loyalty', $keys);
         $this->assertContains('exploration_automation', $keys);
+        $this->assertContains('reward_processing', $keys);
     }
 
     public function testLogEntriesApiReturnsEmptyForMissingLogFile(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
+        $this->bindIsolatedService();
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/entries', [
             'file' => 'laravel',
         ]);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertArrayHasKey('data', $response->json());
+        $this->assertSame([], $response->json('data'));
     }
 
     public function testNonAdminCannotAccessLogEntriesApi(): void
@@ -99,6 +134,7 @@ class AdminLogsDashboardTest extends TestCase
     public function testLogSummaryApiReturnsExpectedKeysForMissingFile(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
+        $this->bindIsolatedService();
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/summary', [
             'file' => 'laravel',
@@ -124,6 +160,7 @@ class AdminLogsDashboardTest extends TestCase
     public function testLogFilesApiIncludesExistsAndSizeFields(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
+        $this->bindIsolatedService();
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/files');
 
@@ -135,71 +172,36 @@ class AdminLogsDashboardTest extends TestCase
 
     public function testLogEntriesReturnsNewestLinesFirstWhenFileHasContent(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
+        $oldLine = '[2026-06-23 12:00:00] local.INFO: Old message';
+        $newLine = '[2026-06-24 12:00:00] local.INFO: New message';
+        file_put_contents($this->tempLogDir . '/capital-city-building-upgrades.log', $oldLine . "\n" . $newLine . "\n");
 
-        $oldLine = '[2026-01-01 00:00:00] local.INFO: Old message';
-        $newLine = '[2026-06-23 12:00:00] local.INFO: New message';
-        file_put_contents($logPath, $oldLine . "\n" . $newLine . "\n");
+        $result = $this->isolatedService()->entries('capital_city', 1, '', '', '');
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $result = $service->entries('capital_city', 1, '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
-
-        $this->assertNotEmpty($result['data']);
+        $this->assertCount(2, $result['data']);
         $this->assertSame('New message', $result['data'][0]['message']);
+        $this->assertSame('Old message', $result['data'][1]['message']);
     }
 
     public function testMissingLogFileDoesNotCreateBugReport(): void
     {
-        $logPath = storage_path('logs/laravel.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
-        if ($existed) {
-            unlink($logPath);
-        }
-
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $service->entries('laravel', 1, '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        }
+        $this->isolatedService()->entries('laravel', 1, '', '', '');
 
         $this->assertSame(0, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
     }
 
     public function testEmptyLogFileDoesNotCreateBugReport(): void
     {
-        $logPath = storage_path('logs/laravel.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
+        file_put_contents($this->tempLogDir . '/laravel.log', '');
 
-        file_put_contents($logPath, '');
-
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $service->entries('laravel', 1, '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
+        $this->isolatedService()->entries('laravel', 1, '', '', '');
 
         $this->assertSame(0, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
     }
 
     public function testUnknownFileKeyDoesNotCreateBugReport(): void
     {
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $service->entries('unknown_key_not_whitelisted', 1, '', '', '');
+        $this->isolatedService()->entries('unknown_key_not_whitelisted', 1, '', '', '');
 
         $this->assertSame(0, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
     }
@@ -210,23 +212,13 @@ class AdminLogsDashboardTest extends TestCase
             $this->markTestSkipped('Cannot test file permission failure as root.');
         }
 
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
+        file_put_contents($filePath, "[2026-06-24 12:00:00] local.INFO: Unreadable file content\n");
+        chmod($filePath, 0000);
 
-        file_put_contents($logPath, "log content\n");
-        chmod($logPath, 0000);
+        $result = $this->isolatedService()->entries('capital_city', 1, '', '', '');
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $result = $service->entries('capital_city', 1, '', '', '');
-
-        chmod($logPath, 0644);
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
+        chmod($filePath, 0644);
 
         $this->assertSame([], $result['data']);
         $this->assertSame(0, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
@@ -235,19 +227,10 @@ class AdminLogsDashboardTest extends TestCase
     public function testDatedLaravelLogsAreDiscovered(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $logPath = storage_path('logs/laravel-2026-06-24.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
-        file_put_contents($logPath, "[2026-06-24 12:00:00] local.INFO: Dated log message\n");
+        file_put_contents($this->tempLogDir . '/laravel-2026-06-24.log', "[2026-06-24 12:00:00] local.INFO: Dated log message\n");
+        $this->bindIsolatedService();
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/files');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
 
         $laravel = collect($response->json())->firstWhere('key', 'laravel');
 
@@ -258,19 +241,10 @@ class AdminLogsDashboardTest extends TestCase
     public function testChannelIsNotMissingWhenMatchingDatedFileExists(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $logPath = storage_path('logs/exploration-automation-2026-06-24.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
-        file_put_contents($logPath, "[2026-06-24 12:00:00] local.INFO: Exploration dated log\n");
+        file_put_contents($this->tempLogDir . '/exploration-automation-2026-06-24.log', "[2026-06-24 12:00:00] local.INFO: Exploration dated log\n");
+        $this->bindIsolatedService();
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/files');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
 
         $exploration = collect($response->json())->firstWhere('key', 'exploration_automation');
 
@@ -279,21 +253,11 @@ class AdminLogsDashboardTest extends TestCase
 
     public function testParserExtractsExceptionDetailsFromLogEntry(): void
     {
-        $logPath = storage_path('logs/laravel.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
         $line = '[2026-06-24 12:00:00] local.ERROR: Login failed {"exception":"RuntimeException","file":"/var/app/Auth.php","line":45,"user_id":12,"request_path":"/login"}' . "\n" . '#0 /var/app/Login.php(12): run()';
+        file_put_contents($filePath, $line . "\n");
 
-        file_put_contents($logPath, $line . "\n");
-
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $result = $service->entries('laravel', 1, 'error', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
+        $result = $this->isolatedService()->entries('capital_city', 1, 'error', '', '');
 
         $this->assertSame('2026-06-24 12:00:00', $result['data'][0]['timestamp']);
         $this->assertSame('error', $result['data'][0]['severity']);
@@ -306,75 +270,49 @@ class AdminLogsDashboardTest extends TestCase
 
     public function testPollingReadsOnlyNewEntriesAfterStoredOffset(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
         MonitoredLogFileState::query()->delete();
-        file_put_contents($logPath, "[2026-06-24 12:00:00] local.INFO: First poll\n");
+        file_put_contents($filePath, "[2026-06-24 12:00:00] local.INFO: First poll\n");
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
+        $service = $this->isolatedService();
         $first = $service->poll('capital_city', '', '', '');
 
-        file_put_contents($logPath, "[2026-06-24 12:01:00] local.INFO: Second poll\n", FILE_APPEND);
+        file_put_contents($filePath, "[2026-06-24 12:01:00] local.INFO: Second poll\n", FILE_APPEND);
 
         $second = $service->poll('capital_city', '', '', '');
 
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
-
         $this->assertCount(1, $first['entries']);
+        $this->assertSame('First poll', $first['entries'][0]['message']);
         $this->assertCount(1, $second['entries']);
         $this->assertSame('Second poll', $second['entries'][0]['message']);
     }
 
     public function testMalformedLogLinesDoNotCrashScanner(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
+        file_put_contents($filePath, "not a laravel log line\n");
 
-        file_put_contents($logPath, "not a laravel log line\n");
+        $result = $this->isolatedService()->entries('capital_city', 1, '', '', '');
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $result = $service->entries('capital_city', 1, '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
-
+        $this->assertCount(1, $result['data']);
         $this->assertSame('unknown', $result['data'][0]['severity']);
         $this->assertFalse($result['data'][0]['raw_parseable']);
     }
 
     public function testLogPollingCreatesDedupedSystemBugReport(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
         MonitoredLogFileState::query()->delete();
         MonitoredSystemErrorOccurrence::query()->delete();
         MonitoredSystemErrorReport::query()->delete();
-        file_put_contents($logPath, '[2026-06-24 12:00:00] local.ERROR: Same error {"exception":"RuntimeException","file":"/var/app/Auth.php","line":45}' . "\n");
+        file_put_contents($filePath, '[2026-06-24 12:00:00] local.ERROR: Same error {"exception":"RuntimeException","file":"/var/app/Auth.php","line":45}' . "\n");
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
+        $service = $this->isolatedService();
         $service->poll('capital_city', '', '', '');
 
-        file_put_contents($logPath, '[2026-06-24 12:01:00] local.ERROR: Same error {"exception":"RuntimeException","file":"/var/app/Auth.php","line":45}' . "\n", FILE_APPEND);
+        file_put_contents($filePath, '[2026-06-24 12:01:00] local.ERROR: Same error {"exception":"RuntimeException","file":"/var/app/Auth.php","line":45}' . "\n", FILE_APPEND);
 
         $service->poll('capital_city', '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
 
         $this->assertSame(1, MonitoredSystemErrorReport::count());
         $this->assertSame(2, MonitoredSystemErrorOccurrence::count());
@@ -402,24 +340,13 @@ class AdminLogsDashboardTest extends TestCase
 
     public function testBoundedReadReturnsEntriesFromTailOfLargeFile(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
-        $early = '[2026-01-01 00:00:00] local.INFO: Early entry that should be outside bounded window';
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
+        $early = '[2026-01-01 00:00:00] local.INFO: Early entry outside bounded window';
         $recent = '[2026-06-24 12:00:00] local.INFO: Recent entry inside bounded window';
+        $padding = str_repeat("[2026-03-01 00:00:00] local.DEBUG: Padding\n", 50000);
+        file_put_contents($filePath, $early . "\n" . $padding . $recent . "\n");
 
-        $padding = str_repeat("[2026-03-01 00:00:00] local.DEBUG: Padding\n", 2000);
-        file_put_contents($logPath, $early . "\n" . $padding . $recent . "\n");
-
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $result = $service->entries('capital_city', 1, '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
+        $result = $this->isolatedService()->entries('capital_city', 1, '', '', '');
 
         $messages = array_column($result['data'], 'message');
         $this->assertContains('Recent entry inside bounded window', $messages);
@@ -427,49 +354,29 @@ class AdminLogsDashboardTest extends TestCase
 
     public function testSummaryReturnsCorrectCountsFromBoundedRead(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
-        file_put_contents($logPath,
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
+        file_put_contents($filePath,
             "[2026-06-24 12:00:00] local.ERROR: Error one\n" .
             "[2026-06-24 12:01:00] local.INFO: Info one\n" .
             "[2026-06-24 12:02:00] local.WARNING: Warning one\n"
         );
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $result = $service->summary('capital_city', '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
+        $result = $this->isolatedService()->summary('capital_city', '', '', '');
 
         $this->assertSame(3, $result['total']);
-        $this->assertArrayHasKey('error', $result['by_severity']);
-        $this->assertArrayHasKey('info', $result['by_severity']);
-        $this->assertArrayHasKey('warning', $result['by_severity']);
+        $this->assertSame(1, $result['by_severity']['error']);
+        $this->assertSame(1, $result['by_severity']['info']);
+        $this->assertSame(1, $result['by_severity']['warning']);
     }
 
     public function testNonErrorLogEntryDoesNotCreateSystemBugReport(): void
     {
-        $logPath = storage_path('logs/capital-city-building-upgrades.log');
-        $existed = file_exists($logPath);
-        $original = $existed ? file_get_contents($logPath) : null;
-
+        $filePath = $this->tempLogDir . '/capital-city-building-upgrades.log';
         MonitoredLogFileState::query()->delete();
         MonitoredSystemErrorReport::query()->delete();
-        file_put_contents($logPath, "[2026-06-24 12:00:00] local.INFO: Just an info message\n");
+        file_put_contents($filePath, "[2026-06-24 12:00:00] local.INFO: Just an info message\n");
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $service->poll('capital_city', '', '', '');
-
-        if ($original !== null) {
-            file_put_contents($logPath, $original);
-        } else {
-            unlink($logPath);
-        }
+        $this->isolatedService()->poll('capital_city', '', '', '');
 
         $this->assertSame(0, MonitoredSystemErrorReport::count());
     }
@@ -535,8 +442,7 @@ class AdminLogsDashboardTest extends TestCase
             'occurred_at' => now()->subDay(),
         ]);
 
-        $service = $this->app->make(AdminLogsDashboardService::class);
-        $chart = $service->bugChart(7);
+        $chart = $this->isolatedService()->bugChart(7);
 
         $todayRow = collect($chart)->firstWhere('period', now()->toDateString());
         $yesterdayRow = collect($chart)->firstWhere('period', now()->subDay()->toDateString());
@@ -545,5 +451,15 @@ class AdminLogsDashboardTest extends TestCase
         $this->assertSame(2, $todayRow['occurrences']);
         $this->assertNotNull($yesterdayRow);
         $this->assertSame(1, $yesterdayRow['occurrences']);
+    }
+
+    public function testWithLogRootIsolatesDiscoveryFromRealStorageLogs(): void
+    {
+        $service = $this->app->make(AdminLogsDashboardService::class)->withLogRoot($this->tempLogDir);
+
+        $result = $service->entries('laravel', 1, '', '', '');
+
+        $this->assertSame([], $result['data']);
+        $this->assertSame(0, $result['total']);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
+use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
 use App\Console\AfterDeployment\CreateLocationDataCache;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->commands([
             // After Deployment Commands
             AddHolyStacksToItems::class,
+            BackfillCompletedPanelDismissals::class,
             AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,

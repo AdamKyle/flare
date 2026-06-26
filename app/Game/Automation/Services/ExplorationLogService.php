@@ -248,8 +248,7 @@ class ExplorationLogService
         ExplorationLog::where('character_id', $character->id)
             ->whereNotNull('ended_at')
             ->whereNull('panel_dismissed_at')
-            ->latest('ended_at')
-            ->first()?->update(['panel_dismissed_at' => now()]);
+            ->update(['panel_dismissed_at' => now()]);
 
         $this->broadcastOutputForCharacter($character);
     }

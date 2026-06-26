@@ -75,19 +75,10 @@ class DelveStatusService
 
     public function dismissForCharacter(Character $character): void
     {
-        $delve = DelveExploration::where('character_id', $character->id)
+        DelveExploration::where('character_id', $character->id)
             ->whereNotNull('completed_at')
             ->whereNull('panel_dismissed_at')
-            ->latest('completed_at')
-            ->first();
-
-        if (is_null($delve)) {
-            return;
-        }
-
-        $delve->update([
-            'panel_dismissed_at' => now(),
-        ]);
+            ->update(['panel_dismissed_at' => now()]);
     }
 
     private function completedStatus(Character $character, DelveExploration $delve): array

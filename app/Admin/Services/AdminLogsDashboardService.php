@@ -10,9 +10,27 @@ use Throwable;
 
 class AdminLogsDashboardService
 {
+    private ?string $logRootOverride = null;
+
     public function __construct(
         private readonly MonitoredBugReportService $monitoredBugReportService,
     ) {}
+
+    public function withLogRoot(string $logRoot): static
+    {
+        $clone = clone $this;
+        $clone->logRootOverride = rtrim($logRoot, '/');
+        return $clone;
+    }
+
+    private function resolveLogPattern(string $pattern): string
+    {
+        if ($this->logRootOverride !== null) {
+            $relative = preg_replace('#^logs/#', '', $pattern);
+            return $this->logRootOverride . '/' . $relative;
+        }
+        return storage_path($pattern);
+    }
 
     private const LOG_CHANNELS = [
         'laravel' => [
@@ -241,7 +259,7 @@ class AdminLogsDashboardService
         $files = [];
 
         foreach (self::LOG_CHANNELS[$fileKey]['patterns'] as $pattern) {
-            $matches = glob(storage_path($pattern)) ?: [];
+            $matches = glob($this->resolveLogPattern($pattern)) ?: [];
             foreach ($matches as $path) {
                 if (is_file($path) && is_readable($path)) {
                     $files[$path] = $path;

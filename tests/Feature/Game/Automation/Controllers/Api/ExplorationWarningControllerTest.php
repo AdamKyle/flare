@@ -36,7 +36,7 @@ class ExplorationWarningControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testDismissRemovesLatestWarningAndLinkedLog(): void
+    public function testDismissSoftDismissesLatestWarning(): void
     {
         Event::fake();
 
@@ -62,11 +62,13 @@ class ExplorationWarningControllerTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertNull($response->json('type'));
         $this->assertNull($response->json('output'));
-        $this->assertNull($warning->fresh());
-        $this->assertNull(ExplorationLog::find($log->id));
+        $this->assertNotNull($warning->fresh());
+        $this->assertNotNull($warning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($log->id));
+        $this->assertNotNull(ExplorationLog::find($log->id)->panel_dismissed_at);
     }
 
-    public function testDismissRemovesSelectedWarningByWarningId(): void
+    public function testDismissSoftDismissesAllWarningsForCharacter(): void
     {
         Event::fake();
 
@@ -105,10 +107,14 @@ class ExplorationWarningControllerTest extends TestCase
             ]);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertNull($olderWarning->fresh());
-        $this->assertNull(ExplorationLog::find($olderLog->id));
+        $this->assertNotNull($olderWarning->fresh());
+        $this->assertNotNull($olderWarning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($olderLog->id));
+        $this->assertNotNull(ExplorationLog::find($olderLog->id)->panel_dismissed_at);
         $this->assertNotNull($newerWarning->fresh());
+        $this->assertNotNull($newerWarning->fresh()->dismissed_at);
         $this->assertNotNull(ExplorationLog::find($newerLog->id));
+        $this->assertNotNull(ExplorationLog::find($newerLog->id)->panel_dismissed_at);
     }
 
     public function testDismissBroadcastsClearedWarningState(): void

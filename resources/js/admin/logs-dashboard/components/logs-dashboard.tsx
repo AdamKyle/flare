@@ -458,110 +458,6 @@ export default function LogsDashboard() {
                         )}
                     </section>
 
-                    <MonitoringStatusChart
-                        title="Log Volume"
-                        description="Parsed log entries by day for the selected channel and filters."
-                        points={chartPoints}
-                        series={[
-                            {
-                                key: "entries",
-                                label: "Entries",
-                                color: "#4f46e5",
-                            },
-                        ]}
-                    />
-
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h2 className="text-lg font-semibold">
-                            System Error Occurrences
-                        </h2>
-                        <div className="flex flex-wrap gap-2">
-                            {[7, 14, 30, 60, 120].map((days) => (
-                                <button
-                                    key={days}
-                                    className={[
-                                        "rounded border px-2 py-1 text-xs",
-                                        bugRange === days
-                                            ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
-                                            : "border-gray-300 dark:border-gray-600",
-                                    ].join(" ")}
-                                    onClick={() => setBugRange(days)}
-                                >
-                                    {days}d
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <MonitoringStatusChart
-                        title="Bug Occurrences"
-                        description="System error occurrences grouped by day."
-                        points={bugChart}
-                        series={[
-                            {
-                                key: "occurrences",
-                                label: "Occurrences",
-                                color: "#dc2626",
-                            },
-                        ]}
-                    />
-                    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
-                        <div className="mb-3">
-                            <h2 className="text-lg font-semibold">
-                                Grouped Bugs
-                            </h2>
-                        </div>
-                        <div className="mt-4 overflow-x-auto">
-                            <table className="w-full min-w-[760px] text-left text-sm">
-                                <thead>
-                                    <tr className="border-b dark:border-gray-700">
-                                        <th className="p-2">Bug</th>
-                                        <th className="p-2">Status</th>
-                                        <th className="p-2">Severity</th>
-                                        <th className="p-2">Occurrences</th>
-                                        <th className="p-2">Last Seen</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {bugs.map((bug) => (
-                                        <tr
-                                            key={bug.id}
-                                            className="cursor-pointer border-t hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-                                            onClick={() => {
-                                                setSelectedBug(bug);
-                                                setSelectedEntry(null);
-                                            }}
-                                        >
-                                            <td className="p-2">{bug.title}</td>
-                                            <td className="p-2">
-                                                {bug.status}
-                                            </td>
-                                            <td className="p-2">
-                                                {bug.severity ? (
-                                                    <SeverityBadge
-                                                        severity={bug.severity}
-                                                    />
-                                                ) : (
-                                                    "-"
-                                                )}
-                                            </td>
-                                            <td className="p-2">
-                                                {bug.occurrence_count}
-                                            </td>
-                                            <td className="p-2">
-                                                {bug.last_seen_at ?? "-"}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            {bugs.length === 0 && (
-                                <p className="p-4 text-center text-gray-600 dark:text-gray-300">
-                                    No system errors have been ingested.
-                                </p>
-                            )}
-                        </div>
-                    </section>
-
                     {newEntries.length > 0 && (
                         <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100">
                             {newEntries.length} new log{" "}
@@ -732,6 +628,110 @@ export default function LogsDashboard() {
                             lastPage={entries.last_page}
                             onPageChange={setPage}
                         />
+                    </section>
+
+                    <MonitoringStatusChart
+                        title="Log Volume"
+                        description="Parsed log entries by day for the selected channel and filters."
+                        points={chartPoints}
+                        series={[
+                            {
+                                key: "entries",
+                                label: "Entries",
+                                color: "#4f46e5",
+                            },
+                        ]}
+                    />
+
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <h2 className="text-lg font-semibold">
+                            System Error Occurrences
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                            {[7, 14, 30, 60, 120].map((days) => (
+                                <button
+                                    key={days}
+                                    className={[
+                                        "rounded border px-2 py-1 text-xs",
+                                        bugRange === days
+                                            ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                                            : "border-gray-300 dark:border-gray-600",
+                                    ].join(" ")}
+                                    onClick={() => setBugRange(days)}
+                                >
+                                    {days}d
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <MonitoringStatusChart
+                        title="Bug Occurrences"
+                        description="System error occurrences grouped by day."
+                        points={bugChart}
+                        series={[
+                            {
+                                key: "occurrences",
+                                label: "Occurrences",
+                                color: "#dc2626",
+                            },
+                        ]}
+                    />
+                    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
+                        <div className="mb-3">
+                            <h2 className="text-lg font-semibold">
+                                Grouped Bugs
+                            </h2>
+                        </div>
+                        <div className="mt-4 overflow-x-auto">
+                            <table className="w-full min-w-[760px] text-left text-sm">
+                                <thead>
+                                    <tr className="border-b dark:border-gray-700">
+                                        <th className="p-2">Bug</th>
+                                        <th className="p-2">Status</th>
+                                        <th className="p-2">Severity</th>
+                                        <th className="p-2">Occurrences</th>
+                                        <th className="p-2">Last Seen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {bugs.map((bug) => (
+                                        <tr
+                                            key={bug.id}
+                                            className="cursor-pointer border-t hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            onClick={() => {
+                                                setSelectedBug(bug);
+                                                setSelectedEntry(null);
+                                            }}
+                                        >
+                                            <td className="p-2">{bug.title}</td>
+                                            <td className="p-2">
+                                                {bug.status}
+                                            </td>
+                                            <td className="p-2">
+                                                {bug.severity ? (
+                                                    <SeverityBadge
+                                                        severity={bug.severity}
+                                                    />
+                                                ) : (
+                                                    "-"
+                                                )}
+                                            </td>
+                                            <td className="p-2">
+                                                {bug.occurrence_count}
+                                            </td>
+                                            <td className="p-2">
+                                                {bug.last_seen_at ?? "-"}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {bugs.length === 0 && (
+                                <p className="p-4 text-center text-gray-600 dark:text-gray-300">
+                                    No system errors have been ingested.
+                                </p>
+                            )}
+                        </div>
                     </section>
                 </>
             )}

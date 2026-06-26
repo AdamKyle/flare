@@ -322,7 +322,7 @@ export default class AlchemyItemUsable extends React.Component<
 
     render() {
         return (
-            <div className="mr-auto ml-auto w-full md:w-3/5 max-h-[350px] overflow-y-auto md:max-h-none md:overflow-y-visible pr-2 pb-4">
+            <div className="w-full pb-4">
                 <p className="mt-4 mb-4">{this.props.item.description}</p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                 {this.renderCoreView()}

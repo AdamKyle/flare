@@ -17,6 +17,10 @@ export default class InventoryUseItem extends React.Component<any, any> {
     }
 
     useItem() {
+        if (this.state.loading) {
+            return;
+        }
+
         this.setState({
             loading: true,
             error_message: null,
@@ -64,13 +68,14 @@ export default class InventoryUseItem extends React.Component<any, any> {
             <Dialogue
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
+                primary_button_disabled={this.state.loading}
                 title={
                     <span className="text-pink-500 dark:text-pink-300">
                         {this.props.item.item_name}
                     </span>
                 }
                 secondary_actions={{
-                    secondary_button_disabled: false,
+                    secondary_button_disabled: this.state.loading,
                     secondary_button_label: "Use item",
                     handle_action: () => this.useItem(),
                 }}
