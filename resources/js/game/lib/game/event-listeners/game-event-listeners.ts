@@ -1,6 +1,6 @@
 import { singleton } from "tsyringe";
 import CompletedGuideQuestListener from "../../../../individual-components/player-components/guide-quests/event-listeners/completed-guide-quest-listener";
-import GuideQuestListenerDefinition from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener-definition";
+import type GuideQuestListenerDefinition from "../../../../individual-components/player-components/guide-quests/event-listeners/guide-quest-listener-definition";
 import Game from "../../../game";
 import { serviceContainer } from "../../containers/core-container";
 import GameListener from "./game-listener";

@@ -102,7 +102,7 @@ class ServerMessageHandlerTest extends TestCase
         $this->serverMessageHandler->sendBasicMessage($user, 'test message');
     }
 
-    public function testSendBasicMessageRethrowsNonBroadcastException(): void
+    public function testSendBasicMessageDoesNotThrowOnNonBroadcastException(): void
     {
         $user = $this->createUser();
 
@@ -110,9 +110,18 @@ class ServerMessageHandlerTest extends TestCase
             throw new \RuntimeException('Database connection lost');
         });
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Database connection lost');
+        Log::shouldReceive('warning')
+            ->once()
+            ->withArgs(function (string $message, array $context) use ($user) {
+                return $message === 'Non-critical broadcast event failed.'
+                    && str_contains($context['event_class'], 'ServerMessageEvent')
+                    && str_contains($context['exception_class'], 'RuntimeException')
+                    && $context['exception'] === 'Database connection lost'
+                    && $context['user_id'] === $user->id;
+            });
 
         $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+
+        $this->assertTrue(true);
     }
 }

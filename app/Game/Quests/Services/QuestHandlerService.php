@@ -6,7 +6,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
-use App\Game\Quests\Jobs\HandInQuest;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\UpdateMap;
@@ -19,7 +21,6 @@ use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Events\Values\EventType;
 use App\Game\Quests\Traits\QuestDetails;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class QuestHandlerService
 {
@@ -39,7 +40,8 @@ class QuestHandlerService
         NpcQuestsHandler $npcQuestsHandler,
         CanTravelToMap $canTravelToMap,
         MapTileValue $mapTileValue,
-        BuildQuestCacheService $buildQuestCacheService
+        BuildQuestCacheService $buildQuestCacheService,
+        private readonly BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
     ) {
 
         $this->npcQuestsHandler = $npcQuestsHandler;
@@ -148,8 +150,8 @@ class QuestHandlerService
 
     public function moveCharacter(Character $character, Npc $npc): array|Character
     {
-
         $oldMapDetails = $character->map;
+        $mapChanged = false;
 
         if ($npc->game_map_id !== $character->map->game_map_id) {
             if (! $this->canTravelToMap->canTravel($npc->game_map_id, $character)) {
@@ -159,10 +161,7 @@ class QuestHandlerService
             $character->map()->update(['game_map_id' => $npc->game_map_id]);
 
             $character = $character->refresh();
-
-            event(new UpdateMap($character->user));
-
-            CharacterAttackTypesCacheBuilder::dispatch($character);
+            $mapChanged = true;
         }
 
         $character = $character->refresh();
@@ -170,7 +169,6 @@ class QuestHandlerService
         $this->mapTileValue->setUp($character, $character->map->gameMap);
 
         if (! $this->mapTileValue->canWalk($npc->x_position, $npc->y_position)) {
-
             $character->map->update(['game_map_id' => $oldMapDetails->game_map_id]);
 
             return $this->errorResult('You can traverse to the NPC, but not move to their location as you are
@@ -186,6 +184,12 @@ class QuestHandlerService
 
         if ($oldMapDetails->gameMap->id !== $character->map->gameMap->id) {
             event(new ServerMessageEvent($character->user, 'You were moved (at no gold cost or time out) from: ' . $oldMapDetails->gameMap->name . ' to: ' . $character->map->gameMap->name . ' in order to hand in the quest.'));
+        }
+
+        event(new UpdateMap($character->user));
+
+        if ($mapChanged) {
+            CharacterAttackTypesCacheBuilder::dispatch($character);
         }
 
         $this->updateMapDetails($character);
@@ -204,12 +208,28 @@ class QuestHandlerService
 
     public function handInQuest(Character $character, Quest $quest)
     {
-        HandInQuest::dispatchSync($character, $quest);
+        $this->npcQuestsHandler->consumeQuestRequirements($character, $quest);
+        $this->npcQuestsHandler->questRewardHandler()->createquestQuestLog($character, $quest);
+
+        $sourceType = is_null($quest->raid_id)
+            ? BattleRewardRequestSourceType::QUEST
+            : BattleRewardRequestSourceType::RAID_QUEST;
+
+        $this->battleRewardProcessingQueueManager->enqueue(
+            $character,
+            BattleRewardRequestPriority::FIRST,
+            $sourceType,
+            implode(':', [$sourceType->value, $character->id, $quest->id]),
+            [
+                'character_id' => $character->id,
+                'quest_id' => $quest->id,
+            ],
+        );
 
         $character = $character->refresh();
 
         $quests = $this->buildQuestCacheService->getRegularQuests();
-        $raidQuests = $this->buildQuestCacheService->fetchQuestsForRaid();
+        $raidQuests = $this->buildQuestCacheService->fetchActiveRaidQuests();
 
         return $this->successResult([
             'completed_quests' => $character->questsCompleted()->pluck('quest_id'),

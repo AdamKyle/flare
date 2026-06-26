@@ -9,7 +9,6 @@ use App\Flare\Models\Item;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Services\CharacterRewardLockService;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
@@ -30,7 +29,6 @@ class UpdateCraftingTasksForFactionLoyalty
     public function __construct(
         RandomAffixGenerator $randomAffixGenerator,
         FactionLoyaltyService $factionLoyaltyService,
-        private readonly CharacterRewardLockService $characterRewardLockService,
     ) {
         $this->randomAffixGenerator = $randomAffixGenerator;
         $this->factionLoyaltyService = $factionLoyaltyService;
@@ -53,50 +51,47 @@ class UpdateCraftingTasksForFactionLoyalty
      */
     public function handleCraftingTask(Character $character, Item $item): Character
     {
-        return $this->characterRewardLockService->run($character->id, function () use ($character, $item): Character {
+        $factionLoyalty = $this->getFactionLoyalty($character);
 
-            $factionLoyalty = $this->getFactionLoyalty($character);
+        if (is_null($factionLoyalty)) {
+            return $character;
+        }
 
-            if (is_null($factionLoyalty)) {
-                return $character;
-            }
+        $helpingNpc = $this->getNpcCurrentlyHelping($factionLoyalty);
 
-            $helpingNpc = $this->getNpcCurrentlyHelping($factionLoyalty);
+        if (is_null($helpingNpc)) {
+            return $character;
+        }
 
-            if (is_null($helpingNpc)) {
-                return $character;
-            }
+        if ($this->normalizeMaxLevelNpc($helpingNpc)) {
+            return $character;
+        }
 
-            if ($this->normalizeMaxLevelNpc($helpingNpc)) {
-                return $character;
-            }
+        if (! $this->hasMatchingTask($helpingNpc, 'item_id', $item->id)) {
+            return $character;
+        }
 
-            if (! $this->hasMatchingTask($helpingNpc, 'item_id', $item->id)) {
-                return $character;
-            }
+        $this->handedOverItem = true;
 
-            $this->handedOverItem = true;
+        $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'item_id', $item->id);
 
-            $helpingNpc = $this->updateMatchingHelpTask($helpingNpc, 'item_id', $item->id);
+        $helpingNpc = $helpingNpc->refresh();
 
-            $helpingNpc = $helpingNpc->refresh();
+        $task = $this->getMatchingTask($helpingNpc, 'item_id', $item->id);
 
-            $task = $this->getMatchingTask($helpingNpc, 'item_id', $item->id);
+        $amountLeft = $task['required_amount'] - $task['current_amount'];
 
-            $amountLeft = $task['required_amount'] - $task['current_amount'];
+        if ($amountLeft === 0) {
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' does not want anymore of this item anymore. "We\'re done with this child. Move on. I got other tasks for you to do! But you since you crafted it ..."');
+        } else {
+            ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' is elated at your ability to craft: ' . $item->affix_name . '. "Thank you child! Only: ' . $amountLeft . ' Left to go!"');
+        }
 
-            if ($amountLeft === 0) {
-                ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' does not want anymore of this item anymore. "We\'re done with this child. Move on. I got other tasks for you to do! But you since you crafted it ..."');
-            } else {
-                ServerMessageHandler::sendBasicMessage($character->user, $helpingNpc->npc->real_name . ' is elated at your ability to craft: ' . $item->affix_name . '. "Thank you child! Only: ' . $amountLeft . ' Left to go!"');
-            }
+        if ($this->canLevelUpFame($helpingNpc)) {
+            $this->handleFameLevelUp($character, $helpingNpc);
+        }
 
-            if ($this->canLevelUpFame($helpingNpc)) {
-                $this->handleFameLevelUp($character, $helpingNpc);
-            }
-
-            return $character->refresh();
-        });
+        return $character->refresh();
     }
 
     /**

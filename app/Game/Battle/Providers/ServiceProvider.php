@@ -15,7 +15,7 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Battle\Services\FactionLoyaltyFightService;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Battle\Services\RaidBattleService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -75,7 +75,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BattleEventHandler::class, function ($app) {
             return new BattleEventHandler(
-                $app->make(BattleRewardService::class),
+                $app->make(BattleRewardProcessingQueueManager::class),
                 $app->make(WeeklyBattleService::class),
             );
         });

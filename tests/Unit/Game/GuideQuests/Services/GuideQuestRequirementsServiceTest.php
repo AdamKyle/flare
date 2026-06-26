@@ -4,6 +4,8 @@ namespace Tests\Unit\Game\GuideQuests\Services;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
+use App\Flare\Models\DelveExploration;
+use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
@@ -115,6 +117,71 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredSkillCheck($character, $guideQuest)->getFinishedRequirements();
 
         $this->assertContains('required_skill_level', $finishedRequirements);
+    }
+
+    public function testRequiredDelvePackSizeReturnsFalseWhenNoDelveRowExists(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_delve_pack_size' => 5,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredDelvePackSize($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_delve_pack_size', $finishedRequirements);
+    }
+
+    public function testRequiredDelvePackSizePassesWithRetainedCompletedDelveRow(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_delve_pack_size' => 5,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $delve = DelveExploration::factory()->create([
+            'character_id' => $character->id,
+            'monster_id' => 0,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+        ]);
+
+        DelveLog::factory()->create([
+            'character_id' => $character->id,
+            'delve_exploration_id' => $delve->id,
+            'pack_size' => 5,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredDelvePackSize($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_delve_pack_size', $finishedRequirements);
+    }
+
+    public function testRequiredDelvePackSizeFailsWithInsufficientRetainedCompletedDelveRow(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_delve_pack_size' => 10,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $delve = DelveExploration::factory()->create([
+            'character_id' => $character->id,
+            'monster_id' => 0,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+        ]);
+
+        DelveLog::factory()->create([
+            'character_id' => $character->id,
+            'delve_exploration_id' => $delve->id,
+            'pack_size' => 5,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredDelvePackSize($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_delve_pack_size', $finishedRequirements);
     }
 
     public function testGetSecondaryRequiredSkillCheck()
@@ -840,5 +907,51 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventKillAmount($character, $guideQuest)->getFinishedRequirements();;
 
         $this->assertNotContains('required_event_goal_participation', $finishedRequirements);
+    }
+
+    public function testRequiredSkillCheckReturnsFalseWhenCharacterDoesNotHaveSkill(): void
+    {
+        $gameSkill = $this->createGameSkill(['name' => 'NonexistentSkill' . uniqid()]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_skill' => $gameSkill->id,
+            'required_skill_level' => 1,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredSkillCheck($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_skill_level', $finishedRequirements);
+    }
+
+    public function testRequiredFactionLevelReturnsFalseWhenCharacterHasNoFactionForMap(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'UnreachableMap' . uniqid()]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_faction_id' => $gameMap->id,
+            'required_faction_level' => 1,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredFactionLevel($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_faction_level', $finishedRequirements);
+    }
+
+    public function testRequiredKingdomPassiveLevelReturnsFalseWhenCharacterDoesNotHavePassiveSkill(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_passive_level' => 1,
+            'required_passive_skill' => 999999,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredKingdomPassiveLevel($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_passive_level', $finishedRequirements);
     }
 }

@@ -23,9 +23,10 @@ export type ExplorationWarningType = {
 };
 
 export type ExplorationOutputType = {
-    type: "active" | "warning" | null;
+    type: "active" | "warning" | "ended" | null;
     output: Record<string, any> | null;
     loading?: boolean;
+    received_at?: number;
 };
 
 export type GameActionState = {

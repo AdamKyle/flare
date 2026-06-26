@@ -6,6 +6,7 @@ use App\Flare\Builders\BuildCosmicItem;
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Builders\BuildUniqueItem;
 use App\Flare\Values\RandomAffixDetails;
+use Closure;
 use Exception;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
@@ -44,6 +45,13 @@ class CharacterRewardService
         return $this;
     }
 
+    public function withHeartbeatCallback(?Closure $callback): self
+    {
+        $this->characterXpService->withHeartbeatCallback($callback);
+
+        return $this;
+    }
+
     /**
      * Distribute the XP to the character based on the monster.
      *
@@ -66,6 +74,13 @@ class CharacterRewardService
     {
 
         $this->characterXpService->setCharacter($this->character)->distributeSpecifiedXp($xp);
+
+        return $this;
+    }
+
+    public function distributeCheckpointedXp(int $xp, ?Closure $checkpointCallback = null): CharacterRewardService
+    {
+        $this->characterXpService->setCharacter($this->character)->distributeCheckpointedXp($xp, $checkpointCallback);
 
         return $this;
     }
@@ -93,6 +108,16 @@ class CharacterRewardService
     public function giveCurrencies(Monster $monster, $totalKills = 1): array
     {
         return $this->characterCurrencyRewardService->setCharacter($this->character)->giveCurrencies($monster, $totalKills);
+    }
+
+    public function planCurrencies(Monster $monster, int $totalKills = 1): array
+    {
+        return $this->characterCurrencyRewardService->setCharacter($this->character)->planCurrencies($monster, $totalKills);
+    }
+
+    public function applyPlannedCurrencies(array $plan): array
+    {
+        return $this->characterCurrencyRewardService->setCharacter($this->character)->applyPlannedCurrencies($plan);
     }
 
     /**

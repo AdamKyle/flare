@@ -1,7 +1,8 @@
-import React, { Fragment } from "react";
+import React, { Fragment, lazy, Suspense } from "react";
 import SuccessOutlineButton from "../../../game/components/ui/buttons/success-outline-button";
-import GuideQuest from "./modals/guide-quest";
 import { viewPortWatcher } from "../../../game/lib/view-port-watcher";
+
+const GuideQuest = lazy(() => import("./modals/guide-quest"));
 import GuideQuestListenerDefinition from "./event-listeners/guide-quest-listener-definition";
 import { guideQuestServiceContainer } from "./container/guide-quest-container";
 import GuideQuestListener from "./event-listeners/guide-quest-listener";
@@ -102,12 +103,14 @@ export default class GuideButton extends React.Component<
                 </div>
 
                 {this.state.is_modal_open ? (
-                    <GuideQuest
-                        is_open={this.state.is_modal_open}
-                        manage_modal={this.manageGuideQuestModal}
-                        user_id={this.props.user_id}
-                        view_port={this.state.view_port}
-                    />
+                    <Suspense fallback={null}>
+                        <GuideQuest
+                            is_open={this.state.is_modal_open}
+                            manage_modal={this.manageGuideQuestModal}
+                            user_id={this.props.user_id}
+                            view_port={this.state.view_port}
+                        />
+                    </Suspense>
                 ) : null}
             </Fragment>
         );

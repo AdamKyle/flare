@@ -2,6 +2,7 @@
 
 namespace App\Game\Quests\Providers;
 
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Maps\Validation\CanTravelToMap;
 use App\Game\Maps\Values\MapTileValue;
@@ -48,7 +49,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(NpcQuestsHandler::class),
                 $app->make(CanTravelToMap::class),
                 $app->make(MapTileValue::class),
-                $app->make(BuildQuestCacheService::class)
+                $app->make(BuildQuestCacheService::class),
+                $app->make(BattleRewardProcessingQueueManager::class),
             );
         });
 

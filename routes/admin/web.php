@@ -8,6 +8,15 @@ Route::get('/game/npcs/{npc}', ['as' => 'game.npcs.show', 'uses' => 'NpcsControl
 
 Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
+    Route::get('/admin/character-reward-queue', [
+        'as' => 'admin.character-reward-queue',
+        'uses' => 'BattleRewardQueueController@index',
+    ]);
+
+    Route::get('/admin/monitoring/exploration', ['as' => 'admin.monitoring.exploration', 'uses' => 'MonitoringController@exploration']);
+    Route::get('/admin/monitoring/faction-loyalty', ['as' => 'admin.monitoring.faction-loyalty', 'uses' => 'MonitoringController@factionLoyalty']);
+    Route::get('/admin/monitoring/delve', ['as' => 'admin.monitoring.delve', 'uses' => 'MonitoringController@delve']);
+    Route::get('/admin/monitoring/logs', ['as' => 'admin.monitoring.logs', 'uses' => 'MonitoringController@logs']);
 
     Route::get('/admin/chat-logs', ['as' => 'admin.chat-logs', 'uses' => 'AdminController@chatLogs']);
 

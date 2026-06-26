@@ -2,6 +2,9 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Admin\Events\DelveMonitoringUpdated;
+use App\Game\Automation\Events\DelveStatusUpdated;
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
@@ -23,6 +26,8 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
 use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -161,6 +166,8 @@ class DelveExploration implements ShouldQueue
 
             $delveAutomation->update([
                 'completed_at' => now(),
+                'ended_reason' => DelveOutcome::TIMEOUT->value,
+                'panel_dismissed_at' => null,
             ]);
 
             $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
@@ -182,6 +189,8 @@ class DelveExploration implements ShouldQueue
 
         $delveAutomation->update([
             'completed_at' => now(),
+            'ended_reason' => 'fight_failed',
+            'panel_dismissed_at' => null,
         ]);
 
         event(new AutomationTimeOut($this->character->user, 0));
@@ -272,6 +281,7 @@ class DelveExploration implements ShouldQueue
         $packSize = $params['pack_size'];
 
         for ($i = 1; $i <= $packSize; $i++) {
+            $this->attempts = 0;
             $survived = $this->fightAutomationMonster($delveExploration, $params);
 
             if (!$survived) {
@@ -383,6 +393,8 @@ class DelveExploration implements ShouldQueue
 
             $delveExploration->update([
                 'completed_at' => now(),
+                'ended_reason' => DelveOutcome::DIED->value,
+                'panel_dismissed_at' => null,
             ]);
 
             CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE)->delete();
@@ -474,7 +486,11 @@ class DelveExploration implements ShouldQueue
 
             $delveExploration->update([
                 'completed_at' => now(),
+                'ended_reason' => 'natural_end',
+                'panel_dismissed_at' => null,
             ]);
+
+            event(new DelveStatusUpdated($this->character->user->id));
 
             $this->sendOutEventLogUpdate('You climb from the depths of the delve exploration, covered in blood, grime, dirt. Carrying the treasures you went searching for. Maybe now you have more answers about the darkness, or maybe you have more trauma.', true);
 
@@ -531,6 +547,8 @@ class DelveExploration implements ShouldQueue
         ]);
 
         $this->logCreated = true;
+        event(new DelveMonitoringUpdated($this->character->id));
+        event(new DelveStatusUpdated($this->character->user->id));
     }
 
     /**
@@ -646,4 +664,46 @@ class DelveExploration implements ShouldQueue
         event(new UpdateCharacterCurrenciesEvent($character->refresh()));
 
     }
+
+    // @codeCoverageIgnoreStart
+    public function failed(Throwable $throwable): void
+    {
+        $context = [
+            'character_id' => $this->character?->id,
+            'automation_id' => $this->automationId,
+            'delve_automation_id' => $this->delveAutomationId,
+            'exception_class' => $throwable::class,
+            'exception_message' => $throwable->getMessage(),
+        ];
+
+        Log::error('Delve exploration job failed.', $context);
+
+        (new MonitoredBugReportService)->reportError(
+            'delve-exploration',
+            $throwable->getMessage(),
+            ['character_id' => $this->character?->id, 'automation_id' => $this->automationId],
+            $throwable::class,
+            $this->character?->id,
+        );
+
+        $automation = CharacterAutomation::where('id', $this->automationId)->first();
+        $delveAutomation = DelveExplorationModel::where('id', $this->delveAutomationId)->first();
+
+        if (! is_null($delveAutomation) && is_null($delveAutomation->completed_at)) {
+            $delveAutomation->update([
+                'completed_at' => now(),
+                'ended_reason' => DelveOutcome::ERROR->value,
+                'panel_dismissed_at' => null,
+            ]);
+        }
+
+        if (! is_null($automation)) {
+            $automation->delete();
+        }
+
+        if (! is_null($this->character)) {
+            event(new DelveMonitoringUpdated($this->character->id));
+        }
+    }
+    // @codeCoverageIgnoreEnd
 }

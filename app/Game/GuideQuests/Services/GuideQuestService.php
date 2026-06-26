@@ -8,6 +8,9 @@ use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
@@ -22,8 +25,10 @@ class GuideQuestService
 
     private array $completedAttributes = [];
 
-    public function __construct(GuideQuestRequirementsService $guideQuestRequirementsService)
-    {
+    public function __construct(
+        GuideQuestRequirementsService $guideQuestRequirementsService,
+        private readonly BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
+    ) {
         $this->guideQuestRequirementsService = $guideQuestRequirementsService;
     }
 
@@ -72,6 +77,33 @@ class GuideQuestService
             return false;
         }
 
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $quest->id,
+        ]);
+
+        $this->battleRewardProcessingQueueManager->enqueue(
+            $character,
+            BattleRewardRequestPriority::FIRST,
+            BattleRewardRequestSourceType::GUIDE_QUEST,
+            implode(':', [
+                BattleRewardRequestSourceType::GUIDE_QUEST->value,
+                $character->id,
+                $quest->id,
+            ]),
+            [
+                'character_id' => $character->id,
+                'guide_quest_id' => $quest->id,
+            ],
+        );
+
+        event(new ShowGuideQuestCompletedToast($character->user, false));
+
+        return true;
+    }
+
+    public function processQueuedRewards(Character $character, GuideQuest $quest): void
+    {
         $gold = $character->gold + $quest->gold_reward;
         $goldDust = $character->gold_dust + $quest->gold_dust_reward;
         $shards = $character->shards + $quest->shards_reward;
@@ -96,11 +128,6 @@ class GuideQuestService
             'shards' => $shards,
         ]);
 
-        QuestsCompleted::create([
-            'character_id' => $character->id,
-            'guide_quest_id' => $quest->id,
-        ]);
-
         $character = $character->refresh();
 
         if ($quest->gold_reward > 0) {
@@ -116,10 +143,6 @@ class GuideQuestService
         }
 
         event(new UpdateTopBarEvent($character));
-
-        event(new ShowGuideQuestCompletedToast($character->user, false));
-
-        return true;
     }
 
     public function canHandInQuest(Character $character, GuideQuest $quest, bool $ignoreAutomation = false): bool

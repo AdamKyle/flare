@@ -69,7 +69,7 @@ class GuideQuestRequirementsService
      */
     public function requiredDelveSurvivalTime(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_delve_survival_time)) {
-            $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
+            $lastDelveExploration = DelveExploration::where('character_id', $character->id)->whereNotNull('completed_at')->orderBy('started_at', 'desc')->first();
 
             if (is_null($lastDelveExploration)) {
                 return $this;
@@ -85,19 +85,19 @@ class GuideQuestRequirementsService
 
     public function requiredDelvePackSize(Character $character, GuideQuest $quest): GuideQuestRequirementsService {
         if (!is_null($quest->required_delve_pack_size)) {
-            $lastDelveExploration = DelveExploration::where('character_id', $character->id)->orderBy('started_at', 'desc')->first();
-
-            if (is_null($lastDelveExploration->completed_at)) {
-                return $this;
-            }
-
-            $lasDelveLog = DelveLog::where('character_id', $character->id)->where('delve_exploration_id', $lastDelveExploration->id)->first();
+            $lastDelveExploration = DelveExploration::where('character_id', $character->id)->whereNotNull('completed_at')->orderBy('started_at', 'desc')->first();
 
             if (is_null($lastDelveExploration)) {
                 return $this;
             }
 
-            if ($lasDelveLog->pack_size >= $quest->required_delve_pack_size) {
+            $lastDelveLog = DelveLog::where('character_id', $character->id)->where('delve_exploration_id', $lastDelveExploration->id)->latest()->first();
+
+            if (is_null($lastDelveLog)) {
+                return $this;
+            }
+
+            if ($lastDelveLog->pack_size >= $quest->required_delve_pack_size) {
                 $this->finishedRequirements[] = 'required_delve_pack_size';
             }
         }
@@ -117,7 +117,7 @@ class GuideQuestRequirementsService
 
             $attribute = $primary ? 'required_skill_level' : 'required_secondary_skill_level';
 
-            if ($requiredSkill->level >= $quest->{$attribute}) {
+            if (! is_null($requiredSkill) && $requiredSkill->level >= $quest->{$attribute}) {
                 $this->finishedRequirements[] = $attribute;
             }
         }
@@ -161,7 +161,7 @@ class GuideQuestRequirementsService
         if (! is_null($quest->required_faction_id)) {
             $faction = $character->factions()->where('game_map_id', $quest->required_faction_id)->first();
 
-            if ($faction->current_level >= $quest->required_faction_level) {
+            if (! is_null($faction) && $faction->current_level >= $quest->required_faction_level) {
                 $this->finishedRequirements[] = 'required_faction_level';
             }
         }
@@ -403,7 +403,7 @@ class GuideQuestRequirementsService
         if (! is_null($quest->required_passive_skill) && ! is_null($quest->required_passive_level)) {
             $requiredSkill = $character->passiveSkills()->where('passive_skill_id', $quest->required_passive_skill)->first();
 
-            if ($requiredSkill->current_level >= $quest->required_passive_level) {
+            if (! is_null($requiredSkill) && $requiredSkill->current_level >= $quest->required_passive_level) {
                 $this->finishedRequirements[] = 'required_passive_level';
             }
         }

@@ -10,7 +10,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Core\Services\CharacterRewardLockService;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -37,16 +36,13 @@ class HandInQuest implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(NpcQuestsHandler $npcQuestsHandler, CharacterRewardLockService $characterRewardLockService): void
+    public function handle(NpcQuestsHandler $npcQuestsHandler): void
     {
-
         try {
-            $characterRewardLockService->run($this->character->id, function () use ($npcQuestsHandler): void {
-                $npcQuestsHandler->handleNpcQuest($this->character, $this->quest);
-                $npcQuestsHandler->questRewardHandler()->createquestQuestLog($this->character, $this->quest);
-                event(new GlobalMessageEvent($this->character->name . ' Has completed a quest (' . $this->quest->name . ') for: ' . $this->quest->npc->real_name . ' and been rewarded with a godly gift!'));
-                $npcQuestsHandler->questRewardHandler()->processXpReward($this->quest, $this->character->refresh());
-            });
+            $npcQuestsHandler->handleNpcQuest($this->character, $this->quest);
+            $npcQuestsHandler->questRewardHandler()->createquestQuestLog($this->character, $this->quest);
+            event(new GlobalMessageEvent($this->character->name . ' Has completed a quest (' . $this->quest->name . ') for: ' . $this->quest->npc->real_name . ' and been rewarded with a godly gift!'));
+            $npcQuestsHandler->questRewardHandler()->processXpReward($this->quest, $this->character->refresh());
         } catch (Exception $e) {
             Log::error($e->getMessage());
 

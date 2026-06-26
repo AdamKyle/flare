@@ -111,10 +111,7 @@ export default class SmallActionsManager {
 
         const options: SelectedData[] = [];
 
-        if (
-            !props.character.is_faction_loyalty_automation_running &&
-            !props.character.is_delve_running
-        ) {
+        if (!props.character.is_faction_loyalty_automation_running) {
             options.push({
                 label: this.explorationLabel(),
                 value: "explore",

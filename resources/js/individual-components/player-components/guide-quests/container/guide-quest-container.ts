@@ -1,6 +1,5 @@
 import { container, InjectionToken } from "tsyringe";
 import GuideQuestListener from "../event-listeners/guide-quest-listener";
-import ShopAjax from "../../shop/ajax/shop-ajax";
 import GuideQuestAjax from "../ajax/guide-quest-ajax";
 import CompletedGuideQuestListener from "../event-listeners/completed-guide-quest-listener";
 

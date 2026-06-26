@@ -29,8 +29,12 @@ class NpcQuestsHandler
 
     public function handleNpcQuest(Character $character, Quest $quest): void
     {
-        $npc = $quest->npc;
+        $this->consumeQuestRequirements($character, $quest);
+        $this->npcQuestRewardHandler->processNonXpRewards($quest, $quest->npc, $character);
+    }
 
+    public function consumeQuestRequirements(Character $character, Quest $quest): void
+    {
         $giveRewards = false;
 
         if ($this->questRequiresItem($quest)) {
@@ -83,8 +87,6 @@ class NpcQuestsHandler
         }
 
         if ($giveRewards) {
-            $this->npcQuestRewardHandler->processNonXpRewards($quest, $npc, $character);
-
             return;
         }
 

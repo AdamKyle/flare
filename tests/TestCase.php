@@ -37,6 +37,9 @@ abstract class TestCase extends BaseTestCase
             'queue.connections.event_battle_reward' => [
                 'driver' => 'sync',
             ],
+            'queue.connections.battle_reward_processing' => [
+                'driver' => 'sync',
+            ],
             'queue.connections.battle_reward_factions' => [
                 'driver' => 'sync',
             ],

@@ -2,12 +2,16 @@
 
 namespace Tests\Unit\Flare\Services;
 
+use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -694,5 +698,74 @@ class CharacterXPServiceTest extends TestCase
         $characterService->levelUpCharacter($character->refresh(), 0);
 
         $this->assertEquals(243600, $character->refresh()->xp_next);
+    }
+
+    public function testHeartbeatCallbackIsInvokedMultipleTimesForMultipleLevelUps(): void
+    {
+        $character = $this->character->getCharacter();
+        $xpNext = $character->xp_next;
+        $callCount = 0;
+        $callback = function () use (&$callCount): void {
+            $callCount++;
+        };
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($xpNext * 5 + 50);
+
+        $this->assertGreaterThan(1, $callCount);
+    }
+
+    public function testLevelUpResultIsUnchangedByHeartbeatCallback(): void
+    {
+        $character = $this->character->getCharacter();
+        $xpNext = $character->xp_next;
+        $callback = function (): void {};
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($xpNext + 50);
+
+        $result = $this->characterXPService->getCharacter();
+
+        $this->assertEquals(50, $result->xp);
+        $this->assertGreaterThan(1, $result->level);
+    }
+
+    public function testServerMessagesAreStillEmittedDuringLevelUpsWithHeartbeatCallback(): void
+    {
+        Event::fake();
+        $character = $this->character->getCharacter();
+        $xpNext = $character->xp_next;
+        $callback = function (): void {};
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($xpNext + 50);
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function testActiveProcessorHeartbeatIsRefreshedDuringXpDistributionWithCallback(): void
+    {
+        Event::fake();
+        $character = $this->character->getCharacter();
+        $state = CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        $queueManager = resolve(BattleRewardProcessingQueueManager::class);
+        $callback = fn() => $queueManager->updateHeartbeat($character->id);
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($character->xp_next * 5 + 50);
+
+        $this->assertTrue($state->refresh()->heartbeat_at->isAfter(now()->subSeconds(5)));
     }
 }

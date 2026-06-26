@@ -10,7 +10,6 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Events\Services\EventGoalsService;
-use App\Game\Core\Services\CharacterRewardLockService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -141,7 +140,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UpdateCraftingTasksForFactionLoyalty(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
-                $app->make(CharacterRewardLockService::class),
             );
         });
 

@@ -14,6 +14,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
@@ -55,6 +56,8 @@ class DelveExplorationAutomationService
             'character_id' => $character->id,
             'monster_id' => $monsterId,
             'started_at' => now(),
+            'ended_reason' => null,
+            'panel_dismissed_at' => null,
             'attack_type' => $params['attack_type'],
         ]);
 
@@ -65,6 +68,8 @@ class DelveExplorationAutomationService
         event(new AutomationLogUpdate($character->user->id, 'The Delve will begin in '.$location->minutes_between_delve_fights.' minutes. every three minutes you will fight ' . $params['pack_size'] . ' enemy(ies). You will fight a new pack of or creature every 3 minutes (randomly chosen beast). A pack is always made up of the same creature.'));
 
         event(new AutomationTimeOut($character->user, now()->diffInSeconds($automation->completed_at)));
+
+        event(new DelveStatusUpdated($character->user->id));
 
         $this->startAutomation($character, $location, $automation->id, $delveExploration->id, $params);
     }
@@ -81,6 +86,8 @@ class DelveExplorationAutomationService
 
         DelveExploration::where('character_id', $character->id)->whereNull('completed_at')->first()->update([
             'completed_at' => now(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
         ]);
 
         $this->characterCacheData->deleteCharacterSheet($character);
@@ -93,6 +100,7 @@ class DelveExplorationAutomationService
         event(new AutomationStatus($character->user, false));
         event(new UpdateCharacterStatus($character));
         event(new AutomationLogUpdate($character->user->id, 'Delve has been stopped at player request.'));
+        event(new DelveStatusUpdated($character->user->id));
     }
 
     public function setTimeDelay(Location $location): void

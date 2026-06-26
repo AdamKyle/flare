@@ -18,6 +18,7 @@ import GamblingSection from "./components/gambling-section";
 import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
 import Shop from "./components/specialty-shops/shop";
+import DelveStatusPanel from "./components/delve-status-panel";
 import ActionsProps from "./types/actions-props";
 import ActionsState from "./types/actions-state";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
@@ -483,10 +484,7 @@ export default class Actions extends React.Component<
                             : "Exploration"
                     }
                     on_click={this.manageExploration.bind(this)}
-                    disabled={
-                        this.isFactionLoyaltyAutomationRunning() ||
-                        this.isDelveRunning()
-                    }
+                    disabled={this.isFactionLoyaltyAutomationRunning()}
                     additional_css={"w-full"}
                 />
                 <SuccessOutlineButton
@@ -565,6 +563,20 @@ export default class Actions extends React.Component<
     renderActionContent() {
         const celestialFight = this.renderCelestialFight();
         const actionSlot = this.renderActionSlot();
+        const automationPanel = !this.state.show_exploration ? (
+            <div className="grid gap-4">
+                <ExplorationOutputSection
+                    character_id={this.props.character.id}
+                    exploration_output={this.props.exploration_output}
+                />
+                {this.isDelveRunning() ? (
+                    <DelveStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+                ) : null}
+            </div>
+        ) : null;
         let fightContent = null;
 
         if (this.state.show_exploration) {
@@ -588,6 +600,7 @@ export default class Actions extends React.Component<
         return (
             <div className="grid gap-4">
                 {fightContent}
+                {automationPanel}
                 {this.state.show_gambling_section ? (
                     <div className="mx-auto w-full md:w-2/3">
                         <GamblingSection
@@ -599,18 +612,12 @@ export default class Actions extends React.Component<
                         />
                     </div>
                 ) : null}
-                {!this.state.show_exploration ? (
-                    <ExplorationOutputSection
-                        character_id={this.props.character.id}
-                        exploration_output={this.props.exploration_output}
-                    />
-                ) : null}
             </div>
         );
     }
 
     renderExploration() {
-        if (this.isFactionLoyaltyAutomationRunning() || this.isDelveRunning()) {
+        if (this.isFactionLoyaltyAutomationRunning()) {
             return (
                 <div className="mx-auto w-full md:w-2/3">
                     {this.renderAutomationBlockedNotice()}

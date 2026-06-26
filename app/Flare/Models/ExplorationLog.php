@@ -20,6 +20,7 @@ class ExplorationLog extends Model
         'starting_level',
         'started_at',
         'ended_at',
+        'panel_dismissed_at',
         'stopped_reason',
         'stopped_by_player',
         'fights',
@@ -36,6 +37,7 @@ class ExplorationLog extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
+        'panel_dismissed_at' => 'datetime',
         'stopped_by_player' => 'boolean',
         'starting_level' => 'integer',
         'fights' => 'integer',

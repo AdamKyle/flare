@@ -8,38 +8,32 @@ use App\Game\Core\Values\FeedbackType;
 class FeedbackService {
 
     public function gatherFeedbackData(): array {
-        $today = now()->startOfDay();
-        $yesterday = now()->subDay()->startOfDay();
-
         $totalBugCount = SuggestionAndBugs::where('type', FeedbackType::BUG)->count();
         $totalSuggestionCount = SuggestionAndBugs::where('type', FeedbackType::SUGGESTION)->count();
+        $periodStart = now()->subDays(7);
 
-        $bugsCountToday = SuggestionAndBugs::where('type', FeedbackType::BUG)->where('created_at', '>=', $today)->count();
-        $bugsCountYesterday = SuggestionAndBugs::where('type', FeedbackType::BUG)->where('created_at', '>=', $yesterday)->where('created_at', '<', $today)->count();
-
-        $suggestionCountToday = SuggestionAndBugs::where('type', FeedbackType::SUGGESTION)->where('created_at', '>=', $today)->count();
-        $suggestionCountYesterday = SuggestionAndBugs::where('type', FeedbackType::SUGGESTION)->where('created_at', '>=', $yesterday)->where('created_at', '<', $today)->count();
-
-        $bugsDifference = $this->calculatePercentageDifference($bugsCountToday, $bugsCountYesterday);
-        $suggestionDifference = $this->calculatePercentageDifference($suggestionCountToday, $suggestionCountYesterday);
-
+        $bugsInPeriod = SuggestionAndBugs::where('type', FeedbackType::BUG)
+            ->where('created_at', '>=', $periodStart)
+            ->count();
+        $suggestionsInPeriod = SuggestionAndBugs::where('type', FeedbackType::SUGGESTION)
+            ->where('created_at', '>=', $periodStart)
+            ->count();
+        $periodTotal = $bugsInPeriod + $suggestionsInPeriod;
 
         return [
             'bugsCount' => $totalBugCount,
-            'bugsDifference' => abs($bugsDifference),
+            'bugsPercentage' => $this->calculateShare($bugsInPeriod, $periodTotal),
             'suggestionCount' => $totalSuggestionCount,
-            'suggestionDifference' => abs($suggestionDifference),
+            'suggestionPercentage' => $this->calculateShare($suggestionsInPeriod, $periodTotal),
         ];
     }
 
-    private function calculatePercentageDifference(int $countToday, int $countYesterday): float {
-        if ($countYesterday === 0) {
-            return $countToday > 0 ? ($countToday / 100) : 0.0;
+    private function calculateShare(int $count, int $total): float
+    {
+        if ($total === 0) {
+            return 0.0;
         }
 
-        $difference = $countToday - $countYesterday;
-        $percentageDifference = ($difference / $countYesterday) * 100;
-
-        return $percentageDifference;
+        return round(($count / $total) * 100, 2);
     }
 }

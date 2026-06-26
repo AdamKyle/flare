@@ -20,6 +20,7 @@ class ExplorationLogFactory extends Factory
             'starting_level' => null,
             'started_at' => now(),
             'ended_at' => null,
+            'panel_dismissed_at' => null,
             'stopped_reason' => null,
             'stopped_by_player' => false,
             'fights' => 0,

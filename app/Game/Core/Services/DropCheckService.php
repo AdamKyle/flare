@@ -87,6 +87,118 @@ class DropCheckService
         return $this->battleDrop->rewardTotals();
     }
 
+    public function planDrops(Character $character, Monster $monster, int $killCount = 1, ?float $lootingChance = null): array
+    {
+        $this->gameMapBonus = 0.0;
+        $this->lootingChance = $lootingChance ?? $character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+        $this->monster = $monster;
+
+        $characterMap = $character->map;
+        $gameMap = $characterMap->gameMap;
+
+        if (! is_null($gameMap->drop_chance_bonus)) {
+            $this->gameMapBonus = $gameMap->drop_chance_bonus;
+        }
+
+        $this->findLocationWithEffect($characterMap);
+
+        $this->battleDrop = $this->battleDrop->setMonster($this->monster)
+            ->setSpecialLocation($this->locationWithEffect)
+            ->setGameMapBonus($this->gameMapBonus)
+            ->setLootingChance($this->lootingChance)
+            ->resetRewardTotals();
+
+        $plannedDrops = [];
+
+        for ($killIndex = 0; $killIndex < $killCount; $killIndex++) {
+            $normalDrop = $this->battleDrop->handleDrop($character, $this->canHaveDrop($character), true);
+
+            if (! is_null($normalDrop)) {
+                $plannedDrops[] = [
+                    'item_id' => $normalDrop->id,
+                    'is_mythic' => false,
+                    'source' => 'monster_drop',
+                ];
+            }
+
+            $monsterQuestDrop = $this->battleDrop->handleMonsterQuestDrop($character, true);
+
+            if (! is_null($monsterQuestDrop)) {
+                $plannedDrops[] = [
+                    'item_id' => $monsterQuestDrop->id,
+                    'is_mythic' => false,
+                    'source' => 'monster_quest_drop',
+                ];
+            }
+
+            $delveQuestDrop = $this->battleDrop->planDelveLocationQuestItem($character);
+
+            if (! is_null($delveQuestDrop)) {
+                $plannedDrops[] = [
+                    'item_id' => $delveQuestDrop->id,
+                    'is_mythic' => false,
+                    'source' => 'delve_location_quest_drop',
+                ];
+            }
+
+            if (! is_null($this->locationWithEffect)) {
+                $specialLocationQuestDrop = $this->battleDrop->planSpecialLocationQuestItem($character);
+
+                if (! is_null($specialLocationQuestDrop)) {
+                    $plannedDrops[] = [
+                        'item_id' => $specialLocationQuestDrop->id,
+                        'is_mythic' => false,
+                        'source' => 'special_location_quest_drop',
+                    ];
+                }
+            }
+        }
+
+        if ($monster->celestial_type === CelestialType::KING_CELESTIAL && $this->canHaveMythic(true)) {
+            $plannedDrops[] = [
+                'item_id' => $this->buildMythicItem->fetchMythicItem($character)->id,
+                'is_mythic' => true,
+                'source' => 'king_celestial_mythic',
+            ];
+        }
+
+        if (! is_null($this->locationWithEffect) && ! is_null($this->locationWithEffect->type)) {
+            $locationType = new LocationType($this->locationWithEffect->type);
+
+            if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty() && $this->canHaveMythic()) {
+                $plannedDrops[] = [
+                    'item_id' => $this->buildMythicItem->fetchMythicItem($character)->id,
+                    'is_mythic' => true,
+                    'source' => 'purgatory_dungeon_mythic',
+                ];
+            }
+        }
+
+        return [
+            'kill_count' => $killCount,
+            'looting_chance' => $this->lootingChance,
+            'game_map_bonus' => $this->gameMapBonus,
+            'location_with_effect_id' => $this->locationWithEffect?->id,
+            'drops' => $plannedDrops,
+        ];
+    }
+
+    public function applyPlannedDrops(Character $character, Monster $monster, array $plan): array
+    {
+        $this->monster = $monster;
+        $this->battleDrop = $this->battleDrop->setMonster($monster)
+            ->setSpecialLocation(null)
+            ->setGameMapBonus((float) ($plan['game_map_bonus'] ?? 0.0))
+            ->setLootingChance((float) ($plan['looting_chance'] ?? 0.0))
+            ->resetRewardTotals();
+
+        foreach ($plan['drops'] ?? [] as $drop) {
+            $this->battleDrop->applyPlannedItem($character, (int) $drop['item_id'], (bool) ($drop['is_mythic'] ?? false));
+        }
+
+        return $this->battleDrop->rewardTotals();
+    }
+
     /**
      * See if the player can have a mythic drop.
      *

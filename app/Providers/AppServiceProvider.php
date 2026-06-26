@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
+use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
 use App\Console\AfterDeployment\CreateLocationDataCache;
@@ -11,6 +12,7 @@ use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\MoveAlchemyAndGemsToBags;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\AfterDeployment\RepairStuckExplorationLogs;
+use App\Console\AfterDeployment\ResumeInterruptedRewardProcessing;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -42,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
         $this->commands([
             // After Deployment Commands
             AddHolyStacksToItems::class,
+            BackfillCompletedPanelDismissals::class,
             AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
@@ -50,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
             MoveAlchemyAndGemsToBags::class,
             RepairQuestFeatureRewards::class,
             RepairStuckExplorationLogs::class,
+            ResumeInterruptedRewardProcessing::class,
 
             // Development Commands:
             CreateCharacter::class,

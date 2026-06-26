@@ -80,6 +80,90 @@ class CharacterCurrencyRewardService
         return $this->earnedCurrencies;
     }
 
+    public function planCurrencies(Monster $monster, int $killCount = 1): array
+    {
+        $goldToReward = $monster->gold * $killCount;
+        $copperCoins = 0;
+        $eventShards = 0;
+        $eventGoldDust = 0;
+        $eventCopperCoins = 0;
+
+        $copperCoinsItem = ItemModel::where('effect', ItemEffectsValue::GET_COPPER_COINS)->first();
+        $mercenarySlotBonusItem = ItemModel::where('effect', ItemEffectsValue::MERCENARY_SLOT_BONUS)->first();
+        $gameMap = GameMap::find($monster->game_map_id);
+
+        if (! is_null($copperCoinsItem) && $gameMap->mapType()->isPurgatory()) {
+            $inventory = Inventory::where('character_id', $this->character->id)->first();
+            $copperCoinSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $copperCoinsItem->id)->first();
+            $mercenaryQuestSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $mercenarySlotBonusItem?->id)->first();
+
+            if (! is_null($copperCoinSlot)) {
+                $copperCoins = rand(5, 20) * $killCount;
+                $purgatoryDungeons = $this->purgatoryDungeons($this->character->map);
+
+                if (! is_null($purgatoryDungeons)) {
+                    $copperCoins *= 1.5;
+                }
+
+                if (! is_null($mercenaryQuestSlot)) {
+                    $copperCoins = $copperCoins + $copperCoins * 0.5;
+                }
+            }
+        }
+
+        $event = ScheduledEvent::where('event_type', EventType::WEEKLY_CURRENCY_DROPS)->where('currently_running', true)->first();
+        $canHaveEventCopperCoins = false;
+
+        if (! is_null($event) && ! $monster->is_celestial_entity) {
+            $canHaveEventCopperCoins = $this->character->inventory->slots->filter(function ($slot) {
+                return $slot->item->effect === ItemEffectsValue::GET_COPPER_COINS;
+            })->isNotEmpty();
+
+            $eventShards = rand(1, 375) * $killCount;
+            $eventGoldDust = rand(1, 375) * $killCount;
+
+            if ($canHaveEventCopperCoins) {
+                $eventCopperCoins = rand(1, 115) * $killCount;
+            }
+        }
+
+        return [
+            'kill_count' => $killCount,
+            'gold' => $goldToReward,
+            'copper_coins' => $copperCoins,
+            'event' => [
+                'active' => ! is_null($event) && ! $monster->is_celestial_entity,
+                'shards' => $eventShards,
+                'gold_dust' => $eventGoldDust,
+                'copper_coins' => $eventCopperCoins,
+                'can_have_copper_coins' => $canHaveEventCopperCoins,
+            ],
+        ];
+    }
+
+    public function applyPlannedCurrencies(array $plan): array
+    {
+        $this->earnedCurrencies = [
+            'gold' => 0,
+            'gold_dust' => 0,
+            'shards' => 0,
+            'copper_coins' => 0,
+        ];
+
+        $this->applyGold((int) ($plan['gold'] ?? 0));
+        $this->applyCopperCoins((int) ($plan['copper_coins'] ?? 0));
+
+        if (($plan['event']['active'] ?? false) === true) {
+            $this->applyEventCurrencies($plan['event']);
+        }
+
+        if ($this->character->isLoggedIn()) {
+            event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
+        }
+
+        return $this->earnedCurrencies;
+    }
+
     /**
      * Handles Currency Event Rewards when the event is running.
      *
@@ -172,6 +256,15 @@ class CharacterCurrencyRewardService
     private function distributeGold(Monster $monster, int $killCount): void
     {
         $goldToReward = $monster->gold * $killCount;
+        $this->applyGold($goldToReward);
+    }
+
+    private function applyGold(int $goldToReward): void
+    {
+        if ($goldToReward <= 0) {
+            return;
+        }
+
         $this->earnedCurrencies['gold'] += $goldToReward;
 
         $newGold = $this->character->gold + $goldToReward;
@@ -239,6 +332,71 @@ class CharacterCurrencyRewardService
 
                 $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $coins, $newCoins);
             }
+        }
+    }
+
+    private function applyCopperCoins(int $coins): void
+    {
+        if ($coins <= 0) {
+            return;
+        }
+
+        $this->earnedCurrencies['copper_coins'] += $coins;
+        $newCoins = $this->character->copper_coins + $coins;
+
+        if ($newCoins >= MaxCurrenciesValue::MAX_COPPER) {
+            $newCoins = MaxCurrenciesValue::MAX_COPPER;
+        }
+
+        $this->character->update(['copper_coins' => $newCoins]);
+        $this->character = $this->character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $coins, $newCoins);
+    }
+
+    private function applyEventCurrencies(array $eventPlan): void
+    {
+        $shards = (int) ($eventPlan['shards'] ?? 0);
+        $goldDust = (int) ($eventPlan['gold_dust'] ?? 0);
+        $copperCoins = (int) ($eventPlan['copper_coins'] ?? 0);
+
+        $this->earnedCurrencies['shards'] += $shards;
+        $this->earnedCurrencies['gold_dust'] += $goldDust;
+
+        $characterShards = $this->character->shards + $shards;
+        $characterGoldDust = $this->character->gold_dust + $goldDust;
+        $characterCopperCoins = $this->character->copper_coins + $copperCoins;
+
+        if ($characterShards > MaxCurrenciesValue::MAX_SHARDS) {
+            $characterShards = MaxCurrenciesValue::MAX_SHARDS;
+        }
+
+        if ($characterCopperCoins > MaxCurrenciesValue::MAX_COPPER) {
+            $characterCopperCoins = MaxCurrenciesValue::MAX_COPPER;
+        }
+
+        if ($characterGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
+            $characterGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        }
+
+        $this->character->update([
+            'shards' => $characterShards,
+            'copper_coins' => $characterCopperCoins,
+            'gold_dust' => $characterGoldDust,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDust, $characterGoldDust);
+        $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::SHARDS, $shards, $characterShards);
+
+        if (($eventPlan['can_have_copper_coins'] ?? false) && $copperCoins > 0) {
+            $this->earnedCurrencies['copper_coins'] += $copperCoins;
+            $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $copperCoins, $characterCopperCoins);
+        }
+
+        if (! $this->character->is_auto_battling) {
+            event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
         }
     }
 

@@ -1,12 +1,9 @@
 import Listener from "../../../../game/lib/game/event-listeners/listener";
-import GuideButton from "../guide-button";
-import Game from "../../../../game/game";
+
+export interface GuideQuestCompletedHandler {
+    setState(state: { show_guide_quest_completed: boolean }): void;
+}
 
 export default interface GuideQuestListenerDefinition extends Listener {
-    /**
-     *
-     * @param component
-     * @param userId
-     */
-    initialize: (component: Game | GuideButton, userId: number) => void;
+    initialize: (component: GuideQuestCompletedHandler, userId: number) => void;
 }

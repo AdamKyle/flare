@@ -35,6 +35,8 @@ class MassImportCustomData extends Command
     {
         // Artisan::call('import:game-data "World Gems"');
 
+        Artisan::call('backfill:completed-panel-dismissals --apply');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

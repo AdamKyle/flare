@@ -35,7 +35,7 @@ class CharacterStatBuilder
 
     private Collection $skills;
 
-    private GameMap $map;
+    private ?GameMap $map = null;
 
     private DefenceBuilder $defenceBuilder;
 
@@ -84,7 +84,7 @@ class CharacterStatBuilder
 
         $this->characterBoons = $this->fetchCharacterBoons($character);
 
-        $this->map = $this->character->map->gameMap;
+        $this->map = $this->character->map?->gameMap;
 
         $this->skills = $this->character->skills;
 
@@ -214,6 +214,10 @@ class CharacterStatBuilder
     protected function getMapCharacterReductions(): float
     {
         if ($this->ignoreReductions) {
+            return 0;
+        }
+
+        if (is_null($this->map)) {
             return 0;
         }
 
@@ -634,7 +638,7 @@ class CharacterStatBuilder
         }
 
         if (empty($this->equippedItems)) {
-            if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            if ($this->character->map?->gameMap?->mapType()->isPurgatory()) {
                 if ($itemDevouring >= 0.45) {
                     $itemDevouring -= 0.45;
                 }
@@ -649,7 +653,7 @@ class CharacterStatBuilder
         $bestAffixDevouring = max(array_merge($prefixDevouring, $suffixDevouring));
         $amount = $itemDevouring + $bestAffixDevouring;
 
-        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+        if ($this->character->map?->gameMap?->mapType()->isPurgatory()) {
             if ($amount >= 0.45) {
                 $amount -= 0.45;
             }
@@ -682,7 +686,7 @@ class CharacterStatBuilder
 
         // Handle map type restrictions
         if ($chance > 0) {
-            if (($this->character->map->gameMap->mapType()->isPurgatory() || $this->character->map->gameMap->mapType()->isTwistedMemories()) && $chance > 0.45) {
+            if (($this->character->map?->gameMap?->mapType()->isPurgatory() || $this->character->map?->gameMap?->mapType()->isTwistedMemories()) && $chance > 0.45) {
                 if ($this->character->classType()->isProphet()) {
                     return min($chance, 0.65);
                 } else {

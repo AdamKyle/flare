@@ -23,4 +23,11 @@ class ExplorationWarningController
 
         return response()->json($this->explorationLogService->outputForCharacter($character));
     }
+
+    public function dismissEnded(Character $character): JsonResponse
+    {
+        $this->explorationLogService->dismissEndedLog($character);
+
+        return response()->json($this->explorationLogService->outputForCharacter($character));
+    }
 }

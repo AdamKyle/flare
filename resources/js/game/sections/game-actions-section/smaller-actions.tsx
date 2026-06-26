@@ -19,6 +19,7 @@ import DangerOutlineButton from "../../components/ui/buttons/danger-outline-butt
 import Ajax from "../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
+import DelveStatusPanel from "./components/delve-status-panel";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -425,7 +426,7 @@ export default class SmallerActions extends React.Component<
     }
 
     renderExploration() {
-        if (this.isFactionLoyaltyAutomationRunning() || this.isDelveRunning()) {
+        if (this.isFactionLoyaltyAutomationRunning()) {
             return this.renderAutomationBlockedNotice(false);
         }
 
@@ -517,12 +518,41 @@ export default class SmallerActions extends React.Component<
         }
     }
 
+    renderAutomationPanels() {
+        if (this.state.selected_action === "explore") {
+            return null;
+        }
+
+        return (
+            <Fragment>
+                <ExplorationOutputSection
+                    character_id={this.props.character.id}
+                    exploration_output={this.props.exploration_output}
+                />
+                {this.isDelveRunning() ? (
+                    <div className="mt-3">
+                        <DelveStatusPanel
+                            character_id={this.props.character.id}
+                            user_id={this.props.character.user_id}
+                        />
+                    </div>
+                ) : null}
+            </Fragment>
+        );
+    }
+
     render() {
         return (
             <Fragment>
                 {this.state.selected_action !== null ? (
                     <>
+                        {this.state.selected_action === "slots"
+                            ? this.renderAutomationPanels()
+                            : null}
                         {this.buildSection()}
+                        {this.state.selected_action !== "slots"
+                            ? this.renderAutomationPanels()
+                            : null}
                         <div className="mt-8 mb-4">
                             <Revive
                                 can_attack={
@@ -559,12 +589,9 @@ export default class SmallerActions extends React.Component<
                     </Fragment>
                 )}
 
-                {this.state.selected_action !== "explore" ? (
-                    <ExplorationOutputSection
-                        character_id={this.props.character.id}
-                        exploration_output={this.props.exploration_output}
-                    />
-                ) : null}
+                {this.state.selected_action === null
+                    ? this.renderAutomationPanels()
+                    : null}
 
                 <div className="mt-4 mb-4">
                     <div className="relative bottom-4">

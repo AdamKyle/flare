@@ -19,3 +19,19 @@ Broadcast::channel('refresh-messages-{userId}', function ($user, $userId) {
 Broadcast::channel('update-admin-site-statistics-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
+
+Broadcast::channel('admin-character-reward-queue', function ($user) {
+    return $user->hasRole('Admin');
+});
+
+Broadcast::channel('admin-monitoring-exploration', function ($user) {
+    return $user->hasRole('Admin');
+});
+
+Broadcast::channel('admin-monitoring-faction-loyalty', function ($user) {
+    return $user->hasRole('Admin');
+});
+
+Broadcast::channel('admin-monitoring-delve', function ($user) {
+    return $user->hasRole('Admin');
+});

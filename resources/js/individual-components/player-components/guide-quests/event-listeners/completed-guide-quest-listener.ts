@@ -1,15 +1,15 @@
 import { inject, injectable } from "tsyringe";
 import { Channel } from "laravel-echo";
 import CoreEventListener from "../../../../game/lib/game/event-listeners/core-event-listener";
-import GuideButton from "../guide-button";
-import GuideQuestListenerDefinition from "./guide-quest-listener-definition";
-import Game from "../../../../game/game";
+import GuideQuestListenerDefinition, {
+    GuideQuestCompletedHandler,
+} from "./guide-quest-listener-definition";
 
 @injectable()
 export default class CompletedGuideQuestListener
     implements GuideQuestListenerDefinition
 {
-    private component?: Game | GuideButton;
+    private component?: GuideQuestCompletedHandler;
     private userId?: number;
 
     private guideQuestCompleted?: Channel;
@@ -18,7 +18,7 @@ export default class CompletedGuideQuestListener
         @inject(CoreEventListener) private coreEventListener: CoreEventListener,
     ) {}
 
-    initialize(component: Game | GuideButton, userId: number): void {
+    initialize(component: GuideQuestCompletedHandler, userId: number): void {
         this.component = component;
         this.userId = userId;
     }
@@ -41,11 +41,6 @@ export default class CompletedGuideQuestListener
         this.listForGuideQuestToasts();
     }
 
-    /**
-     * Listen for when the guide quest toast should fire.
-     *
-     * @protected
-     */
     protected listForGuideQuestToasts() {
         if (!this.guideQuestCompleted) {
             return;
@@ -58,17 +53,9 @@ export default class CompletedGuideQuestListener
                     return;
                 }
 
-                if (this.component instanceof Game) {
-                    this.component.setState({
-                        show_guide_quest_completed: event.showQuestCompleted,
-                    });
-                }
-
-                if (this.component instanceof GuideButton) {
-                    this.component.setState({
-                        show_guide_quest_completed: event.showQuestCompleted,
-                    });
-                }
+                this.component.setState({
+                    show_guide_quest_completed: event.showQuestCompleted,
+                });
             },
         );
     }
