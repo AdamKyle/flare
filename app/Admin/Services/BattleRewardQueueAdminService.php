@@ -144,11 +144,26 @@ class BattleRewardQueueAdminService
 
     public function staleQueues(): array
     {
-        return CharacterBattleRewardQueueState::query()
+        return $this->processingQueueRows(onlyStale: true);
+    }
+
+    public function interruptedQueues(): array
+    {
+        return $this->processingQueueRows(onlyStale: false);
+    }
+
+    private function processingQueueRows(bool $onlyStale): array
+    {
+        $query = CharacterBattleRewardQueueState::query()
             ->with('character:id,name')
-            ->stale($this->queueManager->staleCutoff())
-            ->orderBy('heartbeat_at')
-            ->get()
+            ->where('is_processing', true)
+            ->orderBy('heartbeat_at');
+
+        if ($onlyStale) {
+            $query->stale($this->queueManager->staleCutoff());
+        }
+
+        return $query->get()
             ->map(function (CharacterBattleRewardQueueState $state): array {
                 $requests = CharacterBattleRewardRequest::forCharacter($state->character_id)
                     ->queued()
@@ -172,11 +187,16 @@ class BattleRewardQueueAdminService
                         'updated_at',
                     ]);
 
+                $processingRequest = $requests->first(fn (CharacterBattleRewardRequest $request): bool => $request->status === BattleRewardRequestStatus::PROCESSING);
                 $currentRequest = $requests->first(fn (CharacterBattleRewardRequest $request): bool => in_array($request->status, [
                     BattleRewardRequestStatus::PROCESSING,
                     BattleRewardRequestStatus::RESUMABLE,
                 ], true));
                 $currentStep = $currentRequest?->steps->first(fn ($step): bool => $step->status !== BattleRewardStepStatus::COMPLETED);
+
+                $isLocked = $this->queueManager->isProcessorLocked($state->character_id);
+                $processingCount = CharacterBattleRewardRequest::forCharacter($state->character_id)->processing()->count();
+                $isRecoverable = $processingCount > 0 && ! $isLocked;
 
                 return [
                     'character_id' => $state->character_id,
@@ -184,11 +204,16 @@ class BattleRewardQueueAdminService
                     'queue_state_id' => $state->id,
                     'started_at' => $state->started_at,
                     'heartbeat_at' => $state->heartbeat_at,
+                    'heartbeat_age_seconds' => is_null($state->heartbeat_at)
+                        ? null
+                        : (int) $state->heartbeat_at->diffInSeconds(now()),
                     'stale_age_seconds' => is_null($state->heartbeat_at)
                         ? null
-                        : $state->heartbeat_at->diffInSeconds(now()),
+                        : (int) $state->heartbeat_at->diffInSeconds(now()),
+                    'processor_lock_held' => $isLocked,
+                    'is_recoverable' => $isRecoverable,
                     'pending_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->pending()->count(),
-                    'processing_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->processing()->count(),
+                    'processing_request_count' => $processingCount,
                     'resumable_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->resumable()->count(),
                     'failed_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->failed()->count(),
                     'current_request_id' => $currentRequest?->id,
@@ -197,10 +222,13 @@ class BattleRewardQueueAdminService
                     'current_ledger_step' => $currentStep?->step_name?->value,
                     'current_ledger_step_status' => $currentStep?->status?->value,
                     'current_ledger_step_heartbeat_at' => $currentStep?->heartbeat_at,
+                    'ledger_completed_count' => $processingRequest?->steps->filter(fn ($step): bool => $step->status === BattleRewardStepStatus::COMPLETED)->count() ?? 0,
+                    'ledger_total_count' => $processingRequest?->steps->count() ?? 0,
                     'checkpoint_age_seconds' => is_null($currentStep?->checkpoint_json) || is_null($currentStep?->heartbeat_at)
                         ? null
-                        : $currentStep->heartbeat_at->diffInSeconds(now()),
+                        : (int) $currentStep->heartbeat_at->diffInSeconds(now()),
                     'un_emitted_message_count' => $requests->sum('un_emitted_message_count'),
+                    'resumable_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->resumable()->count(),
                     'oldest_pending_request_created_at' => CharacterBattleRewardRequest::forCharacter($state->character_id)
                         ->pending()
                         ->min('created_at'),

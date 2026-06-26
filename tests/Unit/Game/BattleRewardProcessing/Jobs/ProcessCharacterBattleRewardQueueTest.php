@@ -4,7 +4,10 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Jobs;
 
 use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Services\ExplorationLogService;
@@ -787,5 +790,83 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         $job = new ProcessCharacterBattleRewardQueue(1);
 
         $this->assertSame(300, $job->timeout);
+    }
+
+    public function testProcessorRecoversLedgerBackedProcessingRowAtStartupAndProcessesIt(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+            'started_at' => now(),
+        ]);
+        CharacterBattleRewardRequestStep::factory()->create([
+            'character_battle_reward_request_id' => $processingRequest->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::XP,
+            'status' => BattleRewardStepStatus::RUNNING,
+        ]);
+
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once()->andThrow(
+            new \Mockery\Exception('using legacy fallback'),
+        );
+        $battleRewardService->shouldReceive('setUp')->once()->with($character->id, 1)->andReturnSelf();
+        $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
+        $battleRewardService->shouldReceive('processRewards')->once()->with(true);
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::COMPLETED, $processingRequest->refresh()->status);
+    }
+
+    public function testProcessorFailedHookRecoversLedgerBackedProcessingRowAndDispatchesContinuation(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+            'started_at' => now(),
+        ]);
+        CharacterBattleRewardRequestStep::factory()->create([
+            'character_battle_reward_request_id' => $processingRequest->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::XP,
+            'status' => BattleRewardStepStatus::RUNNING,
+        ]);
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->failed(
+            new RuntimeException('job failed hard'),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $processingRequest->refresh()->status);
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
     }
 }

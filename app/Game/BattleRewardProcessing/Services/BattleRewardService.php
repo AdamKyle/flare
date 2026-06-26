@@ -342,18 +342,20 @@ class BattleRewardService
             );
         }
 
-        $this->characterRewardService
-            ->setCharacter($this->character)
-            ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
-                $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
-                    'applied_xp' => (int) $payload['total_xp'],
-                    'levels_awarded' => $levelsAwarded,
-                    'current_level' => $character->level,
-                    'current_xp' => $character->xp,
-                    'remaining_xp' => 0,
-                    'last_checkpoint_at' => now()->toIso8601String(),
-                ]);
-            });
+        DB::transaction(function () use ($step, $payload, $remainingXp): void {
+            $this->characterRewardService
+                ->setCharacter($this->character)
+                ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
+                    $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
+                        'applied_xp' => (int) $payload['total_xp'],
+                        'levels_awarded' => $levelsAwarded,
+                        'current_level' => $character->level,
+                        'current_xp' => $character->xp,
+                        'remaining_xp' => 0,
+                        'last_checkpoint_at' => now()->toIso8601String(),
+                    ]);
+                });
+        });
 
         $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
             'applied_xp' => (int) $payload['total_xp'],

@@ -87,17 +87,19 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
             'lock_acquired' => true,
         ]);
 
-        $recoveredCount = $queueManager->recoverOrphanedProcessingRequests($this->characterId);
+        $ledgerRecoveredCount = $queueManager->recoverLedgerBackedProcessingRequests($this->characterId);
+        $orphanRecoveredCount = $queueManager->recoverOrphanedProcessingRequests($this->characterId);
 
-        if ($recoveredCount > 0) {
-            Log::channel('reward_processing')->warning('Stale repair recovered orphaned processing rows at processor start.', [
+        if ($ledgerRecoveredCount > 0 || $orphanRecoveredCount > 0) {
+            Log::channel('reward_processing')->warning('Processor recovered interrupted or orphaned rows at start.', [
                 'character_id' => $this->characterId,
-                'recovered_count' => $recoveredCount,
+                'ledger_recovered' => $ledgerRecoveredCount,
+                'orphan_recovered' => $orphanRecoveredCount,
             ]);
         }
 
         if ($queueManager->hasProcessingRequests($this->characterId)) {
-            Log::channel('reward_processing')->info('Fresh processing rows remain after orphan recovery. Exiting to avoid killing live work.', [
+            Log::channel('reward_processing')->info('Fresh legacy processing rows remain after recovery. Exiting.', [
                 'character_id' => $this->characterId,
             ]);
 
@@ -414,31 +416,38 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
 
         $queueManager = new BattleRewardProcessingQueueManager();
 
-        $recoveredCount = $queueManager->recoverOrphanedProcessingRequests($this->characterId);
+        $ledgerRecoveredCount = $queueManager->recoverLedgerBackedProcessingRequests($this->characterId);
+        $orphanRecoveredCount = $queueManager->recoverOrphanedProcessingRequests($this->characterId);
 
-        Log::channel('reward_processing')->warning('Failed hook orphan recovery result.', [
+        Log::channel('reward_processing')->warning('Failed hook recovery result.', [
             'character_id' => $this->characterId,
-            'failed_count' => $recoveredCount,
-            'heartbeat_was_stale' => $recoveredCount > 0,
+            'ledger_recovered' => $ledgerRecoveredCount,
+            'orphan_recovered' => $orphanRecoveredCount,
         ]);
 
-        if ($recoveredCount === 0) {
-            Log::channel('reward_processing')->debug('Failed hook: heartbeat is fresh; skipping continuation dispatch.', [
+        if ($queueManager->hasProcessingRequests($this->characterId)) {
+            Log::channel('reward_processing')->debug('Failed hook: fresh legacy processing row still blocking; skipping dispatch.', [
                 'character_id' => $this->characterId,
             ]);
 
             return;
         }
 
-        if ($queueManager->hasPendingRequests($this->characterId)) {
-            Log::channel('reward_processing')->info('Failed hook dispatching processor for remaining pending rows.', [
+        if (! $queueManager->hasPendingRequests($this->characterId)) {
+            Log::channel('reward_processing')->debug('Failed hook: no pending or resumable rows; skipping continuation dispatch.', [
                 'character_id' => $this->characterId,
             ]);
 
-            self::dispatch($this->characterId)
-                ->onConnection('battle_reward_processing')
-                ->onQueue('battle_reward_processing');
+            return;
         }
+
+        Log::channel('reward_processing')->info('Failed hook dispatching processor for remaining rows.', [
+            'character_id' => $this->characterId,
+        ]);
+
+        self::dispatch($this->characterId)
+            ->onConnection('battle_reward_processing')
+            ->onQueue('battle_reward_processing');
     }
 
     private function dispatchFinalPlayerUpdates(

@@ -57,22 +57,23 @@ class BattleRewardMessageOutboxService
                         continue;
                     }
 
+                    $dispatched = false;
+
                     try {
                         $user = User::find($message->user_id);
 
                         if (! is_null($user)) {
-                            $this->safelyDispatchBroadcastEvent(
-                                new ServerMessageEvent(
-                                    $user,
-                                    $message->message,
-                                    $message->message_id,
-                                    $message->source,
-                                    $message->item_id,
-                                    $message->link_text,
-                                ),
-                                ['user_id' => $message->user_id],
-                            );
+                            event(new ServerMessageEvent(
+                                $user,
+                                $message->message,
+                                $message->message_id,
+                                $message->source,
+                                $message->item_id,
+                                $message->link_text,
+                            ));
                         }
+
+                        $dispatched = true;
                     } catch (Throwable $throwable) {
                         Log::channel('reward_ledger')->warning('message.emit_failed', [
                             'character_id' => $message->character_id,
@@ -81,6 +82,10 @@ class BattleRewardMessageOutboxService
                             'exception_class' => $throwable::class,
                             'exception_message' => $throwable->getMessage(),
                         ]);
+                    }
+
+                    if (! $dispatched) {
+                        continue;
                     }
 
                     $message->update(['emitted_at' => now()]);

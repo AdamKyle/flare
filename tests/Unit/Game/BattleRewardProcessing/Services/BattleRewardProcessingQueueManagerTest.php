@@ -4,7 +4,10 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
@@ -531,5 +534,118 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
 
         $this->assertSame(0, $recovered);
         $this->assertSame(BattleRewardRequestStatus::PROCESSING, $processingRequest->refresh()->status);
+    }
+
+    public function testEnsureProcessorRunningWakesForFreshHeartbeatWithLedgerBackedProcessingRow(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now(),
+        ]);
+        CharacterBattleRewardRequestStep::factory()->create([
+            'character_battle_reward_request_id' => $processingRequest->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::XP,
+            'status' => BattleRewardStepStatus::RUNNING,
+        ]);
+
+        $started = resolve(BattleRewardProcessingQueueManager::class)
+            ->ensureProcessorRunning($character);
+
+        $this->assertTrue($started);
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $processingRequest->refresh()->status);
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
+    }
+
+    public function testRecoverLedgerBackedProcessingRequestsMarksRunningStepAndRequestResumable(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now(),
+        ]);
+        $runningStep = CharacterBattleRewardRequestStep::factory()->create([
+            'character_battle_reward_request_id' => $processingRequest->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::XP,
+            'status' => BattleRewardStepStatus::RUNNING,
+        ]);
+
+        $recovered = resolve(BattleRewardProcessingQueueManager::class)
+            ->recoverLedgerBackedProcessingRequests($character->id);
+
+        $this->assertSame(1, $recovered);
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $processingRequest->refresh()->status);
+        $this->assertSame(BattleRewardStepStatus::RESUMABLE, $runningStep->refresh()->status);
+    }
+
+    public function testRecoverLedgerBackedProcessingRequestsIgnoresLegacyRowsWithNoSteps(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $legacyRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now(),
+        ]);
+
+        $recovered = resolve(BattleRewardProcessingQueueManager::class)
+            ->recoverLedgerBackedProcessingRequests($character->id);
+
+        $this->assertSame(0, $recovered);
+        $this->assertSame(BattleRewardRequestStatus::PROCESSING, $legacyRequest->refresh()->status);
+    }
+
+    public function testRecoverLedgerBackedProcessingRequestsMarksCheckpointedStepResumable(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PROCESSING,
+            'started_at' => now(),
+        ]);
+        $checkpointedStep = CharacterBattleRewardRequestStep::factory()->create([
+            'character_battle_reward_request_id' => $processingRequest->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::XP,
+            'status' => BattleRewardStepStatus::CHECKPOINTED,
+            'checkpoint_json' => ['remaining_xp' => 250],
+        ]);
+
+        resolve(BattleRewardProcessingQueueManager::class)
+            ->recoverLedgerBackedProcessingRequests($character->id);
+
+        $this->assertSame(BattleRewardStepStatus::RESUMABLE, $checkpointedStep->refresh()->status);
+        $this->assertSame(['remaining_xp' => 250], $checkpointedStep->refresh()->checkpoint_json);
+    }
+
+    public function testForceReleaseProcessorLockReleasesHeldLock(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $lock = \Illuminate\Support\Facades\Cache::lock('character-reward-queue:' . $character->id, 1800);
+        $lock->get();
+        $this->assertTrue(
+            resolve(BattleRewardProcessingQueueManager::class)->isProcessorLocked($character->id),
+            'Lock should be held before force release',
+        );
+
+        resolve(BattleRewardProcessingQueueManager::class)->forceReleaseProcessorLock($character->id);
+
+        $this->assertFalse(
+            resolve(BattleRewardProcessingQueueManager::class)->isProcessorLocked($character->id),
+            'Lock should be free after force release',
+        );
     }
 }

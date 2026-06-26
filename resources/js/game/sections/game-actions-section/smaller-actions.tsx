@@ -529,12 +529,14 @@ export default class SmallerActions extends React.Component<
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                <div className="mt-3">
-                    <DelveStatusPanel
-                        character_id={this.props.character.id}
-                        user_id={this.props.character.user_id}
-                    />
-                </div>
+                {this.isDelveRunning() ? (
+                    <div className="mt-3">
+                        <DelveStatusPanel
+                            character_id={this.props.character.id}
+                            user_id={this.props.character.user_id}
+                        />
+                    </div>
+                ) : null}
             </Fragment>
         );
     }

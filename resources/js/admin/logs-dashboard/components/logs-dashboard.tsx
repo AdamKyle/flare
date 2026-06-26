@@ -115,62 +115,113 @@ function LogSidePeek({
     entry: LogEntry;
     onClose: () => void;
 }) {
-    const rawFormatted = (() => {
-        if (!entry.raw_log_entry) return null;
-        try {
-            return JSON.stringify(JSON.parse(entry.raw_log_entry), null, 2);
-        } catch {
-            return entry.raw_log_entry;
+    const formatJson = (value: unknown): string => {
+        if (value === null || value === undefined || value === "") {
+            return "—";
         }
-    })();
+        if (typeof value === "string") {
+            try {
+                return JSON.stringify(JSON.parse(value), null, 2);
+            } catch {
+                return value;
+            }
+        }
+        return JSON.stringify(value, null, 2);
+    };
+
+    const codeBlock =
+        "rounded-md border border-gray-200 bg-gray-50 p-3 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words overflow-x-auto dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200";
+    const label =
+        "text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400";
+    const value = "text-sm text-gray-900 break-words dark:text-gray-100";
 
     return (
-        <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xl overflow-y-auto overflow-x-hidden border-l border-gray-200 bg-white p-5 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-            <div className="mb-4 flex items-start justify-between gap-3">
+        <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl overflow-y-auto border-l border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
+            <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
                 <div className="min-w-0">
-                    <h3 className="text-lg font-semibold">Log Detail</h3>
-                    <p className="break-all text-sm text-gray-500">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        Log Detail
+                    </h3>
+                    <p className="break-all text-sm text-gray-500 dark:text-gray-400">
                         {entry.file_path ?? entry.channel ?? "Log entry"}
                     </p>
                 </div>
                 <button
-                    className="shrink-0 rounded border border-gray-300 px-3 py-1 text-sm dark:border-gray-600"
+                    className="shrink-0 rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
                     onClick={onClose}
                 >
                     Close
                 </button>
             </div>
-            <dl className="space-y-4">
-                <DetailBlock label="Timestamp" value={entry.timestamp} />
-                <DetailBlock
-                    label="Level"
-                    value={<SeverityBadge severity={entry.severity} />}
-                />
-                <DetailBlock
-                    label="Channel/File"
-                    value={entry.file_path ?? entry.channel}
-                />
-                <DetailBlock label="Message" value={entry.message} />
-                <DetailBlock
-                    label="Exception Class"
-                    value={entry.exception_class}
-                />
-                <DetailBlock
-                    label="File/Line"
-                    value={
-                        entry.exception_file
-                            ? `${entry.exception_file}${entry.exception_line ? `:${entry.exception_line}` : ""}`
-                            : null
-                    }
-                />
-                <DetailBlock label="Context" value={entry.context} pre />
-                <DetailBlock
-                    label="Stack Trace"
-                    value={entry.stack_trace}
-                    pre
-                />
-                <DetailBlock label="Raw Log Entry" value={rawFormatted} pre />
-            </dl>
+
+            <div className="space-y-6 px-6 py-5">
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1">
+                        <p className={label}>Timestamp</p>
+                        <p className={value}>{entry.timestamp ?? "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className={label}>Level</p>
+                        <div>
+                            <SeverityBadge severity={entry.severity} />
+                        </div>
+                    </div>
+                    <div className="space-y-1">
+                        <p className={label}>Channel / File</p>
+                        <p className={value}>
+                            {entry.channel ?? entry.file_path ?? "—"}
+                        </p>
+                    </div>
+                    {entry.exception_class && (
+                        <div className="space-y-1">
+                            <p className={label}>Exception Class</p>
+                            <p className={value}>{entry.exception_class}</p>
+                        </div>
+                    )}
+                </div>
+
+                <div className="space-y-2">
+                    <p className={label}>Message</p>
+                    <p className={value}>{entry.message}</p>
+                </div>
+
+                {(entry.exception_file || entry.exception_line) && (
+                    <div className="space-y-2">
+                        <p className={label}>File / Line</p>
+                        <p className={value}>
+                            {entry.exception_file ?? ""}
+                            {entry.exception_line
+                                ? `:${entry.exception_line}`
+                                : ""}
+                        </p>
+                    </div>
+                )}
+
+                {entry.context && (
+                    <div className="space-y-2">
+                        <p className={label}>Context</p>
+                        <pre className={codeBlock}>
+                            {formatJson(entry.context)}
+                        </pre>
+                    </div>
+                )}
+
+                {entry.stack_trace && (
+                    <div className="space-y-2">
+                        <p className={label}>Stack Trace</p>
+                        <pre className={codeBlock}>{entry.stack_trace}</pre>
+                    </div>
+                )}
+
+                {entry.raw_log_entry && (
+                    <div className="space-y-2">
+                        <p className={label}>Raw Log Entry</p>
+                        <pre className={codeBlock}>
+                            {formatJson(entry.raw_log_entry)}
+                        </pre>
+                    </div>
+                )}
+            </div>
         </aside>
     );
 }

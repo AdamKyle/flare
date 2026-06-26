@@ -257,8 +257,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                 "get",
                 (result: AxiosResponse) => {
                     this.setState({
-                        exploration_output:
-                            result.data as ExplorationOutputType,
+                        exploration_output: {
+                            ...(result.data as ExplorationOutputType),
+                            received_at: Date.now(),
+                        },
                         exploration_output_loading: false,
                     });
                 },
@@ -293,6 +295,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     exploration_output: {
                         type: event.type,
                         output: event.output,
+                        received_at: Date.now(),
                     },
                 });
             },

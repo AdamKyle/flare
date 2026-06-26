@@ -26,13 +26,14 @@ class BattleRewardProcessingQueueManager
     private const STALE_AFTER_MINUTES = 5;
 
     /**
-     * Must exceed MAX_SECONDS in the processor job to cover normal runs,
-     * but short enough that an abandoned lock does not block stale repair
-     * for a long time. The processor runs for at most ~20 seconds per batch,
-     * so 90 seconds gives comfortable headroom while still expiring well
-     * before the 5-minute stale heartbeat cutoff.
+     * Must exceed the Horizon job timeout (300 s) plus any heavy XP path duration.
+     * 1800 s ensures the lock outlives any normal processor run and does not
+     * expire mid-execution under heavy exploration rewards. After a Horizon
+     * restart, graceful shutdown releases the lock via finally; hard-kill lets
+     * TTL expire. The --force flag on the resume command exists specifically to
+     * recover the stuck state that follows a Horizon restart before TTL expires.
      */
-    private const PROCESSOR_LOCK_SECONDS = 90;
+    private const PROCESSOR_LOCK_SECONDS = 1800;
 
     public const ORPHANED_PROCESSING_FAILED_REASON = 'Orphaned processing request recovered after stale heartbeat and no live processor lock.';
 
@@ -120,53 +121,59 @@ class BattleRewardProcessingQueueManager
                 $isStale = $this->isQueueStateStale($state);
                 $isLocked = $this->isProcessorLocked($characterId);
 
-                if ($isStale && ! $isLocked) {
-                    Log::channel('reward_processing')->warning('Enqueue detects stale/orphaned processing state. Recovering.', [
+                if ($isLocked) {
+                    Log::channel('reward_processing')->debug('Enqueue decides processor already running (lock held).', [
                         'character_id' => $characterId,
-                        'queue_state_id' => $state->id,
-                        'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
-                        'processing_count' => $processingCount,
-                        'lock_key' => 'character-reward-queue:' . $characterId,
-                        'lock_available' => true,
+                        'is_stale' => $isStale,
                     ]);
 
-                    $failedCount = $this->recoverOrphanedProcessingRequests($characterId);
-
-                    Log::channel('reward_processing')->warning('Stale repair failed orphaned processing rows.', [
-                        'character_id' => $characterId,
-                        'legacy_or_recovered_count' => $failedCount,
-                    ]);
-
-                    $state->update([
-                        'is_processing' => true,
-                        'started_at' => now(),
-                        'heartbeat_at' => now(),
-                    ]);
-
-                    DB::afterCommit(function () use ($characterId): void {
-                        Log::channel('reward_processing')->info('Enqueue wakes processor after orphaned recovery.', [
-                            'character_id' => $characterId,
-                        ]);
-
-                        ProcessCharacterBattleRewardQueue::dispatch($characterId)
-                            ->onConnection('battle_reward_processing')
-                            ->onQueue('battle_reward_processing');
-
-                        $this->safelyDispatchBroadcastEvent(
-                            new BattleRewardQueueUpdated($characterId, 'activated'),
-                        );
-                    });
-
-                    return true;
+                    return false;
                 }
 
-                Log::channel('reward_processing')->debug('Enqueue decides processor already running.', [
+                $ledgerRecoveredCount = $this->recoverLedgerBackedProcessingRequests($characterId);
+                $legacyRecoveredCount = $isStale ? $this->recoverOrphanedProcessingRequests($characterId) : 0;
+                $shouldWake = $ledgerRecoveredCount > 0 || $isStale;
+
+                if (! $shouldWake) {
+                    Log::channel('reward_processing')->debug('Enqueue decides processor already running (fresh heartbeat, no ledger rows to recover).', [
+                        'character_id' => $characterId,
+                        'lock_available' => true,
+                        'ledger_recovered' => $ledgerRecoveredCount,
+                    ]);
+
+                    return false;
+                }
+
+                Log::channel('reward_processing')->warning('Enqueue recovered interrupted processing state. Waking processor.', [
                     'character_id' => $characterId,
-                    'is_stale' => $isStale,
-                    'lock_available' => ! $isLocked,
+                    'queue_state_id' => $state->id,
+                    'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+                    'processing_count' => $processingCount,
+                    'ledger_recovered_count' => $ledgerRecoveredCount,
+                    'legacy_recovered_count' => $legacyRecoveredCount,
                 ]);
 
-                return false;
+                $state->update([
+                    'is_processing' => true,
+                    'started_at' => now(),
+                    'heartbeat_at' => now(),
+                ]);
+
+                DB::afterCommit(function () use ($characterId): void {
+                    Log::channel('reward_processing')->info('Enqueue wakes processor after interrupted recovery.', [
+                        'character_id' => $characterId,
+                    ]);
+
+                    ProcessCharacterBattleRewardQueue::dispatch($characterId)
+                        ->onConnection('battle_reward_processing')
+                        ->onQueue('battle_reward_processing');
+
+                    $this->safelyDispatchBroadcastEvent(
+                        new BattleRewardQueueUpdated($characterId, 'activated'),
+                    );
+                });
+
+                return true;
             }
 
             if ($this->isProcessorLocked($characterId)) {
@@ -276,6 +283,61 @@ class BattleRewardProcessingQueueManager
         Log::channel('reward_processing')->warning('recoverOrphanedProcessingRequests: stale heartbeat detected; recovered orphaned processing rows.', [
             'character_id' => $characterId,
             'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
+            'recovered_count' => $count,
+        ]);
+
+        return $count;
+    }
+
+    public function recoverLedgerBackedProcessingRequests(int $characterId): int
+    {
+        $count = 0;
+
+        CharacterBattleRewardRequest::query()
+            ->with('steps')
+            ->forCharacter($characterId)
+            ->processing()
+            ->get()
+            ->each(function (CharacterBattleRewardRequest $request) use (&$count): void {
+                if ($request->steps->isEmpty()) {
+                    return;
+                }
+
+                $request->steps()
+                    ->whereIn('status', [
+                        BattleRewardStepStatus::RUNNING,
+                        BattleRewardStepStatus::CHECKPOINTED,
+                    ])
+                    ->update([
+                        'status' => BattleRewardStepStatus::RESUMABLE,
+                        'heartbeat_at' => now(),
+                    ]);
+
+                $request->update([
+                    'status' => BattleRewardRequestStatus::RESUMABLE,
+                    'failed_reason' => null,
+                    'completed_at' => null,
+                ]);
+
+                Log::channel('reward_ledger')->debug('resume.force_recovered_request', [
+                    'character_id' => $request->character_id,
+                    'request_id' => $request->id,
+                    'status' => BattleRewardRequestStatus::RESUMABLE->value,
+                    'source_type' => $request->source_type?->value,
+                    'source_id' => $request->source_id,
+                ]);
+
+                $count++;
+            });
+
+        if ($count > 0) {
+            $this->safelyDispatchBroadcastEvent(
+                new BattleRewardQueueUpdated($characterId, 'repaired'),
+            );
+        }
+
+        Log::channel('reward_processing')->info('recoverLedgerBackedProcessingRequests completed.', [
+            'character_id' => $characterId,
             'recovered_count' => $count,
         ]);
 
@@ -500,6 +562,11 @@ class BattleRewardProcessingQueueManager
         $lock->release();
 
         return false;
+    }
+
+    public function forceReleaseProcessorLock(int $characterId): void
+    {
+        $this->processorLock($characterId)->forceRelease();
     }
 
     private function processorLockKey(int $characterId): string

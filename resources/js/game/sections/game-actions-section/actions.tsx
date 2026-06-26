@@ -569,10 +569,12 @@ export default class Actions extends React.Component<
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                <DelveStatusPanel
-                    character_id={this.props.character.id}
-                    user_id={this.props.character.user_id}
-                />
+                {this.isDelveRunning() ? (
+                    <DelveStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+                ) : null}
             </div>
         ) : null;
         let fightContent = null;

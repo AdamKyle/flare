@@ -43,13 +43,8 @@ export default class ExplorationOutputSection extends React.Component<
         const isActive = this.props.exploration_output?.type === "active";
 
         if (!wasActive && isActive) {
-            this.setState(
-                {
-                    elapsed: Number(
-                        this.props.exploration_output?.output?.duration ?? 0,
-                    ),
-                },
-                () => this.syncTimer(),
+            this.setState({ elapsed: this.computeInitialElapsed() }, () =>
+                this.syncTimer(),
             );
         } else if (wasActive && !isActive) {
             this.syncTimer();
@@ -63,15 +58,23 @@ export default class ExplorationOutputSection extends React.Component<
         }
     }
 
+    private computeInitialElapsed(): number {
+        const duration = Number(
+            this.props.exploration_output?.output?.duration ?? 0,
+        );
+        const receivedAt = this.props.exploration_output?.received_at;
+        if (receivedAt) {
+            return duration + Math.floor((Date.now() - receivedAt) / 1000);
+        }
+        return duration;
+    }
+
     private syncTimer(): void {
         const isActive = this.props.exploration_output?.type === "active";
 
         if (isActive) {
             if (this.tickInterval === null) {
-                const initialElapsed = Number(
-                    this.props.exploration_output?.output?.duration ?? 0,
-                );
-                this.setState({ elapsed: initialElapsed });
+                this.setState({ elapsed: this.computeInitialElapsed() });
                 this.tickInterval = setInterval(() => {
                     this.setState((prev) => ({ elapsed: prev.elapsed + 1 }));
                 }, 1000);
