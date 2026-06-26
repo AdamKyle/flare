@@ -20,9 +20,9 @@ export default function StaleQueueAlert({
                     {count === 1 ? "entry" : "entries"} detected
                 </h2>
                 <p className="mt-2 text-sm text-amber-900 dark:text-amber-100">
-                    Processing appears to have stopped before completion.
-                    Pending rows can be restarted. Processing rows will be
-                    marked failed and will not be retried automatically.
+                    Processing appears to have paused before completion.
+                    Ledger-backed rows can be resumed from their durable step;
+                    only legacy pre-ledger rows are failed.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                     <button
@@ -36,7 +36,7 @@ export default function StaleQueueAlert({
                         disabled={repairing}
                         onClick={onRepair}
                     >
-                        {repairing ? "Repairing…" : "Repair stale queues"}
+                        {repairing ? "Recovering…" : "Recover stale queues"}
                     </button>
                 </div>
             </div>

@@ -29,6 +29,7 @@ const emptySummary: Summary = {
     queued: 0,
     pending: 0,
     processing: 0,
+    resumable: 0,
     completed: 0,
     failed: 0,
 };
@@ -141,7 +142,7 @@ export default function RewardQueueDashboard() {
         try {
             const result = await repair();
             setMessage(
-                `Repaired ${result.repaired_queue_state_count} queue states. Marked ${result.failed_processing_request_count} processing requests failed and restarted ${result.restarted_processor_count} processors.`,
+                `Recovered ${result.repaired_queue_state_count} queue states. Resumed ${result.resumed_processing_request_count} ledger-backed requests, marked ${result.legacy_failed_processing_request_count} legacy requests failed, and restarted ${result.restarted_processor_count} processors.`,
             );
             await refresh();
         } catch {

@@ -8,6 +8,7 @@ use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
@@ -129,17 +130,11 @@ class BattleRewardProcessingQueueManager
                         'lock_available' => true,
                     ]);
 
-                    $failedCount = CharacterBattleRewardRequest::forCharacter($characterId)
-                        ->processing()
-                        ->update([
-                            'status' => BattleRewardRequestStatus::FAILED,
-                            'failed_reason' => self::ORPHANED_PROCESSING_FAILED_REASON,
-                            'completed_at' => now(),
-                        ]);
+                    $failedCount = $this->recoverOrphanedProcessingRequests($characterId);
 
                     Log::channel('reward_processing')->warning('Stale repair failed orphaned processing rows.', [
                         'character_id' => $characterId,
-                        'failed_count' => $failedCount,
+                        'legacy_or_recovered_count' => $failedCount,
                     ]);
 
                     $state->update([
@@ -225,13 +220,52 @@ class BattleRewardProcessingQueueManager
             return 0;
         }
 
-        $count = CharacterBattleRewardRequest::forCharacter($characterId)
+        $count = 0;
+
+        CharacterBattleRewardRequest::query()
+            ->with('steps')
+            ->forCharacter($characterId)
             ->processing()
-            ->update([
-                'status' => BattleRewardRequestStatus::FAILED,
-                'failed_reason' => self::ORPHANED_PROCESSING_FAILED_REASON,
-                'completed_at' => now(),
-            ]);
+            ->get()
+            ->each(function (CharacterBattleRewardRequest $request) use (&$count): void {
+                if ($request->steps->isNotEmpty()) {
+                    $request->steps()
+                        ->whereIn('status', [
+                            BattleRewardStepStatus::RUNNING,
+                            BattleRewardStepStatus::CHECKPOINTED,
+                        ])
+                        ->update([
+                            'status' => BattleRewardStepStatus::RESUMABLE,
+                            'heartbeat_at' => now(),
+                        ]);
+
+                    $request->update([
+                        'status' => BattleRewardRequestStatus::RESUMABLE,
+                        'failed_reason' => null,
+                        'completed_at' => null,
+                    ]);
+
+                    Log::channel('reward_ledger')->debug('resume.recovered_request', [
+                        'character_id' => $request->character_id,
+                        'request_id' => $request->id,
+                        'status' => BattleRewardRequestStatus::RESUMABLE->value,
+                        'source_type' => $request->source_type?->value,
+                        'source_id' => $request->source_id,
+                    ]);
+
+                    $count++;
+
+                    return;
+                }
+
+                $request->update([
+                    'status' => BattleRewardRequestStatus::FAILED,
+                    'failed_reason' => self::ORPHANED_PROCESSING_FAILED_REASON,
+                    'completed_at' => now(),
+                ]);
+
+                $count++;
+            });
 
         if ($count > 0) {
             $this->safelyDispatchBroadcastEvent(
@@ -239,10 +273,10 @@ class BattleRewardProcessingQueueManager
             );
         }
 
-        Log::channel('reward_processing')->warning('recoverOrphanedProcessingRequests: stale heartbeat detected; failed orphaned processing rows.', [
+        Log::channel('reward_processing')->warning('recoverOrphanedProcessingRequests: stale heartbeat detected; recovered orphaned processing rows.', [
             'character_id' => $characterId,
             'heartbeat_at' => $state->heartbeat_at?->toIso8601String(),
-            'failed_count' => $count,
+            'recovered_count' => $count,
         ]);
 
         return $count;
@@ -252,13 +286,21 @@ class BattleRewardProcessingQueueManager
     {
         return DB::transaction(function () use ($characterId): ?CharacterBattleRewardRequest {
             $request = CharacterBattleRewardRequest::forCharacter($characterId)
-                ->pending()
-                ->orderedForProcessing()
+                ->resumable()
+                ->orderBy('id')
                 ->lockForUpdate()
                 ->first();
 
             if (is_null($request)) {
-                Log::channel('reward_processing')->debug('Next request returns null: no pending rows.', [
+                $request = CharacterBattleRewardRequest::forCharacter($characterId)
+                    ->pending()
+                    ->orderedForProcessing()
+                    ->lockForUpdate()
+                    ->first();
+            }
+
+            if (is_null($request)) {
+                Log::channel('reward_processing')->debug('Next request returns null: no pending or resumable rows.', [
                     'character_id' => $characterId,
                 ]);
 
@@ -288,6 +330,10 @@ class BattleRewardProcessingQueueManager
     public function markProcessing(
         CharacterBattleRewardRequest $request,
     ): CharacterBattleRewardRequest {
+        if (! in_array($request->status, [BattleRewardRequestStatus::PENDING, BattleRewardRequestStatus::RESUMABLE], true)) {
+            return $request->refresh();
+        }
+
         $request->update([
             'status' => BattleRewardRequestStatus::PROCESSING,
             'failed_reason' => null,
@@ -378,7 +424,10 @@ class BattleRewardProcessingQueueManager
             }
 
             $hasPendingRequests = CharacterBattleRewardRequest::forCharacter($characterId)
-                ->pending()
+                ->whereIn('status', [
+                    BattleRewardRequestStatus::PENDING,
+                    BattleRewardRequestStatus::RESUMABLE,
+                ])
                 ->exists();
 
             if ($hasPendingRequests) {
@@ -422,7 +471,12 @@ class BattleRewardProcessingQueueManager
 
     public function hasPendingRequests(int $characterId): bool
     {
-        return CharacterBattleRewardRequest::forCharacter($characterId)->pending()->exists();
+        return CharacterBattleRewardRequest::forCharacter($characterId)
+            ->whereIn('status', [
+                BattleRewardRequestStatus::PENDING,
+                BattleRewardRequestStatus::RESUMABLE,
+            ])
+            ->exists();
     }
 
     public function hasProcessingRequests(int $characterId): bool

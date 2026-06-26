@@ -5,6 +5,7 @@ import RewardQueueCard from "./reward-queue-card";
 const FILTERABLE_STATUSES = new Set([
     "pending",
     "processing",
+    "resumable",
     "completed",
     "failed",
 ]);
@@ -17,7 +18,7 @@ export default function SummaryCards({
     onFilter?: (status: string) => void;
 }) {
     return (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
             {Object.entries(summary).map(([label, value]) => {
                 const filterable =
                     FILTERABLE_STATUSES.has(label) && onFilter != null;

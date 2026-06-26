@@ -13,7 +13,6 @@ use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Core\Traits\CanHaveQuestItem;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
@@ -154,6 +153,45 @@ class BattleDrop
         }
 
         return null;
+    }
+
+    public function planDelveLocationQuestItem(Character $character): ?Item
+    {
+        $automation = $character->currentAutomations()->where('type', AutomationType::DELVE)->first();
+
+        if (is_null($automation)) {
+            return null;
+        }
+
+        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES)
+            ->where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->whereNotNull('hours_to_drop')
+            ->first();
+
+        if (is_null($location)) {
+            return null;
+        }
+
+        if (now()->diffInHours($automation->started_at) < $location->hours_to_drop) {
+            return null;
+        }
+
+        return $this->eligibleLocationQuestItem($character, $location, $this->lootingChance);
+    }
+
+    public function planSpecialLocationQuestItem(Character $character): ?Item
+    {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->exists()) {
+            return null;
+        }
+
+        if (is_null($this->locationWithEffect)) {
+            return null;
+        }
+
+        return $this->eligibleLocationQuestItem($character, $this->locationWithEffect, min($this->lootingChance, 0.45));
     }
 
     /**
@@ -303,6 +341,78 @@ class BattleDrop
         }
 
         $this->attemptToPickUpItem($character, $eligibleItems->random());
+    }
+
+    public function applyPlannedItem(Character $character, int $itemId, bool $isMythic = false): void
+    {
+        $item = Item::find($itemId);
+
+        if (is_null($item)) {
+            return;
+        }
+
+        if ($isMythic) {
+            $this->giveMythicItem($character, $item);
+
+            return;
+        }
+
+        $this->attemptToPickUpItem($character, $item);
+    }
+
+    private function eligibleLocationQuestItem(Character $character, Location $location, float $lootingChance): ?Item
+    {
+        $items = Item::where('drop_location_id', $location->id)
+            ->whereNull('item_suffix_id')
+            ->whereNull('item_prefix_id')
+            ->where('type', 'quest')
+            ->get();
+
+        if ($items->isEmpty()) {
+            return null;
+        }
+
+        if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, 100)) {
+            return null;
+        }
+
+        $character->loadMissing('inventory.slots');
+
+        $ownedItemIds = $character->inventory->slots->pluck('item_id')->all();
+
+        $completedQuestIds = $character->questsCompleted()
+            ->whereNotNull('quest_id')
+            ->pluck('quest_id')
+            ->all();
+
+        $blockedItemIds = [];
+
+        if (! empty($completedQuestIds)) {
+            $blockedItemIds = Quest::query()
+                ->whereIn('id', $completedQuestIds)
+                ->get(['item_id', 'secondary_required_item'])
+                ->flatMap(function (Quest $quest): array {
+                    return [
+                        $quest->item_id,
+                        $quest->secondary_required_item,
+                    ];
+                })
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+        $eligibleItems = $items->filter(function (Item $item) use ($ownedItemIds, $blockedItemIds): bool {
+            return ! in_array($item->id, $ownedItemIds, true)
+                && ! in_array($item->id, $blockedItemIds, true);
+        });
+
+        if ($eligibleItems->isEmpty()) {
+            return null;
+        }
+
+        return $eligibleItems->random();
     }
 
     /**
@@ -455,11 +565,11 @@ class BattleDrop
             if ($item->type === 'quest') {
                 $message = $character->name . ' has found: ' . $item->affix_name;
 
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id);
 
                 broadcast(new GlobalMessageEvent($message));
             } else {
-                event(new ServerMessageEvent($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id));
+                ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id);
 
                 if ($isMythic) {
                     event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));

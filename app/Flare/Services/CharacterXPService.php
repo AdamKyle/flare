@@ -119,6 +119,41 @@ class CharacterXPService
         return $this;
     }
 
+    public function distributeCheckpointedXp(int $xp, ?Closure $checkpointCallback = null): CharacterXPService
+    {
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            if (! is_null($checkpointCallback)) {
+                $checkpointCallback($xp, 0, $this->character);
+            }
+
+            return $this;
+        }
+
+        $this->character->update([
+            'xp' => $this->character->xp + $xp,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        if (! is_null($checkpointCallback)) {
+            $checkpointCallback($xp, 0, $this->character);
+        }
+
+        $startingLevel = $this->character->level;
+
+        $this->handleLevelUp();
+
+        $this->character = $this->character->refresh();
+
+        if (! is_null($checkpointCallback)) {
+            $checkpointCallback($xp, max(0, $this->character->level - $startingLevel), $this->character);
+        }
+
+        return $this;
+    }
+
     /**
      * Handle possible level up.
      *

@@ -3,6 +3,8 @@
 namespace App\Game\Messages\Handlers;
 
 use App\Flare\Models\User;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -15,7 +17,11 @@ class ServerMessageHandler
     /**
      * @param ServerMessageBuilder $serverMessageBuilder
      */
-    public function __construct(private ServerMessageBuilder $serverMessageBuilder) {}
+    public function __construct(
+        private ServerMessageBuilder $serverMessageBuilder,
+        private readonly BattleRewardMessageContext $battleRewardMessageContext,
+        private readonly BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
+    ) {}
 
     /**
      * Handle sending a message with additional information
@@ -32,7 +38,7 @@ class ServerMessageHandler
     {
         $message = $this->serverMessageBuilder->buildWithAdditionalInformation($type, $forMessage, $newValue);
 
-        $this->safelyDispatchBroadcastEvent(new ServerMessageEvent($user, $message), ['user_id' => $user->id]);
+        $this->dispatchOrOutbox($user, $message);
     }
 
     /**
@@ -50,7 +56,7 @@ class ServerMessageHandler
     {
         $message = $this->serverMessageBuilder->buildWithAdditionalInformation($type, $forMessage);
 
-        $this->safelyDispatchBroadcastEvent(new ServerMessageEvent($user, $message, $id), ['user_id' => $user->id]);
+        $this->dispatchOrOutbox($user, $message, $id);
     }
 
     /**
@@ -62,6 +68,48 @@ class ServerMessageHandler
      */
     public function sendBasicMessage(User $user, string $message): void
     {
-        $this->safelyDispatchBroadcastEvent(new ServerMessageEvent($user, $message), ['user_id' => $user->id]);
+        $this->dispatchOrOutbox($user, $message);
+    }
+
+    public function sendBasicMessageWithId(User $user, string $message, ?int $id = null): void
+    {
+        $this->dispatchOrOutbox($user, $message, $id);
+    }
+
+    private function dispatchOrOutbox(
+        User $user,
+        string $message,
+        ?int $id = null,
+        ?string $source = null,
+        ?int $itemId = null,
+        ?string $linkText = null,
+    ): void {
+        if (! $this->battleRewardMessageContext->active()) {
+            $this->safelyDispatchBroadcastEvent(
+                new ServerMessageEvent($user, $message, $id, $source, $itemId, $linkText),
+                ['user_id' => $user->id],
+            );
+
+            return;
+        }
+
+        $storedMessage = $this->battleRewardMessageOutboxService->storeMessage(
+            $this->battleRewardMessageContext->requestId(),
+            $this->battleRewardMessageContext->characterId(),
+            $user->id,
+            $this->battleRewardMessageContext->stepName()?->value,
+            $message,
+            $id,
+            $source,
+            $itemId,
+            $linkText,
+        );
+
+        $this->safelyDispatchBroadcastEvent(
+            new ServerMessageEvent($user, $message, $id, $source, $itemId, $linkText),
+            ['user_id' => $user->id],
+        );
+
+        $this->battleRewardMessageOutboxService->markEmitted($storedMessage);
     }
 }

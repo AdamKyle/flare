@@ -2,11 +2,12 @@
 
 namespace App\Game\BattleRewardProcessing\Enums;
 
-enum BattleRewardRequestStatus: string
+enum BattleRewardStepStatus: string
 {
     case PENDING = 'pending';
-    case PROCESSING = 'processing';
-    case RESUMABLE = 'resumable';
+    case RUNNING = 'running';
+    case CHECKPOINTED = 'checkpointed';
     case COMPLETED = 'completed';
     case FAILED = 'failed';
+    case RESUMABLE = 'resumable';
 }

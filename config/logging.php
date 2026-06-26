@@ -72,6 +72,13 @@ return [
             'days' => 14,
         ],
 
+        'reward_ledger' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/reward_ledger.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],

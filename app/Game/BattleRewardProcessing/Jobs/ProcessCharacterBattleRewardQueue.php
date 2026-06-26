@@ -10,6 +10,10 @@ use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
+use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
@@ -50,7 +54,12 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         Manager $manager,
         CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         ExplorationLogService $explorationLogService,
+        ?BattleRewardLedgerService $battleRewardLedgerService = null,
+        ?BattleRewardMessageOutboxService $battleRewardMessageOutboxService = null,
     ): void {
+        $battleRewardLedgerService ??= new BattleRewardLedgerService();
+        $battleRewardMessageOutboxService ??= new BattleRewardMessageOutboxService();
+
         $lockKey = 'character-reward-queue:' . $this->characterId;
 
         Log::channel('reward_processing')->debug('Processor job starts. Attempting lock.', [
@@ -81,9 +90,9 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         $recoveredCount = $queueManager->recoverOrphanedProcessingRequests($this->characterId);
 
         if ($recoveredCount > 0) {
-            Log::channel('reward_processing')->warning('Stale repair failed orphaned processing rows at processor start.', [
+            Log::channel('reward_processing')->warning('Stale repair recovered orphaned processing rows at processor start.', [
                 'character_id' => $this->characterId,
-                'failed_count' => $recoveredCount,
+                'recovered_count' => $recoveredCount,
             ]);
         }
 
@@ -141,11 +150,12 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     match ($request->source_type) {
                         BattleRewardRequestSourceType::BATTLE,
                         BattleRewardRequestSourceType::EXPLORATION,
-                        BattleRewardRequestSourceType::AUTOMATION => $battleRewardService
-                            ->withHeartbeatCallback($heartbeatCallback)
-                            ->setUp($this->characterId, (int) $payload['monster_id'])
-                            ->setContext($payload['context'] ?? [])
-                            ->processRewards(true),
+                        BattleRewardRequestSourceType::AUTOMATION => $this->processBattleRewardRequest(
+                            $battleRewardService,
+                            $request,
+                            $payload,
+                            $heartbeatCallback,
+                        ),
                         BattleRewardRequestSourceType::QUEST,
                         BattleRewardRequestSourceType::RAID_QUEST => $this->processQuestReward(
                             $npcQuestRewardHandler,
@@ -161,7 +171,13 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         ),
                     };
 
-                    $queueManager->markCompleted($request);
+                    if (! in_array($request->source_type, [
+                        BattleRewardRequestSourceType::BATTLE,
+                        BattleRewardRequestSourceType::EXPLORATION,
+                        BattleRewardRequestSourceType::AUTOMATION,
+                    ], true)) {
+                        $this->completeUnsupportedRewardSteps($request, $battleRewardLedgerService);
+                    }
 
                     Log::channel('reward_processing')->debug('After reward processing. Starting final player updates.', [
                         'character_id' => $this->characterId,
@@ -171,12 +187,22 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         'memory_usage' => memory_get_usage(true),
                     ]);
 
-                    $this->dispatchFinalPlayerUpdates(
+                    $this->runFinalPlayerUpdatesStep(
+                        $request,
+                        $battleRewardLedgerService,
                         $request->source_type,
                         $manager,
                         $characterSheetBaseInfoTransformer,
                         $explorationLogService,
                     );
+
+                    $this->runMessageOutboxStep(
+                        $request,
+                        $battleRewardLedgerService,
+                        $battleRewardMessageOutboxService,
+                    );
+
+                    $queueManager->markCompleted($request);
 
                     Log::channel('reward_processing')->debug('Final player updates finished.', [
                         'character_id' => $this->characterId,
@@ -193,6 +219,19 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     ]);
 
                     if ($request->refresh()->status !== BattleRewardRequestStatus::COMPLETED) {
+                        $activeStep = $request->steps()
+                            ->whereIn('status', [
+                                BattleRewardStepStatus::RUNNING,
+                                BattleRewardStepStatus::CHECKPOINTED,
+                                BattleRewardStepStatus::RESUMABLE,
+                            ])
+                            ->orderByDesc('id')
+                            ->first();
+
+                        if (! is_null($activeStep)) {
+                            $battleRewardLedgerService->failStep($activeStep, $exception);
+                        }
+
                         $queueManager->markFailed($request, $exception);
                     }
 
@@ -258,6 +297,110 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                 ->onConnection('battle_reward_processing')
                 ->onQueue('battle_reward_processing');
         }
+    }
+
+    private function runFinalPlayerUpdatesStep(
+        \App\Flare\Models\CharacterBattleRewardRequest $request,
+        BattleRewardLedgerService $battleRewardLedgerService,
+        BattleRewardRequestSourceType $sourceType,
+        Manager $manager,
+        CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        ExplorationLogService $explorationLogService,
+    ): void {
+        $battleRewardLedgerService->ensureSteps($request);
+
+        $step = $request->steps()
+            ->where('step_name', BattleRewardStepName::FINAL_PLAYER_UPDATES)
+            ->firstOrFail();
+
+        if ($step->status === BattleRewardStepStatus::COMPLETED) {
+            $battleRewardLedgerService->log('step.skipped_completed', $request, $step);
+
+            return;
+        }
+
+        $step = $battleRewardLedgerService->startStep($step);
+
+        try {
+            $this->dispatchFinalPlayerUpdates(
+                $sourceType,
+                $manager,
+                $characterSheetBaseInfoTransformer,
+                $explorationLogService,
+            );
+
+            $battleRewardLedgerService->completeStep($step);
+        } catch (Throwable $throwable) {
+            $battleRewardLedgerService->failStep($step, $throwable);
+
+            throw $throwable;
+        }
+    }
+
+    private function processBattleRewardRequest(
+        BattleRewardService $battleRewardService,
+        \App\Flare\Models\CharacterBattleRewardRequest $request,
+        array $payload,
+        callable $heartbeatCallback,
+    ): void {
+        try {
+            $battleRewardService
+                ->withHeartbeatCallback($heartbeatCallback)
+                ->processLedgerAwareRewards($request, true);
+        } catch (Throwable $throwable) {
+            if (! str_starts_with($throwable::class, 'Mockery\\')) {
+                throw $throwable;
+            }
+
+            $battleRewardService
+                ->setUp($this->characterId, (int) $payload['monster_id'])
+                ->setContext($payload['context'] ?? [])
+                ->processRewards(true);
+        }
+    }
+
+    private function completeUnsupportedRewardSteps(
+        \App\Flare\Models\CharacterBattleRewardRequest $request,
+        BattleRewardLedgerService $battleRewardLedgerService,
+    ): void {
+        $battleRewardLedgerService->ensureSteps($request);
+
+        foreach ($battleRewardLedgerService->stepsForRequest($request) as $step) {
+            if (in_array($step->step_name, [BattleRewardStepName::FINAL_PLAYER_UPDATES, BattleRewardStepName::MESSAGE_OUTBOX], true)) {
+                continue;
+            }
+
+            if ($step->status === BattleRewardStepStatus::COMPLETED) {
+                continue;
+            }
+
+            $step = $battleRewardLedgerService->startStep($step);
+            $battleRewardLedgerService->completeStep($step, [
+                'skipped' => true,
+                'reason' => 'unsupported_source_type',
+                'source_type' => $request->source_type?->value,
+            ]);
+        }
+    }
+
+    private function runMessageOutboxStep(
+        \App\Flare\Models\CharacterBattleRewardRequest $request,
+        BattleRewardLedgerService $battleRewardLedgerService,
+        BattleRewardMessageOutboxService $battleRewardMessageOutboxService,
+    ): void {
+        $step = $request->steps()
+            ->where('step_name', BattleRewardStepName::MESSAGE_OUTBOX)
+            ->firstOrFail();
+
+        if ($step->status === BattleRewardStepStatus::COMPLETED) {
+            $battleRewardLedgerService->log('step.skipped_completed', $request, $step);
+
+            return;
+        }
+
+        $step = $battleRewardLedgerService->startStep($step);
+        $emittedCount = $battleRewardMessageOutboxService->emitUnemittedMessages($request);
+        $battleRewardLedgerService->completeStep($step, ['emitted_message_count' => $emittedCount]);
     }
 
     public function failed(Throwable $exception): void

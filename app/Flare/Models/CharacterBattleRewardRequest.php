@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CharacterBattleRewardRequest extends Model
 {
@@ -41,6 +42,16 @@ class CharacterBattleRewardRequest extends Model
         return $this->belongsTo(Character::class);
     }
 
+    public function steps(): HasMany
+    {
+        return $this->hasMany(CharacterBattleRewardRequestStep::class);
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(CharacterBattleRewardRequestMessage::class);
+    }
+
     public function scopePending(Builder $query): Builder
     {
         return $query->where('status', BattleRewardRequestStatus::PENDING);
@@ -49,6 +60,11 @@ class CharacterBattleRewardRequest extends Model
     public function scopeProcessing(Builder $query): Builder
     {
         return $query->where('status', BattleRewardRequestStatus::PROCESSING);
+    }
+
+    public function scopeResumable(Builder $query): Builder
+    {
+        return $query->where('status', BattleRewardRequestStatus::RESUMABLE);
     }
 
     public function scopeCompleted(Builder $query): Builder
@@ -66,6 +82,7 @@ class CharacterBattleRewardRequest extends Model
         return $query->whereIn('status', [
             BattleRewardRequestStatus::PENDING,
             BattleRewardRequestStatus::PROCESSING,
+            BattleRewardRequestStatus::RESUMABLE,
         ]);
     }
 

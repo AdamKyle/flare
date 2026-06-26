@@ -27,7 +27,7 @@ export default function StaleQueueView({
                     disabled={repairing || staleQueues.length === 0}
                     onClick={onRepair}
                 >
-                    {repairing ? "Repairing…" : "Repair stale queues"}
+                    {repairing ? "Recovering…" : "Recover stale queues"}
                 </button>
             </div>
             {staleQueues.map((queue) => (
@@ -62,6 +62,30 @@ export default function StaleQueueView({
                             <dd>{queue.processing_request_count}</dd>
                         </div>
                         <div>
+                            <dt className="font-medium">Resumable</dt>
+                            <dd>{queue.resumable_request_count}</dd>
+                        </div>
+                        <div>
+                            <dt className="font-medium">Current step</dt>
+                            <dd>{queue.current_ledger_step ?? "—"}</dd>
+                        </div>
+                        <div>
+                            <dt className="font-medium">Step status</dt>
+                            <dd>{queue.current_ledger_step_status ?? "—"}</dd>
+                        </div>
+                        <div>
+                            <dt className="font-medium">Checkpoint age</dt>
+                            <dd>
+                                {queue.checkpoint_age_seconds === null
+                                    ? "—"
+                                    : `${queue.checkpoint_age_seconds} seconds`}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt className="font-medium">Un-emitted messages</dt>
+                            <dd>{queue.un_emitted_message_count}</dd>
+                        </div>
+                        <div>
                             <dt className="font-medium">Oldest pending</dt>
                             <dd>
                                 {queue.oldest_pending_request_created_at ?? "—"}
@@ -83,6 +107,8 @@ export default function StaleQueueView({
                                     <th>Priority</th>
                                     <th>Source type</th>
                                     <th>Source ID</th>
+                                    <th>Ledger step</th>
+                                    <th>Messages</th>
                                     <th>Failed reason</th>
                                     <th>Created</th>
                                     <th>Updated</th>
@@ -100,6 +126,13 @@ export default function StaleQueueView({
                                         <td>{request.priority}</td>
                                         <td>{request.source_type}</td>
                                         <td>{request.source_id ?? "—"}</td>
+                                        <td>
+                                            {request.current_step_name ?? "—"}
+                                        </td>
+                                        <td>
+                                            {request.un_emitted_message_count ??
+                                                0}
+                                        </td>
                                         <td>{request.failed_reason ?? "—"}</td>
                                         <td>{request.created_at}</td>
                                         <td>{request.updated_at}</td>

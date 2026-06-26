@@ -12,6 +12,12 @@ const SERIES = [
         color: "#3b82f6",
         dash: "8,2,2,2",
     },
+    {
+        key: "resumable",
+        label: "Resumable",
+        color: "#8b5cf6",
+        dash: "4,4",
+    },
 ] as const;
 
 const CHART_H = 200;
@@ -66,7 +72,14 @@ function InlineSvgChart({ points }: { points: ChartPoint[] }) {
     const periods = points.map((p) => p.period);
     const maxValue = points.reduce(
         (acc, p) =>
-            Math.max(acc, p.completed, p.failed, p.pending, p.processing),
+            Math.max(
+                acc,
+                p.completed,
+                p.failed,
+                p.pending,
+                p.processing,
+                p.resumable ?? 0,
+            ),
         0,
     );
     const yTicks = useMemo(() => niceYTicks(maxValue), [maxValue]);
@@ -113,7 +126,10 @@ function InlineSvgChart({ points }: { points: ChartPoint[] }) {
             {SERIES.map(({ key, color, dash }) => {
                 const d = points
                     .map((p, i) => {
-                        const v = p[key as keyof ChartPoint] as number;
+                        const v =
+                            (p[key as keyof ChartPoint] as
+                                | number
+                                | undefined) ?? 0;
                         return `${i === 0 ? "M" : "L"} ${xPos(i)} ${yPos(v)}`;
                     })
                     .join(" ");
@@ -216,6 +232,9 @@ function ChartDataTable({ points }: { points: ChartPoint[] }) {
                             <th scope="col" className="p-2">
                                 Processing
                             </th>
+                            <th scope="col" className="p-2">
+                                Resumable
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -229,6 +248,7 @@ function ChartDataTable({ points }: { points: ChartPoint[] }) {
                                 <td className="p-2">{point.failed}</td>
                                 <td className="p-2">{point.pending}</td>
                                 <td className="p-2">{point.processing}</td>
+                                <td className="p-2">{point.resumable ?? 0}</td>
                             </tr>
                         ))}
                     </tbody>

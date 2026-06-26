@@ -126,6 +126,64 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
         $this->assertSame($second->id, CharacterBattleRewardRequest::findOrFail($second->id)->id);
     }
 
+    public function testResumableInterruptedRequestIsClaimedBeforeNewPendingQuest(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $manager = resolve(BattleRewardProcessingQueueManager::class);
+        $resumable = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::RESUMABLE,
+            'priority' => BattleRewardRequestPriority::SECOND,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+        ]);
+        CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'priority' => BattleRewardRequestPriority::FIRST,
+            'source_type' => BattleRewardRequestSourceType::QUEST,
+        ]);
+
+        $claimed = $manager->nextRequest($character->id);
+
+        $this->assertSame($resumable->id, $claimed?->id);
+        $this->assertSame(BattleRewardRequestStatus::PROCESSING, $claimed?->status);
+    }
+
+    public function testQuestPriorityBeatsLowerPriorityBacklogAfterResumableRequestCompletes(): void
+    {
+        Event::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $manager = resolve(BattleRewardProcessingQueueManager::class);
+        $resumable = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::RESUMABLE,
+            'priority' => BattleRewardRequestPriority::SECOND,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+        ]);
+        $backlog = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'priority' => BattleRewardRequestPriority::THIRD,
+            'source_type' => BattleRewardRequestSourceType::EXPLORATION,
+        ]);
+        $quest = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'priority' => BattleRewardRequestPriority::FIRST,
+            'source_type' => BattleRewardRequestSourceType::QUEST,
+        ]);
+
+        $manager->markCompleted($manager->nextRequest($character->id));
+        $claimedQuest = $manager->nextRequest($character->id);
+        $manager->markCompleted($claimedQuest);
+        $claimedBacklog = $manager->nextRequest($character->id);
+
+        $this->assertSame($resumable->id, CharacterBattleRewardRequest::findOrFail($resumable->id)->id);
+        $this->assertSame($quest->id, $claimedQuest?->id);
+        $this->assertSame($backlog->id, $claimedBacklog?->id);
+    }
+
     public function testFailedAndCompletedRequestsAreRetained(): void
     {
         Event::fake();

@@ -6,6 +6,7 @@ use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,9 +28,11 @@ class BattleRewardQueueAdminService
 
         return [
             'queued' => (int) $counts->get(BattleRewardRequestStatus::PENDING->value, 0)
-                + (int) $counts->get(BattleRewardRequestStatus::PROCESSING->value, 0),
+                + (int) $counts->get(BattleRewardRequestStatus::PROCESSING->value, 0)
+                + (int) $counts->get(BattleRewardRequestStatus::RESUMABLE->value, 0),
             'pending' => (int) $counts->get(BattleRewardRequestStatus::PENDING->value, 0),
             'processing' => (int) $counts->get(BattleRewardRequestStatus::PROCESSING->value, 0),
+            'resumable' => (int) $counts->get(BattleRewardRequestStatus::RESUMABLE->value, 0),
             'completed' => (int) $counts->get(BattleRewardRequestStatus::COMPLETED->value, 0),
             'failed' => (int) $counts->get(BattleRewardRequestStatus::FAILED->value, 0),
         ];
@@ -79,6 +82,7 @@ class BattleRewardQueueAdminService
                 . 'SUM(CASE WHEN source_type IN (?, ?, ?) THEN 1 ELSE 0 END) as quest_requests, '
                 . 'SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as pending_count, '
                 . 'SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as processing_count, '
+                . 'SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as resumable_count, '
                 . 'SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as failed_count, '
                 . 'SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as completed_count, '
                 . 'MAX(character_battle_reward_requests.created_at) as last_request_at',
@@ -91,6 +95,7 @@ class BattleRewardQueueAdminService
                     BattleRewardRequestSourceType::RAID_QUEST->value,
                     BattleRewardRequestStatus::PENDING->value,
                     BattleRewardRequestStatus::PROCESSING->value,
+                    BattleRewardRequestStatus::RESUMABLE->value,
                     BattleRewardRequestStatus::FAILED->value,
                     BattleRewardRequestStatus::COMPLETED->value,
                 ],
@@ -102,10 +107,20 @@ class BattleRewardQueueAdminService
 
     public function requests(Request $request, ?int $characterId = null): LengthAwarePaginator
     {
-        return $this->filteredRequests($request, $characterId)
+        $requests = $this->filteredRequests($request, $characterId)
             ->with('character:id,name')
+            ->with(['steps' => fn ($query) => $query->orderBy('id')])
+            ->withCount([
+                'steps as completed_step_count' => fn (Builder $query) => $query->where('status', BattleRewardStepStatus::COMPLETED),
+                'steps as total_step_count',
+                'messages as un_emitted_message_count' => fn (Builder $query) => $query->unemitted(),
+            ])
             ->orderByDesc('id')
             ->paginate(min($request->integer('per_page', 25), 100));
+
+        $requests->getCollection()->transform(fn (CharacterBattleRewardRequest $rewardRequest): array => $this->requestPayload($rewardRequest));
+
+        return $requests;
     }
 
     public function statusBreakdown(Request $request, ?int $characterId = null): array
@@ -139,6 +154,12 @@ class BattleRewardQueueAdminService
                     ->queued()
                     ->orderBy('id')
                     ->limit(50)
+                    ->withCount([
+                        'steps as completed_step_count' => fn (Builder $query) => $query->where('status', BattleRewardStepStatus::COMPLETED),
+                        'steps as total_step_count',
+                        'messages as un_emitted_message_count' => fn (Builder $query) => $query->unemitted(),
+                    ])
+                    ->with(['steps' => fn ($query) => $query->orderBy('id')])
                     ->get([
                         'id',
                         'character_id',
@@ -151,6 +172,12 @@ class BattleRewardQueueAdminService
                         'updated_at',
                     ]);
 
+                $currentRequest = $requests->first(fn (CharacterBattleRewardRequest $request): bool => in_array($request->status, [
+                    BattleRewardRequestStatus::PROCESSING,
+                    BattleRewardRequestStatus::RESUMABLE,
+                ], true));
+                $currentStep = $currentRequest?->steps->first(fn ($step): bool => $step->status !== BattleRewardStepStatus::COMPLETED);
+
                 return [
                     'character_id' => $state->character_id,
                     'character_name' => $state->character?->name,
@@ -162,14 +189,25 @@ class BattleRewardQueueAdminService
                         : $state->heartbeat_at->diffInSeconds(now()),
                     'pending_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->pending()->count(),
                     'processing_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->processing()->count(),
+                    'resumable_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->resumable()->count(),
                     'failed_request_count' => CharacterBattleRewardRequest::forCharacter($state->character_id)->failed()->count(),
+                    'current_request_id' => $currentRequest?->id,
+                    'current_request_source_type' => $currentRequest?->source_type?->value,
+                    'current_request_source_id' => $currentRequest?->source_id,
+                    'current_ledger_step' => $currentStep?->step_name?->value,
+                    'current_ledger_step_status' => $currentStep?->status?->value,
+                    'current_ledger_step_heartbeat_at' => $currentStep?->heartbeat_at,
+                    'checkpoint_age_seconds' => is_null($currentStep?->checkpoint_json) || is_null($currentStep?->heartbeat_at)
+                        ? null
+                        : $currentStep->heartbeat_at->diffInSeconds(now()),
+                    'un_emitted_message_count' => $requests->sum('un_emitted_message_count'),
                     'oldest_pending_request_created_at' => CharacterBattleRewardRequest::forCharacter($state->character_id)
                         ->pending()
                         ->min('created_at'),
                     'oldest_processing_request_created_at' => CharacterBattleRewardRequest::forCharacter($state->character_id)
                         ->processing()
                         ->min('created_at'),
-                    'requests' => $requests,
+                    'requests' => $requests->map(fn (CharacterBattleRewardRequest $rewardRequest): array => $this->requestPayload($rewardRequest))->values(),
                 ];
             })
             ->all();
@@ -194,6 +232,32 @@ class BattleRewardQueueAdminService
             });
     }
 
+    private function requestPayload(CharacterBattleRewardRequest $request): array
+    {
+        $currentStep = $request->relationLoaded('steps')
+            ? $request->steps->first(fn ($step): bool => $step->status !== BattleRewardStepStatus::COMPLETED)
+            : null;
+
+        return [
+            'id' => $request->id,
+            'character' => $request->relationLoaded('character') && ! is_null($request->character)
+                ? ['name' => $request->character->name]
+                : null,
+            'status' => $request->status?->value,
+            'priority' => $request->priority?->value,
+            'source_type' => $request->source_type?->value,
+            'source_id' => $request->source_id,
+            'failed_reason' => $request->failed_reason,
+            'created_at' => $request->created_at,
+            'updated_at' => $request->updated_at,
+            'current_step_name' => $currentStep?->step_name?->value,
+            'current_step_status' => $currentStep?->status?->value,
+            'completed_step_count' => (int) ($request->completed_step_count ?? 0),
+            'total_step_count' => (int) ($request->total_step_count ?? 0),
+            'un_emitted_message_count' => (int) ($request->un_emitted_message_count ?? 0),
+        ];
+    }
+
     private function validatedDays(int $days): int
     {
         return in_array($days, [1, 7, 14, 30, 60, 120, 365], true) ? $days : 7;
@@ -216,6 +280,7 @@ class BattleRewardQueueAdminService
                     'period' => $period,
                     'pending' => (int) $statuses->get(BattleRewardRequestStatus::PENDING->value, 0),
                     'processing' => (int) $statuses->get(BattleRewardRequestStatus::PROCESSING->value, 0),
+                    'resumable' => (int) $statuses->get(BattleRewardRequestStatus::RESUMABLE->value, 0),
                     'completed' => (int) $statuses->get(BattleRewardRequestStatus::COMPLETED->value, 0),
                     'failed' => (int) $statuses->get(BattleRewardRequestStatus::FAILED->value, 0),
                 ];

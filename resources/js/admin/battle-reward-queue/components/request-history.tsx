@@ -51,6 +51,8 @@ export default function RequestHistory({
                             <th>Priority</th>
                             <th>Source</th>
                             <th>Source ID</th>
+                            <th>Ledger</th>
+                            <th>Messages</th>
                             <th>Failed reason</th>
                             <th>Created</th>
                             <th>Updated</th>
@@ -71,6 +73,11 @@ export default function RequestHistory({
                                 <td>{request.priority}</td>
                                 <td>{request.source_type}</td>
                                 <td>{request.source_id ?? "—"}</td>
+                                <td>
+                                    {request.completed_step_count ?? 0}/
+                                    {request.total_step_count ?? 0}
+                                </td>
+                                <td>{request.un_emitted_message_count ?? 0}</td>
                                 <td>{request.failed_reason ?? "—"}</td>
                                 <td>{request.created_at}</td>
                                 <td>{request.updated_at}</td>

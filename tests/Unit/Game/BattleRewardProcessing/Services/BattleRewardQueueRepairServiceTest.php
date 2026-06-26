@@ -8,6 +8,7 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\BattleRewardProcessing\Services\BattleRewardQueueRepairService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardResumeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -44,7 +45,7 @@ class BattleRewardQueueRepairServiceTest extends TestCase
         );
     }
 
-    public function testRepairMarksStaleProcessingRowsFailedWithExactReason(): void
+    public function testRepairMarksLegacyStaleProcessingRowsFailedWithExactReason(): void
     {
         Event::fake();
         Queue::fake();
@@ -63,7 +64,7 @@ class BattleRewardQueueRepairServiceTest extends TestCase
 
         $request->refresh();
         $this->assertSame(BattleRewardRequestStatus::FAILED, $request->status);
-        $this->assertSame(BattleRewardQueueRepairService::FAILED_REASON, $request->failed_reason);
+        $this->assertSame(BattleRewardResumeService::LEGACY_FAILED_REASON, $request->failed_reason);
     }
 
     public function testRepairLeavesPendingRowsPending(): void
@@ -197,9 +198,14 @@ class BattleRewardQueueRepairServiceTest extends TestCase
 
         $this->assertSame([
             'repaired_queue_state_count' => 1,
-            'failed_processing_request_count' => 1,
+            'resumed_processing_request_count' => 0,
+            'legacy_failed_processing_request_count' => 1,
             'restarted_processor_count' => 1,
             'cleared_inactive_queue_state_count' => 0,
+            'resumable_step_count' => 0,
+            'unemitted_message_count' => 0,
+            'would_resume_processing_request_count' => 0,
+            'would_legacy_fail_processing_request_count' => 0,
         ], $summary);
     }
 }

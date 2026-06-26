@@ -54,24 +54,66 @@ class BattleLocationRewardService {
      * @return array
      */
     public function handleLocationSpecificRewards(int $killCount = 1): array {
-        $this->character = $this->purgatorySmithHouseRewardHandler->handleFightingAtPurgatorySmithHouse($this->character, $this->monster, $killCount);
+        $plan = $this->planLocationReward($this->character, $this->monster, [
+            'kill_count' => $killCount,
+        ]);
 
-        $this->character = $this->goldMinesRewardHandler->handleFightingAtGoldMines($this->character, $this->monster, $killCount);
+        $result = $this->applyPlannedLocationReward($this->character, $plan);
 
-        $this->character = $this->theOldChurchRewardHandler->handleFightingAtTheOldChurch($this->character, $this->monster, $killCount);
+        return $result['currencies'] ?? [];
+    }
 
-        $earnedCurrencies = [];
+    public function planLocationReward(Character $character, Monster $monster, array $context = []): array
+    {
+        $killCount = (int) ($context['kill_count'] ?? 1);
 
-        foreach ([
-            $this->purgatorySmithHouseRewardHandler->getEarnedCurrencies(),
-            $this->goldMinesRewardHandler->getEarnedCurrencies(),
-            $this->theOldChurchRewardHandler->getEarnedCurrencies(),
-        ] as $handlerCurrencies) {
-            foreach ($handlerCurrencies as $currency => $amount) {
-                $earnedCurrencies[$currency] = ($earnedCurrencies[$currency] ?? 0) + $amount;
-            }
+        $plan = $this->purgatorySmithHouseRewardHandler->planFightingAtPurgatorySmithHouse($character, $monster, $killCount, $context);
+
+        if ($plan['applies']) {
+            return $plan;
         }
 
-        return $earnedCurrencies;
+        $plan = $this->goldMinesRewardHandler->planFightingAtGoldMines($character, $monster, $killCount, $context);
+
+        if ($plan['applies']) {
+            return $plan;
+        }
+
+        $plan = $this->theOldChurchRewardHandler->planFightingAtTheOldChurch($character, $monster, $killCount, $context);
+
+        if ($plan['applies']) {
+            return $plan;
+        }
+
+        return [
+            'handler' => 'none',
+            'applies' => false,
+            'noop' => true,
+            'reason' => 'no_location_reward',
+            'request_id' => $context['request_id'] ?? null,
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
+            'kill_count' => $killCount,
+            'location' => [
+                'x' => $character->map?->character_position_x,
+                'y' => $character->map?->character_position_y,
+                'game_map_id' => $character->map?->game_map_id,
+            ],
+        ];
+    }
+
+    public function applyPlannedLocationReward(Character $character, array $plan): array
+    {
+        return match ($plan['handler'] ?? 'none') {
+            'purgatory_smith_house' => $this->purgatorySmithHouseRewardHandler->applyPlannedPurgatorySmithHouseReward($character, $plan),
+            'gold_mines' => $this->goldMinesRewardHandler->applyPlannedGoldMinesReward($character, $plan),
+            'the_old_church' => $this->theOldChurchRewardHandler->applyPlannedTheOldChurchReward($character, $plan),
+            default => [
+                'noop' => true,
+                'currencies' => [],
+                'item_count' => 0,
+                'event_created' => false,
+            ],
+        };
     }
 }
