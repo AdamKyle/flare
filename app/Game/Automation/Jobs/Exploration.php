@@ -2,23 +2,46 @@
 
 namespace App\Game\Automation\Jobs;
 
+use App\Admin\Events\ExplorationMonitoringUpdated;
+use App\Admin\Services\MonitoredBugReportService;
+use App\Flare\Models\Character;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
+use App\Flare\Services\CharacterRewardService;
+use App\Flare\Values\AutomationType;
+use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationStatus;
+use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
+use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
+use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Services\ExplorationWarningService;
+use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
+use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,10 +51,11 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Psr\SimpleCache\InvalidArgumentException;
+use Throwable;
 
 class Exploration implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SafelyBroadcastsEvents, SerializesModels;
 
     const int MAX_ATTEMPTS = 10;
 
@@ -68,6 +92,12 @@ class Exploration implements ShouldQueue
     private int $attempts = 0;
 
     private array $lastFightData = [];
+
+    private string $currentState = 'initializing';
+
+    private ?string $cancellationReason = null;
+
+    private array $missingFightDataKeys = [];
 
     private array $battleData = [
         'total_creatures' => 0,
@@ -116,51 +146,99 @@ class Exploration implements ShouldQueue
 
         $this->explorationWarningService = $explorationWarningService;
 
-        $this->explorationLog = ExplorationLog::where('character_automation_id', $this->automationId)
-            ->whereNull('ended_at')
-            ->first();
+        try {
+            $this->explorationLog = ExplorationLog::where('character_automation_id', $this->automationId)
+                ->whereNull('ended_at')
+                ->first();
 
-        $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
+            $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
-        if (is_null($automation)) {
-            return;
-        }
+            if (is_null($automation)) {
+                if (! is_null($this->explorationLog)) {
+                    $missingAutomationContext = [
+                        'character_id' => $this->character->id,
+                        'automation_id' => $this->automationId,
+                        'exploration_log_id' => $this->explorationLog->id,
+                        'cancellation_reason' => 'missing_automation',
+                    ];
 
-        if ($this->shouldBail($automation)) {
-            $this->endAutomation($automation, $characterCacheData);
+                    Log::error('Exploration job found no matching automation for an open exploration log.', $missingAutomationContext);
+                    Log::channel('exploration_automation')->error(
+                        'Exploration job found no matching automation for an open exploration log.',
+                        $missingAutomationContext,
+                    );
 
-            Cache::delete('can-character-survive-'.$this->character->id);
+                    $this->explorationLogService->finalize($this->explorationLog, 'missing_automation');
+                    $this->explorationWarningService->createWarning(
+                        $this->character,
+                        $this->explorationLog,
+                        'missing_automation',
+                        'Exploration ended because the automation was missing. Please report this as a bug.',
+                    );
 
-            return;
-        }
+                    $character = $this->character->refresh();
 
-        $automation = $this->updateAutomation($automation);
+                    $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $this->automationId];
+                    $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+                    $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
+                }
 
-        $params = [
-            'selected_monster_id' => $automation->monster_id,
-            'attack_type' => $this->attackType,
-        ];
-
-        $roundStartedAt = now();
-
-        if ($this->encounter($automation, $params, $this->timeDelay)) {
-
-            if (! is_null($this->explorationLog)) {
-                $this->explorationLogService->recordFightTotals($this->explorationLog, [
-                    'fights' => 1,
-                    'kills' => $this->battleData['total_creatures'],
-                    'weapon_damage' => $this->battleData['weapon_damage'],
-                    'spell_damage' => $this->battleData['spell_damage'],
-                    'healing_done' => $this->battleData['healing_done'],
-                    'damage_blocked' => $this->battleData['damage_blocked'],
-                ], false);
+                return;
             }
 
-            $time = now()->diffInMinutes($automation->completed_at);
+            if ($this->shouldBail($automation)) {
+                $this->endAutomation($automation, $characterCacheData);
 
-            $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
+                Cache::delete('can-character-survive-'.$this->character->id);
 
-            if ($delay === 0) {
+                return;
+            }
+
+            $automation = $this->updateAutomation($automation);
+
+            $params = [
+                'selected_monster_id' => $automation->monster_id,
+                'attack_type' => $this->attackType,
+            ];
+
+            $roundStartedAt = now();
+
+            if ($this->encounter($automation, $params, $this->timeDelay)) {
+
+                if (! is_null($this->explorationLog)) {
+                    $this->explorationLogService->recordFightTotals($this->explorationLog, [
+                        'fights' => 1,
+                        'kills' => $this->battleData['total_creatures'],
+                        'weapon_damage' => $this->battleData['weapon_damage'],
+                        'spell_damage' => $this->battleData['spell_damage'],
+                        'healing_done' => $this->battleData['healing_done'],
+                        'damage_blocked' => $this->battleData['damage_blocked'],
+                    ], false);
+                }
+
+                $time = now()->diffInMinutes($automation->completed_at);
+
+                $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
+
+                if ($delay === 0) {
+                    $rewardContext = [
+                        'total_creatures' => $this->battleData['total_creatures'],
+                        'total_xp' => $this->battleData['total_xp'],
+                        'total_faction_points' => $this->battleData['total_faction_points'],
+                        'total_skill_xp' => $this->battleData['total_skill_xp'],
+                    ];
+
+                    if (! is_null($this->explorationLog)) {
+                        $rewardContext['exploration_log_id'] = $this->explorationLog->id;
+                    }
+
+                    $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $rewardContext);
+
+                    $this->endAutomation($automation, $characterCacheData);
+
+                    return;
+                }
+
                 $rewardContext = [
                     'total_creatures' => $this->battleData['total_creatures'],
                     'total_xp' => $this->battleData['total_xp'],
@@ -174,43 +252,37 @@ class Exploration implements ShouldQueue
 
                 $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $rewardContext);
 
-                $this->endAutomation($automation, $characterCacheData);
+                // @codeCoverageIgnoreStart
+                $delaySeconds = max(0, ($this->timeDelay * 60) - $roundStartedAt->diffInSeconds(now()));
+                Exploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('exploration');
+                // @codeCoverageIgnoreEnd
 
                 return;
             }
 
-            $rewardContext = [
-                'total_creatures' => $this->battleData['total_creatures'],
-                'total_xp' => $this->battleData['total_xp'],
-                'total_faction_points' => $this->battleData['total_faction_points'],
-                'total_skill_xp' => $this->battleData['total_skill_xp'],
-            ];
-
-            if (! is_null($this->explorationLog)) {
-                $rewardContext['exploration_log_id'] = $this->explorationLog->id;
+            if (is_null(CharacterAutomation::find($automation->id))) {
+                return;
             }
 
-            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $rewardContext);
+            if ($this->attempts >= self::MAX_ATTEMPTS) {
+                $this->cancelAutomation(
+                    $automation,
+                    'Exploration ended because this fight could not be completed. Please review your setup and try again.',
+                    'max_attempts_reached',
+                );
 
-            // @codeCoverageIgnoreStart
-            $delaySeconds = max(0, ($this->timeDelay * 60) - $roundStartedAt->diffInSeconds(now()));
-            Exploration::dispatch($this->character, $this->automationId, $this->attackType, $this->timeDelay)->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('exploration');
-            // @codeCoverageIgnoreEnd
+                return;
+            }
 
-            return;
+            $reason = $this->cancellationReason ?? 'fight_failed';
+            $message = $reason === 'malformed_fight_data'
+                ? 'Exploration ended because the fight could not be started correctly. Please try again.'
+                : 'Exploration ended because the fight could not be completed. Please try again.';
+
+            $this->cancelAutomation($automation, $message, $reason);
+        } catch (Throwable $throwable) {
+            $this->handleFailure($throwable, 'unexpected_exception');
         }
-
-        if (is_null(CharacterAutomation::find($automation->id))) {
-            return;
-        }
-
-        if ($this->attempts >= self::MAX_ATTEMPTS) {
-            $this->cancelAutomation($automation);
-
-            return;
-        }
-
-        $this->cancelAutomation($automation, 'Something went wrong with automation. Could not process fight. Automation Canceled.');
     }
 
     /**
@@ -463,6 +535,7 @@ class Exploration implements ShouldQueue
      */
     private function fightAutomationMonster(CharacterAutomation $automation, array $params): bool
     {
+        $this->currentState = 'setting_up_fight';
 
         $setupData = $this->setUpFightForMonster($params);
 
@@ -478,6 +551,7 @@ class Exploration implements ShouldQueue
             return false;
         }
 
+        $this->currentState = 'fighting_monster';
         $data = $this->fightMonster();
 
         if (empty($data)) {
@@ -566,12 +640,23 @@ class Exploration implements ShouldQueue
 
     private function logMalformedBattleData(CharacterAutomation $automation, string $source, array $data): void
     {
-        Log::error('Exploration automation received malformed battle data.', [
+        $this->cancellationReason = 'malformed_fight_data';
+        $this->missingFightDataKeys = $this->missingRequiredHealthData($data);
+        $context = [
             'character_id' => $this->character->id,
             'automation_id' => $automation->id,
+            'exploration_log_id' => $this->explorationLog?->id,
+            'monster_id' => $automation->monster_id,
+            'attack_type' => $this->attackType,
+            'attempts' => $this->attempts,
+            'current_state' => $this->currentState,
+            'cancellation_reason' => $this->cancellationReason,
             'source' => $source,
-            'missing_or_invalid_payload' => $this->missingRequiredHealthData($data),
-        ]);
+            'missing_or_invalid_payload' => $this->missingFightDataKeys,
+        ];
+
+        Log::error('Exploration automation received malformed battle data.', $context);
+        Log::channel('exploration_automation')->error('Exploration automation received malformed battle data.', $context);
     }
 
     /**
@@ -644,16 +729,17 @@ class Exploration implements ShouldQueue
 
         $this->rewardPlayer($character);
 
-        event(new UpdateCharacterStatus($character));
-
-        event(new AutomationTimeOut($character->user, 0));
+        $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $this->automationId];
+        $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
+        event(new ExplorationMonitoringUpdated($this->character->id));
 
     }
 
     /**
      * Cancel automation without rewarding the player.
      */
-    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null, string $reason = 'error'): void
+    private function cancelAutomation(CharacterAutomation $automation, ?string $message = null, string $reason = 'failed'): void
     {
         $automation->delete();
 
@@ -661,9 +747,11 @@ class Exploration implements ShouldQueue
 
         Cache::delete('can-character-survive-'.$this->character->id);
 
-        if (! is_null($message)) {
-            $this->sendOutEventLogUpdate($message);
-        }
+        $this->logCancellation($automation, $reason);
+
+        $warningMessage = $message ?? 'Exploration ended because an unexpected error occurred. Please report this as a bug.';
+
+        $this->sendOutEventLogUpdate($warningMessage);
 
         $character = $this->character->refresh();
 
@@ -673,13 +761,15 @@ class Exploration implements ShouldQueue
                 $character,
                 $this->explorationLog,
                 $reason,
-                $message ?? 'Exploration was cancelled.',
+                $warningMessage,
             );
         }
 
-        event(new UpdateCharacterStatus($character));
-
-        event(new AutomationTimeOut($character->user, 0));
+        $broadcastContext = ['character_id' => $this->character->id, 'automation_id' => $automation->id];
+        $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationStatus($character->user, false), $broadcastContext);
+        event(new ExplorationMonitoringUpdated($this->character->id));
     }
 
     /**
@@ -704,6 +794,7 @@ class Exploration implements ShouldQueue
         $this->lastFightData = $data;
 
         if ($this->shouldAttackAgain($data) && $this->attempts >= self::MAX_ATTEMPTS) {
+            $this->cancellationReason = 'max_attempts_reached';
             $this->sendOutEventLogUpdate('The Guide is growing restless with how long it takes you to kill one monster. "I am bored child!" He grows agitated and decides to walk off. Guess your not strong enough? Either way, you make a run for it to live!', true);
 
             return [];
@@ -718,13 +809,127 @@ class Exploration implements ShouldQueue
         return $data;
     }
 
+    public function failed(Throwable $throwable): void
+    {
+        $this->character = Character::find($this->character->id) ?? $this->character;
+        $this->explorationLog = ExplorationLog::where('character_automation_id', $this->automationId)
+            ->whereNull('ended_at')
+            ->first();
+        $this->explorationLogService = new ExplorationLogService;
+        $this->explorationWarningService = new ExplorationWarningService;
+
+        (new MonitoredBugReportService)->reportError(
+            'exploration-automation',
+            $throwable->getMessage(),
+            ['character_id' => $this->character->id, 'automation_id' => $this->automationId],
+            $throwable::class,
+            $this->character->id,
+        );
+
+        $this->handleFailure($throwable, 'queue_job_failed');
+    }
+
+    private function handleFailure(Throwable $throwable, string $reason): void
+    {
+        $automation = CharacterAutomation::where('id', $this->automationId)
+            ->where('character_id', $this->character->id)
+            ->where('type', AutomationType::EXPLORING)
+            ->first();
+        $context = $this->failureContext($throwable, $reason, $automation);
+
+        Log::error('Exploration automation failed.', $context);
+        Log::channel('exploration_automation')->error('Exploration automation failed.', $context);
+
+        if (is_null($automation)) {
+            return;
+        }
+
+        $automation->delete();
+        Cache::delete('character-defence-'.$this->character->id);
+        Cache::delete('character-sheet-'.$this->character->id);
+        Cache::delete('can-character-survive-'.$this->character->id);
+
+        $warningMessage = 'Exploration stopped because something went wrong. Please try again.';
+        $this->sendOutEventLogUpdate($warningMessage);
+
+        if (! is_null($this->explorationLog) && is_null($this->explorationLog->ended_at)) {
+            $this->explorationLogService->finalize($this->explorationLog, $reason);
+
+            $warningExists = ExplorationWarning::where(
+                'exploration_log_id',
+                $this->explorationLog->id,
+            )->where('type', $reason)->exists();
+
+            if (! $warningExists) {
+                $this->explorationWarningService->createWarning(
+                    $this->character,
+                    $this->explorationLog,
+                    $reason,
+                    $warningMessage,
+                );
+            }
+        }
+
+        $character = $this->character->refresh();
+        $broadcastContext = ['character_id' => $character->id, 'automation_id' => $this->automationId];
+        $this->safelyDispatchBroadcastEvent(new UpdateCharacterStatus($character), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationTimeOut($character->user, 0), $broadcastContext);
+        $this->safelyDispatchBroadcastEvent(new AutomationStatus($character->user, false), $broadcastContext);
+        event(new ExplorationMonitoringUpdated($this->character->id));
+    }
+
+    private function failureContext(
+        Throwable $throwable,
+        string $reason,
+        ?CharacterAutomation $automation,
+    ): array {
+        return [
+            'exception_class' => $throwable::class,
+            'exception_message' => $throwable->getMessage(),
+            'exception_file' => $throwable->getFile(),
+            'exception_line' => $throwable->getLine(),
+            'trace' => $throwable->getTraceAsString(),
+            'character_id' => $this->character->id,
+            'automation_id' => $this->automationId,
+            'exploration_automation_id' => $automation?->id,
+            'monster_id' => $automation?->monster_id ?? $this->monster?->id,
+            'exploration_log_id' => $this->explorationLog?->id,
+            'attack_type' => $this->attackType,
+            'attempts' => $this->attempts,
+            'current_state' => $this->currentState,
+            'cancellation_reason' => $reason,
+            'missing_fight_data_keys' => $this->missingFightDataKeys,
+        ];
+    }
+
+    private function logCancellation(CharacterAutomation $automation, string $reason): void
+    {
+        $context = [
+            'character_id' => $this->character->id,
+            'automation_id' => $automation->id,
+            'exploration_log_id' => $this->explorationLog?->id,
+            'monster_id' => $automation->monster_id,
+            'attack_type' => $this->attackType,
+            'attempts' => $this->attempts,
+            'current_state' => $this->currentState,
+            'cancellation_reason' => $reason,
+            'missing_fight_data_keys' => $this->missingFightDataKeys,
+        ];
+
+        Log::warning('Exploration automation cancelled.', $context);
+        Log::channel('exploration_automation')->warning('Exploration automation cancelled.', $context);
+    }
+
     /**
      * Send out event log updates
      */
     private function sendOutEventLogUpdate(string $message, bool $makeItalic = false, bool $isReward = false): void
     {
         if ($this->character->isLoggedIn()) {
-            event(new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward));
+            $this->safelyDispatchBroadcastEvent(
+                new AutomationLogUpdate($this->character->user->id, $message, $makeItalic, $isReward),
+                ['character_id' => $this->character->id, 'automation_id' => $this->automationId]
+            );
         }
     }
 
@@ -742,7 +947,10 @@ class Exploration implements ShouldQueue
 
         $character->update(['gold' => $gold]);
 
-        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
+        $this->safelyDispatchBroadcastEvent(
+            new UpdateCharacterCurrenciesEvent($character->refresh()),
+            ['character_id' => $this->character->id, 'automation_id' => $this->automationId]
+        );
 
         $this->sendOutEventLogUpdate('Gained 10k Gold for completing the exploration.', false, true);
     }

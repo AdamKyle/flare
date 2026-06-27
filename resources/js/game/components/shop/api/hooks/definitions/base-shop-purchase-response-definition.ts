@@ -1,6 +1,6 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-count-definition';
+import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 
 export interface PurchaseResponse {
   message: string;

@@ -397,6 +397,7 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $this->assertEquals(1000000, $character->gold);
         $this->assertEquals(1000, $character->gold_dust);
         $this->assertEquals(100, $character->shards);
+        $this->assertEquals(2, $character->level);
 
     }
 

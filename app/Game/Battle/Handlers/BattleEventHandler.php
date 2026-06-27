@@ -8,8 +8,9 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\BattleRewardProcessing\Jobs\BattleRewardHandler;
-use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -19,7 +20,10 @@ class BattleEventHandler
 {
     use FetchEquipped;
 
-    public function __construct(private BattleRewardService $battleRewardService, private WeeklyBattleService $weeklyBattleService) {}
+    public function __construct(
+        private BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
+        private WeeklyBattleService $weeklyBattleService,
+    ) {}
 
     /**
      * Process the fact the character has died.
@@ -50,7 +54,48 @@ class BattleEventHandler
      */
     public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
     {
-        BattleRewardHandler::dispatch($characterId, $monsterId, $context)->onQueue('battle_reward_processing')->onConnection('battle_reward_processing');
+        $sourceType = isset($context['exploration_log_id'])
+            ? BattleRewardRequestSourceType::EXPLORATION
+            : BattleRewardRequestSourceType::BATTLE;
+        $sourceId = $this->buildSourceId($sourceType, $characterId, $monsterId, $context);
+
+        $this->battleRewardProcessingQueueManager->enqueue(
+            $characterId,
+            BattleRewardRequestPriority::SECOND,
+            $sourceType,
+            $sourceId,
+            [
+                'character_id' => $characterId,
+                'monster_id' => $monsterId,
+                'context' => $context,
+            ],
+        );
+    }
+
+    private function buildSourceId(
+        BattleRewardRequestSourceType $sourceType,
+        int $characterId,
+        int $monsterId,
+        array $context,
+    ): string {
+        $uniqueTime = number_format(microtime(true), 6, '', '');
+
+        if ($sourceType === BattleRewardRequestSourceType::EXPLORATION) {
+            return implode(':', [
+                $sourceType->value,
+                $characterId,
+                $context['exploration_log_id'],
+                $monsterId,
+                $uniqueTime,
+            ]);
+        }
+
+        return implode(':', [
+            $sourceType->value,
+            $characterId,
+            $monsterId,
+            $uniqueTime,
+        ]);
     }
 
     /**

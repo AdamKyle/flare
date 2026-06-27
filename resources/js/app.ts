@@ -3,10 +3,6 @@
  */
 import './bootstrap';
 
-/**
- * Load the game.
- *
- * This will grab the user and the character id from the
- * meta tags that are fill when logged in.
- */
-import './game/game-launcher';
+if (document.getElementById('game-launcher') !== null) {
+  void import('./game/game-launcher');
+}

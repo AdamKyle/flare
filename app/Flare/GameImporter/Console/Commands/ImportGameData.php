@@ -2,6 +2,8 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Admin\Import\LocationGems\LocationGemsImport;
+use App\Admin\Import\MapGems\MapGemsImport;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -11,6 +13,7 @@ use Illuminate\Console\Command;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ImportGameData extends Command
 {
@@ -46,6 +49,13 @@ class ImportGameData extends Command
 
             $dirNameForReImport = Str::title($dirNameForReImport);
 
+            if ($dirNameForReImport === 'World Gems') {
+                $this->line('Re importing: World Gems');
+                $this->importWorldGems();
+
+                return $this->line('All done ...');
+            }
+
             if (! isset($files[$dirNameForReImport])) {
 
                 return $this->error('No directory in data-imports for: '.$dirNameForReImport);
@@ -62,6 +72,7 @@ class ImportGameData extends Command
 
         // Import maps:
         $this->importGameMaps();
+        $this->importWorldMapGems();
 
         $this->import($excelMapper, $files['Locations Give Items'], 'Locations Give Items');
 
@@ -83,6 +94,7 @@ class ImportGameData extends Command
         $this->line('Importing map spefic data ...');
 
         $this->import($excelMapper, $files['Locations'], 'Locations');
+        $this->importWorldLocationGems();
         $this->import($excelMapper, $files['Npcs'], 'Npcs');
 
         // // This stuff depends on maps existing.
@@ -142,9 +154,40 @@ class ImportGameData extends Command
             }
         }
 
+        if (isset($result['Core Imports'])) {
+            $result['Core Imports'] = $this->sortFilesByCustomOrder($result['Core Imports'], [
+                'Core Imports/game_races.xlsx',
+                'Core Imports/game_classes.xlsx',
+                'Core Imports/class-specials.xlsx',
+            ]);
+        }
+
         $result['Kingdoms'] = array_reverse($result['Kingdoms']);
 
         return $result;
+    }
+
+    /**
+     * Sort files by an explicit import order.
+     */
+    protected function sortFilesByCustomOrder(array $files, array $order): array
+    {
+        usort($files, function (string $firstFile, string $secondFile) use ($order) {
+            $firstIndex = array_search($firstFile, $order, true);
+            $secondIndex = array_search($secondFile, $order, true);
+
+            if ($firstIndex === false) {
+                $firstIndex = PHP_INT_MAX;
+            }
+
+            if ($secondIndex === false) {
+                $secondIndex = PHP_INT_MAX;
+            }
+
+            return $firstIndex <=> $secondIndex;
+        });
+
+        return $files;
     }
 
     /**
@@ -183,6 +226,50 @@ class ImportGameData extends Command
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
         }
+    }
+
+    /**
+     * Import world map gems.
+     */
+    protected function importWorldMapGems(): void
+    {
+        $path = resource_path('data-imports').'/World Gems/map-gems.xlsx';
+
+        Excel::import(new MapGemsImport(), $path);
+    }
+
+    /**
+     * Import world location gems.
+     */
+    protected function importWorldLocationGems(): void
+    {
+        $path = resource_path('data-imports').'/World Gems/location-gems.xlsx';
+
+        Excel::import(new LocationGemsImport(), $path);
+    }
+
+    /**
+     * Import both world gem files in dependency order.
+     */
+    protected function importWorldGems(): void
+    {
+        $mapGemsPath = resource_path('data-imports').'/World Gems/map-gems.xlsx';
+        $locationGemsPath = resource_path('data-imports').'/World Gems/location-gems.xlsx';
+
+        if (! file_exists($mapGemsPath)) {
+            $this->error('Missing file: resources/data-imports/World Gems/map-gems.xlsx');
+
+            return;
+        }
+
+        if (! file_exists($locationGemsPath)) {
+            $this->error('Missing file: resources/data-imports/World Gems/location-gems.xlsx');
+
+            return;
+        }
+
+        Excel::import(new MapGemsImport(), $mapGemsPath);
+        Excel::import(new LocationGemsImport(), $locationGemsPath);
     }
 
     /**

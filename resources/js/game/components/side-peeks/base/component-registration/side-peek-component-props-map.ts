@@ -1,4 +1,6 @@
 import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
+import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
+import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
@@ -20,5 +22,7 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: CharacterKingdomDetailsProps;
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: TraversePropsDefinition;
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: ServerChatItemProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: LogEntrySidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_BUG_REPORT]: BugReportSidePeekProps;
   // Future components go here
 };

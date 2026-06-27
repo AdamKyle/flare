@@ -1,263 +1,131 @@
 ---
 name: front-end-component-creation
-description: Use this skill when adding a new React/TypeScript component, deciding where it belongs, and creating the required API hooks, definitions, props, state, utils, and supporting files.
+description: Use when creating a new Flare frontend React component, deciding placement, props, extraction, rendering style, accessibility behavior, and styling structure.
 ---
 
-# Frontend Component Creation
+# Flare Frontend Component Creation
 
-Use this skill whenever adding a new React/TypeScript component.
+Use this skill whenever creating a new React component in Flare.
 
-Before creating files, inspect the nearest existing feature, parent component, API hook, type folder, and UI pattern. Match the existing structure unless it violates the frontend conventions skill.
+## First decision: where does it belong?
 
-Do not create a flat component folder when the component owns API calls, local hooks, child components, websocket behavior, enums, utils, or multiple screens.
+Place the component by ownership:
 
-## Decide where the component goes
+```text
+resources/js/ui                         generic shared UI primitive
+resources/js/game/reusable-components   reusable game-domain component
+resources/js/game/components/<feature>  game feature component
+resources/js/admin/<feature>            admin feature component
+resources/js/configuration/...          app configuration/registry only
+```
 
-Place the component by ownership, not by convenience.
+Do not put game-specific or admin-specific components into `ui`.
 
-If the component is only used by one feature, place it inside that feature:
+## File structure
 
-resources/js/game/components/<parent-feature>/<feature>/components/<component-name>.tsx
+Use kebab-case files and PascalCase component names.
 
-If the component is a main self-contained feature section, create a feature folder:
+For a feature component:
 
-resources/js/game/components/<parent-feature>/<new-feature>/<new-feature>.tsx
-
-If the component is one screen or step inside a feature flow, place it in:
-
-resources/js/game/components/<parent-feature>/<feature>/screens/<screen-name>.tsx
-
-If the component is reused by multiple nearby components inside the same feature, keep it inside that feature’s `components` folder.
-
-If the component is reused across unrelated features, place it in the appropriate shared/common component area only after confirming an existing shared pattern exists.
-
-Do not move a component into a shared folder just because it might be reused later.
-
-## Required structure for a self-contained feature
-
-Use this layout when the new component has API endpoints, local state hooks, child components, or feature-specific types:
-
-resources/js/game/components/<parent-feature>/<new-feature>
-|
-+-- <new-feature>.tsx
-|
-+-- api
-|   |
-|   +-- definitions
-|   |   |
-|   |   +-- <entity>-definition.ts
-|   |   +-- <entity>-api-response-definition.ts
-|   |   +-- <entity>-request-definition.ts
-|   |
-|   +-- enums
-|   |   |
-|   |   +-- <feature>-api-urls.ts
-|   |
-|   +-- hooks
-|       |
-|       +-- <use-feature-api>.ts
-|       |
-|       +-- definitions
-|           |
-|           +-- <use-feature-api>-definition.ts
-|           +-- <use-feature-api>-params.ts
-|
-+-- components
-|   |
-|   +-- <child-component>.tsx
-|   |
-|   +-- types
-|       |
-|       +-- <child-component>-props.ts
-|
-+-- hooks
-|   |
-|   +-- <use-feature-state>.ts
-|   |
-|   +-- definitions
-|       |
-|       +-- <use-feature-state>-definition.ts
-|       +-- <use-feature-state>-params.ts
-|       +-- <use-feature-state>-state.ts
-|
-+-- screens
-|   |
-|   +-- <feature-screen>.tsx
-|   |
-|   +-- types
-|       |
-|       +-- <feature-screen>-props.ts
-|
-+-- enums
-|   |
-|   +-- <feature>-steps.ts
-|   +-- <feature>-types.ts
-|
-+-- types
-|   |
-|   +-- <shared-feature-props.ts>
-|   +-- <shared-feature-state.ts>
-|
-+-- utils
-|
-+-- <feature>-formatter.ts
-+-- <feature>-normalizer.ts
-+-- <feature>-options.ts
-
-Only create folders that are actually needed.
-
-## API endpoint rules
-
-If the component calls backend endpoints, create an API hook.
-
-API hooks go in:
-
-api/hooks/<use-feature-api>.ts
-
-API hook params go in:
-
-api/hooks/definitions/<use-feature-api>-params.ts
-
-API hook return shape goes in:
-
-api/hooks/definitions/<use-feature-api>-definition.ts
-
-API URLs go in:
-
-api/enums/<feature>-api-urls.ts
-
-API request interfaces go in:
-
-api/definitions/<action>-request-definition.ts
-
-API response interfaces go in:
-
-api/definitions/<entity>-api-response-definition.ts
-
-Backend-shaped fields must remain snake_case unless an existing mapper already converts them.
-
-Components must not call axios directly.
-
-Components must not build raw URLs inline.
-
-Use the existing `useApiHandler()` pattern.
-
-## Component props and state rules
-
-Do not define props inline in the component file.
-
-Component props go in:
-
+```text
+components/<component-name>.tsx
 components/types/<component-name>-props.ts
+```
 
-The interface must be named:
+For a shared UI component:
 
-<ComponentName>Props
+```text
+ui/<family>/<component-name>.tsx
+ui/<family>/types/<component-name>-props.ts
+ui/<family>/enums/<component-name>-variant.ts
+ui/<family>/styles/base-style.ts
+ui/<family>/styles/variant-style.ts
+```
 
-Do not define state interfaces inline in component or hook files.
+Only create folders that are needed.
 
-Hook state goes in:
+## Props
 
-hooks/definitions/<use-hook-name>-state.ts
+Do not define props inline for shared or substantial components.
 
-Hook params go in:
+Use interface:
 
-hooks/definitions/<use-hook-name>-params.ts
+```ts
+export default interface ComponentNameProps {
+  label: string;
+  on_click: () => void;
+}
+```
 
-Hook return interfaces go in:
+Follow existing prop naming where present: `on_click`, `on_close`, `is_open`, `aria_label`.
 
-hooks/definitions/<use-hook-name>-definition.ts
+Keep API-shaped data fields snake_case.
 
-Use `interface` for object shapes.
+## Component body order
 
-Use `type` only when TypeScript requires it for unions, mapped types, tuple-derived values, conditional types, or `keyof typeof`.
+Use this order for substantial components:
 
-## Hook rules
+1. context hooks;
+2. custom hooks;
+3. state;
+4. refs;
+5. derived values;
+6. handlers;
+7. effects;
+8. render helpers;
+9. final return.
 
-Create a local hook when the component has reusable state behavior, API orchestration, websocket subscription behavior, or enough logic that the component becomes hard to read.
+Hooks must never be called conditionally or after early returns.
 
-Local feature hooks go in:
+## Rendering
 
-hooks/<use-feature-hook>.ts
+Large conditional JSX belongs in render helpers.
 
-API hooks go in:
+Good:
 
-api/hooks/<use-feature-api>.ts
+```tsx
+const renderFooter = () => {
+  if (!hasFooter) {
+    return null;
+  }
 
-Hooks must not return JSX.
+  return <Footer />;
+};
+```
 
-Hooks must not hide rendering behavior.
+Avoid nested ternaries and large inline `{condition && (...)}` blocks.
 
-Hooks may return state, derived values, handlers, and fetch functions.
+## Accessibility
 
-## Rendering rules
+Every new component must be accessible:
 
-Do not use large inline conditional JSX.
+- real buttons for actions;
+- real links for navigation;
+- labels for form fields;
+- `aria-label` for icon-only buttons;
+- `aria-hidden="true"` for decorative icons;
+- visible focus styles;
+- screen-reader text or live regions for important status changes;
+- no color-only state indicators.
 
-Do not use inline ternary JSX for major loading, empty, error, or default branches.
+## Styling
 
-Do not use multi-line `{condition && (...)}` blocks.
+Use Tailwind theme tokens, mobile-first classes, and dark mode classes.
 
-Create descriptive render helpers.
+Use `clsx` for conditional classes.
 
-Render helpers must use early returns.
+Move repeated or conditional class maps to a local `styles` file.
 
-Example names:
+Do not add raw hex colors or static inline styles for normal layout/color.
 
-- `renderLoadingState`
-- `renderEmptyState`
-- `renderErrorMessage`
-- `renderHeader`
-- `renderFilters`
-- `renderTable`
-- `renderActions`
-- `renderFooter`
+## Completion checklist
 
-Default return should be the main UI path.
+A new component is acceptable when:
 
-## Component order
-
-Use this order:
-
-1. context hooks
-2. custom hooks
-3. Redux hooks
-4. state
-5. refs
-6. memoized values
-7. derived values
-8. data-fetching helpers
-9. effects
-10. getters
-11. handlers
-12. render helpers
-13. final return
-14. export default
-
-## Spacing and formatting
-
-Group related const declarations.
-
-Add a blank line between logical groups.
-
-Do not create dense blocks of unrelated derived values.
-
-Do not add comments unless required by the existing project pattern or explicitly requested.
-
-Do not add placeholder empty handlers.
-
-Do not add unused files, unused props, unused imports, or unused definitions.
-
-## Final check before completion
-
-Confirm the new component:
-
-- is in the correct ownership folder;
-- has props in the correct `types` folder;
-- has API definitions in `api/definitions`;
-- has API hook params and return interfaces in `api/hooks/definitions`;
-- has local hook params, state, and returns in `hooks/definitions`;
-- has no inline interfaces;
-- has no large inline conditional JSX;
-- follows import order;
-- only created folders that are actually needed.
+- it lives under the correct owner folder;
+- props are in a type file;
+- API/websocket/game-data logic is not mixed into presentational components;
+- rendering is readable;
+- mobile-first and dark mode styles exist;
+- controls are keyboard and screen-reader accessible;
+- imports use aliases where crossing major folders.

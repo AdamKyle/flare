@@ -209,15 +209,36 @@
                 {{ $character->user->banned_reason }}
               </div>
 
-              <x-core.forms.regular-form
-                method="POST"
-                action="{{ route('unban.user', ['user' => $character->user]) }}"
-              >
-                @csrf
-                <div class="flex">
-                  <x-core.buttons.success-button type="submit">
-                    Unban User
-                  </x-core.buttons.success-button>
+                            @php
+                                $silenceHasError = $errors->has('silence_for');
+                            @endphp
+                            <div class="mb-5 w-full">
+                                <label for="silence-options" class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100">Silence Options</label>
+                                <select
+                                    class="block w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 {{ $silenceHasError ? 'border-red-600 focus:border-red-600 focus:ring-red-600 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600' }}"
+                                    id="silence-options"
+                                    name="silence_for"
+                                    @if($silenceHasError) aria-invalid="true" aria-describedby="silence-options-error" @endif
+                                >
+                                    <option @selected(old('silence_for') === 'Please select')>Please select</option>
+                                    <option value="5" @selected(old('silence_for') === '5')>5 Minutes</option>
+                                    <option value="10" @selected(old('silence_for') === '10')>10 Minutes</option>
+                                    <option value="30" @selected(old('silence_for') === '30')>30 Minutes</option>
+                                </select>
+                                @error('silence_for')
+                                    <p id="silence-options-error" class="mt-2 text-sm font-medium text-red-700 dark:text-red-400" role="alert">
+                                        {{ $message }}
+                                    </p>
+                                @enderror
+                            </div>
+
+                            <div class="flex">
+                                <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
+                                    Silence User
+                                </x-core.buttons.primary-button>
+                            </div>
+                        </x-core.forms.regular-form>
+                    </div>
                 </div>
               </x-core.forms.regular-form>
             @else
@@ -227,20 +248,119 @@
               >
                 @csrf
 
-                <div class="mb-5">
-                  <label for="ban-length-options" class="label mb-2 block">
-                    Ban Options
-                  </label>
-                  <select
-                    class="form-control"
-                    id="ban-length-options"
-                    name="for"
-                  >
-                    <option>Please select</option>
-                    <option value="one-day">1 Day</option>
-                    <option value="one-week">1 Week</option>
-                    <option value="perm">For ever</option>
-                  </select>
+                            <div class="mb-4 mt-4">
+                                <strong>Reason They are banned:</strong> {{$character->user->banned_reason}}
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <strong>Character Request:</strong> {{$character->user->un_ban_request}}
+                            </div>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('unban.user', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.success-button type="submit">
+                                        Unban User
+                                    </x-core.buttons.success-button>
+
+                                </div>
+                            </x-core.forms.regular-form>
+                        @elseif (!is_null($character->user->un_ban_request))
+                            <div class="mb-4 mt-4">
+                                <strong>Reason They are banned:</strong> {{$character->user->banned_reason}}
+                            </div>
+
+                            <div class="mb-4 mt-4">
+                                <strong>Character Request:</strong> {{$character->user->un_ban_request}}
+                            </div>
+
+                            <h4 class="mb-5 mt-5">Unban Character</h4>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('unban.user', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.success-button type="submit">
+                                        Unban User
+                                    </x-core.buttons.success-button>
+
+                                </div>
+                            </x-core.forms.regular-form>
+
+                            <h4 class="mb-5 mt-5">Or, Ignore Request</h4>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('user.ignore.unban.request', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.primary-button type="submit">
+                                        Ignore Request
+                                    </x-core.buttons.primary-button>
+                                </div>
+                            </x-core.forms.regular-form>
+                        @elseif ($character->user->is_banned)
+                            <div class="mb-4 mt-4">
+                                <strong>Reason They are banned:</strong> {{$character->user->banned_reason}}
+                            </div>
+
+                            <x-core.forms.regular-form method="POST" action="{{ route('unban.user', ['user' => $character->user]) }}">
+                                @csrf
+                                <div class="flex">
+                                    <x-core.buttons.success-button type="submit">
+                                        Unban User
+                                    </x-core.buttons.success-button>
+                                </div>
+                            </x-core.forms.regular-form>
+                        @else
+                            <x-core.forms.regular-form method="POST" action="{{ route('ban.user', ['user' => $character->user]) }}">
+                                @csrf
+
+                                @php
+                                    $banLengthHasError = $errors->has('for');
+                                    $banReasonHasError = $errors->has('reason');
+                                @endphp
+                                <div class="mb-5 w-full">
+                                    <label for="ban-length-options" class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100">Ban Options</label>
+                                    <select
+                                        class="block w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 {{ $banLengthHasError ? 'border-red-600 focus:border-red-600 focus:ring-red-600 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600' }}"
+                                        id="ban-length-options"
+                                        name="for"
+                                        @if($banLengthHasError) aria-invalid="true" aria-describedby="ban-length-options-error" @endif
+                                    >
+                                        <option @selected(old('for') === 'Please select')>Please select</option>
+                                        <option value="one-day" @selected(old('for') === 'one-day')>1 Day</option>
+                                        <option value="one-week" @selected(old('for') === 'one-week')>1 Week</option>
+                                        <option value="perm" @selected(old('for') === 'perm')>For ever</option>
+                                    </select>
+                                    @error('for')
+                                        <p id="ban-length-options-error" class="mt-2 text-sm font-medium text-red-700 dark:text-red-400" role="alert">
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-5 w-full">
+                                    <label for="ban-reason" class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100">Reason</label>
+                                    <textarea
+                                        class="block w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 {{ $banReasonHasError ? 'border-red-600 focus:border-red-600 focus:ring-red-600 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500' : 'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600' }}"
+                                        id="ban-reason"
+                                        name="reason"
+                                        @if($banReasonHasError) aria-invalid="true" aria-describedby="ban-reason-error" @endif
+                                    >{{ old('reason') }}</textarea>
+                                    @error('reason')
+                                        <p id="ban-reason-error" class="mt-2 text-sm font-medium text-red-700 dark:text-red-400" role="alert">
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+                                </div>
+
+                                <div class="flex">
+                                    <x-core.buttons.primary-button css="ltr:ml-auto rtl:mr-auto" type="submit">
+                                        Ban User
+                                    </x-core.buttons.primary-button>
+                                </div>
+                            </x-core.forms.regular-form>
+                        @endif
+
+                    </div>
                 </div>
 
                 <div class="mb-5">

@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
@@ -34,7 +35,7 @@ class RaidBattleController extends Controller
         $this->deleteMonsterCacheHealth($character->id, $monster->id);
 
         if ($monster->is_raid_boss) {
-            $raidBoss = RaidBoss::where('raid_boss_id', $monster->id)->first();
+            $raidBoss = $this->findCurrentRaidBoss($character, $monster);
 
             if (is_null($raidBoss)) {
                 ServerMessageHandler::sendBasicMessage($character->user, 'There is an issue with raids right now. Please contact The Creator on Discord for more assistance. You can find discord if you hover over
@@ -80,7 +81,18 @@ class RaidBattleController extends Controller
             return response()->json($result, $status);
         }
 
-        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)->first();
+        $raidBoss = $this->findCurrentRaidBoss($character, $monster);
+
+        if (is_null($raidBoss)) {
+            return response()->json([
+                'message' => 'No Raid Boss was found ...',
+            ], 422);
+        }
+
+        $raidBossParticipation = RaidBossParticipation::where('character_id', $character->id)
+            ->where('raid_id', $raidBoss->raid_id)
+            ->where('raid_boss_id', $raidBoss->id)
+            ->first();
 
         if (! is_null($raidBossParticipation)) {
             if ($raidBossParticipation->attacks_left <= 0) {
@@ -88,14 +100,6 @@ class RaidBattleController extends Controller
                     'message' => 'Error! You cannot attack until tomorrow. Out of attacks!',
                 ], 422);
             }
-        }
-
-        $raidBoss = RaidBoss::where('raid_boss_id', $monster->id)->first();
-
-        if (is_null($raidBoss)) {
-            return response()->json([
-                'message' => 'No Raid Boss was found ...',
-            ], 422);
         }
 
         $result = $this->raidBattleService->setRaidBossHealth($raidBoss->boss_current_hp)->fightRaidMonster($character, $monster->id, $attackTypeRequest->attack_type, true);
@@ -108,5 +112,21 @@ class RaidBattleController extends Controller
         }
 
         return response()->json($result, $status);
+    }
+
+    private function findCurrentRaidBoss(Character $character, Monster $monster): ?RaidBoss
+    {
+        $location = Location::where('game_map_id', $character->map->game_map_id)
+            ->where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->first();
+
+        if (is_null($location) || is_null($location->raid_id)) {
+            return null;
+        }
+
+        return RaidBoss::where('raid_id', $location->raid_id)
+            ->where('raid_boss_id', $monster->id)
+            ->first();
     }
 }

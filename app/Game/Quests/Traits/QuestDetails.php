@@ -74,7 +74,7 @@ trait QuestDetails
         }
 
         $assistingNpc = $factionLoyalty->factionLoyaltyNpcs->filter(function ($factionLoyaltyNpc) use ($quest) {
-            return $factionLoyaltyNpc->npc_id === $quest->npc_id;
+            return $factionLoyaltyNpc->npc_id === $quest->assisting_npc_id;
         })->first();
 
         if (is_null($assistingNpc)) {

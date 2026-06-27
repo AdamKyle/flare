@@ -24,6 +24,8 @@ class CharacterClassValue
 
     const DANCER = 'Dancer';
 
+    const BUCCANEER = 'Buccaneer';
+
     // These are special classes that require you to unlock them
     // via the class rank's system:
 
@@ -38,6 +40,8 @@ class CharacterClassValue
     const BOOK_BINDER = 'Book Binder';
 
     const APOTHECARY = 'Apothecary';
+
+    const BEASTMASTER = 'Beastmaster';
 
     private string $value;
 
@@ -61,6 +65,8 @@ class CharacterClassValue
         self::CLERIC => 'Cleric',
         self::BOOK_BINDER => 'Book Binder',
         self::APOTHECARY => 'Apothecary',
+        self::BUCCANEER => 'Buccaneer',
+        self::BEASTMASTER => 'Beastmaster',
     ];
 
     protected $nonCaster = [
@@ -73,6 +79,8 @@ class CharacterClassValue
         self::ALCOHOLIC,
         self::MERCHANT,
         self::GUNSLINGER,
+        self::BUCCANEER,
+        self::BEASTMASTER,
     ];
 
     protected $caster = [
@@ -244,6 +252,16 @@ class CharacterClassValue
     public function isApothecary(): bool
     {
         return $this->value === self::APOTHECARY;
+    }
+
+    public function isBuccaneer(): bool
+    {
+        return $this->value === self::BUCCANEER;
+    }
+
+    public function isBeastmaster(): bool
+    {
+        return $this->value === self::BEASTMASTER;
     }
 
     /**

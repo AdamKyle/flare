@@ -142,7 +142,7 @@ class IsCharacterExploringTest extends TestCase
             'character_id' => $this->character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
         ]);
     }
 }

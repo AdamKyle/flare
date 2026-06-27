@@ -6,12 +6,14 @@ use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
 
 class QuestsControllerTest extends TestCase
 {
-    use CreateNpc, CreateQuest, RefreshDatabase;
+    use CreateItem, CreateLocation, CreateNpc, CreateQuest, RefreshDatabase;
 
     public function test_regular_quest_list_can_be_fetched_during_exploration(): void
     {
@@ -96,6 +98,50 @@ class QuestsControllerTest extends TestCase
         $response->assertJson([
             'message' => 'You cannot do that while Delve automation is running. Cancel it first.',
         ]);
+    }
+
+    public function test_quest_item_drop_location_payload_includes_delve_fields_for_delve_location(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $npc = $this->createNpc();
+        $location = $this->createLocation([
+            'hours_to_drop' => 2,
+            'delve_enemy_strength_increase' => 0.05,
+        ]);
+        $item = $this->createItem(['type' => 'quest', 'drop_location_id' => $location->id]);
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'item_id' => $item->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/quest/'.$quest->id.'/'.$character->id);
+
+        $response->assertOk();
+        $this->assertEquals(2, $response->json('item.drop_location.hours_to_drop'));
+        $this->assertEquals(0.05, $response->json('item.drop_location.delve_enemy_strength_increase'));
+    }
+
+    public function test_quest_item_drop_location_payload_has_no_delve_fields_for_normal_special_location(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $npc = $this->createNpc();
+        $location = $this->createLocation();
+        $item = $this->createItem(['type' => 'quest', 'drop_location_id' => $location->id]);
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'item_id' => $item->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/quest/'.$quest->id.'/'.$character->id);
+
+        $response->assertOk();
+        $hoursToDropValue = $response->json('item.drop_location.hours_to_drop');
+        $this->assertTrue(
+            $hoursToDropValue === null || $hoursToDropValue === 0,
+            'Normal location should not have hours_to_drop > 0'
+        );
     }
 
     public function test_regular_quest_hand_in_is_blocked_during_faction_loyalty(): void

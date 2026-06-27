@@ -1,4 +1,8 @@
 import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
+import BugReportSidePeek from '../../../../../admin/logs-dashboard/components/side-peeks/bug-report-side-peek';
+import LogEntrySidePeek from '../../../../../admin/logs-dashboard/components/side-peeks/log-entry-side-peek';
+import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
+import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
 import BackPack from '../../character-inventory/backpack/backpack';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
@@ -55,6 +59,14 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
     component: ServerChatItem,
     props: {} as ServerChatItemProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: {
+    component: LogEntrySidePeek,
+    props: {} as LogEntrySidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_BUG_REPORT]: {
+    component: BugReportSidePeek,
+    props: {} as BugReportSidePeekProps,
   },
   // Add more components here
 };

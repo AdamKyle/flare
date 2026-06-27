@@ -9,18 +9,6 @@
 @endpush
 
 @section('content')
-<<<<<<< HEAD
-  <div class="container mx-auto mb-5 px-4 pb-10">
-    <div class="mb-10 text-center lg:mt-10">
-      <h1
-        class="mb-5 text-4xl text-7xl font-thin text-gray-800 md:text-9xl dark:text-gray-300"
-      >
-        Features
-      </h1>
-      <p class="mb-10 text-gray-800 italic dark:text-gray-300">
-        All the features, none of the cost!
-      </p>
-=======
     <div class="container px-4 pb-10 mx-auto mb-5">
         <div class="mb-10 text-center lg:mt-10">
             <h1 class="mb-5 text-4xl font-thin text-gray-800 text-7xl dark:text-gray-300 md:text-9xl">Features</h1>
@@ -465,7 +453,6 @@
                 </p>
             </div>
         </div>
->>>>>>> master
     </div>
 
     <div>

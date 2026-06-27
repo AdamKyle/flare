@@ -38,11 +38,11 @@ class HandInQuest implements ShouldQueue
      */
     public function handle(NpcQuestsHandler $npcQuestsHandler): void
     {
-
         try {
             $npcQuestsHandler->handleNpcQuest($this->character, $this->quest);
             $npcQuestsHandler->questRewardHandler()->createquestQuestLog($this->character, $this->quest);
             event(new GlobalMessageEvent($this->character->name.' Has completed a quest ('.$this->quest->name.') for: '.$this->quest->npc->real_name.' and been rewarded with a godly gift!'));
+            $npcQuestsHandler->questRewardHandler()->processXpReward($this->quest, $this->character->refresh());
         } catch (Exception $e) {
             Log::error($e->getMessage());
 

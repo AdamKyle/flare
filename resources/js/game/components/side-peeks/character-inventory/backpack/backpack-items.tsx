@@ -15,7 +15,7 @@ import { SelectedEquippableItemsOptions } from './enums/selected-equippable-item
 import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
 import { ItemSelectedType } from '../types/item-selected-type';
 
-import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-count-definition';
+import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 import { GameDataError } from 'game-data/components/game-data-error';
 
 import { Alert } from 'ui/alerts/alert';

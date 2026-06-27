@@ -136,7 +136,8 @@ class AlchemyControllerTest extends TestCase
         $this->assertEquals(200, $response->status());
         $this->assertEquals($jsonData['items'][0]['id'], $item->id);
         $this->assertGreaterThan(0, $jsonData['skill_xp']['current_xp']);
-        $this->assertNotEmpty($character->inventory->slots);
+        $this->assertEquals(1, $character->alchemyBag->slots()->where('item_id', $item->id)->value('amount'));
+        $this->assertEquals(0, $character->inventory->slots()->where('item_id', $item->id)->count());
         $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
     }

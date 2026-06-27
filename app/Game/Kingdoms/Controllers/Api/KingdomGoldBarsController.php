@@ -104,6 +104,12 @@ class KingdomGoldBarsController extends Controller
 
         $amount = $request->amount_to_withdraw;
 
+        if ($amount < 1) {
+            return response()->json([
+                'message' => 'Amount to withdraw must be at least 1.',
+            ], 422);
+        }
+
         if ($kingdom->gold_bars < $amount) {
             $amount = $kingdom->gold_bars;
         }

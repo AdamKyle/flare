@@ -22,7 +22,7 @@ class AlchemyController extends Controller
         return response()->json([
             'items' => $this->alchemyService->fetchAlchemistItems($character),
             'skill_xp' => $this->alchemyService->fetchSkillXP($character),
-            'inventory_count' => $this->craftingService->getInventoryCount($character),
+            'inventory_count' => $this->craftingService->getAlchemyBagCount($character),
         ]);
     }
 
@@ -43,7 +43,7 @@ class AlchemyController extends Controller
         return response()->json([
             'items' => $this->alchemyService->fetchAlchemistItems($character, false),
             'skill_xp' => $this->alchemyService->fetchSkillXP($character),
-            'inventory_count' => $this->craftingService->getInventoryCount($character),
+            'inventory_count' => $this->craftingService->getAlchemyBagCount($character),
         ]);
     }
 }

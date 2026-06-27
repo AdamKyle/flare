@@ -30,29 +30,45 @@ class ResetDailyRaidAttackLimits extends Command
     public function handle()
     {
 
-        $eventRaid = Event::whereNotNull('raid_id')->first();
+        $eventRaidIds = Event::whereNotNull('raid_id')->pluck('raid_id');
 
-        if (is_null($eventRaid)) {
+        if ($eventRaidIds->isEmpty()) {
             return;
         }
 
-        $isRaidBossDead = ! is_null(RaidBossParticipation::where('killed_boss', true)->first());
+        $participationWasReset = false;
 
-        if ($isRaidBossDead) {
+        RaidBossParticipation::with('raidBoss')
+            ->whereIn('raid_id', $eventRaidIds)
+            ->where('killed_boss', false)
+            ->chunkById(250, function ($participationRecords) use (&$participationWasReset) {
+                foreach ($participationRecords as $record) {
+                    if ($record->attacks_left === 5) {
+                        continue;
+                    }
+
+                    $monsterIdForBroadcast = $record->raidBoss?->raid_boss_id;
+
+                    $record->update([
+                        'attacks_left' => 5,
+                    ]);
+
+                    $record = $record->refresh();
+
+                    event(new UpdateRaidAttacksLeft(
+                        $record->character->user_id,
+                        5,
+                        $record->damage_dealt,
+                        $monsterIdForBroadcast,
+                    ));
+
+                    $participationWasReset = true;
+                }
+            });
+
+        if (! $participationWasReset) {
             return;
         }
-
-        RaidBossParticipation::chunkById(250, function ($participationRecords) {
-            foreach ($participationRecords as $record) {
-                $record->update([
-                    'attacks_left' => 5,
-                ]);
-
-                $record = $record->refresh();
-
-                event(new UpdateRaidAttacksLeft($record->character->user_id, 5, $record->damage_dealt));
-            }
-        });
 
         event(new GlobalMessageEvent('Raid Boss Attack Limit has been reset!'));
     }

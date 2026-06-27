@@ -30,21 +30,10 @@ class QuestsController extends Controller
 
     public function index(Character $character)
     {
-        $eventRaidQuests = [];
-
-        $raidEvents = Event::whereNotNull('raid_id')
-            ->with('raid')
-            ->get();
-
-        foreach ($raidEvents as $event) {
-
-            $eventRaidQuests[] = $this->buildQuestCacheService->fetchQuestsForRaid($event)[0];
-        }
-
         return response()->json([
             'completed_quests' => $character->questsCompleted()->whereNotNull('quest_id')->pluck('quest_id'),
             'quests' => $this->buildQuestCacheService->getRegularQuests(),
-            'raid_quests' => $eventRaidQuests,
+            'raid_quests' => $this->buildQuestCacheService->fetchActiveRaidQuests(),
             'player_plane' => $character->map->gameMap->name,
             'is_winter_event' => Event::where('type', EventType::WINTER_EVENT)->count() > 0,
             'is_delusional_memories' => Event::where('type', EventType::DELUSIONAL_MEMORIES_EVENT)->count() > 0,

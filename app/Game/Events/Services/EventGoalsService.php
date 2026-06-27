@@ -17,16 +17,30 @@ class EventGoalsService
 
     public function getEventGoalData(Character $character, ?GlobalEventGoal $goal = null, ?int $participantsCount = null): array
     {
-        $globalEventGoal = $goal ?? GlobalEventGoal::first();
-        $characterKills = 0;
-        $characterCrafts = 0;
-        $characterEnchants = 0;
+        $gameMap = $character->map?->gameMap;
+        $eventType = $gameMap?->only_during_event_type;
 
-        if (! is_null($character->globalEventKills) || ! is_null($character->globalEventCrafts) || ! is_null($character->globalEventEnchants)) {
-            $characterKills = $character->globalEventKills->kills ?? 0;
-            $characterCrafts = $character->globalEventCrafts->crafts ?? 0;
-            $characterEnchants = $character->globalEventEnchants->enchants ?? 0;
+        if (is_null($eventType)) {
+            return ['event_goals' => null];
         }
+
+        $globalEventGoal = GlobalEventGoal::where('event_type', $eventType)->first();
+
+        if (is_null($globalEventGoal)) {
+            return ['event_goals' => null];
+        }
+
+        $characterKills = $character->globalEventKills()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first()?->kills ?? 0;
+
+        $characterCrafts = $character->globalEventCrafts()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first()?->crafts ?? 0;
+
+        $characterEnchants = $character->globalEventEnchants()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first()?->enchants ?? 0;
 
         return [
             'event_goals' => [

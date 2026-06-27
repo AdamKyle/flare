@@ -35,7 +35,7 @@ class CharacterStatBuilder
 
     private Collection $skills;
 
-    private GameMap $map;
+    private ?GameMap $map = null;
 
     private DefenceBuilder $defenceBuilder;
 
@@ -84,7 +84,7 @@ class CharacterStatBuilder
 
         $this->characterBoons = $this->fetchCharacterBoons($character);
 
-        $this->map = $this->character->map->gameMap;
+        $this->map = $this->character->map?->gameMap;
 
         $this->skills = $this->character->skills;
 
@@ -217,6 +217,10 @@ class CharacterStatBuilder
             return 0;
         }
 
+        if (is_null($this->map)) {
+            return 0;
+        }
+
         if ($this->map->mapType()->isHell() ||
             $this->map->mapType()->isPurgatory() ||
             $this->map->mapType()->isTwistedMemories()
@@ -340,10 +344,7 @@ class CharacterStatBuilder
     {
         $stat = $this->statMod($this->character->damage_stat, $voided);
 
-        $validWeaponTypes = array_diff(
-            array_column(ItemType::cases(), 'value'),
-            [ItemType::RING->value, ItemType::SPELL_DAMAGE->value, ItemType::SPELL_HEALING->value]
-        );
+        $validWeaponTypes = ItemType::validWeapons();
 
         $types = is_array($type) ? $type : [$type];
 
@@ -497,7 +498,7 @@ class CharacterStatBuilder
      */
     public function buildTotalAttack(): int
     {
-        $weaponDamage = $this->buildDamage('weapon') + $this->buildDamage('weapon');
+        $weaponDamage = $this->buildDamage(ItemType::validWeapons()) + $this->buildDamage(ItemType::validWeapons());
         $ringDamage = $this->buildDamage('ring') + $this->buildDamage('ring');
         $spellDamage = $this->buildDamage('spell-damage') + $this->buildDamage('spell-damage');
 
@@ -639,7 +640,7 @@ class CharacterStatBuilder
         }
 
         if (empty($this->equippedItems)) {
-            if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+            if ($this->character->map?->gameMap?->mapType()->isPurgatory()) {
                 if ($itemDevouring >= 0.45) {
                     $itemDevouring -= 0.45;
                 }
@@ -654,7 +655,7 @@ class CharacterStatBuilder
         $bestAffixDevouring = max(array_merge($prefixDevouring, $suffixDevouring));
         $amount = $itemDevouring + $bestAffixDevouring;
 
-        if ($this->character->map->gameMap->mapType()->isPurgatory()) {
+        if ($this->character->map?->gameMap?->mapType()->isPurgatory()) {
             if ($amount >= 0.45) {
                 $amount -= 0.45;
             }
@@ -687,7 +688,7 @@ class CharacterStatBuilder
 
         // Handle map type restrictions
         if ($chance > 0) {
-            if (($this->character->map->gameMap->mapType()->isPurgatory() || $this->character->map->gameMap->mapType()->isTwistedMemories()) && $chance > 0.45) {
+            if (($this->character->map?->gameMap?->mapType()->isPurgatory() || $this->character->map?->gameMap?->mapType()->isTwistedMemories()) && $chance > 0.45) {
                 if ($this->character->classType()->isProphet()) {
                     return min($chance, 0.65);
                 } else {

@@ -103,58 +103,6 @@
         </x-core.dl.dl>
       @endif
 
-<<<<<<< HEAD
-      @if (! is_null($quest))
-        <div
-          class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-        ></div>
-        <p class="mb-4">This quest item is used in the following quest:</p>
-        <x-core.dl.dl>
-          <x-core.dl.dt>Quest Name:</x-core.dl.dt>
-          <x-core.dl.dd>
-            @guest
-              <a
-                href="{{
-                  route('info.page.quest', [
-                    'quest' => $quest->id,
-                  ])
-                }}"
-                target="_blank"
-              >
-                <i class="fas fa-external-link-alt"></i>
-                {{ $quest->name }}
-              </a>
-            @else
-              @if (auth()->user()->hasRole('Admin'))
-                <a
-                  href="{{
-                    route('quests.show', [
-                      'quest' => $quest->id,
-                    ])
-                  }}"
-                  target="_blank"
-                >
-                  <i class="fas fa-external-link-alt"></i>
-                  {{ $quest->name }}
-                </a>
-              @else
-                <a
-                  href="{{
-                  route('info.page.quest', [
-                    'quest' => $quest->id,
-                  ])
-                }}"
-                  target="_blank"
-                >
-                  <i class="fas fa-external-link-alt"></i>
-                  {{ $quest->name }}
-                </a>
-              @endif
-            @endguest
-          </x-core.dl.dd>
-        </x-core.dl.dl>
-      @endif
-=======
                     </dd>
                     <dt>X/Y: </dt>
                     <dd>
@@ -200,7 +148,6 @@
                     <p class="mb-4">Players cannot be auto battling for this item to drop. Looting in this location is capped at 45%.
                     All drop chances are 1/100. Players may also eed to do relevant quests to access this location.</p>
                 @endif
->>>>>>> master
 
       @if (! is_null($item->dropLocation))
         <div

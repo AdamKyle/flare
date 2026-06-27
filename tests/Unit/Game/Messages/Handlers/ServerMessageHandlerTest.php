@@ -6,8 +6,12 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
+use Illuminate\Broadcasting\BroadcastException;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use Tests\Traits\CreateUser;
 
@@ -62,5 +66,64 @@ class ServerMessageHandlerTest extends TestCase
         $this->serverMessageHandler->handleMessageWithNewValue($user, CurrenciesMessageTypes::GOLD, 200, 500);
 
         Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function test_send_basic_message_does_not_throw_when_broadcast_transport_fails(): void
+    {
+        $user = $this->createUser();
+
+        Event::listen(ServerMessageEvent::class, function () {
+            throw new BroadcastException('Pusher connection refused');
+        });
+
+        Log::shouldReceive('warning')->once();
+
+        $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+
+        $this->assertTrue(true);
+    }
+
+    public function test_send_basic_message_logs_warning_with_context_when_broadcast_transport_fails(): void
+    {
+        $user = $this->createUser();
+
+        Event::listen(ServerMessageEvent::class, function () {
+            throw new BroadcastException('Pusher connection refused');
+        });
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->withArgs(function (string $message, array $context) use ($user) {
+                return $message === 'Non-critical broadcast event failed.'
+                    && str_contains($context['event_class'], 'ServerMessageEvent')
+                    && str_contains($context['exception_class'], 'BroadcastException')
+                    && $context['exception'] === 'Pusher connection refused'
+                    && $context['user_id'] === $user->id;
+            });
+
+        $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+    }
+
+    public function test_send_basic_message_does_not_throw_on_non_broadcast_exception(): void
+    {
+        $user = $this->createUser();
+
+        Event::listen(ServerMessageEvent::class, function () {
+            throw new \RuntimeException('Database connection lost');
+        });
+
+        Log::shouldReceive('warning')
+            ->once()
+            ->withArgs(function (string $message, array $context) use ($user) {
+                return $message === 'Non-critical broadcast event failed.'
+                    && str_contains($context['event_class'], 'ServerMessageEvent')
+                    && str_contains($context['exception_class'], 'RuntimeException')
+                    && $context['exception'] === 'Database connection lost'
+                    && $context['user_id'] === $user->id;
+            });
+
+        $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+
+        $this->assertTrue(true);
     }
 }

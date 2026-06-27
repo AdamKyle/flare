@@ -5,13 +5,16 @@ namespace Tests\Unit\Game\Automation\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
+use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -75,6 +78,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals($this->automation->id, $log->character_automation_id);
         $this->assertEquals($this->automation->monster_id, $log->monster_id);
         $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
+        $this->assertEquals($this->character->level, $log->starting_level);
         $this->assertNotNull($log->started_at);
         $this->assertNull($log->ended_at);
         $this->assertEquals(1, ExplorationLog::count());
@@ -186,7 +190,7 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(0, $output['output']['healing']);
         $this->assertEquals(0, $output['output']['blocked']);
         $this->assertEquals(0, $output['output']['duration']);
-        $this->assertNull($output['output']['reason']);
+        $this->assertEquals('running', $output['output']['reason']);
         $this->assertEquals('Exploration is running.', $output['output']['message']);
 
         Event::assertDispatched(ExplorationOutputUpdated::class, function (ExplorationOutputUpdated $event): bool {
@@ -268,6 +272,55 @@ class ExplorationLogServiceTest extends TestCase
                 && $event->output['totals']['fights'] === 4
                 && $event->output['damage']['weapon'] === 1500;
         });
+    }
+
+    public function test_active_output_calculates_levels_gained_from_starting_level(): void
+    {
+        Event::fake();
+
+        $startingLevel = $this->character->level;
+        $this->service->start($this->character, $this->automation);
+        $this->character->update(['level' => $startingLevel + 1000]);
+
+        $output = $this->service->outputForCharacter($this->character->refresh());
+
+        $this->assertEquals(1000, $output['output']['currencies']['levels_gained']);
+        $this->assertEquals(1000, $output['output']['currencies_gained']['levels_gained']);
+    }
+
+    public function test_active_output_includes_levels_gained_outside_reward_processing(): void
+    {
+        Event::fake();
+
+        $startingLevel = $this->character->level;
+        $log = $this->service->start($this->character, $this->automation);
+        $log->update(['currencies_gained' => ['levels_gained' => 200]]);
+        $this->character->update(['level' => $startingLevel + 1000]);
+
+        $output = $this->service->outputForCharacter($this->character->refresh());
+
+        $this->assertEquals(1000, $output['output']['currencies']['levels_gained']);
+    }
+
+    public function test_active_output_supports_old_log_without_starting_level(): void
+    {
+        Event::fake();
+
+        $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $this->automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'starting_level' => null,
+            'started_at' => now(),
+            'currencies_gained' => ['levels_gained' => 12],
+        ]);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals(12, $output['output']['currencies']['levels_gained']);
     }
 
     public function test_output_exposes_current_round_creatures_from_summary_without_changing_completed_fights(): void
@@ -387,6 +440,84 @@ class ExplorationLogServiceTest extends TestCase
                 && $event->output['reason'] === 'inventory_full'
                 && $event->output['message'] === 'Your inventory is full.';
         });
+    }
+
+    public function test_ended_exploration_remains_queryable_after_completion(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'natural_end');
+
+        $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $log->id,
+            'type' => 'natural_end',
+            'message' => 'Exploration completed.',
+        ]);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('warning', $output['type']);
+        $this->assertEquals($log->id, $output['output']['exploration_log_id']);
+        $this->assertEquals(1, ExplorationLog::where('id', $log->id)->where('character_id', $this->character->id)->count());
+    }
+
+    public function test_dismiss_hides_completed_exploration_panel_without_deleting_log(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'player_stopped', true);
+
+        $warning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $log->id,
+            'type' => 'player_stopped',
+            'message' => 'Exploration has been stopped at player request.',
+        ]);
+
+        $this->service->clear($this->character, $warning);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertNull($output['type']);
+        $this->assertNotNull($warning->refresh()->dismissed_at);
+        $this->assertEquals(1, ExplorationLog::where('id', $log->id)->where('character_id', $this->character->id)->count());
+    }
+
+    public function test_starting_new_exploration_overrides_dismissed_completed_panel(): void
+    {
+        Event::fake();
+
+        $completedLog = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($completedLog, 'player_stopped', true);
+
+        $warning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $completedLog->id,
+            'type' => 'player_stopped',
+            'message' => 'Exploration has been stopped at player request.',
+            'dismissed_at' => now(),
+        ]);
+
+        $newAutomation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $activeLog = $this->service->start($this->character, $newAutomation);
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals($activeLog->id, $output['output']['id']);
+        $this->assertNotNull($warning->refresh()->dismissed_at);
     }
 
     public function test_base_output_shows_base_monster_health_range_and_attack_range_with_no_snapshot(): void
@@ -564,6 +695,7 @@ class ExplorationLogServiceTest extends TestCase
         Event::fake();
 
         $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'fight_failed');
 
         $warning = $this->createExplorationWarning([
             'character_id' => $this->character->id,
@@ -582,5 +714,310 @@ class ExplorationLogServiceTest extends TestCase
             return is_null($event->type)
                 && is_null($event->output);
         });
+    }
+
+    public function test_resolve_output_repairs_missing_automation_and_returns_warning_type(): void
+    {
+        Event::fake();
+        Log::shouldReceive('error')->once();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => 999999,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('warning', $output['type']);
+        $this->assertEquals('missing_automation', $output['output']['reason']);
+
+        $log->refresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertEquals('missing_automation', $log->stopped_reason);
+        $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_resolve_output_does_not_repair_when_automation_exists(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals($log->id, $output['output']['id']);
+
+        $log->refresh();
+
+        $this->assertNull($log->ended_at);
+        $this->assertEquals(0, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_start_sets_stopped_reason_to_running(): void
+    {
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->assertEquals('running', $log->stopped_reason);
+    }
+
+    public function test_manually_stopped_exploration_shows_as_ended_type_with_no_warning(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'player_stopped', true);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('ended', $output['type']);
+        $this->assertNotNull($output['output']);
+    }
+
+    public function test_ended_output_contains_stopped_reason_and_reason_fields(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'player_stopped', true);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('ended', $output['type']);
+        $this->assertEquals('player_stopped', $output['output']['stopped_reason']);
+        $this->assertEquals('player_stopped', $output['output']['reason']);
+        $this->assertEquals($log->id, $output['output']['id']);
+        $this->assertEquals($this->monster->id, $output['output']['monster']['id']);
+    }
+
+    public function test_dismiss_ended_log_sets_timestamp_and_returned_output_is_null(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'player_stopped', true);
+
+        $this->service->dismissEndedLog($this->character);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertNull($output['type']);
+        $this->assertNull($output['output']);
+        $this->assertNotNull($log->refresh()->panel_dismissed_at);
+    }
+
+    public function test_dismiss_ended_log_does_not_delete_the_log_record(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'player_stopped', true);
+
+        $this->service->dismissEndedLog($this->character);
+
+        $this->assertEquals(1, ExplorationLog::where('id', $log->id)->where('character_id', $this->character->id)->count());
+    }
+
+    public function test_active_log_takes_priority_over_undismissed_ended_log(): void
+    {
+        Event::fake();
+
+        $endedLog = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($endedLog, 'player_stopped', true);
+
+        $newAutomation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $activeLog = $this->service->start($this->character, $newAutomation);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals($activeLog->id, $output['output']['id']);
+    }
+
+    public function test_warning_takes_priority_over_undismissed_ended_log(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'inventory_full', false);
+
+        $warning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $log->id,
+            'type' => 'inventory_full',
+            'message' => 'Inventory full.',
+        ]);
+
+        $endedLog = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $this->automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now()->subHour(),
+            'ended_at' => now()->subMinutes(30),
+            'stopped_reason' => 'player_stopped',
+        ]);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('warning', $output['type']);
+        $this->assertEquals($warning->id, $output['output']['id']);
+    }
+
+    public function test_finalize_retains_log_record_after_completion(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'natural_end', false);
+
+        $this->assertEquals(1, ExplorationLog::where('id', $log->id)->where('character_id', $this->character->id)->count());
+    }
+
+    public function test_completed_log_remains_queryable_after_panel_dismissal(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->service->recordFightTotals($log, [
+            'fights' => 5,
+            'kills' => 3,
+            'xp_gained' => 250,
+        ]);
+
+        $this->service->finalize($log, 'player_stopped', true);
+        $this->service->dismissEndedLog($this->character);
+
+        $found = ExplorationLog::where('character_id', $this->character->id)
+            ->whereNotNull('ended_at')
+            ->whereNotNull('panel_dismissed_at')
+            ->first();
+
+        $this->assertNotNull($found);
+        $this->assertEquals($log->id, $found->id);
+        $this->assertEquals('player_stopped', $found->stopped_reason);
+        $this->assertEquals(5, $found->fights);
+        $this->assertEquals(3, $found->kills);
+        $this->assertEquals(250, $found->xp_gained);
+    }
+
+    public function test_dismiss_ended_log_broadcasts_output(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($log, 'player_stopped', true);
+
+        Event::fake();
+
+        $this->service->dismissEndedLog($this->character);
+
+        Event::assertDispatched(ExplorationOutputUpdated::class, function (ExplorationOutputUpdated $event): bool {
+            return is_null($event->type)
+                && is_null($event->output);
+        });
+    }
+
+    public function test_starting_new_exploration_after_dismissed_ended_log_shows_active(): void
+    {
+        Event::fake();
+
+        $endedLog = $this->service->start($this->character, $this->automation);
+        $this->service->finalize($endedLog, 'player_stopped', true);
+        $this->service->dismissEndedLog($this->character);
+
+        $newAutomation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $activeLog = $this->service->start($this->character, $newAutomation);
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $this->assertEquals('active', $output['type']);
+        $this->assertEquals($activeLog->id, $output['output']['id']);
+    }
+
+    public function test_apply_reward_context_does_not_throw_when_exploration_warning_state_broadcast_fails(): void
+    {
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $this->app['events']->listen(ExplorationWarningState::class, function (): void {
+            throw new \RuntimeException('Simulated Pusher broadcast failure');
+        });
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $this->character,
+            [
+                'xp' => $this->character->xp,
+                'skill_id' => null,
+                'skill_xp' => 0,
+                'faction_id' => null,
+                'faction_points' => 0,
+                'level' => $this->character->level,
+                'gold' => $this->character->gold,
+                'gold_dust' => $this->character->gold_dust,
+                'shards' => $this->character->shards,
+                'copper_coins' => $this->character->copper_coins,
+            ],
+            ['total_xp' => 75],
+        );
+
+        $this->assertSame(75, $log->refresh()->xp_gained);
+    }
+
+    public function test_apply_reward_context_does_not_throw_when_broadcast_output_fails(): void
+    {
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $this->app['events']->listen(ExplorationOutputUpdated::class, function (): void {
+            throw new \RuntimeException('Simulated output broadcast failure');
+        });
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $this->character,
+            [
+                'xp' => $this->character->xp,
+                'skill_id' => null,
+                'skill_xp' => 0,
+                'faction_id' => null,
+                'faction_points' => 0,
+                'level' => $this->character->level,
+                'gold' => $this->character->gold,
+                'gold_dust' => $this->character->gold_dust,
+                'shards' => $this->character->shards,
+                'copper_coins' => $this->character->copper_coins,
+            ],
+            ['total_xp' => 100],
+        );
+
+        $this->assertSame(100, $log->refresh()->xp_gained);
     }
 }

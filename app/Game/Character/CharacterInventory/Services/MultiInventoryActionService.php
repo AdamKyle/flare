@@ -109,9 +109,11 @@ class MultiInventoryActionService
      */
     public function sellManyItems(Character $character, array $params): array
     {
-        $slotsQuery = $character->inventory->slots()
-            ->whereHas('item', static function ($query) {
-                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+
+        $slots = $character->inventory->slots()
+            ->whereIn('id', $slotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact', 'trinket']);
             })
             ->where('equipped', false);
 
@@ -150,7 +152,29 @@ class MultiInventoryActionService
      */
     public function disenchantManyItems(Character $character, array $params): array
     {
-        return $this->disenchantManyService->disenchantMany($this->manager, $this->characterInventoryCountTransformer, $character, $params);
+        $filteredSlots = $character->inventory->slots
+            ->whereIn('id', $slotIds)
+            ->whereNotIn('item.type', ['alchemy', 'gem', 'quest', 'trinket', 'artifact'])
+            ->where('equipped', false)
+            ->filter(function ($slot) {
+                return ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id);
+            });
+
+        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
+        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
+
+        $character->inventory->slots()->whereIn('id', $filteredSlotIds)->delete();
+
+        $character = $character->refresh();
+
+        DisenchantMany::dispatch($character, $itemIdsToDisenchant);
+
+        return $this->successResult([
+            'message' => 'Items are queued for disenchanting. Check Server Messages
+            (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
+            selected Server Messages from the Orange Chat Dropdown.',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+        ]);
     }
 
     /**
@@ -161,9 +185,11 @@ class MultiInventoryActionService
      */
     public function destroyManyItems(Character $character, array $params): array
     {
-        $slotsQuery = $character->inventory->slots()
-            ->whereHas('item', static function ($query) {
-                $query->whereNotIn('type', ['alchemy', 'quest', 'artifact', 'trinket']);
+
+        $character->inventory->slots()
+            ->whereIn('id', $slotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact']);
             })
             ->where('equipped', false);
 

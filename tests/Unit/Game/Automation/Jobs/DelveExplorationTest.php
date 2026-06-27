@@ -752,6 +752,87 @@ class DelveExplorationTest extends TestCase
         });
     }
 
+    public function test_handle_attempts_reset_per_creature_in_pack(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->bindFightServiceSequence(
+            [$this->livingFightData(), $this->livingFightData()],
+            [
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->wonFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->monsterStillAliveFightData(),
+                $this->wonFightData(),
+            ],
+        );
+
+        $automation = $this->createAutomation();
+        $delve = $this->createDelve();
+
+        $this->runJob($automation->id, $delve->id, ['pack_size' => 2]);
+
+        $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 2);
+    }
+
+    public function test_handle_pack_size_two_does_not_create_timeout_log_when_both_creatures_are_killed_quickly(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->bindWinningFight();
+
+        $automation = $this->createAutomation();
+        $delve = $this->createDelve();
+
+        $this->runJob($automation->id, $delve->id, ['pack_size' => 2]);
+
+        $this->assertFalse(
+            DB::table('delve_logs')
+                ->where('character_id', $this->character->id)
+                ->where('delve_exploration_id', $delve->id)
+                ->where('outcome', DelveOutcome::TIMEOUT->value)
+                ->exists()
+        );
+    }
+
+    public function test_handle_pack_size_greater_than_one_creates_one_delve_log(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->bindWinningFight();
+
+        $automation = $this->createAutomation();
+        $delve = $this->createDelve();
+
+        $this->runJob($automation->id, $delve->id, ['pack_size' => 2]);
+
+        $this->assertEquals(
+            1,
+            DB::table('delve_logs')
+                ->where('character_id', $this->character->id)
+                ->where('delve_exploration_id', $delve->id)
+                ->count()
+        );
+    }
+
     private function runCompletedPackRewardJob(int $hoursElapsed, bool $loggedIn = true): void
     {
         Event::fake();

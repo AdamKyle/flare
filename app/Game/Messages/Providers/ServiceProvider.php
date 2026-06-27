@@ -3,6 +3,8 @@
 namespace App\Game\Messages\Providers;
 
 use App\Flare\Handlers\MessageThrottledHandler;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\Maps\Services\PctService;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Console\Commands\CleanChat;
@@ -51,7 +53,9 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ServerMessageHandler::class, function ($app) {
             return new ServerMessageHandler(
-                $app->make(ServerMessageBuilder::class)
+                $app->make(ServerMessageBuilder::class),
+                $app->make(BattleRewardMessageContext::class),
+                $app->make(BattleRewardMessageOutboxService::class),
             );
         });
 

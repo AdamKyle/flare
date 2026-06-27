@@ -1,6 +1,6 @@
 import { ItemSelectedType } from '../../types/item-selected-type';
 
-import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-count-definition';
+import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 
 export default interface UseManageMultipleSelectedItemsApiParams {
   character_id: number;

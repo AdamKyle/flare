@@ -53,10 +53,8 @@ class KingdomInformationController extends Controller
 
     public function getCharacterInfoForKingdom(Kingdom $kingdom, Character $character): JsonResponse
     {
-        $kingdom = Kingdom::where('id', $kingdom->id)->first();
-
-        if (is_null($kingdom)) {
-            return response()->json(['message' => 'Kingdom not found.'], 422);
+        if (is_null($character->map) || $kingdom->game_map_id !== $character->map->game_map_id) {
+            return response()->json(['message' => 'Kingdom not found on this map.'], 422);
         }
 
         $transformer = $this->basicKingdomTransformer->setCharacter($character);

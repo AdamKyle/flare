@@ -138,6 +138,18 @@ class ClassBonusInformation
             $details['description'] = 'In the shadows, the magics you cast to heal the sick become corrupted and twisted. A plague seeps into the light, posioning the innocent and the wicked alike.';
         }
 
+        if ($classAttackValue->isBuccaneer()) {
+            $details['type'] = Str::ucfirst(ClassAttackValue::BUCCANEERS_BARRAGE);
+            $details['requires'] = 'Gun and Shield, or Two Guns';
+            $details['description'] = 'Buccaneers have two weapon-based specials. With a gun and shield equipped, they fire three shots dealing 25%, 15%, and 5% of character damage. With exactly two guns equipped, they fire three stronger shots dealing 75%, 55%, and 35% of character damage.';
+        }
+
+        if ($classAttackValue->isBeastmaster()) {
+            $details['type'] = 'Devils Piercing Shot / Beast Stomp';
+            $details['requires'] = 'Bow or Hammer';
+            $details['description'] = 'Beastmasters have two weapon-based specials. With a bow equipped, they use Devils Piercing Shot to deal double bow damage and bleed the enemy for 17%, 14%, 8%, and 4% of its current health. With a hammer equipped, they use Beast Stomp to deal double hammer damage and break the earth crust for 25% of the enemy\'s current health.';
+        }
+
         return $details;
     }
 }

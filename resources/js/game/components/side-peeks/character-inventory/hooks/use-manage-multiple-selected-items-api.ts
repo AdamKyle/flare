@@ -7,7 +7,7 @@ import UseManageMultipleSelectedItemsDefinition from './deffinitions/use-manage-
 import UseManageMultipleSelectedItemsResponse from './deffinitions/use-manage-multiple-selected-items-response';
 import { ItemSelectedType } from '../types/item-selected-type';
 
-import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-count-definition';
+import InventoryCountDefinition from 'game-data/api-data-definitions/character/inventory-counts-definition';
 
 export const useManageMultipleSelectedItemsApi =
   (): UseManageMultipleSelectedItemsDefinition => {

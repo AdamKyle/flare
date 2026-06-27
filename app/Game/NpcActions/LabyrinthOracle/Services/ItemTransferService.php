@@ -32,7 +32,7 @@ class ItemTransferService
 
         return array_values($character->refresh()->inventory->slots->filter(function ($slot) {
             return ! in_array($slot->item->type, [
-                'artifact', 'trinket', 'quest', 'alchemy',
+                'artifact', 'trinket', 'quest', 'alchemy', 'gem',
             ]);
         })->map(function ($slot) {
             return [
@@ -73,7 +73,7 @@ class ItemTransferService
         }
 
         if ($this->cannotMoveGems($character, $itemSlotToTransferTo->item)) {
-            return $this->errorResult('You do not have the inventory room to move the gems attached to: '.$itemSlotToTransferTo->item->affix_name.' back into your gem bag.');
+            return $this->errorResult('You do not have room in your Gem Bag to move the gems attached to: '.$itemSlotToTransferTo->item->affix_name.'.');
         }
 
         $this->itemToTransferFromDuplicated = DuplicateItemHandler::duplicateItem($itemSlotToTransferFrom->item);
@@ -131,6 +131,7 @@ class ItemTransferService
 
         if ($isEmptyItem) {
             $itemToGiveBack = Item::where('name', $itemToMoveFrom->name)
+                ->whereKeyNot($itemToMoveFrom->id)
                 ->whereNull('item_suffix_id')
                 ->whereNull('item_prefix_id')
                 ->whereNull('specialty_type')
@@ -138,24 +139,27 @@ class ItemTransferService
                 ->doesntHave('sockets')
                 ->first();
 
+            if (is_null($itemToGiveBack)) {
+                return $itemToMoveFrom;
+            }
+
             $itemToMoveFrom->delete();
 
             return $itemToGiveBack;
         }
 
         return $itemToMoveFrom;
-
     }
 
     protected function cannotMoveGems(Character $character, Item $item): bool
     {
-        if ($character->isInventoryFull()) {
-            return true;
-        }
-
         $totalGemsAttached = $item->sockets->count();
 
-        return ($totalGemsAttached + $character->totalInventoryCount()) > $character->inventory_max;
+        if ($totalGemsAttached === 0) {
+            return false;
+        }
+
+        return ! $character->canAddToGemBag($totalGemsAttached);
     }
 
     /**
@@ -202,19 +206,11 @@ class ItemTransferService
 
         if ($socketsCount > 0) {
             foreach ($this->itemToTransferToDuplicated->sockets as $socket) {
-                $foundGemSlot = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
-
-                if (! is_null($foundGemSlot)) {
-                    $foundGemSlot->update([
-                        'amount' => $foundGemSlot->amount + 1,
-                    ]);
-                } else {
-                    $character->gemBag->gemSlots()->create([
-                        'gem_bag_id' => $character->gemBag->id,
-                        'gem_id' => $socket->gem_id,
-                        'amount' => 1,
-                    ]);
-                }
+                $character->gemBag->gemSlots()->create([
+                    'gem_bag_id' => $character->gemBag->id,
+                    'gem_id' => $socket->gem_id,
+                    'amount' => 1,
+                ]);
             }
 
             $this->itemToTransferToDuplicated->sockets()->delete();

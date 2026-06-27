@@ -34,20 +34,28 @@ class ClassRankService
         $classSpecialsEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', true)->get();
         $classSpecialsNotEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', false)->get();
 
+        $damageStatAmount = $character->getInformation()->statMod($character->damage_stat);
+
         return [
             'class_specialties' => GameClassSpecial::all()->transform(function ($special) {
                 $special->class_name = $special->gameClass->name;
 
                 return $special;
             }),
-            'specials_equipped' => array_values($classSpecialsEquipped->transform(function ($specialEquipped) {
+            'specials_equipped' => array_values($classSpecialsEquipped->transform(function ($specialEquipped) use ($damageStatAmount) {
                 $specialEquipped->class_name = $specialEquipped->gameClassSpecial->gameClass->name;
+                $specialEquipped->specialty_damage = $specialEquipped->gameClassSpecial->specialty_damage
+                    + $specialEquipped->gameClassSpecial->increase_specialty_damage_per_level * $specialEquipped->level
+                    + $damageStatAmount * $specialEquipped->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
 
                 return $specialEquipped;
             })->toArray()),
             'class_ranks' => $character->classRanks->toArray(),
-            'other_class_specials' => array_values($classSpecialsNotEquipped->transform(function ($special) {
+            'other_class_specials' => array_values($classSpecialsNotEquipped->transform(function ($special) use ($damageStatAmount) {
                 $special->class_name = $special->gameClassSpecial->gameClass->name;
+                $special->specialty_damage = $special->gameClassSpecial->specialty_damage
+                    + $special->gameClassSpecial->increase_specialty_damage_per_level * $special->level
+                    + $damageStatAmount * $special->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
 
                 return $special;
             })->toArray()),

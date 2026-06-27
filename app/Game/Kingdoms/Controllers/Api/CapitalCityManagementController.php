@@ -2,14 +2,9 @@
 
 namespace App\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
-use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
-use App\Flare\Models\UnitInQueue;
 use App\Game\Automation\Services\AutomationRestrictionService;
-use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
-use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
 use App\Game\Kingdoms\Requests\BuildingUpgradeRequestsRequest;
 use App\Game\Kingdoms\Requests\CapitalCityCancelBuildingRequest;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
@@ -20,9 +15,6 @@ use App\Game\Kingdoms\Service\CancelBuildingRequestService;
 use App\Game\Kingdoms\Service\CancelUnitRequestService;
 use App\Game\Kingdoms\Service\CapitalCityGoldBarManagementService;
 use App\Game\Kingdoms\Service\CapitalCityManagementService;
-use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
-use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +27,6 @@ class CapitalCityManagementController extends Controller
         private readonly CancelUnitRequestService $cancelUnitRequestService,
         private readonly CapitalCityGoldBarManagementService $capitalCityGoldBarManagementService,
         private readonly AutomationRestrictionService $automationRestrictionService,
-        private readonly BuildingUpgradeRequestValidator $buildingUpgradeRequestValidator,
     ) {}
 
     public function makeCapitalCity(Kingdom $kingdom, Character $character): JsonResponse
@@ -98,26 +89,23 @@ class CapitalCityManagementController extends Controller
             return $restriction;
         }
 
-        $validationMessage = $this->buildingUpgradeRequestValidator->validate(
-            $buildingUpgradeRequestsRequest->request_data,
-            $buildingUpgradeRequestsRequest->request_type
-        );
-
-        if (! is_null($validationMessage)) {
-            return response()->json([
-                'message' => $validationMessage,
-            ], 422);
-        }
-
         Log::channel('capital_city_building_upgrades')->info('upgradeBuildings endpoint called', [
             '$buildingUpgradeRequestsRequest' => $buildingUpgradeRequestsRequest->all(),
             '$character' => $character->id,
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $kingdom->id, $buildingUpgradeRequestsRequest->request_data, $buildingUpgradeRequestsRequest->request_type)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
+        $result = $this->capitalCityManagementService->sendoffBuildingRequests(
+            $character,
+            $kingdom,
+            $buildingUpgradeRequestsRequest->request_data,
+            $buildingUpgradeRequestsRequest->request_type
+        );
 
-        return response()->json([]);
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function fetchKingdomBuildingManagementQueues(Character $character, Kingdom $kingdom)
@@ -146,84 +134,22 @@ class CapitalCityManagementController extends Controller
             return $restriction;
         }
 
-        $requestedAmounts = [];
-
-        foreach ($recruitUnitRequestsRequest->request_data as $kingdomRequestData) {
-            $targetKingdom = $character->kingdoms()->find($kingdomRequestData['kingdom_id'] ?? null);
-
-            if (is_null($targetKingdom)) {
-                continue;
-            }
-
-            foreach ($kingdomRequestData['unit_requests'] ?? [] as $unitRequest) {
-                $gameUnit = GameUnit::where('name', $unitRequest['unit_name'] ?? null)->first();
-
-                if (is_null($gameUnit)) {
-                    continue;
-                }
-
-                $key = $targetKingdom->id.':'.$gameUnit->id;
-                $requestedAmounts[$key] = ($requestedAmounts[$key] ?? 0) + (int) ($unitRequest['unit_amount'] ?? 0);
-
-                $ownedAmount = $targetKingdom->units()
-                    ->where('game_unit_id', $gameUnit->id)
-                    ->sum('amount');
-                $activeManualQueueAmount = UnitInQueue::where('kingdom_id', $targetKingdom->id)
-                    ->where('game_unit_id', $gameUnit->id)
-                    ->where('completed_at', '>', now())
-                    ->sum('amount');
-
-                if ($activeManualQueueAmount > 0) {
-                    return response()->json([
-                        'message' => 'One or more units are already queued for recruitment.',
-                    ], 422);
-                }
-
-                $activeCapitalCityQueueAmount = CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)
-                    ->whereNotIn('status', [
-                        CapitalCityQueueStatus::FINISHED,
-                        CapitalCityQueueStatus::REJECTED,
-                        CapitalCityQueueStatus::CANCELLED,
-                        CapitalCityQueueStatus::CANCELLATION_REJECTED,
-                    ])
-                    ->get()
-                    ->sum(function (CapitalCityUnitQueue $queue) use ($gameUnit) {
-                        return collect($queue->unit_request_data)
-                            ->reject(function (array $request) {
-                                return in_array($request['secondary_status'] ?? null, [
-                                    CapitalCityQueueStatus::FINISHED,
-                                    CapitalCityQueueStatus::REJECTED,
-                                    CapitalCityQueueStatus::CANCELLED,
-                                    CapitalCityQueueStatus::CANCELLATION_REJECTED,
-                                ], true);
-                            })
-                            ->where('name', $gameUnit->name)
-                            ->sum('amount');
-                    });
-
-                if ($activeCapitalCityQueueAmount > 0) {
-                    return response()->json([
-                        'message' => 'One or more units are already queued for recruitment.',
-                    ], 422);
-                }
-
-                if ($ownedAmount + $activeManualQueueAmount + $activeCapitalCityQueueAmount + $requestedAmounts[$key] > KingdomMaxValue::MAX_UNIT) {
-                    return response()->json([
-                        'message' => 'One or more unit requests exceed the maximum allowed units.',
-                    ], 422);
-                }
-            }
-        }
-
         Log::channel('capital_city_unit_recruitments')->info('recruitUnits endpoint called', [
             '$buildingUpgradeRequestsRequest' => $recruitUnitRequestsRequest->all(),
             '$character' => $character->id,
             '$kingdom' => $kingdom->id,
         ]);
 
-        CapitalCityQueueUpUnitRequests::dispatch($character->id, $kingdom->id, $recruitUnitRequestsRequest->request_data)->onConnection('long_running')->onQueue('default_long')->delay(now()->addSecond());
+        $result = $this->capitalCityManagementService->sendOffUnitRecruitmentOrders(
+            $character,
+            $kingdom,
+            $recruitUnitRequestsRequest->request_data
+        );
 
-        return response()->json([]);
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
     }
 
     public function cancelUnitRecruitOrders(RecruitUnitCancellationRequest $request, Character $character, Kingdom $kingdom)

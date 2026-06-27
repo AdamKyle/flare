@@ -13,6 +13,8 @@ use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Handlers\PurgatorySmithHouseRewardHandler;
 use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleLocationRewardService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
@@ -33,6 +35,7 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(BattleRewardMessageContext::class);
 
         $this->app->bind(FactionHandler::class, function ($app) {
             return new FactionHandler(
@@ -97,6 +100,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SecondaryRewardService::class),
                 $app->make(BattleGlobalEventParticipationHandler::class),
                 $app->make(SkillService::class),
+                $app->make(BattleRewardLedgerService::class),
+                $app->make(BattleRewardMessageContext::class),
             );
         });
 

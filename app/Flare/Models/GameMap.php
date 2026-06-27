@@ -8,6 +8,7 @@ use App\Flare\Values\MapNameValue;
 use Database\Factories\GameMapFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GameMap extends Model
 {
@@ -58,6 +59,11 @@ class GameMap extends Model
     public function requiredLocation()
     {
         return $this->hasOne(Location::class, 'id', 'required_location_id');
+    }
+
+    public function gemParamters(): HasOne
+    {
+        return $this->hasOne(GameMapGemParamter::class);
     }
 
     public function mapType(): MapNameValue

@@ -23,16 +23,31 @@ class ServerMessageEvent implements ShouldBroadcastNow
 
     public ?int $id;
 
+    public ?string $source;
+
+    public ?int $itemId;
+
+    public ?string $linkText;
+
     public string $timeStamp;
 
     /**
      * ServerMessageEvent constructor.
      */
-    public function __construct(User $user, string $message, ?int $id = null)
-    {
+    public function __construct(
+        User $user,
+        string $message,
+        ?int $id = null,
+        ?string $source = null,
+        ?int $itemId = null,
+        ?string $linkText = null,
+    ) {
         $this->user = $user;
         $this->message = $message;
         $this->id = $id;
+        $this->source = $source;
+        $this->itemId = $itemId;
+        $this->linkText = $linkText;
         $this->timeStamp = now()->toJSON();
     }
 

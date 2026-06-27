@@ -216,13 +216,11 @@ class SeerService
             return $validationResult;
         }
 
-        $inventoryCount = $character->getInventoryCount() + $slot->item->sockets->count();
-
-        if ($inventoryCount > $character->inventory_max) {
-            return $this->errorResult('Not enough room in your inventory to remove all the gems on this item. (gem bag counts).');
-        }
-
         $socketCount = $slot->item->sockets->count();
+
+        if (! $character->canAddToGemBag($socketCount)) {
+            return $this->errorResult('Not enough room in your Gem Bag to remove all the gems on this item.');
+        }
 
         if (! HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::REMOVE_GEM * $socketCount)) {
             return $this->errorResult('You do not have the gold bars to do this.');
@@ -272,8 +270,8 @@ class SeerService
             return $this->errorResult('The item does not have any sockets. What are you doing?');
         }
 
-        if ($character->isInventoryFull()) {
-            return $this->errorResult('Your inventory is full (gem bag counts). Could not replace the gem.');
+        if (! $character->canAddToGemBag(1)) {
+            return $this->errorResult('Your Gem Bag is full. Could not replace the gem.');
         }
 
         if (! HandleGoldBarsAsACurrency::hasTheGoldBars($character->kingdoms, self::REMOVE_GEM)) {
@@ -288,17 +286,11 @@ class SeerService
             return $this->errorResult('No Gem found on the item for the gem you want to replace.');
         }
 
-        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
-
-        if (! is_null($gemInBag)) {
-            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
-        } else {
-            $character->gemBag->gemSlots()->create([
-                'gem_bag_id' => $character->gemBag->id,
-                'gem_id' => $socket->gem_id,
-                'amount' => 1,
-            ]);
-        }
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id' => $socket->gem_id,
+            'amount' => 1,
+        ]);
 
         $socket->update([
             'gem_id' => $gemSlot->gem_id,
@@ -389,8 +381,8 @@ class SeerService
             return $this->errorResult('Sockets on this item are already empty.');
         }
 
-        if ($character->isInventoryFull()) {
-            return $this->errorResult('Your inventory is full (gem bag counts).');
+        if (! $character->canAddToGemBag(1)) {
+            return $this->errorResult('Your Gem Bag is full.');
         }
 
         return $this->successResult();
@@ -409,13 +401,7 @@ class SeerService
             'item_id' => $newItem->id,
         ]);
 
-        if ($gemSlot->amount > 1) {
-            $gemSlot->update([
-                'amount' => $gemSlot->amount - 1,
-            ]);
-        } else {
-            $gemSlot->delete();
-        }
+        $gemSlot->delete();
 
         return $newItem->refresh();
     }
@@ -433,17 +419,11 @@ class SeerService
             return null;
         }
 
-        $gemInBag = $character->gemBag->gemSlots->where('gem_id', $socket->gem_id)->first();
-
-        if (! is_null($gemInBag)) {
-            $gemInBag->update(['amount' => $gemInBag->amount + 1]);
-        } else {
-            $character->gemBag->gemSlots()->create([
-                'gem_bag_id' => $character->gemBag->id,
-                'gem_id' => $socket->gem_id,
-                'amount' => 1,
-            ]);
-        }
+        $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id' => $socket->gem_id,
+            'amount' => 1,
+        ]);
 
         $socket->delete();
 

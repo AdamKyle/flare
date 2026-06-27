@@ -4,6 +4,7 @@ namespace App\Game\ClassRanks\Providers;
 
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\ClassRanks\Console\Commands\AssignNewClassRanks;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Services\ManageClassService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
@@ -18,6 +19,9 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        $this->commands([
+            AssignNewClassRanks::class,
+        ]);
         $this->app->bind(ClassRankService::class, function ($app) {
             return new ClassRankService(
                 $app->make(UpdateCharacterAttackTypesHandler::class),

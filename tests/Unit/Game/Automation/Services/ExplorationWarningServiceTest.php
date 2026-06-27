@@ -110,7 +110,7 @@ class ExplorationWarningServiceTest extends TestCase
         });
     }
 
-    public function test_dismiss_latest_deletes_warning_and_linked_log_and_broadcasts_cleared_state(): void
+    public function test_dismiss_latest_soft_dismisses_warning_and_linked_log(): void
     {
         Event::fake();
 
@@ -131,15 +131,17 @@ class ExplorationWarningServiceTest extends TestCase
 
         $this->assertFalse($result['has_warning']);
         $this->assertCount(0, $result['warnings']);
-        $this->assertNull($warning->fresh());
-        $this->assertNull(ExplorationLog::find($log->id));
+        $this->assertNotNull($warning->fresh());
+        $this->assertNotNull($warning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($log->id));
+        $this->assertNotNull(ExplorationLog::find($log->id)->panel_dismissed_at);
 
         Event::assertDispatched(ExplorationWarningState::class, function (ExplorationWarningState $event): bool {
             return $event->has_warning === false;
         });
     }
 
-    public function test_dismiss_selected_deletes_warning_and_linked_log_and_broadcasts_cleared_state(): void
+    public function test_dismiss_selected_soft_dismisses_warning_and_linked_log(): void
     {
         Event::fake();
 
@@ -160,12 +162,54 @@ class ExplorationWarningServiceTest extends TestCase
 
         $this->assertFalse($result['has_warning']);
         $this->assertCount(0, $result['warnings']);
-        $this->assertNull($warning->fresh());
-        $this->assertNull(ExplorationLog::find($log->id));
+        $this->assertNotNull($warning->fresh());
+        $this->assertNotNull($warning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($log->id));
+        $this->assertNotNull(ExplorationLog::find($log->id)->panel_dismissed_at);
 
         Event::assertDispatched(ExplorationWarningState::class, function (ExplorationWarningState $event): bool {
             return $event->has_warning === false;
         });
+    }
+
+    public function test_dismiss_latest_soft_dismisses_all_warnings_for_character_at_once(): void
+    {
+        Event::fake();
+
+        $firstLog = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $secondLog = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $firstWarning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $firstLog->id,
+            'type' => 'fight',
+            'message' => 'First warning.',
+        ]);
+
+        $secondWarning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $secondLog->id,
+            'type' => 'fight',
+            'message' => 'Second warning.',
+        ]);
+
+        $result = $this->service->dismissLatest($this->character);
+
+        $this->assertFalse($result['has_warning']);
+        $this->assertCount(0, $result['warnings']);
+        $this->assertNotNull($firstWarning->fresh()->dismissed_at);
+        $this->assertNotNull($secondWarning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($firstLog->id)->panel_dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($secondLog->id)->panel_dismissed_at);
     }
 
     public function test_dismiss_latest_does_nothing_when_no_warning_exists(): void

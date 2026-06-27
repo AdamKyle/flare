@@ -200,8 +200,11 @@ class LocationService
         // Update location based event goals
         event(new UpdateLocationBasedEventGoals($character->user));
 
-        // Update monsters for a possible raid at a possible location
-        $this->updateMonstersForRaid($character, $this->location);
+        if ($this->updateMonstersForRaid($character, $this->location)) {
+            return;
+        }
+
+        $this->updateMonsterForLocationType($character, $this->location);
     }
 
     /**

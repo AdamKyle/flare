@@ -2,10 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Items\Enricher\ItemEnricherFactory;
-use App\Flare\Items\Transformers\EquippableItemTransformer;
-use App\Flare\Items\Transformers\QuestItemTransformer;
-use App\Flare\Items\Values\ItemType;
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
@@ -295,44 +292,27 @@ class CharacterInventoryService
      */
     public function getUsableItems(string $searchText = '', array $filters = []): Collection
     {
-        $inventory = Inventory::where('character_id', $this->character->id)->first();
+        $alchemyBag = $this->character->alchemyBag;
 
-        $query = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)
-            ->join('items', function ($join) use ($searchText, $filters) {
-                $join->on('inventory_slots.item_id', '=', 'items.id')
-                    ->where('items.type', 'alchemy');
+        if (is_null($alchemyBag)) {
+            return [];
+        }
 
-                if (! empty($searchText)) {
-                    $join->where('items.name', 'like', '%'.$searchText.'%');
-                }
+        return AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+            ->where('character_id', $this->character->id)
+            ->with('item')
+            ->get()
+            ->map(function (AlchemyBagSlot $slot) {
+                $item = $this->usableItemTransformer->transform($slot->item);
 
-                if (isset($filters['increase-stats'])) {
-                    $join->whereNotNull('items.increase_stat_by');
-                }
-
-                if (isset($filters['effects-skills'])) {
-                    $join->whereNotNull('items.increase_skill_bonus_by')
-                        ->whereNotNull('items.increase_skill_training_bonus_by');
-                }
-
-                if (isset($filters['effects-base-modifiers'])) {
-                    $join->where(function ($q) {
-                        $q->whereNotNull('items.base_damage_mod')
-                            ->orWhereNotNull('items.base_healing_mod')
-                            ->orWhereNotNull('items.base_ac_mod');
-                    });
-                }
-
-                if (isset($filters['damages-kingdoms'])) {
-                    $join->where('items.damages_kingdoms', true);
-                }
-
-                if (isset($filters['holy-oils'])) {
-                    $join->where('items.can_use_on_other_items', true);
-                }
-            });
-
-        return $query->select('inventory_slots.*')->get();
+                return array_merge($item, [
+                    'id' => $slot->id,
+                    'item_id' => $slot->item_id,
+                    'slot_id' => $slot->id,
+                    'amount' => $slot->amount,
+                ]);
+            })
+            ->toArray();
     }
 
     /**
@@ -395,7 +375,7 @@ class CharacterInventoryService
         $slots = $this->character
             ->inventory
             ->slots
-            ->whereNotIn('item.type', ['quest', 'alchemy'])
+            ->whereNotIn('item.type', ['quest', 'alchemy', 'gem'])
             ->whereNotIn('id', $slotsToIgnore)
             ->where('equipped', false);
 
@@ -470,7 +450,7 @@ class CharacterInventoryService
         return $this->character
             ->inventory
             ->slots
-            ->whereNotIn('item.type', ['quest', 'alchemy', 'artifact'])
+            ->whereNotIn('item.type', ['quest', 'alchemy', 'gem', 'artifact'])
             ->where('equipped', false)
             ->sortBy('id')
             ->pluck('id')
@@ -765,9 +745,14 @@ class CharacterInventoryService
      */
     public function destroyAlchemyItem(int $slotId): array
     {
-        $slot = $this->character->inventory->slots->filter(function ($slot) use ($slotId) {
-            return $slot->id === $slotId;
-        })->first();
+        $alchemyBag = $this->character->alchemyBag;
+        $slot = is_null($alchemyBag)
+            ? null
+            : AlchemyBagSlot::where('id', $slotId)
+                ->where('character_id', $this->character->id)
+                ->where('alchemy_bag_id', $alchemyBag->id)
+                ->with('item')
+                ->first();
 
         if (is_null($slot)) {
             return $this->errorResult('No alchemy item found to destroy.');
@@ -796,17 +781,18 @@ class CharacterInventoryService
      */
     public function destroyAllAlchemyItems(): array
     {
-        $slots = $this->character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'alchemy';
-        });
+        $alchemyBag = $this->character->alchemyBag;
 
-        foreach ($slots as $slot) {
-            $slot->delete();
+        if (! is_null($alchemyBag)) {
+            AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+                ->where('character_id', $this->character->id)
+                ->delete();
         }
 
         $character = $this->character->refresh();
 
-        event(new UpdateCharacterBaseDetailsEvent($character));
+        event(new UpdateTopBarEvent($character));
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
             'message' => 'Destroyed All Alchemy Items.',

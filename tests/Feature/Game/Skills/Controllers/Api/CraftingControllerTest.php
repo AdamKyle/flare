@@ -4,7 +4,10 @@ namespace Tests\Feature\Game\Skills\Controllers\Api;
 
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameSkill;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -206,225 +209,114 @@ class CraftingControllerTest extends TestCase
         $this->assertEquals(422, $response->status());
     }
 
-    public function test_fetch_paginated_items_to_craft_returns_data_items_and_meta()
+    public function test_buccaneer_for_my_class_weapon_crafting_returns_guns(): void
     {
-        $item = $this->createItem([
-            'crafting_type' => 'weapon',
+        $craftingSkill = GameSkill::where('name', 'Weapon Crafting')->first();
+
+        $buccaneerCharacter = (new CharacterFactory)
+            ->createBaseCharacter([], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ])
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+
+        $gun = $this->createItem([
+            'type' => ItemType::GUN->value,
             'can_craft' => true,
             'skill_level_required' => 1,
             'skill_level_trivial' => 25,
-            'type' => 'sword',
         ]);
 
-        $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/'.$this->character->id, [
-                'crafting_type' => $item->type,
-                'per_page' => 10,
-                'page' => 1,
-            ]);
+        $response = $this->actingAs($buccaneerCharacter->user)
+            ->call('GET', '/api/craft-for-class/'.$buccaneerCharacter->id);
+
+        $response->assertOk();
 
         $jsonData = json_decode($response->getContent(), true);
+        $itemIds = array_column($jsonData['items'], 'id');
+        $this->assertContains($gun->id, $itemIds);
+    }
 
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertArrayHasKey('data', $jsonData);
+    public function test_buccaneer_for_my_class_weapon_crafting_does_not_return_shields(): void
+    {
+        $craftingSkill = GameSkill::where('name', 'Weapon Crafting')->first();
+
+        $buccaneerCharacter = (new CharacterFactory)
+            ->createBaseCharacter([], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ])
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+
+        $shield = $this->createItem([
+            'type' => ArmourType::SHIELD->value,
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 25,
+        ]);
+
+        $response = $this->actingAs($buccaneerCharacter->user)
+            ->call('GET', '/api/craft-for-class/'.$buccaneerCharacter->id);
+
+        $response->assertOk();
+
+        $jsonData = json_decode($response->getContent(), true);
+        $itemIds = array_column($jsonData['items'], 'id');
+        $this->assertNotContains($shield->id, $itemIds);
+    }
+
+    public function test_buccaneer_for_my_class_weapon_crafting_returns_successful_response(): void
+    {
+        $craftingSkill = GameSkill::where('name', 'Weapon Crafting')->first();
+
+        $buccaneerCharacter = (new CharacterFactory)
+            ->createBaseCharacter([], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ])
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->assignSkill($craftingSkill, 10)
+            ->getCharacter();
+
+        $response = $this->actingAs($buccaneerCharacter->user)
+            ->call('GET', '/api/craft-for-class/'.$buccaneerCharacter->id);
+
+        $response->assertOk();
+
+        $jsonData = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('items', $jsonData);
-        $this->assertArrayHasKey('meta', $jsonData);
-        $this->assertArrayHasKey('can_load_more', $jsonData['meta']);
-        $this->assertArrayHasKey('pagination', $jsonData['meta']);
-        $this->assertSame($jsonData['data'], $jsonData['items']);
     }
 
-    public function test_fetch_paginated_items_with_search_text_filters_results()
+    public function test_fighter_for_my_class_weapon_crafting_returns_swords(): void
     {
-        $matchingItem = $this->createItem([
-            'name' => 'Iron Sword',
-            'crafting_type' => 'weapon',
-            'type' => 'sword',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $this->createItem([
-            'name' => 'Steel Sword',
-            'crafting_type' => 'weapon',
-            'type' => 'sword',
+        $sword = $this->createItem([
+            'type' => ItemType::SWORD->value,
             'can_craft' => true,
             'skill_level_required' => 1,
             'skill_level_trivial' => 25,
         ]);
 
         $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/'.$this->character->id, [
-                'crafting_type' => 'sword',
-                'per_page' => 10,
-                'page' => 1,
-                'search_text' => 'Iron',
-            ]);
+            ->call('GET', '/api/craft-for-class/'.$this->character->id);
+
+        $response->assertOk();
 
         $jsonData = json_decode($response->getContent(), true);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertCount(1, $jsonData['data']);
-        $this->assertEquals($matchingItem->id, $jsonData['data'][0]['id']);
+        $itemIds = array_column($jsonData['items'], 'id');
+        $this->assertContains($sword->id, $itemIds);
     }
 
-    public function test_fetch_paginated_armour_items_with_subtype_filter()
-    {
-        $armourCraftingSkill = $this->createGameSkill([
-            'name' => 'Armour Crafting',
-            'type' => SkillTypeValue::CRAFTING->value,
-            'max_level' => 400,
-        ]);
-
-        $this->character->skills()->create([
-            'game_skill_id' => $armourCraftingSkill->id,
-            'character_id' => $this->character->id,
-            'level' => 10,
-            'xp' => 0,
-            'xp_max' => 100,
-            'is_locked' => false,
-        ]);
-
-        $helmetItem = $this->createItem([
-            'crafting_type' => 'armour',
-            'type' => 'helmet',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'armour',
-            'type' => 'body',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/'.$this->character->id, [
-                'crafting_type' => 'armour',
-                'per_page' => 10,
-                'page' => 1,
-                'filters' => ['armour_type' => 'helmet'],
-            ]);
-
-        $jsonData = json_decode($response->getContent(), true);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertCount(1, $jsonData['data']);
-        $this->assertEquals($helmetItem->id, $jsonData['data'][0]['id']);
-    }
-
-    public function test_fetch_paginated_items_for_class_returns_data_items_and_meta()
-    {
-        $this->createItem([
-            'type' => 'sword',
-            'crafting_type' => 'weapon',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/craft-for-class/'.$this->character->id, [
-                'per_page' => 10,
-                'page' => 1,
-            ]);
-
-        $jsonData = json_decode($response->getContent(), true);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertArrayHasKey('data', $jsonData);
-        $this->assertArrayHasKey('items', $jsonData);
-        $this->assertArrayHasKey('meta', $jsonData);
-        $this->assertArrayHasKey('can_load_more', $jsonData['meta']);
-        $this->assertArrayHasKey('pagination', $jsonData['meta']);
-        $this->assertSame($jsonData['data'], $jsonData['items']);
-    }
-
-    public function test_fetch_paginated_items_with_null_search_text_returns_200()
-    {
-        $this->createItem([
-            'crafting_type' => 'weapon',
-            'type' => 'sword',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/'.$this->character->id, [
-                'crafting_type' => 'sword',
-                'per_page' => 10,
-                'page' => 1,
-                'search_text' => null,
-            ]);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertArrayHasKey('data', json_decode($response->getContent(), true));
-    }
-
-    public function test_fetch_paginated_items_with_null_armour_type_filter_returns_200()
-    {
-        $armourCraftingSkill = $this->createGameSkill([
-            'name' => 'Armour Crafting',
-            'type' => SkillTypeValue::CRAFTING->value,
-            'max_level' => 400,
-        ]);
-
-        $this->character->skills()->create([
-            'game_skill_id' => $armourCraftingSkill->id,
-            'character_id' => $this->character->id,
-            'level' => 10,
-            'xp' => 0,
-            'xp_max' => 100,
-            'is_locked' => false,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'armour',
-            'type' => 'helmet',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/crafting/'.$this->character->id, [
-                'crafting_type' => 'armour',
-                'per_page' => 10,
-                'page' => 1,
-                'filters' => ['armour_type' => null],
-            ]);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertArrayHasKey('data', json_decode($response->getContent(), true));
-    }
-
-    public function test_fetch_paginated_items_for_class_with_null_search_text_returns_200()
-    {
-        $this->createItem([
-            'type' => 'sword',
-            'crafting_type' => 'weapon',
-            'can_craft' => true,
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 25,
-        ]);
-
-        $response = $this->actingAs($this->character->user)
-            ->call('GET', '/api/craft-for-class/'.$this->character->id, [
-                'per_page' => 10,
-                'page' => 1,
-                'search_text' => null,
-            ]);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertArrayHasKey('data', json_decode($response->getContent(), true));
-    }
-
-    public function test_craft_item_with_null_search_text_returns_200()
+    public function testCraftItem()
     {
         $item = $this->createItem([
             'type' => ItemType::DAGGER->value,

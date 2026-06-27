@@ -128,7 +128,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CapitalCityBuildingManagementRequestHandler::class, function ($app) {
             return new CapitalCityBuildingManagementRequestHandler(
                 $app->make(KingdomBuildingService::class),
-                $app->make(UnitMovementService::class)
+                $app->make(UnitMovementService::class),
+                $app->make(BuildingUpgradeRequestValidator::class)
             );
         });
 

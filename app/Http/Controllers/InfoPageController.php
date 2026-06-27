@@ -6,7 +6,9 @@ use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
+use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GameUnit;
@@ -26,6 +28,7 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Storage;
 
@@ -124,6 +127,30 @@ class InfoPageController extends Controller
             'itemNeeded' => Item::where('effect', $effects)->first(),
             'walkOnWater' => Item::where('effect', $walkOnWater)->first(),
             'mapUrl' => Storage::disk('maps')->url($map->path),
+        ]);
+    }
+
+    public function viewMapGems(): View
+    {
+        return view('information.map-gems.index');
+    }
+
+    public function viewLocationGems(): View
+    {
+        return view('information.location-gems.index');
+    }
+
+    public function viewMapGem(GameMapGemParamter $gameMapGemParamter): View
+    {
+        return view('information.map-gems.show', [
+            'gameMapGemParamter' => $gameMapGemParamter->load('gameMap'),
+        ]);
+    }
+
+    public function viewLocationGem(GameLocationGemParamter $gameLocationGemParamter): View
+    {
+        return view('information.location-gems.show', [
+            'gameLocationGemParamter' => $gameLocationGemParamter->load('location.map'),
         ]);
     }
 

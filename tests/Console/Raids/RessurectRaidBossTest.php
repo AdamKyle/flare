@@ -74,16 +74,38 @@ class RessurectRaidBossTest extends TestCase
             'boss_max_hp' => 100,
             'boss_current_hp' => 0,
         ]);
+        $siblingRaidBoss = RaidBoss::create([
+            'raid_id' => $raid->id,
+            'raid_boss_id' => $otherMonster->id,
+            'boss_max_hp' => 100,
+            'boss_current_hp' => 100,
+        ]);
         RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $raid->id,
+            'raid_boss_id' => $raidBoss->id,
             'attacks_left' => 0,
             'damage_dealt' => 100,
             'killed_boss' => true,
         ]);
+        $otherRaidBoss = RaidBoss::create([
+            'raid_id' => $otherRaid->id,
+            'raid_boss_id' => $otherMonster->id,
+            'boss_max_hp' => 100,
+            'boss_current_hp' => 0,
+        ]);
+        $siblingParticipation = RaidBossParticipation::create([
+            'character_id' => $character->id,
+            'raid_id' => $raid->id,
+            'raid_boss_id' => $siblingRaidBoss->id,
+            'attacks_left' => 3,
+            'damage_dealt' => 10,
+            'killed_boss' => false,
+        ]);
         $otherParticipation = RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $otherRaid->id,
+            'raid_boss_id' => $otherRaidBoss->id,
             'attacks_left' => 0,
             'damage_dealt' => 50,
             'killed_boss' => true,
@@ -92,12 +114,13 @@ class RessurectRaidBossTest extends TestCase
         $this->artisan('ressurect:raid-boss');
 
         $this->assertEquals(100, $raidBoss->refresh()->boss_current_hp);
-        $this->assertEquals(0, RaidBossParticipation::where('raid_id', $raid->id)->count());
+        $this->assertSame(0, RaidBossParticipation::where('raid_boss_id', $raidBoss->id)->count());
+        $this->assertNotNull($siblingParticipation->fresh());
         $this->assertNotNull($otherParticipation->fresh());
         Event::assertDispatched(GlobalMessageEvent::class);
     }
 
-    public function test_does_not_revive_alive_damaged_raid_boss(): void
+    public function test_revives_alive_damaged_raid_boss(): void
     {
         Event::fake();
 
@@ -138,6 +161,7 @@ class RessurectRaidBossTest extends TestCase
         $participation = RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $raid->id,
+            'raid_boss_id' => $raidBoss->id,
             'attacks_left' => 0,
             'damage_dealt' => 75,
             'killed_boss' => false,
@@ -145,9 +169,9 @@ class RessurectRaidBossTest extends TestCase
 
         $this->artisan('ressurect:raid-boss');
 
-        $this->assertEquals(25, $raidBoss->refresh()->boss_current_hp);
-        $this->assertNotNull($participation->fresh());
-        Event::assertNotDispatched(GlobalMessageEvent::class);
+        $this->assertEquals(100, $raidBoss->refresh()->boss_current_hp);
+        $this->assertNull($participation->fresh());
+        Event::assertDispatched(GlobalMessageEvent::class);
     }
 
     public function test_does_not_revive_dead_raid_boss_when_scheduled_raid_is_not_running(): void
@@ -191,6 +215,7 @@ class RessurectRaidBossTest extends TestCase
         $participation = RaidBossParticipation::create([
             'character_id' => $character->id,
             'raid_id' => $raid->id,
+            'raid_boss_id' => $raidBoss->id,
             'attacks_left' => 0,
             'damage_dealt' => 100,
             'killed_boss' => true,

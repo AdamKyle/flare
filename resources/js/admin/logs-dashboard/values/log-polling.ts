@@ -1,0 +1,1 @@
+export const LOG_POLLING_INTERVAL_MS = 60000;

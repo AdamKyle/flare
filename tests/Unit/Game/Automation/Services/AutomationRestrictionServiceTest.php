@@ -131,7 +131,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -146,7 +146,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -161,7 +161,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -176,7 +176,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -191,7 +191,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -206,7 +206,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -221,7 +221,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -236,7 +236,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -251,7 +251,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -266,7 +266,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -281,7 +281,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -296,7 +296,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -311,7 +311,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -326,7 +326,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -341,7 +341,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -356,7 +356,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -371,7 +371,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -386,7 +386,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -401,7 +401,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -416,7 +416,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -431,7 +431,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -446,7 +446,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -462,7 +462,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -478,7 +478,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -494,7 +494,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -510,7 +510,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -526,7 +526,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -542,7 +542,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -558,7 +558,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -574,7 +574,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -590,7 +590,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -606,7 +606,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => true,
         ]);
@@ -629,7 +629,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => true,
         ]);
@@ -645,7 +645,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -669,7 +669,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -693,7 +693,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -716,7 +716,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -739,7 +739,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -762,7 +762,30 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_in_special_location' => false,
+        ]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
+    }
+
+    public function test_exploration_started_in_regular_context_blocks_enemy_strength_modifying_location(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $location = Location::factory()->create([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => 32,
+            'y' => 16,
+            'type' => null,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
+        ]);
+
+        CharacterAutomation::factory()->create([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -777,7 +800,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
@@ -796,7 +819,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now()->subMinutes(10),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
@@ -805,7 +828,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 

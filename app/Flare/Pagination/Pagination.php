@@ -61,6 +61,31 @@ readonly class Pagination
         return $data;
     }
 
+    public function transformLengthAwarePaginator(LengthAwarePaginator $paginator, TransformerAbstract $transformer): array
+    {
+        $resource = new LeagueCollection($paginator->items(), $transformer);
+
+        $resource->setPaginator(new IlluminatePaginatorAdapter($paginator));
+
+        $data = $this->manager->createData($resource)->toArray();
+        $data['meta']['can_load_more'] = $paginator->hasMorePages();
+
+        return $data;
+    }
+
+    public function transformCollectionResponse(Collection $items, TransformerAbstract $transformer, int $perPage = 10, int $currentPage = 1): array
+    {
+        $total = $items->count();
+        $sliced = $items->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $paginator = new LengthAwarePaginator($sliced, $total, $perPage, $currentPage, [
+            'path' => request()->url(),
+            'query' => request()->query(),
+        ]);
+
+        return $this->transformLengthAwarePaginator($paginator, $transformer);
+    }
+
     /**
      * paginate a collection of objects.
      */

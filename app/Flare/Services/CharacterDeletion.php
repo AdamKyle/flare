@@ -2,6 +2,7 @@
 
 namespace App\Flare\Services;
 
+use App\Flare\Models\AlchemyBag;
 use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\CapitalCityBuildingCancellation;
 use App\Flare\Models\CapitalCityBuildingQueue;
@@ -52,6 +53,10 @@ class CharacterDeletion
 
         if (! is_null($character->gemBag)) {
             $this->emptyCharacterGemBag($character->gemBag);
+        }
+
+        if (! is_null($character->alchemyBag)) {
+            $this->emptyCharacterAlchemyBag($character->alchemyBag);
         }
 
         if (! is_null($character->inventorySets)) {
@@ -121,6 +126,15 @@ class CharacterDeletion
         }
 
         $gemBag->delete();
+    }
+
+    protected function emptyCharacterAlchemyBag(AlchemyBag $alchemyBag): void
+    {
+        foreach ($alchemyBag->slots as $slot) {
+            $slot->delete();
+        }
+
+        $alchemyBag->delete();
     }
 
     protected function emptyCharacterInventorySets(Collection $inventorySets): void

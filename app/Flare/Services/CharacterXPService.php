@@ -15,19 +15,28 @@ use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBui
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterService;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\SkillService;
+use Closure;
+use Exception;
 use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Manager;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
 use League\Fractal\Resource\Item;
 
 class CharacterXPService
 {
+    use SafelyBroadcastsEvents;
+
     private Character $character;
+
+    private ?Closure $heartbeatCallback = null;
 
     public function __construct(
         private readonly CharacterService $characterService,
@@ -47,6 +56,13 @@ class CharacterXPService
         return $this;
     }
 
+    public function withHeartbeatCallback(?Closure $callback): self
+    {
+        $this->heartbeatCallback = $callback;
+
+        return $this;
+    }
+
     /**
      * Distribute the XP to the character based on the monster.
      *
@@ -59,7 +75,10 @@ class CharacterXPService
         $this->handleLevelUp();
 
         if (! $this->character->isLoggedIn()) {
-            event(new UpdateTopBarEvent($this->character->refresh()));
+            $this->safelyDispatchBroadcastEvent(
+                new UpdateTopBarEvent($this->character->refresh()),
+                ['character_id' => $this->character->id]
+            );
         }
 
         return $this;
@@ -83,6 +102,41 @@ class CharacterXPService
         $this->character = $this->character->refresh();
 
         $this->handleLevelUp();
+
+        return $this;
+    }
+
+    public function distributeCheckpointedXp(int $xp, ?Closure $checkpointCallback = null): CharacterXPService
+    {
+        if (! $this->canCharacterGainXP($this->character)) {
+            $this->character = $this->normalizeCharacterMaxLevel($this->character);
+
+            if (! is_null($checkpointCallback)) {
+                $checkpointCallback($xp, 0, $this->character);
+            }
+
+            return $this;
+        }
+
+        $this->character->update([
+            'xp' => $this->character->xp + $xp,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        if (! is_null($checkpointCallback)) {
+            $checkpointCallback($xp, 0, $this->character);
+        }
+
+        $startingLevel = $this->character->level;
+
+        $this->handleLevelUp();
+
+        $this->character = $this->character->refresh();
+
+        if (! is_null($checkpointCallback)) {
+            $checkpointCallback($xp, max(0, $this->character->level - $startingLevel), $this->character);
+        }
 
         return $this;
     }
@@ -271,6 +325,10 @@ class CharacterXPService
 
         $this->handleCharacterLevelUp($leftOverXP, $shouldBuildCache);
 
+        if (! is_null($this->heartbeatCallback)) {
+            ($this->heartbeatCallback)();
+        }
+
         $this->character = $this->character->refresh();
 
         if (! $this->canCharacterGainXP($this->character)) {
@@ -331,7 +389,10 @@ class CharacterXPService
         $characterData = new Item($character, $this->characterSheetBaseInfoTransformer);
         $characterData = $this->manager->createData($characterData)->toArray();
 
-        event(new UpdateBaseCharacterInformation($character->user, $characterData));
+        $this->safelyDispatchBroadcastEvent(
+            new UpdateBaseCharacterInformation($character->user, $characterData),
+            ['character_id' => $character->id]
+        );
     }
 
     /**
@@ -353,7 +414,10 @@ class CharacterXPService
         if ($guideEnabled && $hasNoCompletedGuideQuests && $this->character->level < 2) {
             $xp += 10;
 
-            event(new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'));
+            $this->safelyDispatchBroadcastEvent(
+                new ServerMessageEvent($this->character->user, 'Rewarded an extra 10XP while doing the first guide quest. This bonus will end after you reach level 2.'),
+                ['character_id' => $this->character->id]
+            );
         }
 
         return $xp;

@@ -1,5 +1,6 @@
 {
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "main": "resources/js/app.ts",
   "scripts": {
     "dev": "vite",

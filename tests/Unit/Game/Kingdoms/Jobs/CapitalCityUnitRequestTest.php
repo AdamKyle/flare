@@ -6,6 +6,9 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomUnit;
+use App\Flare\Models\UnitInQueue;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
+use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
@@ -211,6 +214,79 @@ class CapitalCityUnitRequestTest extends TestCase
         });
     }
 
+    public function test_mass_recruit_creates_one_queue_per_kingdom(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $firstTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding()->getKingdom();
+        $secondTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 48,
+            'y_position' => 16,
+        ])->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $archers->id,
+            'required_level' => 1,
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [
+            [
+                'kingdom_id' => $firstTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+            [
+                'kingdom_id' => $secondTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+        ]))->handle(resolve(CapitalCityManagementService::class));
+
+        $queues = CapitalCityUnitQueue::orderBy('kingdom_id')->orderBy('id')->get();
+
+        $this->assertCount(2, $queues);
+        $this->assertEqualsCanonicalizing(
+            [$firstTargetKingdom->id, $secondTargetKingdom->id],
+            $queues->pluck('kingdom_id')->all()
+        );
+        $this->assertEqualsCanonicalizing(
+            [$spearmen->name, $archers->name, $spearmen->name, $archers->name],
+            $queues->flatMap(fn (CapitalCityUnitQueue $queue) => collect($queue->unit_request_data)->pluck('name'))->all()
+        );
+        $this->assertTrue($queues->every(fn (CapitalCityUnitQueue $queue) => count($queue->unit_request_data) === 2));
+        Queue::assertPushed(CapitalCityUnitRequestMovement::class, 2);
+    }
+
     public function test_unit_movement_redispatches_continuation_on_long_running_connection(): void
     {
         Queue::fake();
@@ -276,5 +352,319 @@ class CapitalCityUnitRequestTest extends TestCase
         Queue::assertPushed(CapitalCityUnitRequest::class, function (CapitalCityUnitRequest $job) {
             return $job->connection === 'long_running' && $job->queue === 'default_long';
         });
+    }
+
+    public function test_update_capital_city_unit_recruitments_event_fires_once_for_multiple_queue_rows(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $firstTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding()->getKingdom();
+        $secondTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 48,
+            'y_position' => 16,
+        ])->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $archers->id,
+            'required_level' => 1,
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [
+            [
+                'kingdom_id' => $firstTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+            [
+                'kingdom_id' => $secondTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+        ]))->handle(resolve(CapitalCityManagementService::class));
+
+        Event::assertDispatchedTimes(UpdateCapitalCityUnitRecruitments::class, 1);
+    }
+
+    public function test_update_capital_city_unit_queue_table_event_fires_once_for_multiple_queue_rows(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $firstTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding()->getKingdom();
+        $secondTargetKingdom = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 48,
+            'y_position' => 16,
+        ])->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $archers->id,
+            'required_level' => 1,
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [
+            [
+                'kingdom_id' => $firstTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+            [
+                'kingdom_id' => $secondTargetKingdom->id,
+                'unit_requests' => [
+                    ['unit_name' => $spearmen->name, 'unit_amount' => 1000],
+                    ['unit_name' => $archers->name, 'unit_amount' => 1000],
+                ],
+            ],
+        ]))->handle(resolve(CapitalCityManagementService::class));
+
+        Event::assertDispatchedTimes(UpdateCapitalCityUnitQueueTable::class, 1);
+    }
+
+    public function test_no_events_are_fired_when_all_units_are_filtered_from_queue_creation(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $targetKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $gameBuildingId = $targetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        KingdomUnit::factory()->create([
+            'kingdom_id' => $targetKingdom->id,
+            'game_unit_id' => $spearmen->id,
+            'amount' => 500,
+        ]);
+
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'unit_request_data' => [[
+                'name' => $spearmen->name,
+                'amount' => 1,
+                'secondary_status' => CapitalCityQueueStatus::RECRUITING,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::RECRUITING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [[
+            'kingdom_id' => $targetKingdom->id,
+            'unit_requests' => [
+                ['unit_name' => $spearmen->name, 'unit_amount' => 10],
+            ],
+        ]]))->handle(resolve(CapitalCityManagementService::class));
+
+        Event::assertNotDispatched(UpdateCapitalCityUnitRecruitments::class);
+        Event::assertNotDispatched(UpdateCapitalCityUnitQueueTable::class);
+    }
+
+    public function test_units_with_active_capital_city_queue_are_filtered_from_queue_creation(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $targetKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $gameBuildingId = $targetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $archers->id,
+            'required_level' => 1,
+        ]);
+        KingdomUnit::factory()->create([
+            'kingdom_id' => $targetKingdom->id,
+            'game_unit_id' => $spearmen->id,
+            'amount' => 500,
+        ]);
+
+        $targetKingdomManagement->assignCapitalCityUnitQueue([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'requested_kingdom' => $capitalCity->id,
+            'unit_request_data' => [[
+                'name' => $spearmen->name,
+                'amount' => 1,
+                'secondary_status' => CapitalCityQueueStatus::RECRUITING,
+            ]],
+            'messages' => [],
+            'status' => CapitalCityQueueStatus::RECRUITING,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [[
+            'kingdom_id' => $targetKingdom->id,
+            'unit_requests' => [
+                ['unit_name' => $spearmen->name, 'unit_amount' => 10],
+                ['unit_name' => $archers->name, 'unit_amount' => 10],
+            ],
+        ]]))->handle(resolve(CapitalCityManagementService::class));
+
+        $this->assertSame(1, CapitalCityUnitQueue::count());
+        Queue::assertNothingPushed();
+    }
+
+    public function test_units_with_active_manual_queue_are_filtered_from_queue_creation(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $characterFactory
+            ->passiveSkillManagement()
+            ->assignPassiveSkill(PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION, 0, [
+                'name' => 'Capital City Unit Request Travel Time Reduction',
+                'bonus_per_level' => 0.0,
+                'max_level' => 5,
+            ]);
+        $capitalCity = $characterFactory->kingdomManagement()->assignKingdom([
+            'is_capital' => true,
+            'x_position' => 16,
+            'y_position' => 16,
+        ])->getKingdom();
+        $targetKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom([
+            'x_position' => 32,
+            'y_position' => 16,
+        ])->assignBuilding();
+        $targetKingdom = $targetKingdomManagement->getKingdom();
+        $character = $characterFactory->getCharacter();
+        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $gameBuildingId = $targetKingdom->buildings()->first()->game_building_id;
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $spearmen->id,
+            'required_level' => 1,
+        ]);
+        GameBuildingUnit::factory()->create([
+            'game_building_id' => $gameBuildingId,
+            'game_unit_id' => $archers->id,
+            'required_level' => 1,
+        ]);
+
+        UnitInQueue::factory()->create([
+            'character_id' => $character->id,
+            'kingdom_id' => $targetKingdom->id,
+            'game_unit_id' => $spearmen->id,
+            'amount' => 10,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [[
+            'kingdom_id' => $targetKingdom->id,
+            'unit_requests' => [
+                ['unit_name' => $spearmen->name, 'unit_amount' => 10],
+                ['unit_name' => $archers->name, 'unit_amount' => 10],
+            ],
+        ]]))->handle(resolve(CapitalCityManagementService::class));
+
+        $this->assertSame(0, CapitalCityUnitQueue::count());
+        Queue::assertNothingPushed();
     }
 }

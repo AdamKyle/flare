@@ -159,6 +159,7 @@ class Item extends Model
         'required_monster',
         'required_quest',
         'locations',
+        'drop_sources',
         'holy_stack_devouring_darkness',
         'holy_stack_stat_bonus',
         'holy_stacks_applied',
@@ -282,6 +283,59 @@ class Item extends Model
     public function getLocationsAttribute()
     {
         return $this->type === 'quest' ? Location::where('quest_reward_item_id', $this->id)->with('map')->get() : [];
+    }
+
+    public function getDropSourcesAttribute(): array
+    {
+        if ($this->type !== 'quest') {
+            return [];
+        }
+
+        $monster = Monster::where('quest_item_id', $this->id)->with('gameMap')->orderBy('id')->first();
+
+        if (is_null($monster)) {
+            return [];
+        }
+
+        $source = [
+            'monster_name' => $monster->name,
+            'map_name' => $monster->gameMap?->name ?? 'Unknown',
+            'source_type' => $this->resolveMonsterSourceType($monster),
+        ];
+
+        if (! is_null($monster->only_for_location_type)) {
+            $location = Location::where('type', $monster->only_for_location_type)->with('map')->first();
+
+            if (! is_null($location)) {
+                $source['location_name'] = $location->name;
+                $source['location_x'] = $location->x;
+                $source['location_y'] = $location->y;
+                $source['location_map'] = $location->map?->name;
+            }
+        }
+
+        return [$source];
+    }
+
+    private function resolveMonsterSourceType(Monster $monster): string
+    {
+        if ($monster->is_celestial_entity) {
+            return 'Celestial';
+        }
+
+        if ($monster->is_raid_boss) {
+            return 'Raid Boss';
+        }
+
+        if ($monster->is_raid_monster) {
+            return 'Raid Monster';
+        }
+
+        if (! is_null($monster->only_for_location_type)) {
+            return 'Weekly Fight Monster';
+        }
+
+        return 'Normal Monster';
     }
 
     public function getHolyStackDevouringDarknessAttribute()

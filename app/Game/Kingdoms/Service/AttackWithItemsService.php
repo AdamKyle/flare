@@ -3,7 +3,6 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Inventory;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Values\KingdomLogStatusValue;
@@ -11,6 +10,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Traits\CalculateMorale;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Support\Collection;
 
 class AttackWithItemsService
 {
@@ -37,7 +37,9 @@ class AttackWithItemsService
     public function useItemsOnKingdom(Character $character, Kingdom $kingdom, array $slots): array
     {
 
-        if (! $this->doesCharacterHaveItems($character->inventory, $slots)) {
+        $alchemySlots = $this->getValidatedAlchemySlots($character, $slots);
+
+        if (is_null($alchemySlots)) {
             return $this->errorResult('You don\'t own these items.');
         }
 
@@ -53,25 +55,28 @@ class AttackWithItemsService
             return $this->errorResult('You need to be on the same plane as the kingdom you want to attack with items.');
         }
 
-        $itemDefence = $kingdom->kingdomItemResistanceBonus();
+        $itemResistance = $kingdom->kingdomItemResistanceBonus();
 
         $this->setOldBuildings($kingdom);
         $this->setOldUnits($kingdom);
 
-        $damage = $this->gatherDamage($character->inventory, $slots);
+        $rawDamage = $this->gatherDamage($alchemySlots, $slots);
+        $kingdomDefence = $kingdom->fetchKingdomDefenceBonus();
+        $damageAfterDefence = max(0.0, $rawDamage - $kingdomDefence);
+        $damage = $damageAfterDefence;
 
-        $reduction = $kingdom->fetchKingdomDefenceBonus();
-
-        $damage -= ($damage * $reduction);
-
-        if ($itemDefence > 0) {
-            $damage -= ($damage * $itemDefence);
+        if ($itemResistance > 0) {
+            $damage -= ($damage * $itemResistance);
         }
+
+        $damage = max(0.0, $damage);
+        $buildingDamage = $damage / 2;
+        $unitDamage = $damage / 2;
 
         $currentMorale = $kingdom->current_morale;
 
-        $kingdom = $this->damageBuildings($kingdom, ($damage / 2));
-        $kingdom = $this->damageUnits($kingdom, ($damage / 2));
+        $kingdom = $this->damageBuildings($kingdom, $buildingDamage);
+        $kingdom = $this->damageUnits($kingdom, $unitDamage);
 
         $newMorale = $this->calculateNewMorale($kingdom->refresh(), $currentMorale);
 
@@ -91,9 +96,26 @@ class AttackWithItemsService
                 ' doing a total of: '.number_format($damage * 100).'% damage.'
         ));
 
-        $this->createLogs($character, $kingdom, $damage, $moraleLoss);
+        $this->createLogs($character, $kingdom, $damage, $moraleLoss, [
+            'raw_item_damage' => $rawDamage,
+            'kingdom_defence' => $kingdomDefence,
+            'damage_after_defence' => $damageAfterDefence,
+            'item_resistance' => $itemResistance,
+            'final_damage' => $damage,
+            'building_damage' => $buildingDamage,
+            'unit_damage' => $unitDamage,
+        ]);
 
-        $character->inventory->slots()->whereIn('id', $slots)->delete();
+        foreach (array_count_values($slots) as $slotId => $amountUsed) {
+            $slot = $alchemySlots->get($slotId);
+            $remainingAmount = $slot->amount - $amountUsed;
+
+            if ($remainingAmount === 0) {
+                $slot->delete();
+            } else {
+                $slot->update(['amount' => $remainingAmount]);
+            }
+        }
 
         return $this->successResult([
             'message' => 'Dropped items on kingdom!',
@@ -105,8 +127,13 @@ class AttackWithItemsService
      *
      * - If the defender is not an NPC kingdom we create the log for them.
      */
-    protected function createLogs(Character $character, Kingdom $kingdom, float $damageDone, float $moraleLoss): void
-    {
+    protected function createLogs(
+        Character $character,
+        Kingdom $kingdom,
+        float $damageDone,
+        float $moraleLoss,
+        array $damageBreakdown,
+    ): void {
         $attributes = [
             'to_kingdom_id' => $kingdom->id,
             'status' => KingdomLogStatusValue::BOMBS_DROPPED,
@@ -116,6 +143,9 @@ class AttackWithItemsService
             'new_units' => $this->newUnits,
             'item_damage' => $damageDone,
             'morale_loss' => $moraleLoss,
+            'additional_details' => [
+                'item_damage_breakdown' => $damageBreakdown,
+            ],
             'published' => true,
         ];
 
@@ -149,17 +179,34 @@ class AttackWithItemsService
     /**
      * Validate that the character has the items selected.
      */
-    protected function doesCharacterHaveItems(Inventory $inventory, array $slots): bool
+    protected function getValidatedAlchemySlots(Character $character, array $slots): ?Collection
     {
-        $missingItems = [];
+        if (is_null($character->alchemyBag) || count($slots) === 0) {
+            return null;
+        }
 
-        foreach ($slots as $slotId) {
-            if (is_null($inventory->slots->where('id', $slotId)->first())) {
-                array_push($missingItems, $slotId);
+        $uniqueSlotIds = array_unique($slots);
+        $alchemySlots = $character->alchemyBag->slots()
+            ->where('character_id', $character->id)
+            ->whereIn('id', $uniqueSlotIds)
+            ->whereHas('item', function ($query) {
+                $query->where('damages_kingdoms', true);
+            })
+            ->with('item')
+            ->get()
+            ->keyBy('id');
+
+        if ($alchemySlots->count() !== count($uniqueSlotIds)) {
+            return null;
+        }
+
+        foreach (array_count_values($slots) as $slotId => $selectedAmount) {
+            if ($selectedAmount > $alchemySlots->get($slotId)->amount) {
+                return null;
             }
         }
 
-        return count($missingItems) > 0 ? false : true;
+        return $alchemySlots;
     }
 
     /**
@@ -245,12 +292,12 @@ class AttackWithItemsService
     /**
      * Gathers item damage from selected items.
      */
-    protected function gatherDamage(Inventory $inventory, $slots): float
+    protected function gatherDamage(Collection $alchemySlots, array $slots): float
     {
         $damage = 0.0;
 
         foreach ($slots as $slotId) {
-            $slot = $inventory->slots->where('id', $slotId)->first();
+            $slot = $alchemySlots->get($slotId);
 
             $damage += $slot->item->kingdom_damage;
         }

@@ -63,7 +63,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
-            'completed_at' => now()->addHour(),
+            'completed_at' => now()->addSeconds(3),
             'move_down_monster_list_every' => 10,
             'previous_level' => $this->character->level,
             'current_level' => $this->character->level,
@@ -469,7 +469,46 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
     }
 
-    public function test_begin_automation_clears_old_exploration_warning_and_log(): void
+    public function test_begin_automation_creates_exploration_log_with_starting_level(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->character->update(['level' => 15]);
+        $this->character = $this->character->refresh();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $log = ExplorationLog::where('character_id', $this->character->id)->first();
+
+        $this->assertNotNull($log);
+        $this->assertEquals(15, $log->starting_level);
+    }
+
+    public function test_begin_automation_creates_character_automation_without_starting_level_column(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->service->beginAutomation($this->character, [
+            'selected_monster_id' => $this->monster->id,
+            'auto_attack_length' => 1,
+            'move_down_the_list_every' => 10,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $automation = CharacterAutomation::query()->latest('id')->first();
+
+        $this->assertNotNull($automation);
+        $this->assertFalse($automation->getConnection()->getSchemaBuilder()->hasColumn('character_automations', 'starting_level'));
+    }
+
+    public function test_begin_automation_soft_dismisses_old_exploration_warning(): void
     {
         Queue::fake();
         Event::fake();
@@ -495,8 +534,10 @@ class ExplorationAutomationServiceTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
 
-        $this->assertNull($oldWarning->fresh());
-        $this->assertNull(ExplorationLog::find($oldLog->id));
+        $this->assertNotNull($oldWarning->fresh());
+        $this->assertNotNull($oldWarning->fresh()->dismissed_at);
+        $this->assertNotNull(ExplorationLog::find($oldLog->id));
+        $this->assertNotNull(ExplorationLog::find($oldLog->id)->panel_dismissed_at);
     }
 
     public function test_stop_exploration_finalizes_log_with_player_stop(): void

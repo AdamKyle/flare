@@ -1,219 +1,105 @@
 ---
-name: front-end-building-ui-components
-
-description: Use this skill when creating, reviewing, or refactoring shared React/TypeScript UI components under resources/js/ui.
+name: front-end-build-ui-components
+description: Use when creating, reviewing, or refactoring shared Flare UI primitives under resources/js/ui.
 ---
 
-# Frontend Building UI Components
+# Flare Shared UI Component Building
 
-Use this skill for shared UI primitives under:
+Use this skill for components under:
 
+```text
 resources/js/ui
+```
 
-Shared UI components are generic, reusable building blocks. They must not contain game-specific business logic, API calls, websocket logic, feature state, or feature wording unless passed in through props.
+Shared UI components must be generic, reusable, accessible, mobile first, and free of game/admin business logic.
 
-Examples of shared UI components:
+## Belongs in `ui`
 
-* buttons
-* progress bars
-* loading bars
-* alerts
-* cards
-* tabs
-* dropdowns
-* inputs
-* separators
-* tooltips
-* containers
-* infinite scroll wrappers
+Good candidates:
 
-## Decide if the component belongs in ui
+- buttons;
+- alerts;
+- cards;
+- inputs;
+- dropdown shells;
+- form wizard shell;
+- progress/loading bars;
+- tabs;
+- tooltips;
+- generic side-peek shell;
+- infinite scroll wrappers;
+- containers and separators.
 
-Place a component in `resources/js/ui` only when it is reusable across unrelated features.
+Does not belong in `ui`:
 
-Do not place a component in `resources/js/ui` if it is specific to crafting, inventory, quests, combat, maps, gems, shops, or another game domain.
+- crafting logic;
+- inventory item behavior;
+- quest/admin business rules;
+- map/teleport/traverse behavior;
+- character/monster domain display that knows game data;
+- API calls;
+- websocket subscriptions.
 
-Feature-specific components belong inside that feature folder.
+## Required structure
 
-Generic visual components belong in `resources/js/ui`.
+Use the existing pattern:
 
-## Required folder layout
+```text
+resources/js/ui/<family>
+├── <component>.tsx
+├── types
+│   └── <component>-props.ts
+├── enums
+│   └── <component>-variant.ts
+└── styles
+    ├── base-style.ts
+    └── variant-style.ts
+```
 
-Every shared UI component must follow the existing UI folder layout.
+Only create needed folders.
 
-Use kebab-case for files and folders.
+## Props and variants
 
-Use PascalCase for React component names.
+Props live in `types`.
 
-Use interfaces for object shapes.
+Variants live in `enums`.
 
-Use `type` only when TypeScript requires it for unions, mapped types, conditional types, tuple-derived values, or `keyof typeof`.
+Class maps live in `styles` when reusable or conditional.
 
-Recommended structure:
+Use `clsx` for conditional class names.
 
-resources/js/ui/<component-family>
-|
-+-- <component-name>.tsx
-|
-+-- types
-|   |
-|   +-- <component-name>-props.ts
-|
-+-- enums
-|   |
-|   +-- <component-name>-variant.ts
-|
-+-- styles
-|
-+-- <component-name>-base-styles.ts
-+-- <component-name>-variant-styles.ts
+## Accessibility requirements
 
-Only create folders that are needed.
+Shared UI must provide or accept all labels required for accessibility.
 
-## Component rules
+- Buttons use `<button type="button">` unless intentionally submitting.
+- Icon-only buttons require `aria-label`.
+- Decorative icons require `aria-hidden="true"`.
+- Inputs require labels or accessible names.
+- Alerts should announce blocking errors where appropriate.
+- Progress bars expose progress semantics.
+- Loading indicators expose status semantics.
+- Dialog shells expose dialog semantics and focus/Escape behavior.
 
-UI components must be presentational.
+## Mobile and dark mode
 
-UI components must receive data, labels, callbacks, variants, and state through props.
+All shared UI must work on mobile first.
 
-UI components must not call backend APIs.
+Base classes are mobile. Breakpoint classes enhance larger screens.
 
-UI components must not read game context.
+All visible colors must have light and dark mode coverage.
 
-UI components must not read Redux state.
+Do not ship a light-only or dark-only shared component.
 
-UI components must not subscribe to websockets.
+## Shared UI checklist
 
-UI components must not contain feature-specific wording.
+A shared UI change is acceptable when:
 
-UI components must not hard-code game-specific labels.
-
-UI components must not hide feature behavior.
-
-## Props rules
-
-Do not define props inline.
-
-Props must live in:
-
-resources/js/ui/<component-family>/types/<component-name>-props.ts
-
-The interface must be named:
-
-<ComponentName>Props
-
-Props must include all labels needed for accessibility.
-
-Do not rely on visual text alone when a screen-reader label is needed.
-
-## Accessibility rules
-
-Every shared UI component must be 100% accessible and screen-reader friendly.
-
-Required:
-
-* use semantic HTML first;
-* buttons must be real `button` elements unless there is a real link destination;
-* links must be real anchors when navigating;
-* form controls must have labels or valid accessible names;
-* loading components must expose loading state to assistive technology;
-* progress components must use valid progress semantics;
-* decorative icons must use `aria-hidden="true"`;
-* interactive icons must have an accessible label;
-* disabled states must use the correct disabled/aria-disabled behavior;
-* visible focus styles must not be removed;
-* color must not be the only way to communicate state;
-* text contrast must work in light and dark mode.
-
-Progress UI requirements:
-
-* determinate progress must expose `role="progressbar"`;
-* determinate progress must expose `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`;
-* progress labels must be connected with `aria-labelledby` or `aria-label`;
-* loading bars without a known value must expose `role="status"` or `aria-live="polite"` when useful;
-* screen-reader-only text must be used when visual text is not enough.
-
-## Mobile-first rules
-
-Every shared UI component must be mobile first and desktop second.
-
-Base classes are mobile styles.
-
-Use responsive prefixes only when enhancing larger screens.
-
-Prefer:
-
-* base mobile layout first;
-* `sm:`
-* `md:`
-* `lg:`
-* `xl:`
-* `2xl:`
-* `3xl:`
-
-Do not design desktop first and then patch mobile.
-
-## Light and dark mode rules
-
-Every shared UI component must support light and dark mode.
-
-Any visible text, border, background, focus, loading, progress, success, warning, danger, and disabled state must have matching `dark:` classes.
-
-Do not add a light-only component.
-
-Do not add a dark-only component.
-
-## Styling rules
-
-Use Tailwind classes from the project theme.
-
-Use `clsx` when classes are conditional.
-
-Put reusable class groups in `styles`.
-
-Use variant enums when the component has multiple visual styles.
-
-Do not inline large class conditionals in the component body.
-
-Do not use raw CSS files for a new UI component unless the existing UI family already requires it.
-
-Do not use arbitrary Tailwind values unless there is no project token that fits and the reason is clear.
-
-Do not use `calc()`.
-
-Do not use `overflow-hidden` unless an existing component family already uses it for a required visual behavior and there is no accessible alternative.
-
-## UI component order
-
-Use this order inside UI components:
-
-1. imports
-2. derived IDs or generated IDs
-3. derived labels
-4. derived class names
-5. render helpers
-6. final return
-7. export default
-
-Keep UI components small.
-
-Extract styles when class strings become hard to read.
-
-## Completion checklist
-
-Before finishing a UI component, verify:
-
-* it belongs in `resources/js/ui`;
-* props are in `types`;
-* variants are in `enums` when needed;
-* reusable class builders are in `styles`;
-* it is mobile first;
-* it supports light and dark mode;
-* it is keyboard accessible;
-* it is screen-reader friendly;
-* it has valid ARIA only where needed;
-* it does not contain feature-specific logic;
-* it does not call APIs;
-* it does not read feature context;
-* it does not use `calc()`;
-* it does not use unnecessary `overflow-hidden`.
+- it is truly generic;
+- it has typed props;
+- variants/styles are extracted when useful;
+- no game/admin/API/websocket logic leaked in;
+- it is keyboard accessible;
+- it is screen-reader friendly;
+- it uses Tailwind project tokens;
+- it supports mobile, desktop, light mode, and dark mode.

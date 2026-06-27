@@ -9,6 +9,7 @@ use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
+use Illuminate\Support\Facades\Log;
 
 class ExplorationLogService
 {
@@ -20,7 +21,9 @@ class ExplorationLogService
             'character_automation_id' => $automation->id,
             'monster_id' => $automation->monster_id,
             'attack_type' => $automation->attack_type,
+            'starting_level' => $character->level,
             'started_at' => now(),
+            'stopped_reason' => 'running',
         ]);
 
         $this->broadcastOutputForCharacter($character);
@@ -165,8 +168,25 @@ class ExplorationLogService
             'currencies_gained' => $currenciesGained,
         ]);
 
-        event(new ExplorationWarningState($character->user, false, []));
-        (new self)->broadcastOutputForCharacter($character);
+        try {
+            event(new ExplorationWarningState($character->user, false, []));
+        } catch (\Throwable $throwable) {
+            Log::warning('ExplorationLogService::applyRewardContext failed to broadcast ExplorationWarningState.', [
+                'character_id' => $character->id,
+                'exception_class' => $throwable::class,
+                'exception_message' => $throwable->getMessage(),
+            ]);
+        }
+
+        try {
+            (new self)->broadcastOutputForCharacter($character);
+        } catch (\Throwable $throwable) {
+            Log::warning('ExplorationLogService::applyRewardContext failed to broadcast exploration output.', [
+                'character_id' => $character->id,
+                'exception_class' => $throwable::class,
+                'exception_message' => $throwable->getMessage(),
+            ]);
+        }
     }
 
     private static function addCurrencyDelta(array $currenciesGained, string $currency, int $currentValue, int $previousValue): array
@@ -203,12 +223,14 @@ class ExplorationLogService
             return;
         }
 
-        $log = $warning->explorationLog;
+        $warning->update([
+            'dismissed_at' => now(),
+        ]);
 
-        $warning->delete();
-
-        if (! is_null($log)) {
-            $log->delete();
+        if (! is_null($warning->exploration_log_id)) {
+            ExplorationLog::where('id', $warning->exploration_log_id)
+                ->whereNull('panel_dismissed_at')
+                ->update(['panel_dismissed_at' => now()]);
         }
 
         $this->broadcastOutputForCharacter($character);
@@ -221,6 +243,16 @@ class ExplorationLogService
         event(new ExplorationOutputUpdated($character->user, $output['type'], $output['output']));
     }
 
+    public function dismissEndedLog(Character $character): void
+    {
+        ExplorationLog::where('character_id', $character->id)
+            ->whereNotNull('ended_at')
+            ->whereNull('panel_dismissed_at')
+            ->update(['panel_dismissed_at' => now()]);
+
+        $this->broadcastOutputForCharacter($character);
+    }
+
     private function resolveOutputForCharacter(Character $character): array
     {
         $activeLog = ExplorationLog::where('character_id', $character->id)
@@ -229,15 +261,51 @@ class ExplorationLogService
             ->first();
 
         if (! is_null($activeLog)) {
-            return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
+            $automation = CharacterAutomation::where('id', $activeLog->character_automation_id)
+                ->where('character_id', $character->id)
+                ->first();
+
+            if (is_null($automation)) {
+                Log::error('Exploration log found active with no matching automation. Repairing.', [
+                    'character_id' => $character->id,
+                    'exploration_log_id' => $activeLog->id,
+                    'character_automation_id' => $activeLog->character_automation_id,
+                ]);
+
+                $activeLog->update([
+                    'ended_at' => now(),
+                    'stopped_reason' => 'missing_automation',
+                ]);
+
+                ExplorationWarning::create([
+                    'character_id' => $character->id,
+                    'user_id' => $character->user_id,
+                    'exploration_log_id' => $activeLog->id,
+                    'type' => 'missing_automation',
+                    'message' => 'Exploration ended because the automation was missing. Please report this as a bug.',
+                ]);
+            } else {
+                return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
+            }
         }
 
         $warning = ExplorationWarning::where('character_id', $character->id)
+            ->whereNull('dismissed_at')
             ->latest()
             ->first();
 
         if (! is_null($warning)) {
             return ['type' => 'warning', 'output' => $this->formatWarningOutput($warning)];
+        }
+
+        $endedLog = ExplorationLog::where('character_id', $character->id)
+            ->whereNotNull('ended_at')
+            ->whereNull('panel_dismissed_at')
+            ->latest('ended_at')
+            ->first();
+
+        if (! is_null($endedLog)) {
+            return ['type' => 'ended', 'output' => $this->formatLogOutput($endedLog)];
         }
 
         return ['type' => null, 'output' => null];
@@ -264,6 +332,11 @@ class ExplorationLogService
     private function formatLogOutput(ExplorationLog $log): array
     {
         $currencies = $log->currencies_gained ?? [];
+
+        if (is_null($log->ended_at) && ! is_null($log->starting_level)) {
+            $currencies['levels_gained'] = max(0, $log->character()->value('level') - $log->starting_level);
+        }
+
         $monster = Monster::find($log->monster_id);
         $summary = $log->summary ?? [];
         $monsterSnapshot = is_array($summary['monster'] ?? null) ? $summary['monster'] : null;

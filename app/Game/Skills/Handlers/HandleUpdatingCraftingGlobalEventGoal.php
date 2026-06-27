@@ -74,7 +74,9 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 
-        $amount = $character->globalEventCrafts->crafts;
+        $amount = $character->globalEventCrafts()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first()?->crafts ?? 0;
 
         event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $amount));
 

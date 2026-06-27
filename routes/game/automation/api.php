@@ -6,10 +6,14 @@ Route::middleware([
     'is.character.who.they.say.they.are',
 ])->group(function () {
     Route::get('/exploration/{character}/output', ['as' => 'exploration.output', 'uses' => 'Api\ExplorationOutputController@output']);
+    Route::get('/delve/{character}/status', ['as' => 'delve.status', 'uses' => 'Api\DelveExplorationController@status']);
+    Route::get('/delve/{character}/quest-item/{item}', ['as' => 'delve.quest-item', 'uses' => 'Api\DelveExplorationController@questItemDetail']);
 
     Route::middleware(['throttle:150,2'])->group(function () {
         Route::post('/faction-loyalty-automation/{character}/warning/dismiss', ['as' => 'faction-loyalty-automation.warning.dismiss', 'uses' => 'Api\FactionLoyaltyAutomationWarningController@dismiss']);
         Route::post('/exploration/{character}/warning/dismiss', ['as' => 'exploration.warning.dismiss', 'uses' => 'Api\ExplorationWarningController@dismiss']);
+        Route::post('/exploration/{character}/dismiss', ['as' => 'exploration.dismiss', 'uses' => 'Api\ExplorationWarningController@dismissEnded']);
+        Route::post('/delve/{character}/dismiss', ['as' => 'delve.dismiss', 'uses' => 'Api\DelveExplorationController@dismiss']);
     });
 
     Route::middleware(['is.character.dead'])->group(function () {

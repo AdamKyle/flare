@@ -5,6 +5,7 @@ namespace App\Game\Character\CharacterSheet\Transformers;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\BaseTransformer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 
 class CharacterStatDetailsTransformer extends BaseTransformer
 {
@@ -41,8 +42,8 @@ class CharacterStatDetailsTransformer extends BaseTransformer
             'int_modded' => $characterStatBuilder->statMod('int'),
             'agi_modded' => $characterStatBuilder->statMod('agi'),
             'focus_modded' => $characterStatBuilder->statMod('focus'),
-            'weapon_attack' => $characterStatBuilder->buildDamage('weapon'),
-            'voided_weapon_attack' => $characterStatBuilder->buildDamage('weapon', true),
+            'weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons()),
+            'voided_weapon_attack' => $characterStatBuilder->buildDamage(ItemType::validWeapons(), true),
             'ring_damage' => $characterStatBuilder->buildDamage('ring'),
             'spell_damage' => $characterStatBuilder->buildDamage('spell-damage'),
             'voided_spell_damage' => $characterStatBuilder->buildDamage('spell-damage', true),

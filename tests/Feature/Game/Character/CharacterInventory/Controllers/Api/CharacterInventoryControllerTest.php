@@ -427,20 +427,25 @@ class CharacterInventoryControllerTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        $alchemySlot = $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/inventory/use-many-items', [
                 'items_to_use' => [
-                    $character->inventory->slots->first()->id,
+                    $alchemySlot->id,
                 ],
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Used selected items.', $jsonData['message']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('id', $alchemySlot->id)->count());
     }
 
     public function test_use_single_alchemy_item()
@@ -456,9 +461,13 @@ class CharacterInventoryControllerTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/inventory/use-item/'.$item->id);
@@ -466,6 +475,7 @@ class CharacterInventoryControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Used selected item.', $jsonData['message']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('item_id', $item->id)->count());
     }
 
     public function test_destroy_alchemy_item()
@@ -479,21 +489,25 @@ class CharacterInventoryControllerTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+        $alchemySlot = $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
 
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-alchemy-item', [
-                'slot_id' => $character->inventory->slots->first()->id,
+                'slot_id' => $alchemySlot->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
-        $this->assertEquals('Destroyed Alchemy Item: '.$item->affix_name.'.', $jsonData['message']);
+        $this->assertEquals('Destroyed Alchemy Item: '.$item->name.'.', $jsonData['message']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->where('id', $alchemySlot->id)->count());
     }
 
-    public function test_destroy_all_alchemy_items()
+    public function test_destroy_alchemy_item_rejects_another_characters_slot(): void
     {
         $item = $this->createItem([
             'usable' => true,
@@ -501,20 +515,75 @@ class CharacterInventoryControllerTest extends TestCase
             'type' => 'alchemy',
             'affects_skill_type' => SkillTypeValue::TRAINING,
         ]);
-
         $character = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
-            ->inventoryManagement()
-            ->giveItem($item)
             ->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+        $alchemySlot = $otherCharacter->alchemyBag->slots()->create([
+            'character_id' => $otherCharacter->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
 
         $response = $this->actingAs($character->user)
-            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-all-alchemy-items', [
-                'slot_id' => $character->inventory->slots->first()->id,
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-alchemy-item', [
+                'slot_id' => $alchemySlot->id,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
 
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('No alchemy item found to destroy.', $jsonData['message']);
+        $this->assertEquals(2, $alchemySlot->refresh()->amount);
+    }
+
+    public function test_destroy_all_alchemy_items()
+    {
+        $alchemyItem = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+        ]);
+        $normalItem = $this->createItem();
+        $gem = $this->createGem();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($normalItem)
+            ->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $alchemyItem->id,
+            'amount' => 2,
+        ]);
+        $otherSlot = $otherCharacter->alchemyBag->slots()->create([
+            'character_id' => $otherCharacter->id,
+            'item_id' => $alchemyItem->id,
+            'amount' => 3,
+        ]);
+        $gemSlot = $character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $character->gemBag->id,
+            'gem_id' => $gem->id,
+            'amount' => 4,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory/destroy-all-alchemy-items');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Destroyed All Alchemy Items.', $jsonData['message']);
+        $this->assertEquals(0, $character->alchemyBag->slots()->count());
+        $this->assertEquals(3, $otherSlot->refresh()->amount);
+        $this->assertEquals(1, $character->inventory->slots()->where('item_id', $normalItem->id)->count());
+        $this->assertEquals(4, $gemSlot->refresh()->amount);
     }
 }

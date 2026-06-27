@@ -4,6 +4,8 @@ namespace Tests\Unit\Flare\Values;
 
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Values\ClassAttackValue;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -146,5 +148,238 @@ class ClassAttackValueTest extends TestCase
         ], $attackData['class_weapons']);
         $this->assertEquals('Cast', $attackData['attack_type']);
         $this->assertEquals([], $attackData['equipped_class_items']);
+    }
+
+    public function test_buccaneer_with_gun_and_shield_has_item_true(): void
+    {
+        $characterFactory = new CharacterFactory;
+        $characterFactory
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation();
+
+        $gun = $this->createItem([
+            'name' => 'Old Pistol',
+            'type' => ItemType::GUN->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+        $shield = $this->createItem([
+            'name' => 'Buckler',
+            'type' => ArmourType::SHIELD->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+
+        $character = $characterFactory
+            ->inventoryManagement()
+            ->giveItem($gun, true, 'right-hand')
+            ->giveItem($shield, true, 'left-hand')
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::BUCCANEERS_BARRAGE, $attackData['type']);
+        $this->assertEquals('Gun and Shield', $attackData['only']);
+        $this->assertTrue($attackData['has_item']);
+        $this->assertEquals([ItemType::GUN->value], $attackData['class_weapons']);
+        $this->assertEquals('Attack', $attackData['attack_type']);
+    }
+
+    public function test_buccaneer_without_shield_has_item_false(): void
+    {
+        $characterFactory = new CharacterFactory;
+        $characterFactory
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation();
+
+        $gun = $this->createItem([
+            'name' => 'Old Pistol',
+            'type' => ItemType::GUN->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+
+        $character = $characterFactory
+            ->inventoryManagement()
+            ->giveItem($gun, true, 'right-hand')
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::BUCCANEERS_BARRAGE, $attackData['type']);
+        $this->assertFalse($attackData['has_item']);
+    }
+
+    public function test_buccaneer_without_gun_has_item_false(): void
+    {
+        $characterFactory = new CharacterFactory;
+        $characterFactory
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation();
+
+        $shield = $this->createItem([
+            'name' => 'Buckler',
+            'type' => ArmourType::SHIELD->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+
+        $character = $characterFactory
+            ->inventoryManagement()
+            ->giveItem($shield, true, 'left-hand')
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::BUCCANEERS_BARRAGE, $attackData['type']);
+        $this->assertFalse($attackData['has_item']);
+    }
+
+    public function test_beastmaster_with_bow_gets_devils_piercing_shot(): void
+    {
+        $characterFactory = new CharacterFactory;
+        $characterFactory
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Beastmaster',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation();
+
+        $bow = $this->createItem([
+            'name' => 'Hunter\'s Bow',
+            'type' => ItemType::BOW->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+
+        $character = $characterFactory
+            ->inventoryManagement()
+            ->giveItem($bow, true, 'right-hand')
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::DEVILS_PIERCING_SHOT, $attackData['type']);
+        $this->assertEquals(ItemType::BOW->value, $attackData['only']);
+        $this->assertTrue($attackData['has_item']);
+        $this->assertEquals(1, $attackData['amount']);
+        $this->assertEquals([ItemType::BOW->value, ItemType::HAMMER->value], $attackData['class_weapons']);
+        $this->assertEquals('Attack', $attackData['attack_type']);
+    }
+
+    public function test_beastmaster_with_hammer_gets_beast_stomp(): void
+    {
+        $characterFactory = new CharacterFactory;
+        $characterFactory
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Beastmaster',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation();
+
+        $hammer = $this->createItem([
+            'name' => 'War Hammer',
+            'type' => ItemType::HAMMER->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+
+        $character = $characterFactory
+            ->inventoryManagement()
+            ->giveItem($hammer, true, 'right-hand')
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::BEAST_STOMP, $attackData['type']);
+        $this->assertEquals(ItemType::HAMMER->value, $attackData['only']);
+        $this->assertTrue($attackData['has_item']);
+        $this->assertEquals([ItemType::BOW->value, ItemType::HAMMER->value], $attackData['class_weapons']);
+        $this->assertEquals('Attack', $attackData['attack_type']);
+    }
+
+    public function test_beastmaster_with_no_weapon_has_item_false(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Beastmaster',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::BEAST_STOMP, $attackData['type']);
+        $this->assertFalse($attackData['has_item']);
+    }
+
+    public function test_buccaneer_with_two_guns_gets_dual_gun_barrage(): void
+    {
+        $characterFactory = new CharacterFactory;
+        $characterFactory
+            ->createBaseCharacter([
+                'name' => 'Human',
+            ], [
+                'name' => 'Buccaneer',
+                'damage_stat' => 'str',
+                'to_hit_stat' => 'dex',
+            ], assignPassiveSkills: false)
+            ->givePlayerLocation();
+
+        $gun1 = $this->createItem([
+            'name' => 'Old Pistol',
+            'type' => ItemType::GUN->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+        $gun2 = $this->createItem([
+            'name' => 'Navy Revolver',
+            'type' => ItemType::GUN->value,
+            'is_mythic' => false,
+            'is_cosmic' => false,
+        ]);
+
+        $character = $characterFactory
+            ->inventoryManagement()
+            ->giveItem($gun1, true, 'right-hand')
+            ->giveItem($gun2, true, 'left-hand')
+            ->getCharacter();
+
+        $attackData = (new ClassAttackValue($character))->buildAttackData();
+
+        $this->assertEquals(ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE, $attackData['type']);
+        $this->assertEquals('Two Guns', $attackData['only']);
+        $this->assertTrue($attackData['has_item']);
+        $this->assertEquals(2, $attackData['amount']);
+        $this->assertEquals([ItemType::GUN->value], $attackData['class_weapons']);
+        $this->assertEquals('Attack', $attackData['attack_type']);
     }
 }

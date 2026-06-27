@@ -1,252 +1,267 @@
 ---
 name: front-end-feature-layout
-description: Use this skill when creating, reviewing, or refactoring self-contained React/TypeScript frontend feature directories in this repository.
+description: Use when creating or refactoring Flare frontend feature folders, game feature components, admin features, hooks, definitions, utils, styles, and local file organization.
 ---
 
-## Self-Contained Feature Directory Layout
+# Flare Frontend Feature Layout
 
-Use this layout for new self-contained feature sections such as a card, panel, side-peek body, screen section, workflow section, crafting section, shop subsection, or any feature that owns its own API calls, hooks, websocket subscriptions, child components, enums, utils, and local types.
+Use this skill when creating a new feature, restructuring a feature, reviewing folder placement, or deciding where components, hooks, API files, definitions, utilities, styles, and types belong.
 
-Do not place all files flat in one folder.
+## Feature ownership rule
 
-Do not define props, state, hook params, hook returns, API requests, or API responses inline inside component or hook files.
+Put code where the owning domain lives.
 
-Use kebab-case for every file and folder.
+Do not move a feature into `ui` just because it renders UI.
 
-Use PascalCase for component names.
+`ui` is for generic primitives. Game and admin features belong in their domain folders.
 
-Use `interface` for object shapes. Only use `type` when TypeScript requires it for unions, mapped types, conditional types, tuple-derived props, or `keyof typeof` patterns.
+## Game feature layout
 
-Recommended layout:
+For a game feature under `resources/js/game/components/<feature>`, prefer this structure when the folders apply:
 
-resources/js/game/components/<parent-feature>/<self-contained-feature>
-|
-+-- <self-contained-feature>.tsx
-|
-+-- api
-|   |
-|   +-- definitions
-|   |   |
-|   |   +-- <entity>-definition.ts
-|   |   +-- <entity>-api-response-definition.ts
-|   |   +-- <entity>-request-definition.ts
-|   |
-|   +-- enums
-|   |   |
-|   |   +-- <feature>-api-urls.ts
-|   |
-|   +-- hooks
-|       |
-|       +-- <use-feature-api-hook>.ts
-|       |
-|       +-- definitions
-|           |
-|           +-- <use-feature-api-hook>-definition.ts
-|           +-- <use-feature-api-hook>-params.ts
-|
-+-- components
-|   |
-|   +-- <feature-child-component>.tsx
-|   +-- <another-feature-child-component>.tsx
-|   |
-|   +-- types
-|       |
-|       +-- <feature-child-component>-props.ts
-|       +-- <another-feature-child-component>-props.ts
-|
-+-- hooks
-|   |
-|   +-- <use-feature-state>.ts
-|   +-- <use-feature-behavior>.ts
-|   |
-|   +-- definitions
-|       |
-|       +-- <use-feature-state>-definition.ts
-|       +-- <use-feature-state>-params.ts
-|       +-- <use-feature-state>-state.ts
-|
-+-- screens
-|   |
-|   +-- <feature-screen>.tsx
-|   +-- <another-feature-screen>.tsx
-|   |
-|   +-- types
-|       |
-|       +-- <feature-screen>-props.ts
-|       +-- <base-section-props>.ts
-|
-+-- enums
-|   |
-|   +-- <feature>-types.ts
-|   +-- <feature>-steps.ts
-|
-+-- types
-|   |
-|   +-- <shared-feature-props>.ts
-|   +-- <shared-feature-state>.ts
-|   +-- <shared-feature-option>.ts
-|
-+-- utils
-|   |
-|   +-- <feature>-options.ts
-|   +-- <feature>-formatter.ts
-|   +-- <feature>-normalizer.ts
-|
-+-- styles
-|   |
-|   +-- <feature>-styles.ts
-|
-+-- web-sockets
-|
-+-- enums
-|   |
-|   +-- web-socket-channels.ts
-|   +-- web-socket-event-names.ts
-|
-+-- event-data-definitions
-|   |
-|   +-- <feature-event-definition>.ts
-|
-+-- hooks
-|
-+-- <use-feature-web-socket>.ts
-|
-+-- definitions
-|
-+-- <use-feature-web-socket>-params.ts
-+-- <use-feature-web-socket>-definition.ts
+```text
+resources/js/game/components/<feature>
+├── <feature>.tsx
+├── components
+│   ├── <child-component>.tsx
+│   └── types
+│       └── <child-component>-props.ts
+├── screens
+│   ├── <feature-screen>.tsx
+│   └── types
+│       └── <feature-screen>-props.ts
+├── hooks
+│   ├── use-<feature>.ts
+│   └── definitions
+│       ├── use-<feature>-definition.ts
+│       ├── use-<feature>-params.ts
+│       └── use-<feature>-state.ts
+├── api
+│   ├── definitions
+│   │   ├── <entity>-definition.ts
+│   │   ├── <action>-request-definition.ts
+│   │   └── <action>-response-definition.ts
+│   ├── enums
+│   │   └── <feature>-api-urls.ts
+│   └── hooks
+│       ├── use-<action>-api.ts
+│       └── definitions
+│           ├── use-<action>-api-definition.ts
+│           └── use-<action>-api-params.ts
+├── enums
+│   └── <feature>-type.ts
+├── types
+│   └── <shared-feature-type>.ts
+├── utils
+│   ├── <feature>-formatter.ts
+│   └── <feature>-normalizer.ts
+└── styles
+    └── <feature>-styles.ts
+```
 
-Placement rules:
+Only create folders that are needed.
 
-- Root feature file:
-    - owns the feature shell only;
-    - wires feature-level hooks/components together;
-    - does not contain API request logic;
-    - does not contain websocket subscription logic;
-    - does not define inline interfaces.
+Do not add empty folders.
 
-- `components`:
-    - contains renderable child UI specific to this feature;
-    - each component props interface lives in `components/types/<component-name>-props.ts`;
-    - split components when JSX becomes large or when render helpers become too many.
+## Admin feature layout
 
-- `screens`:
-    - use only when the feature has internal screens/steps/views;
-    - screen props live in `screens/types/<screen-name>-props.ts`;
-    - shared screen props live in `screens/types/base-section-props.ts`.
+Admin features live under:
 
-- `api/definitions`:
-    - contains API request, response, and entity interfaces;
-    - keep backend-shaped fields as snake_case when mirroring server payloads;
-    - do not rename API fields to camelCase unless the feature already transforms them.
+```text
+resources/js/admin/<feature>
+```
 
-- `api/hooks`:
-    - contains API request hooks only;
-    - hook params and return interfaces live in `api/hooks/definitions`;
-    - hooks must use `useApiHandler()`;
-    - components must not call axios directly.
+Use this structure when applicable:
 
-- `hooks`:
-    - contains local feature behavior/state hooks;
-    - hook params, return interfaces, and state interfaces live in `hooks/definitions`;
-    - do not hide JSX-heavy rendering in hooks.
+```text
+resources/js/admin/<feature>
+├── <feature>.tsx
+├── manage-<feature>.tsx
+├── manage-<feature>-base.tsx
+├── api
+│   ├── definitions
+│   ├── enums
+│   └── hooks
+│       └── definitions
+├── components
+│   └── types
+├── form-components
+│   └── types
+├── hooks
+│   └── definitions
+├── definitions
+├── types
+└── utils
+```
 
-- `types`:
-    - contains shared feature interfaces used by multiple folders;
-    - do not use this for one component’s props when `components/types` or `screens/types` is more specific.
+Current admin guide quest code follows this pattern.
 
-- `utils`:
-    - contains pure functions only;
-    - no React state;
-    - no JSX;
-    - no API calls.
+Use it as the reference for future admin forms.
 
-- `styles`:
-    - contains class maps or class builder functions only when JSX classes become reusable or conditional enough to justify extraction;
-    - use `clsx` for conditional class names.
+## Shared UI layout
 
-- `web-sockets`:
-    - contains feature-specific websocket channels, event names, event payload interfaces, and websocket hooks;
-    - websocket hook params live in `web-sockets/hooks/definitions`;
-    - use existing websocket provider/hooks;
-    - do not initialize Echo manually.
+Shared UI primitives live under:
 
-Interface naming rules:
+```text
+resources/js/ui/<component-family>
+```
 
-- Component props:
-    - `<ComponentName>Props`
-    - file: `<component-name>-props.ts`
+Typical structure:
 
-- Screen props:
-    - `<ScreenName>Props`
-    - file: `<screen-name>-props.ts`
+```text
+resources/js/ui/<component-family>
+├── <component>.tsx
+├── types
+│   └── <component>-props.ts
+├── enums
+│   └── <component>-variant.ts
+└── styles
+    ├── base-style.ts
+    └── variant-style.ts
+```
 
-- Hook params:
-    - `<UseHookName>Params`
-    - file: `<use-hook-name>-params.ts`
+Examples:
 
-- Hook return:
-    - `<UseHookName>Definition`
-    - file: `<use-hook-name>-definition.ts`
+- `ui/buttons`
+- `ui/alerts`
+- `ui/cards`
+- `ui/input`
+- `ui/form-wizard`
+- `ui/loading-bar`
+- `ui/progress`
+- `ui/side-peek`
+- `ui/tabs`
+- `ui/tool-tips`
 
-- Hook state:
-    - `<UseHookName>State`
-    - file: `<use-hook-name>-state.ts`
+## Reusable game-domain components
 
-- API response:
-    - `<Entity>ApiResponseDefinition`
-    - file: `<entity>-api-response-definition.ts`
+Use:
 
-- API request:
-    - `<Action>RequestDefinition`
-    - file: `<action>-request-definition.ts`
+```text
+resources/js/game/reusable-components
+```
 
-Rendering rules inside self-contained features:
+for components that are reusable inside the game but not generic enough for `ui`.
 
-- Do not leave large inline conditional JSX.
-- Do not use inline ternary JSX for major loading/default branches.
-- Do not use inline `{condition && (...)}` for multi-line blocks.
-- Extract descriptive render helpers.
-- Render helpers must be named by what they render.
-- Render helpers must use early returns.
+Examples include components that know about game terms, game item display, game stats, character data, game currencies, map concepts, monster concepts, or specific game styling semantics.
 
-Preferred pattern:
+Do not put game-domain components into `ui`.
 
-- `renderCraftTypeFieldset`
-- `renderArmourTypeFieldset`
-- `renderSearchFieldset`
-- `renderCraftingSummary`
-- `renderCraftItems`
-- `renderCraftForNpcCheckbox`
-- `renderCraftForEventCheckbox`
-- `renderMessages`
-- `renderSelectedItem`
-- `renderTimeoutMessage`
-- `renderInventoryFullMessage`
-- `renderActions`
+## File naming rules
 
-Derived values and spacing:
+Use kebab-case file names:
 
-- Group related derived values together.
-- Leave a blank line between logical const groups.
-- Do not create dense blocks of unrelated derived const declarations.
-- Keep derived values above handlers only when handlers depend on them.
-- Keep handlers above render helpers.
-- Keep render helpers above the final return.
+```text
+craft-item-list.tsx
+craft-item-list-props.ts
+use-craft-item-api.ts
+use-craft-item-api-definition.ts
+crafting-api-urls.ts
+```
 
-Preferred component order:
+Use PascalCase React component names:
 
-1. context hooks
-2. custom hooks
-3. state
-4. refs
-5. derived values
-6. data-fetching helpers
-7. effects
-8. getters
-9. handlers
-10. render helpers
-11. final return
-12. export default
+```tsx
+const CraftItemList = (...) => { ... };
+```
 
-Do not add a new folder just because this structure lists it. Add only the folders the feature actually needs.
+Use camelCase for local variables and functions unless matching existing snake_case props/API fields.
+
+Keep backend/API payload fields as snake_case.
+
+## Type location rules
+
+Use the narrowest type location:
+
+- component props: `components/types/<component>-props.ts`;
+- screen props: `screens/types/<screen>-props.ts`;
+- hook params/returns/state: `hooks/definitions/*`;
+- API request/response/entity definitions: `api/definitions/*`;
+- API hook params/returns: `api/hooks/definitions/*`;
+- shared feature types used by multiple folders: `types/*`;
+- enum values: `enums/*`.
+
+Do not define component props inline.
+
+Do not define API request/response shapes inside components.
+
+Do not define hook return types inline when the hook is feature-level or shared.
+
+## Utility rules
+
+Feature utilities live in the feature `utils` folder.
+
+Cross-feature utilities live in:
+
+```text
+resources/js/utils
+resources/js/utils/hooks
+```
+
+Utilities must be pure unless clearly named as hooks.
+
+Utility files must not contain JSX.
+
+Utility files must not call APIs.
+
+Utility files must not subscribe to websockets.
+
+Utility files must not mutate React state.
+
+## Styles folder rules
+
+Move class maps and class builder functions into `styles` when classes become conditional or repeated.
+
+Use `clsx` for conditional Tailwind class names.
+
+Do not create a `styles` folder for a single simple class string.
+
+Feature styles stay in the feature folder. Shared UI styles stay in the shared UI folder.
+
+## Root feature file rules
+
+The root feature component should wire the feature together.
+
+It may:
+
+- call feature hooks;
+- call API hooks;
+- pass data to child components;
+- render top-level loading/error/empty/success states;
+- choose screens/sections.
+
+It should not:
+
+- contain raw API URLs;
+- build large request payloads inline;
+- contain many unrelated child components inline;
+- define props interfaces inline;
+- contain websocket subscription details;
+- contain long validation functions;
+- become a dumping ground for all JSX.
+
+## Component extraction rule
+
+Extract a child component when:
+
+- JSX becomes hard to scan;
+- a block has its own props/behavior;
+- the same UI pattern is repeated;
+- a render helper becomes large;
+- a form section has a clear domain name;
+- a section needs independent accessibility labels or focus behavior.
+
+Do not extract tiny one-line markup just to create files.
+
+## Feature completion checklist
+
+A feature layout is acceptable when:
+
+- files live under the owning domain folder;
+- generic UI is not mixed with feature business logic;
+- API definitions are not inside components;
+- props live in local type files;
+- hooks have definitions when they expose reusable contracts;
+- utilities are pure;
+- styles are extracted only when helpful;
+- folder names follow existing Flare conventions.

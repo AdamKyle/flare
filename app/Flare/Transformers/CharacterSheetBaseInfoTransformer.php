@@ -102,10 +102,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'can_use_work_bench' => false,
             'can_access_queen' => $this->canAccessQueenOfHearts($character),
-            'can_access_hell_forged' => $character->map->gameMap->mapType()->isHell(),
-            'can_access_purgatory_chains' => $character->map->gameMap->mapType()->isPurgatory(),
-            'can_access_labyrinth_oracle' => $character->map->gameMap->mapType()->isLabyrinth(),
-            'can_access_twisted_earth' => $character->map->gameMap->mapType()->isTwistedMemories(),
+            'can_access_hell_forged' => $character->map?->gameMap?->mapType()->isHell() ?? false,
+            'can_access_purgatory_chains' => $character->map?->gameMap?->mapType()->isPurgatory() ?? false,
+            'can_access_labyrinth_oracle' => $character->map?->gameMap?->mapType()->isLabyrinth() ?? false,
+            'can_access_twisted_earth' => $character->map?->gameMap?->mapType()->isTwistedMemories() ?? false,
             'is_in_timeout' => ! is_null($character->user->timeout_until),
             'can_see_pledge_tab' => ! is_null($factionLoyalty),
             'pledged_to_faction_id' => ! is_null($factionLoyalty) ? $factionLoyalty->faction_id : null,
@@ -212,6 +212,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
     {
         return $character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
-        })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
+        })->isNotEmpty() && ($character->map?->gameMap?->mapType()->isHell() ?? false);
     }
 }

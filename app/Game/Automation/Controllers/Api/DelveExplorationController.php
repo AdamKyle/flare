@@ -3,6 +3,7 @@
 namespace App\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\LocationType;
@@ -10,6 +11,7 @@ use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Requests\DelveExplorationRequest;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\DelveExplorationAutomationService;
+use App\Game\Automation\Services\DelveStatusService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -17,7 +19,10 @@ class DelveExplorationController extends Controller
 {
     use ChecksAutomationRestrictions;
 
-    public function __construct(private readonly DelveExplorationAutomationService $delveExplorationAutomationService) {}
+    public function __construct(
+        private readonly DelveExplorationAutomationService $delveExplorationAutomationService,
+        private readonly DelveStatusService $delveStatusService,
+    ) {}
 
     public function begin(DelveExplorationRequest $request, Character $character): JsonResponse
     {
@@ -51,6 +56,29 @@ class DelveExplorationController extends Controller
         return response()->json([
             'message' => 'Delve has started child. Let us see how long you last shall we? (Max delve time is 8 hours.)',
         ]);
+    }
+
+    public function status(Character $character): JsonResponse
+    {
+        return response()->json($this->delveStatusService->statusForCharacter($character));
+    }
+
+    public function questItemDetail(Character $character, Item $item): JsonResponse
+    {
+        if ($item->type !== 'quest') {
+            return response()->json(['message' => 'Item is not a quest item.'], 422);
+        }
+
+        return response()->json([
+            'item' => $this->delveStatusService->questItemDetail($item),
+        ]);
+    }
+
+    public function dismiss(Character $character): JsonResponse
+    {
+        $this->delveStatusService->dismissForCharacter($character);
+
+        return response()->json($this->delveStatusService->statusForCharacter($character));
     }
 
     public function stop(Character $character): JsonResponse

@@ -22,7 +22,7 @@ class GemCraftingController extends Controller
         return response()->json([
             'tiers' => $this->gemService->getCraftableTiers($character),
             'skill_xp' => $this->gemService->fetchSkillXP($character),
-            'inventory_count' => $this->craftingService->getInventoryCount($character),
+            'inventory_count' => $this->craftingService->getGemBagCount($character),
         ]);
     }
 
@@ -41,7 +41,7 @@ class GemCraftingController extends Controller
 
         $result['tiers'] = $this->gemService->getCraftableTiers($character);
         $result['skill_xp'] = $this->gemService->fetchSkillXP($character);
-        $result['inventory_count'] = $this->craftingService->getInventoryCount($character);
+        $result['inventory_count'] = $this->craftingService->getGemBagCount($character);
 
         return response()->json($result, $status);
     }

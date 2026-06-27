@@ -5,7 +5,6 @@ namespace App\Flare\Models;
 use Database\Factories\CharacterClassSpecialtiesEquippedFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 
 class CharacterClassSpecialtiesEquipped extends Model
 {
@@ -35,7 +34,6 @@ class CharacterClassSpecialtiesEquipped extends Model
     ];
 
     protected $appends = [
-        'specialty_damage',
         'increase_specialty_damage_per_level',
         'base_damage_mod',
         'base_ac_mod',
@@ -49,25 +47,6 @@ class CharacterClassSpecialtiesEquipped extends Model
         'skill_reduction',
         'resistance_reduction',
     ];
-
-    public function getSpecialtyDamageAttribute()
-    {
-        $cache = Cache::get('character-attack-data-'.$this->character->id);
-
-        if (is_null($cache)) {
-            return 0;
-        }
-
-        if (! isset($cache['damage_stat_amount'])) {
-            return 0;
-        }
-
-        $baseDamage = $this->gameClassSpecial->specialty_damage;
-        $addedDamage = $this->gameClassSpecial->increase_specialty_damage_per_level * $this->level;
-        $characterDamageStat = $cache['damage_stat_amount'] * $this->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
-
-        return $baseDamage + $addedDamage + $characterDamageStat;
-    }
 
     public function getBaseDamageModAttribute()
     {

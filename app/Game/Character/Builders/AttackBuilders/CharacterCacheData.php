@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterAttackDataTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
@@ -166,7 +167,7 @@ class CharacterCacheData
 
         $characterSheet['elemental_atonement'] = $this->characterStatBuilder->buildElementalAtonement();
 
-        $characterSheet['weapon_attack'] = $this->characterStatBuilder->buildDamage('weapon');
+        $characterSheet['weapon_attack'] = $this->characterStatBuilder->buildDamage(ItemType::validWeapons());
         $characterSheet['spell_attack'] = $this->characterStatBuilder->buildDamage('spell-damage');
         $characterSheet['heal_for'] = $this->characterStatBuilder->buildHealing();
 

@@ -6,6 +6,7 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\BaseSkillValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -197,6 +198,8 @@ class ClassRanksControllerTest extends TestCase
             'game_class_id' => $character->game_class_id,
         ]);
 
+        Event::fake();
+
         $response = $this->actingAs($character->user)
             ->call('POST', '/api/equip-specialty/'.$character->id.'/'.$classSpecial->id, [
                 '_token' => csrf_token(),
@@ -205,6 +208,8 @@ class ClassRanksControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Equipped class special: '.$classSpecial->name, $jsonData['message']);
+        $this->assertCount(1, $character->refresh()->classSpecialsEquipped);
+        $this->assertTrue($character->refresh()->classSpecialsEquipped->first()->equipped);
     }
 
     public function test_exploration_blocks_switch_class_and_does_not_change_class(): void

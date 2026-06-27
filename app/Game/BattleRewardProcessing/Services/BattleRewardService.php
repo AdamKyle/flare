@@ -3,14 +3,14 @@
 namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Flare\Models\Event;
-use App\Flare\Models\ExplorationLog;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MapNameValue;
-use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
@@ -18,16 +18,22 @@ use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Skills\Services\SkillService;
+use Closure;
 use Exception;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class BattleRewardService
 {
+    use SafelyBroadcastsEvents;
+
     private ?Character $character;
 
     private ?Monster $monster;
@@ -49,11 +55,20 @@ class BattleRewardService
         private readonly SecondaryRewardService $secondaryRewardService,
         private readonly BattleGlobalEventParticipationHandler $battleGlobalEventParticipationHandler,
         private readonly SkillService $skillService,
+        private readonly BattleRewardLedgerService $battleRewardLedgerService,
+        private readonly BattleRewardMessageContext $battleRewardMessageContext,
     ) {}
 
     /**
      * Set up the battle reward service
      */
+    public function withHeartbeatCallback(?Closure $callback): self
+    {
+        $this->characterRewardService->withHeartbeatCallback($callback);
+
+        return $this;
+    }
+
     public function setUp(int $characterId, int $monsterId): BattleRewardService
     {
 
@@ -83,8 +98,19 @@ class BattleRewardService
     {
 
         if (is_null($this->character) || is_null($this->monster)) {
+            Log::channel('reward_processing')->debug('processRewards: skipped — character or monster is null.', [
+                'character_id' => $this->character?->id,
+                'monster_id' => $this->monster?->id,
+            ]);
+
             return;
         }
+
+        Log::channel('reward_processing')->debug('processRewards: entered.', [
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'has_exploration_log' => isset($this->context['exploration_log_id']),
+        ]);
 
         $beforeSnapshot = null;
 
@@ -92,22 +118,48 @@ class BattleRewardService
             $beforeSnapshot = $this->explorationRewardSnapshot();
         }
 
-        $this->handleAwardingXP();
+        Log::channel('reward_processing')->debug('processRewards: handleAwardSkillPoints start.', ['character_id' => $this->character->id]);
         $this->handleAwardSkillPoints();
+
+        Log::channel('reward_processing')->debug('processRewards: handleFactionPoints start.', ['character_id' => $this->character->id]);
         $this->handleFactionPoints();
+
+        Log::channel('reward_processing')->debug('processRewards: handleFactionLoyaltyBounty start.', ['character_id' => $this->character->id]);
         $this->handleFactionLoyaltyBounty();
+
+        Log::channel('reward_processing')->debug('processRewards: handleCurrencyRewards start.', ['character_id' => $this->character->id]);
         $this->handleCurrencyRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleSpecificLocationRewards start.', ['character_id' => $this->character->id]);
         $this->handleSpecificLocationRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleItemDrops start.', ['character_id' => $this->character->id]);
         $this->handleItemDrops();
+
+        Log::channel('reward_processing')->debug('processRewards: handleWeeklyFightRewards start.', ['character_id' => $this->character->id]);
         $this->handleWeeklyFightRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleSecondaryRewards start.', ['character_id' => $this->character->id]);
         $this->handleSecondaryRewards();
+
+        Log::channel('reward_processing')->debug('processRewards: handleGlobalEventParticipation start.', ['character_id' => $this->character->id]);
         $this->handleGlobalEventParticipation();
+
+        Log::channel('reward_processing')->debug('processRewards: handleAwardingXP start.', ['character_id' => $this->character->id]);
+        $this->handleAwardingXP();
+
+        Log::channel('reward_processing')->debug('processRewards: all reward steps completed.', ['character_id' => $this->character->id]);
 
         if (! is_null($beforeSnapshot)) {
             $log = ExplorationLog::find($this->context['exploration_log_id']);
 
             if (! is_null($log)) {
                 $character = $this->character->refresh();
+
+                Log::channel('reward_processing')->debug('processRewards: applying exploration reward context.', [
+                    'character_id' => $character->id,
+                    'exploration_log_id' => $this->context['exploration_log_id'],
+                ]);
 
                 ExplorationLogService::applyRewardContext(
                     $log,
@@ -118,9 +170,329 @@ class BattleRewardService
             }
         }
 
+        Log::channel('reward_processing')->debug('processRewards: completed.', ['character_id' => $this->character->id]);
+
         if ($includeWinterEvent) {
             WinterEventChristmasGiftHandler::dispatch($this->character->id)->onConnection('event_battle_reward')->onQueue('event_battle_reward')->delay(now()->addSeconds(2));
         }
+    }
+
+    public function processLedgerAwareRewards(CharacterBattleRewardRequest $request, bool $includeWinterEvent = false): void
+    {
+        $payload = $request->handler_payload;
+
+        $this->setUp($request->character_id, (int) $payload['monster_id']);
+        $this->setContext($payload['context'] ?? []);
+
+        if (is_null($this->character) || is_null($this->monster)) {
+            return;
+        }
+
+        $this->battleRewardLedgerService->ensureSteps($request);
+        $this->battleRewardMessageContext->start($request->id, $this->character->id, $this->character->user_id);
+
+        try {
+            foreach ($this->battleRewardLedgerService->stepsForRequest($request) as $step) {
+                if ($step->status === BattleRewardStepStatus::COMPLETED) {
+                    $this->battleRewardLedgerService->log('step.skipped_completed', $request, $step);
+
+                    continue;
+                }
+
+                if (in_array($step->step_name, [BattleRewardStepName::FINAL_PLAYER_UPDATES, BattleRewardStepName::MESSAGE_OUTBOX], true)) {
+                    break;
+                }
+
+                $this->battleRewardMessageContext->setStep($step->step_name);
+                $startedAt = microtime(true);
+                $step = $this->battleRewardLedgerService->startStep($step, $this->payloadForStep($request, $step));
+
+                try {
+                    $result = $this->runLedgerStep($request, $step, $includeWinterEvent);
+
+                    if ($step->refresh()->status !== BattleRewardStepStatus::COMPLETED) {
+                        $this->battleRewardLedgerService->completeStep($step, array_merge($result, [
+                            'elapsed_ms' => (int) ((microtime(true) - $startedAt) * 1000),
+                        ]));
+                    }
+                } catch (Throwable $throwable) {
+                    $this->battleRewardLedgerService->failStep($step, $throwable);
+
+                    throw $throwable;
+                } finally {
+                    $this->battleRewardMessageContext->clearStep();
+                }
+            }
+        } finally {
+            $this->battleRewardMessageContext->clear();
+        }
+    }
+
+    private function runLedgerStep(
+        CharacterBattleRewardRequest $request,
+        CharacterBattleRewardRequestStep $step,
+        bool $includeWinterEvent,
+    ): array {
+        match ($step->step_name) {
+            BattleRewardStepName::BUILD_REWARD_PLAN => null,
+            BattleRewardStepName::SKILL_POINTS => $this->handleAwardSkillPoints(),
+            BattleRewardStepName::FACTION_POINTS => $this->handleFactionPoints(),
+            BattleRewardStepName::FACTION_LOYALTY_BOUNTY => $this->handleFactionLoyaltyBounty(),
+            BattleRewardStepName::CURRENCY_REWARDS => $this->handleLedgerCurrencyRewards($step),
+            BattleRewardStepName::SPECIFIC_LOCATION_REWARDS => $this->handleLedgerSpecificLocationRewards($step),
+            BattleRewardStepName::ITEM_DROPS => $this->handleLedgerItemDrops($step),
+            BattleRewardStepName::WEEKLY_REWARDS => $this->handleWeeklyFightRewards(),
+            BattleRewardStepName::SECONDARY_REWARDS => $this->handleSecondaryRewards(),
+            BattleRewardStepName::GLOBAL_EVENT_PARTICIPATION => $this->handleGlobalEventParticipation(),
+            BattleRewardStepName::XP => $this->handleLedgerAwardingXp($step),
+            BattleRewardStepName::EXPLORATION_CONTEXT => $this->handleLedgerExplorationContext($request),
+            BattleRewardStepName::WINTER_EVENT => $this->handleLedgerWinterEvent($includeWinterEvent),
+            BattleRewardStepName::FINAL_PLAYER_UPDATES,
+            BattleRewardStepName::MESSAGE_OUTBOX => null,
+        };
+
+        $this->character = $this->character?->refresh();
+
+        return ['character_level' => $this->character?->level, 'character_xp' => $this->character?->xp];
+    }
+
+    private function payloadForStep(CharacterBattleRewardRequest $request, CharacterBattleRewardRequestStep $step): array
+    {
+        if ($step->step_name !== BattleRewardStepName::BUILD_REWARD_PLAN) {
+            return $step->payload_json ?? [];
+        }
+
+        return [
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'source_type' => $request->source_type?->value,
+            'source_id' => $request->source_id,
+            'handler_payload' => $request->handler_payload,
+            'context' => $this->context,
+            'total_creatures' => $this->context['total_creatures'] ?? null,
+            'total_xp' => $this->context['total_xp'] ?? null,
+            'total_skill_xp' => $this->context['total_skill_xp'] ?? null,
+            'total_faction_points' => $this->context['total_faction_points'] ?? null,
+            'exploration_log_id' => $this->context['exploration_log_id'] ?? null,
+            'starting' => $this->explorationRewardSnapshot(),
+            'started_at' => now()->toIso8601String(),
+        ];
+    }
+
+    private function handleLedgerAwardingXp(CharacterBattleRewardRequestStep $step): void
+    {
+        $payload = $step->payload_json ?? [];
+
+        if (! isset($payload['total_xp'])) {
+            $payload = array_merge($payload, [
+                'total_xp' => $this->context['total_xp'] ?? $this->characterRewardService->setCharacter($this->character)->fetchXpForMonster($this->monster),
+                'starting_level' => $this->character->level,
+                'starting_xp' => $this->character->xp,
+                'source_request_id' => $step->character_battle_reward_request_id,
+                'source_type' => $step->request?->source_type?->value,
+                'source_id' => $step->request?->source_id,
+                'max_level_context' => [
+                    'current_level' => $this->character->level,
+                ],
+                'planned_at' => now()->toIso8601String(),
+            ]);
+
+            $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
+        }
+
+        $checkpoint = $step->checkpoint_json ?? [];
+        $remainingXp = (int) ($checkpoint['remaining_xp'] ?? $payload['total_xp']);
+
+        if (isset($this->context['total_xp'], $this->context['total_creatures']) && empty($checkpoint)) {
+            $this->battleMessageHandler->handleMessageForExplorationXp(
+                $this->character->user,
+                $this->context['total_creatures'],
+                $payload['total_xp'],
+            );
+        }
+
+        DB::transaction(function () use ($step, $payload, $remainingXp): void {
+            $this->characterRewardService
+                ->setCharacter($this->character)
+                ->distributeCheckpointedXp($remainingXp, function (int $appliedXp, int $levelsAwarded, Character $character) use ($step, $payload): void {
+                    $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
+                        'applied_xp' => (int) $payload['total_xp'],
+                        'levels_awarded' => $levelsAwarded,
+                        'current_level' => $character->level,
+                        'current_xp' => $character->xp,
+                        'remaining_xp' => 0,
+                        'last_checkpoint_at' => now()->toIso8601String(),
+                    ]);
+                });
+        });
+
+        $this->battleRewardLedgerService->checkpointStep($step->refresh(), [
+            'applied_xp' => (int) $payload['total_xp'],
+            'levels_awarded' => max(0, $this->character->refresh()->level - (int) $payload['starting_level']),
+            'current_level' => $this->character->level,
+            'current_xp' => $this->character->xp,
+            'remaining_xp' => 0,
+            'last_checkpoint_at' => now()->toIso8601String(),
+        ]);
+    }
+
+    private function handleLedgerCurrencyRewards(CharacterBattleRewardRequestStep $step): void
+    {
+        $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
+        $payload = $step->payload_json ?? [];
+
+        if (! isset($payload['plan'])) {
+            $payload['plan'] = $this->characterRewardService
+                ->setCharacter($this->character)
+                ->planCurrencies($this->monster, $totalKills);
+
+            $payload['planned_at'] = now()->toIso8601String();
+            $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
+        }
+
+        $goldBeforeReward = $this->character->gold;
+
+        DB::transaction(function () use ($step, $payload, $goldBeforeReward): void {
+            $this->earnedCurrencies = $this->characterRewardService
+                ->setCharacter($this->character)
+                ->applyPlannedCurrencies($payload['plan']);
+
+            $character = $this->character->refresh();
+            $goldGained = $character->gold - $goldBeforeReward;
+
+            $this->goldRush->processPotentialGoldRush($character, $goldGained);
+
+            $this->character = $character->refresh();
+
+            $this->battleRewardLedgerService->completeStep($step, [
+                'applied' => true,
+                'currencies' => $this->earnedCurrencies,
+            ]);
+        });
+    }
+
+    private function handleLedgerItemDrops(CharacterBattleRewardRequestStep $step): void
+    {
+        $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
+        $payload = $step->payload_json ?? [];
+
+        if (! isset($payload['plan'])) {
+            $lootingChance = $this->character->skills->where('name', '=', 'Looting')->first()->skill_bonus;
+            $payload['plan'] = $this->dropCheckService->planDrops($this->character, $this->monster, $totalKills, $lootingChance);
+            $payload['planned_at'] = now()->toIso8601String();
+            $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
+        }
+
+        DB::transaction(function () use ($step, $payload): void {
+            $this->addDropRewardTotals(
+                $this->dropCheckService->applyPlannedDrops($this->character, $this->monster, $payload['plan'])
+            );
+
+            $this->character = $this->character->refresh();
+
+            $this->battleRewardLedgerService->completeStep($step, [
+                'applied' => true,
+                'drop_count' => count($payload['plan']['drops'] ?? []),
+            ]);
+        });
+    }
+
+    private function handleLedgerSpecificLocationRewards(CharacterBattleRewardRequestStep $step): void
+    {
+        $payload = $step->payload_json ?? [];
+        $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
+
+        if (! isset($payload['plan'])) {
+            $step = DB::transaction(function () use ($step, $payload, $totalKills): CharacterBattleRewardRequestStep {
+                $payload['plan'] = $this->battleLocationRewardService
+                    ->setContext($this->character, $this->monster)
+                    ->planLocationReward($this->character, $this->monster, [
+                        'request_id' => $step->character_battle_reward_request_id,
+                        'kill_count' => $totalKills,
+                    ]);
+
+                $payload['planned_at'] = now()->toIso8601String();
+
+                return $this->battleRewardLedgerService->updateStepPayload($step, $payload);
+            });
+        }
+
+        $payload = $step->payload_json ?? [];
+
+        DB::transaction(function () use ($step, $payload): void {
+            $result = $this->battleLocationRewardService
+                ->setContext($this->character, $this->monster)
+                ->applyPlannedLocationReward($this->character, $payload['plan']);
+
+            $this->character = $this->character->refresh();
+
+            foreach (($result['currencies'] ?? []) as $currency => $amount) {
+                if ($amount > 0) {
+                    $this->earnedCurrencies[$currency] = ($this->earnedCurrencies[$currency] ?? 0) + $amount;
+                }
+            }
+
+            $this->battleRewardLedgerService->completeStep($step, [
+                'applied' => true,
+                'handler' => $payload['plan']['handler'] ?? null,
+                'currencies' => $result['currencies'] ?? [],
+                'item_count' => $result['item_count'] ?? 0,
+                'event_created' => $result['event_created'] ?? false,
+                'noop' => $result['noop'] ?? false,
+            ]);
+        });
+    }
+
+    private function handleLedgerExplorationContext(CharacterBattleRewardRequest $request): void
+    {
+        if (! isset($this->context['exploration_log_id'])) {
+            return;
+        }
+
+        $planStep = $request->steps()
+            ->where('step_name', BattleRewardStepName::BUILD_REWARD_PLAN)
+            ->first();
+
+        $beforeSnapshot = $planStep?->payload_json['starting'] ?? null;
+
+        if (is_null($beforeSnapshot)) {
+            return;
+        }
+
+        $log = ExplorationLog::find($this->context['exploration_log_id']);
+
+        if (is_null($log)) {
+            Log::channel('reward_ledger')->debug('exploration_context.missing_log', [
+                'character_id' => $request->character_id,
+                'request_id' => $request->id,
+                'step_name' => BattleRewardStepName::EXPLORATION_CONTEXT->value,
+                'source_type' => $request->source_type?->value,
+                'source_id' => $request->source_id,
+            ]);
+
+            return;
+        }
+
+        $character = $this->character->refresh();
+
+        ExplorationLogService::applyRewardContext(
+            $log,
+            $character,
+            $this->explorationRewardSnapshotWithEarnedCurrencies($beforeSnapshot, $character),
+            $this->context
+        );
+    }
+
+    private function handleLedgerWinterEvent(bool $includeWinterEvent): void
+    {
+        if (! $includeWinterEvent) {
+            return;
+        }
+
+        WinterEventChristmasGiftHandler::dispatch($this->character->id)
+            ->onConnection('event_battle_reward')
+            ->onQueue('event_battle_reward')
+            ->delay(now()->addSeconds(2));
     }
 
     private function explorationRewardSnapshot(): array
@@ -282,7 +654,10 @@ class BattleRewardService
             return;
         }
 
-        event(new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)));
+        $this->safelyDispatchBroadcastEvent(
+            new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)),
+            ['character_id' => $this->character->id]
+        );
     }
 
     /**
@@ -417,51 +792,34 @@ class BattleRewardService
      */
     private function handleGlobalEventParticipation(): void
     {
-        $cacheTtl = now()->addSeconds(15);
+        $gameMap = $this->character->map->gameMap;
+        $eventType = $gameMap->only_during_event_type;
 
-        $event = Cache::remember(
-            'battle_reward_service:active_event',
-            $cacheTtl,
-            static function (): ?Event {
-                return Event::whereIn('type', [
-                    EventType::WINTER_EVENT,
-                    EventType::DELUSIONAL_MEMORIES_EVENT,
-                ])->first();
-            }
-        );
+        if (is_null($eventType)) {
+            return;
+        }
+
+        $event = Event::where('type', $eventType)->first();
 
         if (is_null($event)) {
             return;
         }
 
-        $globalEventGoal = Cache::remember(
-            'battle_reward_service:global_event_goal:'.$event->type,
-            $cacheTtl,
-            static function () use ($event): ?GlobalEventGoal {
-                return GlobalEventGoal::where('event_type', $event->type)->first();
-            }
-        );
-
-        $gameMapArrays = Cache::remember(
-            'battle_reward_service:global_event_map_ids',
-            $cacheTtl,
-            static function (): array {
-                return GameMap::whereIn('name', [
-                    MapNameValue::ICE_PLANE,
-                    MapNameValue::DELUSIONAL_MEMORIES,
-                ])->pluck('id')->toArray();
-            }
-        );
-
-        if (is_null($globalEventGoal) || ! in_array($this->character->map->game_map_id, $gameMapArrays)) {
+        if ($eventType === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
             return;
         }
 
-        $totalKills = 1;
+        $globalEventGoal = GlobalEventGoal::where('event_type', $eventType)->first();
 
-        if (isset($this->context['total_creatures'])) {
-            $totalKills = $this->context['total_creatures'];
+        if (is_null($globalEventGoal)) {
+            return;
         }
+
+        if (is_null($globalEventGoal->max_kills)) {
+            return;
+        }
+
+        $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
 
         $this->battleGlobalEventParticipationHandler->handleGlobalEventParticipation($this->character, $globalEventGoal, $totalKills);
 

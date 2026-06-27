@@ -2,6 +2,7 @@
 
 namespace App\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
@@ -49,6 +50,23 @@ class ItemComparisonController extends Controller
 
     public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character)
     {
+        if ($request->source === 'alchemy_bag') {
+            $alchemyBagSlot = AlchemyBagSlot::where('id', $request->id)
+                ->where('character_id', $character->id)
+                ->where('alchemy_bag_id', $character->alchemyBag?->id)
+                ->with('item')
+                ->first();
+
+            if (is_null($alchemyBagSlot)) {
+                return response()->json(['message' => 'Item does not exist  ...'], 404);
+            }
+
+            return response()->json([
+                'comparison_data' => $this->comparisonService->buildAlchemyBagComparisonData($character, $alchemyBagSlot),
+                'usable_sets' => [],
+            ]);
+        }
+
         $inventory = Inventory::where('character_id', $character->id)->first();
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->id)->first();
 

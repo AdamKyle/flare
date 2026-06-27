@@ -24,7 +24,9 @@ class BuildCharacterAttackTypes
     public function buildCache(Character $character, bool $ignoreReductions = false): array
     {
 
-        $characterAttack = $this->characterAttackBuilder->setCharacter($character, $ignoreReductions);
+        $damageStatAmount = $character->getInformation()->statMod($character->damage_stat);
+
+        $characterAttack = $this->characterAttackBuilder->setCharacter($character, $ignoreReductions, $damageStatAmount);
 
         Cache::put('character-attack-data-'.$character->id, [
             'attack_types' => [
@@ -41,7 +43,7 @@ class BuildCharacterAttackTypes
                 'elemental_atonement' => $character->getInformation()->buildElementalAtonement(),
 
             ],
-            'damage_stat_amount' => $character->getInformation()->statMod($character->damage_stat),
+            'damage_stat_amount' => $damageStatAmount,
         ]);
 
         $this->characterCacheData->deleteCharacterSheet($character);

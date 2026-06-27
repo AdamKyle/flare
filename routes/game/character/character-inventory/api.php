@@ -28,6 +28,7 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
 
         Route::post('/character/{character}/inventory/use-many-items', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
         Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
+        Route::post('/character/{character}/inventory/use-alchemy-item/{alchemyBagSlot}', ['uses' => 'Api\CharacterInventoryController@useAlchemyItem']);
 
         Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);
         Route::post('/character/{character}/inventory/destroy-alchemy-item', ['uses' => 'Api\CharacterInventoryController@destroyAlchemyItem']);
@@ -51,5 +52,4 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
         Route::post('/character/{character}/inventory/disenchant-item', ['uses' => 'Api\CharacterInventoryController@disenchantItem']);
         Route::post('/character/{character}/inventory/move-item-to-set', ['uses' => 'Api\CharacterInventoryController@moveItemToSet']);
     });
-
 });

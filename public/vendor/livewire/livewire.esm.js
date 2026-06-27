@@ -8300,9 +8300,6 @@ var UploadManager = class {
       }
       this.component.$wire.call("_uploadErrored", name, errors, this.uploadBag.first(name).multiple);
     });
-    request.addEventListener("error", () => {
-      this.component.$wire.call("_uploadErrored", name, null, this.uploadBag.first(name).multiple);
-    });
     this.uploadBag.first(name).request = request;
     request.send(formData);
   }

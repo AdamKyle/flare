@@ -14,8 +14,11 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'character.owns.kingdom', 'throttle:500,1'])->group(function () {
     Route::get('/player-kingdoms/{character}', ['as' => 'character.kingdoms', 'uses' => 'Api\KingdomInformationController@getKingdomsList']);
     Route::get('/player-kingdom/{character}/{kingdom}', ['as' => 'character.kingdom', 'uses' => 'Api\KingdomInformationController@fetchKingdomDetails']);
-    Route::get('/kingdom/{kingdom}/{character}', ['as' => 'kingdom.character.info', 'uses' => 'Api\KingdomInformationController@getCharacterInfoForKingdom']);
     Route::get('/kingdoms/{character}/{kingdom}', ['as' => 'kingdoms.location', 'uses' => 'Api\KingdomInformationController@getLocationData']);
+});
+
+Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:500,1'])->group(function () {
+    Route::get('/kingdom/{kingdom}/{character}', ['as' => 'kingdom.character.info', 'uses' => 'Api\KingdomInformationController@getCharacterInfoForKingdom']);
 });
 
 Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:25,1'])->group(function () {
@@ -66,9 +69,7 @@ Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.
 });
 
 Route::middleware(['auth', 'is.character.dead', 'is.character.who.they.say.they.are'])->group(function () {
-    Route::middleware(['character.owns.kingdom'])->group(function () {
-        Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
-    });
+    Route::get('/fetch-attacking-data/{kingdom}/{character}', ['as' => 'kingdom.fetch.attacking-data', 'uses' => 'Api\AttackKingdom@fetchAttackingData']);
 
     Route::post('/drop-items-on-kingdom/{kingdom}/{character}', ['as' => 'drop.items.on.kingdoms', 'uses' => 'Api\AttackKingdom@dropItems'])->middleware('kingdom.automation.blocked');
     Route::post('/attack-kingdom-with-units/{kingdom}/{character}', ['as' => 'attack.kingdom', 'uses' => 'Api\AttackKingdom@attackWithUnits'])->middleware('kingdom.automation.blocked');

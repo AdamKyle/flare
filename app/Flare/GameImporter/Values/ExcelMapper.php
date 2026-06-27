@@ -26,9 +26,9 @@ class ExcelMapper
         'Raids' => RaidsImport::class,
         'Affixes' => AffixesImport::class,
         'Core Imports' => [
-            ClassSpecialsImport::class,
-            ClassImport::class,
             RacesImport::class,
+            ClassImport::class,
+            ClassSpecialsImport::class,
         ],
         'Items' => ItemsImport::class,
         'Weapons' => ItemsImport::class,

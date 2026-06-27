@@ -91,21 +91,25 @@ class CapitalCityManagementService
 
         $queues = CapitalCityBuildingQueue::query()
             ->where('character_id', $character->id)
+            ->whereNotIn('status', $this->capitalCityTerminalStatuses())
             ->when($kingdom, function ($query) use ($kingdom) {
                 return $query->whereHas('kingdom', function ($query) use ($kingdom) {
                     $query->where('game_map_id', $kingdom->game_map_id);
                 })->where('kingdom_id', '!=', $kingdom->id);
             })
             ->with(['kingdom.gameMap:id,name'])
-            ->select(['id', 'kingdom_id', 'character_id', 'status', 'building_request_data', 'completed_at'])
-            ->get();
+            ->select(['id', 'kingdom_id', 'character_id', 'status', 'building_request_data', 'started_at', 'completed_at'])
+            ->get()
+            ->filter(function (CapitalCityBuildingQueue $queue) use ($currentTime) {
+                return $this->capitalCityQueueShouldBeVisible($queue->status, $queue->completed_at, $currentTime);
+            });
 
         $missingBuildingIdsByKingdomId = [];
 
         foreach ($queues as $queue) {
             $queueKingdomId = $queue->kingdom_id;
 
-            foreach ($queue->building_request_data as $request) {
+            foreach ($this->filterActiveCapitalCityQueueRequests($queue->building_request_data) as $request) {
                 if (! array_key_exists('building_name', $request) || empty($request['building_name'])) {
                     $missingBuildingIdsByKingdomId[$queueKingdomId][] = (int) $request['building_id'];
                 }
@@ -134,14 +138,19 @@ class CapitalCityManagementService
 
         $buildingQueueData = $queues->map(function ($queue) use ($currentTime, $buildingNamesByKingdomId) {
             $kingdom = $queue->kingdom;
+            $activeBuildingRequestData = $this->filterActiveCapitalCityQueueRequests($queue->building_request_data);
+
+            if (empty($activeBuildingRequestData)) {
+                return null;
+            }
 
             $queueTimeLeftInSeconds = 0;
 
-            if (! $queue->completed_at->lte($currentTime)) {
+            if ($this->capitalCityBuildingHasActiveTimer($queue->status) && ! $queue->completed_at->lte($currentTime)) {
                 $queueTimeLeftInSeconds = $currentTime->diffInSeconds($queue->completed_at);
             }
 
-            $buildingRequests = collect($queue->building_request_data)->map(function ($request) use ($kingdom, $buildingNamesByKingdomId) {
+            $buildingRequests = collect($activeBuildingRequestData)->map(function ($request) use ($kingdom, $buildingNamesByKingdomId) {
                 $buildingId = (int) $request['building_id'];
 
                 $buildingName = $request['building_name'] ?? null;
@@ -168,35 +177,57 @@ class CapitalCityManagementService
                 'status' => $queue->status,
                 'building_queue' => $buildingRequests,
                 'total_time' => $queueTimeLeftInSeconds,
+                'time_remaining' => $queueTimeLeftInSeconds,
+                'timer_duration' => $this->getQueueDurationInSeconds($queue->started_at, $queue->completed_at),
+                'timer_started_at' => $queue->started_at->timestamp * 1000,
+                'started_at' => $queue->started_at->toIso8601String(),
+                'completed_at' => $queue->completed_at->toIso8601String(),
+                'completed_at_timestamp' => $queue->completed_at->timestamp * 1000,
                 'phase_timer_label' => $this->capitalCityBuildingPhaseTimerLabel($queue->status),
                 'queue_id' => $queue->id,
             ];
         });
 
-        return array_values($buildingQueueData->toArray());
+        return array_values($buildingQueueData->filter()->toArray());
     }
 
     public function fetchUnitQueueData(Character $character, ?Kingdom $kingdom = null): array
     {
-        $queues = CapitalCityUnitQueue::where('character_id', $character->id)
+        $currentTime = now();
+
+        $queues = CapitalCityUnitQueue::query()
+            ->where('character_id', $character->id)
+            ->whereNotIn('status', $this->capitalCityTerminalStatuses())
             ->when($kingdom, function ($query) use ($kingdom) {
                 return $query->whereHas('kingdom', function ($query) use ($kingdom) {
                     $query->where('game_map_id', $kingdom->game_map_id);
                 })->where('kingdom_id', '!=', $kingdom->id);
             })
-            ->get();
+            ->with(['kingdom.gameMap:id,name'])
+            ->select(['id', 'kingdom_id', 'character_id', 'status', 'unit_request_data', 'started_at', 'completed_at'])
+            ->get()
+            ->filter(function (CapitalCityUnitQueue $queue) use ($currentTime) {
+                return $this->capitalCityQueueShouldBeVisible($queue->status, $queue->completed_at, $currentTime);
+            });
 
-        $unitQueueData = $queues->map(function ($queue) {
+        $unitQueueData = $queues->map(function ($queue) use ($currentTime) {
             $kingdom = $queue->kingdom;
-            $queueTimeLeftInSeconds = now()->diffInSeconds($queue->completed_at);
+            $activeUnitRequestData = $this->filterActiveCapitalCityQueueRequests($queue->unit_request_data);
 
-            if ($queue->completed_at->lte(now())) {
-                $queueTimeLeftInSeconds = 0;
+            if (empty($activeUnitRequestData)) {
+                return null;
             }
 
-            $unitRequests = collect($queue->unit_request_data)->map(function ($request) {
+            $queueTimeLeftInSeconds = 0;
+
+            if ($this->capitalCityUnitHasActiveTimer($queue->status) && $queue->completed_at->greaterThan($currentTime)) {
+                $queueTimeLeftInSeconds = $currentTime->diffInSeconds($queue->completed_at);
+            }
+
+            $unitRequests = collect($activeUnitRequestData)->map(function ($request) use ($queue) {
 
                 return [
+                    'queue_id' => $queue->id,
                     'unit_name' => $request['name'],
                     'secondary_status' => $request['secondary_status'],
                     'amount_to_recruit' => $request['amount'],
@@ -207,16 +238,58 @@ class CapitalCityManagementService
 
             return [
                 'queue_id' => $queue->id,
+                'queue_ids' => [$queue->id],
                 'kingdom_id' => $kingdom->id,
                 'kingdom_name' => $kingdom->name,
                 'map_name' => $kingdom->gameMap->name,
                 'unit_requests' => $unitRequests,
                 'status' => $queue->status,
                 'total_time' => $queueTimeLeftInSeconds,
+                'time_remaining' => $queueTimeLeftInSeconds,
+                'timer_duration' => $this->getQueueDurationInSeconds($queue->started_at, $queue->completed_at),
+                'timer_started_at' => $queue->started_at->timestamp * 1000,
+                'started_at' => $queue->started_at->toIso8601String(),
+                'completed_at' => $queue->completed_at->toIso8601String(),
+                'completed_at_timestamp' => $queue->completed_at->timestamp * 1000,
+                'phase_timer_label' => $this->capitalCityUnitPhaseTimerLabel($queue->status),
             ];
         });
 
-        return array_values($unitQueueData->toArray());
+        return array_values($unitQueueData->filter()->groupBy('kingdom_id')->map(function (SupportCollection $queueGroups) {
+            $firstQueueGroup = $queueGroups->first();
+            $unitRequests = $queueGroups
+                ->flatMap(fn (array $queueGroup) => $queueGroup['unit_requests'])
+                ->values()
+                ->toArray();
+
+            $queueIds = $queueGroups
+                ->flatMap(fn (array $queueGroup) => $queueGroup['queue_ids'])
+                ->unique()
+                ->values()
+                ->toArray();
+
+            $activeQueueGroup = $queueGroups
+                ->sortByDesc('total_time')
+                ->first();
+
+            return [
+                'queue_id' => $firstQueueGroup['queue_id'],
+                'queue_ids' => $queueIds,
+                'kingdom_id' => $firstQueueGroup['kingdom_id'],
+                'kingdom_name' => $firstQueueGroup['kingdom_name'],
+                'map_name' => $firstQueueGroup['map_name'],
+                'unit_requests' => $this->reorderUnitRequests($unitRequests),
+                'status' => $activeQueueGroup['status'],
+                'total_time' => $activeQueueGroup['total_time'],
+                'time_remaining' => $activeQueueGroup['time_remaining'],
+                'timer_duration' => $activeQueueGroup['timer_duration'],
+                'timer_started_at' => $activeQueueGroup['timer_started_at'],
+                'started_at' => $activeQueueGroup['started_at'],
+                'completed_at' => $activeQueueGroup['completed_at'],
+                'completed_at_timestamp' => $activeQueueGroup['completed_at_timestamp'],
+                'phase_timer_label' => $activeQueueGroup['phase_timer_label'],
+            ];
+        })->toArray());
     }
 
     /**
@@ -336,7 +409,6 @@ class CapitalCityManagementService
     private function getOtherKingdoms(Character $character, Kingdom $kingdom): EloquentCollection
     {
         return $character->kingdoms()
-            ->whereDoesntHave('capitalCityBuildingQueue')
             ->where('id', '!=', $kingdom->id)
             ->where('game_map_id', $kingdom->game_map_id)
             ->with('gameMap:id,name')
@@ -385,6 +457,11 @@ class CapitalCityManagementService
 
         foreach ($kingdoms as $otherKingdom) {
             $buildingsForKingdom = $buildingsByKingdomId->get($otherKingdom->id, collect());
+
+            if ($buildingsForKingdom->isEmpty()) {
+                continue;
+            }
+
             $kingdomBuildingData[] = $this->formatKingdomBuildingData($kingdom, $otherKingdom, $buildingsForKingdom);
         }
 
@@ -434,12 +511,7 @@ class CapitalCityManagementService
 
         $capitalCityBuildingQueues = CapitalCityBuildingQueue::query()
             ->whereIn('kingdom_id', $kingdomIds)
-            ->whereNotIn('status', [
-                CapitalCityQueueStatus::REJECTED,
-                CapitalCityQueueStatus::FINISHED,
-                CapitalCityQueueStatus::CANCELLED,
-                CapitalCityQueueStatus::CANCELLATION_REJECTED,
-            ])
+            ->whereNotIn('status', $this->capitalCityTerminalStatuses())
             ->select(['id', 'kingdom_id', 'building_request_data'])
             ->get();
 
@@ -450,12 +522,7 @@ class CapitalCityManagementService
         $invalidBuildingIds = $capitalCityBuildingQueues->flatMap(function ($queue) use ($buildingIds) {
             return collect($queue->building_request_data)
                 ->reject(function (array $request) {
-                    return in_array($request['secondary_status'] ?? null, [
-                        CapitalCityQueueStatus::REJECTED,
-                        CapitalCityQueueStatus::FINISHED,
-                        CapitalCityQueueStatus::CANCELLED,
-                        CapitalCityQueueStatus::CANCELLATION_REJECTED,
-                    ], true);
+                    return $this->capitalCityQueueRequestIsTerminal($request);
                 })
                 ->pluck('building_id')
                 ->intersect($buildingIds);
@@ -504,13 +571,26 @@ class CapitalCityManagementService
             ->where('game_map_id', $kingdom->game_map_id)
             ->with('gameMap:id,name')
             ->select('name', 'id', 'game_map_id', 'x_position', 'y_position')
-            ->get()
-            ->each(function ($selectableKingdom) use ($character, $kingdom) {
-                $selectableKingdom->game_map_name = $kingdom->gameMap->name;
-                $selectableKingdom->time_to_kingdom = $this->unitMovementService->getDistanceTime($character, $selectableKingdom, $kingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
-                $selectableKingdom->available_unit_types = $this->getAvailableUnitTypes($selectableKingdom);
-                $selectableKingdom->makeHidden(['gameMap', 'x_position', 'y_position']);
-            });
+            ->get();
+
+        $kingdomIds = $kingdoms->pluck('id')->values()->all();
+        $unitNames = GameUnit::query()
+            ->orderBy('name')
+            ->pluck('name')
+            ->toArray();
+        $manualQueuedUnitNamesByKingdom = $this->getManualQueuedUnitNamesByKingdom($kingdomIds);
+        $capitalCityQueuedUnitNamesByKingdom = $this->getCapitalCityQueuedUnitNamesByKingdom($kingdomIds);
+
+        $kingdoms->each(function ($selectableKingdom) use ($character, $kingdom, $unitNames, $manualQueuedUnitNamesByKingdom, $capitalCityQueuedUnitNamesByKingdom) {
+            $selectableKingdom->game_map_name = $kingdom->gameMap->name;
+            $selectableKingdom->time_to_kingdom = $this->unitMovementService->getDistanceTime($character, $selectableKingdom, $kingdom, PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION);
+            $unavailableUnitNames = array_unique(array_merge(
+                $manualQueuedUnitNamesByKingdom[$selectableKingdom->id] ?? [],
+                $capitalCityQueuedUnitNamesByKingdom[$selectableKingdom->id] ?? [],
+            ));
+            $selectableKingdom->available_unit_types = array_values(array_diff($unitNames, $unavailableUnitNames));
+            $selectableKingdom->makeHidden(['gameMap', 'x_position', 'y_position']);
+        });
 
         return $this->filterOutCapitalCityUnitsInQueue($kingdoms)->toArray();
     }
@@ -525,49 +605,52 @@ class CapitalCityManagementService
         })->values();
     }
 
-    private function getAvailableUnitTypes(Kingdom $kingdom): array
+    private function getManualQueuedUnitNamesByKingdom(array $kingdomIds): array
     {
-        $unitNames = GameUnit::query()
-            ->orderBy('name')
-            ->pluck('name')
-            ->toArray();
-
-        if (empty($unitNames)) {
+        if (empty($kingdomIds)) {
             return [];
         }
 
-        $manualQueuedUnitNames = UnitInQueue::query()
+        $unitNamesByKingdom = [];
+
+        UnitInQueue::query()
             ->join('game_units', 'game_units.id', '=', 'units_in_queue.game_unit_id')
-            ->where('units_in_queue.kingdom_id', $kingdom->id)
+            ->whereIn('units_in_queue.kingdom_id', $kingdomIds)
             ->where('units_in_queue.completed_at', '>', now())
-            ->pluck('game_units.name')
-            ->toArray();
+            ->get(['units_in_queue.kingdom_id', 'game_units.name'])
+            ->each(function ($row) use (&$unitNamesByKingdom) {
+                $unitNamesByKingdom[$row->kingdom_id][] = $row->name;
+            });
 
-        $capitalCityUnitQueue = CapitalCityUnitQueue::where('kingdom_id', $kingdom->id)
-            ->whereNotIn('status', [
-                CapitalCityQueueStatus::REJECTED,
-                CapitalCityQueueStatus::FINISHED,
-                CapitalCityQueueStatus::CANCELLED,
-                CapitalCityQueueStatus::CANCELLATION_REJECTED,
-            ])
-            ->get();
+        return $unitNamesByKingdom;
+    }
 
-        $capitalCityQueuedUnitNames = $capitalCityUnitQueue->flatMap(function ($queue) {
-            return collect($queue->unit_request_data)
-                ->reject(function (array $request) {
-                    return in_array($request['secondary_status'] ?? null, [
-                        CapitalCityQueueStatus::REJECTED,
-                        CapitalCityQueueStatus::FINISHED,
-                        CapitalCityQueueStatus::CANCELLED,
-                        CapitalCityQueueStatus::CANCELLATION_REJECTED,
-                    ], true);
-                })
-                ->pluck('name');
-        })->toArray();
+    private function getCapitalCityQueuedUnitNamesByKingdom(array $kingdomIds): array
+    {
+        if (empty($kingdomIds)) {
+            return [];
+        }
 
-        $unavailableUnitNames = array_unique(array_merge($manualQueuedUnitNames, $capitalCityQueuedUnitNames));
+        $unitNamesByKingdom = [];
 
-        return array_values(array_diff($unitNames, $unavailableUnitNames));
+        CapitalCityUnitQueue::whereIn('kingdom_id', $kingdomIds)
+            ->whereNotIn('status', $this->capitalCityTerminalStatuses())
+            ->get(['kingdom_id', 'unit_request_data'])
+            ->each(function (CapitalCityUnitQueue $queue) use (&$unitNamesByKingdom) {
+                foreach ($queue->unit_request_data as $request) {
+                    if ($this->capitalCityQueueRequestIsTerminal($request)) {
+                        continue;
+                    }
+
+                    if (empty($request['name'])) {
+                        continue;
+                    }
+
+                    $unitNamesByKingdom[$queue->kingdom_id][] = $request['name'];
+                }
+            });
+
+        return $unitNamesByKingdom;
     }
 
     /**
@@ -639,12 +722,86 @@ class CapitalCityManagementService
         );
     }
 
+    private function capitalCityTerminalStatuses(): array
+    {
+        return [
+            CapitalCityQueueStatus::REJECTED,
+            CapitalCityQueueStatus::FINISHED,
+            CapitalCityQueueStatus::CANCELLED,
+            CapitalCityQueueStatus::CANCELLATION_REJECTED,
+        ];
+    }
+
+    private function capitalCityQueueRequestIsTerminal(array $request): bool
+    {
+        return in_array($request['secondary_status'] ?? null, $this->capitalCityTerminalStatuses(), true);
+    }
+
+    private function filterActiveCapitalCityQueueRequests(array $requests): array
+    {
+        return collect($requests)
+            ->reject(fn (array $request) => $this->capitalCityQueueRequestIsTerminal($request))
+            ->values()
+            ->toArray();
+    }
+
+    private function capitalCityQueueShouldBeVisible(string $status, Carbon $completedAt, Carbon $currentTime): bool
+    {
+        if (in_array($status, $this->capitalCityTerminalStatuses(), true)) {
+            return false;
+        }
+
+        if (! $this->capitalCityBuildingHasActiveTimer($status) && ! $this->capitalCityUnitHasActiveTimer($status)) {
+            return true;
+        }
+
+        return $completedAt->greaterThan($currentTime);
+    }
+
     private function capitalCityBuildingPhaseTimerLabel(string $status): string
     {
         return match ($status) {
             CapitalCityQueueStatus::TRAVELING => 'Traveling',
+            CapitalCityQueueStatus::REQUESTING => 'Requesting Resources',
+            CapitalCityQueueStatus::BUILDING => 'Building',
             CapitalCityQueueStatus::REPAIRING => 'Repairing',
+            CapitalCityQueueStatus::PROCESSING => 'Processing',
             default => 'Building',
         };
+    }
+
+    private function capitalCityUnitPhaseTimerLabel(string $status): string
+    {
+        return match ($status) {
+            CapitalCityQueueStatus::TRAVELING => 'Traveling',
+            CapitalCityQueueStatus::REQUESTING => 'Requesting Resources',
+            CapitalCityQueueStatus::RECRUITING => 'Recruiting',
+            CapitalCityQueueStatus::PROCESSING => 'Processing',
+            default => 'Processing',
+        };
+    }
+
+    private function capitalCityBuildingHasActiveTimer(string $status): bool
+    {
+        return in_array($status, [
+            CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::REQUESTING,
+            CapitalCityQueueStatus::BUILDING,
+            CapitalCityQueueStatus::REPAIRING,
+        ], true);
+    }
+
+    private function capitalCityUnitHasActiveTimer(string $status): bool
+    {
+        return in_array($status, [
+            CapitalCityQueueStatus::TRAVELING,
+            CapitalCityQueueStatus::REQUESTING,
+            CapitalCityQueueStatus::RECRUITING,
+        ], true);
+    }
+
+    private function getQueueDurationInSeconds(Carbon $startedAt, Carbon $completedAt): int
+    {
+        return (int) max(0, $startedAt->diffInSeconds($completedAt));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Game\Shop\Services;
 
+use App\Flare\Models\AlchemyBag;
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Pagination;
@@ -31,17 +33,16 @@ class GoblinShopService
      */
     public function buyItem(Character $character, Item $item): array
     {
-
-        $kingdoms = $character->kingdoms()
-            ->whereRaw('(SELECT SUM(gold_bars) FROM kingdoms WHERE gold_bars > 0) >= ?', [$item->gold_bars_cost])
-            ->groupBy('kingdoms.id', 'kingdoms.character_id', 'kingdoms.name')
-            ->selectRaw('*, SUM(gold_bars) as gold_bars_sum')
-            ->get();
-
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($kingdoms, $item->gold_bars_cost);
 
+        if ($item->type === 'alchemy') {
+            $this->addToAlchemyBag($character, $item);
+
+            return;
+        }
+
         $character->inventory->slots()->create([
-            'character_inventory_id' => $character->inventory->id,
+            'inventory_id' => $character->inventory->id,
             'item_id' => $item->id,
         ]);
 
@@ -50,6 +51,40 @@ class GoblinShopService
         return $this->successResult([
             'message' => 'Purchased: '.$item->affix_name,
             'character_gold_bars' => $characterGoldBars,
+        ]);
+    }
+
+    /**
+     * Can the character buy this alchemy item?
+     */
+    public function canBuyAlchemyItem(Character $character): bool
+    {
+        return $character->canAddToAlchemyBag(1);
+    }
+
+    private function addToAlchemyBag(Character $character, Item $item): void
+    {
+        if (! $character->canAddToAlchemyBag(1)) {
+            return;
+        }
+
+        $alchemyBag = AlchemyBag::firstOrCreate(['character_id' => $character->id]);
+
+        $existingSlot = AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+            ->where('item_id', $item->id)
+            ->first();
+
+        if (! is_null($existingSlot)) {
+            $existingSlot->update(['amount' => $existingSlot->amount + 1]);
+
+            return;
+        }
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
         ]);
     }
 }

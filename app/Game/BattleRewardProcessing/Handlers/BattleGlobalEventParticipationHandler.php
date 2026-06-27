@@ -74,7 +74,9 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
 
         event(new UpdateEventGoalProgress($this->eventGoalsService->getEventGoalData($character)));
 
-        $currentKills = $character->globalEventKills->kills;
+        $currentKills = $character->globalEventKills()
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first()?->kills ?? 0;
 
         event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $currentKills));
     }

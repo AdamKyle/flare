@@ -2,11 +2,16 @@
 
 namespace Tests\Unit\Flare\Services;
 
+use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
+use App\Game\Core\Services\CharacterService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -631,5 +636,136 @@ class CharacterXPServiceTest extends TestCase
         $xp = $this->characterXPService->determineXPToAward($character->refresh(), 100);
 
         $this->assertEquals(160, $xp);
+    }
+
+    public function test_xp_next_is_100_when_leveling_to_999(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['level' => 998]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(100, $character->refresh()->xp_next);
+    }
+
+    public function test_xp_next_is_1000_when_leveling_to_1000(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['level' => 999]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(1000, $character->refresh()->xp_next);
+    }
+
+    public function test_xp_next_is_35000_when_leveling_to_4999(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        MaxLevelConfiguration::create([
+            'max_level' => 5000,
+            'half_way' => 2500,
+            'three_quarters' => 3750,
+            'last_leg' => 4800,
+        ]);
+
+        $character->update(['level' => 4998]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(35000, $character->refresh()->xp_next);
+    }
+
+    public function test_xp_next_with_reincarnation_penalty_when_leveling_to_4999(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        MaxLevelConfiguration::create([
+            'max_level' => 5000,
+            'half_way' => 2500,
+            'three_quarters' => 3750,
+            'last_leg' => 4800,
+        ]);
+
+        $character->update(['level' => 4998, 'xp_penalty' => 5.96]);
+
+        $characterService = resolve(CharacterService::class);
+        $characterService->levelUpCharacter($character->refresh(), 0);
+
+        $this->assertEquals(243600, $character->refresh()->xp_next);
+    }
+
+    public function test_heartbeat_callback_is_invoked_multiple_times_for_multiple_level_ups(): void
+    {
+        $character = $this->character->getCharacter();
+        $xpNext = $character->xp_next;
+        $callCount = 0;
+        $callback = function () use (&$callCount): void {
+            $callCount++;
+        };
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($xpNext * 5 + 50);
+
+        $this->assertGreaterThan(1, $callCount);
+    }
+
+    public function test_level_up_result_is_unchanged_by_heartbeat_callback(): void
+    {
+        $character = $this->character->getCharacter();
+        $xpNext = $character->xp_next;
+        $callback = function (): void {};
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($xpNext + 50);
+
+        $result = $this->characterXPService->getCharacter();
+
+        $this->assertEquals(50, $result->xp);
+        $this->assertGreaterThan(1, $result->level);
+    }
+
+    public function test_server_messages_are_still_emitted_during_level_ups_with_heartbeat_callback(): void
+    {
+        Event::fake();
+        $character = $this->character->getCharacter();
+        $xpNext = $character->xp_next;
+        $callback = function (): void {};
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($xpNext + 50);
+
+        Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function test_active_processor_heartbeat_is_refreshed_during_xp_distribution_with_callback(): void
+    {
+        Event::fake();
+        $character = $this->character->getCharacter();
+        $state = CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now()->subMinutes(10),
+        ]);
+        $queueManager = resolve(BattleRewardProcessingQueueManager::class);
+        $callback = fn () => $queueManager->updateHeartbeat($character->id);
+
+        $this->characterXPService
+            ->withHeartbeatCallback($callback)
+            ->setCharacter($character)
+            ->distributeSpecifiedXp($character->xp_next * 5 + 50);
+
+        $this->assertTrue($state->refresh()->heartbeat_at->isAfter(now()->subSeconds(5)));
     }
 }

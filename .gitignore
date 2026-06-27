@@ -28,3 +28,11 @@ deploy.yml
 .idea/
 .phpunit.cache/
 public/build/
+.pnp.*
+.yarn/*
+!.yarn/releases
+!.yarn/releases/**
+!.yarn/plugins
+!.yarn/plugins/**
+!.yarn/patches
+!.yarn/patches/**

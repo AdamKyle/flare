@@ -25,7 +25,8 @@ class ApplyHolyOilRequest extends FormRequest
     {
         return [
             'item_id' => 'required|integer',
-            'alchemy_item_id' => 'required|integer',
+            'alchemy_slot_id' => 'required_without:alchemy_item_id|integer',
+            'alchemy_item_id' => 'required_without:alchemy_slot_id|integer',
         ];
     }
 
@@ -33,7 +34,8 @@ class ApplyHolyOilRequest extends FormRequest
     {
         return [
             'item_id.required' => 'Error. Invalid Input.',
-            'alchemy_item_id.required' => 'Error. Invalid Input.',
+            'alchemy_slot_id.required_without' => 'Error. Invalid Input.',
+            'alchemy_item_id.required_without' => 'Error. Invalid Input.',
         ];
     }
 }

@@ -237,61 +237,47 @@
             </div>
           </x-core.form-wizard.content>
 
-          <x-core.form-wizard.content target="tab-style-2-3">
-            <div class="grid gap-4 md:grid-cols-2">
-              <div>
-                <h3 class="mb-3">Resource Gains</h3>
-                <x-core.forms.input
-                  :model="$building"
-                  label="Increase To Wood:"
-                  modelKey="increase_wood_amount"
-                  name="increase_wood_amount"
-                  type="text"
-                />
-                <x-core.forms.input
-                  :model="$building"
-                  label="Increase To Clay:"
-                  modelKey="increase_clay_amount"
-                  name="increase_clay_amount"
-                  type="text"
-                />
-                <x-core.forms.input
-                  :model="$building"
-                  label="Increase To Stone:"
-                  modelKey="increase_stone_amount"
-                  name="increase_stone_amount"
-                  type="text"
-                />
-                <x-core.forms.input
-                  :model="$building"
-                  label="Increase To Iron:"
-                  modelKey="increase_iron_amount"
-                  name="increase_iron_amount"
-                  type="text"
-                />
-              </div>
-              <div
-                class="my-6 block border-b-2 border-b-gray-300 md:hidden dark:border-b-gray-600"
-              ></div>
-              <div>
-                <h3 class="mb-3">Building Gains</h3>
-                <x-core.forms.input
-                  :model="$building"
-                  label="Increase To Durability:"
-                  modelKey="increase_durability_amount"
-                  name="increase_durability_amount"
-                  type="text"
-                />
-                <x-core.forms.input
-                  :model="$building"
-                  label="Increase To Defence:"
-                  modelKey="increase_defence_amount"
-                  name="increase_defence_amount"
-                  type="text"
-                />
-              </div>
-            </div>
-          </x-core.form-wizard.content>
+                                <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                                <h3 class="mb-3">Morale Increment/Decrement per Hour</h3>
+                                <x-core.forms.input :model="$building" label="Increasesd Morale By (%):" modelKey="increase_morale_amount" name="increase_morale_amount" type="text"/>
+                                <x-core.forms.input :model="$building" label="Decreases Morale By (%):" modelKey="decrease_morale_amount" name="decrease_morale_amount" type="text"/>
+                            </div>
+                            <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <div>
+                                <h3 class="mb-3">Base Requirements</h3>
+                                <x-core.forms.input :model="$building" label="Base Required Pop:" modelKey="required_population" name="required_population" type="text"/>
+                                <x-core.forms.input :model="$building" label="Base Durability:" modelKey="base_durability" name="base_durability" type="text"/>
+                                <x-core.forms.input :model="$building" label="Base Defence:" modelKey="base_defence" name="base_defence" type="text"/>
+                                <x-core.forms.collection-select :model="$building"
+                                                                label="Passive Skill Required (Optional)"
+                                                                name="passive_skill_id"
+                                                                modelKey="passive_skill_id"
+                                                                key="name"
+                                                                value="id"
+                                                                :options="$passiveSkills"
+                                />
+                                <x-core.forms.input :model="$building" label="Passive Level Required?:" modelKey="level_required" name="level_required" type="text"/>
+                                <x-core.forms.check-box :model="$building" label="is Building Locked?" modelKey="is_locked" name="is_locked" />
+                            </div>
+                        </div>
+                    </x-core.form-wizard.content>
+                    <x-core.form-wizard.content target="tab-style-2-2">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="mb-3">Cost Info</h3>
+                                <x-core.forms.input :model="$building" label="Wood Cost:" modelKey="wood_cost" name="wood_cost" type="text"/>
+                                <x-core.forms.input :model="$building" label="Clay Cost:" modelKey="clay_cost" name="clay_cost" type="text"/>
+                                <x-core.forms.input :model="$building" label="Stone Cost:" modelKey="stone_cost" name="stone_cost" type="text"/>
+                                <x-core.forms.input :model="$building" label="Iron Cost:" modelKey="iron_cost" name="iron_cost" type="text"/>
+                                <x-core.forms.input :model="$building" label="Steel Cost:" modelKey="steel_cost" name="steel_cost" type="text"/>
+                            </div>
+                            <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'></div>
+                            <div>
+                                <h3 class="mb-3">Time Information</h3>
+                                <x-core.forms.input :model="$building" label="Time to build (minutes):" modelKey="time_to_build" name="time_to_build" type="text"/>
+                                <x-core.forms.input :model="$building" label="Time increases per level (%):" modelKey="time_increase_amount" name="time_increase_amount" type="text"/>
+                            </div>
+                        </div>
 
           <x-core.form-wizard.content target="tab-style-2-4">
             <x-core.forms.check-box

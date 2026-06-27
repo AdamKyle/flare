@@ -22,16 +22,28 @@ class UpdateCapitalCityUnitQueueRequest implements ShouldBroadcastNow
 
     public string $type;
 
+    public ?int $processedKingdomId;
+
+    public ?string $processedKingdomName;
+
+    public ?array $queueData;
+
+    public array $queuedUnitNames;
+
     /**
      * Create a new event instance.
      */
-    public function __construct(int $userId, bool $isLoading, string $message, string $type)
+    public function __construct(int $userId, bool $isLoading, string $message, string $type, ?int $processedKingdomId = null, ?string $processedKingdomName = null, ?array $queueData = null, array $queuedUnitNames = [])
     {
 
         $this->userId = $userId;
         $this->isLoading = $isLoading;
         $this->message = $message;
         $this->type = $type;
+        $this->processedKingdomId = $processedKingdomId;
+        $this->processedKingdomName = $processedKingdomName;
+        $this->queueData = $queueData;
+        $this->queuedUnitNames = $queuedUnitNames;
     }
 
     /**
@@ -40,5 +52,18 @@ class UpdateCapitalCityUnitQueueRequest implements ShouldBroadcastNow
     public function broadcastOn(): Channel|array
     {
         return new PrivateChannel('capital-city-unit-queue-request-'.$this->userId);
+    }
+
+    public function broadcastWith(): array
+    {
+        return [
+            'isLoading' => $this->isLoading,
+            'message' => $this->message,
+            'type' => $this->type,
+            'processed_kingdom_id' => $this->processedKingdomId,
+            'processed_kingdom_name' => $this->processedKingdomName,
+            'queue_data' => $this->queueData,
+            'queued_unit_names' => $this->queuedUnitNames,
+        ];
     }
 }

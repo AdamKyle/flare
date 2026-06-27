@@ -37,11 +37,17 @@ class GemBagManagement
         $gemSlots = collect();
 
         for ($i = 1; $i <= $amount; $i++) {
-            $gemSlots->push([
-                'gem_bag_id' => $gemBag->id,
-                'gem_id' => $this->createGem()->id,
-                'amount' => $amountOfGems,
-            ]);
+            $gem = $this->createGem();
+
+            for ($gemCount = 1; $gemCount <= $amountOfGems; $gemCount++) {
+                $this->character->gemBag->gemSlots()->create([
+                    'gem_bag_id' => $this->character->gemBag->id,
+                    'gem_id' => $gem->id,
+                    'amount' => 1,
+                ]);
+            }
+
+            $this->character = $this->character->refresh();
         }
 
         $gemSlots->chunk(100)->each(function ($chunk) use ($gemBag) {
@@ -60,11 +66,13 @@ class GemBagManagement
      */
     public function assignGemToBag(int $gemId, int $amount = 1): GemBagManagement
     {
-        $this->character->gemBag->gemSlots()->create([
-            'gem_bag_id' => $this->character->gemBag->id,
-            'gem_id' => $gemId,
-            'amount' => $amount,
-        ]);
+        for ($gemCount = 1; $gemCount <= $amount; $gemCount++) {
+            $this->character->gemBag->gemSlots()->create([
+                'gem_bag_id' => $this->character->gemBag->id,
+                'gem_id' => $gemId,
+                'amount' => 1,
+            ]);
+        }
 
         $this->character = $this->character->refresh();
 

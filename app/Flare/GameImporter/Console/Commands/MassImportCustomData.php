@@ -2,9 +2,6 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\InfoPage;
-use App\Flare\Values\MapNameValue;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -32,17 +29,15 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
+        // Artisan::call('import:game-data "World Gems"');
+
+        Artisan::call('backfill:completed-panel-dismissals --apply');
+
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
         }
-
-        Artisan::call('import:game-data Locations');
-        Artisan::call('break:maps-into-pieces');
-        Artisan::call('import:game-data Armour');
-        Artisan::call('import:game-data Weapons');
-        Artisan::call('clean:invalid-weapons');
     }
 
     /**

@@ -17,16 +17,24 @@ class CharacterAttackBuilder
 
     private Character $character;
 
-    public function __construct(private CharacterStatBuilder $characterStatBuilder) {}
+    private CharacterStatBuilder $characterStatBuilder;
+
+    private ?float $damageStatAmount = null;
+
+    public function __construct(CharacterStatBuilder $characterStatBuilder)
+    {
+        $this->characterStatBuilder = $characterStatBuilder;
+    }
 
     /**
      * Set the character.
      *
      * @return $this
      */
-    public function setCharacter(Character $character, bool $ignoreReductions = false): CharacterAttackBuilder
+    public function setCharacter(Character $character, bool $ignoreReductions = false, ?float $damageStatAmount = null): CharacterAttackBuilder
     {
         $this->character = $character;
+        $this->damageStatAmount = $damageStatAmount;
 
         $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $ignoreReductions);
 
@@ -148,9 +156,15 @@ class CharacterAttackBuilder
             return [];
         }
 
+        $damageStatAmount = $this->damageStatAmount ?? $this->character->getInformation()->statMod($this->character->damage_stat);
+
+        $baseDamage = $classSpecialEquipped->gameClassSpecial->specialty_damage;
+        $addedDamage = $classSpecialEquipped->gameClassSpecial->increase_specialty_damage_per_level * $classSpecialEquipped->level;
+        $damage = $baseDamage + $addedDamage + $damageStatAmount * $classSpecialEquipped->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
+
         return [
             'name' => $classSpecialEquipped->gameClassSpecial->name,
-            'damage' => $classSpecialEquipped->specialty_damage,
+            'damage' => $damage,
             'required_attack_type' => $classSpecialEquipped->gameClassSpecial->attack_type_required,
         ];
     }

@@ -61,3 +61,11 @@
 @if ($class->type()->isApothecary())
   @include('information.classes.partials.prefered-weapons.apothecary')
 @endif
+
+@if ($class->type()->isBuccaneer())
+    @include('information.classes.partials.prefered-weapons.bucaneer')
+@endif
+
+@if ($class->type()->isBeastmaster())
+    @include('information.classes.partials.prefered-weapons.beastmaster')
+@endif

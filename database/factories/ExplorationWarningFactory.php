@@ -17,6 +17,7 @@ class ExplorationWarningFactory extends Factory
             'exploration_log_id' => null,
             'type' => 'fight',
             'message' => 'Something went wrong.',
+            'dismissed_at' => null,
         ];
     }
 }

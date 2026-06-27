@@ -219,19 +219,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-  <div class="menu-detail" data-menu="events">
-    <div class="menu-detail-wrapper">
-      <h6 class="uppercase">Events</h6>
-      <a href="{{ route('info.page', ['pageName' => 'events']) }}">
-        <span class="fas fa-calendar text-sm"></span>
-        Events
-      </a>
-      <a href="{{ route('info.page', ['pageName' => 'global-event-goals']) }}">
-        <span class="fas fa-bars text-sm"></span>
-        Global Event Goals
-      </a>
-=======
     <!-- Map -->
     <div class="menu-detail" data-menu="map">
         <div class="menu-detail-wrapper">
@@ -269,6 +256,14 @@
                 <span class="fas fa-dungeon"></span>
                 Special Locations
             </a>
+            <a href="{{ route('info.page.map-gems.list') }}">
+                <span class="fas fa-gem"></span>
+                Map Gems
+            </a>
+            <a href="{{ route('info.page.location-gems.list') }}">
+                <span class="far fa-gem"></span>
+                Location Gems
+            </a>
             <hr />
             <h6 class="uppercase">Factions</h6>
             <a href="{{ route('info.page', ['pageName' => 'factions']) }}">
@@ -284,7 +279,6 @@
                 Factions Loyalty Automation
             </a>
         </div>
->>>>>>> master
     </div>
     <hr />
     <div class="menu-detail-wrapper">
@@ -356,68 +350,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-  <!-- Kingdom -->
-  <div class="menu-detail" data-menu="kingdom">
-    <div class="menu-detail-wrapper">
-      <a href="{{ route('info.page', ['pageName' => 'kingdoms']) }}">
-        <span class="ra ra-guarded-tower"></span>
-        Kingdoms
-      </a>
-      <a href="{{ route('info.page', ['pageName' => 'attacking-kingdoms']) }}">
-        <span class="ra ra-daggers"></span>
-        Attacking a kingdom
-      </a>
-      <a href="{{ route('info.page', ['pageName' => 'items-and-kingdoms']) }}">
-        <span class="fas fa-flask"></span>
-        Using items on kingdoms
-      </a>
-      <hr />
-      <a href="{{ route('info.page', ['pageName' => 'npc-kingdoms']) }}">
-        <span class="ra ra-player"></span>
-        NPC Kingdoms
-      </a>
-      <a
-        href="{{ route('info.page', ['pageName' => 'kingdom-passive-skills']) }}"
-      >
-        <span class="fas fa-sitemap"></span>
-        Kingdom Passive Skills
-      </a>
-      <a
-        href="{{ route('info.page', ['pageName' => 'kingdom-resource-expansion']) }}"
-      >
-        <span class="fas fa-expand-arrows-alt"></span>
-        Kingdom Resource Expansion
-      </a>
-      <a href="{{ route('info.page', ['pageName' => 'resource-request']) }}">
-        <span class="fas fa-people-carry"></span>
-        Kingdom Resource Requests
-      </a>
-      <hr />
-      <h6>Capital Cities</h6>
-      <a href="{{ route('info.page', ['pageName' => 'capital-cities']) }}">
-        <span class="fas fa-university"></span>
-        What are Capital Cities
-      </a>
-      <a
-        href="{{ route('info.page', ['pageName' => 'managing-buildings-with-capital-cities']) }}"
-      >
-        <span class="fas fa-university"></span>
-        Manageing Buildings
-      </a>
-      <a
-        href="{{ route('info.page', ['pageName' => 'managing-units-through-capital-cities']) }}"
-      >
-        <span class="fas fa-university"></span>
-        Manageing Units
-      </a>
-      <a
-        href="{{ route('info.page', ['pageName' => 'managing-gold-bars-through-capital-cities']) }}"
-      >
-        <span class="fas fa-university"></span>
-        Manageing Gold Bars
-      </a>
-=======
     <!-- Gear Sets -->
     <div class="menu-detail" data-menu="gear-sets">
         <div class="menu-detail-wrapper">
@@ -470,7 +402,6 @@
                 Ancestral Items
             </a>
         </div>
->>>>>>> master
     </div>
   </div>
 

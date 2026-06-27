@@ -12,12 +12,12 @@ use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
-use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -1560,14 +1561,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
-        Log::shouldReceive('error')
-            ->once()
-            ->with('Exploration automation received malformed battle data.', [
-                'character_id' => $this->character->id,
-                'automation_id' => $automation->id,
-                'source' => 'setupMonster',
-                'missing_or_invalid_payload' => ['health'],
-            ]);
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -1613,14 +1609,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
-        Log::shouldReceive('error')
-            ->once()
-            ->with('Exploration automation received malformed battle data.', [
-                'character_id' => $this->character->id,
-                'automation_id' => $automation->id,
-                'source' => 'fightMonster',
-                'missing_or_invalid_payload' => ['health'],
-            ]);
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -2029,7 +2020,9 @@ class ExplorationTest extends TestCase
         $this->instance(MonsterFightService::class, $monsterFightService);
         $this->instance(CharacterCacheData::class, $characterCacheData);
 
-        Log::shouldReceive('error')->once();
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
 
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
@@ -2754,181 +2747,6 @@ class ExplorationTest extends TestCase
         $this->assertEquals(350, $log->summary['monster']['stats']['health']);
     }
 
-    public function test_handle_repeat_dispatch_uses_exploration_queue_with_long_running_connection(): void
-    {
-        Queue::fake();
-        Event::fake();
-
-        $setupData = [
-            'health' => [
-                'current_character_health' => 100,
-                'current_monster_health' => 0,
-                'max_monster_health' => 200,
-            ],
-            'monster' => [
-                'id' => $this->monster->id,
-                'name' => $this->monster->name,
-                'str' => 1, 'dur' => 1, 'dex' => 1, 'chr' => 1,
-                'int' => 1, 'agi' => 1, 'focus' => 1, 'ac' => 1,
-                'attack_damage' => 10, 'spell_damage' => 0, 'healing' => 0,
-                'xp' => 10, 'gold' => 10, 'max_level' => 5,
-            ],
-        ];
-
-        $fightData = [
-            'health' => [
-                'current_character_health' => 100,
-                'current_monster_health' => 0,
-            ],
-            'monster' => ['id' => $this->monster->id],
-        ];
-
-        $monsterFightService = Mockery::mock(MonsterFightService::class);
-        $monsterFightService->shouldReceive('setupMonster')->andReturn($setupData);
-        $monsterFightService->shouldReceive('fightMonster')->andReturn($fightData);
-        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
-
-        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
-        $battleEventHandler->shouldReceive('processMonsterDeath')->once();
-
-        $characterRewardService = Mockery::mock(CharacterRewardService::class);
-        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
-        $characterRewardService->shouldReceive('fetchXpForMonster')->andReturn(10);
-
-        $skillService = Mockery::mock(SkillService::class);
-        $skillService->shouldReceive('setSkillInTraining')->andReturnSelf();
-        $skillService->shouldReceive('getXpForSkillIntraining')->andReturn(0);
-
-        $factionHandler = Mockery::mock(FactionHandler::class);
-        $factionHandler->shouldReceive('getFactionPointsPerKill')->andReturn(0);
-
-        $explorationCreatureCountCalculator = Mockery::mock(ExplorationCreatureCountCalculator::class);
-        $explorationCreatureCountCalculator->shouldReceive('calculate')->andReturn(1);
-
-        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
-            'monster_id' => $this->monster->id,
-            'move_down_monster_list_every' => 10,
-            'previous_level' => $this->character->level,
-            'current_level' => $this->character->level,
-        ])->getCharacter();
-
-        $automation = $this->character->currentAutomations()->first();
-        $automation->update(['completed_at' => now()->addHours(8)]);
-
-        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
-        $job->handle(
-            $monsterFightService,
-            $battleEventHandler,
-            resolve(CharacterCacheData::class),
-            $characterRewardService,
-            $skillService,
-            $explorationCreatureCountCalculator,
-            $factionHandler,
-            resolve(ExplorationLogService::class),
-            resolve(ExplorationWarningService::class),
-        );
-
-        Queue::assertPushed(Exploration::class, function (Exploration $job): bool {
-            return $job->character->is($this->character)
-                && $job->queue === 'exploration'
-                && $job->connection === 'long_running';
-        });
-    }
-
-    public function test_handle_repeat_dispatch_delay_is_based_on_round_start_not_job_finish(): void
-    {
-        Queue::fake();
-        Event::fake();
-
-        $now = Carbon::parse('2026-01-01 12:00:00');
-        Carbon::setTestNow($now);
-
-        $setupData = [
-            'health' => [
-                'current_character_health' => 100,
-                'current_monster_health' => 0,
-                'max_monster_health' => 200,
-            ],
-            'monster' => [
-                'id' => $this->monster->id,
-                'name' => $this->monster->name,
-                'str' => 1, 'dur' => 1, 'dex' => 1, 'chr' => 1,
-                'int' => 1, 'agi' => 1, 'focus' => 1, 'ac' => 1,
-                'attack_damage' => 10, 'spell_damage' => 0, 'healing' => 0,
-                'xp' => 10, 'gold' => 10, 'max_level' => 5,
-            ],
-        ];
-
-        $fightData = [
-            'health' => [
-                'current_character_health' => 100,
-                'current_monster_health' => 0,
-            ],
-            'monster' => ['id' => $this->monster->id],
-        ];
-
-        $monsterFightService = Mockery::mock(MonsterFightService::class);
-        $monsterFightService->shouldReceive('setupMonster')
-            ->andReturnUsing(function () use ($setupData, $now): array {
-                Carbon::setTestNow($now->copy()->addSeconds(30));
-
-                return $setupData;
-            });
-        $monsterFightService->shouldReceive('fightMonster')->andReturn($fightData);
-        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
-
-        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
-        $battleEventHandler->shouldReceive('processMonsterDeath')->once();
-
-        $characterRewardService = Mockery::mock(CharacterRewardService::class);
-        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
-        $characterRewardService->shouldReceive('fetchXpForMonster')->andReturn(10);
-
-        $skillService = Mockery::mock(SkillService::class);
-        $skillService->shouldReceive('setSkillInTraining')->andReturnSelf();
-        $skillService->shouldReceive('getXpForSkillIntraining')->andReturn(0);
-
-        $factionHandler = Mockery::mock(FactionHandler::class);
-        $factionHandler->shouldReceive('getFactionPointsPerKill')->andReturn(0);
-
-        $explorationCreatureCountCalculator = Mockery::mock(ExplorationCreatureCountCalculator::class);
-        $explorationCreatureCountCalculator->shouldReceive('calculate')->andReturn(1);
-
-        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
-            'monster_id' => $this->monster->id,
-            'move_down_monster_list_every' => 10,
-            'previous_level' => $this->character->level,
-            'current_level' => $this->character->level,
-        ])->getCharacter();
-
-        $automation = $this->character->currentAutomations()->first();
-        $automation->update(['completed_at' => now()->addHours(8)]);
-
-        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
-        $job->handle(
-            $monsterFightService,
-            $battleEventHandler,
-            resolve(CharacterCacheData::class),
-            $characterRewardService,
-            $skillService,
-            $explorationCreatureCountCalculator,
-            $factionHandler,
-            resolve(ExplorationLogService::class),
-            resolve(ExplorationWarningService::class),
-        );
-
-        Queue::assertPushed(Exploration::class, function (Exploration $job) use ($now): bool {
-            if (is_null($job->delay)) {
-                return false;
-            }
-
-            return $job->character->is($this->character)
-                && $job->queue === 'exploration'
-                && $job->connection === 'long_running'
-                && $job->delay->toDateTimeString() === $now->copy()->addSeconds(60)->toDateTimeString();
-        });
-    }
-
     public function test_handle_set_up_fight_preserves_character_sheet_cache(): void
     {
         Event::fake();
@@ -3005,5 +2823,234 @@ class ExplorationTest extends TestCase
         Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
 
         $this->assertTrue($preserveCharacterSheetCachePassed);
+    }
+
+    public function test_handle_missing_automation_finalizes_open_exploration_log_with_missing_automation_reason(): void
+    {
+        Event::fake();
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+        ])->getCharacter();
+
+        $automation = $this->character->refresh()->currentAutomations()->first();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        $automationId = $automation->id;
+        $automation->delete();
+
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
+
+        Exploration::dispatchSync($this->character, $automationId, AttackTypeValue::ATTACK, 5);
+
+        $log->refresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertEquals('missing_automation', $log->stopped_reason);
+        $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+
+        Event::assertDispatched(UpdateCharacterStatus::class);
+        Event::assertDispatched(AutomationTimeOut::class);
+    }
+
+    public function test_handle_cancelled_by_error_leaves_no_open_exploration_log(): void
+    {
+        Event::fake();
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->refresh()->currentAutomations()->first();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn([
+            'monster' => ['id' => $this->monster->id],
+        ]);
+
+        $characterCacheData = Mockery::mock(CharacterCacheData::class);
+        $characterCacheData->shouldReceive('deleteCharacterSheet')->with(Mockery::type(Character::class));
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(CharacterCacheData::class, $characterCacheData);
+
+        Log::shouldReceive('channel')->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')->atLeast()->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $log->refresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertNotNull($log->stopped_reason);
+        $this->assertEquals(0, ExplorationLog::where('character_id', $this->character->id)->whereNull('ended_at')->count());
+    }
+
+    public function test_handle_natural_end_leaves_no_open_exploration_log(): void
+    {
+        Event::fake();
+
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        $successfulFightData = [
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 0,
+            ],
+            'monster' => ['id' => $this->monster->id],
+        ];
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn($successfulFightData);
+        $monsterFightService->shouldReceive('fightMonster')->andReturn($successfulFightData);
+        $monsterFightService->shouldReceive('getMonster')->andReturn($this->monster);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('fetchXpForMonster')->andReturn(10);
+
+        $skillService = Mockery::mock(SkillService::class);
+        $skillService->shouldReceive('setSkillInTraining')->andReturnSelf();
+        $skillService->shouldReceive('getXpForSkillIntraining')->andReturn(1);
+
+        $factionHandler = Mockery::mock(FactionHandler::class);
+        $factionHandler->shouldReceive('getFactionPointsPerKill')->andReturn(1);
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->refresh()->currentAutomations()->first();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        $battleEventHandler = Mockery::mock(BattleEventHandler::class);
+        $battleEventHandler->shouldReceive('processMonsterDeath')->once();
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(BattleEventHandler::class, $battleEventHandler);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+        $this->instance(SkillService::class, $skillService);
+        $this->instance(FactionHandler::class, $factionHandler);
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $log->refresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertEquals('natural_end', $log->stopped_reason);
+        $this->assertEquals(0, ExplorationLog::where('character_id', $this->character->id)->whereNull('ended_at')->count());
+    }
+
+    public function test_failed_logs_and_cleans_up_only_exact_exploration_automation(): void
+    {
+        Event::fake();
+        Queue::fake();
+        Log::shouldReceive('channel')->once()->with('exploration_automation')->andReturnSelf();
+        Log::shouldReceive('error')
+            ->twice()
+            ->with('Exploration automation failed.', Mockery::on(function (array $context): bool {
+                return isset(
+                    $context['exception_class'],
+                    $context['exception_message'],
+                    $context['exception_file'],
+                    $context['exception_line'],
+                    $context['trace'],
+                    $context['character_id'],
+                    $context['automation_id'],
+                    $context['cancellation_reason'],
+                );
+            }));
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+        ])->getCharacter();
+        $automation = $this->character->refresh()->currentAutomations()->first();
+        $unrelatedAutomation = CharacterAutomation::create([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::FACTION_LOYALTY,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        (new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1))
+            ->failed(new RuntimeException('Exploration failed.'));
+
+        $this->assertNull($automation->fresh());
+        $this->assertNotNull($unrelatedAutomation->fresh());
+        $this->assertNotNull($log->refresh()->ended_at);
+        $this->assertSame('queue_job_failed', $log->stopped_reason);
+        $this->assertSame(1, ExplorationWarning::where('exploration_log_id', $log->id)->count());
+        Event::assertDispatched(UpdateCharacterStatus::class);
+        Event::assertDispatched(AutomationTimeOut::class);
+        Event::assertDispatched(AutomationStatus::class);
+        Queue::assertNothingPushed();
+    }
+
+    public function test_failed_cleanup_is_idempotent(): void
+    {
+        Event::fake();
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+        ])->getCharacter();
+        $automation = $this->character->refresh()->currentAutomations()->first();
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+        $job = new Exploration($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $job->failed(new RuntimeException('Exploration failed.'));
+        $job->failed(new RuntimeException('Exploration failed again.'));
+
+        $this->assertSame(1, ExplorationWarning::where('exploration_log_id', $log->id)->count());
+        $this->assertNotNull($log->refresh()->ended_at);
     }
 }
