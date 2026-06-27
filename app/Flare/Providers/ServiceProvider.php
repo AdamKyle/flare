@@ -67,6 +67,7 @@ use App\Flare\Services\SkillBonusContextService;
 use App\Flare\Transformers\BasicKingdomTransformer;
 use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Battle\Services\AttackTimerService;
 use App\Flare\Transformers\InventoryTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
@@ -141,7 +142,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterSheetBaseInfoTransformer::class, function ($app) {
             return new CharacterSheetBaseInfoTransformer(
-                $app->make(CharacterStatBuilder::class)
+                $app->make(CharacterStatBuilder::class),
+                $app->make(AttackTimerService::class),
             );
         });
 

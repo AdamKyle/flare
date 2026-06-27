@@ -17,7 +17,9 @@ use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleLocationRewardService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\ClassRanks\Services\ClassRankService;
@@ -47,11 +49,16 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(FactionLoyaltyRewardRequestService::class, function ($app) {
+            return new FactionLoyaltyRewardRequestService(
+                $app->make(BattleRewardProcessingQueueManager::class),
+            );
+        });
+
         $this->app->bind(FactionLoyaltyBountyHandler::class, function ($app) {
             return new FactionLoyaltyBountyHandler(
-                $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
-                $app->make(BattleMessageHandler::class),
+                $app->make(FactionLoyaltyRewardRequestService::class),
             );
         });
 
@@ -96,7 +103,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(BattleRewardService::class, function ($app) {
             return new BattleRewardService(
-               $app->make(BattleMessageHandler::class),
+                $app->make(BattleMessageHandler::class),
                 $app->make(CharacterRewardService::class),
                 $app->make(FactionHandler::class),
                 $app->make(FactionLoyaltyBountyHandler::class),
@@ -110,6 +117,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillService::class),
                 $app->make(BattleRewardLedgerService::class),
                 $app->make(BattleRewardMessageContext::class),
+                $app->make(RandomAffixGenerator::class),
             );
         });
 

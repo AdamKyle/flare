@@ -152,7 +152,8 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     match ($request->source_type) {
                         BattleRewardRequestSourceType::BATTLE,
                         BattleRewardRequestSourceType::EXPLORATION,
-                        BattleRewardRequestSourceType::AUTOMATION => $this->processBattleRewardRequest(
+                        BattleRewardRequestSourceType::AUTOMATION,
+                        BattleRewardRequestSourceType::FACTION_LOYALTY => $this->processBattleRewardRequest(
                             $battleRewardService,
                             $request,
                             $payload,
@@ -177,6 +178,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         BattleRewardRequestSourceType::BATTLE,
                         BattleRewardRequestSourceType::EXPLORATION,
                         BattleRewardRequestSourceType::AUTOMATION,
+                        BattleRewardRequestSourceType::FACTION_LOYALTY,
                     ], true)) {
                         $this->completeUnsupportedRewardSteps($request, $battleRewardLedgerService);
                     }

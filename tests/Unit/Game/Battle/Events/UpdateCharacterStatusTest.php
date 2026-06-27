@@ -148,4 +148,65 @@ class UpdateCharacterStatusTest extends TestCase
 
         $this->assertFalse($event->characterStatuses['is_delve_running']);
     }
+
+    public function testPayloadNormalizesExpiredAttackTimer(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['can_attack']);
+        $this->assertNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function testPayloadKeepsFutureAttackTimerDisabled(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->addSeconds(30),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['can_attack']);
+        $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function testPayloadDoesNotNormalizeExpiredAttackTimerForDeadCharacter(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+            'is_dead' => true,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['can_attack']);
+        $this->assertFalse($this->character->refresh()->can_attack);
+        $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function testPayloadDoesNotNormalizeExpiredAttackTimerWhenAutomationBlocksManualFighting(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addSeconds(300),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['can_attack']);
+        $this->assertFalse($this->character->refresh()->can_attack);
+        $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
 }

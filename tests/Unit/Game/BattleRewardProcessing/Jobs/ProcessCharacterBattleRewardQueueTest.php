@@ -869,4 +869,94 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $processingRequest->refresh()->status);
         Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
     }
+
+    public function testProcessorHandlesFactionLoyaltySourceTypeViaProcessLedgerAwareRewards(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'faction_loyalty_npc_id' => 1,
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 0,
+                'gold_dust_amount' => 0,
+                'shards_amount' => 0,
+            ],
+        ]);
+
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once();
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
+    }
+
+    public function testFactionLoyaltyRewardRequestCompletesWithoutActiveCharacterAutomation(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        CharacterBattleRewardQueueState::factory()->create([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'faction_loyalty_npc_id' => 1,
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 0,
+                'gold_dust_amount' => 0,
+                'shards_amount' => 0,
+            ],
+        ]);
+
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processLedgerAwareRewards')->once();
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
+    }
 }

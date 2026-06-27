@@ -17,6 +17,10 @@ enum BattleRewardStepName: string
     case XP = 'xp';
     case EXPLORATION_CONTEXT = 'exploration_context';
     case WINTER_EVENT = 'winter_event';
+    case FACTION_LOYALTY_FAME = 'faction_loyalty_fame';
+    case FACTION_LOYALTY_CURRENCIES = 'faction_loyalty_currencies';
+    case FACTION_LOYALTY_UNIQUE_ITEM = 'faction_loyalty_unique_item';
+    case FACTION_LOYALTY_XP = 'faction_loyalty_xp';
     case FINAL_PLAYER_UPDATES = 'final_player_updates';
     case MESSAGE_OUTBOX = 'message_outbox';
 
@@ -36,6 +40,19 @@ enum BattleRewardStepName: string
             self::XP,
             self::EXPLORATION_CONTEXT,
             self::WINTER_EVENT,
+            self::FINAL_PLAYER_UPDATES,
+            self::MESSAGE_OUTBOX,
+        ];
+    }
+
+    public static function orderedForFactionLoyalty(): array
+    {
+        return [
+            self::BUILD_REWARD_PLAN,
+            self::FACTION_LOYALTY_FAME,
+            self::FACTION_LOYALTY_CURRENCIES,
+            self::FACTION_LOYALTY_UNIQUE_ITEM,
+            self::FACTION_LOYALTY_XP,
             self::FINAL_PLAYER_UPDATES,
             self::MESSAGE_OUTBOX,
         ];

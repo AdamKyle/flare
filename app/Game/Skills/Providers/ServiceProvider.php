@@ -6,6 +6,7 @@ use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
+use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
@@ -138,8 +139,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(UpdateCraftingTasksForFactionLoyalty::class, function ($app) {
             return new UpdateCraftingTasksForFactionLoyalty(
-                $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
+                $app->make(FactionLoyaltyRewardRequestService::class),
             );
         });
 
