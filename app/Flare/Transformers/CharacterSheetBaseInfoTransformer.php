@@ -10,6 +10,7 @@ use App\Flare\Models\Item;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Exception;
 
@@ -21,7 +22,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         'inventory_count',
     ];
 
-    public function __construct(private readonly CharacterStatBuilder $characterStatBuilder) {}
+    public function __construct(
+        private readonly CharacterStatBuilder $characterStatBuilder,
+        private readonly AttackTimerService $attackTimerService,
+    ) {}
 
     public function setIgnoreReductions(bool $ignoreReductions): void
     {
@@ -35,6 +39,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
      */
     public function transform(Character $character): array
     {
+        $character = $this->attackTimerService->normalizeExpiredAttackTimer($character);
         $characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $this->ignoreReductions);
         $gameClass = GameClass::find($character->game_class_id);
         $factionLoyalty = $character->factionLoyalties()->where('is_pledged', '=', true)->first();

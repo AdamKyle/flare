@@ -28,6 +28,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\CharacterBattleRewardRequestMessage;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
@@ -1294,6 +1298,306 @@ class BattleRewardServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertNull($character->globalEventParticipation);
+    }
+
+    public function testProcessLedgerAwareRewardsCreatesFactionLoyaltySpecificStepsForFactionLoyaltyRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->characterFactory->getCharacter();
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 0,
+                'gold_dust_amount' => 0,
+                'shards_amount' => 0,
+            ],
+        ]);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeCheckpointedXp')
+            ->withArgs(function (int $xp, callable $callback) use ($character): bool {
+                $callback($xp, 0, $character->refresh());
+                return true;
+            })
+            ->andReturnSelf();
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $stepNames = $request->steps()->get()->pluck('step_name')->all();
+
+        $this->assertCount(7, $stepNames);
+        $this->assertContains(BattleRewardStepName::BUILD_REWARD_PLAN, $stepNames);
+        $this->assertContains(BattleRewardStepName::FACTION_LOYALTY_FAME, $stepNames);
+        $this->assertContains(BattleRewardStepName::FACTION_LOYALTY_CURRENCIES, $stepNames);
+        $this->assertContains(BattleRewardStepName::FACTION_LOYALTY_UNIQUE_ITEM, $stepNames);
+        $this->assertContains(BattleRewardStepName::FACTION_LOYALTY_XP, $stepNames);
+        $this->assertNotContains(BattleRewardStepName::XP, $stepNames);
+        $this->assertNotContains(BattleRewardStepName::SKILL_POINTS, $stepNames);
+        $this->assertNotContains(BattleRewardStepName::FACTION_POINTS, $stepNames);
+        $this->assertNotContains(BattleRewardStepName::ITEM_DROPS, $stepNames);
+    }
+
+    public function testProcessLedgerAwareRewardsAppliesCurrenciesToCharacterForFactionLoyaltyRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->characterFactory->getCharacter();
+        $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 1_000_000,
+                'gold_dust_amount' => 1_000,
+                'shards_amount' => 100,
+            ],
+        ]);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeCheckpointedXp')
+            ->withArgs(function (int $xp, callable $callback) use ($character): bool {
+                $callback($xp, 0, $character->refresh());
+                return true;
+            })
+            ->andReturnSelf();
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $character = $character->refresh();
+
+        $this->assertEquals(1_000_000, $character->gold);
+        $this->assertEquals(1_000, $character->gold_dust);
+        $this->assertEquals(100, $character->shards);
+    }
+
+    public function testProcessLedgerAwareRewardsUsesXpAmountFromHandlerPayloadForFactionLoyaltyRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->characterFactory->getCharacter();
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 2500,
+                'gold_amount' => 0,
+                'gold_dust_amount' => 0,
+                'shards_amount' => 0,
+            ],
+        ]);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeCheckpointedXp')
+            ->withArgs(function (int $xp, callable $callback) use ($character): bool {
+                $callback($xp, 0, $character->refresh());
+                return $xp === 2500;
+            })
+            ->andReturnSelf();
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $xpStep = $request->steps()->where('step_name', BattleRewardStepName::FACTION_LOYALTY_XP)->firstOrFail();
+
+        $this->assertSame(2500, $xpStep->payload_json['total_xp']);
+    }
+
+    public function testProcessLedgerAwareRewardsCreatesUniqueItemRewardForFactionLoyaltyRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->characterFactory->getCharacter();
+        $beforeSlotCount = $character->inventory->slots()->count();
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 0,
+                'gold_dust_amount' => 0,
+                'shards_amount' => 0,
+            ],
+        ]);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeCheckpointedXp')
+            ->withArgs(function (int $xp, callable $callback) use ($character): bool {
+                $callback($xp, 0, $character->refresh());
+                return true;
+            })
+            ->andReturnSelf();
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $this->assertGreaterThan($beforeSlotCount, $character->refresh()->inventory->slots()->count());
+    }
+
+    public function testProcessLedgerAwareRewardsPersistsFameMessageForFactionLoyaltyRequest(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->characterFactory->getCharacter();
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 0,
+                'gold_dust_amount' => 0,
+                'shards_amount' => 0,
+            ],
+        ]);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeCheckpointedXp')
+            ->withArgs(function (int $xp, callable $callback) use ($character): bool {
+                $callback($xp, 0, $character->refresh());
+                return true;
+            })
+            ->andReturnSelf();
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $this->assertTrue(
+            CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
+                ->where('step_name', BattleRewardStepName::FACTION_LOYALTY_FAME)
+                ->exists()
+        );
+    }
+
+    public function testProcessLedgerAwareRewardsDoesNotReapplyCurrenciesWhenCurrenciesStepAlreadyCompleted(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $character = $this->characterFactory->getCharacter();
+        $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 1000,
+                'gold_amount' => 500_000,
+                'gold_dust_amount' => 500,
+                'shards_amount' => 50,
+            ],
+        ]);
+
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->andReturnSelf();
+        $characterRewardService->shouldReceive('distributeCheckpointedXp')
+            ->withArgs(function (int $xp, callable $callback) use ($character): bool {
+                $callback($xp, 0, $character->refresh());
+                return true;
+            })
+            ->andReturnSelf();
+        $this->instance(CharacterRewardService::class, $characterRewardService);
+
+        $service = resolve(BattleRewardService::class);
+
+        $service->processLedgerAwareRewards($request);
+        $this->assertEquals(500_000, $character->refresh()->gold);
+
+        $service->processLedgerAwareRewards($request);
+        $this->assertEquals(500_000, $character->refresh()->gold);
+    }
+
+    public function testProcessLedgerAwareRewardsFactionLoyaltyHeavyPathAppliesXpAndCurrenciesWithoutQueueFake(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
+
+        $request = CharacterBattleRewardRequest::factory()->create([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
+            'source_id' => "faction_loyalty:{$character->id}:1:1",
+            'handler_payload' => [
+                'npc_name' => 'Test NPC',
+                'game_map_name' => 'Surface',
+                'reward_level' => 1,
+                'new_fame_level' => 1,
+                'max_level' => 5,
+                'xp_amount' => 250,
+                'gold_amount' => 750_000,
+                'gold_dust_amount' => 750,
+                'shards_amount' => 75,
+            ],
+        ]);
+
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+
+        $character = $character->refresh();
+
+        $this->assertGreaterThan(1, $character->level);
+        $this->assertEquals(750_000, $character->gold);
+        $this->assertEquals(750, $character->gold_dust);
+        $this->assertEquals(75, $character->shards);
+        $this->assertTrue(
+            CharacterBattleRewardRequestMessage::where('character_battle_reward_request_id', $request->id)
+                ->where('step_name', BattleRewardStepName::FACTION_LOYALTY_FAME)
+                ->exists()
+        );
+        $this->assertGreaterThan(0, $character->inventory->slots()->count());
     }
 
     public function testDelusionalMemoriesKillsDoNotCountWhenCurrentStepIsCraft(): void

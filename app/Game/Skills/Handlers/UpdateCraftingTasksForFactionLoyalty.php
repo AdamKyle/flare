@@ -2,36 +2,30 @@
 
 namespace App\Game\Skills\Handlers;
 
-use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Item;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
-use App\Game\Core\Events\UpdateTopBarEvent;
-use App\Game\Core\Traits\HandleCharacterLevelUp;
+use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
-use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateCraftingTasksForFactionLoyalty
 {
-    use FactionLoyalty, HandleCharacterLevelUp;
-
-    private RandomAffixGenerator $randomAffixGenerator;
+    use FactionLoyalty;
 
     private FactionLoyaltyService $factionLoyaltyService;
+
+    private FactionLoyaltyRewardRequestService $factionLoyaltyRewardRequestService;
 
     private bool $handedOverItem = false;
 
     public function __construct(
-        RandomAffixGenerator $randomAffixGenerator,
         FactionLoyaltyService $factionLoyaltyService,
+        FactionLoyaltyRewardRequestService $factionLoyaltyRewardRequestService,
     ) {
-        $this->randomAffixGenerator = $randomAffixGenerator;
         $this->factionLoyaltyService = $factionLoyaltyService;
+        $this->factionLoyaltyRewardRequestService = $factionLoyaltyRewardRequestService;
     }
 
     /**
@@ -46,8 +40,6 @@ class UpdateCraftingTasksForFactionLoyalty
 
     /**
      * Handle when we craft for a npc.
-     *
-     * @throws Exception
      */
     public function handleCraftingTask(Character $character, Item $item): Character
     {
@@ -96,125 +88,45 @@ class UpdateCraftingTasksForFactionLoyalty
 
     /**
      * Handle when the fame levels up.
-     *
-     * @throws Exception
      */
     protected function handleFameLevelUp(Character $character, FactionLoyaltyNpc $helpingNpc): void
     {
-
         if ($this->normalizeMaxLevelNpc($helpingNpc)) {
             return;
         }
 
         $rewardLevel = $helpingNpc->current_level;
-
-        $this->handOutCurrencies($character, $helpingNpc, $rewardLevel);
-        $this->rewardTheUniqueItem($character);
-
         $newLevel = min($helpingNpc->current_level + 1, $helpingNpc->max_level);
 
-        $helpingNpc->update([
-            'current_level' => $newLevel,
-        ]);
-
+        $helpingNpc->update(['current_level' => $newLevel]);
         $helpingNpc = $helpingNpc->refresh();
 
         if ($helpingNpc->current_level === $helpingNpc->max_level) {
-            $helpingNpc->factionLoyaltyNpcTasks->update([
-                'fame_tasks' => [],
-            ]);
+            $helpingNpc->factionLoyaltyNpcTasks->update(['fame_tasks' => []]);
         } else {
             $this->factionLoyaltyService->createNewTasksForNpc($helpingNpc->factionLoyaltyNpcTasks, $character);
         }
 
-        $this->handOutXp($character, $helpingNpc, $rewardLevel);
-    }
+        $normalizedLevel = $rewardLevel <= 0 ? 1 : $rewardLevel;
 
-    /**
-     * Handle currencies.
-     */
-    protected function handOutCurrencies(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc, int $rewardLevel): void
-    {
-        $rewardLevel = $rewardLevel <= 0 ? 1 : $rewardLevel;
-        $newGold = ($rewardLevel * 1000000) + $character->gold;
-        $newGoldDust = ($rewardLevel * 1000) + $character->gold_dust;
-        $newShards = ($rewardLevel * 100) + $character->shards;
-
-        if ($newGold >= MaxCurrenciesValue::MAX_GOLD) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
-        }
-
-        if ($newGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $newGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
-        }
-
-        if ($newShards >= MaxCurrenciesValue::MAX_SHARDS) {
-            $newShards = MaxCurrenciesValue::MAX_SHARDS;
-        }
-
-        $character->update([
-            'gold' => $newGold,
-            'gold_dust' => $newGoldDust,
-            'shards' => $newShards,
-        ]);
-
-        event(new UpdateTopBarEvent($character->refresh()));
-
-        ServerMessageHandler::sendBasicMessage($character->user, 'Your fame with: ' . $factionLoyaltyNpc->npc->real_name . ' on Plane: ' . $factionLoyaltyNpc->npc->gameMap->name);
-    }
-
-    /**
-     * handout XP
-     */
-    protected function handOutXp(Character $character, FactionLoyaltyNpc $factionLoyaltyNpc, int $rewardLevel): void
-    {
-
-        $newAmount = $rewardLevel * 1000;
-
-        $character->update([
-            'xp' => $character->xp + ($newAmount > 0 ? $newAmount : 1000),
-        ]);
-
-        $character = $character->refresh();
-
-        $this->handlePossibleLevelUp($character);
-
-        ServerMessageHandler::sendBasicMessage($character->user, 'Rewarded with: ' . number_format($newAmount > 0 ? $newAmount : 1000) . ' XP.');
-    }
-
-    /**
-     * Reward with a unique item.
-     *
-     * @return void
-     *
-     * @throws Exception
-     */
-    protected function rewardTheUniqueItem(Character $character)
-    {
-        $item = Item::whereNull('specialty_type')
-            ->whereNull('item_prefix_id')
-            ->whereNull('item_suffix_id')
-            ->whereDoesntHave('appliedHolyStacks')
-            ->whereNotIn('type', ['alchemy', 'artifact', 'trinket', 'quest'])
-            ->inRandomOrder()
-            ->first();
-
-        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
-
-        $newItem = $item->duplicate();
-
-        $newItem->update([
-            'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
-            'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
-        ]);
-
-        $slot = $character->inventory->slots()->create([
-            'inventory_id' => $character->inventory->id,
-            'item_id' => $newItem->id,
-        ]);
-
-        event(new ServerMessageEvent($character->user, 'You found something Unique in value child. A simple reward: ' . $item->affix_name, $slot->id));
+        $this->factionLoyaltyRewardRequestService->enqueue(
+            $character->id,
+            $helpingNpc->id,
+            $rewardLevel,
+            [
+                'faction_loyalty_npc_id' => $helpingNpc->id,
+                'npc_id' => $helpingNpc->npc_id,
+                'npc_name' => $helpingNpc->npc->real_name,
+                'game_map_name' => $helpingNpc->npc->gameMap->name,
+                'reward_level' => $rewardLevel,
+                'new_fame_level' => $newLevel,
+                'max_level' => $helpingNpc->max_level,
+                'xp_amount' => $rewardLevel <= 0 ? 1000 : $rewardLevel * 1000,
+                'gold_amount' => $normalizedLevel * 1_000_000,
+                'gold_dust_amount' => $normalizedLevel * 1_000,
+                'shards_amount' => $normalizedLevel * 100,
+            ]
+        );
     }
 
     /**

@@ -2,13 +2,16 @@
 
 namespace Tests\Unit\Game\Skills\Handlers;
 
+use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -301,7 +304,6 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
 
     public function testLevelUpFameFromCrafting()
     {
-
         $item = $this->createItem();
 
         $character = (new CharacterFactory)->createBaseCharacter()
@@ -317,46 +319,18 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
-        $this->createItem([
-            'crafting_type' => 'weapon',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'armour',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'ring',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'spell',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
@@ -391,19 +365,24 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
-        $this->assertEquals(1000000, $character->gold);
-        $this->assertEquals(1000, $character->gold_dust);
-        $this->assertEquals(100, $character->shards);
-        $this->assertEquals(2, $character->level);
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(0, $character->gold_dust);
+        $this->assertEquals(0, $character->shards);
+        $this->assertEquals(1, $character->level);
 
+        $request = CharacterBattleRewardRequest::where('character_id', $character->id)
+            ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
+            ->first();
+
+        $this->assertNotNull($request);
+        $this->assertEquals(1000000, $request->handler_payload['gold_amount']);
     }
 
     public function testLevelUpFameFromCraftingWhenTheEventIsRunning()
     {
-
         $item = $this->createItem();
 
         $this->createEvent([
@@ -423,46 +402,18 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         ]);
 
         Event::fake();
+        Queue::fake();
 
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
-        $this->createItem([
-            'crafting_type' => 'weapon',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'armour',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'ring',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'spell',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
@@ -497,13 +448,19 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
-        $this->assertEquals(1000000, $character->gold);
-        $this->assertEquals(1000, $character->gold_dust);
-        $this->assertEquals(100, $character->shards);
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(0, $character->gold_dust);
+        $this->assertEquals(0, $character->shards);
 
+        $request = CharacterBattleRewardRequest::where('character_id', $character->id)
+            ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
+            ->first();
+
+        $this->assertNotNull($request);
+        $this->assertEquals(1000000, $request->handler_payload['gold_amount']);
     }
 
     public function testDoNotGiveMoreCurrenciesThenMaxAllowedForCraftingTasks()
@@ -525,46 +482,17 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $character->refresh();
 
         Event::fake();
+        Queue::fake();
 
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-
-        $this->createMonster([
-            'game_map_id' => $character->map->game_map_id,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'weapon',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'armour',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'ring',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'spell',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
@@ -596,17 +524,22 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
             ]],
         ]);
 
-        $character = $character->refresh();
-
-        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character, $item);
+        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+
+        $request = CharacterBattleRewardRequest::where('character_id', $character->id)
+            ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
+            ->first();
+
+        $this->assertNotNull($request);
+        $this->assertEquals(1_000_000, $request->handler_payload['gold_amount']);
     }
 
     public function testDoNotAssignTasksForMaxLevelFame()
@@ -628,30 +561,12 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $character->refresh();
 
         Event::fake();
+        Queue::fake();
 
-        $this->createItem([
-            'crafting_type' => 'weapon',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'armour',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'ring',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
-
-        $this->createItem([
-            'crafting_type' => 'spell',
-            'skill_level_required' => 1,
-            'skill_level_trivial' => 50,
-        ]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
 
         $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
@@ -686,13 +601,196 @@ class UpdateCraftingTasksForFactionLoyaltyTest extends TestCase
         $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
 
         Event::assertDispatched(ServerMessageEvent::class);
-        Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
         $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
         $this->assertCount(0, $character->factionLoyalties()->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks);
+
+        $request = CharacterBattleRewardRequest::where('character_id', $character->id)
+            ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
+            ->first();
+
+        $this->assertNotNull($request);
+        $this->assertEquals(24_000_000, $request->handler_payload['gold_amount']);
+    }
+
+    public function testCraftingHandlerDoesNotApplyXpInline()
+    {
+        $item = $this->createItem();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        $character->update(['xp' => 0, 'xp_next' => 1000, 'level' => 1]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'character_id' => $character->id,
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
+        ]);
+
+        $npc = $this->createNpc();
+
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
+                'required_amount' => rand(10, 50),
+                'current_amount' => 200000,
+            ]],
+        ]);
+
+        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
+
+        $this->assertEquals(1, $character->level);
+        $this->assertEquals(0, $character->xp);
+    }
+
+    public function testCraftingHandlerDoesNotApplyCurrenciesInline()
+    {
+        $item = $this->createItem();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
+
+        Event::fake();
+        Queue::fake();
+
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'character_id' => $character->id,
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
+        ]);
+
+        $npc = $this->createNpc();
+
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
+                'required_amount' => rand(10, 50),
+                'current_amount' => 200000,
+            ]],
+        ]);
+
+        $character = $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
+
+        $this->assertEquals(0, $character->gold);
+        $this->assertEquals(0, $character->gold_dust);
+        $this->assertEquals(0, $character->shards);
+    }
+
+    public function testCraftingRetryDoesNotDuplicateRewardRequest()
+    {
+        $item = $this->createItem();
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->getCharacter();
+
+        Event::fake();
+        Queue::fake();
+
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createMonster(['game_map_id' => $character->map->game_map_id]);
+        $this->createItem(['crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'armour', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'ring', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $this->createItem(['crafting_type' => 'spell', 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'character_id' => $character->id,
+            'faction_id' => $character->factions->first(),
+            'is_pledged' => true,
+        ]);
+
+        $npc = $this->createNpc();
+
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 1,
+            'max_level' => 25,
+            'next_level_fame' => 1,
+            'currently_helping' => true,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'fame_tasks' => [[
+                'type' => $item->crafting_type,
+                'item_name' => $item->name,
+                'item_id' => $item->id,
+                'required_amount' => rand(10, 50),
+                'current_amount' => 200000,
+            ]],
+        ]);
+
+        $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
+        $this->updateCraftingTasksForFactionLoyalty->handleCraftingTask($character->refresh(), $item);
+
+        $this->assertCount(1, CharacterBattleRewardRequest::where('character_id', $character->id)
+            ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
+            ->get()
+        );
     }
 
     public function testCannotLevelFameAnyMore()

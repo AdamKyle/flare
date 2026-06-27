@@ -12,6 +12,8 @@ use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
+use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Values\EventType;
@@ -34,9 +36,10 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(Character $character)
+    public function __construct(Character $character, ?AttackTimerService $attackTimerService = null)
     {
-        $character = $character->refresh();
+        $attackTimerService ??= new AttackTimerService(new AutomationRestrictionService());
+        $character = $attackTimerService->normalizeExpiredAttackTimer($character);
 
         $this->characterStatuses = [
             'can_attack' => $character->can_attack,

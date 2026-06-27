@@ -9,6 +9,7 @@ use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueRequest;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
@@ -100,6 +101,7 @@ class CapitalCityBuildingManagementTest extends TestCase
     public function testItConsumesDiscountedResourceCostsForOneCapitalCityBuildingUpgradeWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
     {
         Event::fake();
+        Queue::fake();
 
         $character = $this->character->getCharacter();
 
@@ -181,11 +183,15 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(7704, $targetKingdom->current_wood);
         $this->assertSame(8278, $targetKingdom->current_iron);
         $this->assertSame(9720, $targetKingdom->current_population);
+        Queue::assertPushed(CapitalCityBuildingRequest::class, function (CapitalCityBuildingRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 
     public function testItConsumesDiscountedResourceCostsForMultipleCapitalCityBuildingUpgradesWhenTheBuildingManagementPassiveIsPartiallyTrained(): void
     {
         Event::fake();
+        Queue::fake();
 
         $character = $this->character->getCharacter();
 
@@ -297,6 +303,9 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5408, $targetKingdom->current_wood);
         $this->assertSame(6556, $targetKingdom->current_iron);
         $this->assertSame(9440, $targetKingdom->current_population);
+        Queue::assertPushed(CapitalCityBuildingRequest::class, function (CapitalCityBuildingRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 
     public function testCapitalCityBuildingResourceRejectionUpdatesBuildingRequestDataAndTopLevelStatus(): void

@@ -12,9 +12,11 @@ use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
+use PDOException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -740,6 +742,34 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertNotNull($log->ended_at);
         $this->assertEquals('missing_automation', $log->stopped_reason);
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function testResolveOutputFinalizesMissingAutomationLogWhenWarningCreationHitsLockWaitTimeout(): void
+    {
+        Log::shouldReceive('error')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => 999999,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        ExplorationWarning::creating(function (): void {
+            throw new QueryException('mysql', 'insert into exploration_warnings', [], new PDOException('Lock wait timeout exceeded', 1205));
+        });
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $log->refresh();
+
+        $this->assertEquals('ended', $output['type']);
+        $this->assertEquals('missing_automation', $log->stopped_reason);
+        $this->assertNotNull($log->ended_at);
+        $this->assertSame(0, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
     public function testResolveOutputDoesNotRepairWhenAutomationExists(): void

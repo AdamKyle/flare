@@ -7,6 +7,7 @@ use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Jobs\AttackTimeOutJob;
 use App\Game\Battle\Listeners\AttackTimeOutListener;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Core\Controllers\Api\TimersController;
 use App\Game\Core\Events\ShowTimeOutEvent;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -129,5 +130,21 @@ class AttackTimeOutListenerTest extends TestCase
         Queue::assertPushed(AttackTimeOutJob::class, function (AttackTimeOutJob $job) use ($now): bool {
             return $job->delay->equalTo($now->copy()->addSeconds(20));
         });
+    }
+
+    public function testTimersControllerNormalizesExpiredAttackTimer(): void
+    {
+        Event::fake();
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+        ]);
+
+        (new TimersController)->updateTimersForCharacter($this->character->refresh());
+
+        $this->assertTrue($this->character->refresh()->can_attack);
+        $this->assertNull($this->character->refresh()->can_attack_again_at);
     }
 }

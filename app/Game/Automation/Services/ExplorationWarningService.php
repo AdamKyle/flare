@@ -6,6 +6,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Game\Automation\Events\ExplorationWarningState;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
 
 class ExplorationWarningService
 {
@@ -38,13 +40,35 @@ class ExplorationWarningService
 
     public function createWarning(Character $character, ExplorationLog $log, string $type, string $message): array
     {
-        ExplorationWarning::create([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'exploration_log_id' => $log->id,
-            'type' => $type,
-            'message' => $message,
-        ]);
+        try {
+            ExplorationWarning::create([
+                'character_id' => $character->id,
+                'user_id' => $character->user_id,
+                'exploration_log_id' => $log->id,
+                'type' => $type,
+                'message' => $message,
+            ]);
+        } catch (QueryException $exception) {
+            $exceptionCode = (int) $exception->getCode();
+            $previousCode = (int) ($exception->getPrevious()?->getCode() ?? 0);
+            $isRetryable = in_array($exceptionCode, [1205, 1213], true)
+                || in_array($previousCode, [1205, 1213], true)
+                || str_contains($exception->getMessage(), '1205')
+                || str_contains($exception->getMessage(), '1213')
+                || str_contains($exception->getMessage(), 'Lock wait timeout exceeded')
+                || str_contains($exception->getMessage(), 'Deadlock found');
+
+            if (! $isRetryable) {
+                throw $exception;
+            }
+
+            Log::warning('Exploration warning creation skipped after database lock error.', [
+                'character_id' => $character->id,
+                'exploration_log_id' => $log->id,
+                'type' => $type,
+                'exception_code' => $exceptionCode !== 0 ? $exceptionCode : $previousCode,
+            ]);
+        }
 
         return $this->getState($character);
     }

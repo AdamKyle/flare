@@ -7,8 +7,10 @@ use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationWarningService;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use PDOException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateExplorationLog;
@@ -61,6 +63,33 @@ class ExplorationWarningServiceTest extends TestCase
         Event::assertDispatched(ExplorationWarningState::class, function (ExplorationWarningState $event): bool {
             return $event->has_warning === true;
         });
+    }
+
+    public function testCreateWarningReturnsCurrentStateWhenLockWaitTimeoutOccurs(): void
+    {
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $existingWarning = $this->createExplorationWarning([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'exploration_log_id' => $log->id,
+            'type' => 'existing',
+            'message' => 'Existing warning.',
+        ]);
+
+        ExplorationWarning::creating(function (): void {
+            throw new QueryException('mysql', 'insert into exploration_warnings', [], new PDOException('Lock wait timeout exceeded', 1205));
+        });
+
+        $result = $this->service->createWarning($this->character, $log, 'fight', 'Something went wrong.');
+
+        $this->assertTrue($result['has_warning']);
+        $this->assertCount(1, $result['warnings']);
+        $this->assertEquals($existingWarning->id, $result['warnings'][0]['id']);
+        $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
     public function testGetStateReturnsOnlyTheNewestWarning(): void
