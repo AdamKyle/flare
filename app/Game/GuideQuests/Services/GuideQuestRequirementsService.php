@@ -91,13 +91,16 @@ class GuideQuestRequirementsService
                 return $this;
             }
 
-            $lastDelveLog = DelveLog::where('character_id', $character->id)->where('delve_exploration_id', $lastDelveExploration->id)->latest()->first();
+            $latestPackSize = DelveLog::where('character_id', $character->id)
+                ->where('delve_exploration_id', $lastDelveExploration->id)
+                ->orderBy('created_at', 'desc')
+                ->value('pack_size');
 
-            if (is_null($lastDelveLog)) {
+            if (is_null($latestPackSize)) {
                 return $this;
             }
 
-            if ($lastDelveLog->pack_size >= $quest->required_delve_pack_size) {
+            if ($latestPackSize >= $quest->required_delve_pack_size) {
                 $this->finishedRequirements[] = 'required_delve_pack_size';
             }
         }
