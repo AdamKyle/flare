@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Log;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
@@ -18,6 +16,9 @@ use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
@@ -182,6 +183,57 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredDelvePackSize($character, $guideQuest)->getFinishedRequirements();
 
         $this->assertNotContains('required_delve_pack_size', $finishedRequirements);
+    }
+
+    public function testDelveLogsHasCompositeIndexForLatestPackSizeLookup(): void
+    {
+        $indexColumns = DB::table('information_schema.STATISTICS')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', 'delve_logs')
+            ->where('INDEX_NAME', 'delve_logs_character_exploration_created_index')
+            ->orderBy('SEQ_IN_INDEX')
+            ->pluck('COLUMN_NAME')
+            ->all();
+
+        $this->assertSame([
+            'character_id',
+            'delve_exploration_id',
+            'created_at',
+        ], $indexColumns);
+    }
+
+    public function testRequiredDelvePackSizeUsesLatestDelveLogForCompletedDelveExploration(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_delve_pack_size' => 10,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $delve = DelveExploration::factory()->create([
+            'character_id' => $character->id,
+            'monster_id' => 0,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+        ]);
+
+        DelveLog::factory()->create([
+            'character_id' => $character->id,
+            'delve_exploration_id' => $delve->id,
+            'pack_size' => 5,
+            'created_at' => now()->subMinutes(10),
+        ]);
+
+        DelveLog::factory()->create([
+            'character_id' => $character->id,
+            'delve_exploration_id' => $delve->id,
+            'pack_size' => 10,
+            'created_at' => now(),
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredDelvePackSize($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_delve_pack_size', $finishedRequirements);
     }
 
     public function testGetSecondaryRequiredSkillCheck()
