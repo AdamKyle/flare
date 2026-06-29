@@ -397,6 +397,8 @@ class DelveExploration implements ShouldQueue
                 'panel_dismissed_at' => null,
             ]);
 
+            event(new DelveStatusUpdated($this->character->user->id));
+
             CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE)->delete();
 
             $this->sendOutEventLogUpdate('You died during the delve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');

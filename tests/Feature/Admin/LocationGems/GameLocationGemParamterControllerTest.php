@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Admin\LocationGems;
 
+use Tests\Traits\CreateGem;
+
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\Gem;
 use App\Flare\Models\GemBagSlot;
@@ -19,7 +21,7 @@ use Tests\Traits\CreateUser;
 
 class GameLocationGemParamterControllerTest extends TestCase
 {
-    use CreateGameLocationGemParamter, CreateGameMap, CreateGameSkill, CreateItem, CreateLocation, CreateRole, CreateUser, RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGameMap, CreateGameSkill, CreateGem, CreateItem, CreateLocation, CreateRole, CreateUser, RefreshDatabase;
 
     public function testAdminCanNavigateFromListToCreatePage(): void
     {
@@ -270,7 +272,7 @@ class GameLocationGemParamterControllerTest extends TestCase
         $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
 
         $this->actingAs($admin)
@@ -285,7 +287,7 @@ class GameLocationGemParamterControllerTest extends TestCase
         $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
 
         $this->actingAs($admin)
@@ -300,7 +302,7 @@ class GameLocationGemParamterControllerTest extends TestCase
         $specialLocation = $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
 
         $this->actingAs($admin)
@@ -321,12 +323,12 @@ class GameLocationGemParamterControllerTest extends TestCase
         $surfaceSpecial = $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $surfaceMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
         $this->createLocation([
             'name' => 'Purgatory Smith',
             'game_map_id' => $purgatoryMap->id,
-            'type' => LocationType::PURGATORY_SMITH_HOUSE,
+            'type' => LocationType::PURGATORY_SMITH_HOUSE->value,
         ]);
         $gameLocationGemParamter = $this->createGameLocationGemParamter(['location_id' => $surfaceSpecial->id]);
 
@@ -343,7 +345,7 @@ class GameLocationGemParamterControllerTest extends TestCase
         $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
         $regularLocation = $this->createLocation(['name' => 'Quest Town', 'game_map_id' => $gameMap->id]);
         $this->createItem(['type' => 'quest', 'drop_location_id' => $regularLocation->id]);
@@ -384,12 +386,12 @@ class GameLocationGemParamterControllerTest extends TestCase
         $this->createLocation([
             'name' => 'Hell Special',
             'game_map_id' => $hellMap->id,
-            'type' => LocationType::BROKEN_ANVIL,
+            'type' => LocationType::BROKEN_ANVIL->value,
         ]);
         $this->createLocation([
             'name' => 'Surface Special',
             'game_map_id' => $surfaceMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
 
         $this->actingAs($admin)
@@ -405,7 +407,7 @@ class GameLocationGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameLocationGemParamter();
-        Gem::factory()->locationGenerated($profile)->create([
+        $this->createLocationGeneratedGem($profile, [
             'name' => 'Historical Location Gem',
             'domain' => Gem::DOMAIN_LOCATION,
             'game_location_gem_paramters_id' => $profile->id,
@@ -477,7 +479,7 @@ class GameLocationGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameLocationGemParamter(['name' => 'Location Rolled Profile']);
-        $rolledGem = Gem::factory()->locationGenerated($profile)->create([
+        $rolledGem = $this->createLocationGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_LOCATION,
             'game_location_gem_paramters_id' => $profile->id,
@@ -524,7 +526,7 @@ class GameLocationGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameLocationGemParamter(['name' => 'Decimal Format Location Profile']);
-        $rolledGem = Gem::factory()->locationGenerated($profile)->create([
+        $rolledGem = $this->createLocationGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_LOCATION,
             'game_location_gem_paramters_id' => $profile->id,
@@ -549,7 +551,7 @@ class GameLocationGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameLocationGemParamter(['name' => 'No User ID Location Profile']);
-        $rolledGem = Gem::factory()->locationGenerated($profile)->create([
+        $rolledGem = $this->createLocationGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_LOCATION,
             'game_location_gem_paramters_id' => $profile->id,
@@ -578,7 +580,7 @@ class GameLocationGemParamterControllerTest extends TestCase
     public function testPublicLocationGemPageDoesNotExposeRollingControlsOrRolledValues(): void
     {
         $profile = $this->createGameLocationGemParamter();
-        $rolledGem = Gem::factory()->locationGenerated($profile)->create([
+        $rolledGem = $this->createLocationGeneratedGem($profile, [
             'name' => 'Private Location Roll Value',
             'domain' => Gem::DOMAIN_LOCATION,
             'game_location_gem_paramters_id' => $profile->id,

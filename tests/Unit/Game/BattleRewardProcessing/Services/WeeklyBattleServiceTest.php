@@ -71,7 +71,7 @@ class WeeklyBattleServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
 
         $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $this->weeklyBattleService->handleCharacterDeath($character, $monster);
@@ -105,7 +105,7 @@ class WeeklyBattleServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
 
         $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $weeklyFight = $this->createWeeklyMonsterFight([
@@ -151,7 +151,7 @@ class WeeklyBattleServiceTest extends TestCase
 
 
         $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $weeklyFight = $this->createWeeklyMonsterFight([
@@ -173,7 +173,7 @@ class WeeklyBattleServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
 
         $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::TWSITED_MAIDENS_DUNGEONS,
+            'only_for_location_type' => LocationType::TWISTED_MAIDENS_DUNGEONS->value,
         ]);
 
         $weeklyFight = $this->createWeeklyMonsterFight([
@@ -202,7 +202,7 @@ class WeeklyBattleServiceTest extends TestCase
         ]);
 
         $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $this->weeklyBattleService->handleMonsterDeath($character, $monster);
@@ -250,7 +250,7 @@ class WeeklyBattleServiceTest extends TestCase
     {
         $character = $this->characterFactory->getCharacter();
         $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $this->createWeeklyMonsterFight([

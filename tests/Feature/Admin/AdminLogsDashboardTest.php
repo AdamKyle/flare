@@ -2,20 +2,26 @@
 
 namespace Tests\Feature\Admin;
 
+use Tests\Traits\CreateMonitoredSystemError;
+
 use App\Admin\Services\AdminLogsDashboardService;
+use App\Admin\Services\LogReader;
+use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\MonitoredLogFileState;
 use App\Flare\Models\MonitoredSystemErrorOccurrence;
 use App\Flare\Models\MonitoredSystemErrorReport;
 use App\Flare\Models\SuggestionAndBugs;
 use App\Game\Core\Values\FeedbackType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\TestCase;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class AdminLogsDashboardTest extends TestCase
 {
-    use CreateRole, CreateUser, RefreshDatabase;
+    use CreateMonitoredSystemError, CreateRole, CreateUser, MockeryPHPUnitIntegration, RefreshDatabase;
 
     private string $tempLogDir;
 
@@ -322,9 +328,9 @@ class AdminLogsDashboardTest extends TestCase
     public function testBugChartEndpointReturnsSupportedRangeCounts(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $report = MonitoredSystemErrorReport::factory()->create(['occurrence_count' => 1]);
+        $report = $this->createMonitoredSystemErrorReport(['occurrence_count' => 1]);
 
-        MonitoredSystemErrorOccurrence::factory()->create([
+        $this->createMonitoredSystemErrorOccurrence([
             'monitored_system_error_report_id' => $report->id,
             'occurred_at' => now(),
         ]);
@@ -385,7 +391,7 @@ class AdminLogsDashboardTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
 
-        MonitoredSystemErrorReport::factory()->create([
+        $this->createMonitoredSystemErrorReport([
             'fingerprint' => 'abc123fingerprint',
             'occurrence_count' => 1,
         ]);
@@ -400,17 +406,17 @@ class AdminLogsDashboardTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
 
-        $report = MonitoredSystemErrorReport::factory()->create([
+        $report = $this->createMonitoredSystemErrorReport([
             'occurrence_count' => 2,
         ]);
 
-        MonitoredSystemErrorOccurrence::factory()->create([
+        $this->createMonitoredSystemErrorOccurrence([
             'monitored_system_error_report_id' => $report->id,
             'occurred_at' => now(),
             'message' => 'First occurrence message',
         ]);
 
-        MonitoredSystemErrorOccurrence::factory()->create([
+        $this->createMonitoredSystemErrorOccurrence([
             'monitored_system_error_report_id' => $report->id,
             'occurred_at' => now()->subMinute(),
             'message' => 'Second occurrence message',
@@ -425,19 +431,19 @@ class AdminLogsDashboardTest extends TestCase
 
     public function testBugChartServiceMethodReturnsOccurrenceCountsPerDay(): void
     {
-        $report = MonitoredSystemErrorReport::factory()->create(['occurrence_count' => 3]);
+        $report = $this->createMonitoredSystemErrorReport(['occurrence_count' => 3]);
 
-        MonitoredSystemErrorOccurrence::factory()->create([
+        $this->createMonitoredSystemErrorOccurrence([
             'monitored_system_error_report_id' => $report->id,
             'occurred_at' => now(),
         ]);
 
-        MonitoredSystemErrorOccurrence::factory()->create([
+        $this->createMonitoredSystemErrorOccurrence([
             'monitored_system_error_report_id' => $report->id,
             'occurred_at' => now(),
         ]);
 
-        MonitoredSystemErrorOccurrence::factory()->create([
+        $this->createMonitoredSystemErrorOccurrence([
             'monitored_system_error_report_id' => $report->id,
             'occurred_at' => now()->subDay(),
         ]);
@@ -461,5 +467,98 @@ class AdminLogsDashboardTest extends TestCase
 
         $this->assertSame([], $result['data']);
         $this->assertSame(0, $result['total']);
+    }
+
+    public function testLogFilesApiIncludesBatchCraftingChannel(): void
+    {
+        $reader = Mockery::mock(LogReader::class);
+        $reader->shouldReceive('discoverFiles')->andReturn([]);
+        $service = new AdminLogsDashboardService(resolve(MonitoredBugReportService::class), $reader);
+
+        $files = $service->listFiles();
+
+        $this->assertContains('batch_crafting', array_column($files, 'key'));
+    }
+
+    public function testBatchCraftingLogEntriesEndpointReturnsMockedLines(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $reader = Mockery::mock(LogReader::class);
+        $reader->shouldReceive('discoverFiles')->andReturn(['/mock/batch-crafting.log']);
+        $reader->shouldReceive('fileSize')->andReturn(100);
+        $reader->shouldReceive('readTail')->andReturn('[2026-06-24 12:00:00] local.ERROR: Batch craft exploded {"exception":"RuntimeException","batch_crafting_id":10}' . "\n");
+        $this->app->instance(AdminLogsDashboardService::class, new AdminLogsDashboardService(resolve(MonitoredBugReportService::class), $reader));
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/logs/entries', [
+            'file' => 'batch_crafting',
+            'severity' => 'error',
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('Batch craft exploded', $response->json('data.0.message'));
+    }
+
+    public function testBatchCraftingErrorLogCreatesSystemBugReportFromMockedReader(): void
+    {
+        MonitoredLogFileState::query()->delete();
+        $reader = Mockery::mock(LogReader::class);
+        $reader->shouldReceive('discoverFiles')->andReturn(['/mock/batch-crafting.log']);
+        $reader->shouldReceive('fileSize')->andReturn(100);
+        $reader->shouldReceive('readFrom')->andReturn('[2026-06-24 12:00:00] batch_crafting.ERROR: Batch craft exploded {"exception":"RuntimeException","batch_crafting_id":10}' . "\n");
+        $reader->shouldReceive('readTail')->andReturn('[2026-06-24 12:00:00] batch_crafting.ERROR: Batch craft exploded {"exception":"RuntimeException","batch_crafting_id":10}' . "\n");
+        $service = new AdminLogsDashboardService(resolve(MonitoredBugReportService::class), $reader);
+
+        $service->poll('batch_crafting', '', '', '');
+
+        $this->assertSame(1, MonitoredSystemErrorReport::count());
+        $this->assertStringContainsString('Batch craft exploded', MonitoredSystemErrorReport::first()->latest_message);
+    }
+
+    public function testDuplicateBatchCraftingErrorLogDedupesSystemBugReportFromMockedReader(): void
+    {
+        MonitoredLogFileState::query()->delete();
+        $reader = Mockery::mock(LogReader::class);
+        $reader->shouldReceive('discoverFiles')->andReturn(['/mock/batch-crafting.log', '/mock/batch-crafting-2026-06-24.log']);
+        $reader->shouldReceive('fileSize')->andReturn(100);
+        $reader->shouldReceive('readFrom')->andReturn('[2026-06-24 12:00:00] batch_crafting.ERROR: Same batch craft error {"exception":"RuntimeException","file":"/app/Batch.php","line":12}' . "\n");
+        $reader->shouldReceive('readTail')->andReturn('[2026-06-24 12:00:00] batch_crafting.ERROR: Same batch craft error {"exception":"RuntimeException","file":"/app/Batch.php","line":12}' . "\n");
+        $service = new AdminLogsDashboardService(resolve(MonitoredBugReportService::class), $reader);
+
+        $service->poll('batch_crafting', '', '', '');
+
+        $this->assertSame(1, MonitoredSystemErrorReport::count());
+        $this->assertSame(2, MonitoredSystemErrorOccurrence::count());
+    }
+
+    public function testGenericMonitoredErrorLogCreatesSystemBugReportFromMockedReader(): void
+    {
+        MonitoredLogFileState::query()->delete();
+        $reader = Mockery::mock(LogReader::class);
+        $reader->shouldReceive('discoverFiles')->andReturn(['/mock/laravel.log']);
+        $reader->shouldReceive('fileSize')->andReturn(100);
+        $reader->shouldReceive('readFrom')->andReturn('[2026-06-24 12:00:00] local.ERROR: Generic monitored error {"exception":"RuntimeException","file":"/app/Auth.php","line":45}' . "\n");
+        $reader->shouldReceive('readTail')->andReturn('[2026-06-24 12:00:00] local.ERROR: Generic monitored error {"exception":"RuntimeException","file":"/app/Auth.php","line":45}' . "\n");
+        $service = new AdminLogsDashboardService(resolve(MonitoredBugReportService::class), $reader);
+
+        $service->poll('laravel', '', '', '');
+
+        $this->assertSame(1, MonitoredSystemErrorReport::count());
+        $this->assertStringContainsString('Generic monitored error', MonitoredSystemErrorReport::first()->latest_message);
+    }
+
+    public function testGenericMonitoredErrorLogDedupeStillWorksFromMockedReader(): void
+    {
+        MonitoredLogFileState::query()->delete();
+        $reader = Mockery::mock(LogReader::class);
+        $reader->shouldReceive('discoverFiles')->andReturn(['/mock/laravel.log', '/mock/laravel-2026-06-24.log']);
+        $reader->shouldReceive('fileSize')->andReturn(100);
+        $reader->shouldReceive('readFrom')->andReturn('[2026-06-24 12:00:00] local.ERROR: Same generic monitored error {"exception":"RuntimeException","file":"/app/Auth.php","line":45}' . "\n");
+        $reader->shouldReceive('readTail')->andReturn('[2026-06-24 12:00:00] local.ERROR: Same generic monitored error {"exception":"RuntimeException","file":"/app/Auth.php","line":45}' . "\n");
+        $service = new AdminLogsDashboardService(resolve(MonitoredBugReportService::class), $reader);
+
+        $service->poll('laravel', '', '', '');
+
+        $this->assertSame(1, MonitoredSystemErrorReport::count());
+        $this->assertSame(2, MonitoredSystemErrorOccurrence::count());
     }
 }

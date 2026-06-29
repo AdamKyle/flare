@@ -61,7 +61,7 @@ class LocationsController extends Controller
         }
 
         if (! is_null($location->type)) {
-            $locationType = (new LocationType($location->type));
+            $locationType = LocationType::tryFrom($location->type);
         }
 
         if (! is_null($location->questRewardItem)) {

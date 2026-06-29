@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Values\AutomationType;
@@ -14,7 +16,7 @@ use Tests\TestCase;
 
 class KingdomBuildingsControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function testManualCancelRejectsCapitalCityOwnedBuildingQueue(): void
     {
@@ -28,7 +30,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -130,7 +132,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -170,7 +172,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -382,7 +384,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -429,7 +431,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -475,7 +477,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -813,7 +815,7 @@ class KingdomBuildingsControllerTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $owner->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,

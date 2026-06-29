@@ -255,7 +255,7 @@ class DropCheckServiceTest extends TestCase
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.30);
 
-        $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS);
+        $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS->value);
 
         $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
@@ -291,7 +291,7 @@ class DropCheckServiceTest extends TestCase
         $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
         $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.30);
 
-        $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS);
+        $this->createSpecialLocation($character, LocationType::PURGATORY_DUNGEONS->value);
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
@@ -350,6 +350,188 @@ class DropCheckServiceTest extends TestCase
         $afterSlots = $character->refresh()->inventory->slots()->count();
 
         $this->assertEquals($beforeSlots, $afterSlots);
+    }
+
+    public function testSpecialLocationWithQuestItemCanDropManualQuestItem(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->once()
+            ->andReturnFalse();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->andReturnTrue();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => LocationType::SPECIAL->value,
+            'enemy_strength_type' => null,
+            'name' => 'special_manual_quest_location',
+        ]);
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'drop_location_id' => $location->id,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+        ]);
+
+        $this->service?->process($character->refresh(), $monster->refresh());
+
+        $this->assertTrue($character->refresh()->inventory->slots()->where('item_id', $questItem->id)->exists());
+    }
+
+    public function testExistingTypedQuestDropLocationCanStillDropManualQuestItem(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->twice()
+            ->andReturn(false, true);
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => LocationType::GOLD_MINES->value,
+            'enemy_strength_type' => 1,
+            'name' => 'gold_mines_manual_quest_location',
+        ]);
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'drop_location_id' => $location->id,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+            'drop_check' => 1,
+        ]);
+
+        $this->service?->process($character->refresh(), $monster->refresh());
+
+        $this->assertTrue($character->refresh()->inventory->slots()->where('item_id', $questItem->id)->exists());
+    }
+
+    public function testCaveOfMemoriesIsNotHandledByManualSpecialQuestItemPath(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->once()
+            ->andReturnFalse();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->never();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'enemy_strength_type' => null,
+            'name' => 'cave_manual_quest_location',
+        ]);
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'drop_location_id' => $location->id,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+        ]);
+
+        $this->service?->process($character->refresh(), $monster->refresh());
+
+        $this->assertFalse($character->refresh()->inventory->slots()->where('item_id', $questItem->id)->exists());
+    }
+
+    public function testLocationWithTypeButNoQuestItemsDoesNotHandOutQuestItem(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->once()
+            ->andReturnFalse();
+
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->never();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
+
+        $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => LocationType::SPECIAL->value,
+            'enemy_strength_type' => null,
+            'name' => 'special_manual_quest_location_without_items',
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+        ]);
+
+        $beforeSlots = $character->inventory->slots()->count();
+
+        $this->service?->process($character->refresh(), $monster->refresh());
+
+        $this->assertSame($beforeSlots, $character->refresh()->inventory->slots()->count());
+    }
+
+    public function testEnemyStrengthOnlyLocationWithNullTypeDoesNotHandOutQuestItem(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDifficultItemChance')
+            ->once()
+            ->andReturnFalse();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $this->setLootingToBonus($characterFactory->getCharacter(), 0.10);
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => null,
+            'enemy_strength_type' => 1,
+            'name' => 'enemy_strength_only_manual_quest_location',
+        ]);
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'drop_location_id' => $location->id,
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+            'drop_check' => 1,
+        ]);
+
+        $this->service?->process($character->refresh(), $monster->refresh());
+
+        $this->assertFalse($character->refresh()->inventory->slots()->where('item_id', $questItem->id)->exists());
     }
 
 

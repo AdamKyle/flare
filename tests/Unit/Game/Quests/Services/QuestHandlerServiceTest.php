@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Quests\Services;
 
+use Tests\Traits\CreateFactionLoyalty;
+
 use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyNpc;
@@ -34,7 +36,7 @@ use Tests\Traits\CreateEvent;
 
 class QuestHandlerServiceTest extends TestCase
 {
-    use CreateEvent, CreateLocation, CreateMonster, CreateMonsterCache, CreateNpc, CreateQuest, CreateRaid, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateEvent, CreateFactionLoyalty, CreateLocation, CreateMonster, CreateMonsterCache, CreateNpc, CreateQuest, CreateRaid, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testHandInQuestResponseIncludesCompletedQuestInCompletedQuestsList(): void
     {
@@ -211,12 +213,12 @@ class QuestHandlerServiceTest extends TestCase
 
         $faction = $character->factions()->first();
 
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $faction->id,
         ]);
 
-        FactionLoyaltyNpc::factory()->create([
+        $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $assistingNpc->id,
             'current_level' => 5,
@@ -257,12 +259,12 @@ class QuestHandlerServiceTest extends TestCase
 
         $faction = $character->factions()->first();
 
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $faction->id,
         ]);
 
-        FactionLoyaltyNpc::factory()->create([
+        $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $questNpc->id,
             'current_level' => 5,
@@ -303,12 +305,12 @@ class QuestHandlerServiceTest extends TestCase
 
         $faction = $character->factions()->first();
 
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $faction->id,
         ]);
 
-        FactionLoyaltyNpc::factory()->create([
+        $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $assistingNpc->id,
             'current_level' => 3,

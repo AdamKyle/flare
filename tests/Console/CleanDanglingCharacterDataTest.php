@@ -2,6 +2,16 @@
 
 namespace Tests\Console;
 
+use Tests\Traits\CreateUserLoginDuration;
+
+use Tests\Traits\CreateSmeltingProgress;
+
+use Tests\Traits\CreateFactionLoyalty;
+
+use Tests\Traits\CreateExplorationLog;
+
+use Tests\Traits\CreateDelveAutomation;
+
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
@@ -34,15 +44,7 @@ use Tests\Traits\CreateUser;
 
 class CleanDanglingCharacterDataTest extends TestCase
 {
-    use CreateCelestials,
-        CreateGameMap,
-        CreateItem,
-        CreateKingdom,
-        CreateMessage,
-        CreateMonster,
-        CreateSuggestionAndBugs,
-        CreateUser,
-        RefreshDatabase;
+    use CreateCelestials, CreateDelveAutomation, CreateExplorationLog, CreateFactionLoyalty, CreateGameMap, CreateItem, CreateKingdom, CreateMessage, CreateMonster, CreateSmeltingProgress, CreateSuggestionAndBugs, CreateUser, CreateUserLoginDuration, RefreshDatabase;
 
     private const ORPHAN_CHARACTER_ID = 99999;
 
@@ -58,8 +60,8 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_dry_run_does_not_delete_orphaned_character_records(): void
     {
         $this->withoutFkChecks(function () {
-            ExplorationLog::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
-            SmeltingProgress::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createExplorationLog(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createSmeltingProgress(['character_id' => self::ORPHAN_CHARACTER_ID]);
         });
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data'));
@@ -71,7 +73,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_dry_run_does_not_null_suggestion_character_ids(): void
     {
         $this->withoutFkChecks(function () {
-            SuggestionAndBugs::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createSuggestionAndBug(['character_id' => self::ORPHAN_CHARACTER_ID]);
         });
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data'));
@@ -84,7 +86,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_apply_deletes_orphaned_exploration_logs(): void
     {
         $this->withoutFkChecks(function () {
-            ExplorationLog::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createExplorationLog(['character_id' => self::ORPHAN_CHARACTER_ID]);
         });
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
@@ -95,7 +97,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_apply_deletes_orphaned_smelting_progress(): void
     {
         $this->withoutFkChecks(function () {
-            SmeltingProgress::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createSmeltingProgress(['character_id' => self::ORPHAN_CHARACTER_ID]);
         });
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
@@ -137,7 +139,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_apply_deletes_orphaned_delve_explorations(): void
     {
         $this->withoutFkChecks(function () {
-            DelveExploration::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createDelveAutomation(['character_id' => self::ORPHAN_CHARACTER_ID]);
         });
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
@@ -148,7 +150,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_apply_nulls_suggestion_character_ids_for_missing_characters(): void
     {
         $this->withoutFkChecks(function () {
-            SuggestionAndBugs::factory()->create(['character_id' => self::ORPHAN_CHARACTER_ID]);
+            $this->createSuggestionAndBug(['character_id' => self::ORPHAN_CHARACTER_ID]);
         });
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
@@ -161,7 +163,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_apply_deletes_orphaned_user_login_durations(): void
     {
         $this->withoutFkChecks(function () {
-            UserLoginDuration::factory()->create([
+            $this->createUserLoginDuration([
                 'user_id' => self::ORPHAN_USER_ID,
                 'logged_in_at' => now(),
                 'last_heart_beat' => now(),
@@ -178,7 +180,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        ExplorationLog::factory()->create(['character_id' => $character->id]);
+        $this->createExplorationLog(['character_id' => $character->id]);
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
 
@@ -197,7 +199,7 @@ class CleanDanglingCharacterDataTest extends TestCase
 
     public function test_suggestion_records_are_never_deleted(): void
     {
-        $suggestion = SuggestionAndBugs::factory()->create(['character_id' => null]);
+        $suggestion = $this->createSuggestionAndBug(['character_id' => null]);
 
         $this->assertEquals(0, $this->artisan('cleanup:dangling-character-data', ['--apply' => true]));
 
@@ -263,7 +265,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_dry_run_does_not_delete_login_duration_for_user_without_character(): void
     {
         $user = $this->createUser();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $user->id,
             'logged_in_at' => now(),
             'last_heart_beat' => now(),
@@ -278,7 +280,7 @@ class CleanDanglingCharacterDataTest extends TestCase
     public function test_apply_deletes_login_duration_for_user_without_character(): void
     {
         $user = $this->createUser();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $user->id,
             'logged_in_at' => now(),
             'last_heart_beat' => now(),
@@ -372,7 +374,7 @@ class CleanDanglingCharacterDataTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $factionId,
         ]);
@@ -386,13 +388,13 @@ class CleanDanglingCharacterDataTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $factionLoyaltyNpc = FactionLoyaltyNpc::factory()->create([
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $npcId,
         ]);
 
         $this->withoutFkChecks(function () use ($factionLoyaltyNpc) {
-            FactionLoyaltyNpcTask::factory()->create([
+            $this->createFactionLoyaltyNpcTask([
                 'faction_loyalty_id' => self::ORPHAN_CHARACTER_ID,
                 'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
             ]);
@@ -412,13 +414,13 @@ class CleanDanglingCharacterDataTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $factionId,
         ]);
 
         $this->withoutFkChecks(function () use ($factionLoyalty) {
-            FactionLoyaltyNpcTask::factory()->create([
+            $this->createFactionLoyaltyNpcTask([
                 'faction_loyalty_id' => $factionLoyalty->id,
                 'faction_loyalty_npc_id' => self::ORPHAN_CHARACTER_ID,
             ]);

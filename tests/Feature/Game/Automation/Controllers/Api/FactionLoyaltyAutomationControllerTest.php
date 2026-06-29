@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Game\Automation\Controllers\Api;
 
+use Tests\Traits\CreateGameMap;
+
+use Tests\Traits\CreateFactionLoyaltyAutomation;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
@@ -20,7 +24,7 @@ use Tests\TestCase;
 
 class FactionLoyaltyAutomationControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateFactionLoyaltyAutomation, CreateGameMap, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -235,7 +239,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => 'Other Map',
             'path' => 'other-map',
             'default' => false,
@@ -328,12 +332,12 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
             'completed_at' => now()->addHour(),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
-        $factionLoyaltyAutomation = FactionLoyaltyAutomation::factory()->create([
+        $factionLoyaltyAutomation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,
             'character_id' => $this->character->id,
             'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
         ]);
-        $factionLoyaltyAutomationLog = FactionLoyaltyAutomationLog::factory()->create([
+        $factionLoyaltyAutomationLog = $this->createFactionLoyaltyAutomationLog([
             'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
             'fight_logs' => [
                 [

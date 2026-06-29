@@ -4,6 +4,7 @@ namespace App\Game\Automation\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Location;
 use App\Flare\Values\AutomationType;
 
@@ -45,6 +46,8 @@ class AutomationRestrictionService
 
     public const REGULAR_QUESTS = 'regular_quests';
 
+    public const INVENTORY_MANAGEMENT = 'inventory_management';
+
     public function activeAutomation(Character $character): ?CharacterAutomation
     {
         return $character->currentAutomations()
@@ -61,6 +64,16 @@ class AutomationRestrictionService
 
     public function blockedContext(Character $character, string $action, ?Location $destinationLocation = null): ?array
     {
+        $batchCrafting = $this->activeBatchCrafting($character);
+
+        if (! is_null($batchCrafting) && $this->batchCraftingBlocksAction($action)) {
+            return [
+                'automation' => $batchCrafting,
+                'automation_name' => 'Batch Crafting',
+                'message' => 'You cannot do that while Batch Crafting is running. Cancel it first.',
+            ];
+        }
+
         $automation = $this->activeAutomation($character);
 
         if (is_null($automation)) {
@@ -143,6 +156,29 @@ class AutomationRestrictionService
         }
 
         return $this->explorationBlocksAction($automation, $action, $destinationLocation);
+    }
+
+    private function activeBatchCrafting(Character $character): ?BatchCrafting
+    {
+        return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function batchCraftingBlocksAction(string $action): bool
+    {
+        return in_array($action, [
+            self::START_FACTION_LOYALTY,
+            self::START_ITEM_CRAFTING,
+            self::KINGDOM_MANAGEMENT,
+            self::PLAYER_SKILLS,
+            self::CLASS_RANKS,
+            self::REGULAR_QUESTS,
+            self::INVENTORY_MANAGEMENT,
+        ]);
     }
 
     private function explorationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool

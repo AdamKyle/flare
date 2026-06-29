@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
+use Tests\Traits\CreateGameUnit;
+
+use Tests\Traits\CreateGameBuildingUnit;
+
 use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
@@ -14,7 +18,7 @@ use Tests\TestCase;
 
 class KingdomUnitControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuildingUnit, CreateGameUnit, RefreshDatabase;
 
     public function testManualRecruitRejectsCapitalCityQueuedUnit(): void
     {
@@ -33,7 +37,7 @@ class KingdomUnitControllerTest extends TestCase
         ]);
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
@@ -78,8 +82,8 @@ class KingdomUnitControllerTest extends TestCase
         ])->assignBuilding()->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        GameBuildingUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $this->createGameBuildingUnit([
             'game_building_id' => $building->game_building_id,
             'game_unit_id' => $unit->id,
             'required_level' => 1,
@@ -113,13 +117,13 @@ class KingdomUnitControllerTest extends TestCase
         ])->assignBuilding()->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $kingdom->buildings()->first();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        GameBuildingUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $this->createGameBuildingUnit([
             'game_building_id' => $building->game_building_id,
             'game_unit_id' => $unit->id,
             'required_level' => 1,
         ]);
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,

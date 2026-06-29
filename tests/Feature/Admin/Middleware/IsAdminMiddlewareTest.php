@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Admin\Middleware;
 
+use Tests\Traits\CreateUser;
+
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Flare\Models\Role;
 use App\Flare\Models\User;
@@ -11,7 +13,7 @@ use Tests\TestCase;
 
 class IsAdminMiddlewareTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateUser, RefreshDatabase;
 
     public function testUnauthenticatedJsonRequestReturns401(): void
     {
@@ -24,7 +26,7 @@ class IsAdminMiddlewareTest extends TestCase
 
     public function testAuthenticatedNonAdminJsonRequestReturns403(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createUser();
         $request = Request::create('/test', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $request->setUserResolver(fn () => $user);
 
@@ -36,7 +38,7 @@ class IsAdminMiddlewareTest extends TestCase
     public function testAuthenticatedAdminRequestPassesThrough(): void
     {
         $role = Role::firstOrCreate(['name' => 'Admin']);
-        $user = User::factory()->create();
+        $user = $this->createUser();
         $user->assignRole($role->name);
         $request = Request::create('/test', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $request->setUserResolver(fn () => $user);

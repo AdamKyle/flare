@@ -101,6 +101,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapCharacterSheetRoutes();
         $this->mapCharacterInventoryRoutes();
         $this->mapAutomationApiRoutes();
+        $this->mapBatchCraftingApiRoutes();
         $this->mapGameCoreApiRoutes();
         $this->mapGameMarketApiRoutes();
         $this->mapGameMessageApiRoutes();
@@ -177,6 +178,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Automation\Controllers')
             ->group(base_path('routes/game/automation/api.php'));
+    }
+
+    protected function mapBatchCraftingApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\BatchCrafting\Controllers')
+            ->group(base_path('routes/game/batch-crafting/api.php'));
     }
 
     protected function mapGameKingdomApiRoutes()

@@ -8,6 +8,7 @@ import QueenOfHearts from "../../npc-actions/queen-of-hearts/queen-of-hearts";
 import GemCrafting from "../gem-crafting/gem-crafting";
 import SeerCamp from "../../npc-actions/seer-camp/seer-camp";
 import LabyrinthOracle from "../../npc-actions/labyrinth-oracle/labyrinth-oracle";
+import BatchCraftingSection from "../batch-crafting/batch-crafting-section";
 
 export default class CraftingSection extends React.Component<any, any> {
     constructor(props: any) {
@@ -25,6 +26,14 @@ export default class CraftingSection extends React.Component<any, any> {
                         cannot_craft={this.props.cannot_craft}
                         fame_tasks={this.props.fame_tasks}
                         user_id={this.props.user_id}
+                    />
+                );
+            case "batch-crafting":
+                return (
+                    <BatchCraftingSection
+                        character_id={this.props.character_id}
+                        user_id={this.props.user_id}
+                        remove_crafting={this.props.remove_crafting}
                     />
                 );
             case "enchant":
@@ -77,6 +86,7 @@ export default class CraftingSection extends React.Component<any, any> {
                         cannot_craft={this.props.cannot_craft}
                     />
                 );
+
             case "seer-camp":
                 return (
                     <SeerCamp

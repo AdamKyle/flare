@@ -20,6 +20,7 @@ import Ajax from "../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import DelveStatusPanel from "./components/delve-status-panel";
+import BatchCraftingStatusPanel from "./components/batch-crafting-status-panel";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -529,14 +530,18 @@ export default class SmallerActions extends React.Component<
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                {this.isDelveRunning() ? (
-                    <div className="mt-3">
-                        <DelveStatusPanel
-                            character_id={this.props.character.id}
-                            user_id={this.props.character.user_id}
-                        />
-                    </div>
-                ) : null}
+                <div className="mt-3">
+                    <DelveStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+                </div>
+                <div className="mt-3">
+                    <BatchCraftingStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+                </div>
             </Fragment>
         );
     }

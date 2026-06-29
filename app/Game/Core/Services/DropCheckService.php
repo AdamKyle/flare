@@ -21,9 +21,15 @@ class DropCheckService
 
     private ?Location $locationWithEffect = null;
 
+    private ?Location $manualQuestItemLocation = null;
+
     private ?string $cachedLocationWithEffectKey = null;
 
     private ?Location $cachedLocationWithEffect = null;
+
+    private ?string $cachedManualQuestItemLocationKey = null;
+
+    private ?Location $cachedManualQuestItemLocation = null;
 
     private BuildMythicItem $buildMythicItem;
 
@@ -57,9 +63,11 @@ class DropCheckService
         }
 
         $this->findLocationWithEffect($characterMap);
+        $this->findManualQuestItemLocation($characterMap);
 
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
             ->setSpecialLocation($this->locationWithEffect)
+            ->setManualQuestItemLocation($this->manualQuestItemLocation)
             ->setGameMapBonus($this->gameMapBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
@@ -78,7 +86,7 @@ class DropCheckService
             return $this->battleDrop->rewardTotals();
         }
 
-        $locationType = new LocationType($this->locationWithEffect->type);
+        $locationType = LocationType::from($this->locationWithEffect->type);
 
         if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
             $this->handleMythicDrop($character);
@@ -101,9 +109,11 @@ class DropCheckService
         }
 
         $this->findLocationWithEffect($characterMap);
+        $this->findManualQuestItemLocation($characterMap);
 
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
             ->setSpecialLocation($this->locationWithEffect)
+            ->setManualQuestItemLocation($this->manualQuestItemLocation)
             ->setGameMapBonus($this->gameMapBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
@@ -141,7 +151,7 @@ class DropCheckService
                 ];
             }
 
-            if (! is_null($this->locationWithEffect)) {
+            if (! is_null($this->manualQuestItemLocation)) {
                 $specialLocationQuestDrop = $this->battleDrop->planSpecialLocationQuestItem($character);
 
                 if (! is_null($specialLocationQuestDrop)) {
@@ -163,7 +173,7 @@ class DropCheckService
         }
 
         if (! is_null($this->locationWithEffect) && ! is_null($this->locationWithEffect->type)) {
-            $locationType = new LocationType($this->locationWithEffect->type);
+            $locationType = LocationType::from($this->locationWithEffect->type);
 
             if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty() && $this->canHaveMythic()) {
                 $plannedDrops[] = [
@@ -235,7 +245,7 @@ class DropCheckService
 
         $this->battleDrop->handleDelveLocationQuestItems($character);
 
-        if (! is_null($this->locationWithEffect)) {
+        if (! is_null($this->manualQuestItemLocation)) {
             $this->battleDrop->handleSpecialLocationQuestItem($character);
         }
     }
@@ -261,6 +271,28 @@ class DropCheckService
 
         $this->cachedLocationWithEffectKey = $cacheKey;
         $this->cachedLocationWithEffect = $this->locationWithEffect;
+    }
+
+    private function findManualQuestItemLocation(Map $map): void
+    {
+        $cacheKey = $this->makeLocationWithEffectCacheKey($map);
+
+        if ($this->cachedManualQuestItemLocationKey === $cacheKey) {
+            $this->manualQuestItemLocation = $this->cachedManualQuestItemLocation;
+
+            return;
+        }
+
+        $this->manualQuestItemLocation = Location::whereNotNull('type')
+            ->whereIn('type', LocationType::manualQuestDropValues())
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->dropsQuestItems()
+            ->first();
+
+        $this->cachedManualQuestItemLocationKey = $cacheKey;
+        $this->cachedManualQuestItemLocation = $this->manualQuestItemLocation;
     }
 
     /**

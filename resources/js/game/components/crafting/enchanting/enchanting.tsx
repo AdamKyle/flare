@@ -407,7 +407,7 @@ export default class Enchanting extends React.Component<
                 <div className="mt-2">
                     {this.state.show_enchanting_for_event &&
                     this.state.event_items.length > 0 ? (
-                        <div>
+                        <div className="mb-2">
                             <Select
                                 onChange={this.setTypeOfEnchanting.bind(this)}
                                 options={this.renderEnchantmentTypes()}

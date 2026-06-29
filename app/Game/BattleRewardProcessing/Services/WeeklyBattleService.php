@@ -14,10 +14,10 @@ class WeeklyBattleService
     private LocationSpecialtyHandler $locationSpecialtyHandler;
 
     private array $validLocationTypes = [
-        LocationType::ALCHEMY_CHURCH,
-        LocationType::LORDS_STRONG_HOLD,
-        LocationType::BROKEN_ANVIL,
-        LocationType::TWSITED_MAIDENS_DUNGEONS
+        LocationType::ALCHEMY_CHURCH->value,
+        LocationType::LORDS_STRONG_HOLD->value,
+        LocationType::BROKEN_ANVIL->value,
+        LocationType::TWISTED_MAIDENS_DUNGEONS->value
     ];
 
     public function __construct(LocationSpecialtyHandler $locationSpecialtyHandler)
@@ -105,7 +105,7 @@ class WeeklyBattleService
     private function handleReward(Character $character, Monster $monster, WeeklyMonsterFight $weeklyMonsterFight): Character
     {
 
-        $locationType = new LocationType($monster->only_for_location_type);
+        $locationType = LocationType::from($monster->only_for_location_type);
 
         if ($locationType->isAlchemyChurch() || $locationType->isCaveOfMemories()) {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);

@@ -18,8 +18,10 @@ export default class DropDown extends React.Component<DropDownProps, any> {
 
     renderMenuItems() {
         return this.props.menu_items.map((menuItem) => {
+            const disabled = this.props.disabled || menuItem.disabled === true;
+
             return (
-                <Menu.Item key={menuItem.name} disabled={this.props.disabled}>
+                <Menu.Item key={menuItem.name} disabled={disabled}>
                     {({ active }) => (
                         <button
                             className={clsx(
@@ -54,9 +56,17 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                                         "icon_class",
                                     ),
                                 },
+                                {
+                                    "cursor-not-allowed opacity-50": disabled,
+                                },
                             )}
-                            onClick={() => menuItem.on_click(menuItem.name)}
-                            disabled={this.props.disabled}
+                            onClick={() => {
+                                if (!disabled) {
+                                    menuItem.on_click(menuItem.name);
+                                }
+                            }}
+                            disabled={disabled}
+                            aria-disabled={disabled}
                         >
                             {typeof menuItem.icon_class !== "undefined" ? (
                                 <i

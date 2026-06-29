@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Automation\Middleware;
 
+use Tests\Traits\CreateCharacterAutomation;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AutomationType;
@@ -15,6 +17,9 @@ use Tests\TestCase;
 
 class IsCharacterExploringTest extends TestCase
 {
+    use CreateCharacterAutomation {
+        createCharacterAutomation as createCharacterAutomationRecord;
+    }
     use RefreshDatabase;
 
     private Character $character;
@@ -138,7 +143,7 @@ class IsCharacterExploringTest extends TestCase
 
     private function createCharacterAutomation(): CharacterAutomation
     {
-        return CharacterAutomation::factory()->create([
+        return $this->createCharacterAutomationRecord([
             'character_id' => $this->character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),

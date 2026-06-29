@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
+use Tests\Traits\CreateInventorySlot;
+
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
@@ -30,7 +32,7 @@ use Tests\Traits\CreateUser;
 
 class FactionHandlerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, CreateNpc, CreateQuest, CreateGuideQuest, CreateSkill, CreateUser, RefreshDatabase;
+    use CreateGameMap, CreateGuideQuest, CreateInventorySlot, CreateItem, CreateItemAffix, CreateLocation, CreateMonster, CreateNpc, CreateQuest, CreateSkill, CreateUser, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -219,7 +221,7 @@ class FactionHandlerTest extends TestCase
             'affix_type' => 7,
         ]);
 
-        Item::factory()->create([
+        $this->createItem([
             'cost' => RandomAffixDetails::LEGENDARY,
             'type' => 'weapon',
             'item_prefix_id' => null,
@@ -267,7 +269,7 @@ class FactionHandlerTest extends TestCase
             'affix_type' => 7,
         ]);
 
-        Item::factory()->create([
+        $this->createItem([
             'cost' => RandomAffixDetails::LEGENDARY,
             'type' => 'weapon',
             'item_prefix_id' => null,
@@ -343,7 +345,7 @@ class FactionHandlerTest extends TestCase
             'affix_type' => 7,
         ]);
 
-        Item::factory()->create([
+        $this->createItem([
             'cost' => RandomAffixDetails::LEGENDARY,
             'type' => 'weapon',
             'item_prefix_id' => null,
@@ -429,13 +431,13 @@ class FactionHandlerTest extends TestCase
             'guide_enabled' => true,
         ]);
 
-        $questItem = Item::factory()->create([
+        $questItem = $this->createItem([
             'effect' => ItemEffectsValue::FACTION_POINTS,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($questItem)->getCharacter();
 
-        GuideQuest::factory()->create([
+        $this->createGuideQuest([
             'unlock_at_level' => 1,
             'only_during_event' => null,
             'parent_id' => null,
@@ -448,7 +450,7 @@ class FactionHandlerTest extends TestCase
 
         $this->assertSame($basePoints + 50 + 12, $points);
 
-        GuideQuest::factory()->create([
+        $this->createGuideQuest([
             'unlock_at_level' => 1,
             'only_during_event' => null,
             'parent_id' => null,
@@ -473,11 +475,11 @@ class FactionHandlerTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $questItem = Item::factory()->create([
+        $questItem = $this->createItem([
             'effect' => ItemEffectsValue::FACTION_POINTS,
         ]);
 
-        InventorySlot::factory()->create([
+        $this->createInventorySlot([
             'inventory_id' => $character->inventory->id,
             'item_id' => $questItem->id,
         ]);
@@ -575,7 +577,7 @@ class FactionHandlerTest extends TestCase
             'guide_enabled' => true,
         ]);
 
-        GuideQuest::factory()->create([
+        $this->createGuideQuest([
             'unlock_at_level' => 1,
             'only_during_event' => null,
             'parent_id' => null,
@@ -616,7 +618,7 @@ class FactionHandlerTest extends TestCase
             'affix_type' => 7,
         ]);
 
-        $baseItem = Item::factory()->create([
+        $baseItem = $this->createItem([
             'cost' => RandomAffixDetails::LEGENDARY,
             'type' => 'weapon',
             'item_prefix_id' => null,
@@ -701,7 +703,7 @@ class FactionHandlerTest extends TestCase
 
         $gameMap = GameMap::find($character->map->game_map_id);
 
-        $questItem = Item::factory()->create([
+        $questItem = $this->createItem([
             'effect' => ItemEffectsValue::FACTION_POINTS,
         ]);
 
@@ -717,7 +719,7 @@ class FactionHandlerTest extends TestCase
             'affix_type' => 7,
         ]);
 
-        Item::factory()->create([
+        $this->createItem([
             'cost' => RandomAffixDetails::LEGENDARY,
             'type' => 'weapon',
             'item_prefix_id' => null,
@@ -732,7 +734,7 @@ class FactionHandlerTest extends TestCase
         $character->inventory->slots()->delete();
 
         for ($slotIndex = 1; $slotIndex <= 74; $slotIndex++) {
-            $item = Item::factory()->create([
+            $item = $this->createItem([
                 'type' => 'weapon',
                 'cost' => 1,
             ]);
@@ -818,7 +820,7 @@ class FactionHandlerTest extends TestCase
 
         $gameMap = GameMap::find($character->map->game_map_id);
 
-        $questItem = Item::factory()->create([
+        $questItem = $this->createItem([
             'effect' => ItemEffectsValue::FACTION_POINTS,
         ]);
 
@@ -1039,7 +1041,7 @@ class FactionHandlerTest extends TestCase
             'guide_enabled' => false,
         ]);
 
-        $questItem = Item::factory()->create([
+        $questItem = $this->createItem([
             'effect' => ItemEffectsValue::FACTION_POINTS,
         ]);
 
@@ -1237,7 +1239,7 @@ class FactionHandlerTest extends TestCase
             'guide_enabled' => false,
         ]);
 
-        $questItem = Item::factory()->create([
+        $questItem = $this->createItem([
             'effect' => ItemEffectsValue::FACTION_POINTS,
         ]);
 

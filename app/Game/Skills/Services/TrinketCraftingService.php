@@ -44,7 +44,7 @@ class TrinketCraftingService
         $items = Item::where('type', 'trinket')
             ->where('skill_level_required', '<=', $trinkentrySkill->level)
             ->orderBy('skill_level_required', 'asc')
-            ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
+            ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost', 'skill_level_required')
             ->get();
 
         return $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage)->toArray();

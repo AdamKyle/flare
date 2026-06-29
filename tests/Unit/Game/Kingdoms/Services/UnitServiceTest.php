@@ -2,6 +2,10 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Tests\Traits\CreateKingdom;
+
+use Tests\Traits\CreateGameUnit;
+
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitInQueue;
@@ -14,14 +18,14 @@ use Tests\TestCase;
 
 class UnitServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameUnit, CreateKingdom, RefreshDatabase;
 
     public function testExactUnitMaximumCanBeQueued(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
-        $unit = GameUnit::factory()->create();
-        KingdomUnit::factory()->create([
+        $unit = $this->createGameUnit();
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 10,
@@ -41,7 +45,7 @@ class UnitServiceTest extends TestCase
             'current_steel' => 0,
             'current_population' => 1,
         ])->getKingdom();
-        $unit = GameUnit::factory()->create([
+        $unit = $this->createGameUnit([
             'wood_cost' => 10,
             'clay_cost' => 10,
             'stone_cost' => 10,
@@ -67,7 +71,7 @@ class UnitServiceTest extends TestCase
             'current_steel' => 0,
             'current_population' => 1,
         ])->getKingdom();
-        $unit = GameUnit::factory()->create([
+        $unit = $this->createGameUnit([
             'wood_cost' => 10,
             'clay_cost' => 10,
             'stone_cost' => 10,
@@ -88,13 +92,13 @@ class UnitServiceTest extends TestCase
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create();
-        KingdomUnit::factory()->create([
+        $unit = $this->createGameUnit();
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 15,
         ]);
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
@@ -126,9 +130,9 @@ class UnitServiceTest extends TestCase
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create();
+        $unit = $this->createGameUnit();
 
-        KingdomUnit::factory()->create([
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 1,

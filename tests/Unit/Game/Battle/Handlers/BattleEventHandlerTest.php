@@ -2,19 +2,25 @@
 
 namespace Tests\Unit\Game\Battle\Handlers;
 
+use App\Flare\Models\BatchCrafting;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
+use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
 
 class BattleEventHandlerTest extends TestCase
 {
-    use MockeryPHPUnitIntegration;
+    use CreateBatchCrafting, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testBattleRewardUsesSecondPriorityAndPreservesPayload(): void
     {
@@ -37,7 +43,7 @@ class BattleEventHandlerTest extends TestCase
             )
             ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
 
-        (new BattleEventHandler($queueManager, Mockery::mock(WeeklyBattleService::class)))
+        (new BattleEventHandler($queueManager, Mockery::mock(WeeklyBattleService::class), Mockery::mock(BatchCraftingService::class)))
             ->processMonsterDeath(10, 20, ['attack_type' => 'attack']);
     }
 
@@ -62,8 +68,18 @@ class BattleEventHandlerTest extends TestCase
             )
             ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
 
-        (new BattleEventHandler($queueManager, Mockery::mock(WeeklyBattleService::class)))
+        (new BattleEventHandler($queueManager, Mockery::mock(WeeklyBattleService::class), Mockery::mock(BatchCraftingService::class)))
             ->processMonsterDeath(10, 20, ['exploration_log_id' => 30]);
+    }
+
+    public function testProcessDeadCharacterEndsBatchCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id]);
+
+        resolve(BattleEventHandler::class)->processDeadCharacter($character);
+
+        $this->assertSame(BatchCraftingEndReason::DIED->value, BatchCrafting::where('character_id', $character->id)->first()->ended_reason);
     }
 
 }

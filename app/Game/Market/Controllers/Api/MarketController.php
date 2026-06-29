@@ -7,6 +7,8 @@ use App\Flare\Models\MarketBoard;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
@@ -18,7 +20,7 @@ use League\Fractal\Resource\Collection;
 
 class MarketController extends Controller
 {
-    use IsItemUnique, UpdateMarketBoard;
+    use IsItemUnique, UpdateMarketBoard, ChecksAutomationRestrictions;
 
     private $manager;
 
@@ -51,6 +53,12 @@ class MarketController extends Controller
 
     public function sellItem(ListPriceRequest $request, Character $character)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if ($request->list_for < 1) {
             return response()->json(['message' => 'Listing price must be at least 1 Gold.'], 422);
         }

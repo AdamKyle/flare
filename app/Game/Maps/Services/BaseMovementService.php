@@ -101,7 +101,7 @@ class BaseMovementService
      */
     protected function traversePlayer(Location $location, Character $character): bool
     {
-        if ($location->type === LocationType::TWISTED_GATE) {
+        if ($location->type === LocationType::TWISTED_GATE->value) {
             $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
 
             if (is_null($gameMap)) {
@@ -206,9 +206,9 @@ class BaseMovementService
         if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
 
             if (! is_null($location->type)) {
-                $locationType = new LocationType($location->type);
+                $locationType = LocationType::tryFrom($location->type);
 
-                if ($locationType->isGoldMines() || $locationType->isPurgatoryDungeons()) {
+                if (! is_null($locationType) && ($locationType->isGoldMines() || $locationType->isPurgatoryDungeons())) {
                     return true;
                 }
             }

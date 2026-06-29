@@ -758,6 +758,7 @@ class BattleDropTest extends TestCase
 
         $battleDrop = $this->buildBattleDrop($this->createMonster(['game_map_id' => $gameMap->id]))
             ->setSpecialLocation($location)
+            ->setManualQuestItemLocation($location)
             ->setLootingChance(1.0);
 
         $battleDrop->handleSpecialLocationQuestItem($character);
@@ -779,6 +780,7 @@ class BattleDropTest extends TestCase
 
         $battleDrop = $this->buildBattleDrop($this->createMonster(['game_map_id' => $gameMap->id]))
             ->setSpecialLocation($location)
+            ->setManualQuestItemLocation($location)
             ->setLootingChance(1.0);
 
         $battleDrop->handleSpecialLocationQuestItem($character);
@@ -816,6 +818,7 @@ class BattleDropTest extends TestCase
 
         $battleDrop = $this->buildBattleDrop($this->createMonster(['game_map_id' => $gameMap->id]))
             ->setSpecialLocation($location)
+            ->setManualQuestItemLocation($location)
             ->setLootingChance(0.10);
 
         $battleDrop->handleSpecialLocationQuestItem($character);
@@ -944,6 +947,7 @@ class BattleDropTest extends TestCase
 
         $battleDrop = $this->buildBattleDrop($this->createMonster(['game_map_id' => $gameMap->id]))
             ->setSpecialLocation($location)
+            ->setManualQuestItemLocation($location)
             ->setLootingChance(1.0);
 
         $battleDrop->handleSpecialLocationQuestItem($character);
@@ -987,6 +991,7 @@ class BattleDropTest extends TestCase
 
         $battleDrop = $this->buildBattleDrop($this->createMonster(['game_map_id' => $gameMap->id]))
             ->setSpecialLocation($location)
+            ->setManualQuestItemLocation($location)
             ->setLootingChance(1.0);
 
         $battleDrop->handleSpecialLocationQuestItem($character);

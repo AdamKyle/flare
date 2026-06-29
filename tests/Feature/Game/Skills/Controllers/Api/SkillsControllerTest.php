@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
+use Tests\Traits\CreateCharacterAutomation;
+
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -12,7 +14,7 @@ use Tests\Traits\CreateGameSkill;
 
 class SkillsControllerTest extends TestCase
 {
-    use CreateGameSkill, CreateGameSkill, RefreshDatabase;
+    use CreateCharacterAutomation, CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -59,7 +61,7 @@ class SkillsControllerTest extends TestCase
     public function testExplorationAllowsSkillList(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -73,7 +75,7 @@ class SkillsControllerTest extends TestCase
     public function testDelveAllowsSkillList(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -87,7 +89,7 @@ class SkillsControllerTest extends TestCase
     public function testFactionLoyaltyAllowsSkillList(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
@@ -107,7 +109,7 @@ class SkillsControllerTest extends TestCase
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -203,7 +205,7 @@ class SkillsControllerTest extends TestCase
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -287,7 +289,7 @@ class SkillsControllerTest extends TestCase
 
         $character = $this->character->assignSkill($trainingSkill)->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),

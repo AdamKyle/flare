@@ -2,6 +2,12 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
+use Tests\Traits\CreateGameUnit;
+
+use Tests\Traits\CreateGameBuildingUnit;
+
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -28,7 +34,7 @@ use Tests\TestCase;
 
 class CapitalCityManagementControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameBuildingUnit, CreateGameUnit, RefreshDatabase;
 
     public function testDirectApiCannotQueueMaxLevelBuilding(): void
     {
@@ -134,7 +140,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'building_id' => $building->id,
@@ -551,9 +557,9 @@ class CapitalCityManagementControllerTest extends TestCase
             ])
             ->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create();
-        $gameBuilding = GameBuilding::factory()->create();
-        GameBuildingUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $gameBuilding = $this->createGameBuilding();
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,
@@ -615,9 +621,9 @@ class CapitalCityManagementControllerTest extends TestCase
             ])
             ->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create();
-        $gameBuilding = GameBuilding::factory()->create();
-        GameBuildingUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $gameBuilding = $this->createGameBuilding();
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,

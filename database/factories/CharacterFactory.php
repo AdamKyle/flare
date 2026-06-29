@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameClass;
+use App\Flare\Models\GameRace;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CharacterFactory extends Factory
@@ -25,8 +27,8 @@ class CharacterFactory extends Factory
             'user_id' => 1,
             'name' => 'fake',
             'damage_stat' => 'dex',
-            'game_race_id' => 1,
-            'game_class_id' => 1,
+            'game_race_id' => GameRace::factory(),
+            'game_class_id' => GameClass::factory(),
             'xp' => 1,
             'xp_next' => 100,
             'str' => 1,

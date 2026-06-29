@@ -141,7 +141,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         }
 
         $location = Location::where('game_map_id', $characterMap->game_map_id)->where('x', $characterMap->character_position_x)->where('y', $characterMap->character_position_y)
-            ->where('type', LocationType::CAVE_OF_MEMORIES)->first();
+            ->where('type', LocationType::CAVE_OF_MEMORIES->value)->first();
 
         $characterHasItem = $character->inventory->slots->filter(function($slot) use ($questItemForDelve) {
             return $slot->item_id === $questItemForDelve->id;

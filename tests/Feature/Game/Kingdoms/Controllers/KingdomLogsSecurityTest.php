@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers;
 
+use Tests\Traits\CreateKingdom;
+
 use App\Flare\Models\KingdomLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -9,12 +11,12 @@ use Tests\TestCase;
 
 class KingdomLogsSecurityTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateKingdom, RefreshDatabase;
 
     public function testOwnerCanDeleteOwnKingdomLog(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $log = KingdomLog::factory()->create([
+        $log = $this->createKingdomLog([
             'character_id' => $character->id,
             'status' => 1,
             'opened' => false,
@@ -34,7 +36,7 @@ class KingdomLogsSecurityTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $log = KingdomLog::factory()->create([
+        $log = $this->createKingdomLog([
             'character_id' => $otherCharacter->id,
             'status' => 1,
             'opened' => false,
@@ -54,13 +56,13 @@ class KingdomLogsSecurityTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $ownedLog = KingdomLog::factory()->create([
+        $ownedLog = $this->createKingdomLog([
             'character_id' => $character->id,
             'status' => 1,
             'opened' => false,
             'published' => true,
         ]);
-        $otherLog = KingdomLog::factory()->create([
+        $otherLog = $this->createKingdomLog([
             'character_id' => $otherCharacter->id,
             'status' => 1,
             'opened' => false,

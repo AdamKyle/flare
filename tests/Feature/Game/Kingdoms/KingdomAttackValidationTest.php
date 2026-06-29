@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Game\Kingdoms;
 
+use Tests\Traits\CreateKingdom;
+
+use Tests\Traits\CreateGameUnit;
+
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Requests\AttackRequest;
@@ -16,7 +20,7 @@ use Tests\TestCase;
 
 class KingdomAttackValidationTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameUnit, CreateKingdom, RefreshDatabase;
 
     public function test_negative_attack_unit_amount_is_rejected(): void
     {
@@ -67,8 +71,8 @@ class KingdomAttackValidationTest extends TestCase
         })->update(['skill_type' => SkillTypeValue::EFFECTS_KINGDOM->value]);
         $defenderFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $targetKingdom = $defenderFactory->kingdomManagement()->assignKingdom(['game_map_id' => $sourceKingdom->game_map_id, 'protected_until' => null])->getKingdom();
-        $gameUnit = GameUnit::factory()->create();
-        $kingdomUnit = KingdomUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $kingdomUnit = $this->createKingdomUnit([
             'kingdom_id' => $sourceKingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount' => 10,
@@ -104,8 +108,8 @@ class KingdomAttackValidationTest extends TestCase
             'y_position' => 32,
             'protected_until' => null,
         ])->getKingdom();
-        $gameUnit = GameUnit::factory()->create();
-        $kingdomUnit = KingdomUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $kingdomUnit = $this->createKingdomUnit([
             'kingdom_id' => $sourceKingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount' => 10,

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Game\Kingdoms\Service\KingdomBuildingService;
 use App\Game\Kingdoms\Values\BuildingQueueType;
@@ -12,7 +14,7 @@ use Tests\TestCase;
 
 class KingdomBuildingServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -129,7 +131,7 @@ class KingdomBuildingServiceTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -185,7 +187,7 @@ class KingdomBuildingServiceTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -241,7 +243,7 @@ class KingdomBuildingServiceTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -297,7 +299,7 @@ class KingdomBuildingServiceTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -355,7 +357,7 @@ class KingdomBuildingServiceTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,

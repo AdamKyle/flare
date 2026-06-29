@@ -12,10 +12,10 @@ use Rappasoft\LaravelLivewireTables\Views\Column;
 class WeeklyFightLocations extends DataTableComponent
 {
     private array $weeklyFightLocations = [
-        LocationType::LORDS_STRONG_HOLD,
-        LocationType::BROKEN_ANVIL,
-        LocationType::TWSITED_MAIDENS_DUNGEONS,
-        LocationType::ALCHEMY_CHURCH,
+        LocationType::LORDS_STRONG_HOLD->value,
+        LocationType::BROKEN_ANVIL->value,
+        LocationType::TWISTED_MAIDENS_DUNGEONS->value,
+        LocationType::ALCHEMY_CHURCH->value,
     ];
 
     public function configure(): void

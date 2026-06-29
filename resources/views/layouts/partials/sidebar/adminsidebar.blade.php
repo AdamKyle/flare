@@ -52,6 +52,10 @@
                 <span class="fas fa-dungeon"></span>
                 Delve
             </a>
+            <a href="{{route('admin.monitoring.batch-crafting')}}">
+                <span class="fas fa-hammer"></span>
+                Batch Crafting
+            </a>
             <a href="{{route('admin.monitoring.logs')}}">
                 <span class="fas fa-file-alt"></span>
                 Logs
@@ -143,6 +147,10 @@
         <a href="{{route('locations.create')}}">
             <span class="fas fa-plus"></span>
             Create New Location
+        </a>
+        <a href="{{route('admin.location-templates.list')}}">
+            <span class="ra ra-map"></span>
+            Location Templates
         </a>
         <hr />
         <h6 class="uppercase">Quests</h6>

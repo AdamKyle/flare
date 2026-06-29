@@ -169,7 +169,7 @@ class MapNameValue
                     'drop_chance_bonus' => 0.30,
                     'enemy_stat_bonus' => 0.30,
                     'character_attack_reduction' => 0.25,
-                    'required_location_id' => Location::where('type', LocationType::TEAR_FABRIC_TIME)->first()->id,
+                    'required_location_id' => Location::where('type', LocationType::TEAR_FABRIC_TIME->value)->first()->id,
                     'can_traverse' => true,
                 ];
             case self::ICE_PLANE:

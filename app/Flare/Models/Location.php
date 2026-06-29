@@ -134,7 +134,7 @@ class Location extends Model
             return null;
         }
 
-        return new LocationType($this->type);
+        return LocationType::tryFrom($this->type);
     }
 
     protected static function newFactory()

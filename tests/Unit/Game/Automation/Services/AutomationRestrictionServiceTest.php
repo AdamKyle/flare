@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Game\Automation\Services;
 
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationEffectValue;
@@ -12,10 +10,13 @@ use App\Game\Automation\Services\AutomationRestrictionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateLocation;
 
 class AutomationRestrictionServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateBatchCrafting, CreateCharacterAutomation, CreateLocation, RefreshDatabase;
 
     private AutomationRestrictionService $service;
 
@@ -128,7 +129,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -143,7 +144,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -158,7 +159,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -173,7 +174,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -188,7 +189,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -203,7 +204,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -218,7 +219,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -233,7 +234,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -248,7 +249,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -263,7 +264,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -278,7 +279,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -293,7 +294,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -308,7 +309,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -323,7 +324,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -338,7 +339,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -353,7 +354,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -368,7 +369,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -383,7 +384,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -398,7 +399,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -413,7 +414,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -428,7 +429,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -443,7 +444,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -459,7 +460,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -475,7 +476,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -491,7 +492,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -507,7 +508,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -523,7 +524,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -539,7 +540,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -555,7 +556,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -571,7 +572,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -587,7 +588,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -603,7 +604,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -618,7 +619,7 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInSpecialLocationBlocksEnteringLocation(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
@@ -626,7 +627,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'enemy_strength_type' => null,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -642,7 +643,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -657,7 +658,7 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInRegularContextAllowsEnteringRegularLocation(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $regularLocation = Location::factory()->create([
+        $regularLocation = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
@@ -666,7 +667,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'is_port' => false,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -681,7 +682,7 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInRegularContextAllowsEnteringPort(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $port = Location::factory()->create([
+        $port = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 48,
             'y' => 16,
@@ -690,7 +691,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'is_port' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -705,15 +706,15 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInRegularContextBlocksGoldMine(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
             'enemy_strength_type' => null,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -728,15 +729,15 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInRegularContextBlocksPurgatoryDungeon(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::PURGATORY_DUNGEONS,
+            'type' => LocationType::PURGATORY_DUNGEONS->value,
             'enemy_strength_type' => null,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -751,15 +752,15 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInRegularContextBlocksPurgatorySmithHouse(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::PURGATORY_SMITH_HOUSE,
+            'type' => LocationType::PURGATORY_SMITH_HOUSE->value,
             'enemy_strength_type' => null,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -774,7 +775,7 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testExplorationStartedInRegularContextBlocksEnemyStrengthModifyingLocation(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
@@ -782,7 +783,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -797,7 +798,7 @@ class AutomationRestrictionServiceTest extends TestCase
     public function testBlockedContextReturnsAutomationMessageAndAutomation(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -816,7 +817,7 @@ class AutomationRestrictionServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now()->subMinutes(10),
@@ -825,7 +826,7 @@ class AutomationRestrictionServiceTest extends TestCase
             'started_in_special_location' => false,
         ]);
 
-        $newestAutomation = CharacterAutomation::factory()->create([
+        $newestAutomation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -836,5 +837,37 @@ class AutomationRestrictionServiceTest extends TestCase
         $activeAutomation = $this->service->activeAutomation($character);
 
         $this->assertEquals($newestAutomation->id, $activeAutomation->id);
+    }
+
+    public function testBatchCraftingBlocksStartFactionLoyalty(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
+    }
+
+    public function testBatchCraftingBlocksStartItemCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id]);
+
+        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
+    }
+
+    public function testBatchCraftingAllowsStartCrafting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
+    }
+
+    public function testBatchCraftingAllowsManualFighting(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
 }

@@ -14,6 +14,7 @@ use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\ItemsService;
 use App\Admin\Services\LocationService;
+use App\Admin\Services\LogReader;
 use App\Admin\Services\QuestService;
 use App\Admin\Services\MonitoredBugReportService;
 use App\Admin\Services\SiteStatisticsService;
@@ -88,7 +89,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(AdminLogsDashboardService::class, function ($app) {
-            return new AdminLogsDashboardService($app->make(MonitoredBugReportService::class));
+            return new AdminLogsDashboardService(
+                $app->make(MonitoredBugReportService::class),
+                $app->make(LogReader::class),
+            );
         });
 
         $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);

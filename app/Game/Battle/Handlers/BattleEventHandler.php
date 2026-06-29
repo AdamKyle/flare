@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
@@ -23,6 +24,7 @@ class BattleEventHandler
     public function __construct(
         private BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
         private WeeklyBattleService $weeklyBattleService,
+        private BatchCraftingService $batchCraftingService,
     ) {}
 
     /**
@@ -33,6 +35,8 @@ class BattleEventHandler
         $character->update(['is_dead' => true]);
 
         $character = $character->refresh();
+
+        $this->batchCraftingService->completeForDeath($character);
 
         if (! is_null($monster)) {
 

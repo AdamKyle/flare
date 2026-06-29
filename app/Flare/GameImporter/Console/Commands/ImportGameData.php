@@ -3,6 +3,7 @@
 namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Admin\Import\LocationGems\LocationGemsImport;
+use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
 use App\Admin\Import\MapGems\MapGemsImport;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
@@ -78,6 +79,7 @@ class ImportGameData extends Command
 
         $this->line('Importing non map speficic data ...');
 
+        $this->importLocationTemplates();
         $this->import($excelMapper, $files['Core Imports'], 'Core Imports');
         $this->import($excelMapper, $files['Skills'], 'Skills');
         $this->import($excelMapper, $files['Items'], 'Items');
@@ -249,6 +251,13 @@ class ImportGameData extends Command
         $path = resource_path('data-imports') . '/World Gems/location-gems.xlsx';
 
         Excel::import(new LocationGemsImport(), $path);
+    }
+
+    protected function importLocationTemplates(): void
+    {
+        $path = resource_path('data-imports') . '/Location Templates/location_templates.xlsx';
+
+        Excel::import(new LocationTemplatesImport(), $path);
     }
 
     /**

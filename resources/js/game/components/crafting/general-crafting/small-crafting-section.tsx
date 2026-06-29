@@ -69,6 +69,9 @@ export default class SmallCraftingSection extends React.Component<
                             }}
                             menuPortalTarget={document.body}
                             value={this.craftingSectionManager.getSelectedCraftingTypeForSmallerActionsList()}
+                            isOptionDisabled={(option: any) =>
+                                option.disabled === true
+                            }
                         />
 
                         <DangerButton

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GameSkill;
 use App\Flare\Services\CharacterRewardService;
@@ -48,7 +50,7 @@ use Tests\Traits\CreateScheduledEvent;
 
 class BattleRewardServiceTest extends TestCase
 {
-    use CreateCharacterAutomation, CreateEvent, CreateExplorationLog, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase, CreateItem, CreateItemAffix, CreateScheduledEvent;
+    use CreateCharacterAutomation, CreateCharacterBattleReward, CreateEvent, CreateExplorationLog, CreateGameMap, CreateGlobalEventGoal, CreateItem, CreateItemAffix, CreateMonster, CreateScheduledEvent, RefreshDatabase;
 
     private ?BattleRewardService $battleRewardService;
 
@@ -1307,7 +1309,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $this->characterFactory->getCharacter();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1358,7 +1360,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1401,7 +1403,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $this->characterFactory->getCharacter();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1443,7 +1445,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $beforeSlotCount = $character->inventory->slots()->count();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1482,7 +1484,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $this->characterFactory->getCharacter();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1526,7 +1528,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1567,7 +1569,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",

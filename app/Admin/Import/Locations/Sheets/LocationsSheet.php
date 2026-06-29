@@ -5,6 +5,7 @@ namespace App\Admin\Import\Locations\Sheets;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
+use App\Flare\Values\LocationType;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
@@ -70,6 +71,10 @@ class LocationsSheet implements ToCollection
 
         if (! isset($cleanData['can_auto_battle'])) {
             $cleanData['can_auto_battle'] = false;
+        }
+
+        if (isset($cleanData['enemy_strength_type']) && ! isset($cleanData['type'])) {
+            $cleanData['type'] = LocationType::SPECIAL->value;
         }
 
         return $cleanData;

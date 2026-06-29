@@ -210,19 +210,25 @@ class LocationService
             $location->type_name = null;
 
             if (! is_null($location->type)) {
-                if ((new LocationType($location->type))->isPurgatorySmithHouse()) {
+                $locationType = LocationType::tryFrom($location->type);
+
+                if (is_null($locationType)) {
+                    return $location;
+                }
+
+                if ($locationType->isPurgatorySmithHouse()) {
                     $location->type_name = 'Purgatory Smiths House';
                 }
 
-                if ((new LocationType($location->type))->isUnderWaterCaves()) {
+                if ($locationType->isUnderWaterCaves()) {
                     $location->type_name = 'Underwater Caves';
                 }
 
-                if ((new LocationType($location->type))->isAlchemyChurch()) {
+                if ($locationType->isAlchemyChurch()) {
                     $location->type_name = 'Alchemy Church';
                 }
 
-                if ((new LocationType($location->type))->isCaveOfMemories()) {
+                if ($locationType->isCaveOfMemories()) {
                     $location->type_name = 'Cave of Memories';
                 }
             }
@@ -232,7 +238,11 @@ class LocationService
                 $location->increase_enemy_percentage_by = LocationEffectValue::fetchPercentageIncrease($location->enemy_strength_type);
 
                 if (! is_null($location->type)) {
-                    $locationType = new LocationType($location->type);
+                    $locationType = LocationType::tryFrom($location->type);
+
+                    if (is_null($locationType)) {
+                        return $location;
+                    }
 
                     if ($locationType->isGoldMines()) {
                         $location->type_name = 'Gold Mines';

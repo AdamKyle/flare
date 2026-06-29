@@ -77,7 +77,7 @@ class SecondaryAttacksTest extends TestCase
             'is_port' => false,
             'x' => 16,
             'y' => 16,
-            'type' => LocationType::UNDERWATER_CAVES,
+            'type' => LocationType::UNDERWATER_CAVES->value,
         ]);
 
         Cache::put('character-sheet-' . $character->id, [

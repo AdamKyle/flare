@@ -412,7 +412,7 @@ class CharacterCurrencyRewardService
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)
-            ->where('type', LocationType::PURGATORY_DUNGEONS)
+            ->where('type', LocationType::PURGATORY_DUNGEONS->value)
             ->first();
     }
 }

@@ -2,6 +2,10 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Tests\Traits\CreateGameUnit;
+
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
@@ -23,7 +27,7 @@ use Tests\TestCase;
 
 class CapitalCityManagementServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameUnit, RefreshDatabase;
 
     public function testFetchBuildingsForRepairsIncludesDamagedNonQueuedBuildings(): void
     {
@@ -101,7 +105,7 @@ class CapitalCityManagementServiceTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'building_id' => $building->id,
@@ -432,8 +436,8 @@ class CapitalCityManagementServiceTest extends TestCase
             ]);
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $availableUnit = GameUnit::factory()->create(['name' => 'Archers']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $availableUnit = $this->createGameUnit(['name' => 'Archers']);
 
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
@@ -485,7 +489,7 @@ class CapitalCityManagementServiceTest extends TestCase
             ]);
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
 
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
@@ -718,10 +722,10 @@ class CapitalCityManagementServiceTest extends TestCase
             ])
             ->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $availableUnit = GameUnit::factory()->create(['name' => 'Archers']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $availableUnit = $this->createGameUnit(['name' => 'Archers']);
 
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $unit->id,
@@ -765,9 +769,9 @@ class CapitalCityManagementServiceTest extends TestCase
             ])
             ->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
 
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $unit->id,
@@ -1485,7 +1489,7 @@ class CapitalCityManagementServiceTest extends TestCase
             ]);
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
 
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,

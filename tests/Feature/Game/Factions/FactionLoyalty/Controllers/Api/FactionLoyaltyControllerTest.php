@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Factions\FactionLoyalty\Controllers\Api;
 
+use Tests\Traits\CreateCharacterAutomation;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AttackTypeValue;
@@ -16,7 +18,7 @@ use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyControllerTest extends TestCase
 {
-    use CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
+    use CreateCharacterAutomation, CreateFactionLoyalty, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -161,7 +163,7 @@ class FactionLoyaltyControllerTest extends TestCase
     {
         $this->character->factions()->update(['maxed' => true]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -247,7 +249,7 @@ class FactionLoyaltyControllerTest extends TestCase
             'is_pledged' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -333,7 +335,7 @@ class FactionLoyaltyControllerTest extends TestCase
             'fame_tasks' => [],
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -419,7 +421,7 @@ class FactionLoyaltyControllerTest extends TestCase
             'fame_tasks' => [],
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),

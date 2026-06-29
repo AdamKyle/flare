@@ -39,6 +39,10 @@ if (document.getElementById("delve-monitoring") !== null) {
     void import("./admin/delve-monitoring");
 }
 
+if (document.getElementById("batch-crafting-monitoring") !== null) {
+    void import("./admin/batch-crafting-monitoring");
+}
+
 if (document.getElementById("logs-dashboard") !== null) {
     void import("./admin/logs-dashboard");
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
@@ -14,12 +16,12 @@ use Tests\TestCase;
 
 class BattleRewardMessageOutboxServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacterBattleReward, RefreshDatabase;
 
     public function testStoreMessageCreatesRecord(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
 
         resolve(BattleRewardMessageOutboxService::class)->storeMessage(
             $request->id,
@@ -39,8 +41,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -58,8 +60,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -76,8 +78,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     public function testBroadcastExceptionDoesNotThrowOutOfEmitUnemittedMessages(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -96,8 +98,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     public function testBroadcastExceptionDoesNotMarkEmitted(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -116,8 +118,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     public function testBroadcastExceptionLeavesMessageReplayable(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -136,8 +138,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     public function testRetryAfterPreviousExceptionCanMarkEmitted(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -166,9 +168,9 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
         $originalTime = now()->subSeconds(10);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -187,9 +189,9 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $requestA = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $requestB = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        CharacterBattleRewardRequestMessage::factory()->create([
+        $requestA = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $requestB = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $requestB->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -206,7 +208,7 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
 
         $count = resolve(BattleRewardMessageOutboxService::class)->emitUnemittedMessages($request);
 
@@ -216,8 +218,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     public function testMarkEmittedSetsTimestamp(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -233,8 +235,8 @@ class BattleRewardMessageOutboxServiceTest extends TestCase
     public function testMarkEmittedIsIdempotentWhenAlreadyEmitted(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,

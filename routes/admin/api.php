@@ -51,6 +51,11 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/monitoring/delve/summary', ['uses' => 'Api\MonitoringController@delveSummary']);
     Route::get('/admin/monitoring/delve/chart', ['uses' => 'Api\MonitoringController@delveChart']);
 
+    Route::get('/admin/monitoring/batch-crafting/active', ['uses' => 'Api\MonitoringController@batchCraftingActive']);
+    Route::get('/admin/monitoring/batch-crafting/runs', ['uses' => 'Api\MonitoringController@batchCraftingRuns']);
+    Route::get('/admin/monitoring/batch-crafting/summary', ['uses' => 'Api\MonitoringController@batchCraftingSummary']);
+    Route::get('/admin/monitoring/batch-crafting/chart', ['uses' => 'Api\MonitoringController@batchCraftingChart']);
+
     Route::get('/admin/monitoring/logs/files', ['uses' => 'Api\AdminLogsDashboardController@files']);
     Route::get('/admin/monitoring/logs/entries', ['uses' => 'Api\AdminLogsDashboardController@entries']);
     Route::get('/admin/monitoring/logs/summary', ['uses' => 'Api\AdminLogsDashboardController@summary']);

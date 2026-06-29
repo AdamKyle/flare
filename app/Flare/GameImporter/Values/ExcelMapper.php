@@ -9,6 +9,7 @@ use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Import\Items\ItemsImport;
 use App\Admin\Import\ItemSkills\ItemSkillsImport;
 use App\Admin\Import\Kingdoms\KingdomsImport;
+use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
 use App\Admin\Import\Locations\LocationsImport;
 use App\Admin\Import\Monsters\MonstersImport;
 use App\Admin\Import\Npcs\NpcsImport;
@@ -46,6 +47,7 @@ class ExcelMapper
         ],
         'Locations Give Items' => LocationsImport::class,
         'Locations' => LocationsImport::class,
+        'Location Templates' => LocationTemplatesImport::class,
         'Npcs' => NpcsImport::class,
     ];
 

@@ -10,27 +10,19 @@ use Throwable;
 
 class AdminLogsDashboardService
 {
-    private ?string $logRootOverride = null;
-
     public function __construct(
         private readonly MonitoredBugReportService $monitoredBugReportService,
+        private readonly LogReader $logReader,
     ) {}
 
     public function withLogRoot(string $logRoot): static
     {
         $clone = clone $this;
-        $clone->logRootOverride = rtrim($logRoot, '/');
+        $clone->reader = $this->logReader->withLogRoot($logRoot);
         return $clone;
     }
 
-    private function resolveLogPattern(string $pattern): string
-    {
-        if ($this->logRootOverride !== null) {
-            $relative = preg_replace('#^logs/#', '', $pattern);
-            return $this->logRootOverride . '/' . $relative;
-        }
-        return storage_path($pattern);
-    }
+    private ?LogReader $reader = null;
 
     private const LOG_CHANNELS = [
         'laravel' => [
@@ -62,6 +54,10 @@ class AdminLogsDashboardService
             'label' => 'Reward Ledger',
             'patterns' => ['logs/reward_ledger.log', 'logs/reward_ledger-*.log'],
         ],
+        'batch_crafting' => [
+            'label' => 'Batch Crafting',
+            'patterns' => ['logs/batch-crafting.log', 'logs/batch-crafting-*.log'],
+        ],
     ];
 
     private const LOG_START_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}[^\]]*)\]\s+([A-Za-z0-9_-]+)\.(EMERGENCY|ALERT|CRITICAL|ERROR|FATAL|WARNING|NOTICE|INFO|DEBUG):\s+(.+)$/is';
@@ -80,7 +76,7 @@ class AdminLogsDashboardService
     {
         return array_map(function (string $key): array {
             $files = $this->discoverFiles($key);
-            $size = array_reduce($files, fn (int $carry, string $path): int => $carry + (int) filesize($path), 0);
+            $size = array_reduce($files, fn (int $carry, string $path): int => $carry + (int) $this->reader()->fileSize($path), 0);
 
             return [
                 'key' => $key,
@@ -260,20 +256,7 @@ class AdminLogsDashboardService
             return [];
         }
 
-        $files = [];
-
-        foreach (self::LOG_CHANNELS[$fileKey]['patterns'] as $pattern) {
-            $matches = glob($this->resolveLogPattern($pattern)) ?: [];
-            foreach ($matches as $path) {
-                if (is_file($path) && is_readable($path)) {
-                    $files[$path] = $path;
-                }
-            }
-        }
-
-        ksort($files);
-
-        return array_values($files);
+        return $this->reader()->discoverFiles(self::LOG_CHANNELS[$fileKey]['patterns']);
     }
 
     private function readBoundedEntries(string $fileKey, int $maxBytes = 2097152): array
@@ -281,26 +264,13 @@ class AdminLogsDashboardService
         $entries = [];
 
         foreach ($this->discoverFiles($fileKey) as $path) {
-            $fileSize = filesize($path);
+            $fileSize = $this->reader()->fileSize($path);
 
             if ($fileSize === false || $fileSize === 0) {
                 continue;
             }
 
-            $offset = max(0, $fileSize - $maxBytes);
-            $handle = fopen($path, 'rb');
-
-            if ($handle === false) {
-                continue;
-            }
-
-            if ($offset > 0) {
-                fseek($handle, $offset);
-                fgets($handle);
-            }
-
-            $content = stream_get_contents($handle);
-            fclose($handle);
+            $content = $this->reader()->readTail($path, $maxBytes);
 
             if ($content === false || trim($content) === '') {
                 continue;
@@ -319,7 +289,11 @@ class AdminLogsDashboardService
         $entries = [];
 
         foreach ($this->discoverFiles($fileKey) as $path) {
-            $entries = array_merge($entries, $this->parseContent((string) file_get_contents($path), $path));
+            $content = $this->reader()->readTail($path, PHP_INT_MAX);
+
+            if ($content !== false) {
+                $entries = array_merge($entries, $this->parseContent((string) $content, $path));
+            }
         }
 
         usort($entries, fn (array $a, array $b): int => strcmp($b['timestamp'] ?? '', $a['timestamp'] ?? ''));
@@ -329,22 +303,18 @@ class AdminLogsDashboardService
 
     private function readNewEntries(string $fileKey, string $path): array
     {
-        $fileSize = filesize($path);
+        $fileSize = $this->reader()->fileSize($path);
         $state = MonitoredLogFileState::firstOrCreate(
             ['channel_key' => $fileKey, 'file_path' => $path],
             ['position' => 0, 'file_size' => 0],
         );
 
-        $position = $state->position > $fileSize ? 0 : $state->position;
-        $handle = fopen($path, 'rb');
-
-        if ($handle === false) {
-            throw new RuntimeException('Failed to open log file: ' . basename($path));
+        if ($fileSize === false) {
+            throw new RuntimeException('Failed to stat log file: ' . basename($path));
         }
 
-        fseek($handle, $position);
-        $content = stream_get_contents($handle);
-        fclose($handle);
+        $position = $state->position > $fileSize ? 0 : $state->position;
+        $content = $this->reader()->readFrom($path, $position);
 
         $state->update([
             'position' => $fileSize,
@@ -357,6 +327,11 @@ class AdminLogsDashboardService
         }
 
         return $this->parseContent($content, $path);
+    }
+
+    private function reader(): LogReader
+    {
+        return $this->reader ?? $this->logReader;
     }
 
     private function parseContent(string $content, string $path): array

@@ -19,6 +19,7 @@ import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
 import Shop from "./components/specialty-shops/shop";
 import DelveStatusPanel from "./components/delve-status-panel";
+import BatchCraftingStatusPanel from "./components/batch-crafting-status-panel";
 import ActionsProps from "./types/actions-props";
 import ActionsState from "./types/actions-state";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
@@ -569,12 +570,14 @@ export default class Actions extends React.Component<
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                {this.isDelveRunning() ? (
-                    <DelveStatusPanel
-                        character_id={this.props.character.id}
-                        user_id={this.props.character.user_id}
-                    />
-                ) : null}
+                <DelveStatusPanel
+                    character_id={this.props.character.id}
+                    user_id={this.props.character.user_id}
+                />
+                <BatchCraftingStatusPanel
+                    character_id={this.props.character.id}
+                    user_id={this.props.character.user_id}
+                />
             </div>
         ) : null;
         let fightContent = null;

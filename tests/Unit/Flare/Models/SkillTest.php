@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Flare\Models;
 
+use Tests\Traits\CreateSkill;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\Skill;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -13,7 +15,7 @@ use Tests\Traits\CreateItem;
 
 class SkillTest extends TestCase
 {
-    use CreateGameSkill;
+    use CreateGameSkill, CreateSkill;
     use CreateItem;
     use RefreshDatabase;
 
@@ -37,7 +39,7 @@ class SkillTest extends TestCase
 
     public function testNewFactoryCanCreateSkillInstance(): void
     {
-        $skill = Skill::factory()->make();
+        $skill = $this->makeSkill();
 
         $this->assertInstanceOf(Skill::class, $skill);
     }

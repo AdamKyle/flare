@@ -2,173 +2,148 @@
 
 namespace App\Flare\Values;
 
-use Exception;
-
-class LocationType
+enum LocationType: int
 {
-    /**
-     * @var string
-     */
-    private $value;
+    case PURGATORY_SMITH_HOUSE = 0;
+    case GOLD_MINES = 1;
+    case PURGATORY_DUNGEONS = 2;
+    case UNDERWATER_CAVES = 3;
+    case TEAR_FABRIC_TIME = 4;
+    case THE_OLD_CHURCH = 5;
+    case TWISTED_GATE = 6;
+    case ALCHEMY_CHURCH = 7;
+    case LORDS_STRONG_HOLD = 8;
+    case BROKEN_ANVIL = 9;
+    case TWISTED_MAIDENS_DUNGEONS = 10;
+    case CAVE_OF_MEMORIES = 11;
+    case THE_CELLAR = 12;
+    case SPECIAL = 13;
 
-    const PURGATORY_SMITH_HOUSE = 0;
-
-    const GOLD_MINES = 1;
-
-    const PURGATORY_DUNGEONS = 2;
-
-    const UNDERWATER_CAVES = 3;
-
-    const TEAR_FABRIC_TIME = 4;
-
-    const THE_OLD_CHURCH = 5;
-
-    const TWISTED_GATE = 6;
-
-    const ALCHEMY_CHURCH = 7;
-
-    const LORDS_STRONG_HOLD = 8;
-
-    const BROKEN_ANVIL = 9;
-
-    const TWSITED_MAIDENS_DUNGEONS = 10;
-
-    const CAVE_OF_MEMORIES = 11;
-
-    const THE_CELLAR = 12;
-
-    protected static $values = [
-        0 => self::PURGATORY_SMITH_HOUSE,
-        1 => self::GOLD_MINES,
-        2 => self::PURGATORY_DUNGEONS,
-        3 => self::UNDERWATER_CAVES,
-        4 => self::TEAR_FABRIC_TIME,
-        5 => self::THE_OLD_CHURCH,
-        6 => self::TWISTED_GATE,
-        7 => self::ALCHEMY_CHURCH,
-        8 => self::LORDS_STRONG_HOLD,
-        9 => self::BROKEN_ANVIL,
-        10 => self::TWSITED_MAIDENS_DUNGEONS,
-        11 => self::CAVE_OF_MEMORIES,
-        12 => self::THE_CELLAR,
-    ];
-
-    /**
-     * @var string[]
-     */
-    protected static $namedValues = [
-        self::PURGATORY_SMITH_HOUSE => 'Purgatory Smiths House',
-        self::GOLD_MINES => 'Gold Mines',
-        self::PURGATORY_DUNGEONS => 'Purgatory Dungeons',
-        self::UNDERWATER_CAVES => 'Underwater Caves',
-        self::TEAR_FABRIC_TIME => 'Tear in the fabrice of time',
-        self::THE_OLD_CHURCH => 'The Old Church',
-        self::TWISTED_GATE => 'The Twisted Gate',
-        self::ALCHEMY_CHURCH => 'Alchemy Church',
-        self::LORDS_STRONG_HOLD => 'Lords Strong Hold',
-        self::BROKEN_ANVIL => 'Hells Broken Anvil',
-        self::TWSITED_MAIDENS_DUNGEONS => 'Twisted Maidens Dungeons',
-        self::CAVE_OF_MEMORIES => 'Cave of Memories',
-        self::THE_CELLAR => 'The Cellar',
-    ];
-
-    /**
-     * ItemEffectsValue constructor.
-     *
-     * Throws if the value does not exist in the array of const values.
-     *
-     * @throws Exception
-     */
-    public function __construct(int $value)
+    public function label(): string
     {
-
-        if (! in_array($value, self::$values)) {
-            throw new Exception($value.' does not exist.');
-        }
-
-        $this->value = $value;
+        return match ($this) {
+            self::PURGATORY_SMITH_HOUSE => 'Purgatory Smiths House',
+            self::GOLD_MINES => 'Gold Mines',
+            self::PURGATORY_DUNGEONS => 'Purgatory Dungeons',
+            self::UNDERWATER_CAVES => 'Underwater Caves',
+            self::TEAR_FABRIC_TIME => 'Tear in the fabrice of time',
+            self::THE_OLD_CHURCH => 'The Old Church',
+            self::TWISTED_GATE => 'The Twisted Gate',
+            self::ALCHEMY_CHURCH => 'Alchemy Church',
+            self::LORDS_STRONG_HOLD => 'Lords Strong Hold',
+            self::BROKEN_ANVIL => 'Hells Broken Anvil',
+            self::TWISTED_MAIDENS_DUNGEONS => 'Twisted Maidens Dungeons',
+            self::CAVE_OF_MEMORIES => 'Cave of Memories',
+            self::THE_CELLAR => 'The Cellar',
+            self::SPECIAL => 'Special',
+        };
     }
 
     public static function getNamedValues(): array
     {
-        return self::$namedValues;
+        $values = [];
+
+        foreach (self::cases() as $locationType) {
+            $values[$locationType->value] = $locationType->label();
+        }
+
+        return $values;
     }
 
-    /**
-     * Is purgatory smith house?
-     */
+    public static function values(): array
+    {
+        return array_map(
+            fn (LocationType $locationType): int => $locationType->value,
+            self::cases()
+        );
+    }
+
+    public static function manualQuestDropValues(): array
+    {
+        return [
+            self::PURGATORY_SMITH_HOUSE->value,
+            self::GOLD_MINES->value,
+            self::PURGATORY_DUNGEONS->value,
+            self::UNDERWATER_CAVES->value,
+            self::TEAR_FABRIC_TIME->value,
+            self::THE_OLD_CHURCH->value,
+            self::TWISTED_GATE->value,
+            self::ALCHEMY_CHURCH->value,
+            self::LORDS_STRONG_HOLD->value,
+            self::BROKEN_ANVIL->value,
+            self::TWISTED_MAIDENS_DUNGEONS->value,
+            self::THE_CELLAR->value,
+            self::SPECIAL->value,
+        ];
+    }
+
+    public function canDropManualQuestItems(): bool
+    {
+        return in_array($this->value, self::manualQuestDropValues(), true);
+    }
+
     public function isPurgatorySmithHouse(): bool
     {
-        return $this->value === self::PURGATORY_SMITH_HOUSE;
+        return $this === self::PURGATORY_SMITH_HOUSE;
     }
 
-    /**
-     * Is gold mines?
-     */
     public function isGoldMines(): bool
     {
-        return $this->value === self::GOLD_MINES;
+        return $this === self::GOLD_MINES;
     }
 
-    /**
-     * Is Purgatory dungeons?
-     */
     public function isPurgatoryDungeons(): bool
     {
-        return $this->value === self::PURGATORY_DUNGEONS;
+        return $this === self::PURGATORY_DUNGEONS;
     }
 
-    /**
-     * Is underwater caves?
-     */
     public function isUnderWaterCaves(): bool
     {
-        return $this->value === self::UNDERWATER_CAVES;
+        return $this === self::UNDERWATER_CAVES;
     }
 
-    /**
-     * is the old church?
-     */
     public function isTheOldChurch(): bool
     {
-        return $this->value === self::THE_OLD_CHURCH;
+        return $this === self::THE_OLD_CHURCH;
     }
 
-    /**
-     * Is the twisted gate?
-     */
     public function isTwistedGate(): bool
     {
-        return $this->value === self::TWISTED_GATE;
+        return $this === self::TWISTED_GATE;
     }
 
-    public function isTheCellar(): bool {
-        return $this->value === self::THE_CELLAR;
+    public function isTheCellar(): bool
+    {
+        return $this === self::THE_CELLAR;
     }
 
-    /**
-     * Are we at the alchemy church?
-     */
     public function isAlchemyChurch(): bool
     {
-        return $this->value === self::ALCHEMY_CHURCH;
+        return $this === self::ALCHEMY_CHURCH;
     }
 
     public function isLordsStrongHold(): bool
     {
-        return $this->value === self::LORDS_STRONG_HOLD;
+        return $this === self::LORDS_STRONG_HOLD;
     }
 
     public function isHellsBrokenAnvil(): bool
     {
-        return $this->value === self::BROKEN_ANVIL;
+        return $this === self::BROKEN_ANVIL;
     }
 
-    public function isTwistedMaidensDungeons(): bool {
-        return $this->value === self::TWSITED_MAIDENS_DUNGEONS;
+    public function isTwistedMaidensDungeons(): bool
+    {
+        return $this === self::TWISTED_MAIDENS_DUNGEONS;
     }
 
-    public function isCaveOfMemories(): bool {
-        return $this->value === self::CAVE_OF_MEMORIES;
+    public function isCaveOfMemories(): bool
+    {
+        return $this === self::CAVE_OF_MEMORIES;
+    }
+
+    public function isSpecial(): bool
+    {
+        return $this === self::SPECIAL;
     }
 }

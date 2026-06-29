@@ -94,7 +94,7 @@ class HolyItemService
         return $this->fetchSmithingItems($character);
     }
 
-    protected function getCost(Item $item, Item $alchemyItem): int
+    public function getCost(Item $item, Item $alchemyItem): int
     {
         $baseCost = $item->holy_stacks * 100;
         $totalCost = $baseCost * $alchemyItem->holy_level;

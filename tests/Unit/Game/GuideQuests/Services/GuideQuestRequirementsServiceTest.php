@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
+use Tests\Traits\CreateDelveAutomation;
+
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
@@ -34,17 +36,7 @@ use Tests\Traits\CreateQuest;
 
 class GuideQuestRequirementsServiceTest extends TestCase
 {
-    use CreateGuideQuest,
-        CreateItem,
-        CreateGameSkill,
-        CreateQuest,
-        CreateNpc,
-        CreateGameMap,
-        CreateFactionLoyalty,
-        CreateGameClassSpecial,
-        CreateEvent,
-        CreateGlobalEventGoal,
-        RefreshDatabase;
+    use CreateDelveAutomation, CreateEvent, CreateFactionLoyalty, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateGuideQuest, CreateItem, CreateNpc, CreateQuest, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -141,14 +133,14 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'monster_id' => 0,
             'started_at' => now()->subHour(),
             'completed_at' => now(),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
@@ -167,14 +159,14 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'monster_id' => 0,
             'started_at' => now()->subHour(),
             'completed_at' => now(),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
@@ -210,21 +202,21 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'monster_id' => 0,
             'started_at' => now()->subHour(),
             'completed_at' => now(),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
             'created_at' => now()->subMinutes(10),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 10,

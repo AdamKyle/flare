@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Automation\Services;
 
+use Tests\Traits\CreateLocation;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
@@ -32,7 +34,7 @@ use Tests\Traits\CreateExplorationWarning;
 
 class ExplorationAutomationServiceTest extends TestCase
 {
-    use CreateCharacterAutomation;
+    use CreateCharacterAutomation, CreateLocation;
     use CreateExplorationLog;
     use CreateExplorationWarning;
     use RefreshDatabase;
@@ -334,12 +336,12 @@ class ExplorationAutomationServiceTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $this->character->map->game_map_id,
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
             'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 

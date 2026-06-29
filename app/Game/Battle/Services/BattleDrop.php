@@ -29,6 +29,8 @@ class BattleDrop
 
     private ?Location $locationWithEffect;
 
+    private ?Location $manualQuestItemLocation = null;
+
     private float $gameMapBonus;
 
     private float $lootingChance;
@@ -63,6 +65,13 @@ class BattleDrop
     public function setSpecialLocation(?Location $location = null): BattleDrop
     {
         $this->locationWithEffect = $location;
+
+        return $this;
+    }
+
+    public function setManualQuestItemLocation(?Location $location = null): BattleDrop
+    {
+        $this->manualQuestItemLocation = $location;
 
         return $this;
     }
@@ -163,7 +172,7 @@ class BattleDrop
             return null;
         }
 
-        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES)
+        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES->value)
             ->where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -187,11 +196,11 @@ class BattleDrop
             return null;
         }
 
-        if (is_null($this->locationWithEffect)) {
+        if (is_null($this->manualQuestItemLocation)) {
             return null;
         }
 
-        return $this->eligibleLocationQuestItem($character, $this->locationWithEffect, min($this->lootingChance, 0.45));
+        return $this->eligibleLocationQuestItem($character, $this->manualQuestItemLocation, min($this->lootingChance, 0.45));
     }
 
     /**
@@ -209,7 +218,7 @@ class BattleDrop
             return;
         }
 
-        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES)
+        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES->value)
             ->where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -288,9 +297,13 @@ class BattleDrop
             return;
         }
 
+        if (is_null($this->manualQuestItemLocation)) {
+            return;
+        }
+
         $lootingChance = min($this->lootingChance, 0.45);
 
-        $items = Item::where('drop_location_id', $this->locationWithEffect->id)
+        $items = Item::where('drop_location_id', $this->manualQuestItemLocation->id)
             ->whereNull('item_suffix_id')
             ->whereNull('item_prefix_id')
             ->where('type', 'quest')

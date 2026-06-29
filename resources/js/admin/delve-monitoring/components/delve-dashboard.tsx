@@ -421,7 +421,7 @@ export default function DelveDashboard() {
                         <label className="text-sm font-medium">
                             Character name
                             <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
                                 type="text"
                                 value={filters.character_name}
                                 onChange={(e) => {
@@ -436,7 +436,7 @@ export default function DelveDashboard() {
                         <label className="text-sm font-medium">
                             Date from
                             <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
                                 type="date"
                                 value={filters.date_from}
                                 onChange={(e) => {
@@ -451,7 +451,7 @@ export default function DelveDashboard() {
                         <label className="text-sm font-medium">
                             Date to
                             <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
                                 type="date"
                                 value={filters.date_to}
                                 onChange={(e) => {
