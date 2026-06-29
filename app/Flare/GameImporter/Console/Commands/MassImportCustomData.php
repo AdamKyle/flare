@@ -33,9 +33,11 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        // Artisan::call('import:game-data "World Gems"');
+        Artisan::call('import:game-data "World Gems"');
+        Artisan::call('import:game-data "Location Templates"');
 
         Artisan::call('backfill:completed-panel-dismissals --apply');
+
 
         $this->importInformationSection();
 
