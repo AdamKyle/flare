@@ -3,6 +3,7 @@
 namespace App\Flare\Transformers;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\FactionLoyalty;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameClass;
@@ -44,6 +45,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         $gameClass = GameClass::find($character->game_class_id);
         $factionLoyalty = $character->factionLoyalties()->where('is_pledged', '=', true)->first();
         $factionLoyaltyWarningNotices = $this->getFactionLoyaltyWarningNotices($character);
+        $activeBatchCrafting = $this->activeBatchCrafting($character);
 
         return [
             'id' => $character->id,
@@ -97,6 +99,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
                 ->where('type', AutomationType::DELVE)
                 ->where('completed_at', '>', now())
                 ->exists(),
+            'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
+            'batch_crafting_time_out' => ! is_null($activeBatchCrafting) ? max(0, now()->diffInSeconds($activeBatchCrafting->ends_at, false)) : 0,
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
@@ -199,6 +203,16 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'name' => $name,
             'timer_seconds' => now()->diffInSeconds($automation->completed_at),
         ];
+    }
+
+    private function activeBatchCrafting(Character $character): ?BatchCrafting
+    {
+        return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
     }
 
     private function canSetPactOptionsForDelve(Character $character): bool

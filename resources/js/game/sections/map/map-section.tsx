@@ -453,6 +453,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         automation_time_out={this.state.automation_time_out}
                         automation_time_out_label={this.automationTimerLabel()}
                         celestial_time_out={this.state.celestial_time_out}
+                        batch_crafting_time_out={
+                            this.props.batch_crafting_time_out ?? 0
+                        }
                     />
                 </div>
             </Fragment>

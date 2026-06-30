@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\InventorySet;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
@@ -898,7 +899,7 @@ class InventorySetServiceTest extends TestCase
         $this->assertEquals('Cannot do that.', $result['message']);
     }
 
-    public function testCanMoveSomeItemsFromTheSetToInventory()
+    public function testCannotPartiallyEmptySetWhenWholeSetCannotFitInInventory()
     {
         $character = $this->character
             ->inventorySetManagement()
@@ -917,8 +918,8 @@ class InventorySetServiceTest extends TestCase
 
         $result = $this->inventorySetService->emptySet($character, $set);
 
-        $this->assertEquals(200, $result['status']);
-        $this->assertEquals('Removed '. 1 .' of '. 2 .' items from '.$set->name.'. If all items were not moved over, it is because your inventory became full.', $result['message']);
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Your inventory does not have enough room to empty this set.', $result['message']);
     }
 
     public function testCanMoveAllItemsFromSetToInventory()
@@ -1040,5 +1041,165 @@ class InventorySetServiceTest extends TestCase
         $this->assertNotNull(
             $character->inventorySets()->where('is_equipped', true)->first()
         );
+    }
+
+    public function testCannotMoveInventoryItemIntoBatchCraftingSet(): void
+    {
+        $item = $this->createItem();
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $result = $this->inventorySetService->moveItemToSet($character, $character->inventory->slots->first()->id, $set->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You cannot manually move items into the Batch Crafting set.', $result['message']);
+    }
+
+    public function testCannotSaveEquippedItemsIntoBatchCraftingSet(): void
+    {
+        $character = $this->character->equipStartingEquipment()->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $result = $this->inventorySetService->saveEquippedItemsToSet($character, $set->id);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot save equipped items to the Batch Crafting set.', $result['message']);
+    }
+
+    public function testCannotRenameBatchCraftingSet(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $result = $this->inventorySetService->renameInventorySet($character, $set->id, 'Not Allowed');
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Batch Crafting set cannot be renamed.', $result['message']);
+    }
+
+    public function testCannotEquipBatchCraftingSet(): void
+    {
+        $character = $this->character->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $result = $this->inventorySetService->equipSet($character, $set);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Batch Crafting set cannot be equipped.', $result['message']);
+    }
+
+    public function testCanRemoveOneItemFromBatchCraftingSetWhenInventoryHasRoom(): void
+    {
+        $item = $this->createItem();
+        $character = $this->character->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+        $slot = $set->slots()->create([
+            'item_id' => $item->id,
+        ]);
+
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $set->id, $slot->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame(0, $set->refresh()->slots()->count());
+        $this->assertSame(1, $character->refresh()->inventory->slots()->count());
+    }
+
+    public function testCannotEmptySetWhenWholeSetCannotFitInInventory(): void
+    {
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($this->createItem(), 0)
+            ->putItemInSet($this->createItem(), 0)
+            ->getCharacter();
+        $character->update(['inventory_max' => 1]);
+        $set = $character->inventorySets->first();
+
+        $result = $this->inventorySetService->emptySet($character->refresh(), $set);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Your inventory does not have enough room to empty this set.', $result['message']);
+        $this->assertSame(2, $set->refresh()->slots()->count());
+    }
+
+    public function testCanRemoveItemFromBatchCraftingSetWhenInventoryHasRoom(): void
+    {
+        $item = $this->createItem();
+        $character = $this->character->inventoryManagement()->getCharacterFactory()->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+        $slot = $set->slots()->create([
+            'inventory_set_id' => $set->id,
+            'item_id' => $item->id,
+        ]);
+
+        $result = $this->inventorySetService->removeItemFromInventorySet($character, $set->id, $slot->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame(0, $set->refresh()->slots()->count());
+        $this->assertSame(1, $character->refresh()->inventory->slots()->count());
+    }
+
+    public function testCannotMoveItemIntoBatchCraftingSet(): void
+    {
+        $item = $this->createItem();
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacterFactory()
+            ->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+        $slot = $character->refresh()->inventory->slots->first();
+
+        $result = $this->inventorySetService->moveItemToSet($character, $slot->id, $set->id);
+
+        $this->assertNotNull($result);
+        $this->assertEquals(422, $result['status']);
+        $this->assertSame('You cannot manually move items into the Batch Crafting set.', $result['message']);
+        $this->assertSame(0, $set->refresh()->slots()->count());
     }
 }

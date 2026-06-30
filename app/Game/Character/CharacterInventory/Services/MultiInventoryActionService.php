@@ -7,13 +7,14 @@ use Exception;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 
@@ -101,18 +102,48 @@ class MultiInventoryActionService
             ->where('equipped', false)
             ->get();
 
-        $totalSoldFor = 0;
-
-        foreach ($slots as $slot) {
-            $totalSoldFor += $this->sellItem($character, $slot);
-        }
+        $totalSoldFor = $slots->sum(fn (InventorySlot $slot) => SellItemCalculator::fetchSalePriceWithAffixes($slot->item));
+        $slotCount = $slots->count();
+        $character->increment('gold', $totalSoldFor);
+        $character->inventory->slots()->whereIn('id', $slots->pluck('id')->all())->delete();
 
         $character = $character->refresh();
 
         event(new UpdateCharacterInventoryCountEvent($character));
+        ServerMessageHandler::sendBasicMessage($character->user, 'Sold ' . $slotCount . ' items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% tax).');
 
         return $this->successResult([
-            'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% on each sale), With the exception of Trinkets and Artifacts to the shop. Check your server messages (below - select Server Messsages tab, or for mobile select Server Messages from the dropw down) for details!',
+            'message' => 'Sold all items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% tax), With the exception of Trinkets and Artifacts to the shop.',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+        ]);
+    }
+
+    public function sellManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $slots = $set->slots()
+            ->whereIn('id', $setSlotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact', 'trinket']);
+            })
+            ->with('item')
+            ->get();
+
+        $totalSoldFor = $slots->sum(fn (SetSlot $slot) => SellItemCalculator::fetchSalePriceWithAffixes($slot->item));
+        $slotCount = $slots->count();
+        $character->increment('gold', $totalSoldFor);
+        $set->slots()->whereIn('id', $slots->pluck('id')->all())->delete();
+
+        $character = $character->refresh();
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+        ServerMessageHandler::sendBasicMessage($character->user, 'Sold ' . $slotCount . ' set items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% tax).');
+
+        return $this->successResult([
+            'message' => 'Sold selected set items for: ' . number_format($totalSoldFor) . ' Gold (Minus 5% tax).',
             'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
     }
@@ -172,16 +203,4 @@ class MultiInventoryActionService
             ->replaceItem();
     }
 
-    private function sellItem(Character $character, InventorySlot $slot): int
-    {
-        $item = $slot->item;
-
-        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-        event(new SellItemEvent($slot, $character));
-
-        ServerMessageHandler::sendBasicMessage($character->user, 'Sold item: ' . $item->affix_name . ' for: ' . number_format($totalSoldFor) . ' (Minus 5% tax) Gold! (Selling to a shop can never go above 2 billion gold for an individual item)');
-
-        return $totalSoldFor;
-    }
 }

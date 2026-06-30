@@ -2,9 +2,11 @@
 
 namespace App\Game\BatchCrafting\Services;
 
+use App\Admin\Events\BatchCraftingMonitoringUpdated;
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
-use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\AutomationType;
 use App\Game\BatchCrafting\Events\BatchCraftingStatusUpdated;
@@ -20,6 +22,14 @@ use Illuminate\Validation\ValidationException;
 class BatchCraftingService
 {
     public const DURATION_HOURS = 8;
+
+    public const SETS_PER_RECURRING_TICK = 6;
+
+    public const ITEMS_PER_RECURRING_TICK = 6;
+
+    public const RECURRING_DELAY_SECONDS = 60;
+
+    public const IMMEDIATE_DELAY_SECONDS = 2;
 
     public function __construct(
         private readonly BatchCraftingProcessor $processor,
@@ -73,6 +83,7 @@ class BatchCraftingService
         }
 
         $progress = $this->validatedProgress($character, $type, $data);
+        $progress['tick_delay_seconds'] = $this->tickDelaySeconds($type, $progress);
 
         $batchCrafting = BatchCrafting::create([
             'character_id' => $character->id,
@@ -91,9 +102,10 @@ class BatchCraftingService
 
         event(new ServerMessageEvent($character->user, 'Batch crafting has started. Type: ' . $type->label()));
         event(new BatchCraftingStatusUpdated($character->user_id));
+        event(new BatchCraftingMonitoringUpdated($character->id));
 
         if (! app()->runningUnitTests()) {
-            BatchCraftingJob::dispatch($batchCrafting->id)->delay(now()->addMinute())->onConnection('long_running')->onQueue('default_long');
+            BatchCraftingJob::dispatch($batchCrafting->id)->delay(now()->addSeconds($progress['tick_delay_seconds']))->onConnection('long_running')->onQueue('default_long');
         }
 
         return $batchCrafting;
@@ -137,6 +149,12 @@ class BatchCraftingService
         $type = BatchCraftingType::from($batchCrafting->batch_type);
         $timer = $this->timerDetails($batchCrafting);
         $actionLog = $batchCrafting->action_log ?? [];
+        $progress = $batchCrafting->progress ?? [];
+        $batchCraftingSet = InventorySet::query()
+            ->where('character_id', $character->id)
+            ->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)
+            ->first();
+        $progressPercent = $this->progressPercent($batchCrafting, $timer['progress_percent']);
 
         return [
             'active' => $batchCrafting->isRunning(),
@@ -154,7 +172,7 @@ class BatchCraftingService
                 'remaining_seconds' => $timer['remaining_seconds'],
                 'elapsed_human' => $timer['elapsed_human'],
                 'remaining_human' => $timer['remaining_human'],
-                'progress_percent' => $timer['progress_percent'],
+                'progress_percent' => $progressPercent,
                 'ended_reason' => $batchCrafting->ended_reason,
                 'status' => $batchCrafting->status,
                 'inventory_count' => $character->getInventoryCount(),
@@ -166,14 +184,12 @@ class BatchCraftingService
                 'alchemy_bag_count' => $character->getAlchemyBagCount(),
                 'alchemy_bag_max' => $character->alchemy_bag_limit,
                 'alchemy_bag_remaining' => max(0, $character->alchemy_bag_limit - $character->getAlchemyBagCount()),
-                'mode' => ($batchCrafting->progress ?? [])['craft_mode'] ?? ($batchCrafting->progress ?? [])['alchemy_mode'] ?? ($batchCrafting->progress ?? [])['trinketry_mode'] ?? null,
-                'phase' => ($batchCrafting->progress ?? [])['craft_enchant_phase'] ?? null,
+                'mode' => $progress['craft_mode'] ?? $progress['alchemy_mode'] ?? $progress['trinketry_mode'] ?? null,
+                'phase' => $progress['craft_enchant_phase'] ?? null,
                 'next_action' => $this->nextAction($batchCrafting),
-                'requested_amount' => ($batchCrafting->progress ?? [])['craft_amount'] ?? ($batchCrafting->progress ?? [])['alchemy_amount'] ?? ($batchCrafting->progress ?? [])['trinketry_amount'] ?? null,
-                'completed_amount' => ($batchCrafting->progress ?? [])['craft_specific_count'] ?? ($batchCrafting->progress ?? [])['craft_enchant_specific_count'] ?? ($batchCrafting->progress ?? [])['alchemy_amount_count'] ?? ($batchCrafting->progress ?? [])['trinketry_amount_count'] ?? null,
-                'requested_set_count' => ($batchCrafting->progress ?? [])['requested_set_count'] ?? null,
-                'completed_set_count' => ($batchCrafting->progress ?? [])['completed_set_count'] ?? null,
-                'no_inventory_reason' => ($batchCrafting->progress ?? [])['no_inventory_reason'] ?? null,
+                'requested_amount' => $progress['craft_amount'] ?? $progress['alchemy_amount'] ?? $progress['holy_oil_requested_applications'] ?? null,
+                'completed_amount' => $progress['craft_specific_count'] ?? $progress['craft_enchant_specific_count'] ?? $progress['alchemy_amount_count'] ?? $progress['holy_oil_completed_applications'] ?? null,
+                'no_inventory_reason' => $progress['no_inventory_reason'] ?? null,
                 'skills' => $this->craftingSkillData($character, $type),
                 'currency' => [
                     'type' => $type->requiredCurrency(),
@@ -191,6 +207,11 @@ class BatchCraftingService
                     'failed' => $batchCrafting->failed_count,
                 ],
                 'kept_set_summary' => $this->keptSetSummary($batchCrafting),
+                'batch_crafting_set' => [
+                    'current_slots' => $batchCraftingSet?->currentSlotCount() ?? 0,
+                    'max_slots' => $batchCraftingSet?->max_slots ?? InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+                    'remaining_slots' => $batchCraftingSet?->remainingSlots() ?? InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+                ],
                 'action_log' => $actionLog,
             ],
         ];
@@ -250,8 +271,27 @@ class BatchCraftingService
         }
 
         if (isset($result['end_reason'])) {
+            $counts = $result['counts'] ?? [];
+
+            foreach ($counts as $column => $increment) {
+                if (! in_array($column, [
+                    'crafted_count',
+                    'sold_count',
+                    'destroyed_count',
+                    'listed_count',
+                    'kept_count',
+                    'applied_count',
+                    'skipped_count',
+                    'failed_count',
+                ])) {
+                    continue;
+                }
+
+                $batchCrafting->increment($column, $increment);
+            }
+
             if (! empty($result['actions'] ?? [])) {
-                $this->appendActionLog($batchCrafting, $result['counts'] ?? [], $result['actions']);
+                $this->appendActionLog($batchCrafting, $counts, $result['actions']);
                 $this->logActions($batchCrafting, $result['actions']);
             }
 
@@ -286,6 +326,7 @@ class BatchCraftingService
         }
 
         event(new BatchCraftingStatusUpdated($batchCrafting->user_id));
+        event(new BatchCraftingMonitoringUpdated($batchCrafting->character_id));
 
         return $batchCrafting->refresh();
     }
@@ -308,6 +349,7 @@ class BatchCraftingService
         if (! is_null($batchCrafting) && ! $batchCrafting->isRunning()) {
             $batchCrafting->update(['panel_dismissed_at' => now()]);
             event(new BatchCraftingStatusUpdated($character->user_id));
+            event(new BatchCraftingMonitoringUpdated($character->id));
         }
     }
 
@@ -365,6 +407,7 @@ class BatchCraftingService
         }
 
         event(new BatchCraftingStatusUpdated($batchCrafting->user_id));
+        event(new BatchCraftingMonitoringUpdated($batchCrafting->character_id));
 
         return $batchCrafting->refresh();
     }
@@ -544,6 +587,19 @@ class BatchCraftingService
         ];
     }
 
+    private function progressPercent(BatchCrafting $batchCrafting, int $timerProgressPercent): int
+    {
+        $progress = $batchCrafting->progress ?? [];
+        $requested = $progress['craft_amount'] ?? $progress['alchemy_amount'] ?? $progress['holy_oil_requested_applications'] ?? null;
+        $completed = $progress['craft_specific_count'] ?? $progress['craft_enchant_specific_count'] ?? $progress['alchemy_amount_count'] ?? $progress['holy_oil_completed_applications'] ?? null;
+
+        if (is_null($requested) || is_null($completed) || (int) $requested < 1) {
+            return $timerProgressPercent;
+        }
+
+        return min(100, (int) floor(((int) $completed / (int) $requested) * 100));
+    }
+
     private function formatSeconds(int $seconds): string
     {
         $hours = intdiv($seconds, 3600);
@@ -642,24 +698,50 @@ class BatchCraftingService
         };
     }
 
+    private function tickDelaySeconds(BatchCraftingType $type, array $progress): int
+    {
+        if ($type === BatchCraftingType::HOLY_OILS) {
+            return self::IMMEDIATE_DELAY_SECONDS;
+        }
+
+        if ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? 'experience') === 'amount') {
+            return self::IMMEDIATE_DELAY_SECONDS;
+        }
+
+        if (in_array($type, [BatchCraftingType::CRAFT, BatchCraftingType::CRAFT_AND_ENCHANT], true) && ($progress['craft_mode'] ?? 'experience') === 'specific_item') {
+            return self::IMMEDIATE_DELAY_SECONDS;
+        }
+
+        return self::RECURRING_DELAY_SECONDS;
+    }
+
     private function validatedProgress(Character $character, BatchCraftingType $type, array $data): array
     {
         $progress = $data['progress'] ?? [];
 
         if (in_array($type, [BatchCraftingType::CRAFT, BatchCraftingType::CRAFT_AND_ENCHANT], true)) {
-            $mode = $progress['craft_mode'] ?? 'full_set';
+            $mode = $progress['craft_mode'] ?? 'experience';
 
             if ($mode === 'experience') {
-                $this->rejectMaxedSkill($character, $this->craftingSkillName($progress['specific_crafting_type'] ?? 'weapon'), 'progress.craft_mode');
+                $craftingSkills = $character->skills()
+                    ->whereHas('baseSkill', fn ($query) => $query->whereIn('name', [
+                        'Weapon Crafting',
+                        'Armour Crafting',
+                        'Ring Crafting',
+                        'Spell Crafting',
+                    ]))
+                    ->with('baseSkill')
+                    ->get();
+
+                if ($craftingSkills->isNotEmpty() && $craftingSkills->every(fn ($skill) => $skill->level >= $skill->max_level)) {
+                    throw ValidationException::withMessages([
+                        'progress.craft_mode' => 'Crafting skills are already maxed.',
+                    ]);
+                }
             }
 
             if ($mode === 'specific_item') {
                 $this->validateSpecificCraftItem($character, $progress);
-            }
-
-            if ($mode === 'full_set') {
-                $progress['requested_set_count'] = (int) ($progress['set_count'] ?? ($type === BatchCraftingType::CRAFT_AND_ENCHANT ? 5 : 1));
-                $progress['completed_set_count'] = (int) ($progress['completed_set_count'] ?? 0);
             }
 
             if ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $mode === 'specific_item') {
@@ -677,21 +759,13 @@ class BatchCraftingService
 
             if ($mode === 'amount') {
                 $progress['alchemy_amount'] = (int) ($progress['alchemy_amount'] ?? $progress['craft_amount'] ?? 0);
+                $progress['alchemy_item_id'] = (int) ($progress['alchemy_item_id'] ?? 0);
             }
         }
 
         if ($type === BatchCraftingType::TRINKETRY) {
-            $mode = $progress['trinketry_mode'] ?? 'amount';
-            $progress['trinketry_mode'] = $mode;
-
-            if ($mode === 'experience') {
-                $this->rejectMaxedSkill($character, 'Trinketry', 'progress.trinketry_mode');
-            }
-
-            if ($mode === 'amount') {
-                $progress['trinketry_amount'] = (int) ($progress['trinketry_amount'] ?? $progress['craft_amount'] ?? 0);
-                $progress['craft_amount'] = $progress['trinketry_amount'];
-            }
+            $progress['trinketry_mode'] = 'experience';
+            $this->rejectMaxedSkill($character, 'Trinketry', 'progress.trinketry_mode');
         }
 
         return $progress;
@@ -712,15 +786,20 @@ class BatchCraftingService
             ]);
         }
 
-        $craftableItems = $this->craftingService->fetchCraftableItems($character, [
-            'crafting_type' => $craftingType,
-        ], false);
+        $craftableItems = $this->specificCraftableItems($character, $craftingType);
 
         if ($craftableItems->first(fn ($item) => (int) $item->id === $itemId) === null) {
             throw ValidationException::withMessages([
                 'progress.specific_item_id' => 'The selected item is not craftable by this character.',
             ]);
         }
+    }
+
+    private function specificCraftableItems(Character $character, string $craftingType)
+    {
+        return $this->craftingService->fetchCraftableItems($character, [
+            'crafting_type' => $craftingType,
+        ], false);
     }
 
     private function validateEnchantAffixes(array $affixIds): void

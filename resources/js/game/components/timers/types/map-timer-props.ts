@@ -6,4 +6,6 @@ export default interface MapTimerProps {
     time_left: number;
 
     celestial_time_out: number;
+
+    batch_crafting_time_out: number;
 }

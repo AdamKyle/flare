@@ -5,19 +5,18 @@ import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import DangerButton from "../../ui/buttons/danger-button";
 import PrimaryButton from "../../ui/buttons/primary-button";
 import Select from "react-select";
-import BatchCraftingStatusDisplay, {
-    BatchCraftingStatus,
-} from "./batch-crafting-status-display";
+import { craftingGetEndPoints } from "../general-crafting/helpers/crafting-type-url";
+import { BatchCraftingStatus } from "./batch-crafting-status-display";
 
 type BatchType =
     | "craft"
     | "craft_and_enchant"
-    | "enchant"
     | "alchemy"
     | "holy_oils"
     | "trinketry";
 
-type CraftMode = "full_set" | "specific_item" | "experience";
+type CraftMode = "specific_item" | "experience";
+type CraftCategory = "weapon" | "armour" | "ring" | "spell";
 type AlchemyMode = "experience" | "amount";
 
 type Disposition =
@@ -35,12 +34,16 @@ type CraftableItem = {
     name: string;
     type: string;
     cost?: number;
+    gold_dust_cost?: number;
+    shards_cost?: number;
 };
 
 type EnchantmentOption = {
     id: number;
     name: string;
+    type: "prefix" | "suffix";
     cost?: number;
+    int_required?: number;
 };
 
 type HolyOilItem = {
@@ -71,7 +74,6 @@ type BatchCraftingSectionProps = {
 const batchTypes: { value: BatchType; label: string }[] = [
     { value: "craft", label: "Craft" },
     { value: "craft_and_enchant", label: "Craft and Enchant" },
-    { value: "enchant", label: "Enchant" },
     { value: "alchemy", label: "Alchemy" },
     { value: "holy_oils", label: "Holy Oils" },
     { value: "trinketry", label: "Trinketry" },
@@ -91,8 +93,40 @@ const dispositions: { value: Disposition; label: string }[] = [
     },
 ];
 
+const weaponTypeOptions = [
+    { value: "dagger", label: "Daggers" },
+    { value: "sword", label: "Swords" },
+    { value: "claw", label: "Claws" },
+    { value: "wand", label: "Wands" },
+    { value: "censer", label: "Censers" },
+    { value: "stave", label: "Staves" },
+    { value: "hammer", label: "Hammers" },
+    { value: "bow", label: "Bows" },
+    { value: "gun", label: "Guns" },
+    { value: "fan", label: "Fans" },
+    { value: "mace", label: "Maces" },
+    { value: "scratch-awl", label: "Scratch Awls" },
+];
+
+const armourTypeOptions = [
+    { value: "helmet", label: "Helmet" },
+    { value: "body", label: "Body" },
+    { value: "sleeves", label: "Sleeves" },
+    { value: "gloves", label: "Gloves" },
+    { value: "shield", label: "Shields" },
+    { value: "leggings", label: "Leggings" },
+    { value: "feet", label: "Feet" },
+];
+
+const craftCategoryOptions: { value: CraftCategory; label: string }[] = [
+    { value: "weapon", label: "Weapon" },
+    { value: "armour", label: "Armour" },
+    { value: "ring", label: "Ring" },
+    { value: "spell", label: "Spell" },
+];
+
 function canList(batchType: BatchType): boolean {
-    return ["craft_and_enchant", "enchant", "alchemy"].includes(batchType);
+    return ["craft_and_enchant", "alchemy"].includes(batchType);
 }
 
 function canDisenchant(batchType: BatchType): boolean {
@@ -118,17 +152,25 @@ export default function BatchCraftingSection({
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
     const [selectedOils, setSelectedOils] = useState<number[]>([]);
     const [holyOilsLoading, setHolyOilsLoading] = useState(false);
-    const [craftMode, setCraftMode] = useState<CraftMode>("full_set");
+    const [craftMode, setCraftMode] = useState<CraftMode>("experience");
     const [alchemyMode, setAlchemyMode] = useState<AlchemyMode>("experience");
-    const [specificCraftingType, setSpecificCraftingType] = useState("weapon");
+    const [craftCategory, setCraftCategory] = useState<CraftCategory>("weapon");
+    const [weaponType, setWeaponType] = useState("dagger");
+    const [armourType, setArmourType] = useState("helmet");
     const [specificItemId, setSpecificItemId] = useState<number | null>(null);
     const [craftAmount, setCraftAmount] = useState<number | "">(1);
-    const [trinketryAmount, setTrinketryAmount] = useState<number | "">(1);
-    const [setCount, setSetCount] = useState<number | "">(1);
     const [craftableItems, setCraftableItems] = useState<CraftableItem[]>([]);
+    const [alchemyItems, setAlchemyItems] = useState<CraftableItem[]>([]);
+    const [selectedAlchemyItemId, setSelectedAlchemyItemId] = useState<
+        number | null
+    >(null);
+    const [trinketryIsMaxed, setTrinketryIsMaxed] = useState(false);
     const [enchantments, setEnchantments] = useState<EnchantmentOption[]>([]);
-    const [selectedEnchantments, setSelectedEnchantments] = useState<number[]>(
-        [],
+    const [selectedPrefixId, setSelectedPrefixId] = useState<number | null>(
+        null,
+    );
+    const [selectedSuffixId, setSelectedSuffixId] = useState<number | null>(
+        null,
     );
 
     const fetchStatus = useCallback(() => {
@@ -212,13 +254,26 @@ export default function BatchCraftingSection({
             return;
         }
 
+        const craftingType =
+            craftCategory === "weapon"
+                ? weaponType
+                : craftCategory === "armour"
+                  ? "armour"
+                  : craftCategory;
+
         new Ajax()
             .setRoute(`crafting/${character_id}`)
-            .setParameters({ crafting_type: specificCraftingType })
+            .setParameters({ crafting_type: craftingType })
             .doAjaxCall(
                 "get",
                 (response: AxiosResponse) => {
-                    const items = response.data.items ?? [];
+                    const items =
+                        craftCategory === "armour"
+                            ? (response.data.items ?? []).filter(
+                                  (item: CraftableItem) =>
+                                      item.type === armourType,
+                              )
+                            : (response.data.items ?? []);
                     setCraftableItems(items);
                     setSpecificItemId(items[0]?.id ?? null);
                 },
@@ -227,7 +282,59 @@ export default function BatchCraftingSection({
                     setSpecificItemId(null);
                 },
             );
-    }, [batchType, character_id, craftMode, specificCraftingType]);
+    }, [
+        armourType,
+        batchType,
+        character_id,
+        craftCategory,
+        craftMode,
+        weaponType,
+    ]);
+
+    useEffect(() => {
+        if (batchType !== "alchemy" || alchemyMode !== "amount") {
+            setAlchemyItems([]);
+            setSelectedAlchemyItemId(null);
+            return;
+        }
+
+        new Ajax()
+            .setRoute(craftingGetEndPoints("alchemy", character_id))
+            .doAjaxCall(
+                "get",
+                (response: AxiosResponse) => {
+                    const items = response.data.items ?? [];
+                    setAlchemyItems(items);
+                    setSelectedAlchemyItemId(items[0]?.id ?? null);
+                },
+                (_error: AxiosError) => {
+                    setAlchemyItems([]);
+                    setSelectedAlchemyItemId(null);
+                },
+            );
+    }, [alchemyMode, batchType, character_id]);
+
+    useEffect(() => {
+        if (batchType !== "trinketry") {
+            setTrinketryIsMaxed(false);
+            return;
+        }
+
+        new Ajax()
+            .setRoute(craftingGetEndPoints("trinketry", character_id))
+            .doAjaxCall(
+                "get",
+                (response: AxiosResponse) => {
+                    const skillXp = response.data.skill_xp ?? {};
+                    const nextLevelXp = Number(skillXp.next_level_xp ?? 0);
+                    setTrinketryIsMaxed(
+                        nextLevelXp > 0 &&
+                            Number(skillXp.current_xp ?? 0) >= nextLevelXp,
+                    );
+                },
+                (_error: AxiosError) => setTrinketryIsMaxed(false),
+            );
+    }, [batchType, character_id]);
 
     useEffect(() => {
         if (
@@ -235,7 +342,8 @@ export default function BatchCraftingSection({
             craftMode !== "specific_item"
         ) {
             setEnchantments([]);
-            setSelectedEnchantments([]);
+            setSelectedPrefixId(null);
+            setSelectedSuffixId(null);
             return;
         }
 
@@ -244,30 +352,16 @@ export default function BatchCraftingSection({
             (response: AxiosResponse) => {
                 const affixes = response.data.affixes?.affixes ?? [];
                 setEnchantments(affixes);
-                setSelectedEnchantments(affixes[0]?.id ? [affixes[0].id] : []);
+                setSelectedPrefixId(null);
+                setSelectedSuffixId(null);
             },
             (_error: AxiosError) => {
                 setEnchantments([]);
-                setSelectedEnchantments([]);
+                setSelectedPrefixId(null);
+                setSelectedSuffixId(null);
             },
         );
     }, [batchType, character_id, craftMode]);
-
-    const toggleItemSelection = useCallback((itemId: number) => {
-        setSelectedItems((currentItems) =>
-            currentItems.includes(itemId)
-                ? currentItems.filter((id) => id !== itemId)
-                : [...currentItems, itemId],
-        );
-    }, []);
-
-    const toggleOilSelection = useCallback((slotId: number) => {
-        setSelectedOils((currentOils) =>
-            currentOils.includes(slotId)
-                ? currentOils.filter((id) => id !== slotId)
-                : [...currentOils, slotId],
-        );
-    }, []);
 
     const startBatch = useCallback(() => {
         setIsSaving(true);
@@ -279,18 +373,22 @@ export default function BatchCraftingSection({
             progress.craft_mode = craftMode;
 
             if (craftMode === "specific_item") {
-                progress.specific_crafting_type = specificCraftingType;
+                progress.specific_crafting_type =
+                    craftCategory === "weapon"
+                        ? weaponType
+                        : craftCategory === "armour"
+                          ? "armour"
+                          : craftCategory;
                 progress.specific_item_id = specificItemId;
                 progress.craft_amount =
                     craftAmount !== "" ? Number(craftAmount) : 1;
 
                 if (batchType === "craft_and_enchant") {
-                    progress.enchant_affix_ids = selectedEnchantments;
+                    progress.enchant_affix_ids = [
+                        selectedPrefixId,
+                        selectedSuffixId,
+                    ].filter((affixId) => affixId !== null);
                 }
-            } else if (craftMode === "experience") {
-                progress.specific_crafting_type = specificCraftingType;
-            } else {
-                progress.set_count = setCount !== "" ? Number(setCount) : 1;
             }
         }
 
@@ -300,13 +398,12 @@ export default function BatchCraftingSection({
             if (alchemyMode === "amount") {
                 progress.alchemy_amount =
                     craftAmount !== "" ? Number(craftAmount) : 1;
+                progress.alchemy_item_id = selectedAlchemyItemId;
             }
         }
 
         if (batchType === "trinketry") {
-            progress.trinketry_mode = "amount";
-            progress.trinketry_amount =
-                trinketryAmount !== "" ? Number(trinketryAmount) : 1;
+            progress.trinketry_mode = "experience";
         }
 
         const params: Record<string, unknown> = {
@@ -356,12 +453,14 @@ export default function BatchCraftingSection({
         selectedOils,
         craftMode,
         alchemyMode,
-        specificCraftingType,
+        craftCategory,
+        weaponType,
+        armourType,
         specificItemId,
         craftAmount,
-        trinketryAmount,
-        setCount,
-        selectedEnchantments,
+        selectedPrefixId,
+        selectedSuffixId,
+        selectedAlchemyItemId,
     ]);
 
     const cancelBatch = useCallback(() => {
@@ -413,7 +512,8 @@ export default function BatchCraftingSection({
     );
     const isActive = status?.active ?? false;
     const isCompleted = status?.completed ?? false;
-    const hasBatch = (isActive || isCompleted) && status?.batch !== undefined;
+    const startDisabled =
+        isSaving || (batchType === "trinketry" && trinketryIsMaxed);
 
     return (
         <section className="mt-2">
@@ -447,19 +547,6 @@ export default function BatchCraftingSection({
                         </button>
                     </div>
                 </InfoAlert>
-            ) : null}
-
-            {hasBatch && status?.batch ? (
-                <div className="my-4">
-                    <BatchCraftingStatusDisplay
-                        status={status}
-                        character_id={character_id}
-                        isSaving={isSaving}
-                        onCancel={cancelBatch}
-                        onDismiss={dismissPanel}
-                        onClose={remove_crafting}
-                    />
-                </div>
             ) : null}
 
             {!isActive && !isCompleted ? (
@@ -517,21 +604,18 @@ export default function BatchCraftingSection({
                             <Select
                                 onChange={(opt) =>
                                     setCraftMode(
-                                        (opt?.value ?? "full_set") as CraftMode,
+                                        (opt?.value ??
+                                            "experience") as CraftMode,
                                     )
                                 }
                                 options={[
                                     {
-                                        value: "full_set",
-                                        label: "Full Set (weapon, armour, ring, spell)",
+                                        value: "experience",
+                                        label: "Craft For Experience",
                                     },
                                     {
                                         value: "specific_item",
                                         label: "Specific Item",
-                                    },
-                                    {
-                                        value: "experience",
-                                        label: "Craft For Experience",
                                     },
                                 ]}
                                 menuPosition={"absolute"}
@@ -547,11 +631,9 @@ export default function BatchCraftingSection({
                                 value={{
                                     value: craftMode,
                                     label:
-                                        craftMode === "full_set"
-                                            ? "Full Set (weapon, armour, ring, spell)"
-                                            : craftMode === "specific_item"
-                                              ? "Specific Item"
-                                              : "Craft For Experience",
+                                        craftMode === "specific_item"
+                                            ? "Specific Item"
+                                            : "Craft For Experience",
                                 }}
                             />
                         </label>
@@ -559,43 +641,31 @@ export default function BatchCraftingSection({
 
                     {(batchType === "craft" ||
                         batchType === "craft_and_enchant") &&
-                    craftMode === "full_set" ? (
-                        <label className="grid gap-1 text-sm font-semibold">
-                            Set count
-                            <input
-                                className="rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="number"
-                                min={1}
-                                value={setCount}
-                                onChange={(e) =>
-                                    setSetCount(
-                                        e.target.value === ""
-                                            ? ""
-                                            : parseInt(e.target.value, 10),
-                                    )
-                                }
-                            />
-                        </label>
+                    craftMode === "experience" ? (
+                        <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
+                            Experience mode uses internal 23-item sets and sends
+                            kept output to the Crafted Items Set. It targets
+                            Weapon Crafting, Armour Crafting, Ring Crafting, and
+                            Spell Crafting. Craft and Enchant also enchants
+                            crafted items before disposition rules. You may want
+                            to equip relevant crafting or enchanting gear before
+                            starting.
+                        </p>
                     ) : null}
 
                     {(batchType === "craft" ||
                         batchType === "craft_and_enchant") &&
-                    (craftMode === "specific_item" ||
-                        craftMode === "experience") ? (
+                    craftMode === "specific_item" ? (
                         <label className="grid gap-1 text-sm font-semibold">
-                            Crafting type
+                            Category
                             <Select
                                 onChange={(opt) =>
-                                    setSpecificCraftingType(
-                                        opt?.value ?? "weapon",
+                                    setCraftCategory(
+                                        (opt?.value ??
+                                            "weapon") as CraftCategory,
                                     )
                                 }
-                                options={[
-                                    { value: "weapon", label: "Weapon" },
-                                    { value: "armour", label: "Armour" },
-                                    { value: "ring", label: "Ring" },
-                                    { value: "spell", label: "Spell" },
-                                ]}
+                                options={craftCategoryOptions}
                                 menuPosition={"absolute"}
                                 menuPlacement={"bottom"}
                                 styles={{
@@ -607,12 +677,12 @@ export default function BatchCraftingSection({
                                 }}
                                 menuPortalTarget={document.body}
                                 value={{
-                                    value: specificCraftingType,
+                                    value: craftCategory,
                                     label:
-                                        specificCraftingType
-                                            .charAt(0)
-                                            .toUpperCase() +
-                                        specificCraftingType.slice(1),
+                                        craftCategoryOptions.find(
+                                            (option) =>
+                                                option.value === craftCategory,
+                                        )?.label ?? "Weapon",
                                 }}
                             />
                         </label>
@@ -622,6 +692,64 @@ export default function BatchCraftingSection({
                         batchType === "craft_and_enchant") &&
                     craftMode === "specific_item" ? (
                         <>
+                            {craftCategory === "weapon" ? (
+                                <label className="grid gap-1 text-sm font-semibold">
+                                    Weapon type
+                                    <Select
+                                        onChange={(opt) =>
+                                            setWeaponType(
+                                                opt?.value ?? "dagger",
+                                            )
+                                        }
+                                        options={weaponTypeOptions}
+                                        menuPosition={"absolute"}
+                                        menuPlacement={"bottom"}
+                                        styles={{
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                                color: "#000000",
+                                            }),
+                                        }}
+                                        menuPortalTarget={document.body}
+                                        value={
+                                            weaponTypeOptions.find(
+                                                (option) =>
+                                                    option.value === weaponType,
+                                            ) ?? weaponTypeOptions[0]
+                                        }
+                                    />
+                                </label>
+                            ) : null}
+                            {craftCategory === "armour" ? (
+                                <label className="grid gap-1 text-sm font-semibold">
+                                    Armour type
+                                    <Select
+                                        onChange={(opt) =>
+                                            setArmourType(
+                                                opt?.value ?? "helmet",
+                                            )
+                                        }
+                                        options={armourTypeOptions}
+                                        menuPosition={"absolute"}
+                                        menuPlacement={"bottom"}
+                                        styles={{
+                                            menuPortal: (base) => ({
+                                                ...base,
+                                                zIndex: 9999,
+                                                color: "#000000",
+                                            }),
+                                        }}
+                                        menuPortalTarget={document.body}
+                                        value={
+                                            armourTypeOptions.find(
+                                                (option) =>
+                                                    option.value === armourType,
+                                            ) ?? armourTypeOptions[0]
+                                        }
+                                    />
+                                </label>
+                            ) : null}
                             <label className="grid gap-1 text-sm font-semibold">
                                 Item
                                 <Select
@@ -659,45 +787,98 @@ export default function BatchCraftingSection({
                                 />
                             </label>
                             {batchType === "craft_and_enchant" ? (
-                                <label className="grid gap-1 text-sm font-semibold">
-                                    Enchantments
-                                    <Select
-                                        isMulti
-                                        onChange={(opts) =>
-                                            setSelectedEnchantments(
-                                                opts
-                                                    .map((opt) => opt.value)
-                                                    .slice(0, 2),
-                                            )
-                                        }
-                                        options={enchantments.map(
-                                            (enchantment) => ({
-                                                value: enchantment.id,
-                                                label: `${enchantment.name}${enchantment.cost ? ` Gold Cost: ${enchantment.cost}` : ""}`,
-                                            }),
-                                        )}
-                                        menuPosition={"absolute"}
-                                        menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
-                                        menuPortalTarget={document.body}
-                                        value={enchantments
-                                            .filter((enchantment) =>
-                                                selectedEnchantments.includes(
-                                                    enchantment.id,
-                                                ),
-                                            )
-                                            .map((enchantment) => ({
-                                                value: enchantment.id,
-                                                label: `${enchantment.name}${enchantment.cost ? ` Gold Cost: ${enchantment.cost}` : ""}`,
-                                            }))}
-                                    />
-                                </label>
+                                <>
+                                    <label className="grid gap-1 text-sm font-semibold">
+                                        Prefix enchant
+                                        <Select
+                                            isClearable
+                                            onChange={(opt) =>
+                                                setSelectedPrefixId(
+                                                    opt?.value ?? null,
+                                                )
+                                            }
+                                            options={enchantments
+                                                .filter(
+                                                    (enchantment) =>
+                                                        enchantment.type ===
+                                                        "prefix",
+                                                )
+                                                .map((enchantment) => ({
+                                                    value: enchantment.id,
+                                                    label: `${enchantment.name}${enchantment.cost ? ` Cost: ${enchantment.cost}` : ""}${enchantment.int_required ? `, INT REQ: ${enchantment.int_required}` : ""}`,
+                                                }))}
+                                            menuPosition={"absolute"}
+                                            menuPlacement={"bottom"}
+                                            styles={{
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    color: "#000000",
+                                                }),
+                                            }}
+                                            menuPortalTarget={document.body}
+                                            value={
+                                                enchantments
+                                                    .filter(
+                                                        (enchantment) =>
+                                                            enchantment.type ===
+                                                                "prefix" &&
+                                                            enchantment.id ===
+                                                                selectedPrefixId,
+                                                    )
+                                                    .map((enchantment) => ({
+                                                        value: enchantment.id,
+                                                        label: `${enchantment.name}${enchantment.cost ? ` Cost: ${enchantment.cost}` : ""}${enchantment.int_required ? `, INT REQ: ${enchantment.int_required}` : ""}`,
+                                                    }))[0]
+                                            }
+                                        />
+                                    </label>
+                                    <label className="grid gap-1 text-sm font-semibold">
+                                        Suffix enchant
+                                        <Select
+                                            isClearable
+                                            onChange={(opt) =>
+                                                setSelectedSuffixId(
+                                                    opt?.value ?? null,
+                                                )
+                                            }
+                                            options={enchantments
+                                                .filter(
+                                                    (enchantment) =>
+                                                        enchantment.type ===
+                                                        "suffix",
+                                                )
+                                                .map((enchantment) => ({
+                                                    value: enchantment.id,
+                                                    label: `${enchantment.name}${enchantment.cost ? ` Cost: ${enchantment.cost}` : ""}${enchantment.int_required ? `, INT REQ: ${enchantment.int_required}` : ""}`,
+                                                }))}
+                                            menuPosition={"absolute"}
+                                            menuPlacement={"bottom"}
+                                            styles={{
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    color: "#000000",
+                                                }),
+                                            }}
+                                            menuPortalTarget={document.body}
+                                            value={
+                                                enchantments
+                                                    .filter(
+                                                        (enchantment) =>
+                                                            enchantment.type ===
+                                                                "suffix" &&
+                                                            enchantment.id ===
+                                                                selectedSuffixId,
+                                                    )
+                                                    .map((enchantment) => ({
+                                                        value: enchantment.id,
+                                                        label: `${enchantment.name}${enchantment.cost ? ` Cost: ${enchantment.cost}` : ""}${enchantment.int_required ? `, INT REQ: ${enchantment.int_required}` : ""}`,
+                                                    }))[0]
+                                            }
+                                        />
+                                    </label>
+                                </>
                             ) : null}
                             <label className="grid gap-1 text-sm font-semibold">
                                 Amount to craft
@@ -725,7 +906,7 @@ export default function BatchCraftingSection({
                                 onChange={(opt) =>
                                     setAlchemyMode(
                                         (opt?.value ??
-                                            "standard") as AlchemyMode,
+                                            "experience") as AlchemyMode,
                                     )
                                 }
                                 options={[
@@ -757,51 +938,82 @@ export default function BatchCraftingSection({
                     ) : null}
 
                     {batchType === "alchemy" && alchemyMode === "amount" ? (
-                        <label className="grid gap-1 text-sm font-semibold">
-                            Amount to craft
-                            <input
-                                className="rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="number"
-                                min={1}
-                                value={craftAmount}
-                                onChange={(e) =>
-                                    setCraftAmount(
-                                        e.target.value === ""
-                                            ? ""
-                                            : parseInt(e.target.value, 10),
-                                    )
-                                }
-                            />
-                        </label>
+                        <>
+                            <label className="grid gap-1 text-sm font-semibold">
+                                Alchemy item
+                                <Select
+                                    onChange={(opt) =>
+                                        setSelectedAlchemyItemId(
+                                            opt?.value ?? null,
+                                        )
+                                    }
+                                    options={alchemyItems.map((item) => ({
+                                        value: item.id,
+                                        label: `${item.name}${item.gold_dust_cost ? ` Gold Dust Cost: ${item.gold_dust_cost}` : ""}${item.shards_cost ? ` Shards Cost: ${item.shards_cost}` : ""}`,
+                                    }))}
+                                    menuPosition={"absolute"}
+                                    menuPlacement={"bottom"}
+                                    styles={{
+                                        menuPortal: (base) => ({
+                                            ...base,
+                                            zIndex: 9999,
+                                            color: "#000000",
+                                        }),
+                                    }}
+                                    menuPortalTarget={document.body}
+                                    value={
+                                        selectedAlchemyItemId === null
+                                            ? null
+                                            : alchemyItems
+                                                  .map((item) => ({
+                                                      value: item.id,
+                                                      label: `${item.name}${item.gold_dust_cost ? ` Gold Dust Cost: ${item.gold_dust_cost}` : ""}${item.shards_cost ? ` Shards Cost: ${item.shards_cost}` : ""}`,
+                                                  }))
+                                                  .find(
+                                                      (item) =>
+                                                          item.value ===
+                                                          selectedAlchemyItemId,
+                                                  )
+                                    }
+                                />
+                            </label>
+                            <label className="grid gap-1 text-sm font-semibold">
+                                Amount to craft
+                                <input
+                                    className="rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                    type="number"
+                                    min={1}
+                                    value={craftAmount}
+                                    onChange={(e) =>
+                                        setCraftAmount(
+                                            e.target.value === ""
+                                                ? ""
+                                                : parseInt(e.target.value, 10),
+                                        )
+                                    }
+                                />
+                            </label>
+                        </>
                     ) : null}
 
                     {batchType === "trinketry" ? (
-                        <label className="grid gap-1 text-sm font-semibold">
-                            Amount to craft
-                            <input
-                                className="rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="number"
-                                min={1}
-                                value={trinketryAmount}
-                                onChange={(e) =>
-                                    setTrinketryAmount(
-                                        e.target.value === ""
-                                            ? ""
-                                            : parseInt(e.target.value, 10),
-                                    )
-                                }
-                            />
-                        </label>
+                        trinketryIsMaxed ? (
+                            <p className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800 dark:border-red-700 dark:bg-red-950 dark:text-red-100">
+                                doesnt make sense to batch craft trinket items
+                                now does it? You are max level.
+                            </p>
+                        ) : null
                     ) : null}
 
                     {batchType === "holy_oils" ? (
                         <div className="grid gap-3">
                             <div>
-                                <h4 className="mb-2 text-sm font-semibold">
-                                    Items to apply holy oils to
-                                </h4>
                                 {holyOilsLoading ? (
-                                    <p className="text-sm text-gray-500">
+                                    <p
+                                        className="text-sm text-gray-500"
+                                        role="status"
+                                        aria-live="polite"
+                                    >
                                         Loading...
                                     </p>
                                 ) : holyOilItems.length === 0 ? (
@@ -809,50 +1021,56 @@ export default function BatchCraftingSection({
                                         No items available for holy oils.
                                     </p>
                                 ) : (
-                                    <ul className="max-h-36 space-y-1 overflow-y-auto">
-                                        {holyOilItems.map((slot) => (
-                                            <li key={slot.id}>
-                                                <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedItems.includes(
-                                                            slot.item_id,
-                                                        )}
-                                                        onChange={() =>
-                                                            toggleItemSelection(
-                                                                slot.item_id,
-                                                            )
-                                                        }
-                                                    />
-                                                    <span>
-                                                        {slot.item.name}{" "}
-                                                        <span className="text-xs text-gray-500">
-                                                            (
-                                                            {
-                                                                slot.item
-                                                                    .holy_stacks_applied
-                                                            }
-                                                            /
-                                                            {
-                                                                slot.item
-                                                                    .holy_stacks
-                                                            }{" "}
-                                                            stacks)
-                                                        </span>
-                                                    </span>
-                                                </label>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    <label className="grid gap-1 text-sm font-semibold">
+                                        Items to apply holy oils to
+                                        <Select
+                                            isMulti
+                                            onChange={(options) =>
+                                                setSelectedItems(
+                                                    options.map(
+                                                        (option) =>
+                                                            option.value,
+                                                    ),
+                                                )
+                                            }
+                                            options={holyOilItems.map(
+                                                (slot) => ({
+                                                    value: slot.item_id,
+                                                    label: `${slot.item.name} (${slot.item.holy_stacks_applied}/${slot.item.holy_stacks} stacks)`,
+                                                }),
+                                            )}
+                                            menuPosition={"absolute"}
+                                            menuPlacement={"bottom"}
+                                            styles={{
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    color: "#000000",
+                                                }),
+                                            }}
+                                            menuPortalTarget={document.body}
+                                            value={holyOilItems
+                                                .filter((slot) =>
+                                                    selectedItems.includes(
+                                                        slot.item_id,
+                                                    ),
+                                                )
+                                                .map((slot) => ({
+                                                    value: slot.item_id,
+                                                    label: `${slot.item.name} (${slot.item.holy_stacks_applied}/${slot.item.holy_stacks} stacks)`,
+                                                }))}
+                                        />
+                                    </label>
                                 )}
                             </div>
 
                             <div>
-                                <h4 className="mb-2 text-sm font-semibold">
-                                    Holy oils to use
-                                </h4>
                                 {holyOilsLoading ? (
-                                    <p className="text-sm text-gray-500">
+                                    <p
+                                        className="text-sm text-gray-500"
+                                        role="status"
+                                        aria-live="polite"
+                                    >
                                         Loading...
                                     </p>
                                 ) : holyOilOptions.length === 0 ? (
@@ -860,31 +1078,46 @@ export default function BatchCraftingSection({
                                         No holy oils available.
                                     </p>
                                 ) : (
-                                    <ul className="max-h-36 space-y-1 overflow-y-auto">
-                                        {holyOilOptions.map((slot) => (
-                                            <li key={slot.id}>
-                                                <label className="flex cursor-pointer items-center gap-2 text-sm">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedOils.includes(
-                                                            slot.id,
-                                                        )}
-                                                        onChange={() =>
-                                                            toggleOilSelection(
-                                                                slot.id,
-                                                            )
-                                                        }
-                                                    />
-                                                    <span>
-                                                        {slot.item.name}{" "}
-                                                        <span className="text-xs text-gray-500">
-                                                            (x{slot.amount})
-                                                        </span>
-                                                    </span>
-                                                </label>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    <label className="grid gap-1 text-sm font-semibold">
+                                        Holy oils to use
+                                        <Select
+                                            isMulti
+                                            onChange={(options) =>
+                                                setSelectedOils(
+                                                    options.map(
+                                                        (option) =>
+                                                            option.value,
+                                                    ),
+                                                )
+                                            }
+                                            options={holyOilOptions.map(
+                                                (slot) => ({
+                                                    value: slot.id,
+                                                    label: `${slot.item.name} (x${slot.amount})`,
+                                                }),
+                                            )}
+                                            menuPosition={"absolute"}
+                                            menuPlacement={"bottom"}
+                                            styles={{
+                                                menuPortal: (base) => ({
+                                                    ...base,
+                                                    zIndex: 9999,
+                                                    color: "#000000",
+                                                }),
+                                            }}
+                                            menuPortalTarget={document.body}
+                                            value={holyOilOptions
+                                                .filter((slot) =>
+                                                    selectedOils.includes(
+                                                        slot.id,
+                                                    ),
+                                                )
+                                                .map((slot) => ({
+                                                    value: slot.id,
+                                                    label: `${slot.item.name} (x${slot.amount})`,
+                                                }))}
+                                        />
+                                    </label>
                                 )}
                             </div>
                         </div>
@@ -900,7 +1133,7 @@ export default function BatchCraftingSection({
                         <PrimaryButton
                             button_label={"Start Batch"}
                             on_click={startBatch}
-                            disabled={isSaving}
+                            disabled={startDisabled}
                             additional_css={"w-full md:w-auto"}
                         />
                         <DangerButton

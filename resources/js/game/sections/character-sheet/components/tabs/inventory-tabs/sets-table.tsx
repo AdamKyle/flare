@@ -74,6 +74,7 @@ export default class SetsTable
             equippable: boolean;
             items: InventoryDetails[] | [];
             equipped: boolean;
+            is_batch_crafting_set?: boolean;
         };
     }) {
         const setKeys = Object.keys(sets);
@@ -360,11 +361,19 @@ export default class SetsTable
 
     buildMenuItems() {
         return this.state.drop_down_labels.map((label: string) => {
+            const isBatchCraftingSet =
+                this.props.sets[label]?.is_batch_crafting_set ?? false;
+
             return {
                 name: label,
-                icon_class: clsx("ra ra-crossed-swords", {
-                    "text-yellow-600": this.cannotEquipSet(label),
-                }),
+                icon_class: isBatchCraftingSet
+                    ? "ra ra-anvil"
+                    : clsx("ra ra-crossed-swords", {
+                          "text-yellow-600": this.cannotEquipSet(label),
+                      }),
+                extra_class: isBatchCraftingSet
+                    ? "border border-yellow-sea-700 bg-yellow-sea-500 text-yellow-sea-950 dark:border-yellow-sea-300 dark:bg-yellow-sea-800 dark:text-yellow-sea-50 font-medium"
+                    : undefined,
                 on_click: () => this.switchTable(label),
             };
         });
@@ -378,25 +387,34 @@ export default class SetsTable
 
     buildActionsDropDown() {
         const actions = [];
+        const selectedSet =
+            this.state.selected_set !== null
+                ? this.props.sets[this.state.selected_set]
+                : null;
 
-        actions.push({
-            name: "Rename set",
-            icon_class: "fas fa-edit",
-            on_click: () => this.manageRenameSet(),
-        });
+        if (!selectedSet?.is_batch_crafting_set) {
+            actions.push({
+                name: "Rename set",
+                icon_class: "fas fa-edit",
+                on_click: () => this.manageRenameSet(),
+            });
+        }
 
-        if (this.state.selected_set !== null) {
+        if (this.state.selected_set !== null && selectedSet !== null) {
             if (
                 this.state.selected_set !== this.props.set_name_equipped &&
-                this.props.sets[this.state.selected_set].items.length > 0
+                selectedSet.items.length > 0
             ) {
-                actions.push({
-                    name: "Empty set",
-                    icon_class: "fas fa-eraser",
-                    on_click: () => this.emptySet(),
-                });
+                if (selectedSet.can_empty) {
+                    actions.push({
+                        name: "Empty set",
+                        icon_class: "fas fa-eraser",
+                        on_click: () => this.emptySet(),
+                    });
+                }
 
                 if (
+                    !selectedSet.is_batch_crafting_set &&
                     !this.cannotEquipSet() &&
                     !this.props.is_automation_running
                 ) {
@@ -508,6 +526,17 @@ export default class SetsTable
                             set <i className="fas fa-external-link-alt"></i>
                         </a>{" "}
                         rules. You can still treat this set like a stash tab.
+                    </WarningAlert>
+                ) : null}
+                {this.state.selected_set !== null &&
+                !this.props.sets[this.state.selected_set].can_empty &&
+                this.props.sets[this.state.selected_set]
+                    .empty_disabled_reason ? (
+                    <WarningAlert additional_css={"mb-4"}>
+                        {
+                            this.props.sets[this.state.selected_set]
+                                .empty_disabled_reason
+                        }
                     </WarningAlert>
                 ) : null}
                 {this.buildSetTitle() !== null ? (

@@ -6,21 +6,25 @@ use App\Flare\Models\BatchCrafting;
 use App\Flare\Values\AutomationType;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
+use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBag;
 use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateInventory;
 use Tests\Traits\CreateInventorySlot;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateUser;
 
 class BatchCraftingControllerTest extends TestCase
 {
-    use CreateAlchemyBag, CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateInventory, CreateInventorySlot, CreateItem, CreateUser, RefreshDatabase;
+    use CreateAlchemyBag, CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateGameSkill, CreateInventory, CreateInventorySlot, CreateItem, CreateItemAffix, CreateUser, RefreshDatabase;
 
     public function testStartCraftBatch(): void
     {
@@ -48,7 +52,7 @@ class BatchCraftingControllerTest extends TestCase
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::CRAFT_AND_ENCHANT->value)->first());
     }
 
-    public function testStartEnchantBatch(): void
+    public function testCannotStartEnchantBatch(): void
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
@@ -58,7 +62,7 @@ class BatchCraftingControllerTest extends TestCase
             'disposition' => BatchCraftingDisposition::KEEP->value,
         ]);
 
-        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ENCHANT->value)->first());
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ENCHANT->value)->first());
     }
 
     public function testStartAlchemyBatch(): void
@@ -173,7 +177,7 @@ class BatchCraftingControllerTest extends TestCase
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::LIST->value)->first());
     }
 
-    public function testAllowListForEnchant(): void
+    public function testRejectListForEnchant(): void
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
@@ -183,7 +187,7 @@ class BatchCraftingControllerTest extends TestCase
             'disposition' => BatchCraftingDisposition::LIST->value,
         ]);
 
-        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::LIST->value)->first());
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
     }
 
     public function testAllowListForAlchemy(): void
@@ -233,6 +237,159 @@ class BatchCraftingControllerTest extends TestCase
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ENCHANT->value,
             'disposition' => BatchCraftingDisposition::DISENCHANT->value,
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testRejectKeepBestDisenchantRestForEnchant(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DISENCHANT_REST->value,
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testCraftExperienceDoesNotRequireSpecificCraftingType(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $batchCrafting = BatchCrafting::where('character_id', $character->id)->first();
+
+        $this->assertSame('experience', $batchCrafting->progress['craft_mode'] ?? null);
+        $this->assertArrayNotHasKey('set_count', $batchCrafting->progress ?? []);
+    }
+
+    public function testRejectFullSetCraftMode(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'full_set'],
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testCraftAndEnchantSpecificItemStartsWithAmount(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Controller Batch Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $prefix = $this->createItemAffix(['name' => 'Controller Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'sword',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 2,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+
+        $batchCrafting = BatchCrafting::where('character_id', $character->id)->first();
+        $this->assertSame(2, $batchCrafting->progress['craft_amount'] ?? null);
+    }
+
+    public function testCraftAndEnchantSpecificItemAcceptsOnePrefixAffix(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Controller Prefix Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $prefix = $this->createItemAffix(['name' => 'Single Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'sword',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testCraftAndEnchantSpecificItemAcceptsOneSuffixAffix(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Controller Suffix Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $suffix = $this->createItemAffix(['name' => 'Single Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'sword',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'enchant_affix_ids' => [$suffix->id],
+            ],
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testCraftAndEnchantSpecificItemAcceptsPrefixAndSuffixAffixes(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Controller Both Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $prefix = $this->createItemAffix(['name' => 'Both Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $suffix = $this->createItemAffix(['name' => 'Both Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'sword',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'enchant_affix_ids' => [$prefix->id, $suffix->id],
+            ],
+        ]);
+
+        $batchCrafting = BatchCrafting::where('character_id', $character->id)->first();
+        $this->assertCount(2, $batchCrafting->progress['enchant_affix_ids'] ?? []);
+    }
+
+    public function testAlchemyAmountRequiresSelectedItem(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1],
         ]);
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());

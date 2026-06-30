@@ -17,6 +17,7 @@ import {
     Paginated,
 } from "../types/batch-crafting-monitoring";
 import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
+import useBatchCraftingLiveRefresh from "../hooks/use-batch-crafting-live-refresh";
 
 const DAY_OPTIONS = [
     { value: "1", label: "1 day" },
@@ -116,6 +117,8 @@ export default function BatchCraftingDashboard() {
         void refresh();
     }, [refresh]);
 
+    useBatchCraftingLiveRefresh(refresh);
+
     const applyTableFilter = (nextFilters: Partial<BatchCraftingFilters>) => {
         setFilters({ ...defaultFilters, ...nextFilters });
         setPage(1);
@@ -157,7 +160,7 @@ export default function BatchCraftingDashboard() {
     };
 
     return (
-        <div className="pb-16 text-gray-900 dark:text-gray-100">
+        <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
             {loading && (
                 <p role="status" aria-live="polite">
                     Loading batch crafting monitoring data…
@@ -172,405 +175,506 @@ export default function BatchCraftingDashboard() {
                 </p>
             )}
 
-            <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-                <div className="min-w-0 space-y-5 xl:w-1/2">
-                    <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
-                        {(
-                            [
-                                {
-                                    label: "Total Runs",
-                                    value: summary.total_runs,
-                                    filter: null,
-                                },
-                                {
-                                    label: "Active",
-                                    value: summary.active,
-                                    filter: { status: "active" },
-                                },
-                                {
-                                    label: "Completed",
-                                    value: summary.completed,
-                                    filter: { status: "completed" },
-                                },
-                                {
-                                    label: "Cancelled",
-                                    value: summary.cancelled,
-                                    filter: { status: "cancelled" },
-                                },
-                                {
-                                    label: "Total Crafted",
-                                    value: summary.total_crafted,
-                                    filter: null,
-                                },
-                                {
-                                    label: "Total Failed",
-                                    value: summary.total_failed,
-                                    filter: null,
-                                },
-                            ] as {
-                                label: string;
-                                value: number;
-                                filter: Partial<BatchCraftingFilters> | null;
-                            }[]
-                        ).map(({ label, value, filter }) => (
-                            <button
-                                key={label}
-                                type="button"
-                                className="text-left"
-                                aria-label={`Filter recent runs by ${label}`}
-                                onClick={() => {
-                                    if (filter !== null) {
-                                        applyTableFilter(filter);
-                                    }
-                                }}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                {(
+                    [
+                        {
+                            label: "Total Runs",
+                            value: summary.total_runs,
+                            filter: null,
+                        },
+                        {
+                            label: "Active",
+                            value: summary.active,
+                            filter: { status: "active" },
+                        },
+                        {
+                            label: "Completed",
+                            value: summary.completed,
+                            filter: { status: "completed" },
+                        },
+                        {
+                            label: "Cancelled",
+                            value: summary.cancelled,
+                            filter: { status: "cancelled" },
+                        },
+                        {
+                            label: "Total Crafted",
+                            value: summary.total_crafted,
+                            filter: null,
+                        },
+                        {
+                            label: "Total Failed",
+                            value: summary.total_failed,
+                            filter: null,
+                        },
+                    ] as {
+                        label: string;
+                        value: number;
+                        filter: Partial<BatchCraftingFilters> | null;
+                    }[]
+                ).map(({ label, value, filter }) => (
+                    <button
+                        key={label}
+                        type="button"
+                        className="text-left"
+                        aria-label={`Filter recent runs by ${label}`}
+                        onClick={() => {
+                            if (filter !== null) {
+                                applyTableFilter(filter);
+                            }
+                        }}
+                    >
+                        <MonitorCard>
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                                {label}
+                            </div>
+                            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                                {value}
+                            </div>
+                        </MonitorCard>
+                    </button>
+                ))}
+            </div>
+
+            <div>
+                <label className="mb-3 block text-sm font-medium">
+                    Period
+                    <select
+                        className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                        value={days}
+                        onChange={(e) => setDays(e.target.value)}
+                    >
+                        {DAY_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                <MonitoringStatusChart
+                    title="Batch Crafting Over Time"
+                    description="Runs, items crafted, and failures per day."
+                    points={chartPoints}
+                    series={chartSeries}
+                />
+            </div>
+
+            {active.length > 0 ? (
+                <MonitorCard>
+                    <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                        Active Batches
+                    </h2>
+                    <div className="grid gap-3 md:hidden">
+                        {active.map((row) => (
+                            <div
+                                key={row.character_id}
+                                className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
                             >
-                                <MonitorCard>
-                                    <div className="text-sm text-gray-600 dark:text-gray-300">
-                                        {label}
+                                <div className="font-semibold">
+                                    {row.character_name ?? "—"}
+                                </div>
+                                <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <dt className="text-gray-500 dark:text-gray-400">
+                                            Type
+                                        </dt>
+                                        <dd>{row.batch_type}</dd>
                                     </div>
-                                    <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                                        {value}
+                                    <div>
+                                        <dt className="text-gray-500 dark:text-gray-400">
+                                            Disposition
+                                        </dt>
+                                        <dd>{row.disposition}</dd>
                                     </div>
-                                </MonitorCard>
-                            </button>
+                                    <div>
+                                        <dt className="text-gray-500 dark:text-gray-400">
+                                            Crafted
+                                        </dt>
+                                        <dd>{row.crafted_count}</dd>
+                                    </div>
+                                    <div>
+                                        <dt className="text-gray-500 dark:text-gray-400">
+                                            Failed
+                                        </dt>
+                                        <dd>{row.failed_count}</dd>
+                                    </div>
+                                </dl>
+                            </div>
                         ))}
                     </div>
-
-                    <div>
-                        <label className="mb-3 block text-sm font-medium">
-                            Period
-                            <select
-                                className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                value={days}
-                                onChange={(e) => setDays(e.target.value)}
-                            >
-                                {DAY_OPTIONS.map((opt) => (
-                                    <option key={opt.value} value={opt.value}>
-                                        {opt.label}
-                                    </option>
+                    <div className="hidden overflow-x-auto md:block">
+                        <table className="w-full text-left text-sm">
+                            <thead>
+                                <tr className="border-b border-gray-200 dark:border-gray-700">
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Character
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Type
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Disposition
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Started
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Crafted
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 font-semibold"
+                                    >
+                                        Failed
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {active.map((row) => (
+                                    <tr
+                                        key={row.character_id}
+                                        className="border-b border-gray-100 dark:border-gray-800"
+                                    >
+                                        <td className="py-2 pr-4">
+                                            {row.character_name ?? "—"}
+                                        </td>
+                                        <td className="py-2 pr-4">
+                                            {row.batch_type}
+                                        </td>
+                                        <td className="py-2 pr-4">
+                                            {row.disposition}
+                                        </td>
+                                        <td className="py-2 pr-4">
+                                            {row.started_at ?? "—"}
+                                        </td>
+                                        <td className="py-2 pr-4">
+                                            {row.crafted_count}
+                                        </td>
+                                        <td className="py-2">
+                                            {row.failed_count}
+                                        </td>
+                                    </tr>
                                 ))}
-                            </select>
+                            </tbody>
+                        </table>
+                    </div>
+                </MonitorCard>
+            ) : null}
+
+            <div id="batch-crafting-runs-table">
+                <MonitorCard>
+                    <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                        Recent Runs
+                    </h2>
+                    <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                        <label className="text-sm font-medium">
+                            Character name
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                type="text"
+                                value={filters.character_name}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        character_name: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
                         </label>
-                        <MonitoringStatusChart
-                            title="Batch Crafting Over Time"
-                            description="Runs, items crafted, and failures per day."
-                            points={chartPoints}
-                            series={chartSeries}
-                        />
+                        <label className="text-sm font-medium">
+                            Date from
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                type="date"
+                                value={filters.date_from}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        date_from: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
+                        </label>
+                        <label className="text-sm font-medium">
+                            Date to
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                type="date"
+                                value={filters.date_to}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        date_to: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
+                        </label>
+                        <label className="text-sm font-medium">
+                            Batch type
+                            <input
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                type="text"
+                                value={filters.batch_type}
+                                onChange={(e) => {
+                                    setFilters({
+                                        ...filters,
+                                        batch_type: e.target.value,
+                                    });
+                                    setPage(1);
+                                }}
+                            />
+                        </label>
                     </div>
-
-                    {active.length > 0 ? (
-                        <MonitorCard>
-                            <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                                Active Batches
-                            </h2>
-                            <div className="overflow-x-auto">
-                                <table className="w-full min-w-[600px] text-left text-sm">
-                                    <thead>
-                                        <tr className="border-b border-gray-200 dark:border-gray-700">
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Character
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Type
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Disposition
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Started
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Crafted
-                                            </th>
-                                            <th className="py-2 font-semibold">
-                                                Failed
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {active.map((row) => (
-                                            <tr
-                                                key={row.character_id}
-                                                className="border-b border-gray-100 dark:border-gray-800"
-                                            >
-                                                <td className="py-2 pr-4">
-                                                    {row.character_name ?? "—"}
-                                                </td>
-                                                <td className="py-2 pr-4">
-                                                    {row.batch_type}
-                                                </td>
-                                                <td className="py-2 pr-4">
-                                                    {row.disposition}
-                                                </td>
-                                                <td className="py-2 pr-4">
-                                                    {row.started_at ?? "—"}
-                                                </td>
-                                                <td className="py-2 pr-4">
-                                                    {row.crafted_count}
-                                                </td>
-                                                <td className="py-2">
-                                                    {row.failed_count}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </MonitorCard>
-                    ) : null}
-
-                    <div id="batch-crafting-runs-table">
-                        <MonitorCard>
-                            <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                                Recent Runs
-                            </h2>
-                            <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                <label className="text-sm font-medium">
-                                    Character name
-                                    <input
-                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                        type="text"
-                                        value={filters.character_name}
-                                        onChange={(e) => {
-                                            setFilters({
-                                                ...filters,
-                                                character_name: e.target.value,
-                                            });
-                                            setPage(1);
-                                        }}
-                                    />
-                                </label>
-                                <label className="text-sm font-medium">
-                                    Date from
-                                    <input
-                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                        type="date"
-                                        value={filters.date_from}
-                                        onChange={(e) => {
-                                            setFilters({
-                                                ...filters,
-                                                date_from: e.target.value,
-                                            });
-                                            setPage(1);
-                                        }}
-                                    />
-                                </label>
-                                <label className="text-sm font-medium">
-                                    Date to
-                                    <input
-                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                        type="date"
-                                        value={filters.date_to}
-                                        onChange={(e) => {
-                                            setFilters({
-                                                ...filters,
-                                                date_to: e.target.value,
-                                            });
-                                            setPage(1);
-                                        }}
-                                    />
-                                </label>
-                                <label className="text-sm font-medium">
-                                    Batch type
-                                    <input
-                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                        type="text"
-                                        value={filters.batch_type}
-                                        onChange={(e) => {
-                                            setFilters({
-                                                ...filters,
-                                                batch_type: e.target.value,
-                                            });
-                                            setPage(1);
-                                        }}
-                                    />
-                                </label>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full min-w-[700px] text-left text-sm">
-                                    <thead>
-                                        <tr className="border-b border-gray-200 dark:border-gray-700">
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Character
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Type
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Disposition
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Status
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Started
-                                            </th>
-                                            <th className="py-2 pr-4 font-semibold">
-                                                Crafted
-                                            </th>
-                                            <th className="py-2 font-semibold">
-                                                Failed
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {runs.data.length === 0 ? (
-                                            <tr>
-                                                <td
-                                                    colSpan={7}
-                                                    className="py-4 text-center text-gray-500 dark:text-gray-400"
-                                                >
-                                                    No runs found.
-                                                </td>
-                                            </tr>
-                                        ) : (
-                                            runs.data.map((row) => (
-                                                <tr
-                                                    key={row.id}
-                                                    className="border-b border-gray-100 dark:border-gray-800"
-                                                >
-                                                    <td className="py-2 pr-4">
-                                                        {row.character?.name ??
-                                                            "—"}
-                                                    </td>
-                                                    <td className="py-2 pr-4">
-                                                        {row.batch_type}
-                                                    </td>
-                                                    <td className="py-2 pr-4">
-                                                        {row.disposition}
-                                                    </td>
-                                                    <td className="py-2 pr-4 capitalize">
-                                                        {humanizeStatus(row)}
-                                                    </td>
-                                                    <td className="py-2 pr-4">
-                                                        {row.started_at ?? "—"}
-                                                    </td>
-                                                    <td className="py-2 pr-4">
-                                                        {row.crafted_count}
-                                                    </td>
-                                                    <td className="py-2">
-                                                        {row.failed_count}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                                <span className="text-sm text-gray-600 dark:text-gray-300">
-                                    Page {runs.current_page} of {runs.last_page}
-                                </span>
-                                <div className="flex gap-2">
-                                    <button
-                                        className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                                        disabled={runs.current_page <= 1}
-                                        onClick={() =>
-                                            setPage(runs.current_page - 1)
-                                        }
-                                    >
-                                        Previous
-                                    </button>
-                                    <button
-                                        className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                                        disabled={
-                                            runs.current_page >= runs.last_page
-                                        }
-                                        onClick={() =>
-                                            setPage(runs.current_page + 1)
-                                        }
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        </MonitorCard>
-                    </div>
-                </div>
-
-                <div className="w-full xl:w-1/2">
-                    <MonitorCard>
-                        <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                            Batch Crafting Logs
-                        </h2>
-                        <div className="mb-3">
-                            <label className="text-sm font-medium">
-                                Severity
-                                <select
-                                    className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                    value={logSeverity}
-                                    onChange={(e) => {
-                                        setLogSeverity(e.target.value);
-                                        setLogPage(1);
-                                    }}
-                                >
-                                    <option value="">All</option>
-                                    <option value="ERROR">Error</option>
-                                    <option value="WARNING">Warning</option>
-                                    <option value="INFO">Info</option>
-                                    <option value="DEBUG">Debug</option>
-                                </select>
-                            </label>
-                        </div>
-                        {logs.data.length === 0 ? (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                No log entries found.
+                    <div className="grid gap-3 md:hidden">
+                        {runs.data.length === 0 ? (
+                            <p className="py-4 text-center text-gray-500 dark:text-gray-400">
+                                No runs found.
                             </p>
                         ) : (
-                            <ul className="grid gap-3">
-                                {logs.data.map((entry, index) => (
-                                    <li
-                                        key={`${entry.date}-${index}`}
-                                        className="border-b border-gray-100 pb-2 text-xs dark:border-gray-800"
-                                    >
-                                        <div className="flex flex-wrap items-baseline gap-x-2">
-                                            <span className="text-gray-400 dark:text-gray-500">
-                                                {entry.date}
-                                            </span>
-                                            <span
-                                                className={`font-semibold ${levelColor(entry.level)}`}
-                                            >
-                                                {entry.level}
-                                            </span>
+                            runs.data.map((row) => (
+                                <div
+                                    key={row.id}
+                                    className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
+                                >
+                                    <div className="font-semibold">
+                                        {row.character?.name ?? "—"}
+                                    </div>
+                                    <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                                        <div>
+                                            <dt className="text-gray-500 dark:text-gray-400">
+                                                Type
+                                            </dt>
+                                            <dd>{row.batch_type}</dd>
                                         </div>
-                                        <p className="mt-1 text-gray-700 dark:text-gray-200">
-                                            {entry.text}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
+                                        <div>
+                                            <dt className="text-gray-500 dark:text-gray-400">
+                                                Status
+                                            </dt>
+                                            <dd>{humanizeStatus(row)}</dd>
+                                        </div>
+                                        <div>
+                                            <dt className="text-gray-500 dark:text-gray-400">
+                                                Crafted
+                                            </dt>
+                                            <dd>{row.crafted_count}</dd>
+                                        </div>
+                                        <div>
+                                            <dt className="text-gray-500 dark:text-gray-400">
+                                                Failed
+                                            </dt>
+                                            <dd>{row.failed_count}</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            ))
                         )}
-                        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
-                                Page {logs.current_page} of {logs.last_page}
-                            </span>
-                            <div className="flex gap-2">
-                                <button
-                                    className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                                    disabled={logs.current_page <= 1}
-                                    onClick={() =>
-                                        setLogPage(logs.current_page - 1)
-                                    }
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                                    disabled={
-                                        logs.current_page >= logs.last_page
-                                    }
-                                    onClick={() =>
-                                        setLogPage(logs.current_page + 1)
-                                    }
-                                >
-                                    Next
-                                </button>
-                            </div>
+                    </div>
+                    <div className="hidden overflow-x-auto md:block">
+                        <table className="w-full text-left text-sm">
+                            <thead>
+                                <tr className="border-b border-gray-200 dark:border-gray-700">
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Character
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Type
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Disposition
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Status
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Started
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 pr-4 font-semibold"
+                                    >
+                                        Crafted
+                                    </th>
+                                    <th
+                                        scope="col"
+                                        className="py-2 font-semibold"
+                                    >
+                                        Failed
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {runs.data.length === 0 ? (
+                                    <tr>
+                                        <td
+                                            colSpan={7}
+                                            className="py-4 text-center text-gray-500 dark:text-gray-400"
+                                        >
+                                            No runs found.
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    runs.data.map((row) => (
+                                        <tr
+                                            key={row.id}
+                                            className="border-b border-gray-100 dark:border-gray-800"
+                                        >
+                                            <td className="py-2 pr-4">
+                                                {row.character?.name ?? "—"}
+                                            </td>
+                                            <td className="py-2 pr-4">
+                                                {row.batch_type}
+                                            </td>
+                                            <td className="py-2 pr-4">
+                                                {row.disposition}
+                                            </td>
+                                            <td className="py-2 pr-4 capitalize">
+                                                {humanizeStatus(row)}
+                                            </td>
+                                            <td className="py-2 pr-4">
+                                                {row.started_at ?? "—"}
+                                            </td>
+                                            <td className="py-2 pr-4">
+                                                {row.crafted_count}
+                                            </td>
+                                            <td className="py-2">
+                                                {row.failed_count}
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
+                            Page {runs.current_page} of {runs.last_page}
+                        </span>
+                        <div className="flex gap-2">
+                            <button
+                                className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+                                disabled={runs.current_page <= 1}
+                                onClick={() => setPage(runs.current_page - 1)}
+                            >
+                                Previous
+                            </button>
+                            <button
+                                className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+                                disabled={runs.current_page >= runs.last_page}
+                                onClick={() => setPage(runs.current_page + 1)}
+                            >
+                                Next
+                            </button>
                         </div>
-                    </MonitorCard>
-                </div>
+                    </div>
+                </MonitorCard>
             </div>
+            <MonitorCard>
+                <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                    Batch Crafting Logs
+                </h2>
+                <div className="mb-3">
+                    <label className="text-sm font-medium">
+                        Severity
+                        <select
+                            className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                            value={logSeverity}
+                            onChange={(e) => {
+                                setLogSeverity(e.target.value);
+                                setLogPage(1);
+                            }}
+                        >
+                            <option value="">All</option>
+                            <option value="ERROR">Error</option>
+                            <option value="WARNING">Warning</option>
+                            <option value="INFO">Info</option>
+                            <option value="DEBUG">Debug</option>
+                        </select>
+                    </label>
+                </div>
+                {logs.data.length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                        No log entries found.
+                    </p>
+                ) : (
+                    <ul className="grid gap-3">
+                        {logs.data.map((entry, index) => (
+                            <li
+                                key={`${entry.date}-${index}`}
+                                className="border-b border-gray-100 pb-2 text-xs dark:border-gray-800"
+                            >
+                                <div className="flex flex-wrap items-baseline gap-x-2">
+                                    <span className="text-gray-400 dark:text-gray-500">
+                                        {entry.date}
+                                    </span>
+                                    <span
+                                        className={`font-semibold ${levelColor(entry.level)}`}
+                                    >
+                                        {entry.level}
+                                    </span>
+                                </div>
+                                <p className="mt-1 text-gray-700 dark:text-gray-200">
+                                    {entry.text}
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                        Page {logs.current_page} of {logs.last_page}
+                    </span>
+                    <div className="flex gap-2">
+                        <button
+                            className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+                            disabled={logs.current_page <= 1}
+                            onClick={() => setLogPage(logs.current_page - 1)}
+                        >
+                            Previous
+                        </button>
+                        <button
+                            className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+                            disabled={logs.current_page >= logs.last_page}
+                            onClick={() => setLogPage(logs.current_page + 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </MonitorCard>
         </div>
     );
 }

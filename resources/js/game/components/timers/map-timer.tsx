@@ -13,6 +13,7 @@ export default class MapTimer extends React.Component<MapTimerProps, {}> {
             this.props.time_left,
             this.props.automation_time_out,
             this.props.celestial_time_out,
+            this.props.batch_crafting_time_out,
         ].filter((timeRemaining: number) => timeRemaining !== 0).length;
 
         return (
@@ -40,6 +41,13 @@ export default class MapTimer extends React.Component<MapTimerProps, {}> {
                         key="celestial-timer"
                         time_remaining={this.props.celestial_time_out}
                         time_out_label={"Celestial Timeout"}
+                    />
+                </div>
+                <div>
+                    <TimerProgressBar
+                        key="batch-crafting-timer"
+                        time_remaining={this.props.batch_crafting_time_out}
+                        time_out_label={"Batch Crafting"}
                     />
                 </div>
             </div>

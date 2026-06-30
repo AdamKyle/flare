@@ -15,8 +15,7 @@ class BatchCraftingStartRequest extends FormRequest
         $batchType = $this->input('batch_type');
 
         if (in_array($batchType, [BatchCraftingType::CRAFT->value, BatchCraftingType::CRAFT_AND_ENCHANT->value], true)) {
-            $progress['craft_mode'] = $progress['craft_mode'] ?? 'full_set';
-            $progress['set_count'] = $progress['set_count'] ?? ($batchType === BatchCraftingType::CRAFT_AND_ENCHANT->value ? 5 : 1);
+            $progress['craft_mode'] = $progress['craft_mode'] ?? 'experience';
         }
 
         if ($batchType === BatchCraftingType::ALCHEMY->value) {
@@ -24,8 +23,7 @@ class BatchCraftingStartRequest extends FormRequest
         }
 
         if ($batchType === BatchCraftingType::TRINKETRY->value) {
-            $progress['trinketry_mode'] = $progress['trinketry_mode'] ?? 'amount';
-            $progress['trinketry_amount'] = $progress['trinketry_amount'] ?? 1;
+            $progress['trinketry_mode'] = $progress['trinketry_mode'] ?? 'experience';
         }
 
         $this->merge(['progress' => $progress]);
@@ -38,24 +36,31 @@ class BatchCraftingStartRequest extends FormRequest
 
     public function rules(): array
     {
+        $startableTypes = [
+            BatchCraftingType::CRAFT->value,
+            BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            BatchCraftingType::ALCHEMY->value,
+            BatchCraftingType::HOLY_OILS->value,
+            BatchCraftingType::TRINKETRY->value,
+        ];
+
         return [
-            'batch_type' => ['required', Rule::in(array_column(BatchCraftingType::cases(), 'value'))],
+            'batch_type' => ['required', Rule::in($startableTypes)],
             'disposition' => ['required', Rule::in(array_column(BatchCraftingDisposition::cases(), 'value'))],
             'selected_items' => ['nullable', 'array'],
             'selected_oils' => ['nullable', 'array'],
             'progress' => ['nullable', 'array'],
-            'progress.craft_mode' => ['nullable', 'string', Rule::in(['full_set', 'specific_item', 'experience'])],
+            'progress.craft_mode' => ['nullable', 'string', Rule::in(['specific_item', 'experience'])],
             'progress.specific_crafting_type' => ['nullable', 'string'],
             'progress.specific_item_type' => ['nullable', 'string'],
             'progress.specific_item_id' => ['nullable', 'integer', 'min:1'],
             'progress.craft_amount' => ['nullable', 'integer', 'min:1'],
-            'progress.set_count' => ['nullable', 'integer', 'min:1'],
             'progress.enchant_affix_ids' => ['nullable', 'array', 'min:1', 'max:2'],
             'progress.enchant_affix_ids.*' => ['integer', 'min:1'],
             'progress.alchemy_mode' => ['nullable', 'string', Rule::in(['experience', 'amount'])],
+            'progress.alchemy_item_id' => ['nullable', 'integer', 'min:1'],
             'progress.alchemy_amount' => ['nullable', 'integer', 'min:1'],
-            'progress.trinketry_mode' => ['nullable', 'string', Rule::in(['experience', 'amount'])],
-            'progress.trinketry_amount' => ['nullable', 'integer', 'min:1'],
+            'progress.trinketry_mode' => ['nullable', 'string', Rule::in(['experience'])],
         ];
     }
 
@@ -111,9 +116,9 @@ class BatchCraftingStartRequest extends FormRequest
                 && ($input->progress['alchemy_mode'] ?? null) === 'amount';
         });
 
-        $validator->sometimes('progress.trinketry_amount', ['required'], function ($input) {
-            return $input->batch_type === BatchCraftingType::TRINKETRY->value
-                && ($input->progress['trinketry_mode'] ?? 'amount') === 'amount';
+        $validator->sometimes('progress.alchemy_item_id', ['required'], function ($input) {
+            return $input->batch_type === BatchCraftingType::ALCHEMY->value
+                && ($input->progress['alchemy_mode'] ?? null) === 'amount';
         });
     }
 }

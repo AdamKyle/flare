@@ -3,9 +3,11 @@
 namespace App\Flare\View\Livewire\Admin\LocationTemplates;
 
 use App\Flare\Models\LocationTemplate;
+use App\Flare\Values\LocationTemplateType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 
 class LocationTemplatesTable extends DataTableComponent
 {
@@ -17,6 +19,20 @@ class LocationTemplatesTable extends DataTableComponent
     public function builder(): Builder
     {
         return LocationTemplate::query();
+    }
+
+    public function filters(): array
+    {
+        return [
+            SelectFilter::make('Type')
+                ->options([
+                    '' => 'Please Select',
+                    ...LocationTemplateType::getNamedValues(),
+                ])
+                ->filter(function (Builder $builder, string $value) {
+                    return $builder->where('type', $value);
+                }),
+        ];
     }
 
     public function columns(): array

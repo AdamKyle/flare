@@ -85,6 +85,10 @@ export interface CharacterType {
 
     is_delve_running: boolean;
 
+    is_batch_crafting_running: boolean;
+
+    batch_crafting_time_out: number;
+
     is_at_delve_location: boolean;
 
     can_set_delve_pack: boolean;

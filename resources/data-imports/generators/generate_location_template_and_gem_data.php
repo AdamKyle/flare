@@ -260,22 +260,22 @@ foreach ($generationSets as $setIndex => [$setName, $planeName]) {
     $prefix = slugName($setName);
 
     foreach ($regularThemes as $index => $theme) {
-        $name = $prefix.' '.$theme.' '.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+        $name = $prefix.' '.$theme;
         $locationTemplateRows[] = [$name, sprintf($descriptions['regular'], $name), 'regular', 0, 1];
     }
 
     foreach ($delveThemes as $index => $theme) {
-        $name = $prefix.' '.$theme.' '.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+        $name = $prefix.' '.$theme;
         $locationTemplateRows[] = [$name, sprintf($descriptions['delve'], $name), 'delve', 0, 1];
     }
 
     foreach ($specialThemes as $index => $theme) {
-        $name = $prefix.' '.$theme.' '.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+        $name = $prefix.' '.$theme;
         $locationTemplateRows[] = [$name, sprintf($descriptions['special'], $name), 'special', 0, 1];
     }
 
     foreach ($portThemes as $index => $theme) {
-        $name = $prefix.' '.$theme.' '.str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT);
+        $name = $prefix.' '.$theme;
         $locationTemplateRows[] = [$name, sprintf($descriptions['port'], $name), 'port', 1, 1];
     }
 }

@@ -27,13 +27,19 @@ class BatchCraftingJob implements ShouldQueue
         $batchCrafting = $batchCraftingService->process($batchCrafting);
 
         if ($batchCrafting->isRunning() && ! app()->runningUnitTests()) {
-            $this->redispatchForNextMinute($batchCrafting); // @codeCoverageIgnore
+            $this->redispatchForNextRun($batchCrafting); // @codeCoverageIgnore
         }
     }
 
     /** @codeCoverageIgnore */
-    private function redispatchForNextMinute(BatchCrafting $batchCrafting): void
+    private function redispatchForNextRun(BatchCrafting $batchCrafting): void
     {
-        self::dispatch($batchCrafting->id)->delay(now()->addMinute())->onConnection('long_running')->onQueue('default_long');
+        if (! $batchCrafting->isRunning()) {
+            return;
+        }
+
+        $delaySeconds = (int) (($batchCrafting->progress ?? [])['tick_delay_seconds'] ?? 60);
+
+        self::dispatch($batchCrafting->id)->delay(now()->addSeconds($delaySeconds))->onConnection('long_running')->onQueue('default_long');
     }
 }

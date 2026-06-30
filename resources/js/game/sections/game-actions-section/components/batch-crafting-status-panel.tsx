@@ -19,12 +19,18 @@ export default function BatchCraftingStatusPanel({
     const [status, setStatus] = useState<BatchCraftingStatus | null>(null);
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
+    const [remainingSeconds, setRemainingSeconds] = useState(0);
 
     const fetchStatus = useCallback(() => {
         new Ajax().setRoute(`batch-crafting/${character_id}/status`).doAjaxCall(
             "get",
             (response: AxiosResponse) => {
                 setStatus(response.data);
+                setElapsedSeconds(response.data.batch?.elapsed_seconds ?? 0);
+                setRemainingSeconds(
+                    response.data.batch?.remaining_seconds ?? 0,
+                );
                 setLoading(false);
             },
             (_error: AxiosError) => {
@@ -36,6 +42,19 @@ export default function BatchCraftingStatusPanel({
     useEffect(() => {
         fetchStatus();
     }, [fetchStatus]);
+
+    useEffect(() => {
+        if (!status?.active) {
+            return;
+        }
+
+        const interval = window.setInterval(() => {
+            setElapsedSeconds((current) => current + 1);
+            setRemainingSeconds((current) => Math.max(0, current - 1));
+        }, 1000);
+
+        return () => window.clearInterval(interval);
+    }, [status?.active]);
 
     useEffect(() => {
         const channelName = "batch-crafting-status-updated-" + user_id;
@@ -94,7 +113,7 @@ export default function BatchCraftingStatusPanel({
         ? "Running"
         : (status.batch.ended_reason ?? "Completed").replace(/_/g, " ");
     const timerText = status.active
-        ? `${status.batch.elapsed_human ?? "0s"} elapsed`
+        ? `${formatSeconds(elapsedSeconds)} elapsed / ${formatSeconds(remainingSeconds)} remaining`
         : `${status.batch.elapsed_human ?? "0s"} total`;
 
     return (
@@ -112,4 +131,20 @@ export default function BatchCraftingStatusPanel({
             />
         </AutomationPanelShell>
     );
+}
+
+function formatSeconds(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remaining = seconds % 60;
+
+    if (hours > 0) {
+        return `${hours}h ${minutes}m ${remaining}s`;
+    }
+
+    if (minutes > 0) {
+        return `${minutes}m ${remaining}s`;
+    }
+
+    return `${remaining}s`;
 }

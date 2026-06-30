@@ -19,4 +19,5 @@ enum BatchCraftingEndReason: string
     case FAILED = 'failed';
     case AMOUNT_REACHED = 'amount_reached';
     case SKILL_MAXED = 'skill_maxed';
+    case BATCH_CRAFTING_SET_FULL = 'batch_crafting_set_full';
 }

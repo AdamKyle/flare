@@ -41,6 +41,8 @@ export default class Actions extends React.Component<
             attack_time_out: 0,
             crafting_time_out: 0,
             celestial_time_out: 0,
+            batch_crafting_time_out:
+                this.props.character.batch_crafting_time_out,
             crafting_type: null,
             loading: true,
             show_exploration: false,
@@ -93,6 +95,16 @@ export default class Actions extends React.Component<
                 ...this.state,
                 ...this.props.action_data,
                 ...{ loading: false },
+            });
+        }
+
+        if (
+            prevProps.character.batch_crafting_time_out !==
+            this.props.character.batch_crafting_time_out
+        ) {
+            this.setState({
+                batch_crafting_time_out:
+                    this.props.character.batch_crafting_time_out,
             });
         }
 
@@ -269,6 +281,10 @@ export default class Actions extends React.Component<
 
     isDelveRunning(): boolean {
         return this.props.character.is_delve_running;
+    }
+
+    isBatchCraftingRunning(): boolean {
+        return this.props.character.is_batch_crafting_running;
     }
 
     isAnyAutomationRunning(): boolean {
@@ -564,22 +580,33 @@ export default class Actions extends React.Component<
     renderActionContent() {
         const celestialFight = this.renderCelestialFight();
         const actionSlot = this.renderActionSlot();
-        const automationPanel = !this.state.show_exploration ? (
-            <div className="grid gap-4">
+        const automationPanels = [
+            this.props.exploration_output?.type === "active" ? (
                 <ExplorationOutputSection
+                    key="exploration-output"
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
+            ) : null,
+            this.isDelveRunning() ? (
                 <DelveStatusPanel
+                    key="delve-status"
                     character_id={this.props.character.id}
                     user_id={this.props.character.user_id}
                 />
+            ) : null,
+            this.isBatchCraftingRunning() ? (
                 <BatchCraftingStatusPanel
+                    key="batch-crafting-status"
                     character_id={this.props.character.id}
                     user_id={this.props.character.user_id}
                 />
-            </div>
-        ) : null;
+            ) : null,
+        ].filter(Boolean);
+        const automationPanel =
+            !this.state.show_exploration && automationPanels.length > 0 ? (
+                <div className="grid gap-4">{automationPanels}</div>
+            ) : null;
         let fightContent = null;
 
         if (this.state.show_exploration) {

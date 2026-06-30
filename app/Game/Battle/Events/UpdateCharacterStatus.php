@@ -3,6 +3,7 @@
 namespace App\Game\Battle\Events;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -40,6 +41,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     {
         $attackTimerService ??= new AttackTimerService(new AutomationRestrictionService());
         $character = $attackTimerService->normalizeExpiredAttackTimer($character);
+        $activeBatchCrafting = $this->activeBatchCrafting($character);
 
         $this->characterStatuses = [
             'can_attack' => $character->can_attack,
@@ -61,6 +63,8 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 ->where('type', AutomationType::DELVE)
                 ->where('completed_at', '>', now())
                 ->exists(),
+            'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
+            'batch_crafting_time_out' => ! is_null($activeBatchCrafting) ? max(0, now()->diffInSeconds($activeBatchCrafting->ends_at, false)) : 0,
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
@@ -113,6 +117,16 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'name' => $name,
             'timer_seconds' => now()->diffInSeconds($automation->completed_at),
         ];
+    }
+
+    private function activeBatchCrafting(Character $character): ?BatchCrafting
+    {
+        return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
     }
 
     private function isAlchemyLocked(Character $character): bool

@@ -9,6 +9,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
@@ -140,6 +141,15 @@ class CharacterBuilderService
                 'can_be_equipped' => true,
             ]);
         }
+
+        $this->character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'character_id' => $this->character->id,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
 
         $this->character->map()->create([
             'character_id' => $this->character->id,

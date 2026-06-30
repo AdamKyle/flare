@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Console\AfterDeployment\AddHolyStacksToItems;
+use App\Console\AfterDeployment\AddBatchCraftingSetToPlayers;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\BackfillSpecialLocationTypes;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         // Register development based commands.
         $this->commands([
             // After Deployment Commands
+            AddBatchCraftingSetToPlayers::class,
             AddHolyStacksToItems::class,
             BackfillCompletedPanelDismissals::class,
             BackfillSpecialLocationTypes::class,

@@ -29,7 +29,11 @@ enum BatchCraftingDisposition: string
 
     public function isAllowedFor(BatchCraftingType $type): bool
     {
-        if (in_array($this, [self::DISENCHANT, self::KEEP_BEST_SELL_REST, self::KEEP_BEST_DISENCHANT_REST], true)) {
+        if ($this === self::DISENCHANT) {
+            return $type === BatchCraftingType::CRAFT_AND_ENCHANT;
+        }
+
+        if (in_array($this, [self::KEEP_BEST_SELL_REST, self::KEEP_BEST_DISENCHANT_REST], true)) {
             return $type === BatchCraftingType::CRAFT_AND_ENCHANT;
         }
 
@@ -43,7 +47,6 @@ enum BatchCraftingDisposition: string
 
         return in_array($type, [
             BatchCraftingType::CRAFT_AND_ENCHANT,
-            BatchCraftingType::ENCHANT,
             BatchCraftingType::ALCHEMY,
         ], true);
     }

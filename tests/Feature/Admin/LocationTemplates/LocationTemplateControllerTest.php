@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use Tests\TestCase;
 use Tests\Traits\CreateLocationTemplate;
 use Tests\Traits\CreateRole;
@@ -249,8 +250,16 @@ class LocationTemplateControllerTest extends TestCase
 
         $this->actingAs($admin)
             ->visitRoute('admin.location-templates.list')
-            ->see('<span class="ra ra-map"></span>', false)
+            ->see('<span class="fas fa-map-marked-alt"></span>', false)
             ->see('Location Templates');
+    }
+
+    public function testLocationTemplatesTableHasTypeFilter(): void
+    {
+        $filters = (new LocationTemplatesTable)->filters();
+
+        $this->assertInstanceOf(SelectFilter::class, $filters[0]);
+        $this->assertSame('Type', $filters[0]->getName());
     }
 
     public function testAdminCanDeleteLocationTemplate(): void
@@ -437,6 +446,19 @@ class LocationTemplateControllerTest extends TestCase
 
         $this->assertSame(1249, $records->pluck('name')->unique()->count());
         $this->assertSame(1249, $records->pluck('description')->unique()->count());
+    }
+
+    public function testGeneratedLocationTemplateFileNamesDoNotEndWithNumericSuffixes(): void
+    {
+        $sheet = IOFactory::load(resource_path('data-imports/Location Templates/location_templates.xlsx'))->getActiveSheet();
+        $rows = $sheet->toArray(null, true, true, true);
+        $headers = array_values($rows[1]);
+        unset($rows[1]);
+        $records = collect($rows)->map(function (array $row) use ($headers) {
+            return array_combine($headers, array_values($row));
+        });
+
+        $this->assertFalse($records->pluck('name')->contains(fn (string $name) => preg_match('/\s\d{2}$/', $name) === 1));
     }
 
     public function testGeneratedLocationTemplateFilePortFlagsMatchTypes(): void

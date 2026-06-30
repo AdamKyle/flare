@@ -13,6 +13,8 @@ export default interface ActionsState {
 
     celestial_time_out: number;
 
+    batch_crafting_time_out: number;
+
     crafting_type: string | null;
 
     loading: boolean;

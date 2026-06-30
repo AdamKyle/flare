@@ -58,6 +58,8 @@ export default class SmallerActions extends React.Component<
             movement_time_left: 0,
             automation_time_out: 0,
             celestial_time_out: 0,
+            batch_crafting_time_out:
+                this.props.character.batch_crafting_time_out,
         };
 
         this.smallActionsManager = new SmallActionsManager(this);
@@ -166,6 +168,16 @@ export default class SmallerActions extends React.Component<
             );
         }
 
+        if (
+            prevProps.character.batch_crafting_time_out !==
+            this.props.character.batch_crafting_time_out
+        ) {
+            this.setState({
+                batch_crafting_time_out:
+                    this.props.character.batch_crafting_time_out,
+            });
+        }
+
         if (this.props.action_data === null) {
             return;
         }
@@ -259,6 +271,10 @@ export default class SmallerActions extends React.Component<
 
     isDelveRunning(): boolean {
         return this.props.character.is_delve_running;
+    }
+
+    isBatchCraftingRunning(): boolean {
+        return this.props.character.is_batch_crafting_running;
     }
 
     isAnyAutomationRunning(): boolean {
@@ -524,26 +540,37 @@ export default class SmallerActions extends React.Component<
             return null;
         }
 
-        return (
-            <Fragment>
+        const panels = [
+            this.props.exploration_output?.type === "active" ? (
                 <ExplorationOutputSection
+                    key="exploration-output"
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                <div className="mt-3">
+            ) : null,
+            this.isDelveRunning() ? (
+                <div className="mt-3" key="delve-status">
                     <DelveStatusPanel
                         character_id={this.props.character.id}
                         user_id={this.props.character.user_id}
                     />
                 </div>
-                <div className="mt-3">
+            ) : null,
+            this.isBatchCraftingRunning() ? (
+                <div className="mt-3" key="batch-crafting-status">
                     <BatchCraftingStatusPanel
                         character_id={this.props.character.id}
                         user_id={this.props.character.user_id}
                     />
                 </div>
-            </Fragment>
-        );
+            ) : null,
+        ].filter(Boolean);
+
+        if (panels.length === 0) {
+            return null;
+        }
+
+        return <Fragment>{panels}</Fragment>;
     }
 
     render() {
@@ -614,6 +641,9 @@ export default class SmallerActions extends React.Component<
                                 automation_time_out_label={this.automationTimerLabel()}
                                 celestial_time_out={
                                     this.state.celestial_time_out
+                                }
+                                batch_crafting_time_out={
+                                    this.state.batch_crafting_time_out
                                 }
                             />
                         </div>

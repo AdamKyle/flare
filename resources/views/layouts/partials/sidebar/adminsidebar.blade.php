@@ -149,7 +149,7 @@
             Create New Location
         </a>
         <a href="{{route('admin.location-templates.list')}}">
-            <span class="ra ra-map"></span>
+            <span class="fas fa-map-marked-alt"></span>
             Location Templates
         </a>
         <hr />

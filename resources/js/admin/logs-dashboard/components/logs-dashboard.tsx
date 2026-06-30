@@ -444,38 +444,51 @@ export default function LogsDashboard() {
 
             <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
                 <h2 className="mb-3 text-lg font-semibold">Log Files</h2>
-                <div className="flex flex-wrap gap-2">
-                    {files.map((f) => (
-                        <button
-                            key={f.key}
-                            disabled={!f.exists}
-                            onClick={() => {
-                                setSelectedFile(f.key);
+                <div className="grid gap-3 lg:grid-cols-[minmax(0,20rem)_1fr] lg:items-start">
+                    <label className="text-sm font-medium">
+                        Log file
+                        <select
+                            className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                            value={selectedFile}
+                            onChange={(event) => {
+                                setSelectedFile(event.target.value);
                                 setPage(1);
                             }}
-                            className={[
-                                "rounded border px-3 py-1.5 text-sm transition-colors",
-                                selectedFile === f.key
-                                    ? "border-indigo-500 bg-indigo-50 font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
-                                    : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800",
-                                !f.exists
-                                    ? "cursor-not-allowed opacity-40"
-                                    : "",
-                            ].join(" ")}
                         >
-                            {f.label}
-                            {f.exists && (
-                                <span className="ml-1.5 text-xs text-gray-500 dark:text-gray-400">
-                                    {(f.size_bytes / 1024).toFixed(1)}KB
-                                </span>
-                            )}
-                            {!f.exists && (
-                                <span className="ml-1.5 text-xs">
-                                    (missing)
-                                </span>
-                            )}
-                        </button>
-                    ))}
+                            {files
+                                .filter((file) => file.exists)
+                                .map((file) => (
+                                    <option key={file.key} value={file.key}>
+                                        {file.label}
+                                    </option>
+                                ))}
+                        </select>
+                    </label>
+                    <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                        {files.map((file) => (
+                            <li
+                                key={file.key}
+                                className={[
+                                    "rounded border px-3 py-2 text-sm",
+                                    selectedFile === file.key
+                                        ? "border-indigo-500 bg-indigo-50 font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                                        : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
+                                    !file.exists ? "opacity-60" : "",
+                                ].join(" ")}
+                            >
+                                <div className="flex items-center justify-between gap-2">
+                                    <span className="truncate">
+                                        {file.label}
+                                    </span>
+                                    <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">
+                                        {file.exists
+                                            ? `${(file.size_bytes / 1024).toFixed(1)}KB`
+                                            : "missing"}
+                                    </span>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </section>
 
@@ -624,17 +637,81 @@ export default function LogsDashboard() {
                                 />
                             </label>
                         </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[840px] text-left text-sm">
+                        {entries.data.length === 0 && (
+                            <p className="p-4 text-center text-gray-600 dark:text-gray-300">
+                                No log entries match the current filters.
+                            </p>
+                        )}
+                        <div className="grid gap-3 md:hidden">
+                            {entries.data.map((entry, idx) => (
+                                <button
+                                    key={`${entry.timestamp ?? "raw"}-${idx}`}
+                                    type="button"
+                                    className="rounded border border-gray-200 p-3 text-left text-sm dark:border-gray-700"
+                                    onClick={() => {
+                                        setSelectedEntry(entry);
+                                        setSelectedBug(null);
+                                    }}
+                                >
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                        <span className="text-xs text-gray-500">
+                                            {entry.timestamp ?? "-"}
+                                        </span>
+                                        <SeverityBadge
+                                            severity={entry.severity}
+                                        />
+                                    </div>
+                                    <dl className="mt-2 grid gap-2">
+                                        <div>
+                                            <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                                Channel
+                                            </dt>
+                                            <dd className="break-words">
+                                                {entry.channel ?? "-"}
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                                Message
+                                            </dt>
+                                            <dd className="break-words">
+                                                {entry.message}
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                                Exception
+                                            </dt>
+                                            <dd className="break-words">
+                                                {entry.exception_class ?? "-"}
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </button>
+                            ))}
+                        </div>
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="w-full text-left text-sm">
                                 <thead>
                                     <tr className="border-b dark:border-gray-700">
-                                        <th className="p-2 whitespace-nowrap">
+                                        <th
+                                            scope="col"
+                                            className="p-2 whitespace-nowrap"
+                                        >
                                             Timestamp
                                         </th>
-                                        <th className="p-2">Severity</th>
-                                        <th className="p-2">Channel</th>
-                                        <th className="p-2">Message</th>
-                                        <th className="p-2">Exception</th>
+                                        <th scope="col" className="p-2">
+                                            Severity
+                                        </th>
+                                        <th scope="col" className="p-2">
+                                            Channel
+                                        </th>
+                                        <th scope="col" className="p-2">
+                                            Message
+                                        </th>
+                                        <th scope="col" className="p-2">
+                                            Exception
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -642,9 +719,21 @@ export default function LogsDashboard() {
                                         <tr
                                             key={`${entry.timestamp ?? "raw"}-${idx}`}
                                             className="cursor-pointer border-t align-top hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            role="button"
+                                            tabIndex={0}
                                             onClick={() => {
                                                 setSelectedEntry(entry);
                                                 setSelectedBug(null);
+                                            }}
+                                            onKeyDown={(event) => {
+                                                if (
+                                                    event.key === "Enter" ||
+                                                    event.key === " "
+                                                ) {
+                                                    event.preventDefault();
+                                                    setSelectedEntry(entry);
+                                                    setSelectedBug(null);
+                                                }
                                             }}
                                         >
                                             <td className="p-2 text-xs text-gray-500 whitespace-nowrap">
@@ -668,11 +757,6 @@ export default function LogsDashboard() {
                                     ))}
                                 </tbody>
                             </table>
-                            {entries.data.length === 0 && (
-                                <p className="p-4 text-center text-gray-600 dark:text-gray-300">
-                                    No log entries match the current filters.
-                                </p>
-                            )}
                         </div>
                         <PaginationControls
                             currentPage={entries.current_page}

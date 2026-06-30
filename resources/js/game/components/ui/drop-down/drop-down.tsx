@@ -59,6 +59,13 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                                 {
                                     "cursor-not-allowed opacity-50": disabled,
                                 },
+                                !active &&
+                                    this.props.selected_name !==
+                                        menuItem.name &&
+                                    this.props.secondary_selected !==
+                                        menuItem.name
+                                    ? menuItem.extra_class
+                                    : undefined,
                             )}
                             onClick={() => {
                                 if (!disabled) {

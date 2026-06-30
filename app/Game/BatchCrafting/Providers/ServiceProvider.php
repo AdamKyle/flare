@@ -5,6 +5,7 @@ namespace App\Game\BatchCrafting\Providers;
 use App\Game\BatchCrafting\Services\BatchCraftingProcessor;
 use App\Game\BatchCrafting\Services\BatchCraftingLogger;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
+use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Services\AlchemyService;
@@ -25,6 +26,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EnchantingService::class),
                 $app->make(HolyItemService::class),
                 $app->make(MultiInventoryActionService::class),
+                $app->make(BatchCraftingSetService::class),
             );
         });
 

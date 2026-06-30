@@ -859,6 +859,10 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 set_map_data={this.setMapState.bind(
                                                     this,
                                                 )}
+                                                batch_crafting_time_out={
+                                                    this.state.character
+                                                        .batch_crafting_time_out
+                                                }
                                             />
                                         </MapTabs>
                                     </BasicCard>

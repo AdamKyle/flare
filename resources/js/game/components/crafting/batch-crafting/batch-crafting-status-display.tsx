@@ -73,11 +73,18 @@ export type BatchCraftingStatus = {
         elapsed_human?: string;
         remaining_human?: string;
         progress_percent?: number;
+        requested_amount?: number | null;
+        completed_amount?: number | null;
         ended_reason: string | null;
         status?: string;
         inventory_count: number;
         inventory_max: number;
         inventory_percent?: number;
+        batch_crafting_set?: {
+            current_slots: number;
+            max_slots: number;
+            remaining_slots: number;
+        };
         skills?: BatchCraftingSkillData[];
         currency: {
             type: string;
@@ -211,46 +218,72 @@ export default function BatchCraftingStatusDisplay({
     };
 
     return (
-        <div className="text-sm">
-            <dl className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                <div>
+        <div
+            className="space-y-4 text-sm"
+            role="status"
+            aria-live="polite"
+            aria-label={
+                isActive ? "Batch crafting running" : "Batch crafting ended"
+            }
+        >
+            <dl className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                     <dt className="font-semibold">Type</dt>
                     <dd>{batch.batch_label}</dd>
                 </div>
-                <div>
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                     <dt className="font-semibold">Status</dt>
-                    <dd className="capitalize">
+                    <dd
+                        className="capitalize"
+                        role={
+                            !isActive && batch.ended_reason
+                                ? "alert"
+                                : undefined
+                        }
+                        aria-atomic={
+                            !isActive && batch.ended_reason ? "true" : undefined
+                        }
+                    >
                         {isActive
                             ? "Running"
                             : formatStatus(batch.ended_reason)}
                     </dd>
                 </div>
-                <div>
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                     <dt className="font-semibold">Elapsed</dt>
                     <dd>{batch.elapsed_human ?? "0s"}</dd>
                 </div>
                 {isActive ? (
-                    <div>
+                    <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                         <dt className="font-semibold">Remaining</dt>
                         <dd>{batch.remaining_human ?? "0s"}</dd>
                     </div>
                 ) : null}
-                <div>
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                     <dt className="font-semibold">Currency</dt>
                     <dd>
                         {batch.currency.amount.toLocaleString()}{" "}
                         {batch.currency.type}
                     </dd>
                 </div>
-                <div>
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                     <dt className="font-semibold">Inventory</dt>
                     <dd>
                         {batch.inventory_count} / {batch.inventory_max}
                     </dd>
                 </div>
+                {batch.batch_crafting_set ? (
+                    <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
+                        <dt className="font-semibold">Crafted Items Set</dt>
+                        <dd>
+                            {batch.batch_crafting_set.current_slots} /{" "}
+                            {batch.batch_crafting_set.max_slots}
+                        </dd>
+                    </div>
+                ) : null}
             </dl>
 
-            <div className="my-3">
+            <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                 <div className="mb-1 flex justify-between text-xs text-orange-700 dark:text-white">
                     <span>Inventory Used</span>
                     <span>
@@ -270,37 +303,53 @@ export default function BatchCraftingStatusDisplay({
             </div>
 
             {batch.skills && batch.skills.length > 0 ? (
-                <div className="my-3 space-y-2">
-                    {batch.skills.map((skill) => (
-                        <div key={skill.key}>
-                            <div className="mb-1 flex justify-between text-xs text-orange-700 dark:text-white">
-                                <span>
-                                    {skill.name} (Lv {skill.level})
-                                    {skill.is_maxed ? " — Maxed" : ""}
-                                </span>
-                                {!skill.is_maxed ? (
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
+                    <h4 className="mb-2 text-sm font-semibold">Skills</h4>
+                    <div className="space-y-2">
+                        {batch.skills.map((skill) => (
+                            <div key={skill.key}>
+                                <div className="mb-1 flex justify-between text-xs text-orange-700 dark:text-white">
                                     <span>
-                                        {skill.current_xp.toLocaleString()} /{" "}
-                                        {skill.next_level_xp.toLocaleString()}
+                                        {skill.name} (Lv {skill.level})
+                                        {skill.is_maxed ? " — Maxed" : ""}
                                     </span>
-                                ) : null}
+                                    {!skill.is_maxed ? (
+                                        <span>
+                                            {skill.current_xp.toLocaleString()}{" "}
+                                            /{" "}
+                                            {skill.next_level_xp.toLocaleString()}
+                                        </span>
+                                    ) : null}
+                                </div>
+                                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                                    <div
+                                        className="h-1.5 rounded-full bg-orange-600"
+                                        style={{
+                                            width: `${skill.xp_percent}%`,
+                                        }}
+                                        role="progressbar"
+                                        aria-valuemin={0}
+                                        aria-valuemax={100}
+                                        aria-valuenow={skill.xp_percent}
+                                    />
+                                </div>
                             </div>
-                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                                <div
-                                    className="h-1.5 rounded-full bg-orange-600"
-                                    style={{ width: `${skill.xp_percent}%` }}
-                                    role="progressbar"
-                                    aria-valuemin={0}
-                                    aria-valuemax={100}
-                                    aria-valuenow={skill.xp_percent}
-                                />
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             ) : null}
 
-            <div className="my-4">
+            <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
+                {batch.requested_amount &&
+                typeof batch.completed_amount === "number" ? (
+                    <div className="mb-1 flex justify-between text-xs text-orange-700 dark:text-white">
+                        <span>Completed</span>
+                        <span>
+                            {batch.completed_amount.toLocaleString()} /{" "}
+                            {batch.requested_amount.toLocaleString()}
+                        </span>
+                    </div>
+                ) : null}
                 <div className="h-3 overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
                     <div
                         className="h-full bg-orange-500"
@@ -316,7 +365,7 @@ export default function BatchCraftingStatusDisplay({
                 </p>
             </div>
 
-            <div className="my-4 grid grid-cols-2 gap-2 text-xs md:grid-cols-5">
+            <div className="grid grid-cols-2 gap-2 rounded border border-gray-200 p-3 text-xs dark:border-gray-700 md:grid-cols-5">
                 <span>Crafted: {batch.counts.crafted}</span>
                 <span>Sold: {batch.counts.sold}</span>
                 <span>Destroyed: {batch.counts.destroyed}</span>
@@ -340,10 +389,14 @@ export default function BatchCraftingStatusDisplay({
             ) : null}
 
             {actionLog.length > 0 ? (
-                <div className="my-4">
+                <div className="rounded border border-gray-200 p-3 dark:border-gray-700">
                     <h4 className="mb-2 text-sm font-semibold">
                         Action History
                     </h4>
+                    <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+                        Showing latest 50 actions. Counts above are the source
+                        of truth for full batch progress.
+                    </p>
                     <ul className="grid gap-3">
                         {entries.map((entry, index) => {
                             const item = primaryItem(entry);
