@@ -10,11 +10,11 @@ export default class ProfileReincarnation extends React.Component<ProfileSection
 
         return [
             {
-                label: "Times Reincarnated",
+                label: "Times reincarnated",
                 value: reincarnation.times_reincarnated,
             },
             {
-                label: "Reincarnated Stat Increase",
+                label: "Stat increase",
                 value: reincarnation.reincarnated_stat_increase,
             },
             { label: "XP Penalty", value: reincarnation.xp_penalty },

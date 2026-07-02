@@ -4,12 +4,15 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateUnitMovementLogs;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use Carbon\Carbon;
 
 class UnitRecallService
 {
+    public function __construct(private readonly GameTimerService $gameTimerService) {}
+
     /**
      * Get the time left in the unit movement.
      *
@@ -48,7 +51,9 @@ class UnitRecallService
             }
         }
 
-        $time = $inSeconds ? now()->addSeconds($elapsedTime) : now()->addMinutes($elapsedTime);
+        $time = $inSeconds
+            ? $this->gameTimerService->availableAtFromSeconds($elapsedTime)
+            : $this->gameTimerService->availableAtFromMinutes($elapsedTime);
 
         $unitMovement['is_attacking'] = false;
         $unitMovement['is_recalled'] = true;

@@ -3,6 +3,7 @@
 Route::middleware(['auth'])->group(function () {
     Route::get('/game/tops/monthly-snapshots', ['uses' => 'Api\TopsMonthlySnapshotController@index']);
     Route::get('/game/tops/characters', ['uses' => 'Api\CharacterTopsController@index']);
+    Route::get('/game/tops/characters/{character}/profile', ['uses' => 'Api\CharacterTopsController@profile']);
     Route::get('/game/tops/characters/{character}/overview', ['uses' => 'Api\CharacterTopsController@overview']);
     Route::get('/game/tops/characters/{character}/stats', ['uses' => 'Api\CharacterTopsController@stats']);
     Route::get('/game/tops/characters/{character}/equipment', ['uses' => 'Api\CharacterTopsController@equipment']);

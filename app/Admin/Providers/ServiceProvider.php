@@ -3,6 +3,7 @@
 namespace App\Admin\Providers;
 
 use App\Admin\Console\Commands\CreateAdminAccount;
+use App\Admin\Console\Commands\GenerateGemMaps;
 use App\Admin\Console\Commands\GiveKingdomsToNpcs;
 use App\Admin\Middleware\IsAdminMiddleware;
 use App\Admin\Services\AdminLogsDashboardService;
@@ -10,6 +11,7 @@ use App\Admin\Services\AdminMonitoringService;
 use App\Admin\Services\AssignSkillService;
 use App\Admin\Services\FeedbackService;
 use App\Admin\Services\GuideQuestService;
+use App\Admin\Services\GiveToPlayerService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
 use App\Admin\Services\ItemsService;
@@ -63,6 +65,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new GuideQuestService;
         });
 
+        $this->app->bind(GiveToPlayerService::class, function () {
+            return new GiveToPlayerService;
+        });
+
         $this->app->bind(LocationService::class, function ($app) {
             return new LocationService($app->make(CoordinatesCache::class));
         });
@@ -95,7 +101,7 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->commands([CreateAdminAccount::class, GiveKingdomsToNpcs::class]);
+        $this->commands([CreateAdminAccount::class, GenerateGemMaps::class, GiveKingdomsToNpcs::class]);
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
@@ -12,7 +13,6 @@ use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\UnitNames;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Carbon\Carbon;
 
 class ResourceTransferService
 {
@@ -28,7 +28,10 @@ class ResourceTransferService
 
     private array $additionalMessagesForLog = [];
 
-    public function __construct(private readonly DistanceCalculation $distanceCalculation) {}
+    public function __construct(
+        private readonly DistanceCalculation $distanceCalculation,
+        private readonly GameTimerService $gameTimerService,
+    ) {}
 
     /**
      * Fetch kingdoms you can transfer resources from.
@@ -327,7 +330,7 @@ class ResourceTransferService
             'from_kingdom_id' => $requestingFromKingdom->id,
             'to_kingdom_id' => $requestingKingdom->id,
             'units_moving' => $unitMovementDetails,
-            'completed_at' => now()->addMinutes($completedAtMinutes),
+            'completed_at' => $this->gameTimerService->availableAtFromMinutes($completedAtMinutes),
             'started_at' => now(),
             'moving_to_x' => $requestingKingdom->x_position,
             'moving_to_y' => $requestingKingdom->y_position,
@@ -349,15 +352,13 @@ class ResourceTransferService
         event(new UpdateKingdomQueues($requestingKingdom));
         event(new UpdateKingdomQueues($requestingFromKingdom));
 
-        $minutes = (new Carbon($unitMovementQueue->completed_at))->diffInMinutes($unitMovementQueue->started_at);
-
         MoveUnits::dispatch($unitMovementQueue->id, [
             'amount_of_resources' => $resourcesForRequest,
             'additional_log_messages' => $this->additionalMessagesForLog,
             'capital_city_queue_id' => $capitalCityQueueId,
             'building_id' => $buildingId,
             'unit_id' => $unitId,
-        ])->delay($minutes);
+        ])->delay($unitMovementQueue->completed_at);
 
         event(new ServerMessageEvent($user, 'Your resources are on their way. The Spearmen will guard them on their travels and return should they not die along the way!'));
     }

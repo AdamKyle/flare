@@ -8,6 +8,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\UnitMovementQueue;
 use App\Flare\Values\KingdomLogStatusValue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
@@ -16,7 +17,6 @@ use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -43,7 +43,13 @@ class RequestResources implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(UpdateKingdom $updateKingdom, DistanceCalculation $distanceCalculation, CapitalCityBuildingManagement $capitalCityBuildingManagement, CapitalCityUnitManagement $capitalCityUnitManagement): void
+    public function handle(
+        UpdateKingdom $updateKingdom,
+        DistanceCalculation $distanceCalculation,
+        CapitalCityBuildingManagement $capitalCityBuildingManagement,
+        CapitalCityUnitManagement $capitalCityUnitManagement,
+        GameTimerService $gameTimerService,
+    ): void
     {
 
         $requestedKingdom = Kingdom::find($this->requestingKingdomId);
@@ -100,7 +106,7 @@ class RequestResources implements ShouldQueue
         $timeToKingdom = $this->getMinutesForTravel($requestedKingdom, $requestingFromKingdom, $distanceCalculation);
 
         $unitMovementQueue = UnitMovementQueue::create(
-            $this->buildUnitMovementQueue($requestedKingdom, $requestingFromKingdom, $timeToKingdom)
+            $this->buildUnitMovementQueue($requestedKingdom, $requestingFromKingdom, $timeToKingdom, $gameTimerService)
         );
 
         $this->sendOffEvents($requestedKingdom, $requestingFromKingdom, $unitMovementQueue);
@@ -118,14 +124,19 @@ class RequestResources implements ShouldQueue
 
     }
 
-    private function buildUnitMovementQueue(Kingdom $requestedKingdom, Kingdom $requestFromKingdom, int $completedAtMinutes): array
+    private function buildUnitMovementQueue(
+        Kingdom $requestedKingdom,
+        Kingdom $requestFromKingdom,
+        int $completedAtMinutes,
+        GameTimerService $gameTimerService,
+    ): array
     {
         return [
             'character_id' => $requestedKingdom->character->id,
             'from_kingdom_id' => $requestedKingdom->id,
             'to_kingdom_id' => $requestFromKingdom->id,
             'units_moving' => $this->unitsInMovement,
-            'completed_at' => now()->addMinutes($completedAtMinutes),
+            'completed_at' => $gameTimerService->availableAtFromMinutes($completedAtMinutes),
             'started_at' => now(),
             'moving_to_x' => $requestFromKingdom->x_position,
             'moving_to_y' => $requestFromKingdom->y_position,
@@ -155,9 +166,7 @@ class RequestResources implements ShouldQueue
         event(new UpdateKingdomQueues($requestingKingdom));
         event(new UpdateKingdomQueues($requestingFromKingdom));
 
-        $minutes = (new Carbon($unitMovementQueue->completed_at))->diffInMinutes($unitMovementQueue->started_at);
-
-        MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
+        MoveUnits::dispatch($unitMovementQueue->id)->delay($unitMovementQueue->completed_at);
 
         event(new ServerMessageEvent($user, 'Your resources were dropped off and now the spearmen and (possibly - if sent along) Airship are headed home again.'));
     }

@@ -9,6 +9,7 @@ use App\Flare\Models\GameBuildingUnit;
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
@@ -49,7 +50,8 @@ class CapitalCityProcessUnitRequestHandler
         private readonly CapitalCityRequestResourcesHandler $capitalCityRequestResourcesHandler,
         private readonly DistanceCalculation $distanceCalculation,
         private readonly UnitService $unitService,
-        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation
+        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation,
+        private readonly GameTimerService $gameTimerService,
     ) {}
 
     /**
@@ -403,16 +405,13 @@ class CapitalCityProcessUnitRequestHandler
 
             $totalCosts = $this->sumTotalCostsForUnits($requestData);
 
-            if (config('app.env') !== 'production') {
-                $totalTimeInSeconds = 60;
-            }
-
             $messages = $capitalCityUnitQueue->messages ?? [];
+            $completedAt = $this->gameTimerService->availableAtFromSeconds($totalTimeInSeconds);
 
             $capitalCityUnitQueue->update([
                 'status' => CapitalCityQueueStatus::RECRUITING,
                 'started_at' => now(),
-                'completed_at' => now()->addSeconds($totalTimeInSeconds),
+                'completed_at' => $completedAt,
                 'messages' => array_merge($messages, $this->messages),
                 'unit_request_data' => $capitalCityUnitQueue->unit_request_data,
             ]);
@@ -432,7 +431,7 @@ class CapitalCityProcessUnitRequestHandler
             ]);
 
             CapitalCityUnitRequest::dispatch($capitalCityUnitQueue->id, $totalCosts)->onConnection('long_running')->onQueue('default_long')->delay(
-                now()->addSeconds($totalTimeInSeconds)
+                $completedAt
             );
 
             event(new UpdateCapitalCityUnitQueueTable($capitalCityUnitQueue->character));
@@ -540,7 +539,7 @@ class CapitalCityProcessUnitRequestHandler
     ): void {
         $timeToKingdom = $this->getTimeToKingdom($character, $requestingKingdom, $providingKingdom);
 
-        $timeTillFinished = now()->addMinutes($timeToKingdom);
+        $timeTillFinished = $this->gameTimerService->availableAtFromMinutes($timeToKingdom);
         $startTime = now();
 
         $resourceRequest = CapitalCityResourceRequest::create([
@@ -564,9 +563,7 @@ class CapitalCityProcessUnitRequestHandler
 
         $capitalCityUnitQueue = $updatedCapitalCityUnitQueue;
 
-        $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
-
-        CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->onConnection('long_running')->onQueue('default_long')->delay($delayJobTime);
+        CapitalCityResourceRequestJob::dispatch($capitalCityUnitQueue->id, $resourceRequest->id, CapitalCityResourceRequestType::UNIT_QUEUE)->onConnection('long_running')->onQueue('default_long')->delay($timeTillFinished);
     }
 
     /**

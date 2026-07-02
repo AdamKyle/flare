@@ -111,7 +111,7 @@ export default class ProfileSkills extends React.Component<ProfileSectionProps> 
                 )}
                 <BasicCard additionalClasses="lg:col-span-2">
                     <h2 className="text-xl font-semibold">
-                        Class Specials Equipped
+                        Class Specials Active
                     </h2>
                     <div className="mt-4 grid gap-2">
                         {classSpecials.length === 0 ? (

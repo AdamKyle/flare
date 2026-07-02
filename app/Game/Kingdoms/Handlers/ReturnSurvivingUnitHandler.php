@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
 use App\Game\Kingdoms\Service\UnitMovementService;
@@ -14,8 +15,10 @@ class ReturnSurvivingUnitHandler
 
     private array $newAttackingUnits;
 
-    public function __construct(UnitMovementService $unitMovementService)
-    {
+    public function __construct(
+        UnitMovementService $unitMovementService,
+        private readonly GameTimerService $gameTimerService,
+    ) {
         $this->unitMovementService = $unitMovementService;
     }
 
@@ -43,7 +46,7 @@ class ReturnSurvivingUnitHandler
 
         $time = $this->unitMovementService->getDistanceTime($character, $attackingKingdom, $defendingKingdom);
 
-        $minutes = now()->addMinutes($time);
+        $minutes = $this->gameTimerService->availableAtFromMinutes($time);
 
         $unitMovementQueue = UnitMovementQueue::create([
             'character_id' => $character->id,

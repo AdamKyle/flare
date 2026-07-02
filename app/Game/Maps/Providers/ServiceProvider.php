@@ -7,6 +7,7 @@ use App\Flare\Services\BuildMonsterCacheService;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\MonsterTransformer;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
@@ -61,6 +62,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(GameTimerService::class),
             );
         });
 

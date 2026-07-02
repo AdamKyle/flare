@@ -19,6 +19,7 @@ class CharacterTopsInspectionService
     public function __construct(
         private readonly FactionLoyaltyTopsService $factionLoyaltyTopsService,
         private readonly KingdomTopsService $kingdomTopsService,
+        private readonly CharacterStatDetailsTransformer $characterStatDetailsTransformer,
     ) {}
 
     public function overview(Character $character): array
@@ -107,7 +108,7 @@ class CharacterTopsInspectionService
             ];
         }
 
-        $statDetails = resolve(CharacterStatDetailsTransformer::class)->transform($character);
+        $statDetails = $this->characterStatDetailsTransformer->transform($character);
 
         return [
             'base_stats' => [
@@ -145,7 +146,7 @@ class CharacterTopsInspectionService
                 'devouring_darkness_resistance' => $statDetails['devouring_darkness_res'],
             ],
             'elemental_atonement' => $character->getInformation()->buildElementalAtonement() ?? [],
-            'stat_breakdown' => [],
+            'stat_breakdown' => $this->statBreakdown($character, $statDetails),
         ];
     }
 
@@ -181,7 +182,33 @@ class CharacterTopsInspectionService
 
     public function skills(Character $character): array
     {
-        $character->load(['skills.baseSkill', 'passiveSkills.passiveSkill', 'classRanks.gameClass', 'classSpecialsEquipped.gameClassSpecial']);
+        $character->load([
+            'class',
+            'skills.baseSkill',
+            'passiveSkills.passiveSkill',
+            'classRanks.gameClass',
+            'classRanks.weaponMasteries',
+            'classSpecialsEquipped.gameClassSpecial.gameClass',
+        ]);
+
+        $classRanks = $character->classRanks->map(fn ($rank) => [
+            'class_id' => $rank->game_class_id,
+            'class' => $rank->gameClass?->name,
+            'current_xp' => $rank->current_xp,
+            'required_xp' => $rank->required_xp,
+            'level' => $rank->level,
+            'is_active' => $character->game_class_id === $rank->game_class_id,
+            'weapon_masteries' => $rank->weaponMasteries->map(fn ($mastery) => [
+                'id' => $mastery->id,
+                'name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
+                'weapon_type' => $mastery->weapon_type,
+                'current_xp' => $mastery->current_xp,
+                'required_xp' => $mastery->required_xp,
+                'level' => $mastery->level,
+            ])->values()->all(),
+            'equipped_specialties' => $this->classSpecialtiesForClass($character, $rank->game_class_id, true),
+            'unlocked_specialties' => $this->classSpecialtiesForClass($character, $rank->game_class_id, false),
+        ])->filter(fn (array $rank): bool => $rank['level'] > 1 || $rank['current_xp'] > 0 || $rank['is_active'])->values()->all();
 
         return [
             'regular_skills' => $character->skills->where('is_hidden', false)->map(fn ($skill) => [
@@ -195,15 +222,25 @@ class CharacterTopsInspectionService
                 'name' => $skill->passiveSkill?->name,
                 'current_level' => $skill->current_level,
             ])->values()->all(),
-            'class_ranks' => $character->classRanks->map(fn ($rank) => [
-                'class' => $rank->gameClass?->name,
-                'current_xp' => $rank->current_xp,
-                'required_xp' => $rank->required_xp,
-                'level' => $rank->level,
-            ])->values()->all(),
+            'class_ranks' => $classRanks,
             'class_specialties_equipped' => $character->classSpecialsEquipped->map(fn ($special) => [
+                'id' => $special->game_class_special_id,
                 'name' => $special->gameClassSpecial?->name,
+                'description' => $special->gameClassSpecial?->description,
+                'level' => $special->level ?? null,
+                'current_xp' => $special->current_xp,
+                'required_xp' => $special->required_xp,
+                'equipped' => $special->equipped,
+                'class_name' => $special->gameClassSpecial?->gameClass?->name,
             ])->values()->all(),
+            'crafting_skills' => $character->skills->where('is_hidden', true)->map(fn ($skill) => [
+                'name' => $skill->baseSkill?->name,
+                'level' => $skill->level,
+                'xp' => $skill->xp,
+                'xp_max' => $skill->xp_max,
+                'skill_type' => $skill->skill_type,
+            ])->values()->all(),
+            'kingdom_passives' => [],
         ];
     }
 
@@ -310,11 +347,24 @@ class CharacterTopsInspectionService
 
     private function equipmentItem(?string $position, $item): array
     {
+        $attachedAffixesCount = (int) (! is_null($item?->itemPrefix)) + (int) (! is_null($item?->itemSuffix));
+
         return [
             'position' => $position,
+            'id' => $item?->id,
+            'item_id' => $item?->id,
+            'slot_id' => null,
+            'item_name' => $item?->affix_name,
             'name' => $item?->affix_name,
             'type' => $item?->type,
+            'description' => $item?->description,
+            'is_unique' => (bool) $item?->is_unique,
+            'is_mythic' => (bool) $item?->is_mythic,
+            'is_cosmic' => (bool) $item?->is_cosmic,
+            'attached_affixes_count' => $attachedAffixesCount,
+            'has_holy_stacks_applied' => (int) ($item?->holy_stacks ?? 0),
             'attack' => $item?->base_damage,
+            'healing' => $item?->base_healing,
             'ac' => $item?->base_ac,
             'stat_modifiers' => [
                 'str' => $item?->str_mod,
@@ -325,11 +375,31 @@ class CharacterTopsInspectionService
                 'agi' => $item?->agi_mod,
                 'focus' => $item?->focus_mod,
             ],
-            'prefix' => $item?->itemPrefix?->name,
-            'suffix' => $item?->itemSuffix?->name,
+            'prefix' => $item?->itemPrefix ? [
+                'name' => $item->itemPrefix->name,
+                'description' => $item->itemPrefix->description,
+            ] : null,
+            'suffix' => $item?->itemSuffix ? [
+                'name' => $item->itemSuffix->name,
+                'description' => $item->itemSuffix->description,
+            ] : null,
             'holy_stacks' => $item?->holy_stacks,
+            'sockets' => $item?->sockets?->map(fn ($socket) => [
+                'gem_name' => $socket->gem?->name,
+                'gem_type' => $socket->gem?->gem_type,
+                'tier' => $socket->gem?->tier,
+            ])->values()->all() ?? [],
             'attached_gems' => $item?->sockets?->map(fn ($socket) => ['name' => $socket->gem?->name])->values()->all() ?? [],
-            'item_skill' => $item?->itemSkill?->name,
+            'item_skill' => $item?->itemSkill ? [
+                'name' => $item->itemSkill->name,
+                'description' => $item->itemSkill->description,
+            ] : null,
+            'item_skills' => $item?->itemSkill ? [[
+                'name' => $item->itemSkill->name,
+                'description' => $item->itemSkill->description,
+            ]] : [],
+            'item_skill_progressions' => [],
+            'usable' => (bool) $item?->usable,
         ];
     }
 
@@ -341,5 +411,66 @@ class CharacterTopsInspectionService
     private function loginCount($rows, int $days): int
     {
         return $rows->filter(fn ($row) => $row->logged_in_at?->gte(now()->subDays($days)))->count();
+    }
+
+    private function statBreakdown(Character $character, array $statDetails): array
+    {
+        return [
+            'damage_stat' => [
+                'label' => 'Damage Stat',
+                'value' => $character->damage_stat,
+                'description' => 'Primary stat used by this character for damage calculations.',
+            ],
+            'weapon_damage' => [
+                'label' => 'Weapon Damage',
+                'value' => $statDetails['weapon_attack'] ?? null,
+                'description' => 'Read-only weapon damage total from the public inspect payload.',
+            ],
+            'spell_damage' => [
+                'label' => 'Spell Damage',
+                'value' => $statDetails['spell_damage'] ?? null,
+                'description' => 'Read-only spell damage total from the public inspect payload.',
+            ],
+            'healing' => [
+                'label' => 'Healing',
+                'value' => $statDetails['healing_amount'] ?? null,
+                'description' => 'Read-only healing total from the public inspect payload.',
+            ],
+            'ac' => [
+                'label' => 'AC',
+                'value' => $statDetails['ac'] ?? null,
+                'description' => 'Read-only armor class total from the public inspect payload.',
+            ],
+            'to_hit' => [
+                'label' => 'To-Hit',
+                'value' => $character->{$character->class?->to_hit_stat ?? 'dex'},
+                'description' => 'Current public to-hit stat value for this character.',
+            ],
+        ];
+    }
+
+    private function classSpecialtiesForClass(Character $character, int $gameClassId, bool $equipped): array
+    {
+        return $character->classSpecialsEquipped
+            ->filter(function ($special) use ($gameClassId, $equipped): bool {
+                return $special->equipped === $equipped
+                    && $special->level > 0
+                    && $special->gameClassSpecial?->game_class_id === $gameClassId;
+            })
+            ->map(fn ($special) => [
+                'id' => $special->game_class_special_id,
+                'name' => $special->gameClassSpecial?->name,
+                'description' => $special->gameClassSpecial?->description,
+                'level' => $special->level,
+                'current_xp' => $special->current_xp,
+                'required_xp' => $special->required_xp,
+                'equipped' => $special->equipped,
+                'class_name' => $special->gameClassSpecial?->gameClass?->name,
+                'requires_class_rank_level' => $special->gameClassSpecial?->requires_class_rank_level,
+                'specialty_damage' => $special->gameClassSpecial?->specialty_damage,
+                'attack_type_required' => $special->gameClassSpecial?->attack_type_required,
+            ])
+            ->values()
+            ->all();
     }
 }

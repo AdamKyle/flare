@@ -55,13 +55,22 @@
             </div>
 
             <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>
-            <h3 class="text-sky-600 dark:text-sky-500">Administrator Actions_2</h3>
+            <h3 class="text-sky-600 dark:text-sky-500">Administrator Actions</h3>
             <div class="accordion border border-gray-300 dark:border-gray-900 rounded-xl mt-5">
                 <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse" data-target="#accordion-2">
-                    Force Name Change
+                    Give To Player
                     <span class="collapse-indicator la la-arrow-circle-down"></span>
                 </h5>
                 <div id="accordion-2" class="collapse">
+                    <div class="p-5 pt-0">
+                        @livewire('admin.users.give-to-player', ['character' => $character])
+                    </div>
+                </div>
+                <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse" data-target="#accordion-3">
+                    Force Name Change
+                    <span class="collapse-indicator la la-arrow-circle-down"></span>
+                </h5>
+                <div id="accordion-3" class="collapse">
                     <div class="p-5 pt-0">
                         <x-core.forms.regular-form method="POST" action="{{ route('user.force.name.change', ['user' => $character->user]) }}">
                             @csrf
@@ -73,11 +82,11 @@
                     </div>
                 </div>
                 <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse"
-                    data-target="#accordion-3">
+                    data-target="#accordion-4">
                     Silence Character
                     <span class="collapse-indicator la la-arrow-circle-down"></span>
                 </h5>
-                <div id="accordion-3" class="collapse">
+                <div id="accordion-4" class="collapse">
                     <div class="p-5 pt-0">
                         <x-core.forms.regular-form method="POST" action="{{ route('user.silence', ['user' => $character->user]) }}">
                             @csrf
@@ -114,11 +123,11 @@
                     </div>
                 </div>
                 <h5 class="border-t border-gray-300 dark:border-gray-900 p-5" data-toggle="collapse"
-                    data-target="#accordion-4">
+                    data-target="#accordion-5">
                     Ban Character
                     <span class="collapse-indicator la la-arrow-circle-down"></span>
                 </h5>
-                <div id="accordion-4" class="collapse">
+                <div id="accordion-5" class="collapse">
                     <div class="p-5 pt-0">
                         @if ($character->user->ignored_unban_request)
                             <div class="mb-4 mt-4 text-red-600 dark:text-red-500">

@@ -7,6 +7,7 @@ use App\Flare\Models\CapitalCityResourceRequest;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest as CapitalCityResourceRequestJob;
@@ -32,6 +33,7 @@ class CapitalCityRequestResourcesHandler
         private readonly ResourceTransferService $resourceTransferService,
         private readonly KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService,
         private readonly CapitalCityKingdomLogHandler $capitalCityKingdomLogHandler,
+        private readonly GameTimerService $gameTimerService,
     ) {}
 
     /**
@@ -178,7 +180,7 @@ class CapitalCityRequestResourcesHandler
 
         $timeToKingdom = $this->kingdomMovementTimeCalculationService->getTimeToKingdom($character, $requestingFromKingdom, $requestingKingdom);
 
-        $timeTillFinished = now()->addMinutes($timeToKingdom);
+        $timeTillFinished = $this->gameTimerService->availableAtFromMinutes($timeToKingdom);
         $startTime = now();
 
         $resourceRequest = CapitalCityResourceRequest::create([
@@ -197,9 +199,8 @@ class CapitalCityRequestResourcesHandler
 
         $queue = $queue->refresh();
 
-        $delayJobTime = $timeToKingdom >= 15 ? $startTime->clone()->addMinutes(15) : $timeTillFinished;
         Log::channel('capital_city_building_upgrades')->info('Dispatching Resource Requests');
-        CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, $type)->onConnection('long_running')->onQueue('default_long')->delay($delayJobTime);
+        CapitalCityResourceRequestJob::dispatch($queue->id, $resourceRequest->id, $type)->onConnection('long_running')->onQueue('default_long')->delay($timeTillFinished);
 
         $this->resourceTransferService->sendOffBasicUnitMovement($requestingKingdom, $requestingFromKingdom, $missingResources);
     }

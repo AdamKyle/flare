@@ -8,6 +8,7 @@ use App\Flare\Models\Location;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapPositionValue;
@@ -25,6 +26,7 @@ class TeleportService extends BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        private readonly GameTimerService $gameTimerService,
     ) {
         parent::__construct(
             $mapTileValue,
@@ -107,7 +109,7 @@ class TeleportService extends BaseMovementService
         $character->update([
             'can_move' => $timeout === 0 ? true : false,
             'gold' => $character->gold - $cost,
-            'can_move_again_at' => $timeout === 0 ? null : now()->addMinutes($timeout),
+            'can_move_again_at' => $timeout === 0 ? null : $this->gameTimerService->availableAtFromMinutes($timeout),
         ]);
 
         $character = $character->refresh();

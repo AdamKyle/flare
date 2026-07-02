@@ -4,7 +4,6 @@ import { topsServiceContainer } from "../../shared/container/tops-container";
 import TopsAjaxParams from "../../shared/types/tops-ajax-params";
 import TopsApiResponse from "../../shared/types/tops-api-response";
 import CharacterProfile from "../types/character-profile";
-import TopsValue from "../../shared/types/tops-value";
 
 @injectable()
 export default class CharacterTopsAjax {
@@ -32,35 +31,11 @@ export default class CharacterTopsAjax {
         success: (data: CharacterProfile) => void,
         failure: (message: string) => void,
     ): void {
-        const sections = [
-            "overview",
-            "stats",
-            "equipment",
-            "skills",
-            "factions",
-            "reincarnation",
-            "activity",
-            "quests",
-            "kingdoms",
-            "analytics",
-        ];
-        const results: Record<string, Record<string, TopsValue>> = {};
-        let remaining = sections.length;
-
-        sections.forEach((section: string) => {
-            this.ajax.fetch<Record<string, TopsValue>>(
-                "game/tops/characters/" + characterId + "/" + section,
-                {},
-                (data: Record<string, TopsValue>) => {
-                    results[section] = data;
-                    remaining -= 1;
-
-                    if (remaining === 0) {
-                        success(results as CharacterProfile);
-                    }
-                },
-                failure,
-            );
-        });
+        this.ajax.fetch<CharacterProfile>(
+            "game/tops/characters/" + characterId + "/profile",
+            {},
+            success,
+            failure,
+        );
     }
 }

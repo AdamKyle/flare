@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
@@ -24,7 +25,8 @@ class KingdomAttackService
 
     public function __construct(UnitMovementService $unitMovementService,
         MoveUnitsValidator $moveUnitsValidator,
-        UpdateKingdom $updateKingdom
+        UpdateKingdom $updateKingdom,
+        private readonly GameTimerService $gameTimerService,
     ) {
         $this->unitMovementService = $unitMovementService;
         $this->moveUnitsValidator = $moveUnitsValidator;
@@ -93,7 +95,7 @@ class KingdomAttackService
 
         $time = $this->unitMovementService->determineTimeRequired($character, $kingdom, $fromKingdomId);
 
-        $minutes = now()->addMinutes($time);
+        $minutes = $this->gameTimerService->availableAtFromMinutes($time);
 
         $unitMovementQueue = UnitMovementQueue::create([
             'character_id' => $character->id,

@@ -6,14 +6,17 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\PassiveSkills\Jobs\TrainPassiveSkill;
 
 class PassiveSkillTrainingService
 {
     private CharacterPassiveSkills $characterPassiveSkills;
 
-    public function __construct(CharacterPassiveSkills $characterPassiveSkills)
-    {
+    public function __construct(
+        CharacterPassiveSkills $characterPassiveSkills,
+        private readonly GameTimerService $gameTimerService,
+    ) {
         $this->characterPassiveSkills = $characterPassiveSkills;
     }
 
@@ -33,11 +36,7 @@ class PassiveSkillTrainingService
             return false;
         }
 
-        $time = now()->addHours($skill->hours_to_next);
-
-        if (env('APP_ENV') === 'local') {
-            $time = now()->addMinute();
-        }
+        $time = $this->gameTimerService->availableAtFromHours($skill->hours_to_next);
 
         $skill->update([
             'started_at' => now(),
@@ -46,11 +45,7 @@ class PassiveSkillTrainingService
 
         $skill = $skill->refresh();
 
-        $delayTime = now()->addMinutes(15);
-
-        if (env('APP_ENV') === 'local') {
-            $delayTime = now()->addMinute();
-        }
+        $delayTime = $this->gameTimerService->availableAtFromMinutes(15);
 
         $character = $character->refresh();
 

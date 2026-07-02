@@ -1,5 +1,5 @@
 const basePodiumCardClasses =
-    "flex h-full min-h-[330px] flex-col items-stretch justify-between rounded-sm border-2 p-6 text-center";
+    "flex h-full min-h-[330px] flex-col items-stretch justify-between rounded-t-md rounded-b-none border border-b-0 p-6 text-center";
 const featuredPodiumCardClasses = "min-h-[380px] shadow-md lg:p-8";
 const goldPodiumCardClasses =
     "bg-gradient-to-br from-gold-200 to-gold-300 border-gold-600 text-gold-950 ring-2 ring-gold-500 shadow-md dark:from-gold-950 dark:to-gold-900 dark:border-gold-400 dark:text-gold-100 dark:ring-gold-700";
