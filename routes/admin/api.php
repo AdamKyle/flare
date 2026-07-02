@@ -19,6 +19,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/site-statistics/character-total-gold', ['uses' => 'Api\SiteAccessStatisticsController@getTotalGoldIncludingKingdomsForCharacters']);
     Route::get('/admin/site-statistics/login-duration', ['uses' => 'Api\SiteAccessStatisticsController@getLoginDurationDetails']);
     Route::get('/admin/site-statistics/characters-online', ['uses' => 'Api\SiteAccessStatisticsController@getUsersCurrentlyOnline']);
+    Route::get('/admin/statistics/dashboard-data', ['uses' => 'StatisticsController@dashboardData']);
 
     Route::get('/admin/info-section/page', ['uses' => 'Api\InformationController@getPage']);
     Route::post('/admin/info-section/store-page', ['uses' => 'Api\InformationController@storePage']);

@@ -9,6 +9,7 @@ use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
@@ -130,6 +131,7 @@ class ExplorationLogService
         ]);
 
         $this->broadcastOutputForCharacter($log->character);
+        BroadcastTopsUpdateService::make()->broadcastExplorationCurrentMonth();
     }
 
     public function latestForCharacter(Character $character): ?ExplorationLog
@@ -181,6 +183,7 @@ class ExplorationLogService
 
         try {
             (new self)->broadcastOutputForCharacter($character);
+            BroadcastTopsUpdateService::make()->broadcastExplorationCurrentMonth();
         } catch (\Throwable $throwable) {
             Log::warning('ExplorationLogService::applyRewardContext failed to broadcast exploration output.', [
                 'character_id' => $character->id,

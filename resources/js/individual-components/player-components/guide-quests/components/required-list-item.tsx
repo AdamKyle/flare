@@ -10,12 +10,16 @@ export default class RequiredListItem extends React.Component<
     }
 
     render() {
+        const hasRequirement =
+            this.props.requirement !== null && this.props.requirement !== "";
+
         return (
             <li className={"text-orange-600 dark:text-orange-400"}>
                 {this.props.isFinished ? (
                     <i className="fas fa-check text-green-700 dark:text-green-500 mr-2"></i>
                 ) : null}
-                {this.props.label}: {this.props.requirement}
+                {this.props.label}
+                {hasRequirement ? <>: {this.props.requirement}</> : null}
             </li>
         );
     }

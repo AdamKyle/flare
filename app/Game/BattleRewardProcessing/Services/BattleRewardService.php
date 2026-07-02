@@ -35,6 +35,7 @@ use App\Flare\Models\ExplorationLog;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Log;
@@ -94,6 +95,7 @@ class BattleRewardService
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
         private readonly RandomAffixGenerator $randomAffixGenerator,
+        private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
     ) {}
 
     /**
@@ -918,6 +920,8 @@ class BattleRewardService
             new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)),
             ['character_id' => $this->character->id]
         );
+
+        $this->broadcastTopsUpdateService->broadcastFactionLoyaltyCurrentMonth();
     }
 
     /**

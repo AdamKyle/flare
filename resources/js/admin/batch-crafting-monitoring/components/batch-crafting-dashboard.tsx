@@ -1,13 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
+import "../types/echo-window";
 import {
-    BatchCraftingLogEntry,
-    BatchCraftingLogsPage,
     fetchBatchCraftingActive,
     fetchBatchCraftingChart,
     fetchBatchCraftingLogs,
     fetchBatchCraftingRuns,
     fetchBatchCraftingSummary,
 } from "../ajax/batch-crafting-api";
+import BatchCraftingLogEntry from "../types/batch-crafting-log-entry";
+import BatchCraftingLogsPage from "../types/batch-crafting-logs-page";
 import {
     ActiveBatchCrafter,
     BatchCraftingChartPoint,
@@ -16,8 +17,9 @@ import {
     BatchCraftingSummary,
     Paginated,
 } from "../types/batch-crafting-monitoring";
+import BatchCraftingDashboardState from "../types/batch-crafting-dashboard-state";
 import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
-import useBatchCraftingLiveRefresh from "../hooks/use-batch-crafting-live-refresh";
+import MonitorCard from "./monitor-card";
 
 const DAY_OPTIONS = [
     { value: "1", label: "1 day" },
@@ -59,90 +61,181 @@ const emptyLogsPage = (): BatchCraftingLogsPage => ({
     total: 0,
 });
 
-function MonitorCard({ children }: { children: React.ReactNode }) {
-    return (
-        <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
-            {children}
-        </section>
-    );
-}
-
 function humanizeStatus(row: BatchCraftingRunRow): string {
     if (row.cancelled_at) return "Cancelled";
     if (row.completed_at) return row.ended_reason ?? "Completed";
     return "Running";
 }
 
-export default function BatchCraftingDashboard() {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [days, setDays] = useState("7");
-    const [summary, setSummary] = useState<BatchCraftingSummary>(emptySummary);
-    const [chartData, setChartData] = useState<BatchCraftingChartPoint[]>([]);
-    const [active, setActive] = useState<ActiveBatchCrafter[]>([]);
-    const [runs, setRuns] =
-        useState<Paginated<BatchCraftingRunRow>>(emptyPage());
-    const [filters, setFilters] =
-        useState<BatchCraftingFilters>(defaultFilters);
-    const [page, setPage] = useState(1);
-    const [logs, setLogs] = useState<BatchCraftingLogsPage>(emptyLogsPage());
-    const [logPage, setLogPage] = useState(1);
-    const [logSeverity, setLogSeverity] = useState("");
+export default class BatchCraftingDashboard extends React.Component<
+    Record<string, never>,
+    BatchCraftingDashboardState
+> {
+    private debounceTimer?: ReturnType<typeof setTimeout>;
 
-    const refresh = useCallback(async () => {
-        setLoading(true);
-        setError(null);
+    public constructor(props: Record<string, never>) {
+        super(props);
+
+        this.state = {
+            loading: true,
+            error: null,
+            days: "7",
+            summary: emptySummary,
+            chartData: [],
+            active: [],
+            runs: emptyPage(),
+            filters: defaultFilters,
+            page: 1,
+            logs: emptyLogsPage(),
+            logPage: 1,
+            logSeverity: "",
+        };
+    }
+
+    componentDidMount() {
+        void this.refresh();
+        this.listenForUpdates();
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.debounceTimer);
+        window.Echo?.leave("admin-monitoring-batch-crafting");
+    }
+
+    listenForUpdates() {
+        const channelName = "admin-monitoring-batch-crafting";
+        const channel = window.Echo?.private(channelName);
+
+        channel?.listen(".batch-crafting.monitoring.updated", () => {
+            clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(() => {
+                void this.refresh();
+            }, 500);
+        });
+    }
+
+    async refresh() {
+        this.setState({
+            loading: true,
+            error: null,
+        });
+
         try {
             const [summaryData, chart, activeData, runsData, logsData] =
                 await Promise.all([
-                    fetchBatchCraftingSummary(days),
-                    fetchBatchCraftingChart(days),
+                    fetchBatchCraftingSummary(this.state.days),
+                    fetchBatchCraftingChart(this.state.days),
                     fetchBatchCraftingActive(),
-                    fetchBatchCraftingRuns(filters, page),
-                    fetchBatchCraftingLogs(logPage, logSeverity),
+                    fetchBatchCraftingRuns(this.state.filters, this.state.page),
+                    fetchBatchCraftingLogs(
+                        this.state.logPage,
+                        this.state.logSeverity,
+                    ),
                 ]);
-            setSummary(summaryData);
-            setChartData(chart);
-            setActive(activeData);
-            setRuns(runsData);
-            setLogs(logsData);
+
+            this.setState({
+                summary: summaryData,
+                chartData: chart,
+                active: activeData,
+                runs: runsData,
+                logs: logsData,
+            });
         } catch {
-            setError("Failed to load batch crafting monitoring data.");
+            this.setState({
+                error: "Failed to load batch crafting monitoring data.",
+            });
         } finally {
-            setLoading(false);
+            this.setState({
+                loading: false,
+            });
         }
-    }, [filters, page, days, logPage, logSeverity]);
+    }
 
-    useEffect(() => {
-        void refresh();
-    }, [refresh]);
+    applyTableFilter(nextFilters: Partial<BatchCraftingFilters>) {
+        this.setState(
+            {
+                filters: { ...defaultFilters, ...nextFilters },
+                page: 1,
+            },
+            () => {
+                void this.refresh();
+                window.setTimeout(() => {
+                    document
+                        .getElementById("batch-crafting-runs-table")
+                        ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                        });
+                }, 0);
+            },
+        );
+    }
 
-    useBatchCraftingLiveRefresh(refresh);
+    setFilters(filters: BatchCraftingFilters) {
+        this.setState(
+            {
+                filters,
+                page: 1,
+            },
+            () => void this.refresh(),
+        );
+    }
 
-    const applyTableFilter = (nextFilters: Partial<BatchCraftingFilters>) => {
-        setFilters({ ...defaultFilters, ...nextFilters });
-        setPage(1);
-        window.setTimeout(() => {
-            document
-                .getElementById("batch-crafting-runs-table")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 0);
-    };
+    setPage(page: number) {
+        this.setState(
+            {
+                page,
+            },
+            () => void this.refresh(),
+        );
+    }
 
-    const chartPoints = chartData.map((p) => ({
-        period: p.period,
-        runs: p.runs,
-        crafted: p.crafted,
-        failed: p.failed,
-    }));
+    setDays(days: string) {
+        this.setState(
+            {
+                days,
+            },
+            () => void this.refresh(),
+        );
+    }
 
-    const chartSeries = [
-        { key: "runs", label: "Runs", color: "#6366f1" },
-        { key: "crafted", label: "Crafted", color: "#22c55e" },
-        { key: "failed", label: "Failed", color: "#ef4444" },
-    ];
+    setLogPage(logPage: number) {
+        this.setState(
+            {
+                logPage,
+            },
+            () => void this.refresh(),
+        );
+    }
 
-    const levelColor = (level: string): string => {
+    setLogSeverity(logSeverity: string) {
+        this.setState(
+            {
+                logSeverity,
+                logPage: 1,
+            },
+            () => void this.refresh(),
+        );
+    }
+
+    chartPoints() {
+        return this.state.chartData.map((point: BatchCraftingChartPoint) => ({
+            period: point.period,
+            runs: point.runs,
+            crafted: point.crafted,
+            failed: point.failed,
+        }));
+    }
+
+    chartSeries() {
+        return [
+            { key: "runs", label: "Runs", color: "#6366f1" },
+            { key: "crafted", label: "Crafted", color: "#22c55e" },
+            { key: "failed", label: "Failed", color: "#ef4444" },
+        ];
+    }
+
+    levelColor(level: string): string {
         if (
             level === "ERROR" ||
             level === "CRITICAL" ||
@@ -157,306 +250,135 @@ export default function BatchCraftingDashboard() {
         }
 
         return "text-gray-700 dark:text-gray-200";
-    };
+    }
 
-    return (
-        <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
-            {loading && (
-                <p role="status" aria-live="polite">
-                    Loading batch crafting monitoring data…
-                </p>
-            )}
-            {error !== null && (
-                <p
-                    className="rounded border border-red-400 bg-red-50 p-3 text-red-800 dark:bg-red-950 dark:text-red-100"
-                    role="alert"
-                >
-                    {error}
-                </p>
-            )}
+    render() {
+        const {
+            active,
+            days,
+            error,
+            filters,
+            loading,
+            logSeverity,
+            logs,
+            runs,
+            summary,
+        } = this.state;
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                {(
-                    [
-                        {
-                            label: "Total Runs",
-                            value: summary.total_runs,
-                            filter: null,
-                        },
-                        {
-                            label: "Active",
-                            value: summary.active,
-                            filter: { status: "active" },
-                        },
-                        {
-                            label: "Completed",
-                            value: summary.completed,
-                            filter: { status: "completed" },
-                        },
-                        {
-                            label: "Cancelled",
-                            value: summary.cancelled,
-                            filter: { status: "cancelled" },
-                        },
-                        {
-                            label: "Total Crafted",
-                            value: summary.total_crafted,
-                            filter: null,
-                        },
-                        {
-                            label: "Total Failed",
-                            value: summary.total_failed,
-                            filter: null,
-                        },
-                    ] as {
-                        label: string;
-                        value: number;
-                        filter: Partial<BatchCraftingFilters> | null;
-                    }[]
-                ).map(({ label, value, filter }) => (
-                    <button
-                        key={label}
-                        type="button"
-                        className="text-left"
-                        aria-label={`Filter recent runs by ${label}`}
-                        onClick={() => {
-                            if (filter !== null) {
-                                applyTableFilter(filter);
-                            }
-                        }}
+        return (
+            <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
+                {loading && (
+                    <p role="status" aria-live="polite">
+                        Loading batch crafting monitoring data…
+                    </p>
+                )}
+                {error !== null && (
+                    <p
+                        className="rounded border border-red-400 bg-red-50 p-3 text-red-800 dark:bg-red-950 dark:text-red-100"
+                        role="alert"
                     >
-                        <MonitorCard>
-                            <div className="text-sm text-gray-600 dark:text-gray-300">
-                                {label}
-                            </div>
-                            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                                {value}
-                            </div>
-                        </MonitorCard>
-                    </button>
-                ))}
-            </div>
+                        {error}
+                    </p>
+                )}
 
-            <div>
-                <label className="mb-3 block text-sm font-medium">
-                    Period
-                    <select
-                        className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                        value={days}
-                        onChange={(e) => setDays(e.target.value)}
-                    >
-                        {DAY_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <MonitoringStatusChart
-                    title="Batch Crafting Over Time"
-                    description="Runs, items crafted, and failures per day."
-                    points={chartPoints}
-                    series={chartSeries}
-                />
-            </div>
-
-            {active.length > 0 ? (
-                <MonitorCard>
-                    <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                        Active Batches
-                    </h2>
-                    <div className="grid gap-3 md:hidden">
-                        {active.map((row) => (
-                            <div
-                                key={row.character_id}
-                                className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
-                            >
-                                <div className="font-semibold">
-                                    {row.character_name ?? "—"}
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                    {(
+                        [
+                            {
+                                label: "Total Runs",
+                                value: summary.total_runs,
+                                filter: null,
+                            },
+                            {
+                                label: "Active",
+                                value: summary.active,
+                                filter: { status: "active" },
+                            },
+                            {
+                                label: "Completed",
+                                value: summary.completed,
+                                filter: { status: "completed" },
+                            },
+                            {
+                                label: "Cancelled",
+                                value: summary.cancelled,
+                                filter: { status: "cancelled" },
+                            },
+                            {
+                                label: "Total Crafted",
+                                value: summary.total_crafted,
+                                filter: null,
+                            },
+                            {
+                                label: "Total Failed",
+                                value: summary.total_failed,
+                                filter: null,
+                            },
+                        ] as {
+                            label: string;
+                            value: number;
+                            filter: Partial<BatchCraftingFilters> | null;
+                        }[]
+                    ).map(({ label, value, filter }) => (
+                        <button
+                            key={label}
+                            type="button"
+                            className="text-left"
+                            aria-label={`Filter recent runs by ${label}`}
+                            onClick={() => {
+                                if (filter !== null) {
+                                    this.applyTableFilter(filter);
+                                }
+                            }}
+                        >
+                            <MonitorCard>
+                                <div className="text-sm text-gray-600 dark:text-gray-300">
+                                    {label}
                                 </div>
-                                <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
-                                    <div>
-                                        <dt className="text-gray-500 dark:text-gray-400">
-                                            Type
-                                        </dt>
-                                        <dd>{row.batch_type}</dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-gray-500 dark:text-gray-400">
-                                            Disposition
-                                        </dt>
-                                        <dd>{row.disposition}</dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-gray-500 dark:text-gray-400">
-                                            Crafted
-                                        </dt>
-                                        <dd>{row.crafted_count}</dd>
-                                    </div>
-                                    <div>
-                                        <dt className="text-gray-500 dark:text-gray-400">
-                                            Failed
-                                        </dt>
-                                        <dd>{row.failed_count}</dd>
-                                    </div>
-                                </dl>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="hidden overflow-x-auto md:block">
-                        <table className="w-full text-left text-sm">
-                            <thead>
-                                <tr className="border-b border-gray-200 dark:border-gray-700">
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Character
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Type
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Disposition
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Started
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Crafted
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 font-semibold"
-                                    >
-                                        Failed
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {active.map((row) => (
-                                    <tr
-                                        key={row.character_id}
-                                        className="border-b border-gray-100 dark:border-gray-800"
-                                    >
-                                        <td className="py-2 pr-4">
-                                            {row.character_name ?? "—"}
-                                        </td>
-                                        <td className="py-2 pr-4">
-                                            {row.batch_type}
-                                        </td>
-                                        <td className="py-2 pr-4">
-                                            {row.disposition}
-                                        </td>
-                                        <td className="py-2 pr-4">
-                                            {row.started_at ?? "—"}
-                                        </td>
-                                        <td className="py-2 pr-4">
-                                            {row.crafted_count}
-                                        </td>
-                                        <td className="py-2">
-                                            {row.failed_count}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </MonitorCard>
-            ) : null}
+                                <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+                                    {value}
+                                </div>
+                            </MonitorCard>
+                        </button>
+                    ))}
+                </div>
 
-            <div id="batch-crafting-runs-table">
-                <MonitorCard>
-                    <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                        Recent Runs
-                    </h2>
-                    <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <label className="text-sm font-medium">
-                            Character name
-                            <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="text"
-                                value={filters.character_name}
-                                onChange={(e) => {
-                                    setFilters({
-                                        ...filters,
-                                        character_name: e.target.value,
-                                    });
-                                    setPage(1);
-                                }}
-                            />
-                        </label>
-                        <label className="text-sm font-medium">
-                            Date from
-                            <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="date"
-                                value={filters.date_from}
-                                onChange={(e) => {
-                                    setFilters({
-                                        ...filters,
-                                        date_from: e.target.value,
-                                    });
-                                    setPage(1);
-                                }}
-                            />
-                        </label>
-                        <label className="text-sm font-medium">
-                            Date to
-                            <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="date"
-                                value={filters.date_to}
-                                onChange={(e) => {
-                                    setFilters({
-                                        ...filters,
-                                        date_to: e.target.value,
-                                    });
-                                    setPage(1);
-                                }}
-                            />
-                        </label>
-                        <label className="text-sm font-medium">
-                            Batch type
-                            <input
-                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                                type="text"
-                                value={filters.batch_type}
-                                onChange={(e) => {
-                                    setFilters({
-                                        ...filters,
-                                        batch_type: e.target.value,
-                                    });
-                                    setPage(1);
-                                }}
-                            />
-                        </label>
-                    </div>
-                    <div className="grid gap-3 md:hidden">
-                        {runs.data.length === 0 ? (
-                            <p className="py-4 text-center text-gray-500 dark:text-gray-400">
-                                No runs found.
-                            </p>
-                        ) : (
-                            runs.data.map((row) => (
+                <div>
+                    <label className="mb-3 block text-sm font-medium">
+                        Period
+                        <select
+                            className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                            value={days}
+                            onChange={(e) => this.setDays(e.target.value)}
+                        >
+                            {DAY_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                    <MonitoringStatusChart
+                        title="Batch Crafting Over Time"
+                        description="Runs, items crafted, and failures per day."
+                        points={this.chartPoints()}
+                        series={this.chartSeries()}
+                    />
+                </div>
+
+                {active.length > 0 ? (
+                    <MonitorCard>
+                        <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                            Active Batches
+                        </h2>
+                        <div className="grid gap-3 md:hidden">
+                            {active.map((row) => (
                                 <div
-                                    key={row.id}
+                                    key={row.character_id}
                                     className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
                                 >
                                     <div className="font-semibold">
-                                        {row.character?.name ?? "—"}
+                                        {row.character_name ?? "—"}
                                     </div>
                                     <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
                                         <div>
@@ -467,9 +389,9 @@ export default function BatchCraftingDashboard() {
                                         </div>
                                         <div>
                                             <dt className="text-gray-500 dark:text-gray-400">
-                                                Status
+                                                Disposition
                                             </dt>
-                                            <dd>{humanizeStatus(row)}</dd>
+                                            <dd>{row.disposition}</dd>
                                         </div>
                                         <div>
                                             <dt className="text-gray-500 dark:text-gray-400">
@@ -485,84 +407,64 @@ export default function BatchCraftingDashboard() {
                                         </div>
                                     </dl>
                                 </div>
-                            ))
-                        )}
-                    </div>
-                    <div className="hidden overflow-x-auto md:block">
-                        <table className="w-full text-left text-sm">
-                            <thead>
-                                <tr className="border-b border-gray-200 dark:border-gray-700">
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Character
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Type
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Disposition
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Status
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Started
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 pr-4 font-semibold"
-                                    >
-                                        Crafted
-                                    </th>
-                                    <th
-                                        scope="col"
-                                        className="py-2 font-semibold"
-                                    >
-                                        Failed
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {runs.data.length === 0 ? (
-                                    <tr>
-                                        <td
-                                            colSpan={7}
-                                            className="py-4 text-center text-gray-500 dark:text-gray-400"
+                            ))}
+                        </div>
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="w-full text-left text-sm">
+                                <thead>
+                                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
                                         >
-                                            No runs found.
-                                        </td>
+                                            Character
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Type
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Disposition
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Started
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Crafted
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 font-semibold"
+                                        >
+                                            Failed
+                                        </th>
                                     </tr>
-                                ) : (
-                                    runs.data.map((row) => (
+                                </thead>
+                                <tbody>
+                                    {active.map((row) => (
                                         <tr
-                                            key={row.id}
+                                            key={row.character_id}
                                             className="border-b border-gray-100 dark:border-gray-800"
                                         >
                                             <td className="py-2 pr-4">
-                                                {row.character?.name ?? "—"}
+                                                {row.character_name ?? "—"}
                                             </td>
                                             <td className="py-2 pr-4">
                                                 {row.batch_type}
                                             </td>
                                             <td className="py-2 pr-4">
                                                 {row.disposition}
-                                            </td>
-                                            <td className="py-2 pr-4 capitalize">
-                                                {humanizeStatus(row)}
                                             </td>
                                             <td className="py-2 pr-4">
                                                 {row.started_at ?? "—"}
@@ -574,27 +476,310 @@ export default function BatchCraftingDashboard() {
                                                 {row.failed_count}
                                             </td>
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </MonitorCard>
+                ) : null}
+
+                <div id="batch-crafting-runs-table">
+                    <MonitorCard>
+                        <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                            Recent Runs
+                        </h2>
+                        <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                            <label className="text-sm font-medium">
+                                Character name
+                                <input
+                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                    type="text"
+                                    value={filters.character_name}
+                                    onChange={(e) => {
+                                        this.setFilters({
+                                            ...filters,
+                                            character_name: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </label>
+                            <label className="text-sm font-medium">
+                                Date from
+                                <input
+                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                    type="date"
+                                    value={filters.date_from}
+                                    onChange={(e) => {
+                                        this.setFilters({
+                                            ...filters,
+                                            date_from: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </label>
+                            <label className="text-sm font-medium">
+                                Date to
+                                <input
+                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                    type="date"
+                                    value={filters.date_to}
+                                    onChange={(e) => {
+                                        this.setFilters({
+                                            ...filters,
+                                            date_to: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </label>
+                            <label className="text-sm font-medium">
+                                Batch type
+                                <input
+                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                    type="text"
+                                    value={filters.batch_type}
+                                    onChange={(e) => {
+                                        this.setFilters({
+                                            ...filters,
+                                            batch_type: e.target.value,
+                                        });
+                                    }}
+                                />
+                            </label>
+                        </div>
+                        <div className="grid gap-3 md:hidden">
+                            {runs.data.length === 0 ? (
+                                <p className="py-4 text-center text-gray-500 dark:text-gray-400">
+                                    No runs found.
+                                </p>
+                            ) : (
+                                runs.data.map((row) => (
+                                    <div
+                                        key={row.id}
+                                        className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
+                                    >
+                                        <div className="font-semibold">
+                                            {row.character?.name ?? "—"}
+                                        </div>
+                                        <dl className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                                            <div>
+                                                <dt className="text-gray-500 dark:text-gray-400">
+                                                    Type
+                                                </dt>
+                                                <dd>{row.batch_type}</dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-gray-500 dark:text-gray-400">
+                                                    Status
+                                                </dt>
+                                                <dd>{humanizeStatus(row)}</dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-gray-500 dark:text-gray-400">
+                                                    Crafted
+                                                </dt>
+                                                <dd>{row.crafted_count}</dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-gray-500 dark:text-gray-400">
+                                                    Failed
+                                                </dt>
+                                                <dd>{row.failed_count}</dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        <div className="hidden overflow-x-auto md:block">
+                            <table className="w-full text-left text-sm">
+                                <thead>
+                                    <tr className="border-b border-gray-200 dark:border-gray-700">
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Character
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Type
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Disposition
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Status
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Started
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 pr-4 font-semibold"
+                                        >
+                                            Crafted
+                                        </th>
+                                        <th
+                                            scope="col"
+                                            className="py-2 font-semibold"
+                                        >
+                                            Failed
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {runs.data.length === 0 ? (
+                                        <tr>
+                                            <td
+                                                colSpan={7}
+                                                className="py-4 text-center text-gray-500 dark:text-gray-400"
+                                            >
+                                                No runs found.
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        runs.data.map((row) => (
+                                            <tr
+                                                key={row.id}
+                                                className="border-b border-gray-100 dark:border-gray-800"
+                                            >
+                                                <td className="py-2 pr-4">
+                                                    {row.character?.name ?? "—"}
+                                                </td>
+                                                <td className="py-2 pr-4">
+                                                    {row.batch_type}
+                                                </td>
+                                                <td className="py-2 pr-4">
+                                                    {row.disposition}
+                                                </td>
+                                                <td className="py-2 pr-4 capitalize">
+                                                    {humanizeStatus(row)}
+                                                </td>
+                                                <td className="py-2 pr-4">
+                                                    {row.started_at ?? "—"}
+                                                </td>
+                                                <td className="py-2 pr-4">
+                                                    {row.crafted_count}
+                                                </td>
+                                                <td className="py-2">
+                                                    {row.failed_count}
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+                            <span className="text-sm text-gray-600 dark:text-gray-300">
+                                Page {runs.current_page} of {runs.last_page}
+                            </span>
+                            <div className="flex gap-2">
+                                <button
+                                    className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+                                    disabled={runs.current_page <= 1}
+                                    onClick={() =>
+                                        this.setPage(runs.current_page - 1)
+                                    }
+                                >
+                                    Previous
+                                </button>
+                                <button
+                                    className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
+                                    disabled={
+                                        runs.current_page >= runs.last_page
+                                    }
+                                    onClick={() =>
+                                        this.setPage(runs.current_page + 1)
+                                    }
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </MonitorCard>
+                </div>
+                <MonitorCard>
+                    <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
+                        Batch Crafting Logs
+                    </h2>
+                    <div className="mb-3">
+                        <label className="text-sm font-medium">
+                            Severity
+                            <select
+                                className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                value={logSeverity}
+                                onChange={(e) => {
+                                    this.setLogSeverity(e.target.value);
+                                }}
+                            >
+                                <option value="">All</option>
+                                <option value="ERROR">Error</option>
+                                <option value="WARNING">Warning</option>
+                                <option value="INFO">Info</option>
+                                <option value="DEBUG">Debug</option>
+                            </select>
+                        </label>
                     </div>
+                    {logs.data.length === 0 ? (
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            No log entries found.
+                        </p>
+                    ) : (
+                        <ul className="grid gap-3">
+                            {logs.data.map((entry, index) => (
+                                <li
+                                    key={`${entry.date}-${index}`}
+                                    className="border-b border-gray-100 pb-2 text-xs dark:border-gray-800"
+                                >
+                                    <div className="flex flex-wrap items-baseline gap-x-2">
+                                        <span className="text-gray-400 dark:text-gray-500">
+                                            {entry.date}
+                                        </span>
+                                        <span
+                                            className={`font-semibold ${this.levelColor(entry.level)}`}
+                                        >
+                                            {entry.level}
+                                        </span>
+                                    </div>
+                                    <p className="mt-1 text-gray-700 dark:text-gray-200">
+                                        {entry.text}
+                                    </p>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
                         <span className="text-sm text-gray-600 dark:text-gray-300">
-                            Page {runs.current_page} of {runs.last_page}
+                            Page {logs.current_page} of {logs.last_page}
                         </span>
                         <div className="flex gap-2">
                             <button
                                 className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                                disabled={runs.current_page <= 1}
-                                onClick={() => setPage(runs.current_page - 1)}
+                                disabled={logs.current_page <= 1}
+                                onClick={() =>
+                                    this.setLogPage(logs.current_page - 1)
+                                }
                             >
                                 Previous
                             </button>
                             <button
                                 className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                                disabled={runs.current_page >= runs.last_page}
-                                onClick={() => setPage(runs.current_page + 1)}
+                                disabled={logs.current_page >= logs.last_page}
+                                onClick={() =>
+                                    this.setLogPage(logs.current_page + 1)
+                                }
                             >
                                 Next
                             </button>
@@ -602,79 +787,6 @@ export default function BatchCraftingDashboard() {
                     </div>
                 </MonitorCard>
             </div>
-            <MonitorCard>
-                <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
-                    Batch Crafting Logs
-                </h2>
-                <div className="mb-3">
-                    <label className="text-sm font-medium">
-                        Severity
-                        <select
-                            className="ml-2 rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
-                            value={logSeverity}
-                            onChange={(e) => {
-                                setLogSeverity(e.target.value);
-                                setLogPage(1);
-                            }}
-                        >
-                            <option value="">All</option>
-                            <option value="ERROR">Error</option>
-                            <option value="WARNING">Warning</option>
-                            <option value="INFO">Info</option>
-                            <option value="DEBUG">Debug</option>
-                        </select>
-                    </label>
-                </div>
-                {logs.data.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        No log entries found.
-                    </p>
-                ) : (
-                    <ul className="grid gap-3">
-                        {logs.data.map((entry, index) => (
-                            <li
-                                key={`${entry.date}-${index}`}
-                                className="border-b border-gray-100 pb-2 text-xs dark:border-gray-800"
-                            >
-                                <div className="flex flex-wrap items-baseline gap-x-2">
-                                    <span className="text-gray-400 dark:text-gray-500">
-                                        {entry.date}
-                                    </span>
-                                    <span
-                                        className={`font-semibold ${levelColor(entry.level)}`}
-                                    >
-                                        {entry.level}
-                                    </span>
-                                </div>
-                                <p className="mt-1 text-gray-700 dark:text-gray-200">
-                                    {entry.text}
-                                </p>
-                            </li>
-                        ))}
-                    </ul>
-                )}
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                        Page {logs.current_page} of {logs.last_page}
-                    </span>
-                    <div className="flex gap-2">
-                        <button
-                            className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                            disabled={logs.current_page <= 1}
-                            onClick={() => setLogPage(logs.current_page - 1)}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                            disabled={logs.current_page >= logs.last_page}
-                            onClick={() => setLogPage(logs.current_page + 1)}
-                        >
-                            Next
-                        </button>
-                    </div>
-                </div>
-            </MonitorCard>
-        </div>
-    );
+        );
+    }
 }

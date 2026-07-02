@@ -119,6 +119,8 @@ const guideQuestLabelBuilder = (
             return "Required Delve Survival Hour(s)";
         case "required_delve_pack_size":
             return "Required Delve Pack Size";
+        case "required_batch_crafting_type":
+            return "Required Batch Crafting";
         default:
             return null;
     }
@@ -196,6 +198,10 @@ const getRequirementKey = (labelKey: string): string => {
             return "required_kingdom_building_level";
         case "required_to_be_on_game_map_name":
             return "required_to_be_on_game_map_name";
+        case "required_batch_crafting_type":
+            return "required_batch_crafting_hours";
+        case "required_batch_crafted_items":
+            return "required_batch_crafted_items";
         default:
             return labelKey;
     }
@@ -205,8 +211,12 @@ const buildValueLink = (
     name: string,
     key: string,
     questData: any,
-): JSX.Element | string | number => {
+): JSX.Element | string | number | null => {
     switch (key) {
+        case "required_batch_crafting_type":
+            return `Run ${questData.required_batch_crafting_type_name} for at least ${questData.required_batch_crafting_hours} ${questData.required_batch_crafting_hours === 1 ? "hour" : "hours"}.`;
+        case "required_batch_crafted_items":
+            return null;
         case "required_quest_id":
             return (
                 <a

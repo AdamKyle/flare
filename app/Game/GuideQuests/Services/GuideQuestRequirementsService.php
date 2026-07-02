@@ -3,11 +3,15 @@
 namespace App\Game\GuideQuests\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -106,6 +110,131 @@ class GuideQuestRequirementsService
         }
 
         return $this;
+    }
+
+    public function requiredBatchCraftingExperienceHours(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (is_null($quest->required_batch_crafting_type) || is_null($quest->required_batch_crafting_hours)) {
+            return $this;
+        }
+
+        $batchCraftings = BatchCrafting::where('character_id', $character->id)
+            ->where('batch_type', $quest->required_batch_crafting_type)
+            ->whereNotNull('started_at')
+            ->get();
+
+        foreach ($batchCraftings as $batchCrafting) {
+            $progress = $batchCrafting->progress ?? [];
+
+            if (! $this->batchCraftingWasRunForExperience($quest->required_batch_crafting_type, $progress)) {
+                continue;
+            }
+
+            $endedAt = $batchCrafting->cancelled_at ?? $batchCrafting->completed_at ?? now();
+
+            if ($batchCrafting->started_at->diffInMinutes($endedAt) >= $quest->required_batch_crafting_hours * 60) {
+                $this->finishedRequirements[] = 'required_batch_crafting_hours';
+
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    public function requiredBatchCraftedItems(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (empty($quest->required_batch_crafted_items)) {
+            return $this;
+        }
+
+        if ($this->hasRequiredBatchCraftedItems($character, $quest->required_batch_crafted_items)) {
+            $this->finishedRequirements[] = 'required_batch_crafted_items';
+        }
+
+        return $this;
+    }
+
+    public function hasRequiredBatchCraftedItems(Character $character, array $requiredBatchCraftedItems): bool
+    {
+        if (empty($requiredBatchCraftedItems)) {
+            return true;
+        }
+
+        foreach ($requiredBatchCraftedItems as $requiredBatchCraftedItem) {
+            $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+
+            if (is_null($item)) {
+                return false;
+            }
+
+            if (($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
+                if (! $this->hasRequiredAlchemyBagItemAmount($character, $requiredBatchCraftedItem)) {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if ($item->type === 'alchemy' || count($this->matchingBatchCraftedItemSlotIds($character, $requiredBatchCraftedItem)) < (int) ($requiredBatchCraftedItem['amount'] ?? 0)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function hasRequiredAlchemyBagItemAmount(Character $character, array $requiredBatchCraftedItem): bool
+    {
+        $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+
+        if (is_null($item) || $item->type !== 'alchemy') {
+            return false;
+        }
+
+        return AlchemyBagSlot::where('character_id', $character->id)
+            ->where('item_id', $item->id)
+            ->sum('amount') >= (int) ($requiredBatchCraftedItem['amount'] ?? 0);
+    }
+
+    public function matchingBatchCraftedItemSlotIds(Character $character, array $requiredBatchCraftedItem): array
+    {
+        $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+
+        if (is_null($item) || ($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
+            return [];
+        }
+
+        return InventorySlot::where('inventory_id', $character->inventory->id)
+            ->where(function ($query) {
+                $query->where('equipped', false)
+                    ->orWhereNull('equipped');
+            })
+            ->whereHas('item', function ($query) use ($item, $requiredBatchCraftedItem) {
+                $mustBeEnchanted = (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false);
+
+                if (! $mustBeEnchanted) {
+                    $query->where('id', $item->id)
+                        ->whereNull('item_prefix_id')
+                        ->whereNull('item_suffix_id');
+
+                    return;
+                }
+
+                $query->whereNotNull('item_prefix_id')
+                    ->whereNotNull('item_suffix_id')
+                    ->where(function ($matchingItemQuery) use ($item) {
+                        $matchingItemQuery->where('parent_id', $item->id)
+                            ->orWhere(function ($nameAndTypeQuery) use ($item) {
+                                $nameAndTypeQuery->where('name', $item->name)
+                                    ->where('type', $item->type);
+                            });
+                    });
+            })
+            ->orderBy('id')
+            ->limit((int) ($requiredBatchCraftedItem['amount'] ?? 0))
+            ->pluck('id')
+            ->all();
     }
 
     /**
@@ -568,6 +697,16 @@ class GuideQuestRequirementsService
         if (! is_null($classSkill)) {
             $this->finishedRequirements[] = 'required_skill_type_level';
         }
+    }
+
+    protected function batchCraftingWasRunForExperience(string $batchCraftingType, array $progress): bool
+    {
+        return match ($batchCraftingType) {
+            'craft', 'craft_and_enchant' => ($progress['craft_mode'] ?? null) === 'experience',
+            'alchemy' => ($progress['alchemy_mode'] ?? null) === 'experience',
+            'trinketry' => ($progress['trinketry_mode'] ?? null) === 'experience',
+            default => false,
+        };
     }
 
     /**

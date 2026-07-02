@@ -3,6 +3,8 @@
 namespace App\Game\GuideQuests\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Event;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
@@ -16,6 +18,7 @@ use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Support\Facades\DB;
 
 class GuideQuestService
 {
@@ -77,10 +80,22 @@ class GuideQuestService
             return false;
         }
 
-        QuestsCompleted::create([
-            'character_id' => $character->id,
-            'guide_quest_id' => $quest->id,
-        ]);
+        $handedIn = DB::transaction(function () use ($character, $quest) {
+            if (! $this->consumeRequiredBatchCraftedItems($character, $quest)) {
+                return false;
+            }
+
+            QuestsCompleted::create([
+                'character_id' => $character->id,
+                'guide_quest_id' => $quest->id,
+            ]);
+
+            return true;
+        });
+
+        if (! $handedIn) {
+            return false;
+        }
 
         $this->battleRewardProcessingQueueManager->enqueue(
             $character,
@@ -161,6 +176,10 @@ class GuideQuestService
             return false;
         }
 
+        if (! empty($quest->required_batch_crafted_items) && $this->hasActiveBatchCrafting($character)) {
+            return false;
+        }
+
         $this->completedAttributes = $this->guideQuestRequirementsService->requiredLevelCheck($character, $quest)
             ->requiredReincarnatedAmount($character, $quest)
             ->requiredQuest($character, $quest)
@@ -192,6 +211,8 @@ class GuideQuestService
             ->requiredFameLevel($character, $quest)
             ->requiredDelveSurvivalTime($character, $quest)
             ->requiredDelvePackSize($character, $quest)
+            ->requiredBatchCraftingExperienceHours($character, $quest)
+            ->requiredBatchCraftedItems($character, $quest)
             ->getFinishedRequirements();
 
         if (! empty($this->completedAttributes)) {
@@ -227,6 +248,84 @@ class GuideQuestService
         event(new ServerMessageEvent($character->user, 'Rewarded with: ' . number_format($guideQuest->xp_reward) . ' XP.'));
 
         return $character;
+    }
+
+    private function consumeRequiredBatchCraftedItems(Character $character, GuideQuest $quest): bool
+    {
+        if (empty($quest->required_batch_crafted_items)) {
+            return true;
+        }
+
+        if ($this->hasActiveBatchCrafting($character)) {
+            return false;
+        }
+
+        if (! $this->guideQuestRequirementsService->hasRequiredBatchCraftedItems($character, $quest->required_batch_crafted_items)) {
+            return false;
+        }
+
+        foreach ($quest->required_batch_crafted_items as $requiredBatchCraftedItem) {
+            if (($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
+                if (! $this->consumeRequiredAlchemyBagItems($character, $requiredBatchCraftedItem)) {
+                    return false;
+                }
+
+                continue;
+            }
+
+            $slotIds = $this->guideQuestRequirementsService->matchingBatchCraftedItemSlotIds($character, $requiredBatchCraftedItem);
+
+            if (count($slotIds) < (int) $requiredBatchCraftedItem['amount']) {
+                return false;
+            }
+
+            $character->inventory->slots()
+                ->whereIn('id', $slotIds)
+                ->delete();
+        }
+
+        return true;
+    }
+
+    private function consumeRequiredAlchemyBagItems(Character $character, array $requiredBatchCraftedItem): bool
+    {
+        if (! $this->guideQuestRequirementsService->hasRequiredAlchemyBagItemAmount($character, $requiredBatchCraftedItem)) {
+            return false;
+        }
+
+        $remainingAmountToConsume = (int) $requiredBatchCraftedItem['amount'];
+        $alchemyBagSlots = AlchemyBagSlot::where('character_id', $character->id)
+            ->where('item_id', $requiredBatchCraftedItem['item_id'])
+            ->orderBy('id')
+            ->get();
+
+        foreach ($alchemyBagSlots as $alchemyBagSlot) {
+            if ($remainingAmountToConsume <= 0) {
+                break;
+            }
+
+            if ($alchemyBagSlot->amount <= $remainingAmountToConsume) {
+                $remainingAmountToConsume -= $alchemyBagSlot->amount;
+                $alchemyBagSlot->delete();
+
+                continue;
+            }
+
+            $alchemyBagSlot->update([
+                'amount' => $alchemyBagSlot->amount - $remainingAmountToConsume,
+            ]);
+
+            $remainingAmountToConsume = 0;
+        }
+
+        return $remainingAmountToConsume === 0;
+    }
+
+    private function hasActiveBatchCrafting(Character $character): bool
+    {
+        return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->exists();
     }
 
     private function fetchNextGuideQuest(Character $character): array
@@ -357,6 +456,10 @@ class GuideQuestService
             }
 
             if ($key === 'required_kingdom_building_id') {
+                continue;
+            }
+
+            if ($key === 'required_batch_crafting_type') {
                 continue;
             }
 

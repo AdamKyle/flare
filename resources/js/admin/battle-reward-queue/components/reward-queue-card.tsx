@@ -1,33 +1,26 @@
-import React, { ReactNode } from "react";
+import React from "react";
+import RewardQueueCardProps from "../types/reward-queue-card-props";
 
-export default function RewardQueueCard({
-    title,
-    description,
-    children,
-    className = "",
-}: {
-    title?: string;
-    description?: string;
-    children: ReactNode;
-    className?: string;
-}) {
-    return (
-        <section
-            className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5 ${className}`}
-        >
-            {title && (
-                <div className="mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {title}
-                    </h2>
-                    {description && (
-                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                            {description}
-                        </p>
-                    )}
-                </div>
-            )}
-            {children}
-        </section>
-    );
+export default class RewardQueueCard extends React.Component<RewardQueueCardProps> {
+    render() {
+        return (
+            <section
+                className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5 ${this.props.className ?? ""}`}
+            >
+                {this.props.title && (
+                    <div className="mb-4">
+                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                            {this.props.title}
+                        </h2>
+                        {this.props.description && (
+                            <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                                {this.props.description}
+                            </p>
+                        )}
+                    </div>
+                )}
+                {this.props.children}
+            </section>
+        );
+    }
 }

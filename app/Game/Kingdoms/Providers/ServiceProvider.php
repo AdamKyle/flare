@@ -66,6 +66,7 @@ use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -326,7 +327,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(KingdomTransformer::class),
                 $app->make(KingdomTableTransformer::class),
                 $app->make(KingdomAttackLogsTransformer::class),
-                $app->make(Manager::class)
+                $app->make(Manager::class),
+                $app->make(BroadcastTopsUpdateService::class)
             );
         });
 

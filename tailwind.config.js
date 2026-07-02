@@ -4,11 +4,90 @@ import tailWindPros from '@tailwindcss/typography';
 import tailwindcssDir from "tailwindcss-dir";
 
 export default {
-    mode: 'jit',
+    mode: "jit",
     content: [
-        './resources/**/*.{js,vue,blade.php,jsx,tsx}',
-        './app/Flare/View/Livewire/**/*.php',
-        './vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php'
+        "./resources/**/*.{js,ts,vue,blade.php,jsx,tsx}",
+        "./app/Flare/View/Livewire/**/*.php",
+        "./vendor/rappasoft/laravel-livewire-tables/resources/views/**/*.blade.php",
+    ],
+    safelist: [
+        "bg-gold-50",
+        "bg-gold-100",
+        "bg-gold-200",
+        "from-gold-100",
+        "from-gold-200",
+        "to-gold-200",
+        "to-gold-300",
+        "border-gold-500",
+        "border-gold-600",
+        "text-gold-700",
+        "text-gold-900",
+        "text-gold-950",
+        "ring-gold-300",
+        "ring-gold-500",
+        "dark:bg-gold-900",
+        "dark:bg-gold-950",
+        "dark:from-gold-950",
+        "dark:to-gold-900",
+        "dark:border-gold-400",
+        "dark:text-gold-100",
+        "dark:text-gold-300",
+        "dark:ring-gold-700",
+        "bg-silver-50",
+        "bg-silver-100",
+        "bg-silver-200",
+        "from-silver-100",
+        "from-silver-200",
+        "to-silver-200",
+        "to-silver-300",
+        "border-silver-300",
+        "border-silver-400",
+        "border-silver-500",
+        "text-silver-700",
+        "text-silver-900",
+        "text-silver-950",
+        "ring-silver-300",
+        "ring-silver-400",
+        "dark:bg-silver-900",
+        "dark:bg-silver-950",
+        "dark:from-silver-950",
+        "dark:to-silver-900",
+        "dark:border-silver-300",
+        "dark:border-silver-400",
+        "dark:text-silver-100",
+        "dark:text-silver-300",
+        "dark:ring-silver-700",
+        "bg-ochre-50",
+        "bg-ochre-100",
+        "bg-ochre-200",
+        "from-ochre-100",
+        "from-ochre-200",
+        "to-ochre-200",
+        "to-ochre-300",
+        "border-ochre-400",
+        "border-ochre-500",
+        "border-ochre-600",
+        "text-ochre-700",
+        "text-ochre-900",
+        "text-ochre-950",
+        "ring-ochre-300",
+        "ring-ochre-500",
+        "dark:bg-ochre-900",
+        "dark:bg-ochre-950",
+        "dark:from-ochre-950",
+        "dark:to-ochre-900",
+        "dark:border-ochre-400",
+        "dark:text-ochre-100",
+        "dark:text-ochre-300",
+        "dark:ring-ochre-700",
+        "text-regent-st-blue-600",
+        "text-regent-st-blue-700",
+        "text-regent-st-blue-900",
+        "hover:text-regent-st-blue-700",
+        "focus-visible:ring-regent-st-blue-400",
+        "dark:text-regent-st-blue-100",
+        "dark:text-regent-st-blue-300",
+        "dark:hover:text-regent-st-blue-200",
     ],
     darkMode: "class",
     theme: {
@@ -24,30 +103,30 @@ export default {
             transparent: "transparent",
             black: colors.black,
             white: colors.white,
-            'regent-st-blue': {
-                '50': '#f2f7fc',
-                '100': '#e1edf8',
-                '200': '#cbe0f2',
-                '300': '#a1c9e8',
-                '400': '#7db1dd',
-                '500': '#5e95d3',
-                '600': '#4a7cc6',
-                '700': '#4069b5',
-                '800': '#395694',
-                '900': '#324a76',
-                '950': '#222f49',
+            "regent-st-blue": {
+                50: "#f2f7fc",
+                100: "#e1edf8",
+                200: "#cbe0f2",
+                300: "#a1c9e8",
+                400: "#7db1dd",
+                500: "#5e95d3",
+                600: "#4a7cc6",
+                700: "#4069b5",
+                800: "#395694",
+                900: "#324a76",
+                950: "#222f49",
             },
-            'artifact-colors': {
-                '200': '#e9b8e2',
-                '800': '#82326b',
+            "artifact-colors": {
+                200: "#e9b8e2",
+                800: "#82326b",
             },
-            'cosmic-colors': {
-                '600': '#7A6AC1',
-                '700': '#6959A9',
+            "cosmic-colors": {
+                600: "#7A6AC1",
+                700: "#6959A9",
             },
-            'item-skill-training': {
-                '300': '#f7c852',
-                '600': '#d36e0c'
+            "item-skill-training": {
+                300: "#f7c852",
+                600: "#d36e0c",
             },
             primary: {
                 DEFAULT: "#145388",
@@ -61,18 +140,18 @@ export default {
                 800: "#09253D",
                 900: "#061929",
             },
-            'yellow-sea': {
-                '50': '#fffaeb',
-                '100': '#feefc7',
-                '200': '#fddd8a',
-                '300': '#fcc64d',
-                '400': '#fbaa16',
-                '500': '#f58d0b',
-                '600': '#d96706',
-                '700': '#b44609',
-                '800': '#92360e',
-                '900': '#782d0f',
-                '950': '#451503',
+            "yellow-sea": {
+                50: "#fffaeb",
+                100: "#feefc7",
+                200: "#fddd8a",
+                300: "#fcc64d",
+                400: "#fbaa16",
+                500: "#f58d0b",
+                600: "#d96706",
+                700: "#b44609",
+                800: "#92360e",
+                900: "#782d0f",
+                950: "#451503",
             },
             indigo: {
                 50: "#eef2ff",
@@ -98,6 +177,45 @@ export default {
                 800: "#242526",
                 900: "#151515",
             },
+            silver: {
+                50: "#fafafa",
+                100: "#f5f5f5",
+                200: "#e6e6e6",
+                300: "#c0c0c0",
+                400: "#a3a3a3",
+                500: "#727272",
+                600: "#535353",
+                700: "#404040",
+                800: "#272727",
+                900: "#1a1a1a",
+                950: "#0b0b0b",
+            },
+            gold: {
+                50: "#ffffe7",
+                100: "#ffffc1",
+                200: "#fffb86",
+                300: "#fff141",
+                400: "#ffe30d",
+                500: "#ffd700",
+                600: "#d1a000",
+                700: "#a67102",
+                800: "#89580a",
+                900: "#74480f",
+                950: "#442504",
+            },
+            ochre: {
+                50: "#fcf7ee",
+                100: "#f5e9d0",
+                200: "#e9d09e",
+                300: "#deb46b",
+                400: "#d69c49",
+                500: "#cd7f32",
+                600: "#b5622a",
+                700: "#974826",
+                800: "#7c3a24",
+                900: "#663121",
+                950: "#3a180e",
+            },
         },
         extend: {
             fontSize: {
@@ -111,16 +229,16 @@ export default {
                 DEFAULT: "1px 1px 5px 0 rgba(0, 0, 0, 0.16)",
             },
             screens: {
-                'sm': '640px',
+                sm: "640px",
 
-                'md': '1024px',
+                md: "1024px",
 
-                'lg': '1600px',
+                lg: "1600px",
             },
             colors: {
                 orange: {
                     ...colors.orange,
-                    DEFAULT: "#fff7ed"
+                    DEFAULT: "#fff7ed",
                 },
                 green: {
                     ...colors.green,
@@ -152,20 +270,20 @@ export default {
                 },
                 sky: {
                     ...colors.sky,
-                    DEFAULT: '#f0f9ff'
+                    DEFAULT: "#f0f9ff",
                 },
                 pink: {
                     ...colors.pink,
-                    DEFAULT: '#fdf2f8'
+                    DEFAULT: "#fdf2f8",
                 },
                 amber: {
                     ...colors.amber,
-                    DEFAULT: '#fffbeb'
+                    DEFAULT: "#fffbeb",
                 },
                 lime: {
                     ...colors.lime,
-                    DEFAULT: '#FEF7E7'
-                }
+                    DEFAULT: "#FEF7E7",
+                },
             },
             spacing: {
                 "1/1": "100%",
@@ -178,11 +296,11 @@ export default {
             typography: (theme) => ({
                 default: {
                     css: {
-                        color: theme('colors.gray.900'),
+                        color: theme("colors.gray.900"),
                         a: {
-                            color: theme('colors.blue.700'),
-                            '&:hover': {
-                                color: theme('colors.blue.700'),
+                            color: theme("colors.blue.700"),
+                            "&:hover": {
+                                color: theme("colors.blue.700"),
                             },
                         },
                     },
@@ -191,41 +309,41 @@ export default {
                 dark: {
                     css: {
                         a: {
-                            color: theme('colors.blue.300'),
-                            '&:hover': {
-                                color: theme('colors.blue.400'),
+                            color: theme("colors.blue.300"),
+                            "&:hover": {
+                                color: theme("colors.blue.400"),
                             },
                         },
 
                         h1: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
                         h2: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
                         h3: {
-                            color: theme('colors.blue.300'),
+                            color: theme("colors.blue.300"),
                         },
                         h4: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
                         h5: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
                         h6: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
 
                         strong: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
 
                         code: {
-                            color: theme('colors.gray.300'),
+                            color: theme("colors.gray.300"),
                         },
 
                         figcaption: {
-                            color: theme('colors.gray.500'),
+                            color: theme("colors.gray.500"),
                         },
                     },
                 },
@@ -234,7 +352,7 @@ export default {
     },
     plugins: [tailWindPros, aspectRatio, tailwindcssDir],
     variants: {
-        backgroundColor: ({ after }) => after(['disabled']),
+        backgroundColor: ({ after }) => after(["disabled"]),
         extend: {
             inset: ["direction"],
             float: ["direction"],
@@ -244,4 +362,4 @@ export default {
             textAlign: ["direction"],
         },
     },
-}
+};

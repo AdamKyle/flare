@@ -34,6 +34,8 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Events\DelveTopsUpdated;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -376,6 +378,7 @@ class DelveExplorationTest extends TestCase
         $this->runJob($automation->id, $delve->id);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 1);
+        Event::assertDispatched(DelveTopsUpdated::class);
     }
 
     public function testHandleDoesNotCreateSecondDelveLogWhenSameJobInstanceRunsAgain(): void
@@ -1041,6 +1044,7 @@ class DelveExplorationTest extends TestCase
             resolve(CharacterCacheData::class),
             resolve(CharacterRewardService::class),
             resolve(SkillService::class),
+            resolve(BroadcastTopsUpdateService::class),
         );
     }
 

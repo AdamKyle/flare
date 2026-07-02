@@ -85,11 +85,8 @@ export default class LoginStatistics extends React.Component<any, any> {
             <ResizableBox height={560} small_height={850}>
                 <div>
                     <InfoAlert additional_css={"my-4"}>
-                        This chart is not real time and shows the amount of
-                        logins over the course of a day or days depending on the
-                        dropdown selection. Each players login is only counted
-                        once, even if they login twenty times over the course of
-                        a day.
+                        Login totals from the selected period. Each player's
+                        login is counted once per snapshot window.
                     </InfoAlert>
                     <DropDown
                         menu_items={this.siteStatisticsAjax.createActionsDropDown(

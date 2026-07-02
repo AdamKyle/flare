@@ -28,6 +28,7 @@ use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -118,6 +119,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleRewardLedgerService::class),
                 $app->make(BattleRewardMessageContext::class),
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BroadcastTopsUpdateService::class),
             );
         });
 

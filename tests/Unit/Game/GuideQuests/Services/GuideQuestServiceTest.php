@@ -3,11 +3,15 @@
 namespace Tests\Unit\Game\GuideQuests\Services;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\QuestsCompleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
@@ -15,14 +19,16 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateMonster;
 
 class GuideQuestServiceTest extends TestCase
 {
-    use CreateGuideQuest, CreateItem, CreateMonster, CreateEvent, RefreshDatabase;
+    use CreateBatchCrafting, CreateGuideQuest, CreateItem, CreateItemAffix, CreateMonster, CreateEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -428,5 +434,314 @@ class GuideQuestServiceTest extends TestCase
         $canHandIn = $this->guideQuestService->canHandInQuest($character, $quest);
 
         $this->assertFalse($canHandIn);
+    }
+
+    public function testCanHandInQuestWhenOnlyRequirementIsSatisfiedBatchCraftingExperienceHours(): void
+    {
+        $quest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'craft',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $character = $this->character->updateUser(['guide_enabled' => true])
+            ->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'craft',
+            'started_at' => now()->subHours(2),
+            'completed_at' => null,
+            'cancelled_at' => null,
+            'progress' => [
+                'craft_mode' => 'experience',
+            ],
+        ]);
+
+        $canHandIn = $this->guideQuestService->canHandInQuest($character, $quest);
+
+        $this->assertTrue($canHandIn);
+    }
+
+    public function testHandInConsumesExactRequiredNumberOfPlainMatchingInventorySlots(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 2, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slotOne = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $slotTwo = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertNull(InventorySlot::find($slotOne->id));
+        $this->assertNull(InventorySlot::find($slotTwo->id));
+    }
+
+    public function testHandInConsumesExactRequiredNumberOfEnchantedMatchingInventorySlots(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 2, 'must_be_enchanted' => true],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slotOne = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedHelmet->id]);
+        $slotTwo = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedHelmet->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertNull(InventorySlot::find($slotOne->id));
+        $this->assertNull(InventorySlot::find($slotTwo->id));
+    }
+
+    public function testHandInDoesNotConsumeItemsWithOnlyPrefixForEnchantedRequirement(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $prefixedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => null]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $prefixedHelmet->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($handedIn);
+        $this->assertNotNull(InventorySlot::find($slot->id));
+    }
+
+    public function testHandInDoesNotConsumeItemsWithOnlySuffixForEnchantedRequirement(): void
+    {
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $suffixedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => null, 'item_suffix_id' => $suffix->id]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $suffixedHelmet->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($handedIn);
+        $this->assertNotNull(InventorySlot::find($slot->id));
+    }
+
+    public function testHandInDoesNotConsumeEnchantedItemsForPlainRequirement(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedDagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'parent_id' => $dagger->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedDagger->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($handedIn);
+        $this->assertNotNull(InventorySlot::find($slot->id));
+    }
+
+    public function testHandInLeavesExtraMatchingInventorySlotsAlone(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 2, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slotOne = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $slotTwo = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $slotThree = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertNull(InventorySlot::find($slotOne->id));
+        $this->assertNull(InventorySlot::find($slotTwo->id));
+        $this->assertNotNull(InventorySlot::find($slotThree->id));
+    }
+
+    public function testHandInReturnsFalseAndConsumesNothingWhenOneConfiguredRowIsShort(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($handedIn);
+        $this->assertNotNull(InventorySlot::find($slot->id));
+        $this->assertNull(QuestsCompleted::where('character_id', $character->id)->where('guide_quest_id', $quest->id)->first());
+    }
+
+    public function testHandInReturnsFalseWhileActiveBatchCraftingExistsForTheCharacter(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'craft',
+            'started_at' => now(),
+            'completed_at' => null,
+        ]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($handedIn);
+        $this->assertNotNull(InventorySlot::find($slot->id));
+    }
+
+    public function testCanHandInQuestReturnsTrueWhenItemRequirementsAreSatisfiedAndNoActiveBatchCraftingExists(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $canHandIn = $this->guideQuestService->canHandInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($canHandIn);
+    }
+
+    public function testHandInDecrementsAlchemyBagSlotAmount(): void
+    {
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 3, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $alchemyBagSlot = $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 5]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertSame(2, AlchemyBagSlot::find($alchemyBagSlot->id)->amount);
+    }
+
+    public function testHandInDeletesAlchemyBagSlotWhenExactAmountIsConsumed(): void
+    {
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 5, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $alchemyBagSlot = $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 5]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertNull(AlchemyBagSlot::find($alchemyBagSlot->id));
+    }
+
+    public function testHandInLeavesExtraAlchemyAmountAlone(): void
+    {
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 2, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $alchemyBagSlot = $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 7]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertSame(5, AlchemyBagSlot::find($alchemyBagSlot->id)->amount);
+    }
+
+    public function testHandInConsumesBothInventoryAndAlchemyRowsInTheSameQuest(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 3, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $alchemyBagSlot = $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 4]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($handedIn);
+        $this->assertNull(InventorySlot::find($slot->id));
+        $this->assertSame(1, AlchemyBagSlot::find($alchemyBagSlot->id)->amount);
+    }
+
+    public function testHandInReturnsFalseAndConsumesNothingWhenAlchemyAmountIsShort(): void
+    {
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 3, 'must_be_enchanted' => false],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $slot = $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $alchemyBagSlot = $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 2]);
+
+        $handedIn = $this->guideQuestService->handInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($handedIn);
+        $this->assertNotNull(InventorySlot::find($slot->id));
+        $this->assertSame(2, AlchemyBagSlot::find($alchemyBagSlot->id)->amount);
     }
 }

@@ -12,6 +12,7 @@ use App\Game\Kingdoms\Events\UpdateKingdomLogs;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Events\UpdateKingdomTable;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -30,7 +31,8 @@ class UpdateKingdom
         KingdomTransformer $kingdomTransformer,
         KingdomTableTransformer $kingdomTableTransformer,
         KingdomAttackLogsTransformer $kingdomAttackLogsTransformer,
-        Manager $manager
+        Manager $manager,
+        private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
     ) {
         $this->kingdomTransformer = $kingdomTransformer;
         $this->kingdomTableTransformer = $kingdomTableTransformer;
@@ -49,6 +51,8 @@ class UpdateKingdom
         event(new UpdateKingdomDetails($character->user, $kingdomData));
 
         event(new UpdateKingdomQueues($kingdom));
+
+        $this->broadcastTopsUpdateService->broadcastKingdomCurrentMonth();
     }
 
     /**
@@ -63,6 +67,8 @@ class UpdateKingdom
         $kingdomData = $this->manager->createData($kingdomData)->toArray();
 
         event(new UpdateKingdomTable($character->user, $kingdomData));
+
+        $this->broadcastTopsUpdateService->broadcastKingdomCurrentMonth();
     }
 
     /**

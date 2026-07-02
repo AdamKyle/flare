@@ -2,9 +2,11 @@
 
 namespace App\Flare\Listeners;
 
+use App\Admin\Events\AdminStatisticsDashboardUpdated;
 use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
+use App\Game\Core\Events\WhosPlayingStatisticsUpdated;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Broadcasting\PendingBroadcast;
@@ -37,8 +39,14 @@ class UserLoggedInListener
             })->first();
 
             if (is_null($adminUser)) {
+                broadcast(new AdminStatisticsDashboardUpdated());
+                broadcast(new WhosPlayingStatisticsUpdated());
+
                 return;
             }
+
+            broadcast(new AdminStatisticsDashboardUpdated());
+            broadcast(new WhosPlayingStatisticsUpdated());
 
             return broadcast(new UpdateSiteStatisticsChart($adminUser));
         }
@@ -88,8 +96,14 @@ class UserLoggedInListener
         })->first();
 
         if (is_null($adminUser)) {
+            broadcast(new AdminStatisticsDashboardUpdated());
+            broadcast(new WhosPlayingStatisticsUpdated());
+
             return;
         }
+
+        broadcast(new AdminStatisticsDashboardUpdated());
+        broadcast(new WhosPlayingStatisticsUpdated());
 
         return broadcast(new UpdateSiteStatisticsChart($adminUser));
     }

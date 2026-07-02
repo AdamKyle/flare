@@ -35,12 +35,29 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
 
         return Object.keys(this.props.guide_quest).filter((key: string) => {
             if (this.props.guide_quest !== null) {
+                const value = this.props.guide_quest[key];
+
+                if (value === null) {
+                    return false;
+                }
+
+                if (Array.isArray(value) && value.length === 0) {
+                    return false;
+                }
+
+                if (
+                    key === "required_batch_crafting_hours" ||
+                    key === "required_batch_crafted_item_names"
+                ) {
+                    return false;
+                }
+
                 return (
-                    (key.startsWith("required_") ||
-                        key.startsWith("secondary_")) &&
-                    this.props.guide_quest[key] !== null
+                    key.startsWith("required_") || key.startsWith("secondary_")
                 );
             }
+
+            return false;
         });
     }
 
@@ -52,28 +69,62 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                 return [];
             }
 
+            const matchingCompletedRequirements: any =
+                this.props.completed_requirements.filter(
+                    (completedRequirements: any) => {
+                        return (
+                            completedRequirements.quest_id ===
+                            this.props.guide_quest.id
+                        );
+                    },
+                );
+
+            let completedRequirements: string[] = [];
+
+            if (matchingCompletedRequirements.length > 0) {
+                completedRequirements =
+                    matchingCompletedRequirements[0].completed_requirements;
+            }
+
+            if (key === "required_batch_crafted_items") {
+                (
+                    this.props.guide_quest.required_batch_crafted_item_names ??
+                    []
+                ).forEach((item: any, index: number) => {
+                    const itemLabel =
+                        item.source === "alchemy_bag"
+                            ? `Have ${item.amount}x ${item.name} of type ${item.type_name} in your alchemy bag.`
+                            : `Have ${item.amount}x ${item.name} of type ${item.type_name} in your inventory${item.must_be_enchanted ? " with both a prefix and a suffix" : ""}.`;
+
+                    requirementsList.push(
+                        <RequiredListItem
+                            key={`${key}-${index}`}
+                            label={"Required Item"}
+                            isFinished={completedRequirements.includes(key)}
+                            requirement={itemLabel}
+                        />,
+                    );
+                });
+
+                requirementsList.push(
+                    <RequiredListItem
+                        key={`${key}-consumption`}
+                        label={"Item Consumption"}
+                        isFinished={completedRequirements.includes(key)}
+                        requirement={
+                            "These items are consumed when the guide quest is handed in."
+                        }
+                    />,
+                );
+
+                return [];
+            }
+
             let label = guideQuestLabelBuilder(key, this.props.guide_quest);
 
             if (label !== null) {
                 const requiredKey = getRequirementKey(key);
                 const value = this.props.guide_quest[requiredKey];
-
-                const matchingCompletedRequirements: any =
-                    this.props.completed_requirements.filter(
-                        (completedRequirements: any) => {
-                            return (
-                                completedRequirements.quest_id ===
-                                this.props.guide_quest.id
-                            );
-                        },
-                    );
-
-                let completedRequirements: string[] = [];
-
-                if (matchingCompletedRequirements.length > 0) {
-                    completedRequirements =
-                        matchingCompletedRequirements[0].completed_requirements;
-                }
 
                 const isFinished =
                     completedRequirements.includes(key) ||

@@ -1,5 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { ChartPoint } from "../types/reward-queue";
+import ChartDataTableProps from "../types/chart-data-table-props";
+import ChartDataTableState from "../types/chart-data-table-state";
+import InlineSvgChartProps from "../types/inline-svg-chart-props";
+import StatusVolumeChartProps from "../types/status-volume-chart-props";
 import RewardQueueCard from "./reward-queue-card";
 
 const SERIES = [
@@ -32,18 +36,23 @@ const TABLE_PAGE = 10;
 const MAX_X_LABELS = 8;
 
 function sparseLabels(periods: string[]): number[] {
-    const n = periods.length;
-    if (n <= MAX_X_LABELS) {
-        return periods.map((_, i) => i);
+    const count = periods.length;
+
+    if (count <= MAX_X_LABELS) {
+        return periods.map((_, index: number) => index);
     }
-    const step = Math.ceil(n / MAX_X_LABELS);
+
+    const step = Math.ceil(count / MAX_X_LABELS);
     const indices: number[] = [];
-    for (let i = 0; i < n; i += step) {
-        indices.push(i);
+
+    for (let index = 0; index < count; index += step) {
+        indices.push(index);
     }
-    if (indices[indices.length - 1] !== n - 1) {
-        indices.push(n - 1);
+
+    if (indices[indices.length - 1] !== count - 1) {
+        indices.push(count - 1);
     }
+
     return indices;
 }
 
@@ -51,265 +60,335 @@ function niceYTicks(max: number): number[] {
     if (max === 0) {
         return [0, 1, 2, 3, 4];
     }
+
     const raw = max / 4;
     const magnitude = Math.pow(10, Math.floor(Math.log10(raw)));
     const nice = Math.ceil(raw / magnitude) * magnitude;
+
     return [0, nice, nice * 2, nice * 3, nice * 4];
 }
 
 function shortLabel(period: string): string {
     if (period.includes(" ")) {
         const parts = period.split(" ");
+
         return parts[1]?.substring(0, 5) ?? period;
     }
+
     if (period.length > 8) {
         return period.substring(5);
     }
+
     return period;
 }
 
-function InlineSvgChart({ points }: { points: ChartPoint[] }) {
-    const periods = points.map((p) => p.period);
-    const maxValue = points.reduce(
-        (acc, p) =>
-            Math.max(
-                acc,
-                p.completed,
-                p.failed,
-                p.pending,
-                p.processing,
-                p.resumable ?? 0,
-            ),
-        0,
-    );
-    const yTicks = useMemo(() => niceYTicks(maxValue), [maxValue]);
-    const yMax = yTicks[yTicks.length - 1] ?? 4;
-    const xLabelIndices = useMemo(() => sparseLabels(periods), [periods]);
+class InlineSvgChart extends React.Component<InlineSvgChartProps> {
+    periods() {
+        return this.props.points.map((point: ChartPoint) => point.period);
+    }
 
-    const xPos = (i: number) =>
-        PAD_L + (i / Math.max(periods.length - 1, 1)) * INNER_W;
-    const yPos = (v: number) =>
-        PAD_T + INNER_H - (v / Math.max(yMax, 1)) * INNER_H;
+    maxValue() {
+        return this.props.points.reduce(
+            (value: number, point: ChartPoint) =>
+                Math.max(
+                    value,
+                    point.completed,
+                    point.failed,
+                    point.pending,
+                    point.processing,
+                    point.resumable ?? 0,
+                ),
+            0,
+        );
+    }
 
-    return (
-        <svg
-            viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-            className="w-full"
-            style={{ minHeight: 140 }}
-            role="img"
-            aria-hidden="true"
-        >
-            {yTicks.map((tick) => (
-                <g key={tick}>
-                    <line
-                        x1={PAD_L}
-                        x2={PAD_L + INNER_W}
-                        y1={yPos(tick)}
-                        y2={yPos(tick)}
-                        stroke="currentColor"
-                        strokeOpacity={0.15}
-                        strokeWidth={1}
-                    />
+    xPos(index: number) {
+        return (
+            PAD_L + (index / Math.max(this.periods().length - 1, 1)) * INNER_W
+        );
+    }
+
+    yPos(value: number, yMax: number) {
+        return PAD_T + INNER_H - (value / Math.max(yMax, 1)) * INNER_H;
+    }
+
+    renderSeries(yMax: number) {
+        return SERIES.map(({ key, color, dash }) => {
+            const path = this.props.points
+                .map((point: ChartPoint, index: number) => {
+                    const value =
+                        (point[key as keyof ChartPoint] as
+                            | number
+                            | undefined) ?? 0;
+
+                    return `${index === 0 ? "M" : "L"} ${this.xPos(index)} ${this.yPos(value, yMax)}`;
+                })
+                .join(" ");
+
+            return (
+                <path
+                    key={key}
+                    d={path}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={2}
+                    strokeDasharray={dash || undefined}
+                />
+            );
+        });
+    }
+
+    render() {
+        const periods = this.periods();
+        const yTicks = niceYTicks(this.maxValue());
+        const yMax = yTicks[yTicks.length - 1] ?? 4;
+        const xLabelIndices = sparseLabels(periods);
+
+        return (
+            <svg
+                viewBox={`0 0 ${CHART_W} ${CHART_H}`}
+                className="min-h-[140px] w-full"
+                role="img"
+                aria-hidden="true"
+            >
+                {yTicks.map((tick: number) => (
+                    <g key={tick}>
+                        <line
+                            x1={PAD_L}
+                            x2={PAD_L + INNER_W}
+                            y1={this.yPos(tick, yMax)}
+                            y2={this.yPos(tick, yMax)}
+                            stroke="currentColor"
+                            strokeOpacity={0.15}
+                            strokeWidth={1}
+                        />
+                        <text
+                            x={PAD_L - 4}
+                            y={this.yPos(tick, yMax) + 4}
+                            textAnchor="end"
+                            fontSize={10}
+                            fill="currentColor"
+                            opacity={0.6}
+                        >
+                            {tick}
+                        </text>
+                    </g>
+                ))}
+                {this.renderSeries(yMax)}
+                {xLabelIndices.map((index: number) => (
                     <text
-                        x={PAD_L - 4}
-                        y={yPos(tick) + 4}
-                        textAnchor="end"
-                        fontSize={10}
+                        key={index}
+                        x={this.xPos(index)}
+                        y={PAD_T + INNER_H + 16}
+                        textAnchor="middle"
+                        fontSize={9}
                         fill="currentColor"
-                        opacity={0.6}
+                        opacity={0.65}
                     >
-                        {tick}
+                        {shortLabel(periods[index] ?? "")}
                     </text>
-                </g>
-            ))}
-
-            {SERIES.map(({ key, color, dash }) => {
-                const d = points
-                    .map((p, i) => {
-                        const v =
-                            (p[key as keyof ChartPoint] as
-                                | number
-                                | undefined) ?? 0;
-                        return `${i === 0 ? "M" : "L"} ${xPos(i)} ${yPos(v)}`;
-                    })
-                    .join(" ");
-                return (
-                    <path
-                        key={key}
-                        d={d}
-                        fill="none"
-                        stroke={color}
-                        strokeWidth={2}
-                        strokeDasharray={dash || undefined}
-                    />
-                );
-            })}
-
-            {xLabelIndices.map((i) => (
-                <text
-                    key={i}
-                    x={xPos(i)}
-                    y={PAD_T + INNER_H + 16}
-                    textAnchor="middle"
-                    fontSize={9}
-                    fill="currentColor"
-                    opacity={0.65}
-                >
-                    {shortLabel(periods[i] ?? "")}
-                </text>
-            ))}
-
-            <line
-                x1={PAD_L}
-                x2={PAD_L + INNER_W}
-                y1={PAD_T + INNER_H}
-                y2={PAD_T + INNER_H}
-                stroke="currentColor"
-                strokeOpacity={0.3}
-                strokeWidth={1}
-            />
-            <line
-                x1={PAD_L}
-                x2={PAD_L}
-                y1={PAD_T}
-                y2={PAD_T + INNER_H}
-                stroke="currentColor"
-                strokeOpacity={0.3}
-                strokeWidth={1}
-            />
-        </svg>
-    );
+                ))}
+                <line
+                    x1={PAD_L}
+                    x2={PAD_L + INNER_W}
+                    y1={PAD_T + INNER_H}
+                    y2={PAD_T + INNER_H}
+                    stroke="currentColor"
+                    strokeOpacity={0.3}
+                    strokeWidth={1}
+                />
+                <line
+                    x1={PAD_L}
+                    x2={PAD_L}
+                    y1={PAD_T}
+                    y2={PAD_T + INNER_H}
+                    stroke="currentColor"
+                    strokeOpacity={0.3}
+                    strokeWidth={1}
+                />
+            </svg>
+        );
+    }
 }
 
-function ChartLegend() {
-    return (
-        <div
-            className="mt-3 flex flex-wrap gap-4 text-xs"
-            aria-label="Chart legend"
-        >
-            {SERIES.map(({ key, label, color }) => (
-                <div key={key} className="flex items-center gap-1.5">
-                    <span
-                        className="inline-block h-2 w-6 rounded-sm"
-                        style={{ backgroundColor: color }}
-                        aria-hidden="true"
-                    />
-                    <span className="capitalize text-gray-700 dark:text-gray-300">
-                        {label}
-                    </span>
-                </div>
-            ))}
-        </div>
-    );
-}
-
-function ChartDataTable({ points }: { points: ChartPoint[] }) {
-    const [page, setPage] = useState(1);
-    const totalPages = Math.max(1, Math.ceil(points.length / TABLE_PAGE));
-    const slice = points.slice((page - 1) * TABLE_PAGE, page * TABLE_PAGE);
-
-    return (
-        <details className="mt-3 text-sm text-gray-700 dark:text-gray-200">
-            <summary className="cursor-pointer font-medium">
-                View chart data table
-            </summary>
-            <div className="mt-2 overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                    <thead>
-                        <tr className="border-b dark:border-gray-700">
-                            <th scope="col" className="p-2">
-                                Period
-                            </th>
-                            <th scope="col" className="p-2">
-                                Completed
-                            </th>
-                            <th scope="col" className="p-2">
-                                Failed
-                            </th>
-                            <th scope="col" className="p-2">
-                                Pending
-                            </th>
-                            <th scope="col" className="p-2">
-                                Processing
-                            </th>
-                            <th scope="col" className="p-2">
-                                Resumable
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {slice.map((point) => (
-                            <tr
-                                className="border-t dark:border-gray-700"
-                                key={point.period}
-                            >
-                                <td className="p-2">{point.period}</td>
-                                <td className="p-2">{point.completed}</td>
-                                <td className="p-2">{point.failed}</td>
-                                <td className="p-2">{point.pending}</td>
-                                <td className="p-2">{point.processing}</td>
-                                <td className="p-2">{point.resumable ?? 0}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            {totalPages > 1 && (
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span className="text-gray-600 dark:text-gray-300">
-                        Page {page} of {totalPages}
-                    </span>
-                    <div className="flex gap-2">
-                        <button
-                            className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
-                            disabled={page <= 1}
-                            onClick={() => setPage((p) => p - 1)}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
-                            disabled={page >= totalPages}
-                            onClick={() => setPage((p) => p + 1)}
-                        >
-                            Next
-                        </button>
+class ChartLegend extends React.Component {
+    render() {
+        return (
+            <div
+                className="mt-3 flex flex-wrap gap-4 text-xs"
+                aria-label="Chart legend"
+            >
+                {SERIES.map(({ key, label, color }) => (
+                    <div key={key} className="flex items-center gap-1.5">
+                        <span
+                            className="inline-block h-2 w-6 rounded-sm"
+                            style={{ backgroundColor: color }}
+                            aria-hidden="true"
+                        />
+                        <span className="capitalize text-gray-700 dark:text-gray-300">
+                            {label}
+                        </span>
                     </div>
-                </div>
-            )}
-        </details>
-    );
+                ))}
+            </div>
+        );
+    }
 }
 
-export default function StatusVolumeChart({
-    title,
-    description,
-    points,
-}: {
-    title: string;
-    description: string;
-    points: ChartPoint[];
-}) {
-    const total = points.reduce(
-        (acc, p) => acc + p.completed + p.failed + p.pending + p.processing,
-        0,
-    );
-    const summary = `${title}: ${total} total requests — completed ${points.reduce((a, p) => a + p.completed, 0)}, failed ${points.reduce((a, p) => a + p.failed, 0)}, pending ${points.reduce((a, p) => a + p.pending, 0)}, processing ${points.reduce((a, p) => a + p.processing, 0)}.`;
+class ChartDataTable extends React.Component<
+    ChartDataTableProps,
+    ChartDataTableState
+> {
+    public constructor(props: ChartDataTableProps) {
+        super(props);
 
-    return (
-        <RewardQueueCard title={title} description={description}>
-            {points.length === 0 ? (
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                    No requests in this period.
-                </p>
-            ) : (
-                <>
-                    <p className="sr-only">{summary}</p>
-                    <InlineSvgChart points={points} />
-                    <ChartLegend />
-                    <ChartDataTable points={points} />
-                </>
-            )}
-        </RewardQueueCard>
-    );
+        this.state = {
+            page: 1,
+        };
+    }
+
+    totalPages() {
+        return Math.max(1, Math.ceil(this.props.points.length / TABLE_PAGE));
+    }
+
+    rows() {
+        return this.props.points.slice(
+            (this.state.page - 1) * TABLE_PAGE,
+            this.state.page * TABLE_PAGE,
+        );
+    }
+
+    changePage(page: number) {
+        this.setState({
+            page,
+        });
+    }
+
+    render() {
+        return (
+            <details className="mt-3 text-sm text-gray-700 dark:text-gray-200">
+                <summary className="cursor-pointer font-medium">
+                    View chart data table
+                </summary>
+                <div className="mt-2 overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                        <thead>
+                            <tr className="border-b dark:border-gray-700">
+                                <th scope="col" className="p-2">
+                                    Period
+                                </th>
+                                <th scope="col" className="p-2">
+                                    Completed
+                                </th>
+                                <th scope="col" className="p-2">
+                                    Failed
+                                </th>
+                                <th scope="col" className="p-2">
+                                    Pending
+                                </th>
+                                <th scope="col" className="p-2">
+                                    Processing
+                                </th>
+                                <th scope="col" className="p-2">
+                                    Resumable
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.rows().map((point: ChartPoint) => (
+                                <tr
+                                    className="border-t dark:border-gray-700"
+                                    key={point.period}
+                                >
+                                    <td className="p-2">{point.period}</td>
+                                    <td className="p-2">{point.completed}</td>
+                                    <td className="p-2">{point.failed}</td>
+                                    <td className="p-2">{point.pending}</td>
+                                    <td className="p-2">{point.processing}</td>
+                                    <td className="p-2">
+                                        {point.resumable ?? 0}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {this.totalPages() > 1 && (
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="text-gray-600 dark:text-gray-300">
+                            Page {this.state.page} of {this.totalPages()}
+                        </span>
+                        <div className="flex gap-2">
+                            <button
+                                className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
+                                disabled={this.state.page <= 1}
+                                onClick={() =>
+                                    this.changePage(this.state.page - 1)
+                                }
+                            >
+                                Previous
+                            </button>
+                            <button
+                                className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
+                                disabled={this.state.page >= this.totalPages()}
+                                onClick={() =>
+                                    this.changePage(this.state.page + 1)
+                                }
+                            >
+                                Next
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </details>
+        );
+    }
+}
+
+export default class StatusVolumeChart extends React.Component<StatusVolumeChartProps> {
+    total() {
+        return this.props.points.reduce(
+            (value: number, point: ChartPoint) =>
+                value +
+                point.completed +
+                point.failed +
+                point.pending +
+                point.processing,
+            0,
+        );
+    }
+
+    totalFor(key: keyof ChartPoint) {
+        return this.props.points.reduce((value: number, point: ChartPoint) => {
+            const pointValue = point[key];
+
+            return value + (typeof pointValue === "number" ? pointValue : 0);
+        }, 0);
+    }
+
+    summary() {
+        return `${this.props.title}: ${this.total()} total requests — completed ${this.totalFor("completed")}, failed ${this.totalFor("failed")}, pending ${this.totalFor("pending")}, processing ${this.totalFor("processing")}.`;
+    }
+
+    render() {
+        return (
+            <RewardQueueCard
+                title={this.props.title}
+                description={this.props.description}
+            >
+                {this.props.points.length === 0 ? (
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                        No requests in this period.
+                    </p>
+                ) : (
+                    <>
+                        <p className="sr-only">{this.summary()}</p>
+                        <InlineSvgChart points={this.props.points} />
+                        <ChartLegend />
+                        <ChartDataTable points={this.props.points} />
+                    </>
+                )}
+            </RewardQueueCard>
+        );
+    }
 }

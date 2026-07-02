@@ -2,7 +2,9 @@
 
 namespace App\Flare\Listeners;
 
+use App\Admin\Events\AdminStatisticsDashboardUpdated;
 use App\Flare\Models\UserLoginDuration;
+use App\Game\Core\Events\WhosPlayingStatisticsUpdated;
 use Illuminate\Auth\Events\Logout;
 
 class RecordUserLogOutTimeListener
@@ -36,5 +38,8 @@ class RecordUserLogOutTimeListener
             'last_heart_beat' => now(),
             'last_activity' => now(),
         ]);
+
+        broadcast(new AdminStatisticsDashboardUpdated());
+        broadcast(new WhosPlayingStatisticsUpdated());
     }
 }

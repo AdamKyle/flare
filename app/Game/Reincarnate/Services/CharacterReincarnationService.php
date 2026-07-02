@@ -2,6 +2,7 @@
 
 namespace App\Game\Reincarnate\Services;
 
+use App\Admin\Events\AdminStatisticsDashboardUpdated;
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Values\BaseStatValue;
@@ -124,6 +125,8 @@ class CharacterReincarnationService
         $this->updateCharacterAttackTypes->updateCache($character);
 
         event(new UpdateTopBarEvent($character));
+
+        broadcast(new AdminStatisticsDashboardUpdated());
 
         return $this->successResult([
             'message' => 'Reincarnated character and applied 5% of your current level (base) stats toward your new (base) stats.',

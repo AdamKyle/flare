@@ -24,6 +24,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -75,6 +76,8 @@ class DelveExploration implements ShouldQueue
 
     private bool $logCreated = false;
 
+    private BroadcastTopsUpdateService $broadcastTopsUpdateService;
+
 
     public function __construct(int $characterId, int $locationId, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
     {
@@ -93,6 +96,7 @@ class DelveExploration implements ShouldQueue
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
+        BroadcastTopsUpdateService $broadcastTopsUpdateService,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -100,6 +104,8 @@ class DelveExploration implements ShouldQueue
         $this->skillService = $skillService;
 
         $this->monsterFightService = $monsterFightService;
+
+        $this->broadcastTopsUpdateService = $broadcastTopsUpdateService;
 
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
@@ -551,6 +557,7 @@ class DelveExploration implements ShouldQueue
         $this->logCreated = true;
         event(new DelveMonitoringUpdated($this->character->id));
         event(new DelveStatusUpdated($this->character->user->id));
+        $this->broadcastTopsUpdateService->broadcastDelveCurrentMonth();
     }
 
     /**

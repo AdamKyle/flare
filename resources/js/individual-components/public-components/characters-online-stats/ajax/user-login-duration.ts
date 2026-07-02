@@ -60,6 +60,7 @@ export default class UserLoginDuration {
                 (result: AxiosResponse) => {
                     component.setState({
                         loading: false,
+                        filter_type: filterType,
                         characters_online_data: result.data.characters_online,
                     });
                 },

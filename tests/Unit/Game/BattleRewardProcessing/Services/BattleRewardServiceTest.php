@@ -25,6 +25,7 @@ use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
+use App\Game\Tops\Events\FactionLoyaltyTopsUpdated;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -647,6 +648,33 @@ class BattleRewardServiceTest extends TestCase
 
         $this->assertEquals(1, $matchingTask['current_amount']);
         Event::assertNotDispatched(FactionLoyaltyUpdate::class);
+    }
+
+    public function testProcessRewardsBroadcastsFactionLoyaltyTopsUpdatedAfterFactionLoyaltyBounty(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($character);
+
+        $character = $factionLoyaltyFactory->getCharacter();
+        $factionLoyaltyNpc = $factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $monster = $factionLoyaltyFactory->getBountyMonstersForNpc($factionLoyaltyNpc)[0];
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 0,
+            ])
+            ->processRewards();
+
+        Event::assertDispatched(FactionLoyaltyUpdate::class);
+        Event::assertDispatched(FactionLoyaltyTopsUpdated::class);
     }
 
     public function testNoFactionRewardsGivenWhenCharacterIsAutoBattling(): void

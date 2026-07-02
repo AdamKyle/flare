@@ -35,7 +35,8 @@ class MassImportCustomData extends Command
     {
         Artisan::call('import:game-data "World Gems"');
         Artisan::call('import:game-data "Location Templates"');
-
+        Artisan::call('import:game-data Quests');
+        Artisan::call('batch-crafting:add-set-to-players --apply');
         Artisan::call('backfill:completed-panel-dismissals --apply');
 
 

@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Admin\Services\SiteStatisticsService;
 use App\Game\Core\Services\CharactersOnline;
+use App\Game\Core\Services\WhosPlayingStatisticsService;
 use App\Admin\Requests\SiteAccessStatisticsRequest;
 use App\Flare\Services\SiteAccessStatisticService;
 
@@ -16,6 +17,7 @@ class OnlineUsersController extends Controller {
 
     public function __construct(
         private readonly CharactersOnline $charactersOnline,
+        private readonly WhosPlayingStatisticsService $whosPlayingStatisticsService,
         private readonly SiteStatisticsService $siteStatisticsService,
         private readonly SiteAccessStatisticService $siteAccessStatisticService
     ) {}
@@ -43,7 +45,7 @@ class OnlineUsersController extends Controller {
      * @return JsonResponse
      */
     public function getCharactersOnline(Request $request): JsonResponse {
-        $filter = $request->day_filter ?? 0;
+        $filter = (int) ($request->day_filter ?? 0);
 
         $result = $this->charactersOnline->setFilterType($filter)->getCharacterOnlineData();
 
@@ -51,6 +53,11 @@ class OnlineUsersController extends Controller {
         unset($result['status']);
 
         return response()->json($result, $status);
+    }
+
+    public function getWhosPlayingStatistics(): JsonResponse
+    {
+        return response()->json($this->whosPlayingStatisticsService->snapshot());
     }
 
     /**
