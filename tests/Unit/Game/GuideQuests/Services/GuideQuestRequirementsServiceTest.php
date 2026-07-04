@@ -957,6 +957,130 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertNotContains('required_event_goal_participation', $finishedRequirements);
     }
 
+    public function testPlayerHasGlobalEventCraftAmount()
+    {
+        $character = $this->character->getCharacter();
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'crafts' => 100,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_event_goal_crafting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventCraftAmountWhenNoCraftRowExists()
+    {
+        $character = $this->character->getCharacter();
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_crafting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventCraftAmountWhenCraftsAreBelowRequirement()
+    {
+        $character = $this->character->getCharacter();
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'crafts' => 5,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_crafting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerHasGlobalEventEnchantAmount()
+    {
+        $character = $this->character->getCharacter();
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_enchants' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventEnchants([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'enchants' => 100,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_event_goal_enchanting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventEnchantAmountWhenNoEnchantRowExists()
+    {
+        $character = $this->character->getCharacter();
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_enchanting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventEnchantAmountWhenEnchantsAreBelowRequirement()
+    {
+        $character = $this->character->getCharacter();
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_enchants' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventEnchants([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'enchants' => 5,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_enchanting_participation', $finishedRequirements);
+    }
+
     public function testRequiredSkillCheckReturnsFalseWhenCharacterDoesNotHaveSkill(): void
     {
         $gameSkill = $this->createGameSkill(['name' => 'NonexistentSkill' . uniqid()]);

@@ -87,6 +87,8 @@ export interface CharacterType {
 
     is_batch_crafting_running: boolean;
 
+    is_batch_crafting_visible: boolean;
+
     batch_crafting_time_out: number;
 
     is_at_delve_location: boolean;

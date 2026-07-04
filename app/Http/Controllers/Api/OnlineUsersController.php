@@ -47,7 +47,7 @@ class OnlineUsersController extends Controller {
     public function getCharactersOnline(Request $request): JsonResponse {
         $filter = (int) ($request->day_filter ?? 0);
 
-        $result = $this->charactersOnline->setFilterType($filter)->getCharacterOnlineData();
+        $result = $this->charactersOnline->setFilterType($filter)->getPublicCharacterOnlineData();
 
         $status = $result['status'];
         unset($result['status']);

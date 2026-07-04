@@ -1,4 +1,8 @@
 import { formatNumber } from "../../../../../game/lib/game/format-number";
+import {
+    formatLocalDateTime,
+    isIsoDateString,
+} from "../../../../../game/lib/game/format-local-date";
 
 function isEmptyValue(value: unknown): boolean {
     return value === null || typeof value === "undefined" || value === "";
@@ -22,6 +26,10 @@ export function formatTopsValue(value: unknown): string {
     }
 
     if (typeof value === "string") {
+        if (isIsoDateString(value)) {
+            return formatLocalDateTime(value);
+        }
+
         return value;
     }
 
@@ -56,6 +64,10 @@ export function formatTopsCompactValue(value: unknown): string {
     }
 
     if (typeof value === "string") {
+        if (isIsoDateString(value)) {
+            return formatLocalDateTime(value);
+        }
+
         return value;
     }
 

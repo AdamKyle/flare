@@ -31,4 +31,20 @@ enum BatchCraftingType: string
             default => 'gold',
         };
     }
+
+    public function usesPendingCountdown(array $progress): bool
+    {
+        return match ($this) {
+            self::HOLY_OILS => true,
+            self::ALCHEMY => ($progress['alchemy_mode'] ?? 'experience') === 'amount',
+            self::CRAFT, self::CRAFT_AND_ENCHANT => in_array($progress['craft_mode'] ?? 'experience', ['specific_item', 'craft_set', 'craft_enchant_set'], true),
+            self::ENCHANT => ($progress['enchant_mode'] ?? 'event') === 'set',
+            self::TRINKETRY => false,
+        };
+    }
+
+    public function usesEightHourTimer(array $progress): bool
+    {
+        return ! $this->usesPendingCountdown($progress);
+    }
 }

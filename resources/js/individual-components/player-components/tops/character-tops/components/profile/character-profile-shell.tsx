@@ -1,109 +1,79 @@
 import React from "react";
-import TopsProfileTabs from "../../../shared/components/tops-profile-tabs";
-import ProfileSkills from "../profile-skills";
-import ProfileFactions from "../profile-factions";
-import ProfileReincarnation from "../profile-reincarnation";
-import ProfileKingdoms from "../profile-kingdoms";
-import ProfileOverview from "../profile-overview";
-import CharacterProfileHeader from "./character-profile-header";
-import CharacterProfileSidePanel from "./character-profile-side-panel";
-import ProfileWornItems from "./equipment/profile-equipped-items";
+import CharacterProfileShellProps from "../../types/profile/character-profile-shell-props";
+import TopsCharacterSheetInspect from "./sheet-inspect/tops-character-sheet-inspect";
 import ProfileActivitySection from "./activity/profile-activity-section";
 import ProfileAnalyticsSection from "./analytics/profile-analytics-section";
 import ProfileQuestsSection from "./quests/profile-quests-section";
-import ProfileClassMasteriesSection from "./skills/profile-class-masteries-section";
-import ProfileStatsSection from "./stats/profile-stats-section";
-import CharacterProfileShellProps from "../../types/profile/character-profile-shell-props";
+import ProfileKingdoms from "../profile-kingdoms";
+import { formatLocalDateTime } from "../../../../../../game/lib/game/format-local-date";
 
 export default class CharacterProfileShell extends React.Component<CharacterProfileShellProps> {
-    tabs(): string[] {
-        return [
-            "overview",
-            "stats",
-            "equipment",
-            "skills",
-            "factions",
-            "reincarnation",
-            "activity",
-            "quests",
-            "kingdoms",
-            "analytics",
-        ];
-    }
-
-    renderActivePanel() {
-        switch (this.props.activeTab) {
-            case "stats":
-                return <ProfileStatsSection stats={this.props.profile.stats} />;
-            case "equipment":
-                return (
-                    <ProfileWornItems
-                        equipment={this.props.profile.equipment}
-                    />
-                );
-            case "skills":
-                return (
-                    <div className="grid gap-4">
-                        <ProfileSkills skills={this.props.profile.skills} />
-                        <ProfileClassMasteriesSection
-                            skills={this.props.profile.skills}
-                        />
+    renderStatusBanner(overview: Record<string, any>) {
+        return (
+            <section
+                className="rounded-sm border border-yellow-300 bg-yellow-50 p-4 shadow-sm dark:border-yellow-700 dark:bg-yellow-950/40"
+                aria-label="Character public status"
+            >
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <h2 className="text-lg font-bold text-yellow-950 dark:text-yellow-100">
+                            {overview.name ?? "Unknown Character"}
+                        </h2>
+                        <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                            Current public status for this character inspect.
+                        </p>
                     </div>
-                );
-            case "factions":
-                return (
-                    <ProfileFactions factions={this.props.profile.factions} />
-                );
-            case "reincarnation":
-                return (
-                    <ProfileReincarnation
-                        reincarnation={this.props.profile.reincarnation}
-                    />
-                );
-            case "activity":
-                return (
-                    <ProfileActivitySection
-                        activity={this.props.profile.activity}
-                    />
-                );
-            case "quests":
-                return (
-                    <ProfileQuestsSection quests={this.props.profile.quests} />
-                );
-            case "kingdoms":
-                return (
-                    <ProfileKingdoms kingdoms={this.props.profile.kingdoms} />
-                );
-            case "analytics":
-                return (
-                    <ProfileAnalyticsSection
-                        analytics={this.props.profile.analytics}
-                    />
-                );
-            default:
-                return (
-                    <ProfileOverview overview={this.props.profile.overview} />
-                );
-        }
+                    <dl className="grid gap-3 text-sm sm:grid-cols-3 lg:min-w-[560px]">
+                        <div>
+                            <dt className="font-semibold text-yellow-900 dark:text-yellow-100">
+                                Status
+                            </dt>
+                            <dd className="text-yellow-950 dark:text-yellow-50">
+                                {overview.online ? "Online" : "Offline"}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt className="font-semibold text-yellow-900 dark:text-yellow-100">
+                                Current Map
+                            </dt>
+                            <dd className="text-yellow-950 dark:text-yellow-50">
+                                {overview.current_map ?? "Unknown"}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt className="font-semibold text-yellow-900 dark:text-yellow-100">
+                                Last Active
+                            </dt>
+                            <dd className="text-yellow-950 dark:text-yellow-50">
+                                {formatLocalDateTime(overview.last_active_at)}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+        );
     }
 
     render() {
+        const overview = this.props.profile.overview ?? {};
+
         return (
             <div className="space-y-4">
-                <CharacterProfileHeader
-                    overview={this.props.profile.overview ?? {}}
-                />
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
-                    <main className="min-w-0 space-y-4">
-                        <TopsProfileTabs
-                            tabs={this.tabs()}
-                            active={this.props.activeTab}
-                            onChange={this.props.onTabChange}
-                        />
-                        <div aria-live="polite">{this.renderActivePanel()}</div>
-                    </main>
-                    <CharacterProfileSidePanel profile={this.props.profile} />
-                </div>
+                {this.renderStatusBanner(overview)}
+                <TopsCharacterSheetInspect profile={this.props.profile} />
+                <section
+                    aria-label="Additional public profile details"
+                    className="space-y-4"
+                >
+                    <ProfileQuestsSection quests={this.props.profile.quests} />
+                    <ProfileKingdoms kingdoms={this.props.profile.kingdoms} />
+                    <ProfileAnalyticsSection
+                        analytics={this.props.profile.analytics}
+                    />
+                    <ProfileActivitySection
+                        activity={this.props.profile.activity}
+                    />
+                </section>
             </div>
         );
     }

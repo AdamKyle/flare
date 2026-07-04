@@ -205,6 +205,8 @@ class GuideQuestService
             ->requiredKingdomGoldBarsAmount($character, $quest)
             ->requiredKingdomSpecificBuildingLevel($character, $quest)
             ->requiredGlobalEventKillAmount($character, $quest)
+            ->requiredGlobalEventCraftAmount($character, $quest)
+            ->requiredGlobalEventEnchantAmount($character, $quest)
             ->requirePlayerToBeOnASpecificMap($character, $quest)
             ->requiredSpecialtyType($character, $quest)
             ->requiredHolyStacks($character, $quest)

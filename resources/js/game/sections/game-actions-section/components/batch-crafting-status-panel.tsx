@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Ajax from "../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
-import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import AutomationPanelShell from "./automation-panel-shell";
 import BatchCraftingStatusDisplay, {
     BatchCraftingStatus,
@@ -20,7 +19,6 @@ export default function BatchCraftingStatusPanel({
     const [loading, setLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [elapsedSeconds, setElapsedSeconds] = useState(0);
-    const [remainingSeconds, setRemainingSeconds] = useState(0);
 
     const fetchStatus = useCallback(() => {
         new Ajax().setRoute(`batch-crafting/${character_id}/status`).doAjaxCall(
@@ -28,9 +26,6 @@ export default function BatchCraftingStatusPanel({
             (response: AxiosResponse) => {
                 setStatus(response.data);
                 setElapsedSeconds(response.data.batch?.elapsed_seconds ?? 0);
-                setRemainingSeconds(
-                    response.data.batch?.remaining_seconds ?? 0,
-                );
                 setLoading(false);
             },
             (_error: AxiosError) => {
@@ -50,7 +45,6 @@ export default function BatchCraftingStatusPanel({
 
         const interval = window.setInterval(() => {
             setElapsedSeconds((current) => current + 1);
-            setRemainingSeconds((current) => Math.max(0, current - 1));
         }, 1000);
 
         return () => window.clearInterval(interval);
@@ -88,32 +82,31 @@ export default function BatchCraftingStatusPanel({
                 "post",
                 (_response: AxiosResponse) => {
                     setIsSaving(false);
-                    fetchStatus();
+                    setStatus(null);
+                    window.dispatchEvent(
+                        new CustomEvent("batch-crafting-hidden"),
+                    );
                 },
                 (_error: AxiosError) => setIsSaving(false),
             );
     }, [character_id, fetchStatus]);
 
     if (loading) {
-        return (
-            <div className="mt-3">
-                <LoadingProgressBar />
-            </div>
-        );
+        return null;
     }
 
     if (!status || (!status.active && !status.completed) || !status.batch) {
         return null;
     }
 
-    const title = status.active
-        ? "Batch Crafting In Progress"
-        : "Batch Crafting Ended";
+    const title =
+        status.batch.human_mode_label ??
+        (status.active ? "Batch Crafting In Progress" : "Batch Crafting Ended");
     const statusText = status.active
         ? "Running"
         : (status.batch.ended_reason ?? "Completed").replace(/_/g, " ");
     const timerText = status.active
-        ? `${formatSeconds(elapsedSeconds)} elapsed / ${formatSeconds(remainingSeconds)} remaining`
+        ? `${formatSeconds(elapsedSeconds)} elapsed`
         : `${status.batch.elapsed_human ?? "0s"} total`;
 
     return (

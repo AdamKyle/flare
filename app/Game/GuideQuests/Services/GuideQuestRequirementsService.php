@@ -668,6 +668,40 @@ class GuideQuestRequirementsService
         return $this;
     }
 
+    public function requiredGlobalEventCraftAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService
+    {
+        if (is_null($guideQuest->required_event_goal_crafting_participation)) {
+            return $this;
+        }
+
+        if (is_null($character->globalEventCrafts)) {
+            return $this;
+        }
+
+        if ($character->globalEventCrafts->crafts >= $guideQuest->required_event_goal_crafting_participation) {
+            $this->finishedRequirements[] = 'required_event_goal_crafting_participation';
+        }
+
+        return $this;
+    }
+
+    public function requiredGlobalEventEnchantAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService
+    {
+        if (is_null($guideQuest->required_event_goal_enchanting_participation)) {
+            return $this;
+        }
+
+        if (is_null($character->globalEventEnchants)) {
+            return $this;
+        }
+
+        if ($character->globalEventEnchants->enchants >= $guideQuest->required_event_goal_enchanting_participation) {
+            $this->finishedRequirements[] = 'required_event_goal_enchanting_participation';
+        }
+
+        return $this;
+    }
+
     /**
      * Has the character leveled their class skill to the desired level?
      */

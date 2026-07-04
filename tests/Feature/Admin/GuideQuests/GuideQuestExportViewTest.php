@@ -29,6 +29,23 @@ class GuideQuestExportViewTest extends TestCase
         $this->assertStringContainsString('3', $view);
     }
 
+    public function testGuideQuestExportViewContainsEventGoalCraftAndEnchantColumnsAndValues(): void
+    {
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 12,
+            'required_event_goal_enchanting_participation' => 13,
+        ]);
+
+        $view = view('admin.exports.guide-quests.sheets.guide-quests', [
+            'guideQuests' => collect([$guideQuest]),
+        ])->render();
+
+        $this->assertStringContainsString('required_event_goal_crafting_participation', $view);
+        $this->assertStringContainsString('required_event_goal_enchanting_participation', $view);
+        $this->assertStringContainsString('<td>12</td>', $view);
+        $this->assertStringContainsString('<td>13</td>', $view);
+    }
+
     public function testGuideQuestExportViewContainsBatchCraftedItemRequirementColumnsAndValues(): void
     {
         $helmet = $this->createItem(['name' => 'Export Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);

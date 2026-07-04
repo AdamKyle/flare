@@ -24,9 +24,17 @@ class OnlineUsersControllerSecurityTest extends TestCase
         $response = $this->call('GET', '/api/characters-online');
 
         $response->assertOk();
-        $response->assertJsonFragment(['name' => $character->name]);
-        $response->assertJsonMissing(['duration' => 600]);
-        $response->assertJsonMissing(['currently_exploring' => false]);
+        $response->assertJsonFragment([
+            'name' => $character->name,
+            'level' => $character->level,
+            'map' => 'Surface',
+        ]);
+        $response->assertJsonMissingPath('characters_online.0.duration');
+        $response->assertJsonMissingPath('characters_online.0.currently_exploring');
+        $response->assertJsonMissingPath('characters_online.0.last_activity');
+        $response->assertJsonMissingPath('characters_online.0.last_heart_beat');
+        $response->assertJsonMissingPath('characters_online.0.user_id');
+        $response->assertJsonMissingPath('characters_online.0.email');
         $response->assertJsonMissing(['user_id' => $character->user_id]);
         $response->assertJsonMissing(['email' => $character->user->email]);
     }

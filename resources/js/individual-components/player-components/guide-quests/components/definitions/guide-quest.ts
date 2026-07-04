@@ -43,6 +43,9 @@ export default interface GuideQuest {
     required_mercenary_level: number | null;
     required_secondary_mercenary_level: number | null;
     required_class_specials_equipped: number | null;
+    required_event_goal_participation: number | null;
+    required_event_goal_crafting_participation: number | null;
+    required_event_goal_enchanting_participation: number | null;
     required_batch_crafting_type: string | null;
     required_batch_crafting_hours: number | null;
     required_batch_crafted_items:

@@ -14,6 +14,7 @@ use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\GlobalEventSteps;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -24,7 +25,11 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
 
     private bool $wasItemAccepted = false;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalsService)
+    public function __construct(
+        RandomAffixGenerator $randomAffixGenerator,
+        EventGoalsService $eventGoalsService,
+        private readonly GlobalEventGoalProgressionService $globalEventGoalProgressionService,
+    )
     {
         parent::__construct($randomAffixGenerator, $eventGoalsService);
     }
@@ -82,6 +87,10 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
         ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This item will help in the fight against The Federation! we shall save it for when we are ready for to enchant them!" The Red Hawk Soldier takes the item from you. Onto the next child.');
 
         $this->wasItemAccepted = true;
+
+        if (! is_null($event->event_goal_steps)) {
+            $this->globalEventGoalProgressionService->advanceIfCurrentGoalComplete($globalEventGoal);
+        }
     }
 
     /**

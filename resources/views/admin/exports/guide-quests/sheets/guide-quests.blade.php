@@ -52,6 +52,8 @@
             <th>only_during_event</th>
             <th>be_on_game_map</th>
             <th>required_event_goal_participation</th>
+            <th>required_event_goal_crafting_participation</th>
+            <th>required_event_goal_enchanting_participation</th>
             <th>required_holy_stacks</th>
             <th>required_attached_gems</th>
             <th>required_specialty_type</th>
@@ -128,6 +130,8 @@
                 <td>{{ $guideQuest->only_during_event}}</td>
                 <td>{{ !is_null($guideQuest->be_on_game_map) ? $guideQuest->required_to_be_on_game_map_name : ''}}</td>
                 <td>{{ $guideQuest->required_event_goal_participation }}</td>
+                <td>{{ $guideQuest->required_event_goal_crafting_participation }}</td>
+                <td>{{ $guideQuest->required_event_goal_enchanting_participation }}</td>
                 <td>{{ $guideQuest->required_holy_stacks }}</td>
                 <td>{{ $guideQuest->required_attached_gems }}</td>
                 <td>{{ $guideQuest->required_specialty_type }}</td>

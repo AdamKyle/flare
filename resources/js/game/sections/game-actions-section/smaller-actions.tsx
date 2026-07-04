@@ -60,6 +60,9 @@ export default class SmallerActions extends React.Component<
             celestial_time_out: 0,
             batch_crafting_time_out:
                 this.props.character.batch_crafting_time_out,
+            batch_crafting_visible:
+                this.props.character.is_batch_crafting_visible,
+            batch_crafting_hidden: false,
         };
 
         this.smallActionsManager = new SmallActionsManager(this);
@@ -92,6 +95,14 @@ export default class SmallerActions extends React.Component<
 
     componentDidMount() {
         this.smallActionsManager.initialFetch();
+        window.addEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.addEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
 
         // @ts-ignore
         this.attackTimeOut.listen(
@@ -196,11 +207,34 @@ export default class SmallerActions extends React.Component<
     }
 
     componentWillUnmount(): void {
+        window.removeEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.removeEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
         this.props.update_parent_state({
             monsters: this.state.monsters,
             raid_monsters: this.state.raid_monsters,
         });
     }
+
+    showBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: true,
+            batch_crafting_hidden: false,
+            selected_action: null,
+        });
+    };
+
+    hideBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: false,
+            batch_crafting_hidden: true,
+        });
+    };
 
     showAction(data: any) {
         this.smallActionsManager.setSelectedAction(data);
@@ -275,6 +309,14 @@ export default class SmallerActions extends React.Component<
 
     isBatchCraftingRunning(): boolean {
         return this.props.character.is_batch_crafting_running;
+    }
+
+    isBatchCraftingVisible(): boolean {
+        return (
+            (this.props.character.is_batch_crafting_visible &&
+                !this.state.batch_crafting_hidden) ||
+            this.state.batch_crafting_visible
+        );
     }
 
     isAnyAutomationRunning(): boolean {
@@ -556,7 +598,7 @@ export default class SmallerActions extends React.Component<
                     />
                 </div>
             ) : null,
-            this.isBatchCraftingRunning() ? (
+            this.isBatchCraftingVisible() ? (
                 <div className="mt-3" key="batch-crafting-status">
                     <BatchCraftingStatusPanel
                         character_id={this.props.character.id}

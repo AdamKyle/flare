@@ -8,4 +8,6 @@ export enum InventoryActionConfirmationType {
     MOVE_SELECTED = "move-selected",
     EQUIP_SELECTED = "equip-selected",
     DESTROY_ALL_ALCHEMY_ITEMS = "destroy-all-alchemy-items",
+    SELL_SELECTED_FROM_SET = "sell-selected-from-set",
+    DISENCHANT_SELECTED_FROM_SET = "disenchant-selected-from-set",
 }

@@ -15,6 +15,10 @@ export default interface ActionsState {
 
     batch_crafting_time_out: number;
 
+    batch_crafting_visible: boolean;
+
+    batch_crafting_hidden: boolean;
+
     crafting_type: string | null;
 
     loading: boolean;

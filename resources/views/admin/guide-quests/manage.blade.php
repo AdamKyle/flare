@@ -186,6 +186,12 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Event Goal Kills:"
                                    modelKey="required_event_goal_participation"
                                    name="required_event_goal_participation" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Event Goal Crafts:"
+                                   modelKey="required_event_goal_crafting_participation"
+                                   name="required_event_goal_crafting_participation" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Event Goal Enchants:"
+                                   modelKey="required_event_goal_enchanting_participation"
+                                   name="required_event_goal_enchanting_participation" />
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>

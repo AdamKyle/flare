@@ -1,12 +1,12 @@
 const basePodiumCardClasses =
     "flex h-full min-h-[330px] flex-col items-stretch justify-between rounded-t-md rounded-b-none border border-b-0 p-6 text-center";
-const featuredPodiumCardClasses = "min-h-[380px] shadow-md lg:p-8";
+const featuredPodiumCardClasses = "min-h-[380px] lg:p-8";
 const goldPodiumCardClasses =
-    "bg-gradient-to-br from-gold-200 to-gold-300 border-gold-600 text-gold-950 ring-2 ring-gold-500 shadow-md dark:from-gold-950 dark:to-gold-900 dark:border-gold-400 dark:text-gold-100 dark:ring-gold-700";
+    "bg-gradient-to-br from-gold-100 to-gold-200 border-gold-500 text-gold-950 dark:from-gold-950 dark:to-gold-900 dark:border-gold-500 dark:text-gold-100";
 const silverPodiumCardClasses =
-    "bg-gradient-to-br from-silver-200 to-silver-300 border-silver-500 text-silver-950 ring-2 ring-silver-400 shadow-sm dark:from-silver-950 dark:to-silver-900 dark:border-silver-300 dark:text-silver-100 dark:ring-silver-700";
+    "bg-gradient-to-br from-silver-100 to-silver-200 border-silver-400 text-silver-950 dark:from-silver-950 dark:to-silver-900 dark:border-silver-500 dark:text-silver-100";
 const bronzePodiumCardClasses =
-    "bg-gradient-to-br from-ochre-200 to-ochre-300 border-ochre-600 text-ochre-950 ring-2 ring-ochre-500 shadow-sm dark:from-ochre-950 dark:to-ochre-900 dark:border-ochre-400 dark:text-ochre-100 dark:ring-ochre-700";
+    "bg-gradient-to-br from-ochre-100 to-ochre-200 border-ochre-500 text-ochre-950 dark:from-ochre-950 dark:to-ochre-900 dark:border-ochre-500 dark:text-ochre-100";
 const neutralPodiumCardClasses =
     "border-gray-200 bg-gray-50 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100";
 

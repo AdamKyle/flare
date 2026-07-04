@@ -35,6 +35,10 @@ export default class ModalPropsBuilder {
                 return "Equip Selected";
             case InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS:
                 return "Destroy All Alchemy Items";
+            case InventoryActionConfirmationType.SELL_SELECTED_FROM_SET:
+                return "Sell Selected";
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
+                return "Disenchant Selected";
             default:
                 return "ERROR";
         }
@@ -69,6 +73,16 @@ export default class ModalPropsBuilder {
                     "character/" +
                     characterId +
                     "/inventory/destroy-all-alchemy-items"
+                );
+            case InventoryActionConfirmationType.SELL_SELECTED_FROM_SET:
+                return (
+                    "character/" + characterId + "/inventory-set/sell-selected"
+                );
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
+                return (
+                    "character/" +
+                    characterId +
+                    "/inventory-set/disenchant-selected"
                 );
             default:
                 return "";

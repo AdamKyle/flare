@@ -1,4 +1,5 @@
 import React from "react";
+import Select, { SingleValue } from "react-select";
 import TopsDisplayField from "../types/tops-display-field";
 import TopsLeaderboardRow from "../types/tops-leaderboard-row";
 import TopsCharacterNameLink from "./tops-character-name-link";
@@ -209,21 +210,36 @@ export default class TopsLeaderboardTable extends React.Component<
     }
 
     renderPagination() {
+        const options = [
+            { label: "10", value: "10" },
+            { label: "25", value: "25" },
+            { label: "50", value: "50" },
+        ];
+        const selectedOption =
+            options.find(
+                (option) => option.value === String(this.state.perPage),
+            ) ?? options[0];
+
         return (
             <div className="flex flex-col gap-3 border-t border-gray-200 px-4 py-3 text-sm dark:border-gray-700 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                    Rows
-                    <select
-                        className="rounded-sm border border-gray-300 bg-white px-2 py-1 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                        value={this.state.perPage}
-                        onChange={(event) =>
-                            this.changePerPage(event.target.value)
-                        }
-                    >
-                        <option value={10}>10</option>
-                        <option value={25}>25</option>
-                        <option value={50}>50</option>
-                    </select>
+                    <span>Rows</span>
+                    <div className="w-24">
+                        <Select
+                            className="text-sm"
+                            classNamePrefix="react-select"
+                            options={options}
+                            value={selectedOption}
+                            onChange={(
+                                option: SingleValue<{
+                                    label: string;
+                                    value: string;
+                                }>,
+                            ) => this.changePerPage(option?.value ?? "10")}
+                            aria-label="Select rows per page"
+                            menuPortalTarget={document.body}
+                        />
+                    </div>
                 </label>
                 <div className="flex items-center gap-3">
                     <button

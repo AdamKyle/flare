@@ -14,6 +14,7 @@ use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
@@ -64,7 +65,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
-            'batch_crafting_time_out' => ! is_null($activeBatchCrafting) ? max(0, now()->diffInSeconds($activeBatchCrafting->ends_at, false)) : 0,
+            'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
@@ -127,6 +128,29 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             ->orderByDesc('started_at')
             ->orderByDesc('id')
             ->first();
+    }
+
+    private function batchCraftingTimeOutSeconds(?BatchCrafting $batchCrafting): int
+    {
+        if (is_null($batchCrafting)) {
+            return 0;
+        }
+
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+        $progress = $batchCrafting->progress ?? [];
+
+        if ($type->usesEightHourTimer($progress)) {
+            return max(0, now()->diffInSeconds($batchCrafting->ends_at, false));
+        }
+
+        if (is_null($batchCrafting->started_at)) {
+            return 0;
+        }
+
+        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? 60);
+        $pendingUntil = $batchCrafting->started_at->copy()->addSeconds($tickDelay);
+
+        return max(0, now()->diffInSeconds($pendingUntil, false));
     }
 
     private function isAlchemyLocked(Character $character): bool

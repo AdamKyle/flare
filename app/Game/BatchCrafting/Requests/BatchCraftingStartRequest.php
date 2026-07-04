@@ -18,12 +18,20 @@ class BatchCraftingStartRequest extends FormRequest
             $progress['craft_mode'] = $progress['craft_mode'] ?? 'experience';
         }
 
+        if ($batchType === BatchCraftingType::ENCHANT->value) {
+            $progress['enchant_mode'] = $progress['enchant_mode'] ?? 'event';
+        }
+
         if ($batchType === BatchCraftingType::ALCHEMY->value) {
             $progress['alchemy_mode'] = $progress['alchemy_mode'] ?? 'experience';
         }
 
         if ($batchType === BatchCraftingType::TRINKETRY->value) {
             $progress['trinketry_mode'] = $progress['trinketry_mode'] ?? 'experience';
+        }
+
+        if ($batchType === BatchCraftingType::HOLY_OILS->value) {
+            $progress['holy_oil_mode'] = $progress['holy_oil_mode'] ?? 'selected';
         }
 
         $this->merge(['progress' => $progress]);
@@ -39,6 +47,7 @@ class BatchCraftingStartRequest extends FormRequest
         $startableTypes = [
             BatchCraftingType::CRAFT->value,
             BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            BatchCraftingType::ENCHANT->value,
             BatchCraftingType::ALCHEMY->value,
             BatchCraftingType::HOLY_OILS->value,
             BatchCraftingType::TRINKETRY->value,
@@ -50,28 +59,50 @@ class BatchCraftingStartRequest extends FormRequest
             'selected_items' => ['nullable', 'array'],
             'selected_oils' => ['nullable', 'array'],
             'progress' => ['nullable', 'array'],
-            'progress.craft_mode' => ['nullable', 'string', Rule::in(['specific_item', 'experience'])],
+            'progress.craft_mode' => ['nullable', 'string', Rule::in(['specific_item', 'experience', 'event', 'craft_set', 'craft_enchant_set'])],
+            'progress.craft_experience_skill' => ['nullable', 'string', Rule::in(['weapon', 'armour', 'ring', 'spell', 'enchanting'])],
             'progress.specific_crafting_type' => ['nullable', 'string'],
             'progress.specific_item_type' => ['nullable', 'string'],
             'progress.specific_item_id' => ['nullable', 'integer', 'min:1'],
             'progress.craft_amount' => ['nullable', 'integer', 'min:1'],
             'progress.enchant_affix_ids' => ['nullable', 'array', 'min:1', 'max:2'],
             'progress.enchant_affix_ids.*' => ['integer', 'min:1'],
+            'progress.enchant_mode' => ['nullable', 'string', Rule::in(['event'])],
+            'progress.selected_set_id' => ['nullable', 'integer', 'min:1'],
+            'progress.enchant_plan' => ['nullable', 'array'],
             'progress.alchemy_mode' => ['nullable', 'string', Rule::in(['experience', 'amount'])],
             'progress.alchemy_item_id' => ['nullable', 'integer', 'min:1'],
             'progress.alchemy_amount' => ['nullable', 'integer', 'min:1'],
             'progress.trinketry_mode' => ['nullable', 'string', Rule::in(['experience'])],
+            'progress.holy_oil_mode' => ['nullable', 'string', Rule::in(['selected', 'set'])],
         ];
     }
 
     public function withValidator($validator): void
     {
         $validator->sometimes('selected_items', ['required', 'array', 'min:1'], function ($input) {
-            return $input->batch_type === BatchCraftingType::HOLY_OILS->value;
+            return $input->batch_type === BatchCraftingType::HOLY_OILS->value
+                && ($input->progress['holy_oil_mode'] ?? 'selected') === 'selected';
         });
 
         $validator->sometimes('selected_oils', ['required', 'array', 'min:1'], function ($input) {
             return $input->batch_type === BatchCraftingType::HOLY_OILS->value;
+        });
+
+        $validator->sometimes('progress.selected_set_id', ['required'], function ($input) {
+            if ($input->batch_type === BatchCraftingType::HOLY_OILS->value) {
+                return ($input->progress['holy_oil_mode'] ?? 'selected') === 'set';
+            }
+
+            if ($input->batch_type === BatchCraftingType::CRAFT->value) {
+                return ($input->progress['craft_mode'] ?? 'experience') === 'craft_set';
+            }
+
+            if ($input->batch_type === BatchCraftingType::CRAFT_AND_ENCHANT->value) {
+                return ($input->progress['craft_mode'] ?? 'experience') === 'craft_enchant_set';
+            }
+
+            return false;
         });
 
         $validator->sometimes('progress.craft_mode', ['required'], function ($input) {
@@ -79,6 +110,10 @@ class BatchCraftingStartRequest extends FormRequest
                 BatchCraftingType::CRAFT->value,
                 BatchCraftingType::CRAFT_AND_ENCHANT->value,
             ], true);
+        });
+
+        $validator->sometimes('progress.craft_mode', [Rule::notIn(['event', 'craft_set'])], function ($input) {
+            return $input->batch_type === BatchCraftingType::CRAFT_AND_ENCHANT->value;
         });
 
         $validator->sometimes('progress.specific_crafting_type', ['required'], function ($input) {

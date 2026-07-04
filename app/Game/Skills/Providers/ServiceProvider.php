@@ -11,6 +11,7 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -70,14 +71,16 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(HandleUpdatingCraftingGlobalEventGoal::class, function ($app) {
             return new HandleUpdatingCraftingGlobalEventGoal(
                 $app->make(RandomAffixGenerator::class),
-                $app->make(EventGoalsService::class)
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalProgressionService::class)
             );
         });
 
         $this->app->bind(HandleUpdatingEnchantingGlobalEventGoal::class, function ($app) {
             return new HandleUpdatingEnchantingGlobalEventGoal(
                 $app->make(RandomAffixGenerator::class),
-                $app->make(EventGoalsService::class)
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalProgressionService::class)
             );
         });
 

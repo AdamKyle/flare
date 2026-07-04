@@ -31,6 +31,14 @@
                             <dt>Event Goal Creature Kills</dt>
                             <dd>{{ $guideQuest->required_event_goal_participation }}</dd>
                         @endif
+                        @if (!is_null($guideQuest->required_event_goal_crafting_participation))
+                            <dt>Event Goal Crafts</dt>
+                            <dd>{{ $guideQuest->required_event_goal_crafting_participation }}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_event_goal_enchanting_participation))
+                            <dt>Event Goal Enchants</dt>
+                            <dd>{{ $guideQuest->required_event_goal_enchanting_participation }}</dd>
+                        @endif
                         @if (!is_null($guideQuest->required_game_map_id))
                             <dt>Required Map Access</dt>
                             <dd>{{ $guideQuest->game_map_name }}</dd>

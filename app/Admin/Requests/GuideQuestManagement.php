@@ -38,6 +38,8 @@ class GuideQuestManagement extends FormRequest
             'required_batch_crafted_items.*.item_id' => 'nullable|integer|exists:items,id',
             'required_batch_crafted_items.*.amount' => 'nullable|integer|min:1',
             'required_batch_crafted_items.*.must_be_enchanted' => 'nullable|boolean',
+            'required_event_goal_crafting_participation' => 'nullable|integer|min:1',
+            'required_event_goal_enchanting_participation' => 'nullable|integer|min:1',
         ];
     }
 

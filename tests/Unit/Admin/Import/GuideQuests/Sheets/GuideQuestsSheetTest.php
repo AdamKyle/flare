@@ -80,6 +80,71 @@ class GuideQuestsSheetTest extends TestCase
         $this->assertSame(3, $guideQuest->required_batch_crafting_hours);
     }
 
+    public function testImportCreatesGuideQuestWithEventGoalCraftAndEnchantRequirements(): void
+    {
+        (new GuideQuestsSheet)->collection(new Collection([
+            new Collection([
+                'id',
+                'name',
+                'intro_text',
+                'instructions',
+                'desktop_instructions',
+                'mobile_instructions',
+                'required_game_map_id',
+                'be_on_game_map',
+                'required_skill',
+                'required_skill_level',
+                'required_secondary_skill',
+                'required_secondary_skill_level',
+                'required_passive_skill',
+                'required_passive_level',
+                'required_faction_id',
+                'required_faction_level',
+                'required_quest_item_id',
+                'secondary_quest_item_id',
+                'required_quest_id',
+                'required_kingdom_building_id',
+                'required_kingdom_building_level',
+                'parent_id',
+                'required_event_goal_crafting_participation',
+                'required_event_goal_enchanting_participation',
+                'xp_reward',
+            ]),
+            new Collection([
+                null,
+                'Event Goal Participation Import Quest',
+                'Intro text',
+                'Instructions',
+                'Desktop',
+                'Mobile',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                '',
+                12,
+                13,
+                100,
+            ]),
+        ]));
+
+        $guideQuest = GuideQuest::where('name', 'Event Goal Participation Import Quest')->first();
+
+        $this->assertSame(12, $guideQuest->required_event_goal_crafting_participation);
+        $this->assertSame(13, $guideQuest->required_event_goal_enchanting_participation);
+    }
+
     public function testImportUpdatesGuideQuestWithBatchCraftingRequirement(): void
     {
         $this->createGuideQuest([

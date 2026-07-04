@@ -36,6 +36,21 @@ class CharactersOnline
         ]);
     }
 
+    public function getPublicCharacterOnlineData(): array
+    {
+        $result = $this->getCharacterOnlineData();
+
+        $result['characters_online'] = collect($result['characters_online'])->map(function (array $character): array {
+            return [
+                'name' => $character['name'],
+                'level' => $character['level'],
+                'map' => $character['map'],
+            ];
+        })->all();
+
+        return $result;
+    }
+
     private function buildBaseQuery(): EloquentBuilder
     {
         if ($this->filterType > 0) {

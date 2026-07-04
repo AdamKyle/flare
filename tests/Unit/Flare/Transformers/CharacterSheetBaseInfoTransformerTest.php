@@ -2,11 +2,13 @@
 
 namespace Tests\Unit\Flare\Transformers;
 
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
+use App\Game\BatchCrafting\Values\BatchCraftingType;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -264,5 +266,36 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $this->assertFalse($data['can_access_labyrinth_oracle']);
         $this->assertFalse($data['can_access_twisted_earth']);
         $this->assertFalse($data['can_access_queen']);
+    }
+
+    public function testBatchCraftingTimeOutUsesOneMinutePendingCountdownForDelayedModes(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'started_at' => now(),
+            'progress' => ['tick_delay_seconds' => 60, 'holy_oil_mode' => 'selected'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertEquals(60, $data['batch_crafting_time_out']);
+    }
+
+    public function testBatchCraftingTimeOutUsesEightHourRemainingTimerForEightHourModes(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'ends_at' => now()->addHours(8),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertEquals(28800, $data['batch_crafting_time_out']);
     }
 }

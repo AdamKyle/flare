@@ -10,7 +10,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
+use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MaxCurrenciesValue;
+use App\Flare\Values\RandomAffixDetails;
 use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -21,6 +23,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateGuideQuest;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
@@ -28,7 +31,7 @@ use Tests\Traits\CreateMonster;
 
 class GuideQuestServiceTest extends TestCase
 {
-    use CreateBatchCrafting, CreateGuideQuest, CreateItem, CreateItemAffix, CreateMonster, CreateEvent, RefreshDatabase;
+    use CreateBatchCrafting, CreateGuideQuest, CreateItem, CreateItemAffix, CreateMonster, CreateEvent, CreateGlobalEventGoal, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -461,6 +464,89 @@ class GuideQuestServiceTest extends TestCase
         $canHandIn = $this->guideQuestService->canHandInQuest($character, $quest);
 
         $this->assertTrue($canHandIn);
+    }
+
+    public function testCanHandInQuestWhenOnlyRequirementIsSatisfiedEventCraftAmount(): void
+    {
+        $quest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+        ]);
+
+        $character = $this->character->updateUser(['guide_enabled' => true])
+            ->getCharacter();
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'crafts' => 10,
+        ]);
+
+        $canHandIn = $this->guideQuestService->canHandInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($canHandIn);
+    }
+
+    public function testCanHandInQuestWhenOnlyRequirementIsSatisfiedEventEnchantAmount(): void
+    {
+        $quest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $character = $this->character->updateUser(['guide_enabled' => true])
+            ->getCharacter();
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_enchants' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventEnchants([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'enchants' => 10,
+        ]);
+
+        $canHandIn = $this->guideQuestService->canHandInQuest($character->refresh(), $quest);
+
+        $this->assertTrue($canHandIn);
+    }
+
+    public function testCannotHandInQuestWhenEventCraftAndEnchantRequirementsAreOnlyPartiallySatisfied(): void
+    {
+        $quest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $character = $this->character->updateUser(['guide_enabled' => true])
+            ->getCharacter();
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts' => 1000,
+            'max_enchants' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'crafts' => 10,
+        ]);
+
+        $canHandIn = $this->guideQuestService->canHandInQuest($character->refresh(), $quest);
+
+        $this->assertFalse($canHandIn);
     }
 
     public function testHandInConsumesExactRequiredNumberOfPlainMatchingInventorySlots(): void

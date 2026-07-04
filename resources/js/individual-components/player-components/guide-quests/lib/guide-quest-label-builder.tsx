@@ -111,6 +111,10 @@ const guideQuestLabelBuilder = (
             return "Physically be on Plane";
         case "required_event_goal_participation":
             return "Kill # of Event Creatures";
+        case "required_event_goal_crafting_participation":
+            return "Craft # of Event Items";
+        case "required_event_goal_enchanting_participation":
+            return "Enchant # of Event Items";
         case "required_fame_level":
             return "Increase your fame with an NPC to";
         case "required_reincarnation_amount":

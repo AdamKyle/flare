@@ -148,6 +148,13 @@ class GuideQuestsSheet implements ToCollection
             $data['parent_id'] = $parentGuideQuest->id;
         }
 
+        $data['required_event_goal_crafting_participation'] = blank($data['required_event_goal_crafting_participation'] ?? null)
+            ? null
+            : (int) $data['required_event_goal_crafting_participation'];
+        $data['required_event_goal_enchanting_participation'] = blank($data['required_event_goal_enchanting_participation'] ?? null)
+            ? null
+            : (int) $data['required_event_goal_enchanting_participation'];
+
         return $data;
     }
 

@@ -6,6 +6,7 @@ import { asTopsRecord } from "../../../../shared/helpers/tops-value-helpers";
 import TopsStatListItem from "../../../../shared/types/tops-stat-list-item";
 import TopsValue from "../../../../shared/types/tops-value";
 import ProfileActivitySectionProps from "../../../types/profile/activity/profile-activity-section-props";
+import { formatLocalDateTime } from "../../../../../../../game/lib/game/format-local-date";
 
 export default class ProfileActivitySection extends React.Component<ProfileActivitySectionProps> {
     activity(): Record<string, TopsValue> {
@@ -16,8 +17,14 @@ export default class ProfileActivitySection extends React.Component<ProfileActiv
         const activity = this.activity();
 
         return [
-            { label: "Last Login", value: activity.last_login_at },
-            { label: "Last Activity", value: activity.last_activity_at },
+            {
+                label: "Last Login",
+                value: formatLocalDateTime(activity.last_login_at),
+            },
+            {
+                label: "Last Activity",
+                value: formatLocalDateTime(activity.last_activity_at),
+            },
             {
                 label: "Login Duration 7 Days",
                 value: activity.login_duration_7_days,
@@ -70,17 +77,21 @@ export default class ProfileActivitySection extends React.Component<ProfileActiv
                             No public delve outcomes are available.
                         </p>
                     ) : (
-                        Object.keys(outcomes).map((key: string) => (
-                            <div
-                                key={key}
-                                className="rounded-sm border border-gray-200 p-3 dark:border-gray-700"
-                            >
-                                <p className="text-sm font-semibold">{key}</p>
-                                <p className="text-2xl font-bold tabular-nums">
-                                    {formatTopsValue(outcomes[key])}
-                                </p>
-                            </div>
-                        ))
+                        <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                            {Object.keys(outcomes).map((key: string) => (
+                                <div
+                                    key={key}
+                                    className="rounded-sm border border-gray-200 p-3 dark:border-gray-700"
+                                >
+                                    <dt className="text-sm font-semibold">
+                                        {key}
+                                    </dt>
+                                    <dd className="text-2xl font-bold tabular-nums">
+                                        {formatTopsValue(outcomes[key])}
+                                    </dd>
+                                </div>
+                            ))}
+                        </dl>
                     )}
                 </div>
             </BasicCard>

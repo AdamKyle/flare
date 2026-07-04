@@ -148,6 +148,40 @@ class MultiInventoryActionService
         ]);
     }
 
+    public function disenchantManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $filteredSlots = $set->slots()
+            ->whereIn('id', $setSlotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'trinket', 'artifact']);
+            })
+            ->with('item')
+            ->get()
+            ->filter(function (SetSlot $slot) {
+                return ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id);
+            });
+
+        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
+        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
+
+        $set->slots()->whereIn('id', $filteredSlotIds)->delete();
+
+        $character = $character->refresh();
+
+        DisenchantMany::dispatch($character, $itemIdsToDisenchant);
+
+        return $this->successResult([
+            'message' => 'Set items are queued for disenchanting. Check Server Messages
+            (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
+            selected Server Messages from the Orange Chat Dropdown.',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+        ]);
+    }
+
     public function disenchantManyItems(Character $character, array $slotIds): array
     {
         $filteredSlots = $character->inventory->slots

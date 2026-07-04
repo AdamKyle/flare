@@ -22,7 +22,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(GemWorldLocationPlacementService::class, function ($app) {
-            return new GemWorldLocationPlacementService($app->make(CoordinatesCache::class));
+            return new GemWorldLocationPlacementService(
+                $app->make(CoordinatesCache::class),
+                $app->make(GemWorldPlaneGenerationSettings::class),
+            );
         });
 
         $this->app->bind(GemWorldGenerationService::class, function ($app) {

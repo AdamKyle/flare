@@ -39,7 +39,6 @@ class MassImportCustomData extends Command
         Artisan::call('batch-crafting:add-set-to-players --apply');
         Artisan::call('backfill:completed-panel-dismissals --apply');
 
-
         $this->importInformationSection();
 
         if (config('app.env') !== 'production') {

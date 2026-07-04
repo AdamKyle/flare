@@ -10,6 +10,7 @@ Route::middleware([
     Route::middleware(['throttle:150,2'])->group(function () {
         Route::post('/batch-crafting/{character}/dismiss', ['as' => 'batch-crafting.dismiss', 'uses' => 'Api\BatchCraftingPanelController@dismiss']);
         Route::post('/batch-crafting/{character}/info/acknowledge', ['as' => 'batch-crafting.info.acknowledge', 'uses' => 'Api\BatchCraftingInfoController@acknowledge']);
+        Route::post('/batch-crafting/{character}/preview', ['as' => 'batch-crafting.preview', 'uses' => 'Api\BatchCraftingController@preview']);
     });
 
     Route::middleware(['is.character.dead'])->group(function () {

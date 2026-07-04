@@ -71,6 +71,22 @@ export default class SectionBuilder extends React.Component<
                 );
             case InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS:
                 return <DestroyAlchemyInformation />;
+            case InventoryActionConfirmationType.SELL_SELECTED_FROM_SET:
+                return (
+                    <SellSelectedInformation
+                        item_names={
+                            this.props.item_names ? this.props.item_names : []
+                        }
+                    />
+                );
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
+                return (
+                    <DisenchantSelectedInformation
+                        item_names={
+                            this.props.item_names ? this.props.item_names : []
+                        }
+                    />
+                );
             default:
                 return null;
         }

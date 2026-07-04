@@ -11,6 +11,7 @@ use App\Flare\Models\Item;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Exception;
@@ -100,7 +101,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
-            'batch_crafting_time_out' => ! is_null($activeBatchCrafting) ? max(0, now()->diffInSeconds($activeBatchCrafting->ends_at, false)) : 0,
+            'is_batch_crafting_visible' => ! is_null($this->visibleBatchCrafting($character)),
+            'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
@@ -205,11 +207,47 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         ];
     }
 
+    private function batchCraftingTimeOutSeconds(?BatchCrafting $batchCrafting): int
+    {
+        if (is_null($batchCrafting)) {
+            return 0;
+        }
+
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+        $progress = $batchCrafting->progress ?? [];
+
+        if ($type->usesEightHourTimer($progress)) {
+            return max(0, now()->diffInSeconds($batchCrafting->ends_at, false));
+        }
+
+        if (is_null($batchCrafting->started_at)) {
+            return 0;
+        }
+
+        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? 60);
+        $pendingUntil = $batchCrafting->started_at->copy()->addSeconds($tickDelay);
+
+        return max(0, now()->diffInSeconds($pendingUntil, false));
+    }
+
     private function activeBatchCrafting(Character $character): ?BatchCrafting
     {
         return BatchCrafting::where('character_id', $character->id)
             ->whereNull('completed_at')
             ->whereNull('cancelled_at')
+            ->orderByDesc('started_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    private function visibleBatchCrafting(Character $character): ?BatchCrafting
+    {
+        return BatchCrafting::where('character_id', $character->id)
+            ->where(function ($query) {
+                $query->whereNull('completed_at')
+                    ->whereNull('cancelled_at')
+                    ->orWhereNull('panel_dismissed_at');
+            })
             ->orderByDesc('started_at')
             ->orderByDesc('id')
             ->first();

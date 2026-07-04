@@ -1,27 +1,15 @@
 import React from "react";
 import BasicCard from "../../../../../../../game/components/ui/cards/basic-card";
-import TopsStatList from "../../../../shared/components/tops-stat-list";
 import { formatTopsValue } from "../../../../shared/helpers/tops-format-value";
 import {
     asTopsRecord,
     asTopsRecordList,
 } from "../../../../shared/helpers/tops-value-helpers";
-import TopsStatListItem from "../../../../shared/types/tops-stat-list-item";
 import TopsValue from "../../../../shared/types/tops-value";
 import ProfileAnalyticsSectionProps from "../../../types/profile/analytics/profile-analytics-section-props";
+import TopsChartCard from "../sheet-inspect/tops-chart-card";
 
 export default class ProfileAnalyticsSection extends React.Component<ProfileAnalyticsSectionProps> {
-    summaryItems(): TopsStatListItem[] {
-        const summary = asTopsRecord(this.props.analytics?.summary);
-
-        return [
-            { label: "Exploration Kills", value: summary.exploration_kills },
-            { label: "Exploration Runs", value: summary.exploration_runs },
-            { label: "Delve Runs", value: summary.delve_runs },
-            { label: "Quests Completed", value: summary.quests_completed },
-        ];
-    }
-
     explorationRows(): Record<string, TopsValue>[] {
         const tables = asTopsRecord(this.props.analytics?.tables);
 
@@ -36,12 +24,13 @@ export default class ProfileAnalyticsSection extends React.Component<ProfileAnal
                 className="grid gap-4 lg:grid-cols-2"
                 aria-label="Analytics"
             >
-                <BasicCard>
-                    <h2 className="text-xl font-semibold">Analytics Summary</h2>
-                    <div className="mt-4">
-                        <TopsStatList items={this.summaryItems()} />
-                    </div>
-                </BasicCard>
+                <TopsChartCard
+                    title="Analytics Summary"
+                    description="Public activity totals returned in the Tops profile payload."
+                    chart={this.props.analytics?.analytics_summary_chart}
+                    xAxisLabel="Metric"
+                    yAxisLabel="Count"
+                />
                 <BasicCard>
                     <h2 className="text-xl font-semibold">
                         Exploration By Day
@@ -65,11 +54,28 @@ export default class ProfileAnalyticsSection extends React.Component<ProfileAnal
                                             <p className="font-semibold">
                                                 {row.date}
                                             </p>
-                                            <p className="text-sm text-gray-700 dark:text-gray-300">
-                                                Runs {formatTopsValue(row.runs)}{" "}
-                                                · Kills{" "}
-                                                {formatTopsValue(row.kills)}
-                                            </p>
+                                            <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+                                                <div>
+                                                    <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                                        Runs
+                                                    </dt>
+                                                    <dd>
+                                                        {formatTopsValue(
+                                                            row.runs,
+                                                        )}
+                                                    </dd>
+                                                </div>
+                                                <div>
+                                                    <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                                        Kills
+                                                    </dt>
+                                                    <dd>
+                                                        {formatTopsValue(
+                                                            row.kills,
+                                                        )}
+                                                    </dd>
+                                                </div>
+                                            </dl>
                                         </article>
                                     ),
                                 )}

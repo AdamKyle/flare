@@ -43,6 +43,9 @@ export default class Actions extends React.Component<
             celestial_time_out: 0,
             batch_crafting_time_out:
                 this.props.character.batch_crafting_time_out,
+            batch_crafting_visible:
+                this.props.character.is_batch_crafting_visible,
+            batch_crafting_hidden: false,
             crafting_type: null,
             loading: true,
             show_exploration: false,
@@ -65,6 +68,14 @@ export default class Actions extends React.Component<
         this.setUpState();
 
         this.props.update_show_map_mobile(true);
+        window.addEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.addEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
 
         // @ts-ignore
         this.traverseUpdate.listen(
@@ -78,6 +89,13 @@ export default class Actions extends React.Component<
                     craftingType === "labyrinth-oracle"
                 ) {
                     craftingType = null;
+                }
+
+                if (craftingType === "batch-crafting") {
+                    this.setState({ crafting_type: null }, () => {
+                        this.setState({ crafting_type: "batch-crafting" });
+                    });
+                    return;
                 }
 
                 this.setState({
@@ -160,11 +178,34 @@ export default class Actions extends React.Component<
     }
 
     componentWillUnmount(): void {
+        window.removeEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.removeEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
         this.props.update_parent_state({
             monsters: this.state.monsters,
             raid_monsters: this.state.raid_monsters,
         });
     }
+
+    showBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: true,
+            batch_crafting_hidden: false,
+            crafting_type: null,
+        });
+    };
+
+    hideBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: false,
+            batch_crafting_hidden: true,
+        });
+    };
 
     setUpState(): void {
         if (this.props.action_data === null) {
@@ -285,6 +326,14 @@ export default class Actions extends React.Component<
 
     isBatchCraftingRunning(): boolean {
         return this.props.character.is_batch_crafting_running;
+    }
+
+    isBatchCraftingVisible(): boolean {
+        return (
+            (this.props.character.is_batch_crafting_visible &&
+                !this.state.batch_crafting_hidden) ||
+            this.state.batch_crafting_visible
+        );
     }
 
     isAnyAutomationRunning(): boolean {
@@ -595,7 +644,7 @@ export default class Actions extends React.Component<
                     user_id={this.props.character.user_id}
                 />
             ) : null,
-            this.isBatchCraftingRunning() ? (
+            this.isBatchCraftingVisible() ? (
                 <BatchCraftingStatusPanel
                     key="batch-crafting-status"
                     character_id={this.props.character.id}

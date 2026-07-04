@@ -2,7 +2,9 @@
 
 namespace App\Flare\GemWorldGeneration\Services;
 
+use App\Flare\GemWorldGeneration\Exceptions\CouldNotPlaceGeneratedGemWorldLocation;
 use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
+use App\Flare\GemWorldGeneration\Values\GemWorldGenerationResult;
 use App\Flare\GemWorldGeneration\Values\GemWorldLocationPlacement;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
@@ -11,7 +13,9 @@ use App\Flare\Models\Location;
 use App\Flare\Models\LocationTemplate;
 use App\Flare\Values\LocationTemplateType;
 use App\Flare\Values\LocationType;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class GemWorldGenerationService
 {
@@ -20,25 +24,73 @@ class GemWorldGenerationService
         private readonly GemWorldLocationPlacementService $placementService,
     ) {}
 
-    public function generateMapGem(GameMapGemParamter $gemParamter): ?GameMap
+    public function generateMapGem(GameMapGemParamter $gemParamter): GemWorldGenerationResult
     {
+        $startedAt = now();
+
         if (! is_null($gemParamter->generatedMap)) {
-            return null;
+            $generatedMap = $gemParamter->generatedMap;
+
+            if (Location::where('game_map_id', $generatedMap->id)->count() === 0) {
+                return $this->retryPlacements(
+                    $generatedMap,
+                    $gemParamter->name,
+                    $this->mapGemProfileLabel($gemParamter),
+                    GeneratedGemMapType::MAP_GEM,
+                    $startedAt,
+                );
+            }
+
+            return $this->result(
+                $gemParamter->name,
+                $this->mapGemProfileLabel($gemParamter),
+                GeneratedGemMapType::MAP_GEM,
+                'skipped',
+                $generatedMap,
+                0,
+                $startedAt,
+                'Skipped existing generated map for: '.$gemParamter->name,
+            );
         }
 
         return $this->generate(
             $gemParamter->gameMap,
             $gemParamter->name,
+            $this->mapGemProfileLabel($gemParamter),
             GeneratedGemMapType::MAP_GEM,
             $gemParamter,
             null,
+            $startedAt,
         );
     }
 
-    public function generateLocationGem(GameLocationGemParamter $gemParamter): ?GameMap
+    public function generateLocationGem(GameLocationGemParamter $gemParamter): GemWorldGenerationResult
     {
+        $startedAt = now();
+
         if (! is_null($gemParamter->generatedMap)) {
-            return null;
+            $generatedMap = $gemParamter->generatedMap;
+
+            if (Location::where('game_map_id', $generatedMap->id)->count() === 0) {
+                return $this->retryPlacements(
+                    $generatedMap,
+                    $gemParamter->name,
+                    $this->locationGemProfileLabel($gemParamter),
+                    GeneratedGemMapType::LOCATION_GEM,
+                    $startedAt,
+                );
+            }
+
+            return $this->result(
+                $gemParamter->name,
+                $this->locationGemProfileLabel($gemParamter),
+                GeneratedGemMapType::LOCATION_GEM,
+                'skipped',
+                $gemParamter->generatedMap,
+                0,
+                $startedAt,
+                'Skipped existing generated map for: '.$gemParamter->name,
+            );
         }
 
         $gemParamter->loadMissing('location.map');
@@ -46,35 +98,39 @@ class GemWorldGenerationService
         return $this->generate(
             $gemParamter->location->map,
             $gemParamter->name,
+            $this->locationGemProfileLabel($gemParamter),
             GeneratedGemMapType::LOCATION_GEM,
             null,
             $gemParamter,
+            $startedAt,
         );
     }
 
     /**
-     * @return array{created:int, skipped:int}
+     * @return Collection<int, GemWorldGenerationResult>
      */
-    public function generateMapGems(Collection $gemParamters): array
+    public function generateMapGems(Collection $gemParamters): Collection
     {
-        return $this->generateMany($gemParamters, fn (GameMapGemParamter $gemParamter): ?GameMap => $this->generateMapGem($gemParamter));
+        return $this->generateMany($gemParamters, fn (GameMapGemParamter $gemParamter): GemWorldGenerationResult => $this->generateMapGem($gemParamter));
     }
 
     /**
-     * @return array{created:int, skipped:int}
+     * @return Collection<int, GemWorldGenerationResult>
      */
-    public function generateLocationGems(Collection $gemParamters): array
+    public function generateLocationGems(Collection $gemParamters): Collection
     {
-        return $this->generateMany($gemParamters, fn (GameLocationGemParamter $gemParamter): ?GameMap => $this->generateLocationGem($gemParamter));
+        return $this->generateMany($gemParamters, fn (GameLocationGemParamter $gemParamter): GemWorldGenerationResult => $this->generateLocationGem($gemParamter));
     }
 
     private function generate(
         GameMap $parentMap,
         string $profileName,
+        string $profileLabel,
         GeneratedGemMapType $type,
         ?GameMapGemParamter $mapGemParamter,
         ?GameLocationGemParamter $locationGemParamter,
-    ): GameMap {
+        CarbonInterface $startedAt,
+    ): GemWorldGenerationResult {
         $mapName = $this->generatedMapName($profileName, $type);
         $path = $this->imageGenerator->generate($parentMap, $mapName);
 
@@ -97,9 +153,106 @@ class GemWorldGenerationService
             'game_location_gem_paramter_id' => $locationGemParamter?->id,
         ]);
 
-        $this->createLocations($generatedMap, $profileName);
+        try {
+            $locationsCreated = $this->createLocations($generatedMap, $profileName);
+        } catch (CouldNotPlaceGeneratedGemWorldLocation $exception) {
+            return $this->result(
+                $profileName,
+                $profileLabel,
+                $type,
+                'failed',
+                $generatedMap,
+                0,
+                $startedAt,
+                $exception->getMessage(),
+            );
+        }
 
-        return $generatedMap;
+        return $this->result(
+            $profileName,
+            $profileLabel,
+            $type,
+            'generated',
+            $generatedMap,
+            $locationsCreated,
+            $startedAt,
+            'Generated '.$type->labelForMessage().' world for: '.$profileName,
+        );
+    }
+
+    private function retryPlacements(
+        GameMap $generatedMap,
+        string $profileName,
+        string $profileLabel,
+        GeneratedGemMapType $type,
+        CarbonInterface $startedAt,
+    ): GemWorldGenerationResult {
+        $repairMessage = $this->repairLegacyJpegPath($generatedMap);
+
+        try {
+            $locationsCreated = $this->createLocations($generatedMap, $profileName);
+        } catch (CouldNotPlaceGeneratedGemWorldLocation $exception) {
+            return $this->result(
+                $profileName,
+                $profileLabel,
+                $type,
+                'failed',
+                $generatedMap,
+                0,
+                $startedAt,
+                $exception->getMessage(),
+            );
+        }
+
+        return $this->result(
+            $profileName,
+            $profileLabel,
+            $type,
+            'generated',
+            $generatedMap,
+            $locationsCreated,
+            $startedAt,
+            trim(($repairMessage ?? '').' Recovered and placed locations for existing map: '.$profileName),
+        );
+    }
+
+    private function repairLegacyJpegPath(GameMap $generatedMap): ?string
+    {
+        $oldPath = $generatedMap->path;
+
+        if (! in_array(strtolower(pathinfo($oldPath, PATHINFO_EXTENSION)), ['jpeg', 'jpg'], true)) {
+            return null;
+        }
+
+        $disk = Storage::disk('maps');
+
+        if (! $disk->exists($oldPath)) {
+            return null;
+        }
+
+        $imageData = $disk->get($oldPath);
+        $image = imagecreatefromstring($imageData);
+
+        if ($image === false) {
+            return null;
+        }
+
+        imagedestroy($image);
+
+        $newPath = preg_replace('/\.(jpeg|jpg)$/i', '.png', $oldPath);
+
+        if (is_null($newPath)) {
+            return null;
+        }
+
+        if (! $disk->exists($newPath)) {
+            $disk->put($newPath, $imageData);
+        }
+
+        $generatedMap->update(['path' => $newPath]);
+        $generatedMap->refresh();
+
+        return 'Old generated map path found: '.$oldPath.'; repaired to '.$newPath.'; retrying placement only.';
     }
 
     private function generatedMapName(string $profileName, GeneratedGemMapType $type): string
@@ -107,9 +260,10 @@ class GemWorldGenerationService
         return $profileName.' '.$type->label().' World';
     }
 
-    private function createLocations(GameMap $generatedMap, string $profileName): void
+    private function createLocations(GameMap $generatedMap, string $profileName): int
     {
         $templates = $this->templatesByType($profileName);
+        $locationsCreated = 0;
 
         foreach ($this->placementService->placements($generatedMap) as $placement) {
             $template = $templates[$placement->type]->shift();
@@ -119,7 +273,10 @@ class GemWorldGenerationService
             }
 
             $this->createLocationFromTemplate($generatedMap, $template, $placement);
+            $locationsCreated++;
         }
+
+        return $locationsCreated;
     }
 
     private function templatesByType(string $profileName): array
@@ -178,24 +335,49 @@ class GemWorldGenerationService
         return null;
     }
 
-    private function generateMany(Collection $gemParamters, callable $generator): array
+    private function generateMany(Collection $gemParamters, callable $generator): Collection
     {
-        $created = 0;
-        $skipped = 0;
+        return $gemParamters->map(fn (mixed $gemParamter): GemWorldGenerationResult => $generator($gemParamter))->values();
+    }
 
-        foreach ($gemParamters as $gemParamter) {
-            if (is_null($generator($gemParamter))) {
-                $skipped++;
+    private function result(
+        string $profileName,
+        string $profileLabel,
+        GeneratedGemMapType $type,
+        string $status,
+        ?GameMap $generatedMap,
+        int $locationsCreated,
+        CarbonInterface $startedAt,
+        string $message,
+    ): GemWorldGenerationResult {
+        $finishedAt = now();
 
-                continue;
-            }
+        return new GemWorldGenerationResult(
+            profile_name: $profileName,
+            profile_label: $profileLabel,
+            map_type: $type->value,
+            status: $status,
+            map_id: $generatedMap?->id,
+            path: $generatedMap?->path,
+            locations_created: $locationsCreated,
+            started_at: $startedAt,
+            finished_at: $finishedAt,
+            elapsed_seconds: $startedAt->diffInSeconds($finishedAt),
+            message: $message,
+        );
+    }
 
-            $created++;
-        }
+    private function mapGemProfileLabel(GameMapGemParamter $gemParamter): string
+    {
+        $gemParamter->loadMissing('gameMap');
 
-        return [
-            'created' => $created,
-            'skipped' => $skipped,
-        ];
+        return $gemParamter->gameMap->name.' - '.$gemParamter->name;
+    }
+
+    private function locationGemProfileLabel(GameLocationGemParamter $gemParamter): string
+    {
+        $gemParamter->loadMissing('location.map');
+
+        return $gemParamter->location->nameWithPlaneForLocationGem.' - '.$gemParamter->name;
     }
 }

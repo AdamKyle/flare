@@ -4,8 +4,12 @@ namespace Tests\Feature\Game\Tops;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
+use App\Flare\Models\GuideQuest;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\Npc;
+use App\Flare\Models\Quest;
+use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -163,10 +167,90 @@ class CharacterTopsApiTest extends TestCase
         $this->assertArrayHasKey('item_name', $itemPayload);
         $this->assertArrayHasKey('item_id', $itemPayload);
         $this->assertArrayHasKey('attached_affixes_count', $itemPayload);
+        $this->assertArrayHasKey('str_modifier', $itemPayload);
+        $this->assertArrayHasKey('base_damage', $itemPayload);
+        $this->assertArrayHasKey('base_ac_mod', $itemPayload);
+        $this->assertArrayHasKey('item_atonements', $itemPayload);
+        $this->assertArrayHasKey('item_prefix', $itemPayload);
+        $this->assertArrayHasKey('item_suffix', $itemPayload);
+        $this->assertArrayHasKey('socket_amount', $itemPayload);
         $this->assertArrayHasKey('has_holy_stacks_applied', $itemPayload);
         $this->assertArrayHasKey('sockets', $itemPayload);
         $this->assertArrayHasKey('item_skill', $itemPayload);
         $this->assertSame('Color Sword', $itemPayload['item_name']);
+    }
+
+    public function testProfileIncludesCompletedQuestDetailsAndRealCompletionChart(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $npc = Npc::factory()->create();
+        $quest = Quest::factory()->create([
+            'name' => 'Public Quest Detail',
+            'npc_id' => $npc->id,
+            'before_completion_description' => 'Quest before text.',
+            'after_completion_description' => 'Quest after text.',
+            'reward_gold' => 100,
+            'reward_xp' => 200,
+        ]);
+        QuestsCompleted::factory()->create([
+            'character_id' => $character->id,
+            'quest_id' => $quest->id,
+            'guide_quest_id' => null,
+            'created_at' => now()->subHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
+        $quests = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertSame('Public Quest Detail', $quests['completed_quests'][0]['name']);
+        $this->assertSame('Quest before text.', $quests['completed_quests'][0]['before_completion_description']);
+        $this->assertSame(100, $quests['completed_quests'][0]['rewards']['gold']);
+        $this->assertSame('hours', $quests['completion_chart']['granularity']);
+        $this->assertSame('Quests', $quests['completion_chart']['series'][0]['label']);
+        $this->assertSame(1, $quests['completion_chart']['series'][0]['points'][0]['value']);
+    }
+
+    public function testProfileIncludesCompletedGuideQuestDetails(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $guideQuest = GuideQuest::factory()->create([
+            'name' => 'Public Guide Quest Detail',
+            'intro_text' => 'Guide intro.',
+            'instructions' => 'Guide instructions.',
+            'gold_reward' => 50,
+            'xp_reward' => 75,
+        ]);
+        QuestsCompleted::factory()->create([
+            'character_id' => $character->id,
+            'quest_id' => null,
+            'guide_quest_id' => $guideQuest->id,
+            'created_at' => now()->subHour(),
+        ]);
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
+        $quests = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertSame('Public Guide Quest Detail', $quests['completed_guide_quests'][0]['name']);
+        $this->assertSame('Guide intro.', $quests['completed_guide_quests'][0]['intro_text']);
+        $this->assertSame('Guide instructions.', $quests['completed_guide_quests'][0]['instructions']);
+        $this->assertSame(50, $quests['completed_guide_quests'][0]['rewards']['gold']);
+        $this->assertSame('Guide Quests', $quests['completion_chart']['series'][1]['label']);
+        $this->assertSame(1, $quests['completion_chart']['series'][1]['points'][0]['value']);
+    }
+
+    public function testProfileIncludesKingdomAndAnalyticsChartPayloads(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertArrayHasKey('kingdom_summary_chart', $data['kingdoms']);
+        $this->assertArrayHasKey('resource_totals_chart', $data['kingdoms']);
+        $this->assertArrayHasKey('top_kingdoms_chart', $data['kingdoms']);
+        $this->assertArrayNotHasKey('map_distribution', $data['kingdoms']);
+        $this->assertArrayHasKey('analytics_summary_chart', $data['analytics']);
+        $this->assertSame('Analytics Summary', $data['analytics']['analytics_summary_chart']['source']);
     }
 
     public function testClassMasteryPayloadIncludesActiveLeveledEquippedAndUnlockedDetails(): void
@@ -216,7 +300,7 @@ class CharacterTopsApiTest extends TestCase
         $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $unlockedSpecial->id,
-            'level' => 1,
+            'level' => 2,
             'current_xp' => 2,
             'required_xp' => 10,
             'equipped' => false,
