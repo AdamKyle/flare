@@ -185,6 +185,87 @@ class EnchantingService
         $this->enchantItemService->updateSlot($slot, $params['enchant_for_event']);
     }
 
+    /**
+     * Enchant an item directly for Batch Crafting, with no InventorySlot involved.
+     *
+     * Applies the given affixes to a clone of the item after validating the full
+     * affix list and gold cost. Returns the final item on success, or a destroyed
+     * result if the roll fails.
+     */
+    public function enchantItemForBatch(Character $character, Item $item, array $affixIds, int $cost): array
+    {
+        $enchantingSkill = $this->getEnchantingSkill($character);
+        $characterInt = $character->getInformation()->statMod('int');
+        $affixes = [];
+
+        foreach (array_values(array_filter($affixIds, fn ($affixId) => ! is_null($affixId))) as $affixId) {
+            $affix = ItemAffix::find($affixId);
+
+            if (is_null($affix)) {
+                return ['success' => false, 'item' => null, 'reason' => 'invalid_affix'];
+            }
+
+            if (! in_array($affix->type, ['prefix', 'suffix'], true)) {
+                return ['success' => false, 'item' => null, 'reason' => 'invalid_affix_type'];
+            }
+
+            if ($enchantingSkill->level < $affix->skill_level_required) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
+
+                return ['success' => false, 'item' => null, 'reason' => 'skill_too_low'];
+            }
+
+            if ($characterInt < $affix->int_required) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::INT_TO_LOW_ENCHANTING);
+
+                return ['success' => false, 'item' => null, 'reason' => 'int_too_low'];
+            }
+
+            $affixes[] = $affix;
+        }
+
+        if (empty($affixes)) {
+            return ['success' => false, 'item' => null, 'reason' => 'no_affixes'];
+        }
+
+        if ($character->gold < $cost) {
+            return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold'];
+        }
+
+        $character->update([
+            'gold' => $character->gold - $cost,
+        ]);
+
+        $character = $character->refresh();
+
+        foreach ($affixes as $affix) {
+
+            $tooEasy = $enchantingSkill->level > $affix->skill_level_trivial;
+
+            if ($tooEasy) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
+            }
+
+            if (! $this->enchantItemService->attachAffix($item, $affix, $enchantingSkill, $tooEasy)) {
+                ServerMessageHandler::handleMessage(
+                    $character->user,
+                    CraftingMessageTypes::ENCHANTMENT_FAILED,
+                    'You failed to apply ' . $affix->name . ' to: ' . $item->refresh()->affix_name . '. The item shatters before you. You lost the investment.'
+                );
+
+                $this->enchantItemService->discardPendingItem();
+
+                return ['success' => false, 'item' => null, 'reason' => 'destroyed'];
+            }
+
+            if (! $tooEasy) {
+                event(new UpdateSkillEvent($enchantingSkill));
+            }
+        }
+
+        return ['success' => true, 'item' => $this->enchantItemService->finalizeBatchItem(), 'reason' => null];
+    }
+
     public function timeForEnchanting(Item $item)
     {
 
@@ -228,8 +309,7 @@ class EnchantingService
     protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection
     {
 
-        $affixes = ItemAffix::select('name', 'cost', 'id', 'type', 'int_required')
-            ->where('skill_level_required', '<=', $enchantingSkill->level)
+        $affixes = ItemAffix::where('skill_level_required', '<=', $enchantingSkill->level)
             ->where('randomly_generated', false)
             ->orderBy('skill_level_required', 'asc')
             ->get();

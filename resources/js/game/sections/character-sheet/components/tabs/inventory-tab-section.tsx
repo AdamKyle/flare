@@ -49,30 +49,37 @@ export default class InventoryTabSection extends React.Component<
         this.modalPropsBuilder = serviceContainer().fetch(ModalPropsBuilder);
     }
 
+    private asArray<T>(value: T[] | undefined | null): T[] {
+        return Array.isArray(value) ? value : [];
+    }
+
     componentDidMount(): void {
         this.setState({
-            data: this.props.inventory,
-            usable_items: this.props.usable_items,
+            data: this.asArray(this.props.inventory),
+            usable_items: this.asArray(this.props.usable_items),
         });
     }
 
     componentDidUpdate() {
+        const inventoryProp = this.asArray(this.props.inventory);
+        const usableItemsProp = this.asArray(this.props.usable_items);
+
         if (
-            !isEqual(this.state.data, this.props.inventory) &&
+            !isEqual(this.state.data, inventoryProp) &&
             this.state.search_string.length === 0 &&
             this.state.selected_items.length <= 0
         ) {
             this.setState({
-                data: this.props.inventory,
+                data: inventoryProp,
             });
         }
 
         if (
-            !isEqual(this.state.usable_items, this.props.usable_items) &&
+            !isEqual(this.state.usable_items, usableItemsProp) &&
             this.state.search_string.length === 0
         ) {
             this.setState({
-                usable_items: this.props.usable_items,
+                usable_items: usableItemsProp,
             });
         }
     }
@@ -94,7 +101,7 @@ export default class InventoryTabSection extends React.Component<
 
         if (this.state.table === "inventory") {
             this.setState({
-                data: this.props.inventory
+                data: this.asArray(this.props.inventory)
                     .filter((item: InventoryDetails) => {
                         const itemName = item.item_name.toLowerCase();
                         const itemType = item.type.toLowerCase();
@@ -111,7 +118,7 @@ export default class InventoryTabSection extends React.Component<
             });
         } else {
             this.setState({
-                usable_items: this.props.usable_items
+                usable_items: this.asArray(this.props.usable_items)
                     .filter((item: UsableItemsDetails) => {
                         const itemName = item.item_name.toLowerCase();
 
@@ -245,18 +252,25 @@ export default class InventoryTabSection extends React.Component<
 
     isDropDownHidden() {
         if (this.state.table === "inventory") {
-            return this.state.data.length === 0;
-        } else {
-            return this.props.usable_items.length === 0;
+            return this.asArray(this.state.data).length === 0;
         }
+
+        if (this.state.table === "usable-items") {
+            return this.asArray(this.state.usable_items).length === 0;
+        }
+
+        return true;
     }
 
     isSelectAllHidden() {
-        return this.state.data.length === 0 || this.state.table !== "inventory";
+        return (
+            this.asArray(this.state.data).length === 0 ||
+            this.state.table !== "inventory"
+        );
     }
 
     isSelectedDropDownHidden() {
-        return this.state.selected_items.length <= 0;
+        return this.asArray(this.state.selected_items).length <= 0;
     }
 
     updateInventory(inventory: { [key: string]: InventoryDetails[] }) {
@@ -271,12 +285,14 @@ export default class InventoryTabSection extends React.Component<
     }
 
     selectAllItems() {
-        const selectedItems = this.state.data.map((slot: InventoryDetails) => {
-            return {
-                slot_id: slot.id,
-                item_name: slot.item_name,
-            };
-        });
+        const selectedItems = this.asArray(this.state.data).map(
+            (slot: InventoryDetails) => {
+                return {
+                    slot_id: slot.id,
+                    item_name: slot.item_name,
+                };
+            },
+        );
 
         this.setState({
             selected_items: selectedItems,
@@ -328,7 +344,7 @@ export default class InventoryTabSection extends React.Component<
                     <InventoryTable
                         dark_table={this.props.dark_tables}
                         character_id={this.props.character_id}
-                        inventory={this.state.data}
+                        inventory={this.asArray(this.state.data)}
                         is_dead={this.props.is_dead}
                         update_inventory={this.updateInventory.bind(this)}
                         usable_sets={this.props.usable_sets}
@@ -345,7 +361,7 @@ export default class InventoryTabSection extends React.Component<
                     <UsableItemsTable
                         dark_table={this.props.dark_tables}
                         character_id={this.props.character_id}
-                        usable_items={this.state.usable_items}
+                        usable_items={this.asArray(this.state.usable_items)}
                         is_dead={this.props.is_dead}
                         update_inventory={this.updateInventory.bind(this)}
                         set_success_message={this.setSuccessMessage.bind(this)}
@@ -509,7 +525,7 @@ export default class InventoryTabSection extends React.Component<
                 ) : null}
 
                 {this.state.show_use_many &&
-                this.state.usable_items.length > 0 ? (
+                this.asArray(this.state.usable_items).length > 0 ? (
                     <InventoryUseManyItems
                         is_open={this.state.show_use_many}
                         manage_modal={this.manageUseManyItems.bind(this)}

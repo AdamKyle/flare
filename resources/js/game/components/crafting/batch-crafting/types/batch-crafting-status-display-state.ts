@@ -1,6 +1,7 @@
 export default interface BatchCraftingStatusDisplayState {
     page: number;
-    itemPages: Record<string, number>;
-    openSlotId: number | null;
+    openItemId: number | null;
     openSnapshot: any | null;
+    affixDetailsModalAffix: any | null;
+    affixDetailsModalOpen: boolean;
 }

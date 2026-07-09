@@ -14,6 +14,7 @@ use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
@@ -65,7 +66,10 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
+            'is_batch_crafting_visible' => $this->visibleBatchCrafting($character),
             'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
+            'is_batch_crafting_experience_mode' => $this->isBatchCraftingExperienceMode($activeBatchCrafting),
+            'is_batch_crafting_retry_mode' => $this->isBatchCraftingRetryMode($activeBatchCrafting),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
@@ -122,12 +126,37 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
 
     private function activeBatchCrafting(Character $character): ?BatchCrafting
     {
-        return BatchCrafting::where('character_id', $character->id)
+        $activeId = BatchCrafting::where('character_id', $character->id)
             ->whereNull('completed_at')
             ->whereNull('cancelled_at')
-            ->orderByDesc('started_at')
-            ->orderByDesc('id')
-            ->first();
+            ->max('id');
+
+        if (is_null($activeId)) {
+            return null;
+        }
+
+        return BatchCrafting::select(['id', 'character_id', 'batch_type', 'progress', 'started_at', 'ends_at'])
+            ->find($activeId);
+    }
+
+    private function visibleBatchCrafting(Character $character): bool
+    {
+        $hasActiveBatchCrafting = BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->exists();
+
+        if ($hasActiveBatchCrafting) {
+            return true;
+        }
+
+        return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('panel_dismissed_at')
+            ->where(function ($query) {
+                $query->whereNotNull('completed_at')
+                    ->orWhereNotNull('cancelled_at');
+            })
+            ->exists();
     }
 
     private function batchCraftingTimeOutSeconds(?BatchCrafting $batchCrafting): int
@@ -151,6 +180,29 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         $pendingUntil = $batchCrafting->started_at->copy()->addSeconds($tickDelay);
 
         return max(0, now()->diffInSeconds($pendingUntil, false));
+    }
+
+    private function isBatchCraftingExperienceMode(?BatchCrafting $batchCrafting): bool
+    {
+        if (is_null($batchCrafting)) {
+            return false;
+        }
+
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+
+        return $type->isExperienceMode($batchCrafting->progress ?? []);
+    }
+
+    private function isBatchCraftingRetryMode(?BatchCrafting $batchCrafting): bool
+    {
+        if (is_null($batchCrafting)) {
+            return false;
+        }
+
+        $progress = $batchCrafting->progress ?? [];
+        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? BatchCraftingService::RECURRING_DELAY_SECONDS);
+
+        return $tickDelay < BatchCraftingService::RECURRING_DELAY_SECONDS;
     }
 
     private function isAlchemyLocked(Character $character): bool

@@ -69,7 +69,9 @@ class BatchCraftingStartRequest extends FormRequest
             'progress.enchant_affix_ids.*' => ['integer', 'min:1'],
             'progress.enchant_mode' => ['nullable', 'string', Rule::in(['event'])],
             'progress.selected_set_id' => ['nullable', 'integer', 'min:1'],
+            'progress.craft_enchant_set_mode' => ['nullable', 'string', Rule::in(['build_new'])],
             'progress.enchant_plan' => ['nullable', 'array'],
+            'progress.craft_set_plan' => ['nullable', 'array'],
             'progress.alchemy_mode' => ['nullable', 'string', Rule::in(['experience', 'amount'])],
             'progress.alchemy_item_id' => ['nullable', 'integer', 'min:1'],
             'progress.alchemy_amount' => ['nullable', 'integer', 'min:1'],
@@ -92,14 +94,6 @@ class BatchCraftingStartRequest extends FormRequest
         $validator->sometimes('progress.selected_set_id', ['required'], function ($input) {
             if ($input->batch_type === BatchCraftingType::HOLY_OILS->value) {
                 return ($input->progress['holy_oil_mode'] ?? 'selected') === 'set';
-            }
-
-            if ($input->batch_type === BatchCraftingType::CRAFT->value) {
-                return ($input->progress['craft_mode'] ?? 'experience') === 'craft_set';
-            }
-
-            if ($input->batch_type === BatchCraftingType::CRAFT_AND_ENCHANT->value) {
-                return ($input->progress['craft_mode'] ?? 'experience') === 'craft_enchant_set';
             }
 
             return false;

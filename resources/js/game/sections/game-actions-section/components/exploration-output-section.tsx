@@ -6,7 +6,25 @@ import { startCase } from "lodash";
 import { ExplorationOutputType } from "../../../lib/game/types/game-state";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import { Transition } from "@headlessui/react";
-import AutomationPanelShell from "./automation-panel-shell";
+import AutomationPanelShell, {
+    AutomationPanelTone,
+} from "./automation-panel-shell";
+
+const CLEAN_COMPLETION_REASONS = new Set([
+    "natural_end",
+    "player_stopped",
+    "completed",
+]);
+
+function toneForExplorationReason(
+    reason: string | null | undefined,
+): AutomationPanelTone {
+    if (!reason) {
+        return "success";
+    }
+
+    return CLEAN_COMPLETION_REASONS.has(reason) ? "success" : "warning";
+}
 
 interface ExplorationOutputSectionProps {
     character_id: number;
@@ -506,6 +524,7 @@ export default class ExplorationOutputSection extends React.Component<
                     title="Exploration In Progress"
                     timerText={durationLabel ?? undefined}
                     statusText="running"
+                    tone="neutral"
                 >
                     {this.renderOutputColumns(data)}
                 </AutomationPanelShell>
@@ -519,14 +538,14 @@ export default class ExplorationOutputSection extends React.Component<
         }
 
         const contentId = "exploration-output-warning-body";
+        const reason = data.reason ?? data.type ?? "unknown";
 
         return (
             <div className="mt-3">
                 <AutomationPanelShell
                     title="Exploration Ended"
-                    statusText={this.formatReason(
-                        data.reason ?? data.type ?? "unknown",
-                    )}
+                    statusText={this.formatReason(reason)}
+                    tone={toneForExplorationReason(reason)}
                 >
                     <>
                         <p className="mb-1 text-sm">
@@ -563,14 +582,14 @@ export default class ExplorationOutputSection extends React.Component<
         }
 
         const contentId = "exploration-output-ended-body";
+        const reason = data.reason ?? data.stopped_reason ?? "completed";
 
         return (
             <div className="mt-3">
                 <AutomationPanelShell
                     title="Exploration Ended"
-                    statusText={this.formatReason(
-                        data.reason ?? data.stopped_reason ?? "completed",
-                    )}
+                    statusText={this.formatReason(reason)}
+                    tone={toneForExplorationReason(reason)}
                 >
                     <>
                         <p className="mb-1 text-sm">

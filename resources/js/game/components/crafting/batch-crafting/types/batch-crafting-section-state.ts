@@ -6,6 +6,7 @@ import {
     CraftableItem,
     CraftCategory,
     CraftEnchantSetPlan,
+    CraftSetPlan,
     CraftMode,
     Disposition,
     EnchantMode,
@@ -18,6 +19,8 @@ import {
 
 export default interface BatchCraftingSectionState {
     status: BatchCraftingStatus | null;
+    statusLoading: boolean;
+    statusLoadError: string | null;
     batchType: BatchType;
     disposition: Disposition;
     message: string;
@@ -36,19 +39,28 @@ export default interface BatchCraftingSectionState {
     specificItemId: number | null;
     craftAmount: number | "";
     craftableItems: CraftableItem[];
+    craftableItemsLoading: boolean;
     alchemyItems: CraftableItem[];
+    alchemyItemsLoading: boolean;
     selectedAlchemyItemId: number | null;
     enchantments: EnchantmentOption[];
+    enchantmentsLoading: boolean;
     selectedPrefixId: number | null;
     selectedSuffixId: number | null;
     enchantMode: EnchantMode;
     inventorySets: InventorySetOption[];
     inventorySetsLoading: boolean;
     selectedSetId: number | null;
+    craftEnchantSetMode: "build_new";
     craftEnchantSetPlan: CraftEnchantSetPlan;
+    craftEnchantSetDefaultsApplied: boolean;
     craftEnchantSetBulkPrefixId: number | null;
     craftEnchantSetBulkSuffixId: number | null;
+    craftSetPlan: CraftSetPlan;
     preview: BatchCraftingPreview | null;
     previewLoading: boolean;
     previewError: string | null;
+    hideMaxedCraftNotice: boolean;
+    affixDetailsModalAffix: EnchantmentOption | null;
+    craftEnchantSetItemDetailsModalItem: any | null;
 }

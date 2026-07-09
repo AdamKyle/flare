@@ -45,6 +45,10 @@ class CharactersOnline
                 'name' => $character['name'],
                 'level' => $character['level'],
                 'map' => $character['map'],
+                'duration' => $character['duration'],
+                'currently_exploring' => $character['currently_exploring'],
+                'last_activity' => $character['last_activity'],
+                'last_heart_beat' => $character['last_heart_beat'],
             ];
         })->all();
 

@@ -18,6 +18,7 @@ try {
  */
 
 import axios from 'axios';
+import { handleUnauthenticatedResponse } from './game/lib/ajax/unauthenticated-response-handler';
 window.axios = axios;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -33,6 +34,14 @@ axios.interceptors.request.use(function (config) {
 
     return config;
 }, function (error) {
+    return Promise.reject(error);
+});
+
+axios.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    handleUnauthenticatedResponse(error);
+
     return Promise.reject(error);
 });
 

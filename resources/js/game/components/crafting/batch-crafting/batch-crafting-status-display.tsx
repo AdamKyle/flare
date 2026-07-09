@@ -3,7 +3,10 @@ import { AxisOptions, Chart } from "react-charts";
 import DangerButton from "../../ui/buttons/danger-button";
 import PrimaryButton from "../../ui/buttons/primary-button";
 import ItemNameColorationText from "../../items/item-name/item-name-coloration-text";
-import ItemDetailsModal from "../../modals/item-details/item-details-modal";
+import InventoryUseDetails from "../../../sections/character-sheet/components/modals/inventory-item-details";
+import ItemAffixDetails from "../../../sections/character-sheet/components/modals/components/item-affix-details";
+import ItemDetails from "../../../sections/character-sheet/components/modals/components/item-details";
+import Dialogue from "../../ui/dialogue/dialogue";
 import InfoAlert from "../../ui/alerts/simple-alerts/info-alert";
 import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import BatchCraftingStatusDisplayProps from "./types/batch-crafting-status-display-props";
@@ -13,13 +16,6 @@ import { formatNumber } from "../../../lib/game/format-number";
 
 type ChartPoint = { label: string; value: number };
 type ChartLine = { label: string; data: ChartPoint[]; color?: string };
-type BatchCraftingSnapshotListItem = {
-    display_name: string;
-    quantity: number;
-    snapshot: BatchCraftingItemSnapshot;
-    slot_id: number | null;
-    crafted_at: string | null;
-};
 
 function BatchLineChart({
     title,
@@ -31,6 +27,26 @@ function BatchLineChart({
     yAxisLabel: string;
 }) {
     const hasData = lines.some((line) => line.data.length > 0);
+    const displayLines = React.useMemo(
+        (): ChartLine[] =>
+            lines.map((line) => {
+                if (line.data.length !== 1) {
+                    return line;
+                }
+
+                const [onlyPoint] = line.data;
+                const priorTick = Math.max(0, Number(onlyPoint.label) - 1);
+
+                return {
+                    ...line,
+                    data: [
+                        { label: String(priorTick), value: onlyPoint.value },
+                        onlyPoint,
+                    ],
+                };
+            }),
+        [lines],
+    );
     const primaryAxis = React.useMemo(
         (): AxisOptions<ChartPoint> => ({
             getValue: (datum) => datum.label,
@@ -57,11 +73,11 @@ function BatchLineChart({
     const hasLineColors = lines.some((line) => line.color);
     const getSeriesStyle = React.useCallback(
         (series: { index: number }) => {
-            const color = lines[series.index]?.color;
+            const color = displayLines[series.index]?.color;
 
             return color ? { fill: color, stroke: color } : {};
         },
-        [lines],
+        [displayLines],
     );
 
     return (
@@ -86,7 +102,7 @@ function BatchLineChart({
                     >
                         <Chart
                             options={{
-                                data: lines,
+                                data: displayLines,
                                 primaryAxis,
                                 secondaryAxes,
                                 dark: true,
@@ -131,6 +147,7 @@ export type BatchCraftingItemSnapshot = {
     dur_modifier?: number;
     int_modifier?: number;
     focus_modifier?: number;
+    full_item_details?: any | null;
 };
 
 export type BatchCraftingActionLogEntry = {
@@ -155,10 +172,12 @@ export type BatchCraftingActionLogEntry = {
     phase?: string;
     prefix_affix_name?: string | null;
     suffix_affix_name?: string | null;
+    prefix_affix?: any | null;
+    suffix_affix?: any | null;
     prefix_applied?: boolean;
     suffix_applied?: boolean;
     destination_set?: string;
-    moved_to_set?: boolean;
+    created_in_crafted_items_set?: boolean;
     oil_application?: {
         target_item?: BatchCraftingItemSnapshot | null;
         oil_item?: BatchCraftingItemSnapshot | null;
@@ -171,6 +190,7 @@ export type BatchCraftingSkillData = {
     key: string;
     name: string;
     level: number;
+    max_level: number;
     current_xp: number;
     next_level_xp: number;
     xp_percent: number;
@@ -201,6 +221,10 @@ export type BatchCraftingStatus = {
     completed: boolean;
     status?: string;
     show_info: boolean;
+    craft_mode_availability?: {
+        can_craft_for_experience: boolean;
+        can_craft_and_enchant_for_experience: boolean;
+    };
     craft_experience_options?: BatchCraftingExperienceOption[];
     event_batch?: {
         can_craft_for_event: boolean;
@@ -246,11 +270,11 @@ export type BatchCraftingStatus = {
         current_enchanted_item_snapshot?: BatchCraftingItemSnapshot | null;
         alchemy_current_item?: BatchCraftingItemSnapshot | null;
         trinketry_current_item?: BatchCraftingItemSnapshot | null;
-        crafted_item_snapshots?: BatchCraftingSnapshotListItem[];
-        enchanted_item_snapshots?: BatchCraftingSnapshotListItem[];
-        alchemy_item_snapshots?: BatchCraftingSnapshotListItem[];
-        trinketry_item_snapshots?: BatchCraftingSnapshotListItem[];
-        holy_oil_target_item_snapshots?: BatchCraftingSnapshotListItem[];
+        crafted_item_snapshots?: unknown[];
+        enchanted_item_snapshots?: unknown[];
+        alchemy_item_snapshots?: unknown[];
+        trinketry_item_snapshots?: unknown[];
+        holy_oil_target_item_snapshots?: unknown[];
         gold_spent?: number;
         gold_spent_total?: number;
         gold_gained_total?: number;
@@ -258,6 +282,9 @@ export type BatchCraftingStatus = {
         gold_dust_spent_total?: number;
         gold_dust_gained_total?: number;
         gold_dust_left?: number;
+        shards_spent_total?: number;
+        shards_gained_total?: number;
+        shards_left?: number;
         craft_set_current_item?: BatchCraftingItemSnapshot | null;
         craft_enchant_set_phase?:
             | "crafting"
@@ -271,12 +298,15 @@ export type BatchCraftingStatus = {
         craft_enchant_set_current_item?: BatchCraftingItemSnapshot | null;
         craft_enchant_set_current_prefix?: string | null;
         craft_enchant_set_current_suffix?: string | null;
+        craft_enchant_set_current_prefix_affix?: any | null;
+        craft_enchant_set_current_suffix_affix?: any | null;
         enchant_set_total?: number | null;
         enchant_set_completed?: number | null;
         enchant_set_skipped?: number | null;
         enchant_set_current_item?: BatchCraftingItemSnapshot | null;
         enchant_affix_ids?: number[] | null;
         enchant_affix_names?: string[];
+        enchant_affixes?: any[] | null;
         holy_oil_eligible_items?: number | null;
         holy_oil_total_stacks?: number | null;
         holy_oil_requested_applications?: number | null;
@@ -298,6 +328,8 @@ export type BatchCraftingStatus = {
         event_type?: number | null;
         event_step?: string | null;
         event_actions_per_tick?: number | null;
+        actions_per_minute?: number | null;
+        experience_rate_label?: string | null;
         next_action?: string | null;
         event_goal_progress?: {
             current: number;
@@ -324,7 +356,15 @@ export type BatchCraftingStatus = {
             remaining_slots: number;
         } | null;
         chart_points?: {
-            currency: { tick: number; spent: number; gained: number }[];
+            currency: {
+                tick: number;
+                gold_spent: number;
+                gold_gained: number;
+                gold_dust_spent: number;
+                gold_dust_gained: number;
+                shards_spent: number;
+                shards_gained: number;
+            }[];
             outcomes: { tick: number; success: number; failure: number }[];
             gold_dust: { tick: number; gained: number }[];
         };
@@ -377,6 +417,7 @@ export type BatchCraftingStatus = {
             prefix_affix_name: string | null;
             suffix_affix_name: string | null;
             enchant_can_destroy_item: boolean;
+            enchant_has_failure_risk: boolean;
             destination: string;
             destination_current_slots: number;
             destination_max_slots: number;
@@ -450,6 +491,143 @@ function formatStatus(value?: string | null): string {
     return value.replace(/_/g, " ");
 }
 
+function statusBadgeClasses(status?: string | null): string {
+    if (status === "failed" || status === "destroyed") {
+        return "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300";
+    }
+
+    if (status === "skipped") {
+        return "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
+    }
+
+    return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300";
+}
+
+const CLEAN_END_REASONS = new Set([
+    "completed_duration",
+    "cancelled",
+    "amount_reached",
+    "craft_set_complete",
+    "craft_enchant_set_complete",
+    "enchant_set_complete",
+    "all_oils_applied",
+    "event_goal_complete",
+    "skill_maxed",
+    "maxed_or_nothing_left",
+]);
+
+function isCleanEndReason(reason?: string | null): boolean {
+    if (!reason) {
+        return true;
+    }
+
+    return CLEAN_END_REASONS.has(reason);
+}
+
+type CurrencyChartConfig = {
+    spentLabel: string;
+    spentField: "gold_spent" | "gold_dust_spent" | "shards_spent";
+    gainedLabel: string;
+    gainedField: "gold_gained" | "gold_dust_gained" | "shards_gained";
+};
+
+function resolveCurrencyChartConfig(
+    batch: NonNullable<BatchCraftingStatus["batch"]>,
+): CurrencyChartConfig | null {
+    const disposition = batch.disposition;
+    const spentType = batch.currency?.type ?? "gold";
+    const spentField: CurrencyChartConfig["spentField"] =
+        spentType === "gold_dust"
+            ? "gold_dust_spent"
+            : spentType === "shards"
+              ? "shards_spent"
+              : "gold_spent";
+    const spentLabel =
+        spentType === "gold_dust"
+            ? "Gold Dust Spent"
+            : spentType === "shards"
+              ? "Shards Spent"
+              : "Gold Spent";
+
+    const disenchantsRest =
+        disposition === "disenchant" ||
+        disposition === "keep_best_disenchant_rest" ||
+        (disposition === "keep_highest" &&
+            batch.batch_type === "craft_and_enchant");
+
+    const sellsRest =
+        disposition === "sell" ||
+        disposition === "keep_best_sell_rest" ||
+        (disposition === "keep_highest" &&
+            ["craft", "alchemy", "trinketry"].includes(batch.batch_type));
+
+    if (disenchantsRest) {
+        return {
+            spentLabel,
+            spentField,
+            gainedLabel: "Gold Dust Gained",
+            gainedField: "gold_dust_gained",
+        };
+    }
+
+    if (sellsRest) {
+        return {
+            spentLabel,
+            spentField,
+            gainedLabel: "Gold Gained",
+            gainedField: "gold_gained",
+        };
+    }
+
+    return null;
+}
+
+const INT_ENCHANT_LINKS: { href: string; label: string }[] = [
+    {
+        href: "/information/enchanting?table-filters[types]=0",
+        label: "Stat based enchants",
+    },
+    {
+        href: "/information/enchanting?table-filters[types]=15",
+        label: "Spell crafting - raises INT",
+    },
+    {
+        href: "/information/enchanting?table-filters[types]=16",
+        label: "Enchantment crafting - raises INT",
+    },
+    {
+        href: "/information/crafting?filter=wand",
+        label: "Wands",
+    },
+    {
+        href: "/information/crafting?filter=stave",
+        label: "Staves",
+    },
+    {
+        href: "/information/crafting?filter=spell-damage",
+        label: "Spell Damage",
+    },
+];
+
+function IntEnchantLinksList() {
+    return (
+        <ul className="list-disc space-y-1 pl-5">
+            {INT_ENCHANT_LINKS.map((link) => (
+                <li key={link.href}>
+                    <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {link.label}
+                    </a>
+                </li>
+            ))}
+        </ul>
+    );
+}
+
 function itemForColor(item: BatchCraftingItemSnapshot) {
     return {
         name: item.name ?? "Unknown item",
@@ -480,7 +658,7 @@ function primaryItem(
     );
 }
 
-function ProgressBar({
+export function ProgressBar({
     label,
     current,
     max,
@@ -515,92 +693,6 @@ function ProgressBar({
     );
 }
 
-function SnapshotDetailsModal({
-    item,
-    onClose,
-}: {
-    item: BatchCraftingItemSnapshot;
-    onClose: () => void;
-}) {
-    React.useEffect(() => {
-        const handler = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                onClose();
-            }
-        };
-
-        document.addEventListener("keydown", handler);
-
-        return () => document.removeEventListener("keydown", handler);
-    }, [onClose]);
-
-    const rows = [
-        { label: "Type", value: item.type },
-        { label: "Base Damage", value: item.base_damage },
-        { label: "Base AC", value: item.base_ac },
-        { label: "Base Healing", value: item.base_healing },
-        { label: "STR", value: item.str_modifier },
-        { label: "DEX", value: item.dex_modifier },
-        { label: "AGI", value: item.agi_modifier },
-        { label: "CHR", value: item.chr_modifier },
-        { label: "DUR", value: item.dur_modifier },
-        { label: "INT", value: item.int_modifier },
-        { label: "FOCUS", value: item.focus_modifier },
-    ].filter((row) => {
-        if (typeof row.value === "number") {
-            return row.value > 0;
-        }
-
-        return row.value !== null && typeof row.value !== "undefined";
-    });
-
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="batch-item-snapshot-title"
-        >
-            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-sm bg-white p-6 shadow-lg dark:bg-gray-800 dark:text-gray-100">
-                <div className="flex items-start justify-between gap-4">
-                    <h2
-                        id="batch-item-snapshot-title"
-                        className="text-xl font-semibold"
-                    >
-                        {item.name ?? "Item Details"}
-                    </h2>
-                    <button
-                        type="button"
-                        className="rounded-sm border border-gray-300 px-3 py-1 text-sm font-semibold dark:border-gray-600"
-                        onClick={onClose}
-                    >
-                        Close
-                    </button>
-                </div>
-                {item.description ? (
-                    <p className="mt-3 text-sm text-gray-700 dark:text-gray-300">
-                        {item.description}
-                    </p>
-                ) : null}
-                <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {rows.map((row) => (
-                        <div key={row.label}>
-                            <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                {row.label}
-                            </dt>
-                            <dd>
-                                {typeof row.value === "number"
-                                    ? formatNumber(row.value)
-                                    : row.value}
-                            </dd>
-                        </div>
-                    ))}
-                </dl>
-            </div>
-        </div>
-    );
-}
-
 export default class BatchCraftingStatusDisplay extends React.Component<
     BatchCraftingStatusDisplayProps,
     BatchCraftingStatusDisplayState
@@ -610,9 +702,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         this.state = {
             page: 1,
-            itemPages: {},
-            openSlotId: null,
+            openItemId: null,
             openSnapshot: null,
+            affixDetailsModalAffix: null,
+            affixDetailsModalOpen: false,
         };
     }
 
@@ -645,22 +738,9 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         });
     }
 
-    itemPage(pageKey: string, totalPages: number) {
-        return Math.min(this.state.itemPages[pageKey] ?? 1, totalPages);
-    }
-
-    setItemPage(pageKey: string, page: number) {
+    setOpenItemId(openItemId: number | null) {
         this.setState({
-            itemPages: {
-                ...this.state.itemPages,
-                [pageKey]: page,
-            },
-        });
-    }
-
-    setOpenSlotId(openSlotId: number | null) {
-        this.setState({
-            openSlotId,
+            openItemId,
         });
     }
 
@@ -668,6 +748,77 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         this.setState({
             openSnapshot,
         });
+    }
+
+    openAffixDetails(affix: any) {
+        this.setState({
+            affixDetailsModalAffix: affix,
+            affixDetailsModalOpen: true,
+        });
+    }
+
+    closeAffixDetails() {
+        this.setState({
+            affixDetailsModalAffix: null,
+            affixDetailsModalOpen: false,
+        });
+    }
+
+    renderAffixName(
+        name: string | null | undefined,
+        affix: any | null | undefined,
+    ) {
+        if (!name) {
+            return null;
+        }
+
+        if (!affix) {
+            return <span>{name}</span>;
+        }
+
+        return (
+            <button
+                type="button"
+                className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onClick={() => this.openAffixDetails(affix)}
+            >
+                {name}
+            </button>
+        );
+    }
+
+    renderAffixNamesList(
+        names: string[] | undefined,
+        ids: number[] | null | undefined,
+        affixes: any[] | null | undefined,
+    ) {
+        if (!names || names.length === 0) {
+            return "None";
+        }
+
+        const affixList = affixes ?? [];
+        const idList = ids ?? [];
+
+        return (
+            <>
+                {names.map((name, index) => {
+                    const affixId = idList[index];
+                    const matchedAffix =
+                        typeof affixId === "number"
+                            ? (affixList.find(
+                                  (affix) => affix.id === affixId,
+                              ) ?? null)
+                            : null;
+
+                    return (
+                        <React.Fragment key={`${name}-${index}`}>
+                            {index > 0 ? ", " : ""}
+                            {this.renderAffixName(name, matchedAffix)}
+                        </React.Fragment>
+                    );
+                })}
+            </>
+        );
     }
 
     renderItem(item: BatchCraftingItemSnapshot | null | undefined) {
@@ -683,15 +834,18 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             />
         );
 
-        if (item.can_view && item.slot_id_for_modal) {
+        const liveItemId = item.item_id_for_modal ?? null;
+        const hasLiveSlot =
+            item.slot_id_for_modal !== null &&
+            typeof item.slot_id_for_modal !== "undefined";
+
+        if (item.can_view && liveItemId && hasLiveSlot) {
             return (
                 <button
                     type="button"
                     className="text-left hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
                     aria-label={`View details for ${item.name}`}
-                    onClick={() =>
-                        this.setOpenSlotId(item.slot_id_for_modal ?? null)
-                    }
+                    onClick={() => this.setOpenItemId(liveItemId)}
                 >
                     {text}
                 </button>
@@ -751,49 +905,33 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         if (currencyType === "gold_dust") {
             return (
                 <>
-                    <div>
-                        <dt className="font-semibold">Gold Dust Spent</dt>
-                        <dd>
-                            {formatNumber(batch.gold_dust_spent_total ?? 0)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Dust Gained</dt>
-                        <dd>
-                            {formatNumber(batch.gold_dust_gained_total ?? 0)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Dust Left</dt>
-                        <dd>{formatNumber(batch.gold_dust_left ?? 0)}</dd>
-                    </div>
+                    <dt className="font-semibold">Gold Dust Spent</dt>
+                    <dd>{formatNumber(batch.gold_dust_spent_total ?? 0)}</dd>
+                    <dt className="font-semibold">Gold Dust Gained</dt>
+                    <dd>{formatNumber(batch.gold_dust_gained_total ?? 0)}</dd>
+                    <dt className="font-semibold">Gold Dust Left</dt>
+                    <dd>{formatNumber(batch.gold_dust_left ?? 0)}</dd>
                 </>
             );
         }
 
         if (currencyType === "shards") {
             return (
-                <div>
+                <>
                     <dt className="font-semibold">Shards Left</dt>
                     <dd>{formatNumber(batch.currency?.amount ?? 0)}</dd>
-                </div>
+                </>
             );
         }
 
         return (
             <>
-                <div>
-                    <dt className="font-semibold">Gold Spent</dt>
-                    <dd>{formatNumber(batch.gold_spent_total ?? 0)}</dd>
-                </div>
-                <div>
-                    <dt className="font-semibold">Gold Gained</dt>
-                    <dd>{formatNumber(batch.gold_gained_total ?? 0)}</dd>
-                </div>
-                <div>
-                    <dt className="font-semibold">Gold Left</dt>
-                    <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
-                </div>
+                <dt className="font-semibold">Gold Spent</dt>
+                <dd>{formatNumber(batch.gold_spent_total ?? 0)}</dd>
+                <dt className="font-semibold">Gold Gained</dt>
+                <dd>{formatNumber(batch.gold_gained_total ?? 0)}</dd>
+                <dt className="font-semibold">Gold Left</dt>
+                <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
             </>
         );
     }
@@ -812,10 +950,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         }
 
         return (
-            <div>
+            <>
                 <dt className="font-semibold">Gold Dust Gained</dt>
                 <dd>{formatNumber(gained)}</dd>
-            </div>
+            </>
         );
     }
 
@@ -833,12 +971,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         }
 
         return (
-            <dl className="grid gap-3 sm:grid-cols-2">
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
                 {visibleRows.map((row) => (
-                    <div key={row.label}>
+                    <React.Fragment key={row.label}>
                         <dt className="font-semibold">{row.label}</dt>
                         <dd>{row.value}</dd>
-                    </div>
+                    </React.Fragment>
                 ))}
             </dl>
         );
@@ -863,32 +1001,30 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <h4 className="mb-2 text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
                     Skills
                 </h4>
-                <div className="space-y-3">
+                <div className="grid gap-2">
                     {visibleSkills.map((skill) => (
                         <div key={skill.key}>
-                            <dl className="mb-1 flex items-center justify-between text-xs text-orange-700 dark:text-white">
-                                <div>
-                                    <dt className="sr-only">Skill</dt>
-                                    <dd>
-                                        {skill.name} (Lv {skill.level})
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className="sr-only">Experience</dt>
-                                    <dd>
-                                        {skill.current_xp.toLocaleString()} /{" "}
-                                        {skill.next_level_xp.toLocaleString()}
-                                    </dd>
-                                </div>
-                            </dl>
-                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                            <div className="mb-1 flex justify-between text-xs font-medium text-orange-700 dark:text-white">
+                                <span>
+                                    {skill.name} Skill XP (LV: {skill.level}/
+                                    {skill.max_level})
+                                </span>
+                                <span>
+                                    {formatNumber(skill.current_xp)}/
+                                    {formatNumber(skill.next_level_xp)}
+                                </span>
+                            </div>
+                            <div
+                                className="h-1.5 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+                                role="progressbar"
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                                aria-valuenow={skill.xp_percent}
+                                aria-label={`${skill.name} experience progress`}
+                            >
                                 <div
                                     className="h-1.5 rounded-full bg-orange-600"
                                     style={{ width: `${skill.xp_percent}%` }}
-                                    role="progressbar"
-                                    aria-valuemin={0}
-                                    aria-valuemax={100}
-                                    aria-valuenow={skill.xp_percent}
                                 />
                             </div>
                         </div>
@@ -925,97 +1061,22 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         }
 
         return (
-            <dl className="grid gap-3 sm:grid-cols-2">
+            <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
                 {rows.map((row) => (
-                    <div key={row.label}>
+                    <React.Fragment key={row.label}>
                         <dt className="font-semibold">{row.label}</dt>
                         <dd>{formatNumber(row.value)}</dd>
-                    </div>
+                    </React.Fragment>
                 ))}
             </dl>
         );
     }
 
-    renderSnapshotList(
-        pageKey: string,
-        items: BatchCraftingSnapshotListItem[] | undefined,
-        emptyMessage: string,
+    renderActionHistory(
+        isActive: boolean,
+        endedReason: string | null | undefined,
+        hideActionType: boolean = false,
     ) {
-        const snapshots = items ?? [];
-
-        if (snapshots.length === 0) {
-            return (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {emptyMessage}
-                </p>
-            );
-        }
-
-        const totalPages = Math.max(1, Math.ceil(snapshots.length / perPage));
-        const currentPage = this.itemPage(pageKey, totalPages);
-        const start = (currentPage - 1) * perPage;
-        const pageItems = snapshots
-            .slice()
-            .reverse()
-            .slice(start, start + perPage);
-
-        return (
-            <div className="grid gap-3">
-                <ul className="grid gap-2">
-                    {pageItems.map((item, index) => (
-                        <li
-                            key={`${pageKey}-${item.display_name}-${item.crafted_at ?? index}`}
-                            className="rounded-sm border border-gray-200 p-3 dark:border-gray-700"
-                        >
-                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                                {this.renderItem(item.snapshot)}
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
-                                    {formatLocalDateTime(item.crafted_at)}
-                                </span>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-                {totalPages > 1 ? (
-                    <div className="flex items-center justify-between gap-3">
-                        <button
-                            type="button"
-                            className="rounded border border-gray-300 px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600"
-                            disabled={currentPage === 1}
-                            onClick={() =>
-                                this.setItemPage(pageKey, currentPage - 1)
-                            }
-                        >
-                            Previous
-                        </button>
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                            Page {currentPage} of {totalPages}
-                        </span>
-                        <button
-                            type="button"
-                            className="rounded border border-gray-300 px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600"
-                            disabled={currentPage === totalPages}
-                            onClick={() =>
-                                this.setItemPage(pageKey, currentPage + 1)
-                            }
-                        >
-                            Next
-                        </button>
-                    </div>
-                ) : null}
-            </div>
-        );
-    }
-
-    renderCraftedItems(batch: NonNullable<BatchCraftingStatus["batch"]>) {
-        return this.renderSnapshotList(
-            "crafted-items",
-            batch.crafted_item_snapshots,
-            "No crafted items have been recorded yet.",
-        );
-    }
-
-    renderActionHistory() {
         const actionLog = this.actionLog();
 
         if (actionLog.length === 0) {
@@ -1024,11 +1085,16 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         const currentPage = this.currentPage();
         const totalPages = this.totalPages();
+        const entryCount = actionLog.length;
+        const defaultOpen = isActive || !isCleanEndReason(endedReason);
 
         return (
-            <div>
-                <p className="mb-1 text-sm font-semibold">Action History</p>
-                <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">
+            <details open={defaultOpen}>
+                <summary className="cursor-pointer text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
+                    Action History ({entryCount}{" "}
+                    {entryCount === 1 ? "entry" : "entries"})
+                </summary>
+                <p className="mb-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
                     Every action for this batch is recorded below. Counts above
                     are the source of truth for full batch progress.
                 </p>
@@ -1036,6 +1102,167 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     {this.entries().map((entry, index) => {
                         const item = primaryItem(entry);
                         const statusLabel = formatStatus(entry.status);
+                        const noItemProduced =
+                            !item &&
+                            !(entry.crafted_item && entry.enchanted_item);
+                        const rows: {
+                            label: string;
+                            value: React.ReactNode;
+                            className?: string;
+                            valueClassName?: string;
+                        }[] = [
+                            {
+                                label: "Time",
+                                value: formatLocalDateTime(entry.ts),
+                            },
+                            {
+                                label: "Status",
+                                value: (
+                                    <span
+                                        className={
+                                            "inline-flex rounded-full px-2 py-0.5 text-[0.7rem] font-semibold capitalize " +
+                                            statusBadgeClasses(entry.status)
+                                        }
+                                    >
+                                        {statusLabel}
+                                    </span>
+                                ),
+                            },
+                        ];
+
+                        if (!hideActionType) {
+                            rows.push({
+                                label: "Action Type",
+                                value: formatStatus(entry.action_type),
+                                valueClassName: "capitalize",
+                            });
+                        }
+
+                        if (entry.phase) {
+                            rows.push({
+                                label: "Phase",
+                                value: formatStatus(entry.phase),
+                                valueClassName: "capitalize",
+                            });
+                        }
+
+                        if (entry.crafted_item && entry.enchanted_item) {
+                            rows.push({
+                                label: "Attempted Item",
+                                value: this.renderItem(entry.crafted_item),
+                            });
+                            rows.push({
+                                label: "Result Item",
+                                value: this.renderItem(entry.enchanted_item),
+                            });
+                        } else {
+                            rows.push({
+                                label: "Item",
+                                value: noItemProduced
+                                    ? "No item produced"
+                                    : this.renderItem(item),
+                            });
+                        }
+
+                        if (entry.prefix_affix_name) {
+                            rows.push({
+                                label: "Prefix",
+                                value: (
+                                    <>
+                                        {this.renderAffixName(
+                                            entry.prefix_affix_name,
+                                            entry.prefix_affix,
+                                        )}
+                                        {typeof entry.prefix_applied ===
+                                        "boolean"
+                                            ? entry.prefix_applied
+                                                ? " (applied)"
+                                                : " (not applied)"
+                                            : ""}
+                                    </>
+                                ),
+                            });
+                        }
+
+                        if (entry.suffix_affix_name) {
+                            rows.push({
+                                label: "Suffix",
+                                value: (
+                                    <>
+                                        {this.renderAffixName(
+                                            entry.suffix_affix_name,
+                                            entry.suffix_affix,
+                                        )}
+                                        {typeof entry.suffix_applied ===
+                                        "boolean"
+                                            ? entry.suffix_applied
+                                                ? " (applied)"
+                                                : " (not applied)"
+                                            : ""}
+                                    </>
+                                ),
+                            });
+                        }
+
+                        if (entry.oil_application?.oil_item) {
+                            rows.push({
+                                label: "Oil",
+                                value: this.renderItem(
+                                    entry.oil_application.oil_item,
+                                ),
+                            });
+                        }
+
+                        if (entry.gold_spent) {
+                            rows.push({
+                                label: "Gold Spent",
+                                value: formatNumber(entry.gold_spent),
+                            });
+                        }
+
+                        if (entry.gold_gained) {
+                            rows.push({
+                                label: "Gold Gained",
+                                value: formatNumber(entry.gold_gained),
+                            });
+                        }
+
+                        if (entry.gold_dust_gained) {
+                            rows.push({
+                                label: "Gold Dust Gained",
+                                value: formatNumber(entry.gold_dust_gained),
+                            });
+                        }
+
+                        if (entry.destination_set) {
+                            rows.push({
+                                label: "Destination Set",
+                                value: entry.destination_set,
+                            });
+                        }
+
+                        if (entry.created_in_crafted_items_set) {
+                            rows.push({
+                                label: "Created In Crafted Items Set",
+                                value: "Yes",
+                            });
+                        }
+
+                        if (entry.listed_price) {
+                            rows.push({
+                                label: "Listed Price",
+                                value: formatNumber(entry.listed_price),
+                            });
+                        }
+
+                        if (entry.failure) {
+                            rows.push({
+                                label: "Failure Reason",
+                                value: entry.failure,
+                                valueClassName:
+                                    "text-red-700 dark:text-red-300 break-words",
+                            });
+                        }
 
                         return (
                             <li
@@ -1043,171 +1270,28 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                                 className="border-b border-gray-200 pb-2 dark:border-gray-700"
                                 aria-label={`${entry.action_type ?? "batch action"} ${item?.name ?? "item"} ${statusLabel}`}
                             >
-                                <div className="flex flex-wrap gap-x-2 gap-y-1">
-                                    <span className="text-gray-500 dark:text-gray-400">
-                                        {formatLocalDateTime(entry.ts)}
-                                    </span>
-                                    <span className="font-semibold capitalize">
-                                        {formatStatus(entry.action_type)}
-                                    </span>
-                                    <span className="capitalize text-gray-600 dark:text-gray-300">
-                                        {statusLabel}
-                                    </span>
-                                </div>
-                                <dl className="mt-1 grid gap-1 text-xs text-gray-600 dark:text-gray-400 sm:grid-cols-2">
-                                    {entry.phase ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Phase
+                                <dl className="mt-1 grid grid-cols-1 gap-1 text-xs text-gray-600 dark:text-gray-400 sm:grid-cols-2">
+                                    {rows.map((row) => (
+                                        <React.Fragment key={row.label}>
+                                            <dt
+                                                className={
+                                                    "font-semibold " +
+                                                    (row.className ?? "")
+                                                }
+                                            >
+                                                {row.label}
                                             </dt>
-                                            <dd className="capitalize">
-                                                {formatStatus(entry.phase)}
+                                            <dd
+                                                className={
+                                                    (row.valueClassName ?? "") +
+                                                    " " +
+                                                    (row.className ?? "")
+                                                }
+                                            >
+                                                {row.value}
                                             </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.crafted_item &&
-                                    entry.enchanted_item ? (
-                                        <>
-                                            <div>
-                                                <dt className="font-semibold">
-                                                    Attempted Item
-                                                </dt>
-                                                <dd>
-                                                    {this.renderItem(
-                                                        entry.crafted_item,
-                                                    )}
-                                                </dd>
-                                            </div>
-                                            <div>
-                                                <dt className="font-semibold">
-                                                    Result Item
-                                                </dt>
-                                                <dd>
-                                                    {this.renderItem(
-                                                        entry.enchanted_item,
-                                                    )}
-                                                </dd>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Item
-                                            </dt>
-                                            <dd>{this.renderItem(item)}</dd>
-                                        </div>
-                                    )}
-                                    {entry.prefix_affix_name ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Prefix
-                                            </dt>
-                                            <dd>
-                                                {entry.prefix_affix_name}
-                                                {typeof entry.prefix_applied ===
-                                                "boolean"
-                                                    ? entry.prefix_applied
-                                                        ? " (applied)"
-                                                        : " (not applied)"
-                                                    : ""}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.suffix_affix_name ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Suffix
-                                            </dt>
-                                            <dd>
-                                                {entry.suffix_affix_name}
-                                                {typeof entry.suffix_applied ===
-                                                "boolean"
-                                                    ? entry.suffix_applied
-                                                        ? " (applied)"
-                                                        : " (not applied)"
-                                                    : ""}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.oil_application?.oil_item ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Oil
-                                            </dt>
-                                            <dd>
-                                                {this.renderItem(
-                                                    entry.oil_application
-                                                        .oil_item,
-                                                )}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.gold_spent ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Gold Spent
-                                            </dt>
-                                            <dd>
-                                                {entry.gold_spent.toLocaleString()}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.gold_gained ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Gold Gained
-                                            </dt>
-                                            <dd>
-                                                {entry.gold_gained.toLocaleString()}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.gold_dust_gained ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Gold Dust Gained
-                                            </dt>
-                                            <dd>
-                                                {entry.gold_dust_gained.toLocaleString()}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.destination_set ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Destination Set
-                                            </dt>
-                                            <dd>{entry.destination_set}</dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.moved_to_set ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Moved To Set
-                                            </dt>
-                                            <dd>Yes</dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.listed_price ? (
-                                        <div>
-                                            <dt className="font-semibold">
-                                                Listed Price
-                                            </dt>
-                                            <dd>
-                                                {entry.listed_price.toLocaleString()}
-                                            </dd>
-                                        </div>
-                                    ) : null}
-                                    {entry.failure ? (
-                                        <div>
-                                            <dt className="font-semibold text-red-700 dark:text-red-300">
-                                                Failure Reason
-                                            </dt>
-                                            <dd className="text-red-700 dark:text-red-300">
-                                                {entry.failure}
-                                            </dd>
-                                        </div>
-                                    ) : null}
+                                        </React.Fragment>
+                                    ))}
                                 </dl>
                             </li>
                         );
@@ -1234,7 +1318,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         Next
                     </button>
                 </div>
-            </div>
+            </details>
         );
     }
 
@@ -1245,25 +1329,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             return null;
         }
 
-        const currencyLines: ChartLine[] = [
-            {
-                label: "Currency Spent",
-                data: chartPoints.currency.map((point) => ({
-                    label: String(point.tick),
-                    value: point.spent,
-                })),
-            },
-            {
-                label: "Currency Gained",
-                data: chartPoints.currency.map((point) => ({
-                    label: String(point.tick),
-                    value: point.gained,
-                })),
-            },
-        ];
         const outcomeLines: ChartLine[] = [
             {
                 label: "Success",
+                color: "#22c55e",
                 data: chartPoints.outcomes.map((point) => ({
                     label: String(point.tick),
                     value: point.success,
@@ -1271,6 +1340,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             },
             {
                 label: "Failure",
+                color: "#ef4444",
                 data: chartPoints.outcomes.map((point) => ({
                     label: String(point.tick),
                     value: point.failure,
@@ -1278,10 +1348,43 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             },
         ];
 
+        const currencyConfig = resolveCurrencyChartConfig(batch);
+
+        if (!currencyConfig) {
+            return (
+                <section className="grid gap-4">
+                    <BatchLineChart
+                        title="Success vs Failure"
+                        lines={outcomeLines}
+                        yAxisLabel="Count"
+                    />
+                </section>
+            );
+        }
+
+        const currencyLines: ChartLine[] = [
+            {
+                label: currencyConfig.spentLabel,
+                color: "#2563eb",
+                data: chartPoints.currency.map((point) => ({
+                    label: String(point.tick),
+                    value: point[currencyConfig.spentField] ?? 0,
+                })),
+            },
+            {
+                label: currencyConfig.gainedLabel,
+                color: "#d97706",
+                data: chartPoints.currency.map((point) => ({
+                    label: String(point.tick),
+                    value: point[currencyConfig.gainedField] ?? 0,
+                })),
+            },
+        ];
+
         return (
             <section className="grid gap-4 sm:grid-cols-2">
                 <BatchLineChart
-                    title="Currency Spent vs Gained"
+                    title={`${currencyConfig.spentLabel} vs ${currencyConfig.gainedLabel}`}
                     lines={currencyLines}
                     yAxisLabel="Amount"
                 />
@@ -1325,6 +1428,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         const goldDustLines: ChartLine[] = [
             {
                 label: "Gold Dust Gained",
+                color: "#d97706",
                 data: (chartPoints.gold_dust ?? []).map((point) => ({
                     label: String(point.tick),
                     value: point.gained,
@@ -1333,7 +1437,13 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         ];
 
         return (
-            <section className="grid gap-4 sm:grid-cols-2">
+            <section
+                className={
+                    showGoldDustChart
+                        ? "grid gap-4 sm:grid-cols-2"
+                        : "grid gap-4"
+                }
+            >
                 <BatchLineChart
                     title="Success vs Failure"
                     lines={outcomeLines}
@@ -1408,6 +1518,83 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         );
     }
 
+    renderIntTooLowWarning(
+        batch: NonNullable<BatchCraftingStatus["batch"]>,
+        isActive: boolean,
+    ) {
+        if (isActive || batch.ended_reason !== "int_too_low_for_enchanting") {
+            return null;
+        }
+
+        return (
+            <WarningAlert additional_css="my-2">
+                <div className="space-y-2">
+                    <p>
+                        Batch crafting stopped because your Intelligence is too
+                        low for the selected enchantment. Raise INT and try
+                        again.
+                    </p>
+                    <IntEnchantLinksList />
+                </div>
+            </WarningAlert>
+        );
+    }
+
+    renderIntPreemptiveInfo(
+        batch: NonNullable<BatchCraftingStatus["batch"]>,
+        isActive: boolean,
+    ) {
+        if (!isActive || batch.batch_type !== "craft_and_enchant") {
+            return null;
+        }
+
+        return (
+            <InfoAlert additional_css="text-sm my-2">
+                <div className="space-y-2">
+                    <p>
+                        Enchanting requires enough Intelligence for the selected
+                        enchantment, or this batch will stop early. Raise INT
+                        ahead of time to avoid interruptions.
+                    </p>
+                    <IntEnchantLinksList />
+                </div>
+            </InfoAlert>
+        );
+    }
+
+    renderProcessingStatusText(
+        batch: NonNullable<BatchCraftingStatus["batch"]>,
+        isActive: boolean,
+    ) {
+        if (!isActive) {
+            return null;
+        }
+
+        const remaining =
+            typeof batch.remaining_amount === "number"
+                ? batch.remaining_amount
+                : Math.max(
+                      0,
+                      (batch.requested_amount ?? 0) -
+                          (batch.completed_amount ?? 0),
+                  );
+        const hasFailures = (batch.counts?.failed ?? 0) > 0;
+
+        let text = "Waiting for next batch tick";
+
+        if (remaining > 0 && hasFailures) {
+            text = "Retrying failed items and processing remaining items";
+        } else if (remaining > 0) {
+            text = "Processing remaining items";
+        } else if (hasFailures) {
+            text = "Retrying failed items";
+        }
+
+        return (
+            <p className="text-xs text-gray-500 dark:text-gray-400">{text}</p>
+        );
+    }
+
     renderAmountPreview(batch: NonNullable<BatchCraftingStatus["batch"]>) {
         const preview = batch.amount_preview;
 
@@ -1417,73 +1604,58 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         return (
             <div className="grid gap-3">
-                <InfoAlert additional_css="text-sm">
+                <InfoAlert additional_css="text-sm my-2">
                     Kept output for this batch is moved into the Crafted Items
                     Set, not your normal inventory. You can sell or disenchant
                     items out of that set later.
                 </InfoAlert>
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Selected Item</dt>
-                        <dd>{this.renderItem(preview.selected_item)}</dd>
-                    </div>
+                <h5 className="font-semibold">Craft Amount</h5>
+                <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Selected Item</dt>
+                    <dd>{this.renderItem(preview.selected_item)}</dd>
                     {preview.prefix_affix_name ? (
-                        <div>
+                        <>
                             <dt className="font-semibold">Prefix</dt>
                             <dd>{preview.prefix_affix_name}</dd>
-                        </div>
+                        </>
                     ) : null}
                     {preview.suffix_affix_name ? (
-                        <div>
+                        <>
                             <dt className="font-semibold">Suffix</dt>
                             <dd>{preview.suffix_affix_name}</dd>
-                        </div>
+                        </>
                     ) : null}
-                    <div>
-                        <dt className="font-semibold">Per Item Cost</dt>
-                        <dd>{formatNumber(preview.total_per_item_cost)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Total Cost</dt>
-                        <dd>{formatNumber(preview.total_cost)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Available Gold</dt>
-                        <dd>{formatNumber(preview.available_gold)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Crafted Items Set Space
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.destination_current_slots)} /{" "}
-                            {formatNumber(preview.destination_max_slots)} (
-                            {formatNumber(preview.destination_remaining_slots)}{" "}
-                            remaining)
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Effective Craftable Amount
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.effective_craftable_amount)}{" "}
-                            of{" "}
-                            {formatNumber(preview.remaining_requested_amount)}
-                        </dd>
-                    </div>
-                    {preview.enchant_can_destroy_item ? (
-                        <div>
-                            <dt className="font-semibold">Enchanting Risk</dt>
-                            <dd>
-                                Enchanting can fail and destroy the item. Gold
-                                is still spent even if that happens.
-                            </dd>
-                        </div>
-                    ) : null}
+                    <dt className="font-semibold">Per Item Cost</dt>
+                    <dd>{formatNumber(preview.total_per_item_cost)}</dd>
+                    <dt className="font-semibold">Total Cost</dt>
+                    <dd>{formatNumber(preview.total_cost)}</dd>
+                    <dt className="font-semibold">Available Gold</dt>
+                    <dd>{formatNumber(preview.available_gold)}</dd>
+                    <dt className="font-semibold">Crafted Items Set Space</dt>
+                    <dd>
+                        {formatNumber(preview.destination_current_slots)} /{" "}
+                        {formatNumber(preview.destination_max_slots)} (
+                        {formatNumber(preview.destination_remaining_slots)}{" "}
+                        remaining)
+                    </dd>
+                    <dt className="font-semibold">
+                        Effective Craftable Amount
+                    </dt>
+                    <dd>
+                        {formatNumber(preview.effective_craftable_amount)} of{" "}
+                        {formatNumber(preview.remaining_requested_amount)}
+                    </dd>
                 </dl>
+                {preview.enchant_has_failure_risk ? (
+                    <WarningAlert additional_css="my-2">
+                        Enchanting can fail and destroy the item because your
+                        Enchanting level is below 400. Gold is still spent even
+                        if that happens.
+                    </WarningAlert>
+                ) : null}
                 {preview.capped ? (
-                    <WarningAlert>
+                    <WarningAlert additional_css="my-2">
                         This batch can only complete{" "}
                         {formatNumber(preview.effective_craftable_amount)} of
                         the requested{" "}
@@ -1513,11 +1685,21 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         {isActive ? "Craft Amount" : "Craft Amount Complete"}
                     </h3>
                     <p className="mt-1 text-gray-700 dark:text-gray-300">
-                        {isActive
-                            ? `Crafting ${formatNumber(requested)} of ${item?.name ?? batch.current_item_name ?? "the selected item"}`
-                            : `Crafted ${formatNumber(completed)} of ${formatNumber(requested)}`}
+                        {isActive ? (
+                            <React.Fragment>
+                                Crafting {formatNumber(requested)} of{" "}
+                                {item?.name
+                                    ? this.renderItem(item)
+                                    : (batch.current_item_name ??
+                                      "the selected item")}
+                            </React.Fragment>
+                        ) : (
+                            `Crafted ${formatNumber(completed)} of ${formatNumber(requested)}`
+                        )}
                     </p>
                 </div>
+
+                {this.renderProcessingStatusText(batch, isActive)}
 
                 {this.renderCompletionSummary(
                     isActive,
@@ -1537,43 +1719,27 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     barClassName="bg-orange-600"
                 />
 
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Status</dt>
-                        <dd>{this.statusText(batch, isActive)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Selected Item</dt>
-                        <dd>{this.renderItem(item)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Item</dt>
-                        <dd>{this.renderItem(item)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Requested</dt>
-                        <dd>{formatNumber(requested)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Completed</dt>
-                        <dd>{formatNumber(completed)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Remaining</dt>
-                        <dd>{formatNumber(remaining)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Spent</dt>
-                        <dd>
-                            {formatNumber(
-                                batch.gold_spent_total ?? batch.gold_spent ?? 0,
-                            )}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Left</dt>
-                        <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Status</dt>
+                    <dd>{this.statusText(batch, isActive)}</dd>
+                    <dt className="font-semibold">Selected Item</dt>
+                    <dd>{this.renderItem(item)}</dd>
+                    <dt className="font-semibold">Current Item</dt>
+                    <dd>{this.renderItem(item)}</dd>
+                    <dt className="font-semibold">Requested</dt>
+                    <dd>{formatNumber(requested)}</dd>
+                    <dt className="font-semibold">Completed</dt>
+                    <dd>{formatNumber(completed)}</dd>
+                    <dt className="font-semibold">Remaining</dt>
+                    <dd>{formatNumber(remaining)}</dd>
+                    <dt className="font-semibold">Gold Spent</dt>
+                    <dd>
+                        {formatNumber(
+                            batch.gold_spent_total ?? batch.gold_spent ?? 0,
+                        )}
+                    </dd>
+                    <dt className="font-semibold">Gold Left</dt>
+                    <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
                 </dl>
 
                 {batch.batch_crafting_set ? (
@@ -1590,17 +1756,26 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
                 {this.renderSkillsList(batch.skills)}
                 {this.renderUsefulCounts(batch)}
-                {this.renderActionHistory()}
-
-                <section>
-                    <h4 className="mb-2 font-semibold">Completed Items</h4>
-                    {this.renderCraftedItems(batch)}
-                </section>
+                {this.renderActionHistory(isActive, batch.ended_reason)}
 
                 {this.renderActionButtons(isActive, isSaving)}
 
                 {this.renderOpenModals()}
             </div>
+        );
+    }
+
+    renderExperienceRateLabel(
+        batch: NonNullable<BatchCraftingStatus["batch"]>,
+    ) {
+        if (!batch.experience_rate_label) {
+            return null;
+        }
+
+        return (
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                {batch.experience_rate_label}
+            </p>
         );
     }
 
@@ -1624,64 +1799,58 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     <h3 className="text-lg font-semibold">
                         Crafting for Experience
                     </h3>
+                    {this.renderExperienceRateLabel(batch)}
                     <p className="mt-1 text-gray-700 dark:text-gray-300">
-                        {item?.name
-                            ? `Currently crafting ${item.name}`
-                            : "Preparing to craft the next eligible item."}
+                        {item?.name ? (
+                            <React.Fragment>
+                                Currently crafting {this.renderItem(item)}
+                            </React.Fragment>
+                        ) : (
+                            "Preparing to craft the next eligible item."
+                        )}
                     </p>
                 </div>
 
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Status</dt>
-                        <dd className="capitalize">
-                            {isActive
-                                ? "running"
-                                : formatStatus(batch.ended_reason)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Item</dt>
-                        <dd>{this.renderItem(item)}</dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Status</dt>
+                    <dd className="capitalize">
+                        {isActive
+                            ? "running"
+                            : formatStatus(batch.ended_reason)}
+                    </dd>
+                    <dt className="font-semibold">Current Item</dt>
+                    <dd>{this.renderItem(item)}</dd>
                     {batch.last_action ? (
-                        <div>
+                        <>
                             <dt className="font-semibold">Last Action</dt>
                             <dd>{batch.last_action}</dd>
-                        </div>
+                        </>
                     ) : null}
                     {batch.next_action ? (
-                        <div>
+                        <>
                             <dt className="font-semibold">Next Action</dt>
                             <dd>{batch.next_action}</dd>
-                        </div>
+                        </>
                     ) : null}
-                    <div>
-                        <dt className="font-semibold">Items Crafted</dt>
-                        <dd>{formatNumber(batch.counts.crafted)}</dd>
-                    </div>
+                    <dt className="font-semibold">Items Crafted</dt>
+                    <dd>{formatNumber(batch.counts.crafted)}</dd>
                     {this.renderCurrencyDetails(batch)}
                     {set && movesToCraftedItemsSet ? (
-                        <div>
+                        <>
                             <dt className="font-semibold">Crafted Items Set</dt>
                             <dd>
                                 {formatNumber(set.current_slots)} /{" "}
                                 {formatNumber(set.max_slots)}
                             </dd>
-                        </div>
+                        </>
                     ) : null}
                 </dl>
 
                 {this.renderSkillsList(batch.skills)}
 
-                <section>
-                    <h4 className="mb-2 font-semibold">Recent Crafted Items</h4>
-                    {this.renderCraftedItems(batch)}
-                </section>
-
                 {this.renderUsefulCounts(batch)}
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason, true)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -1730,61 +1899,38 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     barClassName="bg-orange-600"
                 />
 
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Status</dt>
-                        <dd>{this.statusText(batch, isActive)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Selected Set</dt>
-                        <dd>
-                            {set
-                                ? typeof set.max_slots === "number"
-                                    ? `${set.name} (${set.current_slots} / ${set.max_slots})`
-                                    : `${set.name} (${set.current_slots} used / unlimited)`
-                                : "None"}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Remaining Slots</dt>
-                        <dd>{set ? formatNumber(set.remaining_slots) : "—"}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Requested Entries</dt>
-                        <dd>{formatNumber(requested)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Completed Entries</dt>
-                        <dd>{formatNumber(completed)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Remaining Entries</dt>
-                        <dd>{formatNumber(remaining)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Item</dt>
-                        <dd>{this.renderItem(item)}</dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Status</dt>
+                    <dd>{this.statusText(batch, isActive)}</dd>
+                    <dt className="font-semibold">Selected Set</dt>
+                    <dd>
+                        {set
+                            ? typeof set.max_slots === "number"
+                                ? `${set.name} (${set.current_slots} / ${set.max_slots})`
+                                : `${set.name} (${set.current_slots} used / unlimited)`
+                            : "None"}
+                    </dd>
+                    <dt className="font-semibold">Remaining Slots</dt>
+                    <dd>{set ? formatNumber(set.remaining_slots) : "—"}</dd>
+                    <dt className="font-semibold">Requested Entries</dt>
+                    <dd>{formatNumber(requested)}</dd>
+                    <dt className="font-semibold">Completed Entries</dt>
+                    <dd>{formatNumber(completed)}</dd>
+                    <dt className="font-semibold">Remaining Entries</dt>
+                    <dd>{formatNumber(remaining)}</dd>
+                    <dt className="font-semibold">Current Item</dt>
+                    <dd>{this.renderItem(item)}</dd>
                     {this.renderCurrencyDetails(batch)}
-                    <div>
-                        <dt className="font-semibold">Skipped</dt>
-                        <dd>{formatNumber(batch.counts.skipped)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Failed</dt>
-                        <dd>{formatNumber(batch.counts.failed)}</dd>
-                    </div>
+                    <dt className="font-semibold">Skipped</dt>
+                    <dd>{formatNumber(batch.counts.skipped)}</dd>
+                    <dt className="font-semibold">Failed</dt>
+                    <dd>{formatNumber(batch.counts.failed)}</dd>
                 </dl>
 
                 {this.renderSkillsList(batch.skills)}
 
-                <section>
-                    <h4 className="mb-2 font-semibold">Crafted Items</h4>
-                    {this.renderCraftedItems(batch)}
-                </section>
-
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -1827,6 +1973,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </p>
                 </div>
 
+                {this.renderIntTooLowWarning(batch, isActive)}
+                {this.renderIntPreemptiveInfo(batch, isActive)}
+                {this.renderProcessingStatusText(batch, isActive)}
+
                 {this.renderCompletionSummary(
                     isActive,
                     batch.completion_summary,
@@ -1838,108 +1988,75 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 )}
 
                 <ProgressBar
-                    label="Work Completed"
-                    current={batch.completed_amount ?? 0}
-                    max={requested * 3}
+                    label="Items Completed"
+                    current={completedFinal}
+                    max={requested}
                     percent={batch.progress_percent ?? 0}
                     barClassName="bg-orange-600"
                 />
 
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Status</dt>
-                        <dd>{this.statusText(batch, isActive)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Phase</dt>
-                        <dd className="capitalize">{phaseLabel}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Destination Set</dt>
-                        <dd>
-                            {set
-                                ? typeof set.max_slots === "number"
-                                    ? `${set.name} (${set.current_slots} / ${set.max_slots})`
-                                    : `${set.name} (${set.current_slots} used / unlimited)`
-                                : "None"}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Full Set Requested</dt>
-                        <dd>{formatNumber(requested)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Crafted</dt>
-                        <dd>{formatNumber(batch.counts.crafted)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Prefix Enchants Applied
-                        </dt>
-                        <dd>
-                            {formatNumber(
-                                batch.craft_enchant_set_prefix_applied_count ??
-                                    0,
-                            )}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Suffix Enchants Applied
-                        </dt>
-                        <dd>
-                            {formatNumber(
-                                batch.craft_enchant_set_suffix_applied_count ??
-                                    0,
-                            )}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Completed Final Items</dt>
-                        <dd>{formatNumber(completedFinal)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Remaining Work Units</dt>
-                        <dd>{formatNumber(remainingWorkUnits)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Item</dt>
-                        <dd>{this.renderItem(item)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Prefix</dt>
-                        <dd>
-                            {batch.craft_enchant_set_current_prefix ?? "None"}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Suffix</dt>
-                        <dd>
-                            {batch.craft_enchant_set_current_suffix ?? "None"}
-                        </dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Status</dt>
+                    <dd>{this.statusText(batch, isActive)}</dd>
+                    <dt className="font-semibold">Phase</dt>
+                    <dd className="capitalize">{phaseLabel}</dd>
+                    <dt className="font-semibold">Destination Set</dt>
+                    <dd>
+                        {set
+                            ? typeof set.max_slots === "number"
+                                ? `${set.name} (${set.current_slots} / ${set.max_slots})`
+                                : `${set.name} (${set.current_slots} used / unlimited)`
+                            : "None"}
+                    </dd>
+                    <dt className="font-semibold">Full Set Requested</dt>
+                    <dd>{formatNumber(requested)}</dd>
+                    <dt className="font-semibold">Crafted</dt>
+                    <dd>{formatNumber(batch.counts.crafted)}</dd>
+                    <dt className="font-semibold">Prefix Enchants Applied</dt>
+                    <dd>
+                        {formatNumber(
+                            batch.craft_enchant_set_prefix_applied_count ?? 0,
+                        )}
+                    </dd>
+                    <dt className="font-semibold">Suffix Enchants Applied</dt>
+                    <dd>
+                        {formatNumber(
+                            batch.craft_enchant_set_suffix_applied_count ?? 0,
+                        )}
+                    </dd>
+                    <dt className="font-semibold">Completed Final Items</dt>
+                    <dd>{formatNumber(completedFinal)}</dd>
+                    <dt className="font-semibold">Remaining Work Units</dt>
+                    <dd>{formatNumber(remainingWorkUnits)}</dd>
+                    <dt className="font-semibold">Current Item</dt>
+                    <dd>{this.renderItem(item)}</dd>
+                    <dt className="font-semibold">Current Prefix</dt>
+                    <dd>
+                        {batch.craft_enchant_set_current_prefix
+                            ? this.renderAffixName(
+                                  batch.craft_enchant_set_current_prefix,
+                                  batch.craft_enchant_set_current_prefix_affix,
+                              )
+                            : "None"}
+                    </dd>
+                    <dt className="font-semibold">Current Suffix</dt>
+                    <dd>
+                        {batch.craft_enchant_set_current_suffix
+                            ? this.renderAffixName(
+                                  batch.craft_enchant_set_current_suffix,
+                                  batch.craft_enchant_set_current_suffix_affix,
+                              )
+                            : "None"}
+                    </dd>
                     {this.renderCurrencyDetails(batch)}
-                    <div>
-                        <dt className="font-semibold">Failed</dt>
-                        <dd>{formatNumber(batch.counts.failed)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Skipped</dt>
-                        <dd>{formatNumber(batch.counts.skipped)}</dd>
-                    </div>
+                    <dt className="font-semibold">Failed</dt>
+                    <dd>{formatNumber(batch.counts.failed)}</dd>
+                    <dt className="font-semibold">Skipped</dt>
+                    <dd>{formatNumber(batch.counts.skipped)}</dd>
                 </dl>
 
-                <section>
-                    <h4 className="mb-2 font-semibold">Output Items</h4>
-                    {this.renderSnapshotList(
-                        "craft-enchant-set-output-items",
-                        batch.enchanted_item_snapshots,
-                        "No completed set items have been recorded yet.",
-                    )}
-                </section>
-
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -1971,6 +2088,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </p>
                 </div>
 
+                {this.renderIntTooLowWarning(batch, isActive)}
+
                 <ProgressBar
                     label="Items Enchanted"
                     current={enchantedCount}
@@ -1979,73 +2098,43 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     barClassName="bg-orange-600"
                 />
 
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Status</dt>
-                        <dd>{this.statusText(batch, isActive)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Selected Set</dt>
-                        <dd>
-                            {set
-                                ? `${set.name} (${set.current_slots} / ${set.max_slots})`
-                                : "None"}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Eligible Items</dt>
-                        <dd>{formatNumber(eligibleTotal)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Enchanted</dt>
-                        <dd>{formatNumber(enchantedCount)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Remaining</dt>
-                        <dd>{formatNumber(remainingCount)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Skipped</dt>
-                        <dd>{formatNumber(skippedCount)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Failed</dt>
-                        <dd>{formatNumber(batch.counts.failed)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Selected Enchantments</dt>
-                        <dd>
-                            {batch.enchant_affix_names &&
-                            batch.enchant_affix_names.length > 0
-                                ? batch.enchant_affix_names.join(", ")
-                                : "None"}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Item</dt>
-                        <dd>{this.renderItem(item)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Spent</dt>
-                        <dd>{formatNumber(batch.gold_spent_total ?? 0)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Left</dt>
-                        <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Status</dt>
+                    <dd>{this.statusText(batch, isActive)}</dd>
+                    <dt className="font-semibold">Selected Set</dt>
+                    <dd>
+                        {set
+                            ? `${set.name} (${set.current_slots} / ${set.max_slots})`
+                            : "None"}
+                    </dd>
+                    <dt className="font-semibold">Eligible Items</dt>
+                    <dd>{formatNumber(eligibleTotal)}</dd>
+                    <dt className="font-semibold">Enchanted</dt>
+                    <dd>{formatNumber(enchantedCount)}</dd>
+                    <dt className="font-semibold">Remaining</dt>
+                    <dd>{formatNumber(remainingCount)}</dd>
+                    <dt className="font-semibold">Skipped</dt>
+                    <dd>{formatNumber(skippedCount)}</dd>
+                    <dt className="font-semibold">Failed</dt>
+                    <dd>{formatNumber(batch.counts.failed)}</dd>
+                    <dt className="font-semibold">Selected Enchantments</dt>
+                    <dd>
+                        {this.renderAffixNamesList(
+                            batch.enchant_affix_names,
+                            batch.enchant_affix_ids,
+                            batch.enchant_affixes,
+                        )}
+                    </dd>
+                    <dt className="font-semibold">Current Item</dt>
+                    <dd>{this.renderItem(item)}</dd>
+                    <dt className="font-semibold">Gold Spent</dt>
+                    <dd>{formatNumber(batch.gold_spent_total ?? 0)}</dd>
+                    <dt className="font-semibold">Gold Left</dt>
+                    <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
                 </dl>
 
-                <section>
-                    <h4 className="mb-2 font-semibold">Enchanted Items</h4>
-                    {this.renderSnapshotList(
-                        "enchant-set-items",
-                        batch.enchanted_item_snapshots,
-                        "No enchanted items have been recorded yet.",
-                    )}
-                </section>
-
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2070,33 +2159,23 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 {items.map((entry, index) => (
                     <li key={index}>
                         <dl className="grid grid-cols-2 gap-1 text-xs sm:grid-cols-4">
-                            <div>
-                                <dt className="font-semibold">Item</dt>
-                                <dd>{this.renderItem(entry.item)}</dd>
-                            </div>
-                            <div>
-                                <dt className="font-semibold">Stacks</dt>
-                                <dd>
-                                    {formatNumber(entry.current_stacks)} /{" "}
-                                    {formatNumber(entry.max_stacks)}
-                                </dd>
-                            </div>
-                            <div>
-                                <dt className="font-semibold">Remaining</dt>
-                                <dd>
-                                    {formatNumber(entry.remaining_capacity)}
-                                </dd>
-                            </div>
-                            <div>
-                                <dt className="font-semibold">
-                                    Gold Dust / Application
-                                </dt>
-                                <dd>
-                                    {formatNumber(
-                                        entry.gold_dust_cost_per_application,
-                                    )}
-                                </dd>
-                            </div>
+                            <dt className="font-semibold">Item</dt>
+                            <dd>{this.renderItem(entry.item)}</dd>
+                            <dt className="font-semibold">Stacks</dt>
+                            <dd>
+                                {formatNumber(entry.current_stacks)} /{" "}
+                                {formatNumber(entry.max_stacks)}
+                            </dd>
+                            <dt className="font-semibold">Remaining</dt>
+                            <dd>{formatNumber(entry.remaining_capacity)}</dd>
+                            <dt className="font-semibold">
+                                Gold Dust / Application
+                            </dt>
+                            <dd>
+                                {formatNumber(
+                                    entry.gold_dust_cost_per_application,
+                                )}
+                            </dd>
                         </dl>
                     </li>
                 ))}
@@ -2116,33 +2195,19 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         return (
             <div className="grid gap-3">
                 {this.renderHolyOilItemsPreviewList(preview.items)}
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">
-                            Total Remaining Applications
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.total_remaining_applications)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Selected Oils Available
-                        </dt>
-                        <dd>{formatNumber(preview.selected_oils_available)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Dust Available</dt>
-                        <dd>{formatNumber(preview.gold_dust_available)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Max Applications Possible
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.max_applications_possible)}
-                        </dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">
+                        Total Remaining Applications
+                    </dt>
+                    <dd>
+                        {formatNumber(preview.total_remaining_applications)}
+                    </dd>
+                    <dt className="font-semibold">Selected Oils Available</dt>
+                    <dd>{formatNumber(preview.selected_oils_available)}</dd>
+                    <dt className="font-semibold">Gold Dust Available</dt>
+                    <dd>{formatNumber(preview.gold_dust_available)}</dd>
+                    <dt className="font-semibold">Max Applications Possible</dt>
+                    <dd>{formatNumber(preview.max_applications_possible)}</dd>
                 </dl>
                 {preview.capped ? (
                     <WarningAlert>
@@ -2167,33 +2232,19 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         return (
             <div className="grid gap-3">
                 {this.renderHolyOilItemsPreviewList(preview.items)}
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Total Eligible Items</dt>
-                        <dd>{formatNumber(preview.total_eligible_items)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Total Remaining Applications
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.total_remaining_applications)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Selected Oils Available
-                        </dt>
-                        <dd>{formatNumber(preview.selected_oils_available)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Max Applications Possible
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.max_applications_possible)}
-                        </dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Total Eligible Items</dt>
+                    <dd>{formatNumber(preview.total_eligible_items)}</dd>
+                    <dt className="font-semibold">
+                        Total Remaining Applications
+                    </dt>
+                    <dd>
+                        {formatNumber(preview.total_remaining_applications)}
+                    </dd>
+                    <dt className="font-semibold">Selected Oils Available</dt>
+                    <dd>{formatNumber(preview.selected_oils_available)}</dd>
+                    <dt className="font-semibold">Max Applications Possible</dt>
+                    <dd>{formatNumber(preview.max_applications_possible)}</dd>
                 </dl>
                 {preview.capped && preview.capped_message ? (
                     <WarningAlert>{preview.capped_message}</WarningAlert>
@@ -2234,100 +2285,58 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     barClassName="bg-orange-600"
                 />
 
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Status</dt>
-                        <dd>{this.statusText(batch, isActive)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Selected Set</dt>
-                        <dd>
-                            {set
-                                ? `${set.name} (${set.current_slots} / ${set.max_slots})`
-                                : "None"}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Total Eligible Set Items
-                        </dt>
-                        <dd>
-                            {formatNumber(batch.holy_oil_eligible_items ?? 0)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Total Holy Stacks</dt>
-                        <dd>{formatNumber(totalStacks)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Oils Needed</dt>
-                        <dd>{formatNumber(requested)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Oils Applied</dt>
-                        <dd>{formatNumber(completed)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Oils Remaining</dt>
-                        <dd>{formatNumber(remaining)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Skipped/Ineligible</dt>
-                        <dd>
-                            {formatNumber(batch.holy_oil_skipped_items ?? 0)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Total Stat Bonus Applied
-                        </dt>
-                        <dd>
-                            {(
-                                batch.holy_oil_total_stat_bonus_applied ?? 0
-                            ).toFixed(2)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Total Devouring Darkness Bonus Applied
-                        </dt>
-                        <dd>
-                            {(
-                                batch.holy_oil_total_devouring_darkness_bonus_applied ??
-                                0
-                            ).toFixed(2)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Target Item</dt>
-                        <dd>
-                            {this.renderItem(
-                                batch.holy_oil_current_target_item,
-                            )}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Current Oil Item</dt>
-                        <dd>
-                            {this.renderItem(batch.holy_oil_current_oil_item)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Dust Spent</dt>
-                        <dd>
-                            {formatNumber(batch.holy_oil_gold_dust_spent ?? 0)}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Gold Dust Left</dt>
-                        <dd>{formatNumber(batch.gold_dust_left ?? 0)}</dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Status</dt>
+                    <dd>{this.statusText(batch, isActive)}</dd>
+                    <dt className="font-semibold">Selected Set</dt>
+                    <dd>
+                        {set
+                            ? `${set.name} (${set.current_slots} / ${set.max_slots})`
+                            : "None"}
+                    </dd>
+                    <dt className="font-semibold">Total Eligible Set Items</dt>
+                    <dd>{formatNumber(batch.holy_oil_eligible_items ?? 0)}</dd>
+                    <dt className="font-semibold">Total Holy Stacks</dt>
+                    <dd>{formatNumber(totalStacks)}</dd>
+                    <dt className="font-semibold">Oils Needed</dt>
+                    <dd>{formatNumber(requested)}</dd>
+                    <dt className="font-semibold">Oils Applied</dt>
+                    <dd>{formatNumber(completed)}</dd>
+                    <dt className="font-semibold">Oils Remaining</dt>
+                    <dd>{formatNumber(remaining)}</dd>
+                    <dt className="font-semibold">Skipped/Ineligible</dt>
+                    <dd>{formatNumber(batch.holy_oil_skipped_items ?? 0)}</dd>
+                    <dt className="font-semibold">Total Stat Bonus Applied</dt>
+                    <dd>
+                        {(batch.holy_oil_total_stat_bonus_applied ?? 0).toFixed(
+                            2,
+                        )}
+                    </dd>
+                    <dt className="font-semibold">
+                        Total Devouring Darkness Bonus Applied
+                    </dt>
+                    <dd>
+                        {(
+                            batch.holy_oil_total_devouring_darkness_bonus_applied ??
+                            0
+                        ).toFixed(2)}
+                    </dd>
+                    <dt className="font-semibold">Current Target Item</dt>
+                    <dd>
+                        {this.renderItem(batch.holy_oil_current_target_item)}
+                    </dd>
+                    <dt className="font-semibold">Current Oil Item</dt>
+                    <dd>{this.renderItem(batch.holy_oil_current_oil_item)}</dd>
+                    <dt className="font-semibold">Gold Dust Spent</dt>
+                    <dd>{formatNumber(batch.holy_oil_gold_dust_spent ?? 0)}</dd>
+                    <dt className="font-semibold">Gold Dust Left</dt>
+                    <dd>{formatNumber(batch.gold_dust_left ?? 0)}</dd>
                 </dl>
 
                 {this.renderHolyOilsSetPreview(batch)}
 
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2356,6 +2365,9 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <h3 className="text-lg font-semibold">
                     Craft and Enchant for Experience
                 </h3>
+                {this.renderExperienceRateLabel(batch)}
+                {this.renderIntTooLowWarning(batch, isActive)}
+                {this.renderIntPreemptiveInfo(batch, isActive)}
                 {this.renderDetailGrid([
                     {
                         label: "Status",
@@ -2407,21 +2419,9 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     },
                 ])}
                 {this.renderSkillsList(batch.skills)}
-                <section>
-                    <h4 className="mb-2 font-semibold">Crafted Items</h4>
-                    {this.renderCraftedItems(batch)}
-                </section>
-                <section>
-                    <h4 className="mb-2 font-semibold">Enchanted Items</h4>
-                    {this.renderSnapshotList(
-                        "craft-enchant-experience-enchanted-items",
-                        batch.enchanted_item_snapshots,
-                        "No enchanted items have been recorded yet.",
-                    )}
-                </section>
                 {this.renderUsefulCounts(batch)}
                 {this.renderCraftAndEnchantExperienceCharts(batch, disenchants)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2443,6 +2443,9 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <h3 className="text-lg font-semibold">
                     Craft and Enchant Amount
                 </h3>
+                {this.renderIntTooLowWarning(batch, isActive)}
+                {this.renderIntPreemptiveInfo(batch, isActive)}
+                {this.renderProcessingStatusText(batch, isActive)}
                 <ProgressBar
                     label="Batch Progress"
                     current={completed}
@@ -2471,11 +2474,11 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     },
                     {
                         label: "Selected Enchantments",
-                        value:
-                            batch.enchant_affix_names &&
-                            batch.enchant_affix_names.length > 0
-                                ? batch.enchant_affix_names.join(", ")
-                                : "None",
+                        value: this.renderAffixNamesList(
+                            batch.enchant_affix_names,
+                            batch.enchant_affix_ids,
+                            batch.enchant_affixes,
+                        ),
                     },
                     { label: "Requested", value: formatNumber(requested) },
                     { label: "Enchanted", value: formatNumber(completed) },
@@ -2505,19 +2508,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: formatNumber(batch.counts.skipped),
                     },
                 ])}
-                <section>
-                    <h4 className="mb-2 font-semibold">Crafted Items</h4>
-                    {this.renderCraftedItems(batch)}
-                </section>
-                <section>
-                    <h4 className="mb-2 font-semibold">Enchanted Items</h4>
-                    {this.renderSnapshotList(
-                        "craft-enchant-specific-enchanted-items",
-                        batch.enchanted_item_snapshots,
-                        "No enchanted items have been recorded yet.",
-                    )}
-                </section>
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2535,6 +2526,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         return (
             <div className="space-y-4 text-sm" role="status" aria-live="polite">
                 <h3 className="text-lg font-semibold">{actionLabel}</h3>
+                {this.renderExperienceRateLabel(batch)}
+                {isEnchant
+                    ? this.renderIntTooLowWarning(batch, isActive)
+                    : null}
                 {this.renderDetailGrid([
                     {
                         label: "Status",
@@ -2600,22 +2595,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: formatNumber(batch.counts.skipped),
                     },
                 ])}
-                <section>
-                    <h4 className="mb-2 font-semibold">Items</h4>
-                    {this.renderSnapshotList(
-                        isEnchant
-                            ? "event-enchanted-items"
-                            : "event-crafted-items",
-                        isEnchant
-                            ? batch.enchanted_item_snapshots
-                            : batch.crafted_item_snapshots,
-                        isEnchant
-                            ? "No enchanted event items have been recorded yet."
-                            : "No crafted event items have been recorded yet.",
-                    )}
-                </section>
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2632,6 +2613,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <h3 className="text-lg font-semibold">
                     Alchemy for Experience
                 </h3>
+                {this.renderExperienceRateLabel(batch)}
                 {this.renderSkillsList(batch.skills)}
                 <ProgressBar
                     label="Alchemy Bag Used"
@@ -2685,16 +2667,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: formatNumber(batch.counts.failed),
                     },
                 ])}
-                <section>
-                    <h4 className="mb-2 font-semibold">Alchemy Items</h4>
-                    {this.renderSnapshotList(
-                        "alchemy-experience-items",
-                        batch.alchemy_item_snapshots,
-                        "No alchemy items have been recorded yet.",
-                    )}
-                </section>
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2714,6 +2688,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         return (
             <div className="space-y-4 text-sm" role="status" aria-live="polite">
                 <h3 className="text-lg font-semibold">Alchemy Amount</h3>
+                {this.renderProcessingStatusText(batch, isActive)}
                 <ProgressBar
                     label="Batch Progress"
                     current={completed}
@@ -2749,21 +2724,19 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: formatNumber(batch.gold_dust_left ?? 0),
                     },
                     {
+                        label: "Shards Spent",
+                        value: formatNumber(batch.shards_spent_total ?? 0),
+                        show: (batch.shards_spent_total ?? 0) > 0,
+                    },
+                    {
                         label: "Gold Gained",
                         value: formatNumber(batch.gold_gained_total ?? 0),
                         show: (batch.gold_gained_total ?? 0) > 0,
                     },
                 ])}
                 {this.renderAlchemyAmountPreview(batch)}
-                <section>
-                    <h4 className="mb-2 font-semibold">Alchemy Items</h4>
-                    {this.renderSnapshotList(
-                        "alchemy-amount-items",
-                        batch.alchemy_item_snapshots,
-                        "No alchemy items have been recorded yet.",
-                    )}
-                </section>
-                {this.renderActionHistory()}
+                {this.renderCharts(batch)}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2781,57 +2754,42 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         return (
             <div className="grid gap-3">
-                <dl className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                        <dt className="font-semibold">Selected Item</dt>
-                        <dd>{this.renderItem(preview.selected_item)}</dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Per Item Cost</dt>
-                        <dd>
-                            {formatNumber(preview.gold_dust_cost_per_item)} gold
-                            dust
-                            {preview.shards_cost_per_item > 0
-                                ? `, ${formatNumber(preview.shards_cost_per_item)} shards`
-                                : ""}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Total Cost</dt>
-                        <dd>
-                            {formatNumber(preview.total_gold_dust_cost)} gold
-                            dust
-                            {preview.total_shards_cost > 0
-                                ? `, ${formatNumber(preview.total_shards_cost)} shards`
-                                : ""}
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Available Currency</dt>
-                        <dd>
-                            {formatNumber(preview.available_gold_dust)} gold
-                            dust, {formatNumber(preview.available_shards)}{" "}
-                            shards
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">Alchemy Bag Space</dt>
-                        <dd>
-                            {formatNumber(preview.bag_current)} /{" "}
-                            {formatNumber(preview.bag_max)} (
-                            {formatNumber(preview.bag_remaining)} remaining)
-                        </dd>
-                    </div>
-                    <div>
-                        <dt className="font-semibold">
-                            Effective Craftable Amount
-                        </dt>
-                        <dd>
-                            {formatNumber(preview.effective_craftable_amount)}{" "}
-                            of{" "}
-                            {formatNumber(preview.remaining_requested_amount)}
-                        </dd>
-                    </div>
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
+                    <dt className="font-semibold">Selected Item</dt>
+                    <dd>{this.renderItem(preview.selected_item)}</dd>
+                    <dt className="font-semibold">Per Item Cost</dt>
+                    <dd>
+                        {formatNumber(preview.gold_dust_cost_per_item)} gold
+                        dust
+                        {preview.shards_cost_per_item > 0
+                            ? `, ${formatNumber(preview.shards_cost_per_item)} shards`
+                            : ""}
+                    </dd>
+                    <dt className="font-semibold">Total Cost</dt>
+                    <dd>
+                        {formatNumber(preview.total_gold_dust_cost)} gold dust
+                        {preview.total_shards_cost > 0
+                            ? `, ${formatNumber(preview.total_shards_cost)} shards`
+                            : ""}
+                    </dd>
+                    <dt className="font-semibold">Available Currency</dt>
+                    <dd>
+                        {formatNumber(preview.available_gold_dust)} gold dust,{" "}
+                        {formatNumber(preview.available_shards)} shards
+                    </dd>
+                    <dt className="font-semibold">Alchemy Bag Space</dt>
+                    <dd>
+                        {formatNumber(preview.bag_current)} /{" "}
+                        {formatNumber(preview.bag_max)} (
+                        {formatNumber(preview.bag_remaining)} remaining)
+                    </dd>
+                    <dt className="font-semibold">
+                        Effective Craftable Amount
+                    </dt>
+                    <dd>
+                        {formatNumber(preview.effective_craftable_amount)} of{" "}
+                        {formatNumber(preview.remaining_requested_amount)}
+                    </dd>
                 </dl>
                 {preview.capped ? (
                     <WarningAlert>
@@ -2856,6 +2814,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <h3 className="text-lg font-semibold">
                     Trinketry for Experience
                 </h3>
+                {this.renderExperienceRateLabel(batch)}
                 {this.renderSkillsList(batch.skills)}
                 {this.renderDetailGrid([
                     {
@@ -2870,8 +2829,17 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         ),
                     },
                     {
+                        label: "Shards Spent",
+                        value: formatNumber(batch.shards_spent_total ?? 0),
+                    },
+                    {
                         label: "Shards Left",
                         value: formatNumber(batch.currency?.amount ?? 0),
+                    },
+                    {
+                        label: "Gold Gained",
+                        value: formatNumber(batch.gold_gained_total ?? 0),
+                        show: (batch.gold_gained_total ?? 0) > 0,
                     },
                     {
                         label: "Successes",
@@ -2882,16 +2850,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: formatNumber(batch.counts.failed),
                     },
                 ])}
-                <section>
-                    <h4 className="mb-2 font-semibold">Trinkets</h4>
-                    {this.renderSnapshotList(
-                        "trinketry-items",
-                        batch.trinketry_item_snapshots,
-                        "No trinketry items have been recorded yet.",
-                    )}
-                </section>
                 {this.renderCharts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -2993,15 +2953,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     },
                 ])}
                 {this.renderHolyOilsSelectedPreview(batch)}
-                <section>
-                    <h4 className="mb-2 font-semibold">Target Items</h4>
-                    {this.renderSnapshotList(
-                        "holy-oils-selected-target-items",
-                        batch.holy_oil_target_item_snapshots,
-                        "No holy oil target items have been recorded yet.",
-                    )}
-                </section>
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>
@@ -3013,20 +2965,39 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         return (
             <React.Fragment>
-                {this.state.openSlotId !== null ? (
-                    <ItemDetailsModal
+                {this.state.openItemId !== null ? (
+                    <InventoryUseDetails
                         is_open={true}
                         character_id={character_id}
-                        slot_id={this.state.openSlotId}
-                        is_automation_running={true}
-                        is_dead={false}
-                        manage_modal={() => this.setOpenSlotId(null)}
+                        item_id={this.state.openItemId}
+                        manage_modal={() => this.setOpenItemId(null)}
                     />
                 ) : null}
-                {this.state.openSnapshot !== null ? (
-                    <SnapshotDetailsModal
-                        item={this.state.openSnapshot}
-                        onClose={() => this.setOpenSnapshot(null)}
+                {this.state.openSnapshot !== null &&
+                this.state.openSnapshot.full_item_details ? (
+                    <Dialogue
+                        is_open={true}
+                        handle_close={() => this.setOpenSnapshot(null)}
+                        title={
+                            <ItemNameColorationText
+                                custom_width={false}
+                                item={itemForColor(this.state.openSnapshot)}
+                            />
+                        }
+                        large_modal={true}
+                        additional_dialogue_css={"top-[110px]"}
+                    >
+                        <ItemDetails
+                            item={this.state.openSnapshot.full_item_details}
+                            character_id={character_id}
+                        />
+                    </Dialogue>
+                ) : null}
+                {this.state.affixDetailsModalAffix ? (
+                    <ItemAffixDetails
+                        is_open={this.state.affixDetailsModalOpen}
+                        affix={this.state.affixDetailsModalAffix}
+                        manage_modal={() => this.closeAffixDetails()}
                     />
                 ) : null}
             </React.Fragment>
@@ -3169,7 +3140,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     barClassName="bg-orange-600"
                 />
                 {this.renderUsefulCounts(batch)}
-                {this.renderActionHistory()}
+                {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
             </div>

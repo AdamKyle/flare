@@ -3,6 +3,8 @@
 namespace Tests\Feature\Game\BatchCrafting\Controllers;
 
 use App\Flare\Models\BatchCrafting;
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\SetSlot;
 use App\Flare\Values\AutomationType;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
@@ -94,13 +96,13 @@ class BatchCraftingControllerTest extends TestCase
         $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
         $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
         $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
-        $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
         $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::HOLY_OILS->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
-            'selected_items' => [$item->id],
+            'selected_items' => [$itemSlot->id],
             'selected_oils' => [$oilSlot->id],
         ]);
 
@@ -555,13 +557,13 @@ class BatchCraftingControllerTest extends TestCase
         $otherAlchemyBag = $this->createAlchemyBag(['character_id' => $otherCharacter->id]);
         $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
         $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
-        $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
         $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $otherAlchemyBag->id, 'character_id' => $otherCharacter->id, 'item_id' => $oil->id, 'amount' => 1]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::HOLY_OILS->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
-            'selected_items' => [$item->id],
+            'selected_items' => [$itemSlot->id],
             'selected_oils' => [$oilSlot->id],
         ]);
 
@@ -576,13 +578,13 @@ class BatchCraftingControllerTest extends TestCase
         $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
         $item = $this->createItem(['type' => 'trinket', 'holy_stacks' => 1]);
         $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
-        $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
         $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::HOLY_OILS->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
-            'selected_items' => [$item->id],
+            'selected_items' => [$itemSlot->id],
             'selected_oils' => [$oilSlot->id],
         ]);
 
@@ -597,13 +599,13 @@ class BatchCraftingControllerTest extends TestCase
         $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
         $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
         $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => false, 'holy_level' => null]);
-        $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
         $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::HOLY_OILS->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
-            'selected_items' => [$item->id],
+            'selected_items' => [$itemSlot->id],
             'selected_oils' => [$oilSlot->id],
         ]);
 
@@ -806,5 +808,484 @@ class BatchCraftingControllerTest extends TestCase
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
         $this->assertSame('crafted_items_set', $response->json('amount_preview.destination'));
         $this->assertSame(4, $response->json('amount_preview.effective_craftable_amount'));
+    }
+
+    public function testPreviewCraftAndEnchantSetReturnsNonZeroEnchantCostThroughHttpValidation(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 1000]);
+        $this->createInventory(['character_id' => $character->id]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 5, 'xp' => 0, 'xp_max' => 100]);
+        $this->createItem(['name' => 'Preview Set Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $prefix = $this->createItemAffix(['name' => 'HTTP Preview Prefix', 'type' => 'prefix', 'cost' => 30, 'int_required' => 0, 'skill_level_required' => 1]);
+        $suffix = $this->createItemAffix(['name' => 'HTTP Preview Suffix', 'type' => 'suffix', 'cost' => 40, 'int_required' => 0, 'skill_level_required' => 1]);
+
+        $response = $this->actingAs($user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'selected_set_id' => $set->id,
+                'enchant_plan' => [
+                    'dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id],
+                ],
+            ],
+        ]);
+
+        $this->assertSame(70, $response->json('cost_breakdown.enchant_cost_total'));
+    }
+
+    public function testPreviewCraftEnchantSetReturnsAllTwentyThreeSetTargets(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+
+        $response = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ]);
+
+        $this->assertCount(23, $response->json('cost_breakdown.plan_entries'));
+    }
+
+    public function testPreviewCraftEnchantSetDefaultsToHighestCraftableItemPerTarget(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 10]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $this->createItem(['name' => 'Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $highItem = $this->createItem(['name' => 'High Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 50, 'skill_level_required' => 3, 'skill_level_trivial' => 1]);
+
+        $response = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ]);
+
+        $daggerEntry = collect($response->json('cost_breakdown.plan_entries'))->firstWhere('key', 'dagger');
+
+        $this->assertSame($highItem->id, $daggerEntry['selected_item_id']);
+    }
+
+    public function testPreviewCraftEnchantSetDefaultsToHighestValidPrefixAndSuffix(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $this->createItemAffix(['name' => 'Cheap Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+        $expensivePrefix = $this->createItemAffix(['name' => 'Expensive Prefix', 'type' => 'prefix', 'cost' => 100, 'int_required' => 0, 'skill_level_required' => 1]);
+        $this->createItemAffix(['name' => 'Cheap Suffix', 'type' => 'suffix', 'cost' => 5, 'int_required' => 0, 'skill_level_required' => 1]);
+        $expensiveSuffix = $this->createItemAffix(['name' => 'Expensive Suffix', 'type' => 'suffix', 'cost' => 200, 'int_required' => 0, 'skill_level_required' => 1]);
+
+        $response = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ]);
+
+        $this->assertSame($expensivePrefix->id, $response->json('cost_breakdown.default_prefix_affix_id'));
+        $this->assertSame($expensiveSuffix->id, $response->json('cost_breakdown.default_suffix_affix_id'));
+    }
+
+    public function testPreviewCraftEnchantSetDefaultAffixDoesNotExceedCharacterInt(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $eligiblePrefix = $this->createItemAffix(['name' => 'Eligible Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+        $this->createItemAffix(['name' => 'Too High Int Prefix', 'type' => 'prefix', 'cost' => 999, 'int_required' => 999999, 'skill_level_required' => 1]);
+
+        $response = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ]);
+
+        $this->assertSame($eligiblePrefix->id, $response->json('cost_breakdown.default_prefix_affix_id'));
+    }
+
+    public function testPreviewCraftEnchantSetDefaultAffixDoesNotExceedEnchantingSkill(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $eligibleSuffix = $this->createItemAffix(['name' => 'Eligible Suffix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+        $this->createItemAffix(['name' => 'Too High Skill Suffix', 'type' => 'suffix', 'cost' => 999, 'int_required' => 0, 'skill_level_required' => 999]);
+
+        $response = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ]);
+
+        $this->assertSame($eligibleSuffix->id, $response->json('cost_breakdown.default_suffix_affix_id'));
+    }
+
+    public function testStartCraftEnchantSetAcceptsUntouchedDefaultPlan(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $this->createItemAffix(['name' => 'Default Plan Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+        $this->createItemAffix(['name' => 'Default Plan Suffix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+
+        $previewResponse = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set', 'selected_set_id' => $set->id],
+        ]);
+
+        $defaultPrefixId = $previewResponse->json('cost_breakdown.default_prefix_affix_id');
+        $defaultSuffixId = $previewResponse->json('cost_breakdown.default_suffix_affix_id');
+        $keys = collect($previewResponse->json('cost_breakdown.plan_entries'))->pluck('key');
+        $enchantPlan = $keys->mapWithKeys(fn (string $key) => [$key => [
+            'prefix_affix_id' => $defaultPrefixId,
+            'suffix_affix_id' => $defaultSuffixId,
+        ]])->all();
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'selected_set_id' => $set->id,
+                'enchant_plan' => $enchantPlan,
+            ],
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::CRAFT_AND_ENCHANT->value)->first());
+    }
+
+    public function testStartCraftEnchantSetRejectsEnchantExistingMode(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'craft_enchant_set_mode' => 'enchant_existing',
+                'enchant_plan' => [],
+            ],
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $this->response->assertStatus(302);
+        $this->assertTrue(session()->has('errors'));
+    }
+
+    public function testPreviewCraftEnchantSetManualSelectionOverridesDefaultItem(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 10]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $lowItem = $this->createItem(['name' => 'Manual Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $this->createItem(['name' => 'Manual High Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 50, 'skill_level_required' => 3, 'skill_level_trivial' => 1]);
+
+        $response = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'enchant_plan' => [
+                    'dagger' => ['selected_item_id' => $lowItem->id],
+                ],
+            ],
+        ]);
+
+        $daggerEntry = collect($response->json('cost_breakdown.plan_entries'))->firstWhere('key', 'dagger');
+
+        $this->assertSame($lowItem->id, $daggerEntry['selected_item_id']);
+    }
+
+    public function testStartCraftEnchantSetRejectsInvalidManualAffixId(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $suffix = $this->createItemAffix(['name' => 'Wrong Type Affix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+
+        $keys = collect($this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ])->json('cost_breakdown.plan_entries'))->pluck('key');
+
+        $enchantPlan = $keys->mapWithKeys(fn (string $key) => [$key => [
+            'prefix_affix_id' => $suffix->id,
+        ]])->all();
+
+        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'selected_set_id' => $set->id,
+                'enchant_plan' => $enchantPlan,
+            ],
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testCraftAmountUsesCraftedItemsSetCapacityNotNormalInventory(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 1000]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
+        $item = $this->createItem(['name' => 'Destination Test Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1]);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
+
+        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+            ],
+        ]);
+        $response = $this->response;
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+    }
+
+    public function testCraftForExperienceUsesCraftedItemsSetCapacityNotNormalInventory(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
+        $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
+
+        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+        $response = $this->response;
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+    }
+
+    public function testCraftAndEnchantAmountUsesCraftedItemsSetCapacityNotNormalInventory(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Destination Test Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $prefix = $this->createItemAffix(['name' => 'Destination Test Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
+
+        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'sword',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+        $response = $this->response;
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+    }
+
+    public function testCraftAndEnchantForExperienceUsesCraftedItemsSetCapacityNotNormalInventory(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 100, 'inventory_max' => 10]);
+        $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
+
+        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+        $response = $this->response;
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+    }
+
+    public function testTrinketryUsesCraftedItemsSetCapacityNotNormalInventory(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'shards' => 100]);
+        $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'trinket']);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
+
+        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+        ]);
+        $response = $this->response;
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+    }
+
+    public function testAlchemyUsesAlchemyBagCapacityNotNormalInventory(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 0, 'gold_dust' => 1000]);
+
+        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'experience'],
+        ]);
+        $response = $this->response;
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ALCHEMY->value)->first());
+    }
+
+    public function testCraftSetIgnoresSelectedSetIdAndBlocksWhenCraftedItemsSetIsFull(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
+        $targetSet = InventorySet::factory()->create(['character_id' => $character->id]);
+
+        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_set',
+                'selected_set_id' => $targetSet->id,
+            ],
+        ]);
+        $response = $this->response;
+
+        $response->assertStatus(422);
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::CRAFT->value)->first());
+        $this->assertSame(0, $targetSet->refresh()->slots()->count());
+    }
+
+    public function testCraftAndEnchantSetBuildNewIgnoresSelectedSetIdAndBlocksWhenCraftedItemsSetIsFull(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
+        $this->createItemAffix(['name' => 'Selected Set Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+        $this->createItemAffix(['name' => 'Selected Set Suffix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
+        $targetSet = InventorySet::factory()->create(['character_id' => $character->id]);
+
+        $previewResponse = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set'],
+        ]);
+        $defaultPrefixId = $previewResponse->json('cost_breakdown.default_prefix_affix_id');
+        $defaultSuffixId = $previewResponse->json('cost_breakdown.default_suffix_affix_id');
+        $keys = collect($previewResponse->json('cost_breakdown.plan_entries'))->pluck('key');
+        $enchantPlan = $keys->mapWithKeys(fn (string $key) => [$key => [
+            'prefix_affix_id' => $defaultPrefixId,
+            'suffix_affix_id' => $defaultSuffixId,
+        ]])->all();
+
+        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'selected_set_id' => $targetSet->id,
+                'enchant_plan' => $enchantPlan,
+            ],
+        ]);
+        $response = $this->response;
+
+        $response->assertStatus(422);
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::CRAFT_AND_ENCHANT->value)->first());
+        $this->assertSame(0, $targetSet->refresh()->slots()->count());
+    }
+
+    public function testGenericInventorySpaceMessageNotShownWhenCraftedItemsSetIsTheBlocker(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
+        $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
+        $craftedItemsSet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'max_slots' => 1,
+        ]);
+        SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
+
+        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+        $response = $this->response;
+
+        $this->assertStringNotContainsString('cannot start without inventory space', $response->json('errors.batch_crafting.0'));
+    }
+
+    public function testCraftForExperienceStartsWithZeroNormalInventorySpaceSinceDestinationIsCraftedItemsSet(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 0, 'gold' => 100]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
+
+        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+        $response = $this->response;
+
+        $response->assertStatus(200);
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->first());
     }
 }

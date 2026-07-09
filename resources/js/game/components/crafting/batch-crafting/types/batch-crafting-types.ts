@@ -56,16 +56,71 @@ export type EnchantmentOption = {
     id: number;
     name: string;
     type: "prefix" | "suffix";
-    cost?: number;
-    int_required?: number;
+    cost: number;
+    description: string;
+    int_required: number;
+    skill_level_required: number;
+    str_mod: number;
+    dex_mod: number;
+    agi_mod: number;
+    chr_mod: number;
+    dur_mod: number;
+    int_mod: number;
+    focus_mod: number;
+    str_reduction: number;
+    dex_reduction: number;
+    dur_reduction: number;
+    int_reduction: number;
+    chr_reduction: number;
+    agi_reduction: number;
+    focus_reduction: number;
+    base_damage_mod: number;
+    base_ac_mod: number;
+    base_healing_mod: number;
+    damage_amount: number;
+    irresistible_damage: boolean;
+    damage_can_stack: boolean;
+    steal_life_amount: number;
+    entranced_chance: number;
+    devouring_light: number;
+    skill_reduction: number;
+    resistance_reduction: number;
+    skill_name: string | null;
+    skill_training_bonus: number;
+    skill_bonus: number;
 };
 
 export type CraftEnchantSetPlanEntry = {
     prefixAffixId: number | null;
     suffixAffixId: number | null;
+    selectedItemId: number | null;
 };
 
 export type CraftEnchantSetPlan = Record<string, CraftEnchantSetPlanEntry>;
+
+export type CraftSetPlanEntry = {
+    selectedItemId: number | null;
+};
+
+export type CraftSetPlan = Record<string, CraftSetPlanEntry>;
+
+export type CraftEnchantSetAvailableItem = {
+    id: number;
+    name: string;
+    cost: number;
+};
+
+export type CraftEnchantSetPlanPreviewEntry = {
+    key: string;
+    target: { type: string; crafting_type: string };
+    selected_item_id: number | null;
+    selected_item_name: string | null;
+    selected_item_cost: number;
+    selected_item_details: any | null;
+    prefix_cost: number;
+    suffix_cost: number;
+    available_items: CraftEnchantSetAvailableItem[];
+};
 
 export type HolyOilItem = {
     id: number;
@@ -94,6 +149,7 @@ export type BatchCraftingItemPreviewSnapshot = {
     is_mythic?: boolean;
     is_cosmic?: boolean;
     holy_stacks_applied?: number;
+    full_item_details?: any | null;
 };
 
 export type AmountPreview = {
@@ -109,6 +165,7 @@ export type AmountPreview = {
     prefix_affix_name: string | null;
     suffix_affix_name: string | null;
     enchant_can_destroy_item: boolean;
+    enchant_has_failure_risk: boolean;
     destination: string;
     destination_current_slots: number;
     destination_max_slots: number;
@@ -166,9 +223,69 @@ export type HolyOilSetPreview = {
     capped: boolean;
 } | null;
 
+export type CostBreakdown = {
+    currency: string;
+    currency_label: string;
+    required_to_start: number;
+    available_currency_amount: number;
+    can_afford_start: boolean;
+    total_cost_known: boolean;
+    total_required: number | null;
+    effective_amount: number | null;
+    destination: string | null;
+    source_hint: string | null;
+    message: string | null;
+    planned_items?: number;
+    configured_items?: number;
+    craft_cost_total?: number;
+    enchant_cost_total?: number;
+    total_required_gold?: number;
+    missing_currency_amount?: number;
+    can_afford_full_plan?: boolean;
+    total_required_gold_dust?: number;
+    total_required_shards?: number;
+    available_gold_dust?: number;
+    available_shards?: number;
+    enchant_has_failure_risk?: boolean;
+    default_prefix_affix_id?: number | null;
+    default_prefix_affix_name?: string | null;
+    default_suffix_affix_id?: number | null;
+    default_suffix_affix_name?: string | null;
+    plan_entries?: CraftEnchantSetPlanPreviewEntry[];
+};
+
+export type BatchCraftingStartBlockerLink = {
+    url: string;
+    label: string;
+};
+
+export type BatchCraftingStartBlocker = {
+    code: string;
+    message: string;
+    blocking: boolean;
+    links?: BatchCraftingStartBlockerLink[];
+    plan_key?: string;
+    affix_id?: number;
+    affix_name?: string;
+    affix_type?: string;
+    int_required?: number;
+    character_int?: number;
+};
+
+export type DestinationCapacity = {
+    destination: "crafted_items_set" | "alchemy_bag";
+    destination_label: string;
+    current: number;
+    max: number;
+    remaining: number;
+} | null;
+
 export type BatchCraftingPreview = {
+    cost_breakdown: CostBreakdown;
     amount_preview: AmountPreview;
     alchemy_amount_preview: AlchemyAmountPreview;
     holy_oil_selected_preview: HolyOilSelectedPreview;
     holy_oil_set_preview: HolyOilSetPreview;
+    destination_capacity: DestinationCapacity;
+    start_blockers: BatchCraftingStartBlocker[];
 };

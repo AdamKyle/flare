@@ -111,6 +111,41 @@ class TrinketCraftingService
     }
 
     /**
+     * Craft a trinket directly for Batch Crafting, with no InventorySlot involved.
+     *
+     * Preserves the same affordability, skill requirement, success/failure roll, and
+     * currency spending rules as craft(), but never picks the item up into inventory.
+     *
+     * @throws Exception
+     */
+    public function craftForBatch(Character $character, Item $item): array
+    {
+        $trinkentrySkill = $this->fetchCharacterSkill($character);
+
+        if (! $this->canAfford($character, $item)) {
+            return ['success' => false, 'item' => null, 'reason' => 'not_enough_currency'];
+        }
+
+        if ($trinkentrySkill->level < $item->skill_level_required) {
+            return ['success' => false, 'item' => null, 'reason' => 'skill_too_low'];
+        }
+
+        if ($trinkentrySkill->level > $item->skill_level_trivial) {
+            $this->updateTrinketCost($character, $item);
+
+            return ['success' => true, 'item' => $item, 'reason' => null];
+        }
+
+        $this->updateTrinketCost($character, $item);
+
+        if (! $this->canCraft($trinkentrySkill)) {
+            return ['success' => false, 'item' => null, 'reason' => 'failed_roll'];
+        }
+
+        return ['success' => true, 'item' => $item, 'reason' => null];
+    }
+
+    /**
      * Fetch the crafting skill for the player.
      */
     protected function fetchCharacterSkill(Character $character): Skill

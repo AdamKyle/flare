@@ -126,6 +126,17 @@ export default class Actions extends React.Component<
             });
         }
 
+        if (
+            prevProps.character.is_batch_crafting_visible !==
+            this.props.character.is_batch_crafting_visible
+        ) {
+            this.setState({
+                batch_crafting_visible:
+                    this.props.character.is_batch_crafting_visible,
+                batch_crafting_hidden: false,
+            });
+        }
+
         if (this.props.action_data === null) {
             return;
         }
@@ -196,7 +207,6 @@ export default class Actions extends React.Component<
         this.setState({
             batch_crafting_visible: true,
             batch_crafting_hidden: false,
-            crafting_type: null,
         });
     };
 
@@ -630,6 +640,7 @@ export default class Actions extends React.Component<
         const celestialFight = this.renderCelestialFight();
         const actionSlot = this.renderActionSlot();
         const automationPanels = [
+            !this.state.show_exploration &&
             this.props.exploration_output?.type === "active" ? (
                 <ExplorationOutputSection
                     key="exploration-output"
@@ -637,14 +648,15 @@ export default class Actions extends React.Component<
                     exploration_output={this.props.exploration_output}
                 />
             ) : null,
-            this.isDelveRunning() ? (
+            !this.state.show_exploration && this.isDelveRunning() ? (
                 <DelveStatusPanel
                     key="delve-status"
                     character_id={this.props.character.id}
                     user_id={this.props.character.user_id}
                 />
             ) : null,
-            this.isBatchCraftingVisible() ? (
+            this.isBatchCraftingVisible() &&
+            this.state.crafting_type !== "batch-crafting" ? (
                 <BatchCraftingStatusPanel
                     key="batch-crafting-status"
                     character_id={this.props.character.id}
@@ -653,7 +665,7 @@ export default class Actions extends React.Component<
             ) : null,
         ].filter(Boolean);
         const automationPanel =
-            !this.state.show_exploration && automationPanels.length > 0 ? (
+            automationPanels.length > 0 ? (
                 <div className="grid gap-4">{automationPanels}</div>
             ) : null;
         let fightContent = null;

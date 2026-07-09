@@ -49,29 +49,32 @@ class GemWorldImageGeneratorTest extends TestCase
     {
         $parentMap = $this->createGameMap(['name' => 'Surface']);
 
-        ini_set('memory_limit', '128M');
+        $safeLowerMemoryLimit = ((int) ceil(memory_get_usage(true) / 1024 / 1024) + 64) . 'M';
+        ini_set('memory_limit', $safeLowerMemoryLimit);
 
         $this->app->make(GemWorldImageGenerator::class)->generate($parentMap, 'Test World');
 
         $this->assertSame('3G', ini_get('memory_limit'));
     }
 
-    public function testGeneratorDoesNotLowerMemoryBackTo128M(): void
+    public function testGeneratorDoesNotLowerMemoryBackToThePreviousLowerLimit(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Surface']);
 
-        ini_set('memory_limit', '128M');
+        $safeLowerMemoryLimit = ((int) ceil(memory_get_usage(true) / 1024 / 1024) + 64) . 'M';
+        ini_set('memory_limit', $safeLowerMemoryLimit);
 
         $this->app->make(GemWorldImageGenerator::class)->generate($parentMap, 'Test World');
 
-        $this->assertNotSame('128M', ini_get('memory_limit'));
+        $this->assertNotSame($safeLowerMemoryLimit, ini_get('memory_limit'));
     }
 
     public function testShadowPlaneGenerationDoesNotFailAtMemoryRestoreStep(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Shadow Plane']);
 
-        ini_set('memory_limit', '128M');
+        $safeLowerMemoryLimit = ((int) ceil(memory_get_usage(true) / 1024 / 1024) + 64) . 'M';
+        ini_set('memory_limit', $safeLowerMemoryLimit);
 
         $path = $this->app->make(GemWorldImageGenerator::class)->generate($parentMap, 'Shadow Plane World');
 

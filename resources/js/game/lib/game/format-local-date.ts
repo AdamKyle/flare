@@ -11,7 +11,7 @@ export function formatLocalDateTime(value: unknown): string {
         return "—";
     }
 
-    return date.toFormat("yyyy-MM-dd H:mm");
+    return date.toFormat("LLL d, yyyy h:mm a");
 }
 
 export function isIsoDateString(value: unknown): boolean {

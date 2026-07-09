@@ -551,11 +551,7 @@ export default class Game extends React.Component<GameProps, GameState> {
                     icon_key={"has_logs"}
                 >
                     <TabPanel key={"game"}>
-                        <Suspense
-                            fallback={
-                                <ManualProgressBar label="Loading game sections..." />
-                            }
-                        >
+                        <Suspense fallback={null}>
                             <div
                                 className={clsx(
                                     "grid grid-cols-1 lg:grid-cols-3 gap-4",
@@ -862,6 +858,14 @@ export default class Game extends React.Component<GameProps, GameState> {
                                                 batch_crafting_time_out={
                                                     this.state.character
                                                         .batch_crafting_time_out
+                                                }
+                                                batch_crafting_experience_mode={
+                                                    this.state.character
+                                                        .is_batch_crafting_experience_mode
+                                                }
+                                                batch_crafting_retry_mode={
+                                                    this.state.character
+                                                        .is_batch_crafting_retry_mode
                                                 }
                                             />
                                         </MapTabs>

@@ -25,8 +25,8 @@ export default class ItemTable extends React.Component<ItemTableProps, any> {
         this.state = {
             items: [],
             dark_tables: false,
-            filter_type: undefined,
-            search_term: "",
+            filter_type: props.initial_filter ?? undefined,
+            search_term: props.initial_search_text ?? "",
         };
 
         this.typingTimeOut = null;

@@ -198,6 +198,61 @@ class CraftingService
     }
 
     /**
+     * Craft an item directly for Batch Crafting, with no InventorySlot involved.
+     *
+     * Uses the same skill requirement, gold affordability, and success/failure roll
+     * rules as craft(), charging gold and assigning crafting XP exactly like craft()
+     * does on a successful roll. Never picks up the item into inventory.
+     *
+     * @throws Exception
+     */
+    public function craftForBatch(Character $character, Item $item, string $craftingType): array
+    {
+        $skill = $this->fetchCraftingSkill($character, $craftingType);
+
+        $cost = $this->getItemCost($character, $item);
+
+        if ($cost > $character->gold) {
+            return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold'];
+        }
+
+        return $this->attemptToCraftItemForBatch($character, $skill, $item);
+    }
+
+    /**
+     * Attempt to craft an item for Batch Crafting without picking it up into inventory.
+     *
+     * @throws Exception
+     */
+    private function attemptToCraftItemForBatch(Character $character, Skill $skill, Item $item): array
+    {
+        if ($skill->level < $item->skill_level_required) {
+            return ['success' => false, 'item' => null, 'reason' => 'skill_too_low'];
+        }
+
+        if ($skill->level > $item->skill_level_trivial) {
+            $this->updateCharacterGold($character, $item);
+
+            return ['success' => true, 'item' => $item, 'reason' => null];
+        }
+
+        $characterRoll = $this->skillCheckService->characterRoll($skill);
+        $dcCheck = $this->skillCheckService->getDCCheck($skill, 0);
+
+        if ($dcCheck < $characterRoll) {
+            $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+            $this->updateCharacterGold($character, $item);
+
+            return ['success' => true, 'item' => $item, 'reason' => null];
+        }
+
+        $this->updateCharacterGold($character, $item);
+
+        return ['success' => false, 'item' => null, 'reason' => 'failed_roll'];
+    }
+
+    /**
      * Get crafting skill for automation.
      *
      * @param Character $character

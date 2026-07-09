@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\SetSlot;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -64,6 +66,45 @@ class CharacterInventoryControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertGreaterThan(0, $jsonData['equipped'][0]['healing']);
+    }
+
+    public function testGetCharacterInventoryApiRequestReturnsExpectedShapeWithFullCraftedItemsSet()
+    {
+        $item = $this->createItem();
+
+        $character = $this->character->getCharacter();
+
+        $inventorySet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => 1,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+        ]);
+
+        SetSlot::factory()->create([
+            'inventory_set_id' => $inventorySet->id,
+            'item_id' => $item->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertIsArray($jsonData['inventory']);
+        $this->assertIsArray($jsonData['usable_items']);
+        $this->assertIsArray($jsonData['usable_sets']);
+        $this->assertIsArray($jsonData['savable_sets']);
+        $this->assertIsArray($jsonData['equipped']);
+        $this->assertIsArray($jsonData['quest_items']);
+        $this->assertIsArray($jsonData['sets']);
+        $this->assertTrue($jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['is_batch_crafting_set']);
+        $this->assertEquals(1, $jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['current_slots']);
+        $this->assertEquals(0, $jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['remaining_slots']);
+        $this->assertEquals(1, $jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['max_slots']);
     }
 
     public function testFailToGetApiItemDetails()

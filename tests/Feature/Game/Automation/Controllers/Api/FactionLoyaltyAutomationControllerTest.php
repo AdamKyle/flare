@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\Automation\Controllers\Api;
 
 use Tests\Traits\CreateGameMap;
 
+use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateFactionLoyaltyAutomation;
 
 use App\Flare\Models\Character;
@@ -24,7 +25,7 @@ use Tests\TestCase;
 
 class FactionLoyaltyAutomationControllerTest extends TestCase
 {
-    use CreateFactionLoyaltyAutomation, CreateGameMap, RefreshDatabase;
+    use CreateBatchCrafting, CreateFactionLoyaltyAutomation, CreateGameMap, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -189,6 +190,29 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         $this->assertEquals(422, $response->getStatusCode());
         $this->assertEquals('You are currently doing Delve. This action cannot be completed right now. Please cancel Delve first.', $jsonData['message']);
+        $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
+    }
+
+    public function testBeginReturns422WhenBatchCraftingIsRunning(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty-automation/' . $this->character->id . '/start', [
+                '_token' => csrf_token(),
+                'attack_type' => AttackTypeValue::ATTACK,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You cannot do that while Batch Crafting is running. Cancel it first.', $jsonData['message']);
         $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
     }
 

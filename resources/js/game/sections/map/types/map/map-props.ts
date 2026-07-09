@@ -47,4 +47,6 @@ export default interface MapProps {
     can_move: boolean;
 
     batch_crafting_time_out?: number;
+
+    batch_crafting_experience_mode?: boolean;
 }

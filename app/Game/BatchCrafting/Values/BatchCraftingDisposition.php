@@ -37,6 +37,10 @@ enum BatchCraftingDisposition: string
             return $type === BatchCraftingType::CRAFT_AND_ENCHANT;
         }
 
+        if ($this === self::KEEP_HIGHEST && $type === BatchCraftingType::CRAFT_AND_ENCHANT) {
+            return false;
+        }
+
         if ($type === BatchCraftingType::HOLY_OILS) {
             return $this === self::KEEP;
         }

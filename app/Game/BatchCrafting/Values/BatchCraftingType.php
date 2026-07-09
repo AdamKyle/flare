@@ -47,4 +47,14 @@ enum BatchCraftingType: string
     {
         return ! $this->usesPendingCountdown($progress);
     }
+
+    public function isExperienceMode(array $progress): bool
+    {
+        return match ($this) {
+            self::CRAFT, self::CRAFT_AND_ENCHANT => ($progress['craft_mode'] ?? 'experience') === 'experience',
+            self::ALCHEMY => ($progress['alchemy_mode'] ?? 'experience') === 'experience',
+            self::TRINKETRY => true,
+            self::ENCHANT, self::HOLY_OILS => false,
+        };
+    }
 }

@@ -189,6 +189,17 @@ export default class SmallerActions extends React.Component<
             });
         }
 
+        if (
+            prevProps.character.is_batch_crafting_visible !==
+            this.props.character.is_batch_crafting_visible
+        ) {
+            this.setState({
+                batch_crafting_visible:
+                    this.props.character.is_batch_crafting_visible,
+                batch_crafting_hidden: false,
+            });
+        }
+
         if (this.props.action_data === null) {
             return;
         }
@@ -225,7 +236,6 @@ export default class SmallerActions extends React.Component<
         this.setState({
             batch_crafting_visible: true,
             batch_crafting_hidden: false,
-            selected_action: null,
         });
     };
 
@@ -578,11 +588,8 @@ export default class SmallerActions extends React.Component<
     }
 
     renderAutomationPanels() {
-        if (this.state.selected_action === "explore") {
-            return null;
-        }
-
         const panels = [
+            this.state.selected_action !== "explore" &&
             this.props.exploration_output?.type === "active" ? (
                 <ExplorationOutputSection
                     key="exploration-output"
@@ -590,6 +597,7 @@ export default class SmallerActions extends React.Component<
                     exploration_output={this.props.exploration_output}
                 />
             ) : null,
+            this.state.selected_action !== "explore" &&
             this.isDelveRunning() ? (
                 <div className="mt-3" key="delve-status">
                     <DelveStatusPanel
@@ -686,6 +694,10 @@ export default class SmallerActions extends React.Component<
                                 }
                                 batch_crafting_time_out={
                                     this.state.batch_crafting_time_out
+                                }
+                                batch_crafting_experience_mode={
+                                    this.props.character
+                                        .is_batch_crafting_experience_mode
                                 }
                             />
                         </div>

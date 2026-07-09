@@ -15,6 +15,8 @@ import ItemSkillManagement from "./item-skill-management/item-skill-management";
 import ItemSkill from "./item-skill-management/types/deffinitions/item-skill";
 import ItemSkillProgression from "./item-skill-management/types/deffinitions/item-skill-progression";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
+import DangerAlert from "../../../components/ui/alerts/simple-alerts/danger-alert";
+import Inventory from "../../../lib/game/character-sheet/types/inventory/inventory";
 
 export default class CharacterInventoryTabs extends React.Component<
     CharacterInventoryTabsProps,
@@ -51,6 +53,7 @@ export default class CharacterInventoryTabs extends React.Component<
             dark_tables: false,
             loading: true,
             inventory: null,
+            inventory_error: null,
             disable_tabs: false,
             item_skill_data: null,
         };
@@ -70,9 +73,21 @@ export default class CharacterInventoryTabs extends React.Component<
                 .doAjaxCall(
                     "get",
                     (result: AxiosResponse) => {
+                        if (!this.isPlainObject(result.data)) {
+                            this.setState({
+                                loading: false,
+                                inventory: null,
+                                inventory_error:
+                                    "Inventory could not be loaded. Please refresh and try again.",
+                            });
+
+                            return;
+                        }
+
                         this.setState({
                             loading: false,
-                            inventory: result.data,
+                            inventory: this.normalizeInventory(result.data),
+                            inventory_error: null,
                         });
                     },
                     (error: AxiosError) => {
@@ -94,7 +109,7 @@ export default class CharacterInventoryTabs extends React.Component<
 
                     this.setState(
                         {
-                            inventory: inventoryState,
+                            inventory: this.normalizeInventory(inventoryState),
                         },
                         () => {
                             this.updateItemSkillData();
@@ -102,6 +117,43 @@ export default class CharacterInventoryTabs extends React.Component<
                     );
                 }
             },
+        );
+    }
+
+    // Fills in safe defaults for any missing/malformed keys so callers never receive undefined arrays.
+    private normalizeInventory(data: unknown): Inventory {
+        const source: any = this.isPlainObject(data) ? data : {};
+
+        return {
+            inventory: Array.isArray(source.inventory) ? source.inventory : [],
+            usable_items: Array.isArray(source.usable_items)
+                ? source.usable_items
+                : [],
+            usable_sets: Array.isArray(source.usable_sets)
+                ? source.usable_sets
+                : [],
+            savable_sets: Array.isArray(source.savable_sets)
+                ? source.savable_sets
+                : [],
+            equipped: Array.isArray(source.equipped) ? source.equipped : [],
+            quest_items: Array.isArray(source.quest_items)
+                ? source.quest_items
+                : [],
+            sets: this.isPlainObject(source.sets) ? source.sets : {},
+            set_is_equipped:
+                typeof source.set_is_equipped === "boolean"
+                    ? source.set_is_equipped
+                    : false,
+            set_name_equipped:
+                typeof source.set_name_equipped === "string"
+                    ? source.set_name_equipped
+                    : "",
+        };
+    }
+
+    private isPlainObject(value: unknown): boolean {
+        return (
+            typeof value === "object" && value !== null && !Array.isArray(value)
         );
     }
 
@@ -115,7 +167,7 @@ export default class CharacterInventoryTabs extends React.Component<
         }
 
         this.setState({
-            inventory: stateInventory,
+            inventory: this.normalizeInventory(stateInventory),
         });
     }
 
@@ -177,6 +229,16 @@ export default class CharacterInventoryTabs extends React.Component<
     }
 
     render() {
+        if (this.state.inventory_error !== null) {
+            return (
+                <div className="my-4">
+                    <DangerAlert additional_css={"mb-4"}>
+                        {this.state.inventory_error}
+                    </DangerAlert>
+                </div>
+            );
+        }
+
         if (this.state.loading || this.state.inventory === null) {
             return (
                 <div className="my-4">

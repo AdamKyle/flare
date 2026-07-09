@@ -7,7 +7,26 @@ import DelveQuestItemModal from "./delve-quest-item-modal";
 import LoadingProgressBar from "../../../components/ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../../components/ui/buttons/danger-button";
 import { updateTimers } from "../../../lib/ajax/update-timers";
-import AutomationPanelShell from "./automation-panel-shell";
+import AutomationPanelShell, {
+    AutomationPanelTone,
+} from "./automation-panel-shell";
+
+const CLEAN_COMPLETION_REASONS = new Set([
+    "timeout",
+    "natural_end",
+    "player_stopped",
+    "completed",
+]);
+
+function toneForDelveReason(
+    reason: string | null | undefined,
+): AutomationPanelTone {
+    if (!reason) {
+        return "success";
+    }
+
+    return CLEAN_COMPLETION_REASONS.has(reason) ? "success" : "warning";
+}
 
 type QuestItem = {
     id: number;
@@ -251,6 +270,9 @@ export default function DelveStatusPanel({
         : status.completed
           ? "completed"
           : "running";
+    const tone: AutomationPanelTone = status.completed
+        ? toneForDelveReason(status.reason ?? "completed")
+        : "neutral";
 
     return (
         <>
@@ -258,6 +280,7 @@ export default function DelveStatusPanel({
                 title={title}
                 timerText={formatDuration(elapsed)}
                 statusText={reason}
+                tone={tone}
             >
                 {status.completed ? (
                     <div className="mb-4">

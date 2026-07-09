@@ -870,4 +870,29 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
     }
+
+    public function testCompletedBatchCraftingDoesNotBlockStartFactionLoyalty(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'completed_at' => now(),
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
+    }
+
+    public function testDismissedBatchCraftingDoesNotBlockStartFactionLoyalty(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
+    }
 }

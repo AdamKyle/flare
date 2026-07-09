@@ -160,12 +160,16 @@ class AutomationRestrictionService
 
     private function activeBatchCrafting(Character $character): ?BatchCrafting
     {
-        return BatchCrafting::where('character_id', $character->id)
+        $activeId = BatchCrafting::where('character_id', $character->id)
             ->whereNull('completed_at')
             ->whereNull('cancelled_at')
-            ->orderByDesc('started_at')
-            ->orderByDesc('id')
-            ->first();
+            ->max('id');
+
+        if (is_null($activeId)) {
+            return null;
+        }
+
+        return BatchCrafting::find($activeId);
     }
 
     private function batchCraftingBlocksAction(string $action): bool

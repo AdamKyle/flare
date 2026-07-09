@@ -11,6 +11,7 @@ use App\Flare\Models\Item;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ClassAttackValue;
 use App\Flare\Values\ItemEffectsValue;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
@@ -101,8 +102,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
-            'is_batch_crafting_visible' => ! is_null($this->visibleBatchCrafting($character)),
+            'is_batch_crafting_visible' => $this->visibleBatchCrafting($character),
             'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
+            'is_batch_crafting_experience_mode' => $this->isBatchCraftingExperienceMode($activeBatchCrafting),
+            'is_batch_crafting_retry_mode' => $this->isBatchCraftingRetryMode($activeBatchCrafting),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
@@ -230,27 +233,62 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return max(0, now()->diffInSeconds($pendingUntil, false));
     }
 
-    private function activeBatchCrafting(Character $character): ?BatchCrafting
+    private function isBatchCraftingExperienceMode(?BatchCrafting $batchCrafting): bool
     {
-        return BatchCrafting::where('character_id', $character->id)
-            ->whereNull('completed_at')
-            ->whereNull('cancelled_at')
-            ->orderByDesc('started_at')
-            ->orderByDesc('id')
-            ->first();
+        if (is_null($batchCrafting)) {
+            return false;
+        }
+
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+
+        return $type->isExperienceMode($batchCrafting->progress ?? []);
     }
 
-    private function visibleBatchCrafting(Character $character): ?BatchCrafting
+    private function isBatchCraftingRetryMode(?BatchCrafting $batchCrafting): bool
     {
+        if (is_null($batchCrafting)) {
+            return false;
+        }
+
+        $progress = $batchCrafting->progress ?? [];
+        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? BatchCraftingService::RECURRING_DELAY_SECONDS);
+
+        return $tickDelay < BatchCraftingService::RECURRING_DELAY_SECONDS;
+    }
+
+    private function activeBatchCrafting(Character $character): ?BatchCrafting
+    {
+        $activeId = BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->max('id');
+
+        if (is_null($activeId)) {
+            return null;
+        }
+
+        return BatchCrafting::select(['id', 'character_id', 'batch_type', 'progress', 'started_at', 'ends_at'])
+            ->find($activeId);
+    }
+
+    private function visibleBatchCrafting(Character $character): bool
+    {
+        $hasActiveBatchCrafting = BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->exists();
+
+        if ($hasActiveBatchCrafting) {
+            return true;
+        }
+
         return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('panel_dismissed_at')
             ->where(function ($query) {
-                $query->whereNull('completed_at')
-                    ->whereNull('cancelled_at')
-                    ->orWhereNull('panel_dismissed_at');
+                $query->whereNotNull('completed_at')
+                    ->orWhereNotNull('cancelled_at');
             })
-            ->orderByDesc('started_at')
-            ->orderByDesc('id')
-            ->first();
+            ->exists();
     }
 
     private function canSetPactOptionsForDelve(Character $character): bool

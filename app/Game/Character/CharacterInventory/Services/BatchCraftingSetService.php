@@ -4,8 +4,7 @@ namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\SetSlot;
+use App\Flare\Models\Item;
 
 class BatchCraftingSetService
 {
@@ -32,12 +31,14 @@ class BatchCraftingSetService
         return $this->remainingSlots($character) >= $amount;
     }
 
-    public function moveInventorySlotIntoBatchCraftingSet(Character $character, InventorySlot $slot): array
+    /**
+     * Create a Batch Crafting output item directly as a SetSlot in the Crafted Items Set.
+     *
+     * Never requires or creates an InventorySlot, and never inspects normal inventory
+     * capacity. Checks only the Crafted Items Set's own remaining capacity.
+     */
+    public function createItemInBatchCraftingSet(Character $character, Item $item, ?string $position = null): array
     {
-        if ($slot->inventory?->character_id !== $character->id) {
-            return ['success' => false, 'reason' => 'not_owned', 'set_slot' => null];
-        }
-
         $set = $this->getOrCreateForCharacter($character);
 
         if (! $this->canAccept($character, 1)) {
@@ -46,10 +47,9 @@ class BatchCraftingSetService
 
         $setSlot = $set->slots()->create([
             'inventory_set_id' => $set->id,
-            'item_id' => $slot->item_id,
+            'item_id' => $item->id,
+            'position' => $position,
         ]);
-
-        $slot->delete();
 
         return ['success' => true, 'reason' => null, 'set_slot' => $setSlot];
     }

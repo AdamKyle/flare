@@ -456,6 +456,9 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         batch_crafting_time_out={
                             this.props.batch_crafting_time_out ?? 0
                         }
+                        batch_crafting_experience_mode={
+                            this.props.batch_crafting_experience_mode ?? false
+                        }
                     />
                 </div>
             </Fragment>

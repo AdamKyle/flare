@@ -65,12 +65,22 @@ class BatchCraftingLogger
         ]));
     }
 
-    public function exceptionCaught(BatchCrafting $batchCrafting, Throwable $throwable): void
+    public function exceptionCaught(BatchCrafting $batchCrafting, Throwable $throwable, array $extraContext = []): void
     {
-        $this->error('Batch crafting exception caught.', $this->context($batchCrafting, [
+        $this->error('Batch crafting exception caught.', $this->context($batchCrafting, array_merge([
             'status' => 'failed',
             'exception_class' => get_class($throwable),
             'exception_message' => $throwable->getMessage(),
+            'stack_trace' => $throwable->getTraceAsString(),
+        ], $extraContext)));
+    }
+
+    public function eventGoalCycled(BatchCrafting $batchCrafting, ?int $previousGoalId, int $newGoalId): void
+    {
+        $this->info('Batch crafting event goal cycled.', $this->context($batchCrafting, [
+            'status' => 'event_goal_cycled',
+            'previous_event_goal_id' => $previousGoalId,
+            'new_event_goal_id' => $newGoalId,
         ]));
     }
 

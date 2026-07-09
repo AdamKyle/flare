@@ -60,9 +60,18 @@ class EnchantItemService
 
             if ($this->item->appliedHolyStacks->isEmpty() && $this->item->sockets->isEmpty()) {
                 if ($this->getCountOfMatchingItems() > 1) {
+                    $temporaryClone = $this->item;
+                    $matchingItemId = $this->findMatchingItemId($temporaryClone);
+
                     $slot->update([
-                        'item_id' => $this->findMatchingItemId(),
+                        'item_id' => $matchingItemId,
                     ]);
+
+                    $slot = $slot->refresh();
+
+                    $this->deleteOrphanedClone($temporaryClone, $matchingItemId);
+
+                    $this->item = null;
                 } else {
                     $slot->update([
                         'item_id' => $this->item->id,
@@ -88,15 +97,22 @@ class EnchantItemService
 
     /**
      * Delete the slot.
+     *
+     * Never deletes the item if it is still referenced by another
+     * inventory slot, set slot, market listing, or market history entry.
      */
     public function deleteSlot(InventorySlot $slot): void
     {
         $slot->delete();
 
         if (! is_null($this->item)) {
-            $this->item->delete();
+            $item = $this->item;
 
             $this->item = null;
+
+            if ($this->itemHasNoRemainingReferences($item)) {
+                $item->delete();
+            }
         }
     }
 
@@ -109,11 +125,61 @@ class EnchantItemService
     }
 
     /**
+     * Finalize the pending clone for a direct item write (no slot involved).
+     *
+     * Mirrors the dedupe branch of updateSlot(): if an existing item already matches
+     * the clone's name/prefix/suffix, the clone is discarded and the existing item's
+     * id is returned instead so batch crafting doesn't proliferate near-duplicate rows.
+     */
+    public function finalizeBatchItem(): ?Item
+    {
+        if (is_null($this->item)) {
+            return null;
+        }
+
+        if ($this->item->appliedHolyStacks->isEmpty() && $this->item->sockets->isEmpty() && $this->getCountOfMatchingItems() > 1) {
+            $temporaryClone = $this->item;
+            $matchingItemId = $this->findMatchingItemId($temporaryClone);
+            $finalItem = Item::find($matchingItemId);
+
+            $this->deleteOrphanedClone($temporaryClone, $matchingItemId);
+
+            $this->item = null;
+
+            return $finalItem;
+        }
+
+        $finalItem = $this->item;
+        $this->item = null;
+
+        return $finalItem;
+    }
+
+    /**
+     * Discard a pending clone that will never be referenced, for example when a
+     * direct item enchant attempt fails before anything points at the clone.
+     */
+    public function discardPendingItem(): void
+    {
+        if (is_null($this->item)) {
+            return;
+        }
+
+        $item = $this->item;
+
+        $this->item = null;
+
+        if ($this->itemHasNoRemainingReferences($item)) {
+            $item->delete();
+        }
+    }
+
+    /**
      * Enchant the item.
      *
      * @return void
      */
-    protected function enchantItem(Item $item, ItemAffix $affix)
+    private function enchantItem(Item $item, ItemAffix $affix)
     {
         if (! is_null($this->item)) {
             $this->cloneItem($this->item, $affix);
@@ -124,7 +190,7 @@ class EnchantItemService
         $this->cloneItem($item, $affix);
     }
 
-    protected function cloneItem(Item $item, ItemAffix $affix)
+    private function cloneItem(Item $item, ItemAffix $affix)
     {
         $clonedItem = DuplicateItemHandler::duplicateItem($item);
 
@@ -168,7 +234,7 @@ class EnchantItemService
     /**
      * Count the matching items.
      */
-    protected function getCountOfMatchingItems(): int
+    private function getCountOfMatchingItems(): int
     {
         return Item::where('name', $this->item->name)
             ->where('item_prefix_id', $this->item->item_prefix_id)
@@ -179,21 +245,50 @@ class EnchantItemService
     }
 
     /**
-     * Fetch matching item id.
+     * Fetch the id of an existing item matching the temporary clone.
+     *
+     * Does not delete the temporary clone. The slot must be switched to the
+     * returned id first; the caller deletes the clone afterwards if it is safe to do so.
      */
-    protected function findMatchingItemId(): int
+    private function findMatchingItemId(Item $temporaryClone): int
     {
-        $item = $this->item;
-
-        $this->item->delete();
-        $this->item = null;
-
-        return Item::where('name', $item->name)
-            ->where('item_prefix_id', $item->item_prefix_id)
-            ->where('item_suffix_id', $item->item_suffix_id)
+        $matchingItem = Item::where('name', $temporaryClone->name)
+            ->where('item_prefix_id', $temporaryClone->item_prefix_id)
+            ->where('item_suffix_id', $temporaryClone->item_suffix_id)
+            ->where('id', '!=', $temporaryClone->id)
             ->whereDoesntHave('appliedHolyStacks')
             ->whereDoesntHave('sockets')
-            ->first()
-            ->id;
+            ->first();
+
+        return is_null($matchingItem) ? $temporaryClone->id : $matchingItem->id;
+    }
+
+    /**
+     * Delete the temporary clone once the slot has moved off of it, but only
+     * when nothing else references it.
+     */
+    private function deleteOrphanedClone(Item $temporaryClone, int $matchingItemId): void
+    {
+        if ($temporaryClone->id === $matchingItemId) {
+            return;
+        }
+
+        $temporaryClone = $temporaryClone->fresh();
+
+        if (! is_null($temporaryClone) && $this->itemHasNoRemainingReferences($temporaryClone)) {
+            $temporaryClone->delete();
+        }
+    }
+
+    /**
+     * Whether the item is safe to delete: not referenced by any inventory
+     * slot, set slot, market listing, or market history entry.
+     */
+    private function itemHasNoRemainingReferences(Item $item): bool
+    {
+        return $item->inventorySlots()->doesntExist()
+            && $item->inventorySetSlots()->doesntExist()
+            && $item->marketListings()->doesntExist()
+            && $item->marketHistory()->doesntExist();
     }
 }

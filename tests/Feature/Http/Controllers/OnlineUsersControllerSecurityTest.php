@@ -11,7 +11,7 @@ class OnlineUsersControllerSecurityTest extends TestCase
 {
     use CreateUserLoginDuration, RefreshDatabase;
 
-    public function testPublicCharactersOnlinePayloadExcludesActivityDetails(): void
+    public function testPublicCharactersOnlinePayloadExcludesAccountDetailsButIncludesActivityDetails(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $this->createUserLoginDuration([
@@ -29,10 +29,10 @@ class OnlineUsersControllerSecurityTest extends TestCase
             'level' => $character->level,
             'map' => 'Surface',
         ]);
-        $response->assertJsonMissingPath('characters_online.0.duration');
-        $response->assertJsonMissingPath('characters_online.0.currently_exploring');
-        $response->assertJsonMissingPath('characters_online.0.last_activity');
-        $response->assertJsonMissingPath('characters_online.0.last_heart_beat');
+        $response->assertJsonPath('characters_online.0.duration', fn ($duration) => is_int($duration));
+        $response->assertJsonPath('characters_online.0.currently_exploring', fn ($currentlyExploring) => is_bool($currentlyExploring));
+        $response->assertJsonPath('characters_online.0.last_activity', fn ($lastActivity) => is_string($lastActivity));
+        $response->assertJsonPath('characters_online.0.last_heart_beat', fn ($lastHeartBeat) => is_string($lastHeartBeat));
         $response->assertJsonMissingPath('characters_online.0.user_id');
         $response->assertJsonMissingPath('characters_online.0.email');
         $response->assertJsonMissing(['user_id' => $character->user_id]);

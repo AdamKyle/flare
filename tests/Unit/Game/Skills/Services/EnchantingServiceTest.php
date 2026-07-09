@@ -610,4 +610,77 @@ class EnchantingServiceTest extends TestCase
 
         $this->assertEquals($foundSlot->id, $slot->id);
     }
+
+    public function testEnchantItemForBatchValidatesAllAffixesBeforeChargingGold(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$this->prefix->id, 999999], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('invalid_affix', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
+
+    public function testEnchantItemForBatchDoesNotChargeGoldWhenAffixValidationFails(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+        $wrongTypeAffix = $this->createItemAffix([
+            'type' => 'invalid',
+            'int_required' => 1,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 2,
+            'cost' => 1000,
+        ]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$wrongTypeAffix->id], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('invalid_affix_type', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
+
+    public function testEnchantItemForBatchRejectsAffixAboveCharacterInt(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000, 'int' => 1]);
+        $affix = $this->createItemAffix([
+            'type' => 'prefix',
+            'int_required' => 10000,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 2,
+            'cost' => 1000,
+        ]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$affix->id], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('int_too_low', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
+
+    public function testEnchantItemForBatchRejectsAffixAboveEnchantingSkill(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+        $affix = $this->createItemAffix([
+            'type' => 'prefix',
+            'int_required' => 1,
+            'skill_level_required' => 10000,
+            'skill_level_trivial' => 10001,
+            'cost' => 1000,
+        ]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$affix->id], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('skill_too_low', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
 }

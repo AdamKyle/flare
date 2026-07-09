@@ -81,63 +81,32 @@ class BatchCraftingSetServiceTest extends TestCase
         $this->assertFalse($this->batchCraftingSetService->canAccept($character, 1));
     }
 
-    public function testMoveInventorySlotReturnsSuccessTrueOnSuccess(): void
+    public function testCreateItemInBatchCraftingSetReturnsSuccessTrueOnSuccess(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->inventoryManagement()
-            ->giveItem($this->createItem())
-            ->getCharacterFactory()
-            ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $item = $this->createItem();
 
-        $slot = $character->inventory->slots->first();
-        $result = $this->batchCraftingSetService->moveInventorySlotIntoBatchCraftingSet($character, $slot);
+        $result = $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $item);
 
         $this->assertTrue($result['success']);
         $this->assertNull($result['reason']);
         $this->assertNotNull($result['set_slot']);
+        $this->assertSame($item->id, $result['set_slot']->item_id);
     }
 
-    public function testMoveInventorySlotDeletesInventorySlotOnSuccess(): void
+    public function testCreateItemInBatchCraftingSetNeverCreatesAnInventorySlot(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->inventoryManagement()
-            ->giveItem($this->createItem())
-            ->getCharacterFactory()
-            ->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $item = $this->createItem();
 
-        $slot = $character->inventory->slots->first();
-        $slotId = $slot->id;
-        $this->batchCraftingSetService->moveInventorySlotIntoBatchCraftingSet($character, $slot);
+        $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $item);
 
-        $this->assertNull($character->refresh()->inventory->slots()->find($slotId));
+        $this->assertSame(0, $character->inventory->slots()->count());
     }
 
-    public function testMoveInventorySlotReturnsNotOwnedWhenSlotBelongsToOtherCharacter(): void
+    public function testCreateItemInBatchCraftingSetReturnsSetFullWhenNoRemainingSlots(): void
     {
-        $ownerCharacter = (new CharacterFactory)->createBaseCharacter()
-            ->inventoryManagement()
-            ->giveItem($this->createItem())
-            ->getCharacterFactory()
-            ->getCharacter();
-
-        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $slot = $ownerCharacter->inventory->slots->first();
-
-        $result = $this->batchCraftingSetService->moveInventorySlotIntoBatchCraftingSet($otherCharacter, $slot);
-
-        $this->assertFalse($result['success']);
-        $this->assertSame('not_owned', $result['reason']);
-        $this->assertNull($result['set_slot']);
-    }
-
-    public function testMoveInventorySlotReturnsSetFullWhenNoRemainingSlots(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()
-            ->inventoryManagement()
-            ->giveItem($this->createItem())
-            ->getCharacterFactory()
-            ->getCharacter();
-
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $filler = $this->createItem();
 
@@ -145,8 +114,7 @@ class BatchCraftingSetServiceTest extends TestCase
             $set->slots()->create(['inventory_set_id' => $set->id, 'item_id' => $filler->id]);
         }
 
-        $slot = $character->inventory->slots->first();
-        $result = $this->batchCraftingSetService->moveInventorySlotIntoBatchCraftingSet($character, $slot);
+        $result = $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $this->createItem());
 
         $this->assertFalse($result['success']);
         $this->assertSame('set_full', $result['reason']);

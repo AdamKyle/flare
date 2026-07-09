@@ -11,6 +11,7 @@ use App\Flare\Values\MapNameValue;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -297,5 +298,143 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
 
         $this->assertEquals(28800, $data['batch_crafting_time_out']);
+    }
+
+    public function testActiveBatchCraftingLookupExcludesCancelledBatches(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'cancelled_at' => now(),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['is_batch_crafting_running']);
+    }
+
+    public function testActiveBatchCraftingLookupExcludesCompletedBatches(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'completed_at' => now(),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['is_batch_crafting_running']);
+    }
+
+    public function testActiveBatchCraftingLookupReturnsNewestBatchWithoutStartedAtSort(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'started_at' => now(),
+            'completed_at' => now(),
+            'progress' => ['tick_delay_seconds' => 60, 'holy_oil_mode' => 'selected'],
+        ]);
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'ends_at' => now()->addHours(8),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertTrue($data['is_batch_crafting_running']);
+        $this->assertEquals(28800, $data['batch_crafting_time_out']);
+    }
+
+    public function testActiveBatchCraftingTransformerQueryNeverCombinesBroadOrWithOrderBy(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'ends_at' => now()->addHours(8),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+        $unsafeBatchCraftingQueries = [];
+
+        DB::listen(function ($query) use (&$unsafeBatchCraftingQueries): void {
+            $sql = strtolower($query->sql);
+
+            if (
+                str_starts_with($sql, 'select') &&
+                str_contains($sql, 'batch_craftings') &&
+                str_contains($sql, 'panel_dismissed_at') &&
+                str_contains($sql, ' or ') &&
+                str_contains($sql, 'order by')
+            ) {
+                $unsafeBatchCraftingQueries[] = $sql;
+            }
+        });
+
+        resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertEmpty($unsafeBatchCraftingQueries);
+    }
+
+    public function testVisibleBatchCraftingIsTrueForActiveBatch(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'ends_at' => now()->addHours(8),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertTrue($data['is_batch_crafting_visible']);
+    }
+
+    public function testVisibleBatchCraftingIsTrueWhenNotYetDismissed(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertTrue($data['is_batch_crafting_visible']);
+    }
+
+    public function testVisibleBatchCraftingIsFalseWhenCompletedAndDismissed(): void
+    {
+        BatchCrafting::factory()->create([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'started_at' => now(),
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['is_batch_crafting_visible']);
     }
 }

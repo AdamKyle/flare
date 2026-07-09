@@ -11,6 +11,7 @@ use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
@@ -197,6 +198,25 @@ class BatchCraftingPanelControllerTest extends TestCase
         $this->assertNotNull($response->json('batch.id'));
     }
 
+    public function testStatusReturnsActivePanelDataAfterStartingCraftForExperience(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+        ]);
+
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertTrue($response->json('active'));
+        $this->assertTrue($response->json('is_visible'));
+        $this->assertSame(BatchCraftingType::CRAFT->value, $response->json('batch.batch_type'));
+    }
+
     public function testStatusReturnsTimerFields(): void
     {
         $user = $this->createUser();
@@ -229,6 +249,57 @@ class BatchCraftingPanelControllerTest extends TestCase
         $this->actingAs($user)->post(route('batch-crafting.cancel', ['character' => $character]));
 
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->whereNotNull('cancelled_at')->first());
+    }
+
+    public function testStatusReturnsCompletedVisiblePanelDataAfterCancel(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id]);
+
+        $this->actingAs($user)->post(route('batch-crafting.cancel', ['character' => $character]));
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertTrue($response->json('completed'));
+        $this->assertTrue($response->json('is_visible'));
+    }
+
+    public function testStatusReturnsNotVisibleAfterDismiss(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id, 'completed_at' => now(), 'ended_reason' => BatchCraftingEndReason::DIED->value, 'panel_dismissed_at' => null]);
+
+        $this->actingAs($user)->post(route('batch-crafting.dismiss', ['character' => $character]));
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertFalse($response->json('is_visible'));
+    }
+
+    public function testStatusEndpointQueryDoesNotCombineBroadOrWithOrderBy(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id]);
+        $unsafeQueries = [];
+
+        DB::listen(function ($query) use (&$unsafeQueries): void {
+            $sql = strtolower($query->sql);
+
+            if (
+                str_starts_with($sql, 'select') &&
+                str_contains($sql, 'batch_craftings') &&
+                str_contains($sql, 'panel_dismissed_at') &&
+                str_contains($sql, ' or ') &&
+                str_contains($sql, 'order by')
+            ) {
+                $unsafeQueries[] = $sql;
+            }
+        });
+
+        $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertEmpty($unsafeQueries);
     }
 
     public function testStatusReturnsInventoryBarFields(): void

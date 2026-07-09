@@ -66,7 +66,7 @@ class CharacterInventoryController extends Controller
         if (is_null($slot)) {
             return response()->json([
                 'message' => 'You cannot do that.',
-            ]);
+            ], 422);
         }
 
         $item = new FractalItem($slot->item, $itemTransformer);
