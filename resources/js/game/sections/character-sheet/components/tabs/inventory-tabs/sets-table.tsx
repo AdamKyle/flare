@@ -440,6 +440,19 @@ export default class SetsTable
     }
 
     buildSelectedItemsDropDown() {
+        if (this.isSelectedSetBatchCraftingSet()) {
+            return [
+                {
+                    name: "Destroy Selected",
+                    icon_class: "fas fa-trash",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET,
+                        ),
+                },
+            ];
+        }
+
         return [
             {
                 name: "Sell Selected",
@@ -663,13 +676,17 @@ export default class SetsTable
                             disabled={this.props.is_dead || this.state.loading}
                         />
                     </div>
-                    <div className="w-full md:w-auto mt-[-10px] md:mt-0">
-                        <DropDown
-                            menu_items={this.buildActionsDropDown()}
-                            button_title="Actions"
-                            disabled={this.props.is_dead || this.state.loading}
-                        />
-                    </div>
+                    {!this.isSelectedSetBatchCraftingSet() ? (
+                        <div className="w-full md:w-auto mt-[-10px] md:mt-0">
+                            <DropDown
+                                menu_items={this.buildActionsDropDown()}
+                                button_title="Actions"
+                                disabled={
+                                    this.props.is_dead || this.state.loading
+                                }
+                            />
+                        </div>
+                    ) : null}
                     {this.isSelectedSetBatchCraftingSet() &&
                     this.state.data.length > 0 ? (
                         <div className="w-full md:w-auto mt-[-10px] md:mt-0">
@@ -694,6 +711,23 @@ export default class SetsTable
                                     }
                                 />
                             )}
+                        </div>
+                    ) : null}
+                    {this.isSelectedSetBatchCraftingSet() &&
+                    this.state.data.length > 0 ? (
+                        <div className="w-full md:w-auto mt-[-10px] md:mt-0">
+                            <DangerButton
+                                button_label={"Destroy All"}
+                                on_click={() =>
+                                    this.manageConfirmationModal(
+                                        InventoryActionConfirmationType.DESTROY_ALL_FROM_SET,
+                                    )
+                                }
+                                additional_css="w-full md:w-auto"
+                                disabled={
+                                    this.props.is_dead || this.state.loading
+                                }
+                            />
                         </div>
                     ) : null}
                     {this.isSelectedSetBatchCraftingSet() &&

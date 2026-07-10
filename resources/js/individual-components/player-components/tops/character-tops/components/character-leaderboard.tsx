@@ -52,7 +52,7 @@ export default class CharacterLeaderboard extends React.Component<CharacterLeade
             <TopsLeaderboardDashboard
                 title="Character Progression"
                 description="The highest progressing characters, ranked by reincarnations, level, XP, and gold."
-                resetDescription="Leaderboards reset on the first day of each calendar month. Current Month is shown by default, previous monthly results stay available through archived snapshots, and All Time keeps lifetime totals."
+                resetDescription="This leaderboard tracks live, cumulative character progress and does not reset each month. Current Month and All Time reflect the same up-to-date totals; switching periods changes which characters are eligible to appear, not the underlying data."
                 response={this.props.leaderboard}
                 primaryMetric={{
                     key: "times_reincarnated",

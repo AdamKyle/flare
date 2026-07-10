@@ -79,6 +79,8 @@ class BatchCraftingControllerTest extends TestCase
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ALCHEMY->value,
@@ -88,10 +90,65 @@ class BatchCraftingControllerTest extends TestCase
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ALCHEMY->value)->first());
     }
 
+    public function testStartAlchemyBatchRejectsLockedAlchemy(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => true]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ALCHEMY->value)->first());
+    }
+
+    public function testStartHolyOilsBatchRejectsLockedAlchemy(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => true]);
+        $inventory = $this->createInventory(['character_id' => $character->id]);
+        $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
+        $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
+        $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'selected_items' => [$itemSlot->id],
+            'selected_oils' => [$oilSlot->id],
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::HOLY_OILS->value)->first());
+    }
+
+    public function testStartAlchemyBatchRejectsSellDisposition(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ALCHEMY->value)->first());
+    }
+
     public function testStartHolyOilsBatch(): void
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
         $inventory = $this->createInventory(['character_id' => $character->id]);
         $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
         $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
@@ -182,6 +239,7 @@ class BatchCraftingControllerTest extends TestCase
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
             'disposition' => BatchCraftingDisposition::LIST->value,
+            'listing_price' => 50,
         ]);
 
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::LIST->value)->first());
@@ -204,10 +262,13 @@ class BatchCraftingControllerTest extends TestCase
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ALCHEMY->value,
             'disposition' => BatchCraftingDisposition::LIST->value,
+            'listing_price' => 1,
         ]);
 
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::LIST->value)->first());
@@ -444,6 +505,125 @@ class BatchCraftingControllerTest extends TestCase
         ]);
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testKeepBestDestroyRestAllowedForCraftExperience(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value)->first());
+    }
+
+    public function testKeepBestDestroyRestRejectedForCraftAmount(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
+        $item = $this->createItem(['name' => 'Keep Best Amount Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1],
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testTrinketryAllowsKeepBestDestroyRestDisposition(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'shards' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value)->first());
+    }
+
+    public function testAlchemyAmountAllowsUseNowDisposition(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::USE_NOW->value)->first());
+    }
+
+    public function testStartRejectsListDispositionWithoutListingPrice(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testHolyOilsListRejectedWhenSelectedItemHasNoEnchants(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100]);
+        $inventory = $this->createInventory(['character_id' => $character->id]);
+        $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
+        $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
+        $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'listing_price' => 50,
+            'selected_items' => [$itemSlot->id],
+            'selected_oils' => [$oilSlot->id],
+        ]);
+
+        $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+    }
+
+    public function testHolyOilsListAllowedWhenSelectedItemHasEnchants(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
+        $inventory = $this->createInventory(['character_id' => $character->id]);
+        $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
+        $prefix = $this->createItemAffix(['name' => 'Holy Oil List Prefix', 'type' => 'prefix']);
+        $item = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1, 'item_prefix_id' => $prefix->id]);
+        $oil = $this->createItem(['type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $itemSlot = $this->createInventorySlot(['inventory_id' => $inventory->id, 'item_id' => $item->id]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+
+        $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'listing_price' => 50,
+            'selected_items' => [$itemSlot->id],
+            'selected_oils' => [$oilSlot->id],
+        ]);
+
+        $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('disposition', BatchCraftingDisposition::LIST->value)->first());
     }
 
     public function testCancelActiveBatch(): void
@@ -1161,6 +1341,8 @@ class BatchCraftingControllerTest extends TestCase
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 0, 'gold_dust' => 1000]);
+        $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
 
         $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ALCHEMY->value,

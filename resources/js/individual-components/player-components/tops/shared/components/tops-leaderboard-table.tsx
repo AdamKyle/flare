@@ -4,7 +4,7 @@ import TopsDisplayField from "../types/tops-display-field";
 import TopsLeaderboardRow from "../types/tops-leaderboard-row";
 import TopsCharacterNameLink from "./tops-character-name-link";
 import TopsRankBadge from "./tops-rank-badge";
-import { formatTopsValue } from "../helpers/tops-format-value";
+import { formatTopsFieldValue } from "../helpers/tops-format-value";
 import {
     tableCellTextClasses,
     tableRowClasses,
@@ -281,7 +281,7 @@ export default class TopsLeaderboardTable extends React.Component<
                     (isNumericField ? "whitespace-nowrap tabular-nums" : "")
                 }
             >
-                {formatTopsValue(row[field.key])}
+                {formatTopsFieldValue(field, row[field.key])}
             </td>
         );
     }

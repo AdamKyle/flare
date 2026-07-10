@@ -27,6 +27,11 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                     "/inventory/item/" +
                     this.props.item_id,
             )
+            .setParameters(
+                typeof this.props.slot_id === "number"
+                    ? { slot_id: this.props.slot_id }
+                    : {},
+            )
             .doAjaxCall(
                 "get",
                 (result: AxiosResponse) => {

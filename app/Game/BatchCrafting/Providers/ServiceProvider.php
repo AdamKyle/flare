@@ -9,9 +9,11 @@ use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
+use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Admin\Services\MonitoredBugReportService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
+use App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Services\AlchemyService;
 use App\Game\Skills\Services\CraftingService;
@@ -32,9 +34,11 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EnchantingService::class),
                 $app->make(HolyItemService::class),
                 $app->make(MultiInventoryActionService::class),
+                $app->make(UseItemService::class),
                 $app->make(BatchCraftingSetService::class),
                 $app->make(InventorySetService::class),
                 $app->make(HandleUpdatingCraftingGlobalEventGoal::class),
+                $app->make(ServerMessageHandler::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(EventBatchEnchantingAffixSelector::class),
             );

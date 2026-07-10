@@ -9,40 +9,28 @@ export default class FactionLoyaltyTopsTableColumns extends React.Component<Tops
                 rows={this.props.rows}
                 fields={[
                     {
-                        key: "highest_faction_level",
-                        label: "Highest Faction Level",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "highest_faction_points",
-                        label: "Highest Faction Points",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "maxed_faction_count",
-                        label: "Maxed Factions",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "highest_npc_loyalty_level",
-                        label: "NPC Loyalty",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "automation_run_count",
-                        label: "Automation Runs",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "latest_action",
-                        label: "Latest Action",
+                        key: "highest_faction_name",
+                        label: "Highest Level Faction",
                         align: "left",
                         type: "text",
+                    },
+                    {
+                        key: "total_faction_level",
+                        label: "Total Faction Level",
+                        align: "right",
+                        type: "number",
+                    },
+                    {
+                        key: "npcs_helped_count",
+                        label: "NPCs Helped",
+                        align: "right",
+                        type: "number",
+                    },
+                    {
+                        key: "total_npc_fame_level",
+                        label: "Total NPC Fame Level",
+                        align: "right",
+                        type: "number",
                     },
                 ]}
             />

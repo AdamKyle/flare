@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\Character\CharacterInventory\Requests\DestroyAllFromSetRequest;
 use App\Game\Character\CharacterInventory\Requests\InventoryMultiRequest;
 use App\Game\Character\CharacterInventory\Requests\MoveSelectedItemsRequest;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
@@ -124,6 +125,50 @@ class CharacterInventoryMultiController extends Controller
         }
 
         $result = $this->multiInventoryActionService->disenchantManySetSlots($character, $set, $request->slot_ids);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function destroySelectedFromSet(MoveSelectedItemsRequest $request, Character $character): JsonResponse
+    {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
+        $set = InventorySet::find($request->set_id);
+
+        if (is_null($set)) {
+            return response()->json(['message' => 'Cannot do that.'], 422);
+        }
+
+        $result = $this->multiInventoryActionService->destroyManySetSlots($character, $set, $request->slot_ids);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function destroyAllFromSet(DestroyAllFromSetRequest $request, Character $character): JsonResponse
+    {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
+        $set = InventorySet::find($request->set_id);
+
+        if (is_null($set)) {
+            return response()->json(['message' => 'Cannot do that.'], 422);
+        }
+
+        $result = $this->multiInventoryActionService->destroyAllCraftedItemsSetSlots($character, $set);
 
         $status = $result['status'];
         unset($result['status']);

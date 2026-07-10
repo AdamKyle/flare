@@ -16,6 +16,9 @@ import ItemNameColorationText from "../../items/item-name/item-name-coloration-t
 import ItemAffixDetails from "../../../sections/character-sheet/components/modals/components/item-affix-details";
 import ItemDetails from "../../../sections/character-sheet/components/modals/components/item-details";
 import Dialogue from "../../ui/dialogue/dialogue";
+import { MarketBoardLineChart } from "../../ui/charts/line-chart";
+import ComponentLoading from "../../ui/loading/component-loading";
+import { DateTime } from "luxon";
 import {
     BatchCraftingStatus,
     ProgressBar,
@@ -43,18 +46,18 @@ import {
 
 const selectAllHolyOilItemsValue = -1;
 
-const batchTypes: { value: BatchType; label: string }[] = [
-    { value: "craft", label: "Craft" },
-    { value: "craft_and_enchant", label: "Craft and Enchant" },
-    { value: "enchant", label: "Enchant For Event" },
-    { value: "alchemy", label: "Alchemy" },
-    { value: "holy_oils", label: "Holy Oils" },
-    { value: "trinketry", label: "Trinketry" },
-];
+const batchTypes: { value: BatchType; label: string; isDisabled?: boolean }[] =
+    [
+        { value: "craft", label: "Craft" },
+        { value: "craft_and_enchant", label: "Craft and Enchant" },
+        { value: "enchant", label: "Enchant For Event" },
+        { value: "alchemy", label: "Alchemy" },
+        { value: "holy_oils", label: "Holy Oils" },
+        { value: "trinketry", label: "Trinketry" },
+    ];
 
 const dispositions: { value: Disposition; label: string }[] = [
     { value: "keep", label: "Keep" },
-    { value: "keep_highest", label: "Keep Highest Level Crafted At The End" },
     { value: "sell", label: "Sell" },
     { value: "destroy", label: "Destroy" },
     { value: "list", label: "List" },
@@ -64,6 +67,11 @@ const dispositions: { value: Disposition; label: string }[] = [
         value: "keep_best_disenchant_rest",
         label: "Keep Best and Disenchant Rest",
     },
+    {
+        value: "keep_best_destroy_rest",
+        label: "Keep Best and Destroy Rest",
+    },
+    { value: "use_now", label: "Use Now" },
 ];
 
 const weaponTypeOptions = [
@@ -104,11 +112,29 @@ type CraftEnchantSetPlanItem = {
     label: string;
 };
 
+// The Set planner shows one row per individual target slot, so it needs the
+// singular form of each weapon type (weaponTypeOptions' labels are plural,
+// which is correct for the "Weapon type" category dropdown but wrong here).
+const weaponTypeSingularLabels: Record<string, string> = {
+    dagger: "Dagger",
+    sword: "Sword",
+    claw: "Claw",
+    wand: "Wand",
+    censer: "Censer",
+    stave: "Stave",
+    hammer: "Hammer",
+    bow: "Bow",
+    gun: "Gun",
+    fan: "Fan",
+    mace: "Mace",
+    "scratch-awl": "Scratch Awl",
+};
+
 const craftEnchantSetPlanItems: CraftEnchantSetPlanItem[] = [
     ...weaponTypeOptions.map((option) => ({
         key: option.value,
         category: "weapon" as const,
-        label: option.label,
+        label: weaponTypeSingularLabels[option.value] ?? option.label,
     })),
     ...armourTypeOptions.map((option) => ({
         key: option.value,
@@ -129,16 +155,119 @@ type CraftModeOption = { value: CraftMode; label: string };
 type EnchantModeOption = { value: EnchantMode; label: string };
 type AlchemyModeOption = { value: AlchemyMode; label: string };
 
-function canList(batchType: BatchType): boolean {
-    return ["craft_and_enchant", "alchemy"].includes(batchType);
+// Mirrors the server-side matrix enforced by
+// app/Game/BatchCrafting/Values/BatchCraftingDisposition::isAllowedFor(). Keep
+// this in sync with that method whenever the allowed dispositions change.
+// holy_oil_mode is not a parameter here because both Holy Oils modes
+// (selected gear and inventory set) currently allow the exact same
+// disposition set server-side.
+function getAllowedDispositions(
+    batchType: BatchType,
+    craftMode: CraftMode,
+    alchemyMode: AlchemyMode,
+): Disposition[] {
+    if (batchType === "enchant") {
+        return ["keep"];
+    }
+
+    if (batchType === "craft") {
+        if (craftMode === "event") {
+            return ["keep"];
+        }
+
+        if (craftMode === "experience") {
+            return [
+                "keep",
+                "sell",
+                "destroy",
+                "keep_best_sell_rest",
+                "keep_best_destroy_rest",
+            ];
+        }
+
+        return ["keep", "sell", "destroy"];
+    }
+
+    if (batchType === "craft_and_enchant") {
+        if (craftMode === "experience") {
+            return [
+                "keep",
+                "sell",
+                "destroy",
+                "list",
+                "disenchant",
+                "keep_best_sell_rest",
+                "keep_best_destroy_rest",
+                "keep_best_disenchant_rest",
+            ];
+        }
+
+        return ["keep", "sell", "destroy", "list", "disenchant"];
+    }
+
+    if (batchType === "alchemy") {
+        if (alchemyMode === "experience") {
+            return [
+                "keep",
+                "destroy",
+                "list",
+                "keep_best_destroy_rest",
+                "use_now",
+            ];
+        }
+
+        return ["keep", "destroy", "list", "use_now"];
+    }
+
+    if (batchType === "trinketry") {
+        return ["keep", "destroy", "keep_best_destroy_rest"];
+    }
+
+    if (batchType === "holy_oils") {
+        return ["keep", "sell", "destroy", "list", "disenchant"];
+    }
+
+    return ["keep"];
 }
 
-function canDisenchant(batchType: BatchType): boolean {
-    return batchType === "craft_and_enchant";
+type AffixSelectOption = {
+    value: number;
+    label: string;
+    cost: number;
+    intRequired: number;
+    skillLevelRequired: number;
+    skillName: string | null;
+};
+
+function toAffixOption(enchantment: EnchantmentOption): AffixSelectOption {
+    return {
+        value: enchantment.id,
+        label: enchantment.name,
+        cost: enchantment.cost,
+        intRequired: enchantment.int_required,
+        skillLevelRequired: enchantment.skill_level_required,
+        skillName: enchantment.skill_name,
+    };
 }
 
-function canKeepBestRest(batchType: BatchType): boolean {
-    return batchType === "craft_and_enchant";
+function formatAffixOptionLabel(option: AffixSelectOption) {
+    return (
+        <span className="flex flex-wrap items-center gap-1">
+            <span>{option.label}</span>
+            <span className="text-xs text-gray-700">
+                Cost: {formatNumber(option.cost)}
+            </span>
+            <span className="text-xs text-gray-700">
+                INT Required: {formatNumber(option.intRequired)}
+            </span>
+            {option.skillLevelRequired > 0 ? (
+                <span className="text-xs text-gray-700">
+                    {option.skillName ?? "Skill"} Level:{" "}
+                    {formatNumber(option.skillLevelRequired)}
+                </span>
+            ) : null}
+        </span>
+    );
 }
 
 export default class BatchCraftingSection extends React.Component<
@@ -156,6 +285,7 @@ export default class BatchCraftingSection extends React.Component<
             statusLoadError: null,
             batchType: "craft",
             disposition: "keep",
+            listingPrice: 1,
             message: "",
             isSaving: false,
             holyOilItems: [],
@@ -186,7 +316,6 @@ export default class BatchCraftingSection extends React.Component<
             selectedSetId: null,
             craftEnchantSetMode: "build_new",
             craftEnchantSetPlan: {},
-            craftEnchantSetDefaultsApplied: false,
             craftEnchantSetBulkPrefixId: null,
             craftEnchantSetBulkSuffixId: null,
             craftSetPlan: {},
@@ -196,6 +325,9 @@ export default class BatchCraftingSection extends React.Component<
             hideMaxedCraftNotice: false,
             affixDetailsModalAffix: null,
             craftEnchantSetItemDetailsModalItem: null,
+            listingChartData: [],
+            listingChartLoading: false,
+            listingChartItemId: null,
         };
     }
 
@@ -269,24 +401,153 @@ export default class BatchCraftingSection extends React.Component<
         ) {
             this.fetchPreview();
         }
+
+        if (
+            previousState.disposition !== this.state.disposition ||
+            this.getListingChartItemId(previousState) !==
+                this.getListingChartItemId(this.state)
+        ) {
+            this.fetchListingChartDataIfNeeded();
+        }
+    }
+
+    getListingChartItemId(state: BatchCraftingSectionState): number | null {
+        const resolvedCraftMode = this.getResolvedCraftMode(
+            state.status,
+            state.batchType,
+            state.craftMode,
+        );
+        const resolvedAlchemyMode = this.getResolvedAlchemyMode(
+            state.status,
+            state.alchemyMode,
+        );
+
+        if (
+            state.batchType === "craft_and_enchant" &&
+            resolvedCraftMode === "specific_item"
+        ) {
+            return state.specificItemId;
+        }
+
+        if (state.batchType === "alchemy" && resolvedAlchemyMode === "amount") {
+            return state.selectedAlchemyItemId;
+        }
+
+        return null;
+    }
+
+    fetchListingChartDataIfNeeded() {
+        const itemId = this.getListingChartItemId(this.state);
+
+        if (this.state.disposition !== "list" || itemId === null) {
+            if (
+                this.state.listingChartData.length > 0 ||
+                this.state.listingChartItemId !== null
+            ) {
+                this.setState({
+                    listingChartData: [],
+                    listingChartLoading: false,
+                    listingChartItemId: null,
+                });
+            }
+
+            return;
+        }
+
+        if (itemId === this.state.listingChartItemId) {
+            return;
+        }
+
+        this.setState({
+            listingChartLoading: true,
+            listingChartItemId: itemId,
+        });
+
+        new Ajax()
+            .setRoute("market-board/items")
+            .setParameters({ item_id: itemId })
+            .doAjaxCall(
+                "get",
+                (result: AxiosResponse) => {
+                    const data = result.data.items.map(
+                        (item: { listed_at: string; listed_price: number }) => {
+                            return {
+                                date: DateTime.fromISO(item.listed_at)
+                                    .toLocaleString({
+                                        weekday: "short",
+                                        month: "short",
+                                        day: "2-digit",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        second: "2-digit",
+                                    })
+                                    .toString(),
+                                price: item.listed_price,
+                            };
+                        },
+                    );
+
+                    const now = DateTime.now()
+                        .toLocaleString({
+                            weekday: "short",
+                            month: "short",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                        })
+                        .toString();
+
+                    if (data.length === 0) {
+                        data.push({
+                            date: now,
+                            price: 0,
+                        });
+                    }
+
+                    this.setState({
+                        listingChartLoading: false,
+                        listingChartData: [
+                            {
+                                label: "Listed for (Gold)",
+                                color: "#441414",
+                                data,
+                            },
+                        ],
+                    });
+                },
+                (_error: AxiosError) => {
+                    this.setState({
+                        listingChartLoading: false,
+                        listingChartData: [],
+                    });
+                },
+            );
     }
 
     getAvailableBatchTypes(status: BatchCraftingStatus | null) {
         const trinketryMaxed = status?.event_batch?.trinketry_maxed ?? false;
         const canEnchantForEvent =
             status?.event_batch?.can_enchant_for_event ?? false;
+        const alchemyLocked = status?.event_batch?.alchemy_locked ?? false;
 
-        return batchTypes.filter((option) => {
-            if (option.value === "trinketry") {
-                return !trinketryMaxed;
-            }
+        return batchTypes
+            .filter((option) => {
+                if (option.value === "trinketry") {
+                    return !trinketryMaxed;
+                }
 
-            if (option.value === "enchant") {
-                return canEnchantForEvent;
-            }
+                if (option.value === "enchant") {
+                    return canEnchantForEvent;
+                }
 
-            return true;
-        });
+                return true;
+            })
+            .map((option) =>
+                option.value === "alchemy" || option.value === "holy_oils"
+                    ? { ...option, isDisabled: alchemyLocked }
+                    : option,
+            );
     }
 
     getCraftExperienceOptions(
@@ -408,6 +669,7 @@ export default class BatchCraftingSection extends React.Component<
     getAlchemyModeOptions(
         status: BatchCraftingStatus | null,
     ): AlchemyModeOption[] {
+        const alchemyLocked = status?.event_batch?.alchemy_locked ?? false;
         const alchemyMaxed = status?.event_batch?.alchemy_maxed ?? false;
 
         return [
@@ -636,6 +898,7 @@ export default class BatchCraftingSection extends React.Component<
         this.setState({
             batchType,
             disposition: "keep",
+            listingPrice: 1,
             craftMode,
             alchemyMode,
             holyOilMode: "selected",
@@ -654,7 +917,6 @@ export default class BatchCraftingSection extends React.Component<
             selectedSetId: null,
             inventorySets: [],
             craftEnchantSetPlan: {},
-            craftEnchantSetDefaultsApplied: false,
             craftEnchantSetBulkPrefixId: null,
             craftEnchantSetBulkSuffixId: null,
             craftSetPlan: {},
@@ -677,26 +939,13 @@ export default class BatchCraftingSection extends React.Component<
             this.state.alchemyMode,
         );
 
-        if (disposition === "list" && !canList(batchType)) {
-            this.setState({
-                disposition: "keep",
-            });
-            return;
-        }
+        const allowedDispositions = getAllowedDispositions(
+            batchType,
+            craftMode,
+            alchemyMode,
+        );
 
-        if (disposition === "disenchant" && !canDisenchant(batchType)) {
-            this.setState({
-                disposition: "keep",
-            });
-            return;
-        }
-
-        if (
-            ["keep_best_sell_rest", "keep_best_disenchant_rest"].includes(
-                disposition,
-            ) &&
-            !canKeepBestRest(batchType)
-        ) {
+        if (!allowedDispositions.includes(disposition)) {
             this.setState({
                 disposition: "keep",
             });
@@ -782,7 +1031,6 @@ export default class BatchCraftingSection extends React.Component<
             ) {
                 this.setState({
                     craftEnchantSetPlan: {},
-                    craftEnchantSetDefaultsApplied: false,
                     craftEnchantSetBulkPrefixId: null,
                     craftEnchantSetBulkSuffixId: null,
                 });
@@ -799,7 +1047,6 @@ export default class BatchCraftingSection extends React.Component<
                         },
                     ]),
                 ),
-                craftEnchantSetDefaultsApplied: false,
             });
         }
 
@@ -960,6 +1207,7 @@ export default class BatchCraftingSection extends React.Component<
             craftSetPlan,
             disposition,
             holyOilMode,
+            listingPrice,
             selectedAlchemyItemId,
             selectedItems,
             selectedOils,
@@ -1059,6 +1307,10 @@ export default class BatchCraftingSection extends React.Component<
             disposition: disposition,
             progress: progress,
         };
+
+        if (disposition === "list") {
+            params.listing_price = listingPrice !== "" ? listingPrice : 1;
+        }
 
         if (batchType === "holy_oils") {
             params.selected_items = holyOilMode === "set" ? [] : selectedItems;
@@ -1220,79 +1472,16 @@ export default class BatchCraftingSection extends React.Component<
                             }
                         });
 
-                        let craftEnchantSetDefaultsApplied =
-                            prevState.craftEnchantSetDefaultsApplied;
-
-                        if (
-                            !craftEnchantSetDefaultsApplied &&
-                            previewData?.cost_breakdown?.plan_entries !==
-                                undefined
-                        ) {
-                            const defaultPrefixId =
-                                previewData.cost_breakdown
-                                    .default_prefix_affix_id ?? null;
-                            const defaultSuffixId =
-                                previewData.cost_breakdown
-                                    .default_suffix_affix_id ?? null;
-
-                            if (
-                                defaultPrefixId !== null ||
-                                defaultSuffixId !== null
-                            ) {
-                                if (
-                                    craftEnchantSetPlan ===
-                                    prevState.craftEnchantSetPlan
-                                ) {
-                                    craftEnchantSetPlan = {
-                                        ...craftEnchantSetPlan,
-                                    };
-                                }
-
-                                Object.keys(craftEnchantSetPlan).forEach(
-                                    (key) => {
-                                        const entry = craftEnchantSetPlan[key];
-                                        const updatedEntry = { ...entry };
-                                        let changed = false;
-
-                                        if (
-                                            (entry.prefixAffixId === null ||
-                                                entry.prefixAffixId ===
-                                                    undefined) &&
-                                            defaultPrefixId !== null
-                                        ) {
-                                            updatedEntry.prefixAffixId =
-                                                defaultPrefixId;
-                                            changed = true;
-                                        }
-
-                                        if (
-                                            (entry.suffixAffixId === null ||
-                                                entry.suffixAffixId ===
-                                                    undefined) &&
-                                            defaultSuffixId !== null
-                                        ) {
-                                            updatedEntry.suffixAffixId =
-                                                defaultSuffixId;
-                                            changed = true;
-                                        }
-
-                                        if (changed) {
-                                            craftEnchantSetPlan[key] =
-                                                updatedEntry;
-                                        }
-                                    },
-                                );
-                            }
-
-                            craftEnchantSetDefaultsApplied = true;
-                        }
-
+                        // Prefix/suffix affixes are intentionally never
+                        // auto-filled from cost_breakdown.default_prefix_affix_id
+                        // / default_suffix_affix_id here. Only the craftable
+                        // item preselection above is automatic; the player must
+                        // explicitly choose bulk or per-row affixes.
                         return {
                             preview: previewData,
                             previewLoading: false,
                             craftEnchantSetPlan,
                             craftSetPlan,
-                            craftEnchantSetDefaultsApplied,
                         };
                     });
                 },
@@ -1445,25 +1634,53 @@ export default class BatchCraftingSection extends React.Component<
         }
 
         const setPrefixAffixId = (key: string, prefixAffixId: number | null) =>
-            this.setState((prevState) => ({
-                craftEnchantSetPlan: {
+            this.setState((prevState) => {
+                const craftEnchantSetPlan = {
                     ...prevState.craftEnchantSetPlan,
                     [key]: {
                         ...prevState.craftEnchantSetPlan[key],
                         prefixAffixId,
                     },
-                },
-            }));
+                };
+                const bulkStillUniform =
+                    prevState.craftEnchantSetBulkPrefixId !== null &&
+                    Object.values(craftEnchantSetPlan).every(
+                        (entry) =>
+                            entry.prefixAffixId ===
+                            prevState.craftEnchantSetBulkPrefixId,
+                    );
+
+                return {
+                    craftEnchantSetPlan,
+                    craftEnchantSetBulkPrefixId: bulkStillUniform
+                        ? prevState.craftEnchantSetBulkPrefixId
+                        : null,
+                };
+            });
         const setSuffixAffixId = (key: string, suffixAffixId: number | null) =>
-            this.setState((prevState) => ({
-                craftEnchantSetPlan: {
+            this.setState((prevState) => {
+                const craftEnchantSetPlan = {
                     ...prevState.craftEnchantSetPlan,
                     [key]: {
                         ...prevState.craftEnchantSetPlan[key],
                         suffixAffixId,
                     },
-                },
-            }));
+                };
+                const bulkStillUniform =
+                    prevState.craftEnchantSetBulkSuffixId !== null &&
+                    Object.values(craftEnchantSetPlan).every(
+                        (entry) =>
+                            entry.suffixAffixId ===
+                            prevState.craftEnchantSetBulkSuffixId,
+                    );
+
+                return {
+                    craftEnchantSetPlan,
+                    craftEnchantSetBulkSuffixId: bulkStillUniform
+                        ? prevState.craftEnchantSetBulkSuffixId
+                        : null,
+                };
+            });
         const setSelectedItemId = (
             key: string,
             selectedItemId: number | null,
@@ -1545,16 +1762,10 @@ export default class BatchCraftingSection extends React.Component<
 
         const prefixOptions = enchantments
             .filter((enchantment) => enchantment.type === "prefix")
-            .map((enchantment) => ({
-                value: enchantment.id,
-                label: enchantment.name,
-            }));
+            .map(toAffixOption);
         const suffixOptions = enchantments
             .filter((enchantment) => enchantment.type === "suffix")
-            .map((enchantment) => ({
-                value: enchantment.id,
-                label: enchantment.name,
-            }));
+            .map(toAffixOption);
 
         const categories: {
             category: CraftEnchantSetPlanItem["category"];
@@ -1590,6 +1801,7 @@ export default class BatchCraftingSection extends React.Component<
                                 setBulkPrefixId(opt?.value ?? null)
                             }
                             options={prefixOptions}
+                            formatOptionLabel={formatAffixOptionLabel}
                             menuPosition={"absolute"}
                             menuPlacement={"bottom"}
                             styles={{
@@ -1630,6 +1842,7 @@ export default class BatchCraftingSection extends React.Component<
                                 setBulkSuffixId(opt?.value ?? null)
                             }
                             options={suffixOptions}
+                            formatOptionLabel={formatAffixOptionLabel}
                             menuPosition={"absolute"}
                             menuPlacement={"bottom"}
                             styles={{
@@ -1756,10 +1969,13 @@ export default class BatchCraftingSection extends React.Component<
                                             entry.suffixAffixId !== undefined);
                                     const availableItemOptions = (
                                         planPreviewEntry?.available_items ?? []
-                                    ).map((availableItem) => ({
-                                        value: availableItem.id,
-                                        label: availableItem.name,
-                                    }));
+                                    )
+                                        .slice()
+                                        .sort((a, b) => a.cost - b.cost)
+                                        .map((availableItem) => ({
+                                            value: availableItem.id,
+                                            label: availableItem.name,
+                                        }));
                                     const selectedItemIdValue =
                                         entry.selectedItemId ??
                                         planPreviewEntry?.selected_item_id ??
@@ -1797,6 +2013,10 @@ export default class BatchCraftingSection extends React.Component<
                                         >
                                             <summary className="cursor-pointer rounded p-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
                                                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
+                                                    <dt className="font-semibold sm:whitespace-nowrap">
+                                                        Target
+                                                    </dt>
+                                                    <dd>{item.label}</dd>
                                                     <dt className="font-semibold sm:whitespace-nowrap">
                                                         Item Name
                                                     </dt>
@@ -2048,6 +2268,9 @@ export default class BatchCraftingSection extends React.Component<
                                                             )
                                                         }
                                                         options={prefixOptions}
+                                                        formatOptionLabel={
+                                                            formatAffixOptionLabel
+                                                        }
                                                         menuPosition={
                                                             "absolute"
                                                         }
@@ -2094,6 +2317,9 @@ export default class BatchCraftingSection extends React.Component<
                                                             )
                                                         }
                                                         options={suffixOptions}
+                                                        formatOptionLabel={
+                                                            formatAffixOptionLabel
+                                                        }
                                                         menuPosition={
                                                             "absolute"
                                                         }
@@ -2272,10 +2498,13 @@ export default class BatchCraftingSection extends React.Component<
                                         planEntriesByKey.get(item.key) ?? null;
                                     const availableItemOptions = (
                                         planPreviewEntry?.available_items ?? []
-                                    ).map((availableItem) => ({
-                                        value: availableItem.id,
-                                        label: availableItem.name,
-                                    }));
+                                    )
+                                        .slice()
+                                        .sort((a, b) => a.cost - b.cost)
+                                        .map((availableItem) => ({
+                                            value: availableItem.id,
+                                            label: availableItem.name,
+                                        }));
                                     const selectedItemIdValue =
                                         entry.selectedItemId ??
                                         planPreviewEntry?.selected_item_id ??
@@ -2303,6 +2532,10 @@ export default class BatchCraftingSection extends React.Component<
                                         >
                                             <summary className="cursor-pointer rounded p-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
                                                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
+                                                    <dt className="font-semibold sm:whitespace-nowrap">
+                                                        Target
+                                                    </dt>
+                                                    <dd>{item.label}</dd>
                                                     <dt className="font-semibold sm:whitespace-nowrap">
                                                         Item Name
                                                     </dt>
@@ -2755,6 +2988,230 @@ export default class BatchCraftingSection extends React.Component<
         );
     }
 
+    listingItemCount(): number | null {
+        const preview = this.state.preview;
+
+        if (preview?.amount_preview) {
+            return preview.amount_preview.effective_craftable_amount;
+        }
+
+        if (preview?.alchemy_amount_preview) {
+            return preview.alchemy_amount_preview.effective_craftable_amount;
+        }
+
+        if (
+            this.state.batchType === "holy_oils" &&
+            this.state.holyOilMode === "selected"
+        ) {
+            return (
+                preview?.holy_oil_selected_preview?.total_eligible_items ?? null
+            );
+        }
+
+        if (
+            this.state.batchType === "holy_oils" &&
+            this.state.holyOilMode === "set"
+        ) {
+            return preview?.holy_oil_set_preview?.total_eligible_items ?? null;
+        }
+
+        if (
+            this.state.batchType === "craft_and_enchant" &&
+            this.state.craftMode === "craft_enchant_set"
+        ) {
+            return preview?.cost_breakdown?.planned_items ?? null;
+        }
+
+        return null;
+    }
+
+    listingContext(): string {
+        const preview = this.state.preview;
+
+        if (preview?.amount_preview?.selected_item?.name) {
+            const affixes = [
+                preview.amount_preview.prefix_affix_name,
+                preview.amount_preview.suffix_affix_name,
+            ].filter(Boolean);
+
+            if (affixes.length > 0) {
+                return `${preview.amount_preview.selected_item.name} with ${affixes.join(" and ")}`;
+            }
+
+            return preview.amount_preview.selected_item.name;
+        }
+
+        if (preview?.alchemy_amount_preview?.selected_item?.name) {
+            return preview.alchemy_amount_preview.selected_item.name;
+        }
+
+        if (
+            this.state.batchType === "holy_oils" &&
+            this.state.holyOilMode === "selected"
+        ) {
+            return "Selected Holy Oils gear that remains eligible after oil application";
+        }
+
+        if (
+            this.state.batchType === "holy_oils" &&
+            this.state.holyOilMode === "set"
+        ) {
+            const setName = preview?.holy_oil_set_preview?.set_name;
+
+            return setName
+                ? `${setName} Holy Oils set items that remain eligible after oil application`
+                : "Holy Oils set items that remain eligible after oil application";
+        }
+
+        if (
+            this.state.batchType === "craft_and_enchant" &&
+            this.state.craftMode === "craft_enchant_set"
+        ) {
+            return "Final enchanted set outputs from the configured set plan";
+        }
+
+        return "Eligible output produced by this batch";
+    }
+
+    renderListingPricePanel() {
+        const { disposition, listingChartData, listingChartLoading } =
+            this.state;
+
+        if (disposition !== "list") {
+            return null;
+        }
+
+        const itemId = this.getListingChartItemId(this.state);
+        const isDarkMode =
+            typeof window !== "undefined" &&
+            window.localStorage.getItem("scheme") === "dark";
+        const preview = this.state.preview;
+        const itemCountToList = this.listingItemCount();
+        const listingContext = this.listingContext();
+        const listingPriceNumber =
+            typeof this.state.listingPrice === "number"
+                ? this.state.listingPrice
+                : 0;
+        const totalListedValue =
+            itemCountToList !== null
+                ? itemCountToList * listingPriceNumber
+                : null;
+        const potentialSellerNet =
+            totalListedValue !== null
+                ? Math.round(totalListedValue * 0.95)
+                : null;
+        const setListingPrice = (value: number | "") => {
+            if (value === "") {
+                this.setState({ listingPrice: "" });
+                return;
+            }
+
+            let normalizedValue = value;
+
+            if (normalizedValue < 1) {
+                normalizedValue = 1;
+            }
+
+            if (normalizedValue > 2000000000000000) {
+                normalizedValue = 2000000000000000;
+            }
+
+            this.setState({ listingPrice: normalizedValue });
+        };
+
+        return (
+            <div className="rounded border border-regent-st-blue-200 bg-regent-st-blue-50 p-3 text-sm text-regent-st-blue-900 dark:border-regent-st-blue-800 dark:bg-regent-st-blue-900 dark:text-regent-st-blue-100">
+                <h5 className="font-semibold">Listing Price</h5>
+                <p className="text-xs">
+                    Every item this batch lists on the market board will be
+                    listed for this single price.
+                </p>
+                <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
+                    <dt className="font-semibold sm:whitespace-nowrap">
+                        Output
+                    </dt>
+                    <dd>{listingContext}</dd>
+                </dl>
+                <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
+                {itemId !== null ? (
+                    listingChartLoading ? (
+                        <div className="p-5 mb-2">
+                            <ComponentLoading />
+                        </div>
+                    ) : (
+                        <>
+                            <MarketBoardLineChart
+                                dark_chart={isDarkMode}
+                                data={listingChartData}
+                                key_for_value={"price"}
+                            />
+                            <p className="text-xs text-gray-700 dark:text-gray-500 mb-4 mt-2">
+                                If the chart above states 0, then this item has
+                                never been listed before or there is no current
+                                listing for it.
+                            </p>
+                        </>
+                    )
+                ) : null}
+                <label
+                    className="grid gap-1 text-sm font-semibold"
+                    htmlFor="batch-listing-price"
+                >
+                    List For
+                    <input
+                        id="batch-listing-price"
+                        type="number"
+                        className="rounded border border-gray-300 bg-white p-2 text-base disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-800"
+                        min={1}
+                        step={1}
+                        value={this.state.listingPrice}
+                        onChange={(e) =>
+                            setListingPrice(
+                                e.target.value === ""
+                                    ? ""
+                                    : parseInt(e.target.value, 10),
+                            )
+                        }
+                    />
+                </label>
+                <dl className="mt-3 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
+                    <dt className="font-semibold sm:whitespace-nowrap">
+                        Items To List
+                    </dt>
+                    <dd>
+                        {itemCountToList !== null
+                            ? formatNumber(itemCountToList)
+                            : "Determined as the batch produces eligible output"}
+                    </dd>
+                    <dt className="font-semibold sm:whitespace-nowrap">
+                        List Price Per Item
+                    </dt>
+                    <dd>{formatNumber(listingPriceNumber)} Gold</dd>
+                    <dt className="font-semibold sm:whitespace-nowrap">
+                        Total Listed Value
+                    </dt>
+                    <dd>
+                        {totalListedValue !== null
+                            ? `${formatNumber(totalListedValue)} Gold`
+                            : "Depends on final listed output count"}
+                    </dd>
+                    <dt className="font-semibold sm:whitespace-nowrap">
+                        Potential Net After Market Tax
+                    </dt>
+                    <dd>
+                        {potentialSellerNet !== null
+                            ? `${formatNumber(potentialSellerNet)} Gold`
+                            : "Depends on final listed output count"}
+                    </dd>
+                </dl>
+                <p className="text-xs text-gray-700 dark:text-gray-500 mt-2">
+                    Every item sold from this listing is subject to the usual 5%
+                    market tax.
+                </p>
+            </div>
+        );
+    }
+
     renderCraftAmountPreview() {
         const preview = this.state.preview?.amount_preview;
         const statusBlock = this.renderPreviewStatus(!!preview);
@@ -2769,28 +3226,33 @@ export default class BatchCraftingSection extends React.Component<
 
         const hasStartBlockers =
             (this.state.preview?.start_blockers ?? []).length > 0;
+        const storesOutput = preview.destination !== null;
 
         return (
             <div className="grid gap-3">
                 {this.renderPreviewLoadingIndicator()}
-                <InfoAlert additional_css="text-sm my-2">
-                    Kept output for this batch is moved into the Crafted Items
-                    Set, not your normal inventory. You can sell or disenchant
-                    items out of that set later.
-                </InfoAlert>
-                <ProgressBar
-                    label="Crafted Items Set Space"
-                    current={preview.destination_current_slots}
-                    max={preview.destination_max_slots}
-                    percent={
-                        preview.destination_max_slots > 0
-                            ? (preview.destination_current_slots /
-                                  preview.destination_max_slots) *
-                              100
-                            : 0
-                    }
-                    barClassName="bg-regent-st-blue-500"
-                />
+                {storesOutput ? (
+                    <>
+                        <InfoAlert additional_css="text-sm my-2">
+                            Kept output for this batch is moved into the Crafted
+                            Items Set, not your normal inventory. You can sell
+                            or disenchant items out of that set later.
+                        </InfoAlert>
+                        <ProgressBar
+                            label="Crafted Items Set Space"
+                            current={preview.destination_current_slots}
+                            max={preview.destination_max_slots}
+                            percent={
+                                preview.destination_max_slots > 0
+                                    ? (preview.destination_current_slots /
+                                          preview.destination_max_slots) *
+                                      100
+                                    : 0
+                            }
+                            barClassName="bg-regent-st-blue-500"
+                        />
+                    </>
+                ) : null}
                 {preview.enchant_has_failure_risk ? (
                     <WarningAlert additional_css="my-2">
                         Enchanting can fail and destroy the item because your
@@ -2802,7 +3264,8 @@ export default class BatchCraftingSection extends React.Component<
                 !hasStartBlockers ? (
                     <WarningAlert additional_css="my-2">
                         This batch cannot complete any items with your current
-                        gold and Crafted Items Set space.
+                        gold{storesOutput ? " and Crafted Items Set space" : ""}
+                        .
                     </WarningAlert>
                 ) : preview.capped ? (
                     <WarningAlert additional_css="my-2">
@@ -2810,7 +3273,8 @@ export default class BatchCraftingSection extends React.Component<
                         {formatNumber(preview.effective_craftable_amount)} of
                         the requested{" "}
                         {formatNumber(preview.remaining_requested_amount)} items
-                        with your current gold and Crafted Items Set space.
+                        with your current gold
+                        {storesOutput ? " and Crafted Items Set space" : ""}.
                     </WarningAlert>
                 ) : null}
                 {preview.requested_amount >
@@ -2840,26 +3304,36 @@ export default class BatchCraftingSection extends React.Component<
 
         const hasStartBlockers =
             (this.state.preview?.start_blockers ?? []).length > 0;
+        const storesOutput = [
+            "keep",
+            "keep_best_sell_rest",
+            "keep_best_destroy_rest",
+        ].includes(this.state.disposition);
 
         return (
             <div className="grid gap-3">
                 {this.renderPreviewLoadingIndicator()}
-                <InfoAlert additional_css="text-sm my-2">
-                    Output for this batch is moved into the Alchemy Bag. This
-                    run is capped by Alchemy Bag space, Gold Dust, and Shards,
-                    whichever runs out first.
-                </InfoAlert>
-                <ProgressBar
-                    label="Alchemy Bag Space"
-                    current={preview.bag_current}
-                    max={preview.bag_max}
-                    percent={
-                        preview.bag_max > 0
-                            ? (preview.bag_current / preview.bag_max) * 100
-                            : 0
-                    }
-                    barClassName="bg-regent-st-blue-500"
-                />
+                {storesOutput ? (
+                    <>
+                        <InfoAlert additional_css="text-sm my-2">
+                            Output for this batch is moved into the Alchemy Bag.
+                            This run is capped by Alchemy Bag space, Gold Dust,
+                            and Shards, whichever runs out first.
+                        </InfoAlert>
+                        <ProgressBar
+                            label="Alchemy Bag Space"
+                            current={preview.bag_current}
+                            max={preview.bag_max}
+                            percent={
+                                preview.bag_max > 0
+                                    ? (preview.bag_current / preview.bag_max) *
+                                      100
+                                    : 0
+                            }
+                            barClassName="bg-regent-st-blue-500"
+                        />
+                    </>
+                ) : null}
                 {preview.effective_craftable_amount === 0 &&
                 !hasStartBlockers ? (
                     <>
@@ -2885,7 +3359,7 @@ export default class BatchCraftingSection extends React.Component<
                                 {formatNumber(preview.available_shards)}.
                             </WarningAlert>
                         ) : null}
-                        {preview.bag_remaining <= 0 ? (
+                        {storesOutput && preview.bag_remaining <= 0 ? (
                             <WarningAlert additional_css="my-2">
                                 Your Alchemy Bag is full. Free up space before
                                 starting this batch.
@@ -2898,7 +3372,8 @@ export default class BatchCraftingSection extends React.Component<
                         {formatNumber(preview.effective_craftable_amount)} of
                         the requested{" "}
                         {formatNumber(preview.remaining_requested_amount)} items
-                        with your current currency and alchemy bag space.
+                        with your current currency
+                        {storesOutput ? " and alchemy bag space" : ""}.
                     </WarningAlert>
                 ) : null}
             </div>
@@ -3098,13 +3573,45 @@ export default class BatchCraftingSection extends React.Component<
             weaponType,
         } = this.state;
 
+        const alchemyLocked = status?.event_batch?.alchemy_locked ?? false;
         const alchemyMaxed = status?.event_batch?.alchemy_maxed ?? false;
         const trinketryMaxed = status?.event_batch?.trinketry_maxed ?? false;
 
         const setBatchType = (batchType: BatchType) =>
             this.handleBatchTypeChange(batchType);
-        const setDisposition = (disposition: Disposition) =>
+        const setDisposition = (disposition: Disposition) => {
+            if (disposition === "list") {
+                let defaultListingPrice = 1;
+
+                if (this.state.batchType === "craft_and_enchant") {
+                    const amountCraftEnchantCost =
+                        this.state.preview?.amount_preview
+                            ?.total_per_item_cost ?? 0;
+                    const setCraftEnchantCost =
+                        (this.state.preview?.cost_breakdown?.craft_cost_total ??
+                            0) +
+                        (this.state.preview?.cost_breakdown
+                            ?.enchant_cost_total ?? 0);
+                    const craftEnchantCost =
+                        amountCraftEnchantCost > 0
+                            ? amountCraftEnchantCost
+                            : setCraftEnchantCost;
+
+                    if (craftEnchantCost > 0) {
+                        defaultListingPrice = craftEnchantCost;
+                    }
+                }
+
+                this.setState({
+                    disposition,
+                    listingPrice: defaultListingPrice,
+                });
+
+                return;
+            }
+
             this.setState({ disposition });
+        };
         const setCraftMode = (craftMode: CraftMode) =>
             this.setState({ craftMode });
         const setAlchemyMode = (alchemyMode: AlchemyMode) =>
@@ -3181,15 +3688,13 @@ export default class BatchCraftingSection extends React.Component<
             craftModeOptions[0];
         const selectedCraftMode = (selectedCraftModeOption?.value ??
             "specific_item") as CraftMode;
-        const availableDispositions = dispositions.filter(
-            (option) =>
-                batchType !== "enchant" &&
-                (option.value !== "list" || canList(batchType)) &&
-                (option.value !== "disenchant" || canDisenchant(batchType)) &&
-                (!["keep_best_sell_rest", "keep_best_disenchant_rest"].includes(
-                    option.value,
-                ) ||
-                    canKeepBestRest(batchType)),
+        const allowedDispositionValues = getAllowedDispositions(
+            batchType,
+            selectedCraftMode,
+            (selectedAlchemyModeOption?.value ?? "amount") as AlchemyMode,
+        );
+        const availableDispositions = dispositions.filter((option) =>
+            allowedDispositionValues.includes(option.value),
         );
         const selectedBatchType = availableBatchTypes.find(
             (option) => option.value === batchType,
@@ -3256,6 +3761,8 @@ export default class BatchCraftingSection extends React.Component<
         );
         const startDisabled =
             isSaving ||
+            (batchType === "alchemy" && alchemyLocked) ||
+            (batchType === "holy_oils" && alchemyLocked) ||
             (batchType === "alchemy" &&
                 selectedAlchemyModeOption?.value === "experience" &&
                 alchemyMaxed) ||
@@ -3396,8 +3903,21 @@ export default class BatchCraftingSection extends React.Component<
                             />
                         </label>
 
-                        {batchType !== "holy_oils" &&
-                        batchType !== "enchant" ? (
+                        {alchemyLocked ? (
+                            <WarningAlert additional_css="text-sm my-2">
+                                You need to unlock Alchemy before you can batch
+                                craft alchemy items.
+                            </WarningAlert>
+                        ) : null}
+
+                        {alchemyLocked ? (
+                            <WarningAlert additional_css="text-sm my-2">
+                                You need to unlock Alchemy before you can batch
+                                craft with Holy Oils.
+                            </WarningAlert>
+                        ) : null}
+
+                        {availableDispositions.length > 1 ? (
                             <label className="grid gap-1 text-sm font-semibold">
                                 Disposition
                                 <Select
@@ -3420,16 +3940,6 @@ export default class BatchCraftingSection extends React.Component<
                                     value={selectedDisposition}
                                 />
                             </label>
-                        ) : null}
-
-                        {disposition === "keep_highest" ? (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                {batchType === "craft_and_enchant"
-                                    ? "Keep Highest will keep the highest/best enchanted item crafted and disenchant the rest."
-                                    : batchType === "trinketry"
-                                      ? "Keep Highest will keep the highest/best trinket crafted and sell the rest."
-                                      : "Keep Highest will keep the highest/best item crafted and sell the rest."}
-                            </p>
                         ) : null}
 
                         {(batchType === "craft" ||
@@ -3505,6 +4015,16 @@ export default class BatchCraftingSection extends React.Component<
                             <InfoAlert additional_css="text-sm my-2">
                                 Alchemy is maxed, so this character cannot batch
                                 craft alchemy items for experience.
+                            </InfoAlert>
+                        ) : null}
+
+                        {batchType === "alchemy" &&
+                        disposition === "use_now" ? (
+                            <InfoAlert additional_css="text-sm my-2">
+                                We will only use usable items on you. The rest
+                                will be placed into your Alchemy Bag. You may
+                                only have 10 boons at a time, so extras will be
+                                placed into your Alchemy Bag.
                             </InfoAlert>
                         ) : null}
 
@@ -3824,10 +4344,10 @@ export default class BatchCraftingSection extends React.Component<
                                                             enchantment.type ===
                                                             "prefix",
                                                     )
-                                                    .map((enchantment) => ({
-                                                        value: enchantment.id,
-                                                        label: enchantment.name,
-                                                    }))}
+                                                    .map(toAffixOption)}
+                                                formatOptionLabel={
+                                                    formatAffixOptionLabel
+                                                }
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
                                                 styles={{
@@ -3847,10 +4367,7 @@ export default class BatchCraftingSection extends React.Component<
                                                                 enchantment.id ===
                                                                     selectedPrefixId,
                                                         )
-                                                        .map((enchantment) => ({
-                                                            value: enchantment.id,
-                                                            label: enchantment.name,
-                                                        }))[0]
+                                                        .map(toAffixOption)[0]
                                                 }
                                             />
                                         </label>
@@ -3876,10 +4393,10 @@ export default class BatchCraftingSection extends React.Component<
                                                             enchantment.type ===
                                                             "suffix",
                                                     )
-                                                    .map((enchantment) => ({
-                                                        value: enchantment.id,
-                                                        label: enchantment.name,
-                                                    }))}
+                                                    .map(toAffixOption)}
+                                                formatOptionLabel={
+                                                    formatAffixOptionLabel
+                                                }
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
                                                 styles={{
@@ -3899,10 +4416,7 @@ export default class BatchCraftingSection extends React.Component<
                                                                 enchantment.id ===
                                                                     selectedSuffixId,
                                                         )
-                                                        .map((enchantment) => ({
-                                                            value: enchantment.id,
-                                                            label: enchantment.name,
-                                                        }))[0]
+                                                        .map(toAffixOption)[0]
                                                 }
                                             />
                                         </label>
@@ -4309,6 +4823,8 @@ export default class BatchCraftingSection extends React.Component<
                         {this.renderCostBreakdown(
                             selectedSetNotEmpty || hasBlockingTargetSetBlocker,
                         )}
+
+                        {this.renderListingPricePanel()}
 
                         {message !== "" ? (
                             <p className="text-sm text-red-700 dark:text-red-300">

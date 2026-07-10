@@ -3,10 +3,9 @@ import TopsDisplayField from "../types/tops-display-field";
 import TopsLeaderboardRow from "../types/tops-leaderboard-row";
 import TopsCharacterNameLink from "./tops-character-name-link";
 import TopsRankBadge from "./tops-rank-badge";
-import {
-    formatTopsCompactValue,
-    formatTopsValue,
-} from "../helpers/tops-format-value";
+import TopsStatList from "./tops-stat-list";
+import TopsStatListItem from "../types/tops-stat-list-item";
+import { formatTopsCompactFieldValue } from "../helpers/tops-format-value";
 import {
     mobileCardClasses,
     podiumAccentClasses,
@@ -18,25 +17,14 @@ export default class TopsMobileLeaderboardCards extends React.Component<TopsMobi
         return mobileCardClasses(rank);
     }
 
-    renderMetricCell(row: TopsLeaderboardRow, field: TopsDisplayField) {
-        return (
-            <div
-                key={field.key}
-                className="flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-sm bg-white/40 px-3 py-2 text-center dark:bg-black/15"
-            >
-                <p
-                    className={
-                        "block w-full text-center text-xs font-bold " +
-                        podiumAccentClasses(row.rank)
-                    }
-                >
-                    {field.label}
-                </p>
-                <p className="block w-full whitespace-nowrap text-center font-black tabular-nums">
-                    {formatTopsValue(row[field.key])}
-                </p>
-            </div>
-        );
+    supportingMetricItems(row: TopsLeaderboardRow): TopsStatListItem[] {
+        return this.props.supportingMetrics
+            .slice(0, 4)
+            .map((field: TopsDisplayField) => ({
+                label: field.label,
+                value: row[field.key],
+                type: field.type,
+            }));
     }
 
     renderCard(row: TopsLeaderboardRow) {
@@ -75,17 +63,18 @@ export default class TopsMobileLeaderboardCards extends React.Component<TopsMobi
                         {this.props.primaryMetric.label}
                     </p>
                     <p className="block w-full whitespace-nowrap text-center text-3xl font-black leading-none tabular-nums">
-                        {formatTopsCompactValue(
+                        {formatTopsCompactFieldValue(
+                            this.props.primaryMetric,
                             row[this.props.primaryMetric.key],
                         )}
                     </p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                    {this.props.supportingMetrics
-                        .slice(0, 4)
-                        .map((field: TopsDisplayField) =>
-                            this.renderMetricCell(row, field),
-                        )}
+                <div className="mt-4">
+                    <TopsStatList
+                        items={this.supportingMetricItems(row)}
+                        compact={true}
+                        accentClassName={podiumAccentClasses(row.rank)}
+                    />
                 </div>
             </article>
         );

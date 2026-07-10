@@ -127,6 +127,7 @@ export type BatchCraftingItemSnapshot = {
     item_id?: number | null;
     item_id_for_modal?: number | null;
     slot_id_for_modal?: number | null;
+    set_slot_id?: number | null;
     name?: string;
     type?: string;
     affix_count?: number;
@@ -155,6 +156,7 @@ export type BatchCraftingActionLogEntry = {
     timestamp?: string;
     action_type?: string;
     status?: string;
+    disposition?: string;
     crafted_item?: BatchCraftingItemSnapshot | null;
     enchanted_item?: BatchCraftingItemSnapshot | null;
     alchemy_item?: BatchCraftingItemSnapshot | null;
@@ -238,6 +240,7 @@ export type BatchCraftingStatus = {
         max_runtime_hours: number;
         active_event_mode: boolean;
         crafting_skills_maxed: boolean;
+        alchemy_locked: boolean;
         alchemy_maxed: boolean;
         trinketry_maxed: boolean;
         enchanting_maxed: boolean;
@@ -285,6 +288,9 @@ export type BatchCraftingStatus = {
         shards_spent_total?: number;
         shards_gained_total?: number;
         shards_left?: number;
+        listing_price_per_item?: number | null;
+        total_listed_value?: number;
+        potential_seller_net?: number;
         craft_set_current_item?: BatchCraftingItemSnapshot | null;
         craft_enchant_set_phase?:
             | "crafting"
@@ -364,6 +370,7 @@ export type BatchCraftingStatus = {
                 gold_dust_gained: number;
                 shards_spent: number;
                 shards_gained: number;
+                listed_value: number;
             }[];
             outcomes: { tick: number; success: number; failure: number }[];
             gold_dust: { tick: number; gained: number }[];
@@ -491,6 +498,42 @@ function formatStatus(value?: string | null): string {
     return value.replace(/_/g, " ");
 }
 
+function actionHistoryStatusLabel(entry: BatchCraftingActionLogEntry): string {
+    const disposition = entry.disposition ?? null;
+
+    // Craft+Enchant Amount/Experience attach enchanted_item to the same row as the
+    // disposition; Craft+Enchant Set's finalize row never carries enchanted_item, so
+    // its action_type is the only signal that this row is an enchanted final output.
+    const isEnchantedOutput =
+        disposition !== null &&
+        (entry.enchanted_item != null ||
+            entry.action_type === "craft_enchant_set_finalize");
+
+    if (isEnchantedOutput) {
+        if (disposition === "keep" || disposition.startsWith("keep_best")) {
+            return "Enchanted and Kept";
+        }
+
+        if (disposition === "sell") {
+            return "Enchanted and Sold";
+        }
+
+        if (disposition === "destroy") {
+            return "Enchanted and Destroyed";
+        }
+
+        if (disposition === "list") {
+            return "Enchanted and Listed";
+        }
+
+        if (disposition === "disenchant") {
+            return "Enchanted and Disenchanted";
+        }
+    }
+
+    return formatStatus(entry.status);
+}
+
 function statusBadgeClasses(status?: string | null): string {
     if (status === "failed" || status === "destroyed") {
         return "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300";
@@ -528,7 +571,11 @@ type CurrencyChartConfig = {
     spentLabel: string;
     spentField: "gold_spent" | "gold_dust_spent" | "shards_spent";
     gainedLabel: string;
-    gainedField: "gold_gained" | "gold_dust_gained" | "shards_gained";
+    gainedField:
+        | "gold_gained"
+        | "gold_dust_gained"
+        | "shards_gained"
+        | "listed_value";
 };
 
 function resolveCurrencyChartConfig(
@@ -561,12 +608,23 @@ function resolveCurrencyChartConfig(
         (disposition === "keep_highest" &&
             ["craft", "alchemy", "trinketry"].includes(batch.batch_type));
 
+    const listsRest = disposition === "list";
+
     if (disenchantsRest) {
         return {
             spentLabel,
             spentField,
             gainedLabel: "Gold Dust Gained",
             gainedField: "gold_dust_gained",
+        };
+    }
+
+    if (listsRest) {
+        return {
+            spentLabel,
+            spentField,
+            gainedLabel: "Listed Value",
+            gainedField: "listed_value",
         };
     }
 
@@ -703,6 +761,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         this.state = {
             page: 1,
             openItemId: null,
+            openSetSlotId: null,
             openSnapshot: null,
             affixDetailsModalAffix: null,
             affixDetailsModalOpen: false,
@@ -738,9 +797,13 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         });
     }
 
-    setOpenItemId(openItemId: number | null) {
+    setOpenItemId(
+        openItemId: number | null,
+        openSetSlotId: number | null = null,
+    ) {
         this.setState({
             openItemId,
+            openSetSlotId,
         });
     }
 
@@ -834,18 +897,37 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             />
         );
 
-        const liveItemId = item.item_id_for_modal ?? null;
+        // set_slot_id signals that the item now lives in a real, viewable
+        // Crafted Items Set slot. InventoryUseDetails is keyed by the
+        // underlying Item id (item_id) for the details it displays, but
+        // duplicate non-enchanted items can share the same catalog item_id
+        // across several SetSlots, so set_slot_id is also passed through as
+        // an exact-slot hint (backend falls back to its old item_id-only
+        // lookup when no slot id is supplied, so every other existing caller
+        // of this modal is unaffected).
+        const hasSetSlot =
+            item.set_slot_id !== null &&
+            typeof item.set_slot_id !== "undefined";
+        const liveItemId =
+            item.item_id_for_modal ??
+            (hasSetSlot ? (item.item_id ?? null) : null);
         const hasLiveSlot =
-            item.slot_id_for_modal !== null &&
-            typeof item.slot_id_for_modal !== "undefined";
+            (item.slot_id_for_modal !== null &&
+                typeof item.slot_id_for_modal !== "undefined") ||
+            hasSetSlot;
 
-        if (item.can_view && liveItemId && hasLiveSlot) {
+        if ((item.can_view || hasSetSlot) && liveItemId && hasLiveSlot) {
             return (
                 <button
                     type="button"
                     className="text-left hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
                     aria-label={`View details for ${item.name}`}
-                    onClick={() => this.setOpenItemId(liveItemId)}
+                    onClick={() =>
+                        this.setOpenItemId(
+                            liveItemId,
+                            hasSetSlot ? (item.set_slot_id ?? null) : null,
+                        )
+                    }
                 >
                     {text}
                 </button>
@@ -1054,6 +1136,22 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             { label: "Applied", value: batch.counts.applied },
             { label: "Skipped", value: batch.counts.skipped },
             { label: "Failed", value: batch.counts.failed },
+            ...(batch.disposition === "list"
+                ? [
+                      {
+                          label: "Listing Price Per Item",
+                          value: batch.listing_price_per_item ?? 0,
+                      },
+                      {
+                          label: "Total Listed Value",
+                          value: batch.total_listed_value ?? 0,
+                      },
+                      {
+                          label: "Potential Net After Market Tax",
+                          value: batch.potential_seller_net ?? 0,
+                      },
+                  ]
+                : []),
         ].filter((row) => row.value > 0);
 
         if (rows.length === 0) {
@@ -1069,6 +1167,57 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </React.Fragment>
                 ))}
             </dl>
+        );
+    }
+
+    // Shared listing-summary rows for the List disposition, spread into
+    // renderDetailGrid-style row arrays (Craft and Enchant Amount/Experience,
+    // Alchemy Amount/Experience, Holy Oils Selected). Only meaningful when
+    // the batch's disposition is "list".
+    listingSummaryRows(batch: NonNullable<BatchCraftingStatus["batch"]>): {
+        label: string;
+        value: React.ReactNode;
+        show?: boolean;
+    }[] {
+        if (batch.disposition !== "list") {
+            return [];
+        }
+
+        return [
+            {
+                label: "Listing Price Per Item",
+                value: formatNumber(batch.listing_price_per_item ?? 0),
+            },
+            {
+                label: "Total Listed Value",
+                value: formatNumber(batch.total_listed_value ?? 0),
+            },
+            {
+                label: "Potential Net After Market Tax",
+                value: formatNumber(batch.potential_seller_net ?? 0),
+            },
+        ];
+    }
+
+    // Same data as listingSummaryRows, but as direct dt/dd children for the
+    // hand-built <dl> panels (Craft and Enchant Set, Holy Oils Set) that
+    // don't go through renderDetailGrid.
+    renderListingValueDtDd(batch: NonNullable<BatchCraftingStatus["batch"]>) {
+        if (batch.disposition !== "list") {
+            return null;
+        }
+
+        return (
+            <>
+                <dt className="font-semibold">Listing Price Per Item</dt>
+                <dd>{formatNumber(batch.listing_price_per_item ?? 0)}</dd>
+                <dt className="font-semibold">Total Listed Value</dt>
+                <dd>{formatNumber(batch.total_listed_value ?? 0)}</dd>
+                <dt className="font-semibold">
+                    Potential Net After Market Tax
+                </dt>
+                <dd>{formatNumber(batch.potential_seller_net ?? 0)}</dd>
+            </>
         );
     }
 
@@ -1101,7 +1250,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <ul className="grid gap-3">
                     {this.entries().map((entry, index) => {
                         const item = primaryItem(entry);
-                        const statusLabel = formatStatus(entry.status);
+                        const statusLabel = actionHistoryStatusLabel(entry);
                         const noItemProduced =
                             !item &&
                             !(entry.crafted_item && entry.enchanted_item);
@@ -1397,69 +1546,6 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         );
     }
 
-    renderCraftAndEnchantExperienceCharts(
-        batch: NonNullable<BatchCraftingStatus["batch"]>,
-        showGoldDustChart: boolean,
-    ) {
-        const chartPoints = batch.chart_points;
-
-        if (!chartPoints) {
-            return null;
-        }
-
-        const outcomeLines: ChartLine[] = [
-            {
-                label: "Success",
-                color: "#22c55e",
-                data: chartPoints.outcomes.map((point) => ({
-                    label: String(point.tick),
-                    value: point.success,
-                })),
-            },
-            {
-                label: "Failure",
-                color: "#ef4444",
-                data: chartPoints.outcomes.map((point) => ({
-                    label: String(point.tick),
-                    value: point.failure,
-                })),
-            },
-        ];
-        const goldDustLines: ChartLine[] = [
-            {
-                label: "Gold Dust Gained",
-                color: "#d97706",
-                data: (chartPoints.gold_dust ?? []).map((point) => ({
-                    label: String(point.tick),
-                    value: point.gained,
-                })),
-            },
-        ];
-
-        return (
-            <section
-                className={
-                    showGoldDustChart
-                        ? "grid gap-4 sm:grid-cols-2"
-                        : "grid gap-4"
-                }
-            >
-                <BatchLineChart
-                    title="Success vs Failure"
-                    lines={outcomeLines}
-                    yAxisLabel="Count"
-                />
-                {showGoldDustChart ? (
-                    <BatchLineChart
-                        title="Gold Dust Gained Over Time"
-                        lines={goldDustLines}
-                        yAxisLabel="Gold Dust"
-                    />
-                ) : null}
-            </section>
-        );
-    }
-
     renderActionButtons(isActive: boolean, isSaving: boolean) {
         const { onCancel, onClose, onDismiss } = this.props;
 
@@ -1602,6 +1688,16 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             return null;
         }
 
+        const enchantAffixes = batch.enchant_affixes ?? [];
+        const previewPrefixAffix =
+            enchantAffixes.find(
+                (affix: any) => affix.name === preview.prefix_affix_name,
+            ) ?? null;
+        const previewSuffixAffix =
+            enchantAffixes.find(
+                (affix: any) => affix.name === preview.suffix_affix_name,
+            ) ?? null;
+
         return (
             <div className="grid gap-3">
                 <InfoAlert additional_css="text-sm my-2">
@@ -1617,13 +1713,23 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     {preview.prefix_affix_name ? (
                         <>
                             <dt className="font-semibold">Prefix</dt>
-                            <dd>{preview.prefix_affix_name}</dd>
+                            <dd>
+                                {this.renderAffixName(
+                                    preview.prefix_affix_name,
+                                    previewPrefixAffix,
+                                )}
+                            </dd>
                         </>
                     ) : null}
                     {preview.suffix_affix_name ? (
                         <>
                             <dt className="font-semibold">Suffix</dt>
-                            <dd>{preview.suffix_affix_name}</dd>
+                            <dd>
+                                {this.renderAffixName(
+                                    preview.suffix_affix_name,
+                                    previewSuffixAffix,
+                                )}
+                            </dd>
                         </>
                     ) : null}
                     <dt className="font-semibold">Per Item Cost</dt>
@@ -1790,6 +1896,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             "keep",
             "keep_highest",
             "keep_best_sell_rest",
+            "keep_best_destroy_rest",
             "keep_best_disenchant_rest",
         ].includes(batch.disposition);
 
@@ -2049,6 +2156,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                             : "None"}
                     </dd>
                     {this.renderCurrencyDetails(batch)}
+                    {this.renderGoldDustGainedIfApplicable(batch)}
+                    {this.renderListingValueDtDd(batch)}
                     <dt className="font-semibold">Failed</dt>
                     <dd>{formatNumber(batch.counts.failed)}</dd>
                     <dt className="font-semibold">Skipped</dt>
@@ -2331,6 +2440,15 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     <dd>{formatNumber(batch.holy_oil_gold_dust_spent ?? 0)}</dd>
                     <dt className="font-semibold">Gold Dust Left</dt>
                     <dd>{formatNumber(batch.gold_dust_left ?? 0)}</dd>
+                    {(batch.gold_gained_total ?? 0) > 0 ? (
+                        <>
+                            <dt className="font-semibold">Gold Gained</dt>
+                            <dd>
+                                {formatNumber(batch.gold_gained_total ?? 0)}
+                            </dd>
+                        </>
+                    ) : null}
+                    {this.renderListingValueDtDd(batch)}
                 </dl>
 
                 {this.renderHolyOilsSetPreview(batch)}
@@ -2352,11 +2470,15 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             "disenchant",
             "keep_best_disenchant_rest",
         ].includes(batch.disposition);
+        const sells = ["sell", "keep_best_sell_rest"].includes(
+            batch.disposition,
+        );
         const set = batch.batch_crafting_set;
         const movesToCraftedItemsSet = [
             "keep",
             "keep_highest",
             "keep_best_sell_rest",
+            "keep_best_destroy_rest",
             "keep_best_disenchant_rest",
         ].includes(batch.disposition);
 
@@ -2400,6 +2522,11 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         show: disenchants,
                     },
                     {
+                        label: "Gold Gained",
+                        value: formatNumber(batch.gold_gained_total ?? 0),
+                        show: sells,
+                    },
+                    {
                         label: "Successes",
                         value: formatNumber(
                             (batch.counts.crafted ?? 0) +
@@ -2417,10 +2544,11 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                             : "0 / 2000",
                         show: !!set && movesToCraftedItemsSet,
                     },
+                    ...this.listingSummaryRows(batch),
                 ])}
                 {this.renderSkillsList(batch.skills)}
                 {this.renderUsefulCounts(batch)}
-                {this.renderCraftAndEnchantExperienceCharts(batch, disenchants)}
+                {this.renderCharts(batch)}
                 {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
@@ -2500,6 +2628,13 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         ].includes(batch.disposition),
                     },
                     {
+                        label: "Gold Gained",
+                        value: formatNumber(batch.gold_gained_total ?? 0),
+                        show: ["sell", "keep_best_sell_rest"].includes(
+                            batch.disposition,
+                        ),
+                    },
+                    {
                         label: "Failed",
                         value: formatNumber(batch.counts.failed),
                     },
@@ -2507,7 +2642,9 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         label: "Skipped",
                         value: formatNumber(batch.counts.skipped),
                     },
+                    ...this.listingSummaryRows(batch),
                 ])}
+                {this.renderCharts(batch)}
                 {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
@@ -2666,6 +2803,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         label: "Failures",
                         value: formatNumber(batch.counts.failed),
                     },
+                    ...this.listingSummaryRows(batch),
                 ])}
                 {this.renderCharts(batch)}
                 {this.renderActionHistory(isActive, batch.ended_reason)}
@@ -2733,6 +2871,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: formatNumber(batch.gold_gained_total ?? 0),
                         show: (batch.gold_gained_total ?? 0) > 0,
                     },
+                    ...this.listingSummaryRows(batch),
                 ])}
                 {this.renderAlchemyAmountPreview(batch)}
                 {this.renderCharts(batch)}
@@ -2951,8 +3090,15 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         label: "Current Oil Item",
                         value: this.renderItem(batch.holy_oil_current_oil_item),
                     },
+                    {
+                        label: "Gold Gained",
+                        value: formatNumber(batch.gold_gained_total ?? 0),
+                        show: (batch.gold_gained_total ?? 0) > 0,
+                    },
+                    ...this.listingSummaryRows(batch),
                 ])}
                 {this.renderHolyOilsSelectedPreview(batch)}
+                {this.renderCharts(batch)}
                 {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}
                 {this.renderOpenModals()}
@@ -2970,6 +3116,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         is_open={true}
                         character_id={character_id}
                         item_id={this.state.openItemId}
+                        slot_id={this.state.openSetSlotId ?? undefined}
                         manage_modal={() => this.setOpenItemId(null)}
                     />
                 ) : null}

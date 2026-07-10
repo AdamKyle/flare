@@ -5,7 +5,9 @@ namespace App\Game\Character\CharacterInventory\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
 use App\Game\Character\CharacterInventory\Requests\ComparisonFromChatValidate;
 use App\Game\Character\CharacterInventory\Requests\ComparisonValidation;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
@@ -63,6 +65,23 @@ class ItemComparisonController extends Controller
 
             return response()->json([
                 'comparison_data' => $this->comparisonService->buildAlchemyBagComparisonData($character, $alchemyBagSlot),
+                'usable_sets' => [],
+            ]);
+        }
+
+        if ($request->source === 'crafted_items_set') {
+            $setSlot = SetSlot::where('id', $request->id)
+                ->whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id)
+                    ->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE))
+                ->with('item')
+                ->first();
+
+            if (is_null($setSlot) || is_null($setSlot->item)) {
+                return response()->json(['message' => 'Item does not exist  ...'], 404);
+            }
+
+            return response()->json([
+                'comparison_data' => $this->comparisonService->buildSetSlotComparisonData($character, $setSlot),
                 'usable_sets' => [],
             ]);
         }

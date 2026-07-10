@@ -28,7 +28,7 @@ export default class KingdomTops extends React.Component<
             error_message: null,
             leaderboard: null,
             period: props.default_period,
-            metric: "total_value",
+            metric: "kingdom_count",
             search: "",
         };
 

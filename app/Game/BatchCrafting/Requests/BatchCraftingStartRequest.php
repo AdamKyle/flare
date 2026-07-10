@@ -58,6 +58,7 @@ class BatchCraftingStartRequest extends FormRequest
             'disposition' => ['required', Rule::in(array_column(BatchCraftingDisposition::cases(), 'value'))],
             'selected_items' => ['nullable', 'array'],
             'selected_oils' => ['nullable', 'array'],
+            'listing_price' => ['nullable', 'integer', 'min:1'],
             'progress' => ['nullable', 'array'],
             'progress.craft_mode' => ['nullable', 'string', Rule::in(['specific_item', 'experience', 'event', 'craft_set', 'craft_enchant_set'])],
             'progress.craft_experience_skill' => ['nullable', 'string', Rule::in(['weapon', 'armour', 'ring', 'spell', 'enchanting'])],
@@ -148,6 +149,10 @@ class BatchCraftingStartRequest extends FormRequest
         $validator->sometimes('progress.alchemy_item_id', ['required'], function ($input) {
             return $input->batch_type === BatchCraftingType::ALCHEMY->value
                 && ($input->progress['alchemy_mode'] ?? null) === 'amount';
+        });
+
+        $validator->sometimes('listing_price', ['required', 'integer', 'min:1'], function ($input) {
+            return $input->disposition === BatchCraftingDisposition::LIST->value;
         });
     }
 }

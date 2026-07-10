@@ -23,6 +23,7 @@ export default interface BatchCraftingSectionState {
     statusLoadError: string | null;
     batchType: BatchType;
     disposition: Disposition;
+    listingPrice: number | "";
     message: string;
     isSaving: boolean;
     holyOilItems: HolyOilItem[];
@@ -53,7 +54,6 @@ export default interface BatchCraftingSectionState {
     selectedSetId: number | null;
     craftEnchantSetMode: "build_new";
     craftEnchantSetPlan: CraftEnchantSetPlan;
-    craftEnchantSetDefaultsApplied: boolean;
     craftEnchantSetBulkPrefixId: number | null;
     craftEnchantSetBulkSuffixId: number | null;
     craftSetPlan: CraftSetPlan;
@@ -63,4 +63,7 @@ export default interface BatchCraftingSectionState {
     hideMaxedCraftNotice: boolean;
     affixDetailsModalAffix: EnchantmentOption | null;
     craftEnchantSetItemDetailsModalItem: any | null;
+    listingChartData: any[];
+    listingChartLoading: boolean;
+    listingChartItemId: number | null;
 }

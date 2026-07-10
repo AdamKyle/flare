@@ -286,7 +286,7 @@ export default class ProfileQuestsSection extends React.Component<
                     >
                         <button
                             type="button"
-                            className="text-left font-semibold text-regent-st-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-regent-st-blue-400 dark:text-regent-st-blue-300"
+                            className="text-left font-semibold text-gray-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-regent-st-blue-400 dark:text-gray-100"
                             onClick={() =>
                                 this.setState({ selectedQuest: quest })
                             }

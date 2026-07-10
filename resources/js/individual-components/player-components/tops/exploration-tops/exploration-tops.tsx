@@ -10,7 +10,7 @@ import ExplorationLeaderboard from "./components/exploration-leaderboard";
 import TopsApiResponse from "../shared/types/tops-api-response";
 
 const resetDescription =
-    "Leaderboards reset on the first day of each calendar month. Current Month is shown by default, previous monthly results stay available through archived snapshots, and All Time keeps lifetime totals.";
+    "This leaderboard tracks live, cumulative character progress and does not reset each month. Current Month and All Time reflect the same up-to-date totals; switching periods changes which characters are eligible to appear, not the underlying data.";
 
 export default class ExplorationTops extends React.Component<
     ExplorationTopsProps,

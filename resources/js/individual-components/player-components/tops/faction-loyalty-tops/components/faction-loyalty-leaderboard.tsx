@@ -1,47 +1,34 @@
 import React from "react";
 import TopsDisplayField from "../../shared/types/tops-display-field";
 import TopsLeaderboardDashboard from "../../shared/components/tops-leaderboard-dashboard";
-import TopsPeriod from "../../shared/types/tops-period";
 import FactionLoyaltyLeaderboardProps from "../types/faction-loyalty-leaderboard-props";
 
 export default class FactionLoyaltyLeaderboard extends React.Component<FactionLoyaltyLeaderboardProps> {
     tableFields(): TopsDisplayField[] {
         return [
             {
-                key: "highest_faction_level",
-                label: "Highest Faction Level",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "highest_faction_points",
-                label: "Highest Faction Points",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "maxed_faction_count",
-                label: "Maxed Factions",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "highest_npc_loyalty_level",
-                label: "NPC Loyalty",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "automation_run_count",
-                label: "Automation Runs",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "latest_action",
-                label: "Latest Action",
+                key: "highest_faction_name",
+                label: "Highest Level Faction",
                 align: "left",
                 type: "text",
+            },
+            {
+                key: "total_faction_level",
+                label: "Total Faction Level",
+                align: "right",
+                type: "number",
+            },
+            {
+                key: "npcs_helped_count",
+                label: "NPCs Helped",
+                align: "right",
+                type: "number",
+            },
+            {
+                key: "total_npc_fame_level",
+                label: "Total NPC Fame Level",
+                align: "right",
+                type: "number",
             },
         ];
     }
@@ -49,26 +36,20 @@ export default class FactionLoyaltyLeaderboard extends React.Component<FactionLo
     supportingMetrics(): TopsDisplayField[] {
         return [
             {
-                key: "highest_faction_level",
-                label: "Highest Faction Level",
+                key: "highest_faction_name",
+                label: "Faction",
+                align: "left",
+                type: "text",
+            },
+            {
+                key: "total_faction_level",
+                label: "Faction Lvls",
                 align: "right",
                 type: "number",
             },
             {
-                key: "highest_faction_points",
-                label: "Highest Faction Points",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "maxed_faction_count",
-                label: "Maxed Factions",
-                align: "right",
-                type: "number",
-            },
-            {
-                key: "highest_npc_loyalty_level",
-                label: "NPC Loyalty",
+                key: "npcs_helped_count",
+                label: "NPCs Helped",
                 align: "right",
                 type: "number",
             },
@@ -76,14 +57,9 @@ export default class FactionLoyaltyLeaderboard extends React.Component<FactionLo
     }
 
     primaryMetric(): TopsDisplayField {
-        const metric = this.props.leaderboard?.available_metrics.find(
-            (availableMetric: TopsPeriod) =>
-                availableMetric.key === this.props.metric,
-        );
-
         return {
-            key: this.props.metric,
-            label: metric?.label ?? "Highest Faction Level",
+            key: "total_npc_fame_level",
+            label: "NPC Fame Level",
             align: "right",
             type: "number",
         };
@@ -93,8 +69,8 @@ export default class FactionLoyaltyLeaderboard extends React.Component<FactionLo
         return (
             <TopsLeaderboardDashboard
                 title="Faction Loyalty Leaderboard"
-                description="The strongest faction progression, ranked by fame, maxed factions, NPC loyalty, and automation activity."
-                resetDescription="Leaderboards reset on the first day of each calendar month. Current Month is shown by default, previous monthly results stay available through archived snapshots, and All Time keeps lifetime totals."
+                description="Ranked by Highest Level Faction, tie-broken by Total Faction Level, NPCs Helped, and Total NPC Fame Level."
+                resetDescription="This leaderboard tracks live, cumulative character progress and does not reset each month. Current Month and All Time reflect the same up-to-date totals."
                 response={this.props.leaderboard}
                 primaryMetric={this.primaryMetric()}
                 supportingMetrics={this.supportingMetrics()}

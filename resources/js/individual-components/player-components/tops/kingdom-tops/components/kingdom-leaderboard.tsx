@@ -8,14 +8,14 @@ export default class KingdomLeaderboard extends React.Component<KingdomLeaderboa
     tableFields(): TopsDisplayField[] {
         return [
             {
-                key: "total_value",
-                label: "Total Value",
+                key: "kingdom_count",
+                label: "Kingdoms",
                 align: "right",
                 type: "number",
             },
             {
-                key: "kingdom_count",
-                label: "Kingdoms",
+                key: "total_value",
+                label: "Total Value",
                 align: "right",
                 type: "number",
             },

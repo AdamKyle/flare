@@ -4,6 +4,7 @@ namespace Tests\Unit\Flare\Transformers;
 
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\GemBagSlot;
+use App\Flare\Models\InventorySet;
 use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -55,6 +56,28 @@ class CharacterInventoryCountTransformerTest extends TestCase
         $this->assertArrayHasKey('gem_bag_count', $data);
         $this->assertArrayHasKey('gem_bag_limit', $data);
         $this->assertArrayHasKey('is_gem_bag_full', $data);
+    }
+
+    public function testTransformerPayloadIncludesCraftedItemsSetCountAndMax(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => 25,
+        ]);
+        $set->slots()->create(['item_id' => $this->createItem()->id]);
+        $set->slots()->create(['item_id' => $this->createItem()->id]);
+
+        $data = resolve(CharacterInventoryCountTransformer::class)->transform($character->refresh());
+
+        $this->assertSame(2, $data['crafted_items_set_count']);
+        $this->assertSame(25, $data['crafted_items_set_max']);
     }
 
     public function testTransformerAlchemyBagCountReflectsSlotAmounts(): void

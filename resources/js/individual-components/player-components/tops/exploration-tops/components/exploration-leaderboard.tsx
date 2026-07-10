@@ -8,10 +8,15 @@ export default class ExplorationLeaderboard extends React.Component<ExplorationL
     tableFields(): TopsDisplayField[] {
         return [
             { key: "kills", label: "Kills", align: "right", type: "number" },
-            { key: "fights", label: "Fights", align: "right", type: "number" },
+            {
+                key: "length_of_time_seconds",
+                label: "Length of Time",
+                align: "right",
+                type: "duration",
+            },
             {
                 key: "xp_gained",
-                label: "XP Gained",
+                label: "XP",
                 align: "right",
                 type: "number",
             },
@@ -20,13 +25,6 @@ export default class ExplorationLeaderboard extends React.Component<ExplorationL
                 label: "Skill XP",
                 align: "right",
                 type: "number",
-            },
-            { key: "run_count", label: "Runs", align: "right", type: "number" },
-            {
-                key: "latest_started_at",
-                label: "Latest Started",
-                align: "left",
-                type: "date",
             },
         ];
     }
@@ -34,10 +32,15 @@ export default class ExplorationLeaderboard extends React.Component<ExplorationL
     supportingMetrics(): TopsDisplayField[] {
         return [
             { key: "kills", label: "Kills", align: "right", type: "number" },
-            { key: "fights", label: "Fights", align: "right", type: "number" },
+            {
+                key: "length_of_time_seconds",
+                label: "Length of Time",
+                align: "right",
+                type: "duration",
+            },
             {
                 key: "xp_gained",
-                label: "XP Gained",
+                label: "XP",
                 align: "right",
                 type: "number",
             },
@@ -48,6 +51,14 @@ export default class ExplorationLeaderboard extends React.Component<ExplorationL
                 type: "number",
             },
         ];
+    }
+
+    metricType(): TopsDisplayField["type"] {
+        if (this.props.metric === "length_of_time_seconds") {
+            return "duration";
+        }
+
+        return "number";
     }
 
     primaryMetric(): TopsDisplayField {
@@ -60,7 +71,7 @@ export default class ExplorationLeaderboard extends React.Component<ExplorationL
             key: this.props.metric,
             label: metric?.label ?? "Kills",
             align: "right",
-            type: "number",
+            type: this.metricType(),
         };
     }
 
@@ -68,8 +79,8 @@ export default class ExplorationLeaderboard extends React.Component<ExplorationL
         return (
             <TopsLeaderboardDashboard
                 title="Exploration Leaderboard"
-                description="The most active explorers, ranked by kills, fights, XP, skill XP, and runs."
-                resetDescription="Leaderboards reset on the first day of each calendar month. Current Month is shown by default, previous monthly results stay available through archived snapshots, and All Time keeps lifetime totals."
+                description="The most active explorers, ranked by kills, length of time, XP, and skill XP."
+                resetDescription="This leaderboard tracks live, cumulative character progress and does not reset each month. Current Month and All Time reflect the same up-to-date totals."
                 response={this.props.leaderboard}
                 primaryMetric={this.primaryMetric()}
                 supportingMetrics={this.supportingMetrics()}

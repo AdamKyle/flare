@@ -12,14 +12,14 @@ export default class TopsPodium extends React.Component<TopsPodiumProps> {
 
     cardWidthClass(cardsCount: number, isFeatured: boolean): string {
         if (cardsCount === 1) {
-            return "w-full max-w-md";
+            return "w-full max-w-sm";
         }
 
         if (cardsCount === 3 && isFeatured) {
-            return "w-full max-w-sm lg:max-w-md";
+            return "w-full max-w-xs lg:max-w-sm";
         }
 
-        return "w-full max-w-sm";
+        return "w-full max-w-xs";
     }
 
     renderCard(

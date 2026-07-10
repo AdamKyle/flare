@@ -11,7 +11,7 @@ export default class TopsCharacterNameLink extends React.Component<TopsCharacter
             );
         }
 
-        return "font-semibold text-regent-st-blue-600 no-underline transition-colors hover:text-regent-st-blue-700 hover:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-regent-st-blue-400 focus-visible:ring-offset-2 dark:text-regent-st-blue-300 dark:hover:text-regent-st-blue-200 dark:focus-visible:ring-offset-gray-900";
+        return "font-semibold text-gray-900 no-underline underline-offset-4 transition-colors hover:text-gray-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-regent-st-blue-400 focus-visible:ring-offset-2 dark:text-gray-100 dark:hover:text-white dark:focus-visible:ring-offset-gray-900";
     }
 
     render() {

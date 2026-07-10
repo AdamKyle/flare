@@ -21,10 +21,10 @@ class TopsMonthlySnapshotService
         $count = 0;
 
         $count += $this->upsertRows('characters', 'progression', $periodStart, $periodEnd, $this->characterTopsService->leaderboard(['period' => 'all_time'])['rows']);
-        $count += $this->upsertRows('exploration', 'kills', $periodStart, $periodEnd, $this->explorationTopsService->leaderboard(['period' => $period, 'metric' => 'kills'])['rows']);
-        $count += $this->upsertRows('delve', 'strongest_enemy_increase', $periodStart, $periodEnd, $this->delveTopsService->leaderboard(['period' => $period, 'metric' => 'strongest_enemy_increase'])['rows']);
+        $count += $this->upsertRows('exploration', 'kills', $periodStart, $periodEnd, $this->explorationTopsService->leaderboard(['period' => 'all_time', 'metric' => 'kills'])['rows']);
+        $count += $this->upsertRows('delve', 'survived_duration_seconds', $periodStart, $periodEnd, $this->delveTopsService->leaderboard(['period' => $period, 'metric' => 'survived_duration_seconds'])['rows']);
         $count += $this->upsertRows('faction-loyalty', 'highest_faction_level', $periodStart, $periodEnd, $this->factionLoyaltyTopsService->leaderboard(['period' => 'all_time', 'metric' => 'highest_faction_level'])['rows']);
-        $count += $this->upsertRows('kingdoms', 'total_value', $periodStart, $periodEnd, $this->kingdomTopsService->leaderboard(['period' => 'all_time', 'metric' => 'total_value'])['rows']);
+        $count += $this->upsertRows('kingdoms', 'kingdom_count', $periodStart, $periodEnd, $this->kingdomTopsService->leaderboard(['period' => 'all_time', 'metric' => 'kingdom_count'])['rows']);
 
         return $count;
     }

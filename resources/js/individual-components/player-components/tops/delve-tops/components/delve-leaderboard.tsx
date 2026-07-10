@@ -9,34 +9,21 @@ export default class DelveLeaderboard extends React.Component<DelveLeaderboardPr
         return [
             {
                 key: "strongest_enemy_increase",
-                label: "Strongest Enemy Increase",
+                label: "Total Enemy Strength %",
                 align: "right",
-                type: "number",
+                type: "percent",
             },
             {
-                key: "encounter_count",
-                label: "Encounters",
+                key: "survived_duration_seconds",
+                label: "Survived Duration",
                 align: "right",
-                type: "number",
-            },
-            { key: "run_count", label: "Runs", align: "right", type: "number" },
-            {
-                key: "average_pack_size",
-                label: "Average Pack Size",
-                align: "right",
-                type: "number",
+                type: "duration",
             },
             {
-                key: "survived_count",
-                label: "Survived",
+                key: "total_floors",
+                label: "Total Floors",
                 align: "right",
                 type: "number",
-            },
-            {
-                key: "latest_run_started_at",
-                label: "Latest Run",
-                align: "left",
-                type: "date",
             },
         ];
     }
@@ -45,24 +32,35 @@ export default class DelveLeaderboard extends React.Component<DelveLeaderboardPr
         return [
             {
                 key: "strongest_enemy_increase",
-                label: "Strongest Enemy Increase",
+                label: "Enemy Strength",
                 align: "right",
-                type: "number",
+                type: "percent",
             },
             {
-                key: "encounter_count",
-                label: "Encounters",
+                key: "survived_duration_seconds",
+                label: "Duration",
                 align: "right",
-                type: "number",
+                type: "duration",
             },
-            { key: "run_count", label: "Runs", align: "right", type: "number" },
             {
-                key: "average_pack_size",
-                label: "Average Pack Size",
+                key: "total_floors",
+                label: "Floors",
                 align: "right",
                 type: "number",
             },
         ];
+    }
+
+    metricType(): TopsDisplayField["type"] {
+        if (this.props.metric === "survived_duration_seconds") {
+            return "duration";
+        }
+
+        if (this.props.metric === "strongest_enemy_increase") {
+            return "percent";
+        }
+
+        return "number";
     }
 
     primaryMetric(): TopsDisplayField {
@@ -73,9 +71,9 @@ export default class DelveLeaderboard extends React.Component<DelveLeaderboardPr
 
         return {
             key: this.props.metric,
-            label: metric?.label ?? "Strongest Enemy Increase",
+            label: metric?.label ?? "Survived Duration",
             align: "right",
-            type: "number",
+            type: this.metricType(),
         };
     }
 
@@ -83,7 +81,7 @@ export default class DelveLeaderboard extends React.Component<DelveLeaderboardPr
         return (
             <TopsLeaderboardDashboard
                 title="Delve Leaderboard"
-                description="The strongest delve runs, ranked by enemy strength, encounters, runs, and pack size."
+                description="Ranked by survived duration."
                 resetDescription="Leaderboards reset on the first day of each calendar month. Current Month is shown by default, previous monthly results stay available through archived snapshots, and All Time keeps lifetime totals."
                 response={this.props.leaderboard}
                 primaryMetric={this.primaryMetric()}

@@ -10,39 +10,21 @@ export default class DelveTopsTableColumns extends React.Component<TopsTableColu
                 fields={[
                     {
                         key: "strongest_enemy_increase",
-                        label: "Strongest Enemy Increase",
+                        label: "Total Enemy Strength %",
                         align: "right",
-                        type: "number",
+                        type: "percent",
                     },
                     {
-                        key: "encounter_count",
-                        label: "Encounters",
+                        key: "survived_duration_seconds",
+                        label: "Survived Duration",
                         align: "right",
-                        type: "number",
+                        type: "duration",
                     },
                     {
-                        key: "run_count",
-                        label: "Runs",
+                        key: "total_floors",
+                        label: "Total Floors",
                         align: "right",
                         type: "number",
-                    },
-                    {
-                        key: "average_pack_size",
-                        label: "Average Pack Size",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "survived_count",
-                        label: "Survived",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "latest_run_started_at",
-                        label: "Latest Run",
-                        align: "left",
-                        type: "date",
                     },
                 ]}
             />

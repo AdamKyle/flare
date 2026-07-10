@@ -19,37 +19,8 @@ class CharacterTopsService
         $period = $this->topsPeriodService->resolve($parameters['period'] ?? null);
         $metric = 'progression';
         $metrics = [['key' => 'progression', 'label' => 'Progression']];
-        $snapshot = $this->snapshotResponse('characters', $metric, $period, $metrics);
-
-        if (! is_null($snapshot)) {
-            return $snapshot;
-        }
-
-        $activeUserIds = null;
-
-        if ($period['key'] !== 'all_time') {
-            $activeUserIds = UserLoginDuration::query()
-                ->where(function ($query) use ($period) {
-                    $query->whereBetween('last_activity', [$period['start'], $period['end']])
-                        ->orWhere(function ($fallback) use ($period) {
-                            $fallback->whereNull('last_activity')
-                                ->whereBetween('logged_in_at', [$period['start'], $period['end']]);
-                        });
-                })
-                ->pluck('user_id')
-                ->unique()
-                ->values();
-        }
-
-        if ($period['is_archived_month'] && ! is_null($activeUserIds)) {
-            return $this->response('characters', $metric, $period, [], $metrics, [], 'Historical character progression requires a monthly snapshot for this archived month.');
-        }
 
         $query = Character::with(['race', 'class', 'map.gameMap', 'user']);
-
-        if (! is_null($activeUserIds)) {
-            $query->whereIn('user_id', $activeUserIds);
-        }
 
         $rows = $query->get()->map(function (Character $character) {
             $lastActivity = UserLoginDuration::where('user_id', $character->user_id)

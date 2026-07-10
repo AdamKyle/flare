@@ -4,7 +4,7 @@ namespace App\Game\Character\CharacterInventory\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ComparisonFromChatValidate extends FormRequest
+class DestroyAllFromSetRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,15 +24,14 @@ class ComparisonFromChatValidate extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'required',
-            'source' => 'nullable|string|in:alchemy_bag,crafted_items_set',
+            'set_id' => 'required|integer',
         ];
     }
 
     public function messages()
     {
         return [
-            'id.required' => 'Error. Invalid Input.',
+            'set_id.required' => 'Which set do you want to destroy all items from?',
         ];
     }
 }

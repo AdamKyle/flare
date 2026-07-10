@@ -35,13 +35,16 @@ export type InventorySetOption = {
 
 export type Disposition =
     | "keep"
+    // Legacy status/action-history value only. New starts must not expose this in selectable UI.
     | "keep_highest"
     | "sell"
     | "destroy"
     | "list"
     | "disenchant"
     | "keep_best_sell_rest"
-    | "keep_best_disenchant_rest";
+    | "keep_best_disenchant_rest"
+    | "keep_best_destroy_rest"
+    | "use_now";
 
 export type CraftableItem = {
     id: number;
@@ -166,7 +169,7 @@ export type AmountPreview = {
     suffix_affix_name: string | null;
     enchant_can_destroy_item: boolean;
     enchant_has_failure_risk: boolean;
-    destination: string;
+    destination: string | null;
     destination_current_slots: number;
     destination_max_slots: number;
     destination_remaining_slots: number;

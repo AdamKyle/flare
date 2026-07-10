@@ -1,14 +1,17 @@
 const basePodiumCardClasses =
-    "flex h-full min-h-[330px] flex-col items-stretch justify-between rounded-t-md rounded-b-none border border-b-0 p-6 text-center";
-const featuredPodiumCardClasses = "min-h-[380px] lg:p-8";
+    "flex h-full min-h-[180px] flex-col items-stretch justify-between gap-4 rounded-t-md rounded-b-none border border-b-0 p-3 text-center shadow-sm";
+const featuredPodiumCardClasses = "min-h-[210px] lg:p-4";
 const goldPodiumCardClasses =
-    "bg-gradient-to-br from-gold-100 to-gold-200 border-gold-500 text-gold-950 dark:from-gold-950 dark:to-gold-900 dark:border-gold-500 dark:text-gold-100";
+    "bg-gradient-to-br from-gold-100 to-gold-200 border-gold-500 text-gold-950 hover:text-gold-950 dark:from-gold-950 dark:to-gold-900 dark:border-gold-500 dark:text-gold-100 dark:hover:text-gold-100 dark:shadow-none";
+
 const silverPodiumCardClasses =
-    "bg-gradient-to-br from-silver-100 to-silver-200 border-silver-400 text-silver-950 dark:from-silver-950 dark:to-silver-900 dark:border-silver-500 dark:text-silver-100";
+    "bg-gradient-to-br from-silver-100 to-silver-200 border-silver-400 text-silver-950 hover:text-silver-950 dark:from-silver-950 dark:to-silver-900 dark:border-silver-500 dark:text-silver-100 dark:hover:text-silver-100 dark:shadow-none";
+
 const bronzePodiumCardClasses =
-    "bg-gradient-to-br from-ochre-100 to-ochre-200 border-ochre-500 text-ochre-950 dark:from-ochre-950 dark:to-ochre-900 dark:border-ochre-500 dark:text-ochre-100";
+    "bg-gradient-to-br from-ochre-100 to-ochre-200 border-ochre-500 text-ochre-950 hover:text-ochre-950 dark:from-ochre-950 dark:to-ochre-900 dark:border-ochre-500 dark:text-ochre-100 dark:hover:text-ochre-100 dark:shadow-none";
+
 const neutralPodiumCardClasses =
-    "border-gray-200 bg-gray-50 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100";
+    "border-gray-300 bg-white text-gray-900 hover:text-gray-900 shadow-gray-200/60 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:text-gray-100 dark:shadow-none";
 
 const goldAccentClasses = "text-gold-700 dark:text-gold-300";
 const silverAccentClasses = "text-silver-700 dark:text-silver-300";
@@ -63,7 +66,7 @@ const silverTableCharacterLinkClasses =
 const bronzeTableCharacterLinkClasses =
     "text-ochre-950 hover:text-ochre-800 dark:text-ochre-100 dark:hover:text-ochre-300";
 const neutralTableCharacterLinkClasses =
-    "text-regent-st-blue-600 hover:text-regent-st-blue-700 dark:text-regent-st-blue-300 dark:hover:text-regent-st-blue-200";
+    "text-gray-900 hover:text-gray-700 dark:text-gray-100 dark:hover:text-white";
 
 export function podiumCardClasses(rank: number, isFeatured: boolean): string {
     if (rank === 1) {

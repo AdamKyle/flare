@@ -3,16 +3,21 @@
 namespace Tests\Unit\Game\BatchCrafting\Services;
 
 use App\Admin\Services\MonitoredBugReportService;
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
+use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\Setup\Character\CharacterFactory;
@@ -387,5 +392,239 @@ class BatchCraftingProcessorTest extends TestCase
         $craftedCount = collect($result->action_log)->filter(fn (array $entry) => ($entry['action_type'] ?? null) === 'event_fallback_craft' && ($entry['status'] ?? null) === 'crafted')->count();
 
         $this->assertSame(23, $craftedCount);
+    }
+
+    public function testAlchemyUseNowEmitsAggregateUsedMessageForUsableBoonItem(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        Bus::fake([CharacterBoonJob::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
+        $item = $this->createItem([
+            'name' => 'Use Now Boon Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 1,
+            'gold_dust_cost' => 0,
+            'shards_cost' => 0,
+            'usable' => true,
+            'lasts_for' => 60,
+            'damages_kingdoms' => false,
+            'can_use_on_other_items' => false,
+            'can_stack' => true,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => [
+                'alchemy_mode' => 'amount',
+                'alchemy_amount' => 1,
+                'alchemy_item_id' => $item->id,
+            ],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return $event->message === 'Used 1 Use Now Boon Item boon on you.';
+        });
+    }
+
+    public function testAlchemyUseNowEmitsAggregateKeptMessageForKingdomBombItem(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
+        $item = $this->createItem([
+            'name' => 'Kingdom Bomb Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 1,
+            'gold_dust_cost' => 0,
+            'shards_cost' => 0,
+            'usable' => false,
+            'lasts_for' => null,
+            'damages_kingdoms' => true,
+            'can_use_on_other_items' => false,
+            'can_stack' => false,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => [
+                'alchemy_mode' => 'amount',
+                'alchemy_amount' => 1,
+                'alchemy_item_id' => $item->id,
+            ],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return $event->message === 'Kept 1 Kingdom Bomb Item in your Alchemy Bag because it could not be used on you right now.';
+        });
+        $this->assertSame(1, AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->value('amount'));
+    }
+
+    public function testAlchemyUseNowKeptMessageIncludesLinkMetadataWhenItemRemainsInBag(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
+        $item = $this->createItem([
+            'name' => 'Link Metadata Kingdom Bomb Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 1,
+            'gold_dust_cost' => 0,
+            'shards_cost' => 0,
+            'usable' => false,
+            'lasts_for' => null,
+            'damages_kingdoms' => true,
+            'can_use_on_other_items' => false,
+            'can_stack' => false,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => [
+                'alchemy_mode' => 'amount',
+                'alchemy_amount' => 1,
+                'alchemy_item_id' => $item->id,
+            ],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $alchemyBagSlot = AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->first();
+
+        $this->assertNotNull($alchemyBagSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($alchemyBagSlot, $item) {
+            return $event->message === 'Kept 1 Link Metadata Kingdom Bomb Item in your Alchemy Bag because it could not be used on you right now.'
+                && $event->id === $alchemyBagSlot->id
+                && $event->source === 'alchemy_bag'
+                && $event->linkText === $item->name;
+        });
+    }
+
+    public function testAlchemyUseNowEmitsAggregateUsedAndKeptMessageWhenTenBoonCapIsReachedMidTick(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        Bus::fake([CharacterBoonJob::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
+        $existingBoonItem = $this->createItem(['name' => 'Existing Boon Item', 'type' => 'alchemy', 'usable' => true, 'lasts_for' => 60, 'can_stack' => true]);
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $existingBoonItem->id,
+            'last_for_minutes' => 60,
+            'amount_used' => 9,
+            'started' => now(),
+            'complete' => now()->addHour(),
+        ]);
+        $item = $this->createItem([
+            'name' => 'Cap Test Boon Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 1,
+            'gold_dust_cost' => 0,
+            'shards_cost' => 0,
+            'usable' => true,
+            'lasts_for' => 60,
+            'damages_kingdoms' => false,
+            'can_use_on_other_items' => false,
+            'can_stack' => true,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => [
+                'alchemy_mode' => 'amount',
+                'alchemy_amount' => 3,
+                'alchemy_item_id' => $item->id,
+            ],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return $event->message === 'Used 1 Cap Test Boon Item boon on you. Kept 2 extra Cap Test Boon Item in your Alchemy Bag.';
+        });
+        $this->assertSame(2, AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->value('amount'));
+    }
+
+    public function testAlchemyUseNowActionLogStillRecordsPerItemDispositionDetails(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        Bus::fake([CharacterBoonJob::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
+        $existingBoonItem = $this->createItem(['name' => 'Action Log Existing Boon', 'type' => 'alchemy', 'usable' => true, 'lasts_for' => 60, 'can_stack' => true]);
+        $character->boons()->create([
+            'character_id' => $character->id,
+            'item_id' => $existingBoonItem->id,
+            'last_for_minutes' => 60,
+            'amount_used' => 9,
+            'started' => now(),
+            'complete' => now()->addHour(),
+        ]);
+        $item = $this->createItem([
+            'name' => 'Action Log Boon Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 1,
+            'gold_dust_cost' => 0,
+            'shards_cost' => 0,
+            'usable' => true,
+            'lasts_for' => 60,
+            'damages_kingdoms' => false,
+            'can_use_on_other_items' => false,
+            'can_stack' => true,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => [
+                'alchemy_mode' => 'amount',
+                'alchemy_amount' => 3,
+                'alchemy_item_id' => $item->id,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $alchemyEntries = collect($result->action_log)->filter(fn (array $entry) => ($entry['action_type'] ?? null) === 'alchemy');
+        $usedEntries = $alchemyEntries->filter(fn (array $entry) => ($entry['disposition'] ?? null) === 'use_now');
+        $keptEntries = $alchemyEntries->filter(fn (array $entry) => ($entry['disposition'] ?? null) === 'keep');
+
+        $this->assertSame(1, $usedEntries->count());
+        $this->assertSame(2, $keptEntries->count());
+        $this->assertSame('Action Log Boon Item', $usedEntries->first()['used_item']['name'] ?? null);
+        $this->assertSame('Action Log Boon Item', $keptEntries->first()['kept_item']['name'] ?? null);
     }
 }

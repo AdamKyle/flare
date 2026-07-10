@@ -39,4 +39,18 @@ class CharacterTopsServiceTest extends TestCase
         $this->assertSame(2, $data['podium'][1]['rank']);
         $this->assertSame(3, $data['podium'][2]['rank']);
     }
+
+    public function testCharacterProgressionCurrentMonthAndAllTimeUseCumulativeRows(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id, 'name' => 'Cumulative', 'level' => 10, 'times_reincarnated' => 1]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subMonths(2), 'last_activity' => now()->subMonths(2), 'last_heart_beat' => now()->subMonths(2)]);
+
+        $currentMonth = $this->app->make(CharacterTopsService::class)->leaderboard(['period' => 'current_month']);
+        $allTime = $this->app->make(CharacterTopsService::class)->leaderboard(['period' => 'all_time']);
+
+        $this->assertSame($character->id, $currentMonth['rows'][0]['character_id']);
+        $this->assertSame($currentMonth['rows'][0]['character_id'], $allTime['rows'][0]['character_id']);
+        $this->assertSame($currentMonth['rows'][0]['level'], $allTime['rows'][0]['level']);
+    }
 }

@@ -8,11 +8,13 @@ use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\SetSlot;
+use App\Flare\Models\Skill;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
@@ -34,6 +36,7 @@ use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Values\SkillTypeValue;
+use Facades\App\Flare\Calculators\SellItemCalculator;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -83,9 +86,21 @@ class BatchCraftingService
         $type = BatchCraftingType::from($data['batch_type']);
         $disposition = BatchCraftingDisposition::from($data['disposition']);
 
-        if (! $disposition->isAllowedFor($type)) {
+        if (! $disposition->isAllowedFor($type, $data['progress'] ?? [])) {
             throw ValidationException::withMessages([
                 'disposition' => 'This disposition is not allowed for this batch crafting type.',
+            ]);
+        }
+
+        if ($type === BatchCraftingType::ALCHEMY && $this->isAlchemyLocked($character)) {
+            throw ValidationException::withMessages([
+                'batch_type' => 'You need to unlock Alchemy before you can batch craft alchemy items.',
+            ]);
+        }
+
+        if ($type === BatchCraftingType::HOLY_OILS && $this->isAlchemyLocked($character)) {
+            throw ValidationException::withMessages([
+                'batch_type' => 'You need to unlock Alchemy before you can batch craft with Holy Oils.',
             ]);
         }
 
@@ -115,17 +130,34 @@ class BatchCraftingService
 
         if ($type === BatchCraftingType::HOLY_OILS) {
             $this->validateHolyOilSelections($character, $data);
-        }
 
-        if ($this->isSetMode($type, $data['progress'] ?? []) && $disposition !== BatchCraftingDisposition::KEEP) {
-            throw ValidationException::withMessages([
-                'disposition' => 'Set-based batch crafting only supports the Keep disposition.',
-            ]);
+            if (in_array($disposition, [BatchCraftingDisposition::LIST, BatchCraftingDisposition::DISENCHANT], true)
+                && ! $this->holyOilDispositionEligible($character, $data, $disposition)) {
+                throw ValidationException::withMessages([
+                    'disposition' => $disposition === BatchCraftingDisposition::LIST
+                        ? 'Listing is only available when the targeted item(s) already have 1 or 2 enchants.'
+                        : 'Disenchanting is only available when the targeted item(s) already have enchants.',
+                ]);
+            }
         }
 
         $progress = $this->validatedProgress($character, $type, $data);
 
-        $startBlockers = $this->startBlockers($character, $type, $progress, $data['selected_items'] ?? [], $data['selected_oils'] ?? []);
+        if ($disposition === BatchCraftingDisposition::LIST
+            && $type === BatchCraftingType::ALCHEMY
+            && ($progress['alchemy_mode'] ?? null) === 'amount'
+            && isset($progress['alchemy_item_id'])) {
+            $alchemyItem = Item::find($progress['alchemy_item_id']);
+            $minPrice = is_null($alchemyItem) ? 0 : SellItemCalculator::fetchMinPrice($alchemyItem);
+
+            if ($minPrice > 0 && (int) ($data['listing_price'] ?? 0) < $minPrice) {
+                throw ValidationException::withMessages([
+                    'listing_price' => 'No! The minimum listing price is: ' . number_format($minPrice) . ' Gold.',
+                ]);
+            }
+        }
+
+        $startBlockers = $this->startBlockers($character, $type, $progress, $data['selected_items'] ?? [], $data['selected_oils'] ?? [], $disposition);
         $blockingMessages = array_values(array_map(
             fn (array $blocker): string => $blocker['message'],
             array_filter($startBlockers, fn (array $blocker): bool => $blocker['blocking'])
@@ -138,6 +170,10 @@ class BatchCraftingService
         }
 
         $progress['tick_delay_seconds'] = $this->tickDelaySeconds($type, $progress);
+
+        if ($disposition === BatchCraftingDisposition::LIST) {
+            $progress['listing_price'] = (int) $data['listing_price'];
+        }
 
         $batchCrafting = BatchCrafting::create([
             'character_id' => $character->id,
@@ -172,15 +208,16 @@ class BatchCraftingService
         $progress = $data['progress'] ?? [];
         $selectedItemIds = $data['selected_items'] ?? [];
         $selectedOilIds = $data['selected_oils'] ?? [];
+        $disposition = isset($data['disposition']) ? BatchCraftingDisposition::from($data['disposition']) : BatchCraftingDisposition::KEEP;
 
         return [
-            'cost_breakdown' => $this->costBreakdown($character, $type, $progress, $selectedItemIds, $selectedOilIds),
-            'amount_preview' => $this->amountPreview($character, $type, $progress),
-            'alchemy_amount_preview' => $this->alchemyAmountPreview($character, $type, $progress),
+            'cost_breakdown' => $this->costBreakdown($character, $type, $progress, $selectedItemIds, $selectedOilIds, $disposition),
+            'amount_preview' => $this->amountPreview($character, $type, $progress, $disposition),
+            'alchemy_amount_preview' => $this->alchemyAmountPreview($character, $type, $progress, $disposition),
             'holy_oil_selected_preview' => $this->holyOilsSelectedPreview($character, $type, $selectedItemIds, $selectedOilIds, $progress),
             'holy_oil_set_preview' => $this->holyOilsSetPreview($character, $type, $selectedOilIds, $progress),
-            'destination_capacity' => $this->destinationCapacityPreview($character, $type, $progress),
-            'start_blockers' => $this->startBlockers($character, $type, $progress, $selectedItemIds, $selectedOilIds),
+            'destination_capacity' => $this->destinationCapacityPreview($character, $type, $progress, $disposition),
+            'start_blockers' => $this->startBlockers($character, $type, $progress, $selectedItemIds, $selectedOilIds, $disposition),
         ];
     }
 
@@ -189,16 +226,9 @@ class BatchCraftingService
      * amount_preview (Crafted Items Set) or alchemy_amount_preview (Alchemy Bag).
      * Normal inventory is never the final destination for any batch crafting mode.
      */
-    private function destinationCapacityPreview(Character $character, BatchCraftingType $type, array $progress): ?array
+    private function destinationCapacityPreview(Character $character, BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): ?array
     {
-        $craftMode = $progress['craft_mode'] ?? null;
-
-        $needsCraftedItemsSet = $type === BatchCraftingType::TRINKETRY
-            || ($type === BatchCraftingType::CRAFT && in_array($craftMode, ['experience', 'craft_set'], true))
-            || ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $craftMode === 'experience')
-            || ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $craftMode === 'craft_enchant_set');
-
-        if ($needsCraftedItemsSet) {
+        if ($this->requiresCraftedItemsSetCapacity($type, $progress, $disposition)) {
             $batchCraftingSet = $this->batchCraftingSetService->getOrCreateForCharacter($character);
 
             return [
@@ -210,7 +240,7 @@ class BatchCraftingService
             ];
         }
 
-        if ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? null) === 'experience') {
+        if ($this->requiresAlchemyBagCapacity($type, $progress, $disposition)) {
             return [
                 'destination' => 'alchemy_bag',
                 'destination_label' => 'Alchemy Bag',
@@ -223,43 +253,55 @@ class BatchCraftingService
         return null;
     }
 
-    private function startBlockers(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds): array
+    private function startBlockers(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds, BatchCraftingDisposition $disposition): array
     {
         $craftMode = $progress['craft_mode'] ?? null;
 
         if ($type === BatchCraftingType::CRAFT && $craftMode === 'specific_item') {
-            return $this->amountModeStartBlockers($this->amountPreview($character, $type, $progress));
+            return $this->amountModeStartBlockers($this->amountPreview($character, $type, $progress, $disposition), $disposition);
         }
 
         if ($type === BatchCraftingType::CRAFT && $craftMode === 'craft_set') {
-            return $this->craftSetStartBlockers($character, $progress, false);
+            return $this->craftSetStartBlockers($character, $progress, false, $disposition);
         }
 
         if ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $craftMode === 'specific_item') {
             return array_merge(
                 $this->manualSelectedAffixIntBlockers($character, $progress['enchant_affix_ids'] ?? []),
-                $this->amountModeStartBlockers($this->amountPreview($character, $type, $progress))
+                $this->amountModeStartBlockers($this->amountPreview($character, $type, $progress, $disposition), $disposition)
             );
         }
 
         if ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $craftMode === 'craft_enchant_set') {
-            return $this->craftSetStartBlockers($character, $progress, true);
+            return $this->craftSetStartBlockers($character, $progress, true, $disposition);
         }
 
         if ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? null) === 'amount') {
-            return $this->alchemyAmountStartBlockers($character, $progress);
+            return $this->alchemyAmountStartBlockers($character, $progress, $disposition);
         }
 
         if (in_array($type, [BatchCraftingType::CRAFT, BatchCraftingType::CRAFT_AND_ENCHANT], true) && $craftMode === 'experience') {
-            return $this->craftedItemsSetCapacityBlockers($character);
+            if (! $this->requiresCraftedItemsSetCapacity($type, $progress, $disposition)) {
+                return [];
+            }
+
+            return $this->craftedItemsSetCapacityBlockers($character, $this->retainedCraftedItemsSetSlots($type, $progress, $disposition));
         }
 
         if ($type === BatchCraftingType::TRINKETRY) {
-            return $this->craftedItemsSetCapacityBlockers($character);
+            if (! $this->requiresCraftedItemsSetCapacity($type, $progress, $disposition)) {
+                return [];
+            }
+
+            return $this->craftedItemsSetCapacityBlockers($character, $this->retainedCraftedItemsSetSlots($type, $progress, $disposition));
         }
 
         if ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? null) === 'experience') {
-            return $this->alchemyBagCapacityBlockers($character);
+            if (! $this->requiresAlchemyBagCapacity($type, $progress, $disposition)) {
+                return [];
+            }
+
+            return $this->alchemyBagCapacityBlockers($character, $this->retainedAlchemyBagSlots($disposition));
         }
 
         return [];
@@ -295,16 +337,25 @@ class BatchCraftingService
      * Output for Alchemy Experience mode is created in the Alchemy Bag, not normal
      * inventory.
      */
-    private function alchemyBagCapacityBlockers(Character $character): array
+    private function alchemyBagCapacityBlockers(Character $character, int $requiredSlots = 1): array
     {
-        if (! $character->isAlchemyBagFull()) {
-            return [];
+        $remaining = max(0, $character->alchemy_bag_limit - $character->getAlchemyBagCount());
+
+        if ($remaining <= 0) {
+            return [$this->blocker(
+                'alchemy_bag_full',
+                'Your Alchemy Bag is full. Empty space before starting this batch.'
+            )];
         }
 
-        return [$this->blocker(
-            'alchemy_bag_full',
-            'Your Alchemy Bag is full. Empty space before starting this batch.'
-        )];
+        if ($remaining < $requiredSlots) {
+            return [$this->blocker(
+                'alchemy_bag_not_enough_space',
+                'Your Alchemy Bag does not have enough space. Needed: ' . number_format($requiredSlots) . ', Remaining space: ' . number_format($remaining) . '.'
+            )];
+        }
+
+        return [];
     }
 
     private function blocker(string $code, string $message, array $links = [], bool $blocking = true, array $metadata = []): array
@@ -370,7 +421,7 @@ class BatchCraftingService
         return $blockers;
     }
 
-    private function amountModeStartBlockers(?array $preview): array
+    private function amountModeStartBlockers(?array $preview, BatchCraftingDisposition $disposition): array
     {
         if (is_null($preview)) {
             return [];
@@ -385,6 +436,10 @@ class BatchCraftingService
                 'not_enough_gold',
                 'You do not have enough Gold to start this batch. Required: ' . number_format($preview['total_cost']) . ', Available: ' . number_format($preview['available_gold']) . ', Missing: ' . number_format($missing) . '.'
             );
+        }
+
+        if (! $this->keepsOutputInCraftedItemsSet($disposition)) {
+            return $blockers;
         }
 
         if ($preview['destination_remaining_slots'] <= 0) {
@@ -406,9 +461,9 @@ class BatchCraftingService
         return $blockers;
     }
 
-    private function alchemyAmountStartBlockers(Character $character, array $progress): array
+    private function alchemyAmountStartBlockers(Character $character, array $progress, BatchCraftingDisposition $disposition): array
     {
-        $preview = $this->alchemyAmountPreview($character, BatchCraftingType::ALCHEMY, $progress);
+        $preview = $this->alchemyAmountPreview($character, BatchCraftingType::ALCHEMY, $progress, $disposition);
 
         if (is_null($preview)) {
             return [];
@@ -434,6 +489,10 @@ class BatchCraftingService
             );
         }
 
+        if (! $this->keepsOutputInAlchemyBag($disposition)) {
+            return $blockers;
+        }
+
         if ($preview['bag_remaining'] <= 0) {
             $blockers[] = $this->blocker(
                 'alchemy_bag_full',
@@ -453,7 +512,7 @@ class BatchCraftingService
         return $blockers;
     }
 
-    private function craftSetStartBlockers(Character $character, array $progress, bool $includeEnchanting): array
+    private function craftSetStartBlockers(Character $character, array $progress, bool $includeEnchanting, BatchCraftingDisposition $disposition): array
     {
         $planKey = $includeEnchanting ? 'enchant_plan' : 'craft_set_plan';
         $plan = is_array($progress[$planKey] ?? null) ? $progress[$planKey] : [];
@@ -469,7 +528,86 @@ class BatchCraftingService
             );
         }
 
+        if (! $this->keepsOutputInCraftedItemsSet($disposition)) {
+            return $blockers;
+        }
+
         return array_merge($blockers, $this->craftedItemsSetCapacityBlockers($character, count($queue)));
+    }
+
+    /**
+     * Mirrors BatchCraftingProcessor::shouldMoveKeptOutputToBatchSet() for start-time
+     * validation: only dispositions that actually place output in the Crafted Items Set
+     * should require capacity there before a batch is allowed to start.
+     */
+    private function keepsOutputInCraftedItemsSet(BatchCraftingDisposition $disposition): bool
+    {
+        return in_array($disposition, [
+            BatchCraftingDisposition::KEEP,
+            BatchCraftingDisposition::KEEP_HIGHEST,
+            BatchCraftingDisposition::KEEP_BEST_SELL_REST,
+            BatchCraftingDisposition::KEEP_BEST_DISENCHANT_REST,
+            BatchCraftingDisposition::KEEP_BEST_DESTROY_REST,
+        ], true);
+    }
+
+    private function keepsOutputInAlchemyBag(BatchCraftingDisposition $disposition): bool
+    {
+        return in_array($disposition, [
+            BatchCraftingDisposition::KEEP,
+            BatchCraftingDisposition::KEEP_HIGHEST,
+            BatchCraftingDisposition::KEEP_BEST_DESTROY_REST,
+        ], true);
+    }
+
+    private function requiresCraftedItemsSetCapacity(BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): bool
+    {
+        if (! $this->keepsOutputInCraftedItemsSet($disposition)) {
+            return false;
+        }
+
+        $craftMode = $progress['craft_mode'] ?? null;
+
+        return $type === BatchCraftingType::TRINKETRY
+            || ($type === BatchCraftingType::CRAFT && in_array($craftMode, ['specific_item', 'experience', 'craft_set'], true))
+            || ($type === BatchCraftingType::CRAFT_AND_ENCHANT && in_array($craftMode, ['specific_item', 'experience', 'craft_enchant_set'], true));
+    }
+
+    private function requiresAlchemyBagCapacity(BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): bool
+    {
+        return $type === BatchCraftingType::ALCHEMY
+            && in_array(($progress['alchemy_mode'] ?? null), ['amount', 'experience'], true)
+            && $this->keepsOutputInAlchemyBag($disposition);
+    }
+
+    private function retainedCraftedItemsSetSlots(BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): int
+    {
+        $craftMode = $progress['craft_mode'] ?? null;
+
+        if ($craftMode === 'specific_item') {
+            return max(1, (int) ($progress['craft_amount'] ?? 1) - (int) ($progress['craft_specific_count'] ?? $progress['craft_enchant_specific_count'] ?? 0));
+        }
+
+        if (in_array($craftMode, ['craft_set', 'craft_enchant_set'], true)) {
+            return count($this->processor->craftSetQueue());
+        }
+
+        if ($disposition === BatchCraftingDisposition::KEEP) {
+            return $type === BatchCraftingType::TRINKETRY
+                ? self::ITEMS_PER_RECURRING_TICK
+                : self::ITEMS_PER_FULL_SET;
+        }
+
+        if ($type === BatchCraftingType::TRINKETRY) {
+            return 1;
+        }
+
+        return count(collect($this->processor->craftSetQueue())->unique('type'));
+    }
+
+    private function retainedAlchemyBagSlots(BatchCraftingDisposition $disposition): int
+    {
+        return $disposition === BatchCraftingDisposition::KEEP ? self::ITEMS_PER_RECURRING_TICK : 1;
     }
 
     private function craftEnchantSetPlanIntBlockers(Character $character, array $plan): array
@@ -632,7 +770,7 @@ class BatchCraftingService
         return 'Your set is not a valid set to enchant all the items. You must have 23 items in the set, which consist of: 12 weapons (daggers, swords, claws, wands, censers, bows, staves, hammers, maces, scratch awls, guns, fans), 7 armour pieces (shield, body, leggings, sleeves, gloves, feet, helmet), 2 rings, and 2 spells (spell damage, spell healing). You can create one by crafting a set or selecting an empty set to craft and enchant the items.';
     }
 
-    private function costBreakdown(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds): array
+    private function costBreakdown(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds, BatchCraftingDisposition $disposition): array
     {
         $currency = $type->requiredCurrency();
         $available = $this->currencyAmount($character, $currency);
@@ -650,20 +788,20 @@ class BatchCraftingService
             'message' => null,
         ];
 
-        $amountPreview = $this->amountPreview($character, $type, $progress);
+        $amountPreview = $this->amountPreview($character, $type, $progress, $disposition);
 
         if (! is_null($amountPreview)) {
             $breakdown['required_to_start'] = (int) $amountPreview['total_per_item_cost'];
             $breakdown['total_cost_known'] = true;
             $breakdown['total_required'] = (int) $amountPreview['total_cost'];
             $breakdown['effective_amount'] = (int) $amountPreview['effective_craftable_amount'];
-            $breakdown['destination'] = 'Crafted Items Set';
+            $breakdown['destination'] = $this->keepsOutputInCraftedItemsSet($disposition) ? 'Crafted Items Set' : null;
             $breakdown['can_afford_start'] = $amountPreview['effective_craftable_amount'] > 0;
 
             return $breakdown;
         }
 
-        $alchemyPreview = $this->alchemyAmountPreview($character, $type, $progress);
+        $alchemyPreview = $this->alchemyAmountPreview($character, $type, $progress, $disposition);
 
         if (! is_null($alchemyPreview)) {
             $requiredToStart = (int) $alchemyPreview['gold_dust_cost_per_item'] + (int) $alchemyPreview['shards_cost_per_item'];
@@ -674,7 +812,7 @@ class BatchCraftingService
             $breakdown['available_gold_dust'] = (int) $alchemyPreview['available_gold_dust'];
             $breakdown['available_shards'] = (int) $alchemyPreview['available_shards'];
             $breakdown['effective_amount'] = (int) $alchemyPreview['effective_craftable_amount'];
-            $breakdown['destination'] = 'Alchemy Bag';
+            $breakdown['destination'] = $this->keepsOutputInAlchemyBag($disposition) ? 'Alchemy Bag' : null;
             $breakdown['can_afford_start'] = $alchemyPreview['effective_craftable_amount'] > 0;
 
             return $breakdown;
@@ -888,6 +1026,7 @@ class BatchCraftingService
         }
 
         $type = BatchCraftingType::from($batchCrafting->batch_type);
+        $disposition = BatchCraftingDisposition::from($batchCrafting->disposition);
         $timer = $this->timerDetails($batchCrafting);
         $actionLog = $batchCrafting->action_log ?? [];
         $progress = $batchCrafting->progress ?? [];
@@ -986,6 +1125,9 @@ class BatchCraftingService
                 'shards_spent_total' => (int) ($progress['currency_totals']['shards_spent'] ?? 0),
                 'shards_gained_total' => (int) ($progress['currency_totals']['shards_gained'] ?? 0),
                 'shards_left' => (int) $character->shards,
+                'listing_price_per_item' => $progress['listing_price'] ?? null,
+                'total_listed_value' => (int) ($progress['currency_totals']['listed_value'] ?? 0),
+                'potential_seller_net' => (int) round(((int) ($progress['currency_totals']['listed_value'] ?? 0)) * 0.95),
                 'no_inventory_reason' => $progress['no_inventory_reason'] ?? null,
                 'skills' => $this->relevantSkillsForBatch($character, $type, $progress, $batchCrafting->disposition),
                 'skills_being_trained' => $this->skillsBeingTrained($character, $batchCrafting),
@@ -1039,8 +1181,8 @@ class BatchCraftingService
                 'holy_oil_current_target_item' => $progress['holy_oil_current_target_item'] ?? null,
                 'holy_oil_current_oil_item' => $progress['holy_oil_current_oil_item'] ?? null,
                 'kept_set_summary' => $this->keptSetSummary($batchCrafting),
-                'amount_preview' => $this->amountPreview($character, $type, $progress),
-                'alchemy_amount_preview' => $this->alchemyAmountPreview($character, $type, $progress),
+                'amount_preview' => $this->amountPreview($character, $type, $progress, $disposition),
+                'alchemy_amount_preview' => $this->alchemyAmountPreview($character, $type, $progress, $disposition),
                 'holy_oil_selected_preview' => $this->holyOilsSelectedPreview($character, $type, $batchCrafting->selected_items ?? [], $batchCrafting->selected_oils ?? [], $progress),
                 'holy_oil_set_preview' => $this->holyOilsSetPreview($character, $type, $batchCrafting->selected_oils ?? [], $progress),
                 'batch_crafting_set' => [
@@ -1179,13 +1321,51 @@ class BatchCraftingService
         event(new BatchCraftingStatusUpdated($batchCrafting->user_id));
         event(new BatchCraftingMonitoringUpdated($batchCrafting->character_id));
 
-        $processedActionCount = count($result['actions'] ?? []);
-
-        if ($processedActionCount > 0) {
-            event(new AutomationLogUpdate($batchCrafting->user_id, 'Batch crafting processed ' . $processedActionCount . ' action' . ($processedActionCount === 1 ? '' : 's') . '.'));
+        if (! empty($counts)) {
+            event(new AutomationLogUpdate($batchCrafting->user_id, $this->tickSummaryMessage($counts)));
         }
 
         return $batchCrafting->refresh();
+    }
+
+    /**
+     * Per-tick summary shown in place of individual manual-style crafting/
+     * enchanting/alchemy/trinketry/sell/list/disenchant messages, since a single
+     * batch tick can process many items and firing one player-facing message per
+     * item would spam the message log. Action history still carries the exact
+     * outcome of every individual item.
+     */
+    private function tickSummaryMessage(array $counts): string
+    {
+        $labels = [
+            'crafted_count' => 'crafted',
+            'enchanted_count' => 'enchanted',
+            'kept_count' => 'kept',
+            'sold_count' => 'sold',
+            'destroyed_count' => 'destroyed',
+            'listed_count' => 'listed',
+            'disenchanted_count' => 'disenchanted',
+            'applied_count' => 'applied Holy Oil to',
+            'used_count' => 'used',
+            'failed_count' => 'failed to process',
+            'skipped_count' => 'skipped',
+        ];
+
+        $parts = [];
+
+        foreach ($labels as $column => $label) {
+            $amount = (int) ($counts[$column] ?? 0);
+
+            if ($amount > 0) {
+                $parts[] = $label . ' ' . number_format($amount) . ($amount === 1 ? ' item' : ' items');
+            }
+        }
+
+        if (empty($parts)) {
+            return 'Batch crafting processed this chunk with no item changes.';
+        }
+
+        return 'Batch crafting update: ' . implode(', ', $parts) . '.';
     }
 
     /**
@@ -1448,6 +1628,8 @@ class BatchCraftingService
         $chartPoints = $progress['chart_points'] ?? ['currency' => [], 'outcomes' => [], 'gold_dust' => []];
         $tick = count($chartPoints['currency']) + 1;
 
+        $listedValue = collect($actions)->sum(fn (array $action) => (int) ($action['listed_price'] ?? 0));
+
         $chartPoints['currency'][] = [
             'tick' => $tick,
             'gold_spent' => $goldSpent,
@@ -1456,6 +1638,7 @@ class BatchCraftingService
             'gold_dust_gained' => $goldDustGained,
             'shards_spent' => $shardsSpent,
             'shards_gained' => 0,
+            'listed_value' => $listedValue,
         ];
         $chartPoints['outcomes'][] = ['tick' => $tick, 'success' => $successCount, 'failure' => $failureCount];
         $chartPoints['gold_dust'][] = ['tick' => $tick, 'gained' => $goldDustGained];
@@ -1474,6 +1657,7 @@ class BatchCraftingService
             'gold_dust_gained' => 0,
             'shards_spent' => 0,
             'shards_gained' => 0,
+            'listed_value' => 0,
         ];
 
         if ($currency === 'gold') {
@@ -1486,6 +1670,7 @@ class BatchCraftingService
 
         $totals['gold_gained'] += collect($actions)->sum(fn (array $action) => (int) ($action['gold_gained'] ?? 0));
         $totals['gold_dust_gained'] += collect($actions)->sum(fn (array $action) => (int) ($action['gold_dust_gained'] ?? 0));
+        $totals['listed_value'] = ((int) ($totals['listed_value'] ?? 0)) + collect($actions)->sum(fn (array $action) => (int) ($action['listed_price'] ?? 0));
 
         return $totals;
     }
@@ -2025,7 +2210,7 @@ class BatchCraftingService
         ];
     }
 
-    private function amountPreview(Character $character, BatchCraftingType $type, array $progress): ?array
+    private function amountPreview(Character $character, BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): ?array
     {
         if (($progress['craft_mode'] ?? null) !== 'specific_item') {
             return null;
@@ -2070,7 +2255,8 @@ class BatchCraftingService
         $batchCraftingSet = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $destinationRemaining = $batchCraftingSet->remainingSlots();
 
-        $effectiveCraftableAmount = max(0, min($remainingRequested, $affordableByGold, $destinationRemaining));
+        $capacityLimit = $this->keepsOutputInCraftedItemsSet($disposition) ? $destinationRemaining : $remainingRequested;
+        $effectiveCraftableAmount = max(0, min($remainingRequested, $affordableByGold, $capacityLimit));
 
         return [
             'selected_item' => $this->itemSnapshot($item),
@@ -2086,7 +2272,7 @@ class BatchCraftingService
             'suffix_affix_name' => $suffixName,
             'enchant_can_destroy_item' => $isCraftAndEnchant,
             'enchant_has_failure_risk' => $enchantHasFailureRisk,
-            'destination' => 'crafted_items_set',
+            'destination' => $this->keepsOutputInCraftedItemsSet($disposition) ? 'crafted_items_set' : null,
             'destination_current_slots' => $batchCraftingSet->currentSlotCount(),
             'destination_max_slots' => $batchCraftingSet->max_slots,
             'destination_remaining_slots' => $destinationRemaining,
@@ -2095,7 +2281,7 @@ class BatchCraftingService
         ];
     }
 
-    private function alchemyAmountPreview(Character $character, BatchCraftingType $type, array $progress): ?array
+    private function alchemyAmountPreview(Character $character, BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): ?array
     {
         if ($type !== BatchCraftingType::ALCHEMY || ($progress['alchemy_mode'] ?? null) !== 'amount') {
             return null;
@@ -2128,7 +2314,8 @@ class BatchCraftingService
         $affordableByShards = $shardsCost > 0 ? intdiv((int) $character->shards, $shardsCost) : $remainingRequested;
         $bagRemaining = max(0, $character->alchemy_bag_limit - $character->getAlchemyBagCount());
 
-        $effectiveCraftableAmount = max(0, min($remainingRequested, $affordableByGoldDust, $affordableByShards, $bagRemaining));
+        $capacityLimit = $this->keepsOutputInAlchemyBag($disposition) ? $bagRemaining : $remainingRequested;
+        $effectiveCraftableAmount = max(0, min($remainingRequested, $affordableByGoldDust, $affordableByShards, $capacityLimit));
 
         return [
             'selected_item' => $this->itemSnapshot($item),
@@ -2579,22 +2766,6 @@ class BatchCraftingService
         return $seconds === 1 ? '1 second' : $seconds . ' seconds';
     }
 
-    private function isSetMode(BatchCraftingType $type, array $progress): bool
-    {
-        if ($type === BatchCraftingType::CRAFT && ($progress['craft_mode'] ?? 'experience') === 'craft_set') {
-            return true;
-        }
-
-        if ($type === BatchCraftingType::CRAFT_AND_ENCHANT && ($progress['craft_mode'] ?? 'experience') === 'craft_enchant_set') {
-            return true;
-        }
-
-        if ($type === BatchCraftingType::ENCHANT && ($progress['enchant_mode'] ?? 'event') === 'set') {
-            return true;
-        }
-
-        return false;
-    }
 
     private function eventCurrentPhaseLabel(BatchCrafting $batchCrafting): ?string
     {
@@ -2652,10 +2823,30 @@ class BatchCraftingService
             'max_runtime_hours' => self::DURATION_HOURS,
             'active_event_mode' => (bool) (($batchCrafting?->progress ?? [])['event_mode'] ?? false),
             'crafting_skills_maxed' => $this->areAllCraftingSkillsMaxed($character),
+            'alchemy_locked' => $this->isAlchemyLocked($character),
             'alchemy_maxed' => $this->isSkillMaxedByName($character, 'Alchemy'),
             'trinketry_maxed' => $this->isSkillMaxedByName($character, 'Trinketry'),
             'enchanting_maxed' => $this->isEnchantingMaxed($character),
         ];
+    }
+
+    private function isAlchemyLocked(Character $character): bool
+    {
+        $alchemy = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
+
+        if (is_null($alchemy)) {
+            return true;
+        }
+
+        $skill = Skill::where('game_skill_id', $alchemy->id)
+            ->where('character_id', $character->id)
+            ->first();
+
+        if (! is_null($skill)) {
+            return (bool) $skill->is_locked;
+        }
+
+        return true;
     }
 
     private function experienceRateInfo(BatchCraftingType $type, array $progress): array
@@ -3486,6 +3677,55 @@ class BatchCraftingService
                 ]);
             }
         }
+    }
+
+    private function holyOilDispositionEligible(Character $character, array $data, BatchCraftingDisposition $disposition): bool
+    {
+        $mode = $data['progress']['holy_oil_mode'] ?? 'selected';
+
+        if ($mode === 'set') {
+            $set = InventorySet::where('id', $data['progress']['selected_set_id'] ?? 0)
+                ->where('character_id', $character->id)
+                ->first();
+
+            if (is_null($set)) {
+                return false;
+            }
+
+            $enchantedStates = $set->slots()
+                ->whereHas('item', fn ($query) => $query->whereNotIn('type', ['trinket', 'artifact']))
+                ->with('item')
+                ->get()
+                ->filter(fn (SetSlot $slot) => ! is_null($slot->item) && ($slot->item->holy_stacks - $slot->item->holy_stacks_applied) > 0)
+                ->map(fn (SetSlot $slot) => ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id));
+
+            if ($enchantedStates->isEmpty()) {
+                return false;
+            }
+
+            return $enchantedStates->every(fn (bool $hasEnchant) => $hasEnchant);
+        }
+
+        $selectedItems = $data['selected_items'] ?? [];
+
+        if (empty($selectedItems) || is_null($character->inventory)) {
+            return false;
+        }
+
+        $enchantedStates = $character->inventory->slots()
+            ->whereIn('id', $selectedItems)
+            ->with('item')
+            ->get()
+            ->filter(fn ($slot) => ! is_null($slot->item)
+                && ! in_array($slot->item->type, ['trinket', 'artifact'], true)
+                && ($slot->item->holy_stacks - $slot->item->holy_stacks_applied) > 0)
+            ->map(fn ($slot) => ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id));
+
+        if ($enchantedStates->count() !== count($selectedItems) || $enchantedStates->isEmpty()) {
+            return false;
+        }
+
+        return $enchantedStates->every(fn (bool $hasEnchant) => $hasEnchant);
     }
 
     private function validateHolyOilOilSelections(Character $character, array $selectedOils): void

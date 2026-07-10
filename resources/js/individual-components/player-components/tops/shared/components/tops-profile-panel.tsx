@@ -7,6 +7,7 @@ import TopsValue from "../types/tops-value";
 export default class TopsProfilePanel extends React.Component<TopsProfilePanelProps> {
     render() {
         const data = this.props.data ?? {};
+        const fieldTypes = this.props.fieldTypes ?? {};
         const items = Object.keys(data)
             .filter(
                 (key: string) =>
@@ -15,6 +16,7 @@ export default class TopsProfilePanel extends React.Component<TopsProfilePanelPr
             .map((key: string) => ({
                 label: key.replaceAll("_", " "),
                 value: data[key] as TopsValue,
+                type: fieldTypes[key],
             }));
 
         return (

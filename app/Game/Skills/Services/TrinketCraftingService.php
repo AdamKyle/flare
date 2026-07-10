@@ -118,20 +118,30 @@ class TrinketCraftingService
      *
      * @throws Exception
      */
-    public function craftForBatch(Character $character, Item $item): array
+    public function craftForBatch(Character $character, Item $item, bool $suppressSuccessServerMessage = false): array
     {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
         if (! $this->canAfford($character, $item)) {
+            event(new ServerMessageEvent($character->user, 'You do not have enough of the required currencies to craft this.'));
+
             return ['success' => false, 'item' => null, 'reason' => 'not_enough_currency'];
         }
 
         if ($trinkentrySkill->level < $item->skill_level_required) {
+            ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
+
             return ['success' => false, 'item' => null, 'reason' => 'skill_too_low'];
         }
 
         if ($trinkentrySkill->level > $item->skill_level_trivial) {
+            ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
+
             $this->updateTrinketCost($character, $item);
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+            }
 
             return ['success' => true, 'item' => $item, 'reason' => null];
         }
@@ -139,7 +149,13 @@ class TrinketCraftingService
         $this->updateTrinketCost($character, $item);
 
         if (! $this->canCraft($trinkentrySkill)) {
+            event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
+
             return ['success' => false, 'item' => null, 'reason' => 'failed_roll'];
+        }
+
+        if (! $suppressSuccessServerMessage) {
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
         }
 
         return ['success' => true, 'item' => $item, 'reason' => null];

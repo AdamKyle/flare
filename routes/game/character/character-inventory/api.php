@@ -44,6 +44,8 @@ Route::group(['middleware' => ['is.character.dead']], function () {
     Route::post('/character/{character}/inventory/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelected']);
     Route::post('/character/{character}/inventory-set/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelectedFromSet']);
     Route::post('/character/{character}/inventory-set/disenchant-selected', ['uses' => 'Api\CharacterInventoryMultiController@disenchantSelectedFromSet']);
+    Route::post('/character/{character}/inventory-set/destroy-selected', ['uses' => 'Api\CharacterInventoryMultiController@destroySelectedFromSet']);
+    Route::post('/character/{character}/inventory-set/destroy-all', ['uses' => 'Api\CharacterInventoryMultiController@destroyAllFromSet']);
 });
 
 });

@@ -15,14 +15,14 @@ export default class ExplorationTopsTableColumns extends React.Component<TopsTab
                         type: "number",
                     },
                     {
-                        key: "fights",
-                        label: "Fights",
+                        key: "length_of_time_seconds",
+                        label: "Length of Time",
                         align: "right",
-                        type: "number",
+                        type: "duration",
                     },
                     {
                         key: "xp_gained",
-                        label: "XP Gained",
+                        label: "XP",
                         align: "right",
                         type: "number",
                     },
@@ -31,18 +31,6 @@ export default class ExplorationTopsTableColumns extends React.Component<TopsTab
                         label: "Skill XP",
                         align: "right",
                         type: "number",
-                    },
-                    {
-                        key: "run_count",
-                        label: "Runs",
-                        align: "right",
-                        type: "number",
-                    },
-                    {
-                        key: "latest_started_at",
-                        label: "Latest Started",
-                        align: "left",
-                        type: "date",
                     },
                 ]}
             />

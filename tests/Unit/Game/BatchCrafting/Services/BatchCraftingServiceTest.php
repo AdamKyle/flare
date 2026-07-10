@@ -9,6 +9,8 @@ use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\HolyStack;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\SetSlot;
 use App\Flare\Models\SuggestionAndBugs;
 use App\Game\Core\Values\FeedbackType;
 use App\Game\BatchCrafting\Events\BatchCraftingStatusUpdated;
@@ -20,6 +22,7 @@ use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
+use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Values\ArmourType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
@@ -53,6 +56,7 @@ use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGameMap;
@@ -67,7 +71,7 @@ use Tests\Traits\CreateUser;
 
 class BatchCraftingServiceTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateUser, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateCharacterBoon, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateUser, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testStopOnDeath(): void
     {
@@ -196,6 +200,329 @@ class BatchCraftingServiceTest extends TestCase
 
         $this->assertSame(BatchCraftingEndReason::AMOUNT_REACHED->value, $result->ended_reason);
         $this->assertGreaterThan(0, $result->crafted_count);
+    }
+
+    public function testKeptCraftedItemsSetServerMessageIncludesLinkMetadata(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $ringCrafting = $this->createGameSkill(['name' => 'Ring Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $spellCrafting = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])
+            ->assignSkill($ringCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])
+            ->assignSkill($spellCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])
+            ->assignSkill($armourCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])
+            ->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Link Metadata Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $setSlot = SetSlot::whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id))
+            ->where('item_id', $item->id)
+            ->first();
+
+        $this->assertNotNull($setSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($setSlot, $item) {
+            return $event->message === 'Kept: ' . $item->name . ' in your Crafted Items Set.'
+                && $event->id === $setSlot->id
+                && $event->source === 'crafted_items_set'
+                && $event->linkText === $item->name;
+        });
+    }
+
+    public function testBatchCraftKeptOutputCraftedMessageIsLinkedToExactSetSlot(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Linked Craft Message Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $setSlot = SetSlot::whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id))
+            ->where('item_id', $item->id)
+            ->first();
+
+        $this->assertNotNull($setSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($setSlot, $item) {
+            return $event->message === 'You crafted a: ' . $item->name . '!'
+                && $event->id === $setSlot->id
+                && $event->source === 'crafted_items_set'
+                && $event->linkText === $item->name;
+        });
+    }
+
+    public function testBatchCraftKeptOutputDoesNotDispatchDuplicatePlainCraftedMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'No Duplicate Craft Message Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedMessages = collect(Event::dispatched(ServerMessageEvent::class))
+            ->filter(fn (array $dispatched) => $dispatched[0]->message === 'You crafted a: ' . $item->name . '!');
+
+        $this->assertCount(1, $craftedMessages);
+    }
+
+    public function testBatchCraftAndEnchantKeptOutputEnchantMessageIsLinkedToExactSetSlot(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Linked Enchant Message Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $prefix = $this->createItemAffix(['name' => 'Linked Enchant Message Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'sword', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'enchant_affix_ids' => [$prefix->id]],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $setSlot = SetSlot::whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id))
+            ->whereHas('item', fn ($query) => $query->where('item_prefix_id', $prefix->id))
+            ->first();
+
+        $this->assertNotNull($setSlot);
+        $expectedItemName = $setSlot->item->affix_name;
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($setSlot, $prefix, $expectedItemName) {
+            return $event->message === 'Applied enchantment: ' . $prefix->name . ' to: ' . $expectedItemName
+                && $event->id === $setSlot->id
+                && $event->source === 'crafted_items_set'
+                && $event->linkText === $expectedItemName;
+        });
+    }
+
+    public function testBatchTrinketryKeptOutputCraftedMessageIsLinkedToExactSetSlot(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'copper_coins' => 1000000, 'inventory_max' => 30]);
+        $trinket = $this->createItem(['name' => 'Linked Trinketry Message Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $setSlot = SetSlot::whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id))
+            ->where('item_id', $trinket->id)
+            ->first();
+
+        $this->assertNotNull($setSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($setSlot, $trinket) {
+            return $event->message === 'You crafted a: ' . $trinket->name . '!'
+                && $event->id === $setSlot->id
+                && $event->source === 'crafted_items_set'
+                && $event->linkText === $trinket->name;
+        });
+    }
+
+    public function testBatchCraftSoldOutputDoesNotEmitLinkMetadata(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'No Fake Link Sold Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($item) {
+            return str_starts_with($event->message, 'Sold: ' . $item->name)
+                && is_null($event->id)
+                && is_null($event->source)
+                && is_null($event->linkText);
+        });
+    }
+
+    public function testAlchemyAmountKeepDispatchesLinkedKeptInBagMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Linked Alchemy Amount Keep Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $alchemyBagSlot = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->first();
+
+        $this->assertNotNull($alchemyBagSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($alchemyBagSlot, $item) {
+            return $event->message === 'Kept: ' . $item->name . ' in your Alchemy Bag.'
+                && $event->id === $alchemyBagSlot->id
+                && $event->source === 'alchemy_bag'
+                && $event->linkText === $item->name;
+        });
+    }
+
+    public function testAlchemyExperienceKeepDispatchesLinkedKeptInBagMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(100);
+            })
+        );
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 1, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Linked Alchemy Experience Keep Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'experience'],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $alchemyBagSlot = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->first();
+
+        $this->assertNotNull($alchemyBagSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($alchemyBagSlot, $item) {
+            return $event->message === 'Kept: ' . $item->name . ' in your Alchemy Bag.'
+                && $event->id === $alchemyBagSlot->id
+                && $event->source === 'alchemy_bag'
+                && $event->linkText === $item->name;
+        });
+    }
+
+    public function testAlchemyExperienceKeepBestDestroyRestDispatchesLinkedKeptMessageForRetainedBest(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(100);
+            })
+        );
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $alchemySkill = $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value);
+        $alchemySkill->update(['level' => 1, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'alchemy_bag_limit' => 20]);
+        $item = $this->createItem(['name' => 'Linked Alchemy Keep Best Destroy Rest Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => ['alchemy_mode' => 'experience'],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $alchemyBagSlot = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->first();
+
+        $this->assertNotNull($alchemyBagSlot);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) use ($alchemyBagSlot, $item) {
+            return $event->message === 'Kept: ' . $item->name . ' in your Alchemy Bag.'
+                && $event->id === $alchemyBagSlot->id
+                && $event->source === 'alchemy_bag'
+                && $event->linkText === $item->name;
+        });
+    }
+
+    public function testAlchemyDestroyDoesNotEmitLinkMetadata(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'No Fake Link Alchemy Destroy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertNotDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return str_starts_with($event->message, 'Kept: ');
+        });
+    }
+
+    public function testAlchemyListDoesNotEmitLinkMetadata(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'No Fake Link Alchemy List Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id, 'listing_price' => 5],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertNotDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return str_starts_with($event->message, 'Kept: ');
+        });
     }
 
     public function testMaxLevelCraftAndEnchantBatchStillCraftsAndEnchantsWhenEligibleItemsAndAffixesExist(): void
@@ -1570,7 +1897,7 @@ class BatchCraftingServiceTest extends TestCase
         (new BatchCraftingService($processor, resolve(CraftingService::class), $logger, resolve(EnchantingService::class), resolve(BatchCraftingSetService::class), resolve(HolyItemService::class)))->process($batchCrafting);
 
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
-            return $event->message === 'Batch crafting processed 1 action.';
+            return $event->message === 'Batch crafting update: crafted 1 item.';
         });
     }
 
@@ -1720,9 +2047,11 @@ class BatchCraftingServiceTest extends TestCase
             resolve(EnchantingService::class),
             resolve(HolyItemService::class),
             resolve(MultiInventoryActionService::class),
+            resolve(UseItemService::class),
             resolve(BatchCraftingSetService::class),
             resolve(InventorySetService::class),
             resolve(HandleUpdatingCraftingGlobalEventGoal::class),
+            resolve(\App\Game\Messages\Handlers\ServerMessageHandler::class),
         );
 
         $result = $processor->processOneTick($batchCrafting, $character->refresh());
@@ -2442,6 +2771,63 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(1, $craftedItemsSet->slots()->count());
         $this->assertSame(0, InventorySlot::where('inventory_id', $character->inventory->id)->count());
         $this->assertSame(1, $result->progress['craft_set_completed'] ?? null, $result->ended_reason ?? 'no end reason');
+        $keptAction = collect($result->action_log)->first(fn (array $entry) => ($entry['action_type'] ?? null) === 'craft_set');
+        $this->assertNotNull($keptAction['kept_item']['set_slot_id'] ?? null);
+    }
+
+    public function testCraftSetSellDispositionDoesNotCreateCraftedItemsSetOutput(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Craft Set Sell Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 100, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => [
+                'craft_mode' => 'craft_set',
+                'craft_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_set_index' => 0,
+                'craft_set_requested' => 1,
+                'craft_set_completed' => 0,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->sold_count);
+        $this->assertGreaterThan(0, collect($result->action_log)->sum('gold_gained'));
+    }
+
+    public function testCraftSetDestroyDispositionDoesNotCreateCraftedItemsSetOutput(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Craft Set Destroy Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => [
+                'craft_mode' => 'craft_set',
+                'craft_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_set_index' => 0,
+                'craft_set_requested' => 1,
+                'craft_set_completed' => 0,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->destroyed_count);
     }
 
     public function testCraftSetStopsWhenCraftedItemsSetDoesNotHaveEnoughSpace(): void
@@ -2633,6 +3019,49 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertGreaterThan(0, $result->action_log[1]['gold_dust_gained'] ?? 0, $result->ended_reason ?? 'no end reason');
 
         $this->assertGreaterThan(0, $result->action_log[1]['gold_dust_gained'] ?? 0);
+    }
+
+    public function testListDispositionCreatesMarketBoardRowUsingSuppliedListingPrice(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->skills->first(function ($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value;
+        })->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'List Price Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $prefix = $this->createItemAffix(['name' => 'List Price Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'sword', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'enchant_affix_ids' => [$prefix->id], 'listing_price' => 777],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertNotNull(MarketBoard::where('character_id', $character->id)->where('listed_price', 777)->first());
+    }
+
+    public function testKeptCraftedItemActionLogIncludesSetSlotId(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Set Slot Id Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $keptAction = collect($result->action_log)->first(fn (array $entry) => ($entry['disposition'] ?? null) === 'keep');
+        $this->assertNotNull($keptAction['kept_item']['set_slot_id'] ?? null);
     }
 
     public function testStatusExposesChartPointsForEntireRun(): void
@@ -4069,7 +4498,7 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(60, $batchCrafting->progress['tick_delay_seconds'] ?? null);
     }
 
-    public function testCraftAndEnchantSetOnlySupportsKeepDisposition(): void
+    public function testCraftAndEnchantSetAllowsSellDisposition(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
@@ -4080,11 +4509,31 @@ class BatchCraftingServiceTest extends TestCase
         $keys = $processor->craftEnchantSetPlanKeys($processor->craftSetQueue());
         $plan = array_fill_keys($keys, ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id]);
 
+        $batchCrafting = resolve(BatchCraftingService::class)->start($character, [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => ['craft_mode' => 'craft_enchant_set', 'selected_set_id' => $set->id, 'enchant_plan' => $plan],
+        ]);
+
+        $this->assertSame(BatchCraftingDisposition::SELL->value, $batchCrafting->disposition);
+    }
+
+    public function testCraftAndEnchantSetRejectsKeepBestSellRestDisposition(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $prefix = $this->createItemAffix(['name' => 'Craft Enchant Set Keep Best Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $suffix = $this->createItemAffix(['name' => 'Craft Enchant Set Keep Best Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $processor = resolve(BatchCraftingProcessor::class);
+        $keys = $processor->craftEnchantSetPlanKeys($processor->craftSetQueue());
+        $plan = array_fill_keys($keys, ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id]);
+
         $this->expectException(ValidationException::class);
 
         resolve(BatchCraftingService::class)->start($character, [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::SELL->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_SELL_REST->value,
             'progress' => ['craft_mode' => 'craft_enchant_set', 'selected_set_id' => $set->id, 'enchant_plan' => $plan],
         ]);
     }
@@ -4525,6 +4974,160 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(InventorySet::BATCH_CRAFTING_SET_NAME, $finalizeEntry['destination_set'] ?? null);
         $this->assertTrue($finalizeEntry['created_in_crafted_items_set'] ?? false);
         $this->assertSame(1, $craftedItemsSet?->slots()->count());
+        $this->assertNotNull($finalizeEntry['kept_item']['set_slot_id'] ?? null);
+    }
+
+    public function testCraftAndEnchantSetFinalizeSellDispositionRemovesFinalOutputFromCraftedItemsSet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $prefix = $this->createItemAffix(['name' => 'Finalize Sell Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $item = $this->createItem(['name' => 'Finalize Sell Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'craft_enchant_set_target_mode' => 'craft_new',
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_keys' => ['dagger'],
+                'enchant_plan' => [],
+                'craft_enchant_set_requested' => 1,
+                'craft_enchant_set_phase' => 'finalizing',
+                'craft_enchant_set_craft_index' => 1,
+                'craft_enchant_set_enchant_index' => 1,
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
+                'craft_enchant_set_prefix_applied_count' => 0,
+                'craft_enchant_set_suffix_applied_count' => 0,
+                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_completed_work_units' => 2,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->sold_count);
+        $this->assertGreaterThan(0, collect($result->action_log)->sum('gold_gained'));
+    }
+
+    public function testCraftAndEnchantSetFinalizeDestroyDispositionRemovesFinalOutputFromCraftedItemsSet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $prefix = $this->createItemAffix(['name' => 'Finalize Destroy Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $item = $this->createItem(['name' => 'Finalize Destroy Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'craft_enchant_set_target_mode' => 'craft_new',
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_keys' => ['dagger'],
+                'enchant_plan' => [],
+                'craft_enchant_set_requested' => 1,
+                'craft_enchant_set_phase' => 'finalizing',
+                'craft_enchant_set_craft_index' => 1,
+                'craft_enchant_set_enchant_index' => 1,
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
+                'craft_enchant_set_prefix_applied_count' => 0,
+                'craft_enchant_set_suffix_applied_count' => 0,
+                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_completed_work_units' => 2,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->destroyed_count);
+    }
+
+    public function testCraftAndEnchantSetFinalizeListDispositionCreatesMarketRowAndNoCraftedItemsSetOutput(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $prefix = $this->createItemAffix(['name' => 'Finalize List Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $item = $this->createItem(['name' => 'Finalize List Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'craft_enchant_set_target_mode' => 'craft_new',
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_keys' => ['dagger'],
+                'enchant_plan' => [],
+                'listing_price' => 888,
+                'craft_enchant_set_requested' => 1,
+                'craft_enchant_set_phase' => 'finalizing',
+                'craft_enchant_set_craft_index' => 1,
+                'craft_enchant_set_enchant_index' => 1,
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
+                'craft_enchant_set_prefix_applied_count' => 0,
+                'craft_enchant_set_suffix_applied_count' => 0,
+                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_completed_work_units' => 2,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->listed_count);
+        $this->assertSame(1, MarketBoard::where('character_id', $character->id)->where('item_id', $item->id)->count());
+        $this->assertGreaterThanOrEqual(888, MarketBoard::where('character_id', $character->id)->first()->listed_price);
+    }
+
+    public function testCraftAndEnchantSetFinalizeDisenchantDispositionRemovesFinalOutputFromCraftedItemsSet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $prefix = $this->createItemAffix(['name' => 'Finalize Disenchant Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
+        $item = $this->createItem(['name' => 'Finalize Disenchant Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::DISENCHANT->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'craft_enchant_set_target_mode' => 'craft_new',
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_keys' => ['dagger'],
+                'enchant_plan' => [],
+                'craft_enchant_set_requested' => 1,
+                'craft_enchant_set_phase' => 'finalizing',
+                'craft_enchant_set_craft_index' => 1,
+                'craft_enchant_set_enchant_index' => 1,
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
+                'craft_enchant_set_prefix_applied_count' => 0,
+                'craft_enchant_set_suffix_applied_count' => 0,
+                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_completed_work_units' => 2,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->progress['outcome_totals']['disenchanted'] ?? null);
+        $this->assertGreaterThan(0, collect($result->action_log)->sum('gold_dust_gained'));
     }
 
     public function testCraftForExperienceStatusExposesCraftedItemsSetMaxSlotsAsTwoThousand(): void
@@ -5024,6 +5627,101 @@ class BatchCraftingServiceTest extends TestCase
 
         $this->assertNotNull($untouchedSlotAfterProcessing);
         $this->assertSame(0, $untouchedSlotAfterProcessing->item->holy_stacks_applied);
+    }
+
+    public function testBatchHolyOilsSelectedDestroyEmitsDestroyedServerMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Holy Oil Selected Destroy Weapon', 'type' => 'weapon', 'holy_stacks' => 1]);
+        $selectedSlot = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $item->id]);
+        $oil = $this->createItem(['name' => 'Holy Oil Selected Destroy Oil', 'type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'selected_items' => [$selectedSlot->id],
+            'selected_oils' => [$oilSlot->id],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => str_starts_with($event->message, 'Destroyed:'));
+    }
+
+    public function testBatchHolyOilsSelectedListEmitsListedServerMessageWithPrice(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Holy Oil Selected List Weapon', 'type' => 'weapon', 'holy_stacks' => 1, 'cost' => 100]);
+        $selectedSlot = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $item->id]);
+        $oil = $this->createItem(['name' => 'Holy Oil Selected List Oil', 'type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'selected_items' => [$selectedSlot->id],
+            'selected_oils' => [$oilSlot->id],
+            'progress' => ['listing_price' => 50],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => str_starts_with($event->message, 'Listed:') && str_contains($event->message, 'Gold.'));
+    }
+
+    public function testBatchHolyOilsSetDestroyEmitsDestroyedServerMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Holy Oil Set Destroy Weapon', 'type' => 'weapon', 'holy_stacks' => 1]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
+        $oil = $this->createItem(['name' => 'Holy Oil Set Destroy Oil', 'type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'selected_oils' => [$oilSlot->id],
+            'progress' => ['holy_oil_mode' => 'set', 'selected_set_id' => $set->id, 'holy_oil_total_stacks' => 1, 'holy_oil_requested_applications' => 1, 'holy_oil_completed_applications' => 0],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => str_starts_with($event->message, 'Destroyed:'));
+    }
+
+    public function testBatchHolyOilsSetListEmitsListedServerMessageWithPrice(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem(['name' => 'Holy Oil Set List Weapon', 'type' => 'weapon', 'holy_stacks' => 1, 'cost' => 100]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
+        $oil = $this->createItem(['name' => 'Holy Oil Set List Oil', 'type' => 'alchemy', 'can_use_on_other_items' => true, 'holy_level' => 1]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'selected_oils' => [$oilSlot->id],
+            'progress' => ['holy_oil_mode' => 'set', 'selected_set_id' => $set->id, 'holy_oil_total_stacks' => 1, 'holy_oil_requested_applications' => 1, 'holy_oil_completed_applications' => 0, 'listing_price' => 50],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => str_starts_with($event->message, 'Listed:') && str_contains($event->message, 'Gold.'));
     }
 
     public function testAlchemyAmountStatusExposesBagCapAndCostPreview(): void
@@ -6941,6 +7639,757 @@ class BatchCraftingServiceTest extends TestCase
         Bus::assertDispatched(DisenchantMany::class);
     }
 
+    public function testCraftExperienceKeepBestSellRestSellsReplacedRetainedSetSlot(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 400, false)
+            ->getCharacter();
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $lowDagger = $this->createItem(['name' => 'Keep Best Sell Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 100, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $highDagger = $this->createItem(['name' => 'Keep Best Sell High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_SELL_REST->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $lowDagger->id,
+                'craft_amount' => 1,
+                'craft_specific_count' => 0,
+            ],
+        ]);
+
+        $firstResult = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $craftedItemsSetAfterFirstTick = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $firstSlotId = $craftedItemsSetAfterFirstTick?->slots()->first()?->id;
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null, 'progress' => array_merge($firstResult->progress ?? [], ['specific_item_id' => $highDagger->id, 'craft_specific_count' => 0])]);
+        $secondResult = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertNotNull($firstSlotId);
+        $this->assertFalse($craftedItemsSet->slots()->where('id', $firstSlotId)->exists());
+        $this->assertSame(1, $craftedItemsSet->slots()->count());
+        $this->assertSame($highDagger->id, $craftedItemsSet->slots()->first()->item_id);
+        $this->assertSame(1, $secondResult->sold_count);
+        $this->assertSame($lowDagger->id, collect($secondResult->action_log)->pluck('sold_item.item_id')->filter()->first());
+    }
+
+    public function testCraftExperienceKeepBestDestroyRestDestroysReplacedRetainedSetSlot(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 400, false)
+            ->getCharacter();
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $lowDagger = $this->createItem(['name' => 'Keep Best Destroy Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $highDagger = $this->createItem(['name' => 'Keep Best Destroy High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $lowDagger->id,
+                'craft_amount' => 1,
+                'craft_specific_count' => 0,
+            ],
+        ]);
+
+        $firstResult = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $craftedItemsSetAfterFirstTick = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $firstSlotId = $craftedItemsSetAfterFirstTick?->slots()->first()?->id;
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null, 'progress' => array_merge($firstResult->progress ?? [], ['specific_item_id' => $highDagger->id, 'craft_specific_count' => 0])]);
+        $secondResult = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertNotNull($firstSlotId);
+        $this->assertFalse($craftedItemsSet->slots()->where('id', $firstSlotId)->exists());
+        $this->assertSame(1, $craftedItemsSet->slots()->count());
+        $this->assertSame($highDagger->id, $craftedItemsSet->slots()->first()->item_id);
+        $this->assertSame(1, $secondResult->destroyed_count);
+        $this->assertSame($lowDagger->id, collect($secondResult->action_log)->pluck('destroyed_item.item_id')->filter()->first());
+    }
+
+    public function testCraftAndEnchantExperienceKeepBestDisenchantRestDisenchantsReplacedRetainedSetSlot(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 400, false)
+            ->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
+        $lowDagger = $this->createItem(['name' => 'Keep Best Disenchant Retained Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $highDagger = $this->createItem(['name' => 'Keep Best Disenchant Retained High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $prefix = $this->createItemAffix(['name' => 'Keep Best Replacement Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DISENCHANT_REST->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $lowDagger->id,
+                'craft_amount' => 1,
+                'craft_enchant_specific_count' => 0,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+
+        $afterCraftTick = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $firstResult = resolve(BatchCraftingService::class)->process($afterCraftTick->refresh());
+        $craftedItemsSetAfterFirstTick = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $firstSlotId = $craftedItemsSetAfterFirstTick?->slots()->first()?->id;
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null, 'progress' => array_merge($firstResult->progress ?? [], ['specific_item_id' => $highDagger->id, 'craft_enchant_specific_count' => 0, 'craft_enchant_phase' => 'craft', 'pending_enchant_item_id' => null])]);
+        $afterCraftTickTwo = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+        $secondResult = resolve(BatchCraftingService::class)->process($afterCraftTickTwo->refresh());
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertNotNull($firstSlotId);
+        $this->assertFalse($craftedItemsSet->slots()->where('id', $firstSlotId)->exists());
+        $this->assertSame(1, $craftedItemsSet->slots()->count());
+        $this->assertGreaterThanOrEqual(1, $secondResult->progress['outcome_totals']['disenchanted'] ?? 0);
+        $this->assertGreaterThan(0, collect($secondResult->action_log)->sum('gold_dust_gained'));
+    }
+
+    public function testCraftAndEnchantExperienceKeepBestSellRestSellsReplacedRetainedSetSlot(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 400, false)
+            ->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
+        $lowDagger = $this->createItem(['name' => 'Keep Best Enchant Sell Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $highDagger = $this->createItem(['name' => 'Keep Best Enchant Sell High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $prefix = $this->createItemAffix(['name' => 'Keep Best Enchant Sell Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_SELL_REST->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $lowDagger->id,
+                'craft_amount' => 1,
+                'craft_enchant_specific_count' => 0,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+
+        $afterCraftTick = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $firstResult = resolve(BatchCraftingService::class)->process($afterCraftTick->refresh());
+        $craftedItemsSetAfterFirstTick = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $firstSlotId = $craftedItemsSetAfterFirstTick?->slots()->first()?->id;
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null, 'progress' => array_merge($firstResult->progress ?? [], ['specific_item_id' => $highDagger->id, 'craft_enchant_specific_count' => 0, 'craft_enchant_phase' => 'craft', 'pending_enchant_item_id' => null])]);
+        $afterCraftTickTwo = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+        $secondResult = resolve(BatchCraftingService::class)->process($afterCraftTickTwo->refresh());
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertNotNull($firstSlotId);
+        $this->assertFalse($craftedItemsSet->slots()->where('id', $firstSlotId)->exists());
+        $this->assertSame(1, $craftedItemsSet->slots()->count());
+        $this->assertGreaterThanOrEqual(1, $secondResult->sold_count);
+        $this->assertGreaterThan(0, collect($secondResult->action_log)->sum('gold_gained'));
+    }
+
+    public function testCraftAndEnchantExperienceKeepBestDestroyRestDestroysReplacedRetainedSetSlot(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 400, false)
+            ->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
+        $lowDagger = $this->createItem(['name' => 'Keep Best Enchant Destroy Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $highDagger = $this->createItem(['name' => 'Keep Best Enchant Destroy High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $prefix = $this->createItemAffix(['name' => 'Keep Best Enchant Destroy Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $lowDagger->id,
+                'craft_amount' => 1,
+                'craft_enchant_specific_count' => 0,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+
+        $afterCraftTick = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $firstResult = resolve(BatchCraftingService::class)->process($afterCraftTick->refresh());
+        $craftedItemsSetAfterFirstTick = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $firstSlotId = $craftedItemsSetAfterFirstTick?->slots()->first()?->id;
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null, 'progress' => array_merge($firstResult->progress ?? [], ['specific_item_id' => $highDagger->id, 'craft_enchant_specific_count' => 0, 'craft_enchant_phase' => 'craft', 'pending_enchant_item_id' => null])]);
+        $afterCraftTickTwo = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+        $secondResult = resolve(BatchCraftingService::class)->process($afterCraftTickTwo->refresh());
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertNotNull($firstSlotId);
+        $this->assertFalse($craftedItemsSet->slots()->where('id', $firstSlotId)->exists());
+        $this->assertSame(1, $craftedItemsSet->slots()->count());
+        $this->assertGreaterThanOrEqual(1, $secondResult->destroyed_count);
+    }
+
+    public function testAlchemyExperienceKeepBestDestroyRestDestroysReplacedRetainedAlchemyBagItem(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $alchemySkill = $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value);
+        $alchemySkill->update(['level' => 1, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'alchemy_bag_limit' => 20]);
+        $lowItem = $this->createItem(['name' => 'Keep Best Alchemy Destroy Low Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => ['alchemy_mode' => 'experience'],
+        ]);
+
+        $firstResult = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $firstSlot = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $lowItem->id)->first();
+        $alchemySkill->refresh()->update(['level' => 2]);
+        $lowItem->update(['can_craft' => false]);
+        $highItem = $this->createItem(['name' => 'Keep Best Alchemy Destroy High Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null]);
+        $secondResult = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+
+        $this->assertNotNull($firstSlot);
+        $remainingSlots = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->get();
+        $this->assertCount(1, $remainingSlots);
+        $this->assertSame($highItem->id, $remainingSlots->first()->item_id);
+        $this->assertGreaterThanOrEqual(1, $secondResult->destroyed_count);
+    }
+
+    public function testTrinketryExperienceKeepBestDestroyRestDestroysReplacedRetainedSetSlot(): void
+    {
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'copper_coins' => 1000000, 'inventory_max' => 30]);
+        $lowTrinket = $this->createItem(['name' => 'Keep Best Trinketry Destroy Low Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $firstResult = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $craftedItemsSetAfterFirstTick = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $firstSlotId = $craftedItemsSetAfterFirstTick?->slots()->first()?->id;
+        $character->skills()->where('game_skill_id', $trinketry->id)->update(['level' => 2]);
+        $lowTrinket->update(['can_craft' => false]);
+        $highTrinket = $this->createItem(['name' => 'Keep Best Trinketry Destroy High Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 2]);
+        $secondResult = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertNotNull($firstSlotId);
+        $this->assertFalse($craftedItemsSet->slots()->where('id', $firstSlotId)->exists());
+        $this->assertSame(1, $craftedItemsSet->slots()->count());
+        $this->assertSame($highTrinket->id, $craftedItemsSet->slots()->first()->item_id);
+        $this->assertGreaterThanOrEqual(1, $secondResult->destroyed_count);
+    }
+
+    public function testAlchemyUseNowUsesValidBoonItemAsABoonOnTheCharacter(): void
+    {
+        Bus::fake([\App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Usable Boon Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1, 'usable' => true, 'lasts_for' => 30, 'damages_kingdoms' => false, 'can_use_on_other_items' => false]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(1, $character->boons()->active()->where('item_id', $item->id)->count());
+        $this->assertSame(0, \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->count());
+        $usedAction = collect($result->action_log)->first(fn (array $entry) => ($entry['disposition'] ?? null) === 'use_now');
+        $this->assertNotNull($usedAction);
+    }
+
+    public function testAlchemyUseNowKeepsKingdomBombInAlchemyBagAndDoesNotUseIt(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Kingdom Bomb Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1, 'usable' => true, 'lasts_for' => 30, 'damages_kingdoms' => true, 'can_use_on_other_items' => false]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(0, $character->boons()->active()->where('item_id', $item->id)->count());
+        $keptSlot = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->first();
+        $this->assertNotNull($keptSlot);
+        $keptAction = collect($result->action_log)->first(fn (array $entry) => ($entry['disposition'] ?? null) === 'keep');
+        $this->assertNotNull($keptAction);
+    }
+
+    public function testAlchemyUseNowKeepsExtraBoonItemInAlchemyBagWhenAlreadyAtTenBoons(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+
+        for ($boonIndex = 0; $boonIndex < 10; $boonIndex++) {
+            $existingBoonItem = $this->createItem(['name' => 'Existing Boon Item ' . $boonIndex, 'type' => 'alchemy', 'usable' => true, 'lasts_for' => 30, 'damages_kingdoms' => false, 'can_use_on_other_items' => false]);
+            $this->createCharacterBoon([
+                'character_id' => $character->id,
+                'item_id' => $existingBoonItem->id,
+                'last_for_minutes' => 30,
+                'amount_used' => 1,
+                'started' => now(),
+                'complete' => now()->addMinutes(30),
+            ]);
+        }
+
+        $item = $this->createItem(['name' => 'Overflow Boon Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1, 'usable' => true, 'lasts_for' => 30, 'damages_kingdoms' => false, 'can_use_on_other_items' => false]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(0, $character->boons()->active()->where('item_id', $item->id)->count());
+        $keptSlot = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->first();
+        $this->assertNotNull($keptSlot);
+    }
+
+    public function testAlchemyAmountDestroyProcessesWhenAlchemyBagIsFull(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 1]);
+        $bagFillerItem = $this->createItem(['name' => 'Destroy While Full Bag Filler', 'type' => 'alchemy']);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $bagFillerItem->id, 'amount' => 1]);
+        $item = $this->createItem(['name' => 'Alchemy Destroy While Full Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertNotSame(BatchCraftingEndReason::ALCHEMY_BAG_FULL->value, $result->ended_reason);
+        $this->assertSame(1, $result->destroyed_count);
+    }
+
+    public function testAlchemyAmountListProcessesWhenAlchemyBagIsFull(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 1]);
+        $bagFillerItem = $this->createItem(['name' => 'List While Full Bag Filler', 'type' => 'alchemy']);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $bagFillerItem->id, 'amount' => 1]);
+        $item = $this->createItem(['name' => 'Alchemy List While Full Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertNotSame(BatchCraftingEndReason::ALCHEMY_BAG_FULL->value, $result->ended_reason);
+        $this->assertSame(1, $result->listed_count);
+    }
+
+    public function testAlchemyAmountUseNowUsesValidBoonWhenAlchemyBagIsFull(): void
+    {
+        Bus::fake([\App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob::class]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 1]);
+        $bagFillerItem = $this->createItem(['name' => 'Use Now While Full Bag Filler', 'type' => 'alchemy']);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $bagFillerItem->id, 'amount' => 1]);
+        $item = $this->createItem(['name' => 'Usable Boon While Full Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1, 'usable' => true, 'lasts_for' => 30, 'damages_kingdoms' => false, 'can_use_on_other_items' => false]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(1, $character->boons()->active()->where('item_id', $item->id)->count());
+        $this->assertNotSame(BatchCraftingEndReason::ALCHEMY_BAG_FULL->value, $result->ended_reason);
+    }
+
+    public function testAlchemyAmountUseNowStopsSafelyForKingdomBombWhenAlchemyBagIsFull(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 1]);
+        $bagFillerItem = $this->createItem(['name' => 'Kingdom Bomb While Full Bag Filler', 'type' => 'alchemy']);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $bagFillerItem->id, 'amount' => 1]);
+        $item = $this->createItem(['name' => 'Kingdom Bomb While Full Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1, 'usable' => true, 'lasts_for' => 30, 'damages_kingdoms' => true, 'can_use_on_other_items' => false]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(BatchCraftingEndReason::ALCHEMY_BAG_FULL->value, $result->ended_reason);
+        $this->assertSame(0, \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->count());
+        $this->assertSame(0, $character->boons()->active()->where('item_id', $item->id)->count());
+    }
+
+    public function testAlchemyAmountKeepStopsWhenAlchemyBagIsFull(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 1]);
+        $bagFillerItem = $this->createItem(['name' => 'Keep While Full Bag Filler', 'type' => 'alchemy']);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $bagFillerItem->id, 'amount' => 1]);
+        $item = $this->createItem(['name' => 'Keep While Full Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(BatchCraftingEndReason::ALCHEMY_BAG_FULL->value, $result->ended_reason);
+        $this->assertSame(0, \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->count());
+    }
+
+    public function testAlchemyExperienceKeepBestDestroyRestSwapsWinnerWithoutRequiringExtraBagCapacity(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $alchemySkill = $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value);
+        $alchemySkill->update(['level' => 1, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'alchemy_bag_limit' => 1]);
+        $lowItem = $this->createItem(['name' => 'Keep Best Tight Capacity Low Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DESTROY_REST->value,
+            'progress' => ['alchemy_mode' => 'experience'],
+        ]);
+
+        $firstResult = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $alchemySkill->refresh()->update(['level' => 2]);
+        $lowItem->update(['can_craft' => false]);
+        $highItem = $this->createItem(['name' => 'Keep Best Tight Capacity High Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
+        $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null]);
+        $secondResult = resolve(BatchCraftingService::class)->process($firstResult->refresh());
+
+        $this->assertNotSame(BatchCraftingEndReason::ALCHEMY_BAG_FULL->value, $secondResult->ended_reason);
+        $remainingSlots = \App\Flare\Models\AlchemyBagSlot::where('character_id', $character->id)->get();
+        $this->assertCount(1, $remainingSlots);
+        $this->assertSame($highItem->id, $remainingSlots->first()->item_id);
+    }
+
+    public function testBatchCraftSpecificItemEmitsManualCraftedServerMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 400, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $item = $this->createItem(['name' => 'Server Message Craft Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'craft_specific_count' => 0,
+            ],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => $event->message === 'You crafted a: Server Message Craft Dagger!');
+    }
+
+    public function testBatchCraftAndEnchantSpecificItemEmitsManualEnchantedServerMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 400, false)->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
+        $item = $this->createItem(['name' => 'Server Message Enchant Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $prefix = $this->createItemAffix(['name' => 'Server Message Enchant Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'craft_enchant_specific_count' => 0,
+                'enchant_affix_ids' => [$prefix->id],
+            ],
+        ]);
+
+        $afterCraftTick = resolve(BatchCraftingService::class)->process($batchCrafting);
+        resolve(BatchCraftingService::class)->process($afterCraftTick->refresh());
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => str_starts_with($event->message, 'Applied enchantment: Server Message Enchant Prefix to:'));
+    }
+
+    public function testBatchTrinketryEmitsManualCraftedServerMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'copper_coins' => 1000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
+        $this->createItem(['name' => 'Server Message Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => $event->message === 'You crafted a: Server Message Trinket!');
+    }
+
+    public function testBatchSellDispositionEmitsManualSoldServerMessage(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 400, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $item = $this->createItem(['name' => 'Server Message Sell Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $item->id,
+                'craft_amount' => 1,
+                'craft_specific_count' => 0,
+            ],
+        ]);
+
+        resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        Event::assertDispatched(ServerMessageEvent::class, fn ($event) => str_starts_with($event->message, 'Sold: Server Message Sell Dagger for:'));
+    }
+
+    public function testAlchemyAmountRejectsSellDisposition(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Alchemy Sell Rejected Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+
+        $this->expectException(ValidationException::class);
+
+        resolve(BatchCraftingService::class)->start($character, [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id],
+        ]);
+    }
+
+    public function testAlchemyExperienceRejectsKeepBestSellRestDisposition(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 10]);
+
+        $this->expectException(ValidationException::class);
+
+        resolve(BatchCraftingService::class)->start($character, [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_SELL_REST->value,
+            'progress' => ['alchemy_mode' => 'experience'],
+        ]);
+    }
+
+    public function testCraftAndEnchantSetDisenchantRemovesFinalOutputFromCraftedItemsSetAndRecordsGoldDust(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 10, false)
+            ->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
+        $prefix = $this->createItemAffix(['name' => 'Craft Enchant Set Disenchant Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $enchantedItem = $this->createItem(['name' => 'Craft Enchant Set Disenchant Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 400, 'item_prefix_id' => $prefix->id]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::DISENCHANT->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'selected_set_id' => $set->id,
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_keys' => ['dagger'],
+                'craft_enchant_set_crafted_item_ids' => ['dagger' => $enchantedItem->id],
+                'craft_enchant_set_phase' => 'finalizing',
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_completed_final_count' => 0,
+            ],
+        ]);
+        $goldDustBefore = $character->gold_dust;
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftedItemsSet = InventorySet::where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)->first();
+        $this->assertSame(0, $craftedItemsSet?->slots()->count() ?? 0);
+        $this->assertSame(1, $result->progress['outcome_totals']['disenchanted'] ?? 0);
+        $this->assertGreaterThan($goldDustBefore, $character->refresh()->gold_dust);
+
+        $disenchantAction = collect($result->action_log)->first(fn (array $entry) => ($entry['disposition'] ?? null) === 'disenchant');
+        $this->assertNotNull($disenchantAction);
+        $this->assertSame($enchantedItem->id, $disenchantAction['disenchanted_item']['item_id'] ?? null);
+    }
+
+    public function testCraftAndEnchantSetListCreatesMarketBoardRowWithNonzeroListedValue(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignSkill($weaponCrafting, 10, false)
+            ->getCharacter();
+        $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $enchantedItem = $this->createItem(['name' => 'Craft Enchant Set List Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'selected_set_id' => $set->id,
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_keys' => ['dagger'],
+                'craft_enchant_set_crafted_item_ids' => ['dagger' => $enchantedItem->id],
+                'craft_enchant_set_phase' => 'finalizing',
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_completed_final_count' => 0,
+                'listing_price' => 5000,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $marketRow = MarketBoard::where('character_id', $character->id)->where('item_id', $enchantedItem->id)->first();
+        $this->assertNotNull($marketRow);
+        $this->assertSame(5000, $marketRow->listed_price);
+
+        $listedAction = collect($result->action_log)->first(fn (array $entry) => ($entry['disposition'] ?? null) === 'list');
+        $this->assertNotNull($listedAction);
+        $this->assertSame(5000, $listedAction['listed_price'] ?? null);
+
+        $chartListedValue = collect($result->progress['chart_points']['currency'] ?? [])->sum('listed_value');
+        $this->assertGreaterThan(0, $chartListedValue);
+        $this->assertSame(5000, $result->progress['currency_totals']['listed_value'] ?? 0);
+    }
+
     public function testKeepHighestForAlchemySellsTheLowerLevelDuplicateItem(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
@@ -7869,5 +9318,133 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertGreaterThan(0, $craftedItemsSet->slots()->count());
         $this->assertSame($inventoryCountBefore, $character->refresh()->getInventoryCount());
         $this->assertNull($result->ended_reason);
+    }
+
+    public function testCraftAmountSellPreviewDoesNotRequireCraftedItemsSetCapacity(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $item = $this->createItem(['name' => 'Sell Full Set Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $craftedItemsSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 1]);
+        $this->createInventorySetSlot(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
+
+        $preview = resolve(BatchCraftingService::class)->preview($character, [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::SELL->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 5],
+        ]);
+
+        $this->assertNull(collect($preview['start_blockers'])->firstWhere('code', 'crafted_items_set_full'));
+        $this->assertNull($preview['destination_capacity']);
+        $this->assertSame(5, $preview['amount_preview']['effective_craftable_amount']);
+    }
+
+    public function testCraftAmountKeepPreviewStillRequiresCraftedItemsSetCapacity(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $item = $this->createItem(['name' => 'Keep Full Set Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $craftedItemsSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 1]);
+        $this->createInventorySetSlot(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
+
+        $preview = resolve(BatchCraftingService::class)->preview($character, [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 5],
+        ]);
+
+        $this->assertNotNull(collect($preview['start_blockers'])->firstWhere('code', 'crafted_items_set_full'));
+        $this->assertSame('crafted_items_set', $preview['destination_capacity']['destination']);
+        $this->assertSame(0, $preview['amount_preview']['effective_craftable_amount']);
+    }
+
+    public function testCraftAndEnchantAmountListPreviewIsNotCappedByCraftedItemsSetCapacity(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 5, 'xp' => 100, 'xp_max' => 100]);
+        $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1000]);
+        $item = $this->createItem(['name' => 'List Full Set Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $prefix = $this->createItemAffix(['name' => 'List Full Set Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $craftedItemsSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 1]);
+        $this->createInventorySetSlot(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
+
+        $preview = resolve(BatchCraftingService::class)->preview($character, [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 5, 'enchant_affix_ids' => [$prefix->id]],
+        ]);
+
+        $this->assertNull(collect($preview['start_blockers'])->firstWhere('code', 'crafted_items_set_full'));
+        $this->assertNull($preview['destination_capacity']);
+        $this->assertSame(5, $preview['amount_preview']['effective_craftable_amount']);
+    }
+
+    public function testAlchemyAmountListPreviewDoesNotRequireAlchemyBagCapacity(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 1]);
+        $bagFillerItem = $this->createItem(['name' => 'Alchemy List Bag Filler', 'type' => 'alchemy']);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $bagFillerItem->id, 'amount' => 1]);
+        $item = $this->createItem(['name' => 'Alchemy List Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1]);
+
+        $preview = resolve(BatchCraftingService::class)->preview($character, [
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 5, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $this->assertNull(collect($preview['start_blockers'])->firstWhere('code', 'alchemy_bag_full'));
+        $this->assertNull($preview['destination_capacity']);
+        $this->assertSame(5, $preview['alchemy_amount_preview']['effective_craftable_amount']);
+    }
+
+    public function testHolyOilsSelectedListRejectsWhenAnySelectedTargetIsIneligible(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $prefix = $this->createItemAffix(['name' => 'Holy Oil Eligible Prefix', 'type' => 'prefix']);
+        $eligibleItem = $this->createItem(['name' => 'Holy Oil Eligible Gear', 'type' => 'dagger', 'holy_stacks' => 1, 'item_prefix_id' => $prefix->id]);
+        $ineligibleItem = $this->createItem(['name' => 'Holy Oil Ineligible Gear', 'type' => 'sword', 'holy_stacks' => 1]);
+        $oil = $this->createItem(['name' => 'Holy Oil Eligibility Oil', 'type' => 'alchemy']);
+        $eligibleSlot = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $eligibleItem->id]);
+        $ineligibleSlot = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $ineligibleItem->id]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 2]);
+
+        $this->expectException(ValidationException::class);
+
+        resolve(BatchCraftingService::class)->start($character, [
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::LIST->value,
+            'selected_items' => [$eligibleSlot->id, $ineligibleSlot->id],
+            'selected_oils' => [$oilSlot->id],
+            'listing_price' => 1,
+            'progress' => ['holy_oil_mode' => 'selected'],
+        ]);
+    }
+
+    public function testHolyOilsSelectedDisenchantRejectsWhenAnySelectedTargetIsIneligible(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000]);
+        $prefix = $this->createItemAffix(['name' => 'Holy Oil Disenchant Prefix', 'type' => 'prefix']);
+        $eligibleItem = $this->createItem(['name' => 'Holy Oil Disenchant Eligible Gear', 'type' => 'dagger', 'holy_stacks' => 1, 'item_prefix_id' => $prefix->id]);
+        $ineligibleItem = $this->createItem(['name' => 'Holy Oil Disenchant Ineligible Gear', 'type' => 'sword', 'holy_stacks' => 1]);
+        $oil = $this->createItem(['name' => 'Holy Oil Disenchant Oil', 'type' => 'alchemy']);
+        $eligibleSlot = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $eligibleItem->id]);
+        $ineligibleSlot = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $ineligibleItem->id]);
+        $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 2]);
+
+        $this->expectException(ValidationException::class);
+
+        resolve(BatchCraftingService::class)->start($character, [
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::DISENCHANT->value,
+            'selected_items' => [$eligibleSlot->id, $ineligibleSlot->id],
+            'selected_oils' => [$oilSlot->id],
+            'progress' => ['holy_oil_mode' => 'selected'],
+        ]);
     }
 }

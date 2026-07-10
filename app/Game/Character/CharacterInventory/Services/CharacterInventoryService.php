@@ -158,6 +158,23 @@ class CharacterInventoryService
     }
 
     /**
+     * Resolves an exact SetSlot for item details, instead of the item_id-based
+     * lookup in getSlotForItemDetails() below, which picks the first slot it finds
+     * matching that item_id. When duplicate, non-enchanted items share the same
+     * catalog Item row across multiple SetSlots (e.g. several identical Batch
+     * Crafting outputs kept in the Crafted Items Set), that ambiguous lookup can
+     * resolve to the wrong physical slot. Callers that already know the specific
+     * SetSlot id (such as Batch Crafting action history) should use this instead.
+     */
+    public function getSetSlotForItemDetails(Character $character, Item $item, int $setSlotId): ?SetSlot
+    {
+        return SetSlot::where('id', $setSlotId)
+            ->where('item_id', $item->id)
+            ->whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id))
+            ->first();
+    }
+
+    /**
      * Gets the slot that holds the item, for its details.
      */
     public function getSlotForItemDetails(Character $character, Item $item): InventorySlot|SetSlot|null

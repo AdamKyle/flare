@@ -10,6 +10,7 @@ import DisenchantSelectedInformation from "./disenchant-selected-information";
 import EquipSelectedInformation from "./equip-selected-information";
 import MoveSelectedInformation from "./move-selected-information";
 import DestroyAlchemyInformation from "./destroy-alchemy-information";
+import DestroyAllFromSetInformation from "./destroy-all-from-set-information";
 
 export default class SectionBuilder extends React.Component<
     SectionBuilderProps,
@@ -82,6 +83,16 @@ export default class SectionBuilder extends React.Component<
             case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
                 return (
                     <DisenchantSelectedInformation
+                        item_names={
+                            this.props.item_names ? this.props.item_names : []
+                        }
+                    />
+                );
+            case InventoryActionConfirmationType.DESTROY_ALL_FROM_SET:
+                return <DestroyAllFromSetInformation />;
+            case InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET:
+                return (
+                    <DestroySelectedInformation
                         item_names={
                             this.props.item_names ? this.props.item_names : []
                         }

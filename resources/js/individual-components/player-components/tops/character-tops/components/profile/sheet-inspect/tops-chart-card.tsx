@@ -249,7 +249,7 @@ export default function TopsChartCard({
                 )}
 
                 <details>
-                    <summary className="cursor-pointer text-sm font-semibold text-blue-700 dark:text-blue-300">
+                    <summary className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-gray-100">
                         Data table
                     </summary>
                     <div className="mt-3 overflow-x-auto">

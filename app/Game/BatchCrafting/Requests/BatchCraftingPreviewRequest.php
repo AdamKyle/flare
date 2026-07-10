@@ -2,6 +2,7 @@
 
 namespace App\Game\BatchCrafting\Requests;
 
+use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -26,6 +27,7 @@ class BatchCraftingPreviewRequest extends FormRequest
 
         return [
             'batch_type' => ['required', Rule::in($startableTypes)],
+            'disposition' => ['nullable', Rule::in(array_column(BatchCraftingDisposition::cases(), 'value'))],
             'selected_items' => ['nullable', 'array'],
             'selected_items.*' => ['integer'],
             'selected_oils' => ['nullable', 'array'],

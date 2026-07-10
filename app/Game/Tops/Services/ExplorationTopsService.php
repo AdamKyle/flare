@@ -19,24 +19,15 @@ class ExplorationTopsService
         $metric = $parameters['metric'] ?? 'kills';
         $metrics = [
             ['key' => 'kills', 'label' => 'Kills'],
-            ['key' => 'fights', 'label' => 'Fights'],
-            ['key' => 'xp_gained', 'label' => 'XP Gained'],
+            ['key' => 'length_of_time_seconds', 'label' => 'Length of Time'],
+            ['key' => 'xp_gained', 'label' => 'XP'],
             ['key' => 'skill_xp_gained', 'label' => 'Skill XP'],
-            ['key' => 'run_count', 'label' => 'Runs'],
         ];
-        $snapshot = $this->snapshotResponse('exploration', $metric, $period, $metrics);
 
-        if (! is_null($snapshot)) {
-            return $snapshot;
-        }
-
-        $query = ExplorationLog::with('character');
-
-        if ($period['key'] !== 'all_time') {
-            $query->whereBetween('started_at', [$period['start'], $period['end']]);
-        }
-
-        $rows = $query->get()
+        // Exploration is a cumulative, non-resetting leaderboard: unlike Kingdoms/Delve,
+        // it does not filter rows by the selected period. Current Month and All Time
+        // therefore return identical underlying totals.
+        $rows = ExplorationLog::with('character')->get()
             ->groupBy('character_id')
             ->map(function ($logs) {
                 $character = $logs->first()->character;
@@ -52,6 +43,7 @@ class ExplorationTopsService
                     'skill_xp_gained' => $logs->sum('skill_xp_gained'),
                     'faction_points_gained' => $logs->sum('faction_points_gained'),
                     'run_count' => $logs->count(),
+                    'length_of_time_seconds' => $logs->sum(fn ($log) => is_null($log->ended_at) ? 0 : $log->started_at->diffInSeconds($log->ended_at)),
                     'latest_started_at' => $logs->max('started_at')?->toISOString(),
                     'latest_ended_at' => $logs->max('ended_at')?->toISOString(),
                     'stopped_reason' => $logs->sortByDesc('started_at')->first()?->stopped_reason,
@@ -81,6 +73,7 @@ class ExplorationTopsService
             'attack_type' => $explorationLog->attack_type,
             'started_at' => $explorationLog->started_at?->toISOString(),
             'ended_at' => $explorationLog->ended_at?->toISOString(),
+            'length_of_time_seconds' => is_null($explorationLog->ended_at) ? 0 : $explorationLog->started_at->diffInSeconds($explorationLog->ended_at),
             'fights' => $explorationLog->fights,
             'kills' => $explorationLog->kills,
             'xp_gained' => $explorationLog->xp_gained,

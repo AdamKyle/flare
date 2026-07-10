@@ -16,10 +16,10 @@ class KingdomTopsService
     {
         $parameters = $request instanceof Request ? $request->query() : $request;
         $period = $this->topsPeriodService->resolve($parameters['period'] ?? null);
-        $metric = $parameters['metric'] ?? 'total_value';
+        $metric = $parameters['metric'] ?? 'kingdom_count';
         $metrics = [
-            ['key' => 'total_value', 'label' => 'Total Value'],
             ['key' => 'kingdom_count', 'label' => 'Most Kingdoms'],
+            ['key' => 'total_value', 'label' => 'Total Value'],
             ['key' => 'total_treasury', 'label' => 'Highest Treasury'],
             ['key' => 'total_gold_bars', 'label' => 'Most Gold Bars'],
             ['key' => 'total_current_population', 'label' => 'Highest Population'],

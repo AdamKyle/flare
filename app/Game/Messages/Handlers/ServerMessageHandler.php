@@ -76,6 +76,21 @@ class ServerMessageHandler
         $this->dispatchOrOutbox($user, $message, $id);
     }
 
+    /**
+     * Send a basic message with a clickable item link.
+     *
+     * @param User $user
+     * @param string $message
+     * @param int $id
+     * @param string|null $source
+     * @param string|null $linkText
+     * @return void
+     */
+    public function sendBasicMessageWithLink(User $user, string $message, int $id, ?string $source, ?string $linkText): void
+    {
+        $this->dispatchOrOutbox($user, $message, $id, $source, null, $linkText);
+    }
+
     private function dispatchOrOutbox(
         User $user,
         string $message,

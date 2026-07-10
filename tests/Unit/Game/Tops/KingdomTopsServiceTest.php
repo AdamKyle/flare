@@ -26,4 +26,16 @@ class KingdomTopsServiceTest extends TestCase
 
         $this->assertSame(1, $data['rows'][0]['kingdom_count']);
     }
+
+    public function testKingdomTopsDefaultsToRankingByKingdomCount(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        $map = GameMap::factory()->create();
+        Kingdom::factory()->create(['character_id' => $character->id, 'game_map_id' => $map->id, 'npc_owned' => false, 'treasury' => 100]);
+
+        $data = $this->app->make(KingdomTopsService::class)->leaderboard(['period' => 'current_month']);
+
+        $this->assertSame('kingdom_count', $data['metric']);
+    }
 }

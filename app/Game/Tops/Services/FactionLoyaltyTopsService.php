@@ -19,25 +19,15 @@ class FactionLoyaltyTopsService
         $period = $this->topsPeriodService->resolve($parameters['period'] ?? null);
         $metric = $parameters['metric'] ?? 'highest_faction_level';
         $metrics = [
-            ['key' => 'highest_faction_level', 'label' => 'Highest Faction Level'],
-            ['key' => 'maxed_faction_count', 'label' => 'Maxed Factions'],
-            ['key' => 'highest_npc_loyalty_level', 'label' => 'Highest NPC Loyalty'],
-            ['key' => 'automation_run_count', 'label' => 'Automation Runs'],
+            ['key' => 'highest_faction_level', 'label' => 'Highest Level Faction'],
+            ['key' => 'total_faction_level', 'label' => 'Total Faction Level'],
+            ['key' => 'npcs_helped_count', 'label' => 'NPCs Helped'],
+            ['key' => 'total_npc_fame_level', 'label' => 'Total NPC Fame Level'],
         ];
-        $snapshot = $this->snapshotResponse('faction-loyalty', $metric, $period, $metrics);
 
-        if (! is_null($snapshot)) {
-            return $snapshot;
-        }
-
-        if ($period['is_archived_month']) {
-            return $this->response('faction-loyalty', $metric, $period, [], $metrics, [], 'Historical faction loyalty progression requires a monthly snapshot for this archived month.');
-        }
-
-        $rows = Character::with(['factions', 'factionLoyalties.factionLoyaltyNpcs'])->get()->map(function (Character $character) {
-            $automations = FactionLoyaltyAutomation::where('character_id', $character->id)->get();
-            $latestAutomation = $automations->sortByDesc('last_automation_action_at')->first();
+        $rows = Character::with(['factions.gameMap', 'factionLoyalties.factionLoyaltyNpcs'])->get()->map(function (Character $character) {
             $npcs = $character->factionLoyalties->flatMap(fn ($loyalty) => $loyalty->factionLoyaltyNpcs);
+            $highestFaction = $character->factions->sortByDesc('current_level')->first();
 
             return [
                 'rank' => 0,
@@ -45,18 +35,24 @@ class FactionLoyaltyTopsService
                 'character_name' => $character->name,
                 'character_profile_url' => $this->characterProfileUrl($character->id),
                 'highest_faction_level' => (int) $character->factions->max('current_level'),
+                'highest_faction_name' => $highestFaction?->gameMap?->name,
                 'highest_faction_points' => (int) $character->factions->max('current_points'),
+                'total_faction_level' => (int) $character->factions->sum('current_level'),
                 'maxed_faction_count' => $character->factions->where('maxed', true)->count(),
                 'pledged_faction_count' => $character->factionLoyalties->where('is_pledged', true)->count(),
                 'highest_npc_loyalty_level' => (int) $npcs->max('current_level'),
-                'automation_run_count' => $automations->count(),
-                'latest_action' => $latestAutomation?->last_automation_action,
-                'latest_outcome' => $latestAutomation?->last_fight_outcome,
+                'npcs_helped_count' => $npcs->where('current_level', '>', 1)->count(),
+                'total_npc_fame_level' => (int) $npcs->sum('current_level'),
             ];
-        })->filter(fn (array $row) => $row['highest_faction_level'] > 0 || $row['automation_run_count'] > 0);
+        })->filter(fn (array $row) => $row['highest_faction_level'] > 0 || $row['total_npc_fame_level'] > 0);
 
+        // Chained sortByDesc calls are stable, so the LAST call is the primary sort
+        // and each earlier call becomes a progressively deeper tie-break. Tie-break
+        // priority: 1. total faction level, 2. NPCs helped, 3. total NPC fame level.
         $rows = $this->applySearch($rows, $parameters['search'] ?? null)
-            ->sortByDesc('highest_faction_points')
+            ->sortByDesc('total_npc_fame_level')
+            ->sortByDesc('npcs_helped_count')
+            ->sortByDesc('total_faction_level')
             ->sortByDesc($metric)
             ->values()
             ->all();

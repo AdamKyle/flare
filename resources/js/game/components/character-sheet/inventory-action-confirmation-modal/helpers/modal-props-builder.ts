@@ -39,6 +39,10 @@ export default class ModalPropsBuilder {
                 return "Sell Selected";
             case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
                 return "Disenchant Selected";
+            case InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET:
+                return "Destroy Selected Items";
+            case InventoryActionConfirmationType.DESTROY_ALL_FROM_SET:
+                return "Destroy All";
             default:
                 return "ERROR";
         }
@@ -83,6 +87,16 @@ export default class ModalPropsBuilder {
                     "character/" +
                     characterId +
                     "/inventory-set/disenchant-selected"
+                );
+            case InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET:
+                return (
+                    "character/" +
+                    characterId +
+                    "/inventory-set/destroy-selected"
+                );
+            case InventoryActionConfirmationType.DESTROY_ALL_FROM_SET:
+                return (
+                    "character/" + characterId + "/inventory-set/destroy-all"
                 );
             default:
                 return "";

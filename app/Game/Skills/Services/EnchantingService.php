@@ -191,8 +191,13 @@ class EnchantingService
      * Applies the given affixes to a clone of the item after validating the full
      * affix list and gold cost. Returns the final item on success, or a destroyed
      * result if the roll fails.
+     *
+     * $suppressSuccessServerMessage skips only the "Applied enchantment: X to: Y"
+     * success message, used when the batch processor will emit a linked equivalent
+     * once the item is committed to the Crafted Items Set. Failure messages are
+     * never suppressed.
      */
-    public function enchantItemForBatch(Character $character, Item $item, array $affixIds, int $cost): array
+    public function enchantItemForBatch(Character $character, Item $item, array $affixIds, int $cost, bool $suppressSuccessServerMessage = false): array
     {
         $enchantingSkill = $this->getEnchantingSkill($character);
         $characterInt = $character->getInformation()->statMod('int');
@@ -256,6 +261,10 @@ class EnchantingService
                 $this->enchantItemService->discardPendingItem();
 
                 return ['success' => false, 'item' => null, 'reason' => 'destroyed'];
+            }
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTED, 'Applied enchantment: ' . $affix->name . ' to: ' . $item->refresh()->affix_name);
             }
 
             if (! $tooEasy) {

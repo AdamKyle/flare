@@ -28,7 +28,7 @@ export default class DelveTops extends React.Component<
             error_message: null,
             leaderboard: null,
             period: props.default_period,
-            metric: "strongest_enemy_increase",
+            metric: "survived_duration_seconds",
             search: "",
         };
 
@@ -109,7 +109,7 @@ export default class DelveTops extends React.Component<
         return (
             <TopsPageShell
                 title="Delve Leaderboard"
-                description="The strongest delve runs, ranked by enemy strength, encounters, runs, and pack size."
+                description="Ranked by survived duration."
                 resetDescription={resetDescription}
             >
                 <DelveLeaderboard

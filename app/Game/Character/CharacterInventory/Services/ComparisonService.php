@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\ItemComparisonTransfromer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
@@ -99,6 +100,27 @@ class ComparisonService
             'atonement' => [],
             'itemToEquip' => $item,
             'type' => 'alchemy',
+            'slotId' => $slot->id,
+            'characterId' => $character->id,
+            'bowEquipped' => false,
+            'setEquipped' => false,
+            'hammerEquipped' => false,
+            'staveEquipped' => false,
+            'setIndex' => 0,
+        ];
+    }
+
+    public function buildSetSlotComparisonData(Character $character, SetSlot $slot): array
+    {
+        $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
+        $item = (new Manager)->createData($item)->toArray()['data'];
+        $item['slot_id'] = $slot->id;
+
+        return [
+            'details' => [],
+            'atonement' => [],
+            'itemToEquip' => $item,
+            'type' => $slot->item->type,
             'slotId' => $slot->id,
             'characterId' => $character->id,
             'bowEquipped' => false,

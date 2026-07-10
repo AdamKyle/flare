@@ -58,10 +58,13 @@ class CharacterInventoryController extends Controller
         return response()->json($inventory->getInventoryForApi());
     }
 
-    public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse
+    public function itemDetails(Request $request, Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse
     {
+        $setSlotId = $request->query('slot_id');
 
-        $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
+        $slot = is_null($setSlotId)
+            ? $this->characterInventoryService->getSlotForItemDetails($character, $item)
+            : $this->characterInventoryService->getSetSlotForItemDetails($character, $item, (int) $setSlotId);
 
         if (is_null($slot)) {
             return response()->json([
