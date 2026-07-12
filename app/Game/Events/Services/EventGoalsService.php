@@ -10,6 +10,13 @@ class EventGoalsService
 {
     use ResponseBuilder;
 
+    private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
+
+    public function __construct(?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null)
+    {
+        $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService ?? new GlobalEventGoalEligibilityService();
+    }
+
     /**
      * Fetches the current event goal data for controller action.
      */
@@ -23,14 +30,13 @@ class EventGoalsService
      */
     public function getEventGoalData(Character $character): array
     {
-        $gameMap = $character->map?->gameMap;
-        $eventType = $gameMap?->only_during_event_type;
+        $event = $this->globalEventGoalEligibilityService->eventForCharacterMap($character);
 
-        if (is_null($eventType)) {
+        if (is_null($event)) {
             return ['event_goals' => null];
         }
 
-        $globalEventGoal = GlobalEventGoal::where('event_type', $eventType)->first();
+        $globalEventGoal = $event->globalEventGoals()->latest('id')->first();
 
         if (is_null($globalEventGoal)) {
             return ['event_goals' => null];

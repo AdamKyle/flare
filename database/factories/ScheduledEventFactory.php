@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Flare\Models\ScheduledEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ScheduledEventFactory extends Factory
@@ -25,11 +26,14 @@ class ScheduledEventFactory extends Factory
         return [
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'raid_id' => null,
+            'parent_scheduled_event_id' => null,
             'start_date' => now(),
             'end_date' => now(),
             'description' => 'Test',
             'currently_running' => false,
             'raids_for_event' => null,
+            'status' => ScheduledEventStatus::SCHEDULED,
+            'cancelled_at' => null,
         ];
     }
 }

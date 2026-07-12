@@ -10,6 +10,7 @@ use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -32,6 +33,7 @@ use Tests\Traits\CreateGlobalCraftingInventorySlot;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateScheduledEvent;
 
 class EnchantingServiceTest extends TestCase
 {
@@ -44,6 +46,7 @@ class EnchantingServiceTest extends TestCase
         CreateGlobalCraftingInventory,
         CreateGlobalCraftingInventorySlot,
         CreateGameMap,
+        CreateScheduledEvent,
         RefreshDatabase;
 
     private ?CharacterFactory $character;
@@ -125,13 +128,17 @@ class EnchantingServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
         ]);
 
         $globalEventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -143,13 +150,13 @@ class EnchantingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $inventory = $this->createGlobalCraftingInventory([
-            'global_event_id' => $globalEventGoal->id,
+            'global_event_goal_id' => $globalEventGoal->id,
             'character_id' => $character->id,
         ]);
 
         $this->createGlobalCraftingInventorySlot([
             'global_event_crafting_inventory_id' => $inventory->id,
-            'item_id' => $this->createItem(),
+            'item_id' => $this->createItem()->id,
         ]);
 
         $gameMap = $this->createGameMap([
@@ -449,13 +456,17 @@ class EnchantingServiceTest extends TestCase
 
         $enchantingService = $this->app->make(EnchantingService::class);
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
         ]);
 
         $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -464,7 +475,13 @@ class EnchantingServiceTest extends TestCase
             'should_be_mythic' => true,
         ]);
 
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update(['gold' => 1000]);
 
@@ -584,8 +601,17 @@ class EnchantingServiceTest extends TestCase
     public function testGetItemForGlobalEvent()
     {
 
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+            'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
+        ]);
+
         $globalEventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -594,16 +620,26 @@ class EnchantingServiceTest extends TestCase
             'should_be_mythic' => true,
         ]);
 
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
         $character = $this->character->getCharacter();
 
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character = $character->refresh();
+
         $inventory = $this->createGlobalCraftingInventory([
-            'global_event_id' => $globalEventGoal->id,
+            'global_event_goal_id' => $globalEventGoal->id,
             'character_id' => $character->id,
         ]);
 
+        $this->assertNotNull($inventory->id);
+
         $slot = $this->createGlobalCraftingInventorySlot([
             'global_event_crafting_inventory_id' => $inventory->id,
-            'item_id' => $this->createItem(),
+            'item_id' => $this->createItem()->id,
         ]);
 
         $foundSlot = $this->enchantingService->getSlotFromInventory($character, $slot->id);

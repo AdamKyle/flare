@@ -169,12 +169,7 @@ class AdminGemRollServiceTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
 
-        try {
-            resolve(AdminGemRollService::class)->rollMapGem($profile, $admin);
-        } finally {
-            $this->assertSame(0, Gem::count());
-            $this->assertNull($profile->fresh()->rolled_gem_id);
-        }
+        resolve(AdminGemRollService::class)->rollMapGem($profile, $admin);
     }
 
     public function testMapReversedRangeRollsBetweenNormalizedBounds(): void

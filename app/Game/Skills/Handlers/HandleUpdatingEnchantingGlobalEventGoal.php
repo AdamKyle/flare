@@ -4,15 +4,14 @@ namespace App\Game\Skills\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
-use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\InventorySlot;
 use App\Game\Events\Concerns\UpdateCharacterEventGoalParticipation;
 use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\GlobalEventSteps;
 use Exception;
@@ -28,6 +27,7 @@ class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalPartici
         RandomAffixGenerator $randomAffixGenerator,
         EventGoalsService $eventGoalsService,
         private readonly GlobalEventGoalProgressionService $globalEventGoalProgressionService,
+        private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
     )
     {
         parent::__construct($randomAffixGenerator, $eventGoalsService);
@@ -41,15 +41,19 @@ class HandleUpdatingEnchantingGlobalEventGoal extends BaseGlobalEventGoalPartici
     public function handleUpdatingEnchantingGlobalEventGoal(Character $character, InventorySlot|GlobalEventCraftingInventorySlot $slot): void
     {
 
-        $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
+        $event = $this->globalEventGoalEligibilityService->eventForCharacterMap($character);
 
-        if (is_null($event)) {
+        if (is_null($event) || $event->current_event_goal_step !== GlobalEventSteps::ENCHANT) {
             return;
         }
 
-        $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
+        $globalEventGoal = $event->globalEventGoals()->latest('id')->first();
 
         if (is_null($globalEventGoal)) {
+            return;
+        }
+
+        if ($slot instanceof GlobalEventCraftingInventorySlot && $slot->inventory->global_event_goal_id !== $globalEventGoal->id) {
             return;
         }
 

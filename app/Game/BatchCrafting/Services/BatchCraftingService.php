@@ -7,7 +7,6 @@ use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\InventorySet;
@@ -2806,10 +2805,10 @@ class BatchCraftingService
 
     private function eventBatchData(Character $character, ?BatchCrafting $batchCrafting = null): array
     {
-        $event = Event::whereNotNull('current_event_goal_step')->first();
         $craftGoal = $this->globalEventGoalEligibilityService->currentCraftingGoalFor($character);
         $enchantGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
         $goal = $craftGoal ?? $enchantGoal;
+        $event = $goal?->event;
 
         return [
             'can_craft_for_event' => ! is_null($craftGoal),
@@ -3461,6 +3460,7 @@ class BatchCraftingService
             'event_mode' => true,
             'event_action' => 'craft',
             'event_type' => $goal->event_type,
+            'event_id' => $goal->event_id,
             'event_goal_id' => $goal->id,
             'event_step' => GlobalEventSteps::CRAFT,
             'craft_mode' => 'event',
@@ -3491,6 +3491,7 @@ class BatchCraftingService
             'event_mode' => true,
             'event_action' => 'enchant',
             'event_type' => $goal->event_type,
+            'event_id' => $goal->event_id,
             'event_goal_id' => $goal->id,
             'event_step' => GlobalEventSteps::ENCHANT,
             'enchant_mode' => 'event',

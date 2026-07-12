@@ -4,7 +4,6 @@ namespace App\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
@@ -94,7 +93,7 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
 
         event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $currentKills));
 
-        $event = Event::where('type', $globalEventGoal->event_type)->first();
+        $event = $globalEventGoal->event;
 
         if (! is_null($event?->event_goal_steps)) {
             $this->globalEventGoalProgressionService->advanceIfCurrentGoalComplete($globalEventGoal);

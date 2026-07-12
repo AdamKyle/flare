@@ -7,8 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
-use App\Flare\Models\Event;
-use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
@@ -19,6 +17,7 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
@@ -96,6 +95,7 @@ class BattleRewardService
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
         private readonly RandomAffixGenerator $randomAffixGenerator,
         private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
+        private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
     ) {}
 
     /**
@@ -1057,24 +1057,17 @@ class BattleRewardService
      * @throws Exception
      */
     private function handleGlobalEventParticipation(): void {
-        $gameMap = $this->character->map->gameMap;
-        $eventType = $gameMap->only_during_event_type;
-
-        if (is_null($eventType)) {
-            return;
-        }
-
-        $event = Event::where('type', $eventType)->first();
+        $event = $this->globalEventGoalEligibilityService->eventForCharacterMap($this->character);
 
         if (is_null($event)) {
             return;
         }
 
-        if ($eventType === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
+        if ($event->type === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
             return;
         }
 
-        $globalEventGoal = GlobalEventGoal::where('event_type', $eventType)->first();
+        $globalEventGoal = $event->globalEventGoals()->latest('id')->first();
 
         if (is_null($globalEventGoal)) {
             return;

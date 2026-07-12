@@ -6,7 +6,9 @@ use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\KingdomEventService;
+use App\Game\Events\Services\ScheduledEventDispatchService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -23,12 +25,16 @@ class ServiceProvider extends ApplicationServiceProvider
             RestartGlobalEventGoal::class,
         ]);
 
-        $this->app->bind(EventGoalsService::class, function () {
-            return new EventGoalsService;
+        $this->app->bind(EventGoalsService::class, function ($app) {
+            return new EventGoalsService($app->make(GlobalEventGoalEligibilityService::class));
         });
 
         $this->app->bind(KingdomEventService::class, function () {
             return new KingdomEventService;
+        });
+
+        $this->app->bind(ScheduledEventDispatchService::class, function () {
+            return new ScheduledEventDispatchService;
         });
     }
 

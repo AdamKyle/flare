@@ -26,6 +26,7 @@ use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -130,6 +131,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleRewardMessageContext::class),
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BroadcastTopsUpdateService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
             );
         });
 

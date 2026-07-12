@@ -8,6 +8,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\QuestsCompleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Flare\Models\Item;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemSpecialtyType;
@@ -15,6 +16,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
@@ -470,14 +472,23 @@ class GuideQuestServiceTest extends TestCase
     {
         $quest = $this->createGuideQuest([
             'required_event_goal_crafting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
             ->getCharacter();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent(['type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'scheduled_event_id' => $schedule->id]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'max_crafts' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
@@ -497,14 +508,23 @@ class GuideQuestServiceTest extends TestCase
     {
         $quest = $this->createGuideQuest([
             'required_event_goal_enchanting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
             ->getCharacter();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent(['type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'scheduled_event_id' => $schedule->id]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'max_enchants' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
@@ -525,15 +545,24 @@ class GuideQuestServiceTest extends TestCase
         $quest = $this->createGuideQuest([
             'required_event_goal_crafting_participation' => 10,
             'required_event_goal_enchanting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $character = $this->character->updateUser(['guide_enabled' => true])
             ->getCharacter();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent(['type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'scheduled_event_id' => $schedule->id]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'max_crafts' => 1000,
             'max_enchants' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);

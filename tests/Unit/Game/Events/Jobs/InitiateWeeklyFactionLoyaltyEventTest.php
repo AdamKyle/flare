@@ -42,6 +42,7 @@ class InitiateWeeklyFactionLoyaltyEventTest extends TestCase
         Event::fake();
 
         $event = $this->createScheduledEvent([
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
         ]);
 

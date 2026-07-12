@@ -12,6 +12,7 @@ use App\Flare\Models\RaidBoss;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\EventSchedulerService;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -24,6 +25,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
+use Throwable;
 
 class InitiateRaid implements ShouldQueue
 {
@@ -49,28 +51,54 @@ class InitiateRaid implements ShouldQueue
         BuildQuestCacheService $buildQuestCacheService,
     ): void {
 
-        $event = ScheduledEvent::find($this->eventId);
+        $scheduledEvent = ScheduledEvent::find($this->eventId);
 
-        $event->update([
-            'currently_running' => true,
-        ]);
-
-        if (empty($this->raidStory)) {
-
-            $raid = Raid::find($event->raid_id);
-
-            $this->initializeRaid($raid, $locationService, $eventSchedulerService, $updateRaidMonsters);
-
-            $buildQuestCacheService->buildRaidQuestCache(true);
-
-            $eventSchedulerService->generateFutureRaid($event);
-
+        if (is_null($scheduledEvent)) {
             return;
         }
 
-        event(new GlobalMessageEvent(array_shift($this->raidStory), 'raid-global-message'));
+        $status = $scheduledEvent->status();
 
-        InitiateRaid::dispatch($event->id, $this->raidStory)->delay(now()->addSeconds(30));
+        if ($status->isCancelling() || $status->isTerminal()) {
+            return;
+        }
+
+        if ($status->isQueued()) {
+            $scheduledEvent->applyStatus(ScheduledEventStatus::STARTING);
+        } elseif (! $status->isStarting()) {
+            return;
+        }
+
+        try {
+            if (empty($this->raidStory)) {
+
+                if (Event::where('scheduled_event_id', $scheduledEvent->id)->exists()) {
+                    $scheduledEvent->applyStatus(ScheduledEventStatus::RUNNING);
+
+                    return;
+                }
+
+                $raid = Raid::find($scheduledEvent->raid_id);
+
+                $this->initializeRaid($raid, $locationService, $eventSchedulerService, $updateRaidMonsters, $scheduledEvent);
+
+                $buildQuestCacheService->buildRaidQuestCache(true);
+
+                $eventSchedulerService->generateFutureRaid($scheduledEvent);
+
+                $scheduledEvent->applyStatus(ScheduledEventStatus::RUNNING);
+
+                return;
+            }
+
+            event(new GlobalMessageEvent(array_shift($this->raidStory), 'raid-global-message'));
+
+            InitiateRaid::dispatch($scheduledEvent->id, $this->raidStory)->delay(now()->addSeconds(30));
+        } catch (Throwable $throwable) {
+            $scheduledEvent->applyStatus(ScheduledEventStatus::FAILED);
+
+            throw $throwable;
+        }
     }
 
     /**
@@ -80,12 +108,13 @@ class InitiateRaid implements ShouldQueue
         Raid $raid,
         LocationService $locationService,
         EventSchedulerService $eventSchedulerService,
-        UpdateRaidMonsters $updateRaidMonsters
+        UpdateRaidMonsters $updateRaidMonsters,
+        ScheduledEvent $scheduledEvent,
     ): void {
 
         $this->corruptLocations($raid, $locationService);
 
-        $createdEvent = $this->createEvent($eventSchedulerService);
+        $createdEvent = $this->createEvent($eventSchedulerService, $scheduledEvent);
 
         $this->createRaidBoss($raid);
 
@@ -190,19 +219,14 @@ class InitiateRaid implements ShouldQueue
      * - Update the calendar with the updated scheduled events.
      * - Returns the created event.
      */
-    private function createEvent(EventSchedulerService $eventSchedulerService): Event
+    private function createEvent(EventSchedulerService $eventSchedulerService, ScheduledEvent $scheduledEvent): Event
     {
-        $scheduledEvent = ScheduledEvent::find($this->eventId);
-
         $createdEvent = Event::create([
             'type' => EventType::RAID_EVENT,
             'started_at' => now(),
             'ends_at' => $scheduledEvent->end_date,
             'raid_id' => $scheduledEvent->raid_id,
-        ]);
-
-        $scheduledEvent->update([
-            'currently_running' => true,
+            'scheduled_event_id' => $scheduledEvent->id,
         ]);
 
         event(new UpdateScheduledEvents($eventSchedulerService->fetchEvents()));

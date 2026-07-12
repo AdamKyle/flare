@@ -6,6 +6,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
@@ -14,6 +15,7 @@ use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -867,13 +869,20 @@ class CraftingServiceTest extends TestCase
 
         $craftingService = $this->app->make(CraftingService::class);
 
-        $this->createEvent([
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
         ]);
 
         $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_crafts' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,

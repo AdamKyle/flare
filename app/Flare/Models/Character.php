@@ -238,22 +238,22 @@ class Character extends Model
 
     public function globalEventParticipation()
     {
-        return $this->hasOne(GlobalEventParticipation::class, 'character_id', 'id');
+        return $this->hasMany(GlobalEventParticipation::class, 'character_id', 'id');
     }
 
     public function globalEventKills()
     {
-        return $this->hasOne(GlobalEventKill::class, 'character_id', 'id');
+        return $this->hasMany(GlobalEventKill::class, 'character_id', 'id');
     }
 
     public function globalEventCrafts()
     {
-        return $this->hasOne(GlobalEventCraft::class, 'character_id', 'id');
+        return $this->hasMany(GlobalEventCraft::class, 'character_id', 'id');
     }
 
     public function globalEventEnchants()
     {
-        return $this->hasOne(GlobalEventEnchant::class, 'character_id', 'id');
+        return $this->hasMany(GlobalEventEnchant::class, 'character_id', 'id');
     }
 
     public function weeklyBattleFights()

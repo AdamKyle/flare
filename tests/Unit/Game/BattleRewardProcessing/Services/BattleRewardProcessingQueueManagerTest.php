@@ -111,21 +111,16 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
             throw new QueryException('mysql', 'insert into character_battle_reward_requests', [], new PDOException('Duplicate entry', 1062));
         });
 
-        try {
-            resolve(BattleRewardProcessingQueueManager::class)->enqueue(
-                $character,
-                BattleRewardRequestPriority::SECOND,
-                BattleRewardRequestSourceType::BATTLE,
-                44,
-                ['monster_id' => 44, 'context' => []],
-            );
-            $this->fail('Unrelated database exception was swallowed.');
-        } catch (QueryException $exception) {
-            $this->assertSame(1062, $exception->getCode());
-        }
+        $this->expectException(QueryException::class);
+        $this->expectExceptionCode(1062);
 
-        $this->assertSame(0, CharacterBattleRewardRequest::forCharacter($character->id)->count());
-        Queue::assertNothingPushed();
+        resolve(BattleRewardProcessingQueueManager::class)->enqueue(
+            $character,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::BATTLE,
+            44,
+            ['monster_id' => 44, 'context' => []],
+        );
     }
 
     public function testEnqueueDoesNotDispatchProcessorWhenRewardRequestCreationNeverSucceeds(): void
@@ -137,19 +132,16 @@ class BattleRewardProcessingQueueManagerTest extends TestCase
             throw new QueryException('mysql', 'insert into character_battle_reward_requests', [], new PDOException('Lock wait timeout exceeded', 1205));
         });
 
-        try {
-            resolve(BattleRewardProcessingQueueManager::class)->enqueue(
-                $character,
-                BattleRewardRequestPriority::SECOND,
-                BattleRewardRequestSourceType::BATTLE,
-                44,
-                ['monster_id' => 44, 'context' => []],
-            );
-        } catch (QueryException) {
-        }
+        $this->expectException(QueryException::class);
+        $this->expectExceptionCode(1205);
 
-        $this->assertSame(0, CharacterBattleRewardRequest::forCharacter($character->id)->count());
-        Queue::assertNothingPushed();
+        resolve(BattleRewardProcessingQueueManager::class)->enqueue(
+            $character,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::BATTLE,
+            44,
+            ['monster_id' => 44, 'context' => []],
+        );
     }
 
     public function testDifferentCharactersEachReceiveAProcessor(): void

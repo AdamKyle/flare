@@ -8,9 +8,11 @@ use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\EventSchedulerService;
 use App\Flare\Values\MapNameValue;
+use App\Game\Events\Services\ScheduledEventDispatchService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use Carbon\Carbon;
@@ -20,6 +22,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class InitiateDelusionalMemoriesEvent implements ShouldQueue
 {
@@ -35,50 +38,67 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
         $this->eventId = $eventId;
     }
 
-    public function handle(BuildQuestCacheService $buildQuestCacheService, EventSchedulerService $eventSchedulerService): void
-    {
-        $event = ScheduledEvent::find($this->eventId);
+    public function handle(
+        BuildQuestCacheService $buildQuestCacheService,
+        EventSchedulerService $eventSchedulerService,
+        ScheduledEventDispatchService $scheduledEventDispatchService,
+    ): void {
+        $scheduledEvent = ScheduledEvent::find($this->eventId);
 
-        if (is_null($event) || $event->currently_running) {
+        if (is_null($scheduledEvent) || ! $scheduledEvent->status()->isQueued()) {
             return;
         }
 
-        $event->update([
-            'currently_running' => true,
-        ]);
+        $scheduledEvent->applyStatus(ScheduledEventStatus::STARTING);
 
-        $event = $event->refresh();
+        try {
+            if (Event::where('scheduled_event_id', $scheduledEvent->id)->exists()) {
+                $scheduledEvent->applyStatus(ScheduledEventStatus::RUNNING);
 
-        $createdEvent = Event::create([
-            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'started_at' => $event->start_date,
-            'ends_at' => $event->end_date,
-            'event_goal_steps' => [
-                GlobalEventSteps::BATTLE,
-                GlobalEventSteps::CRAFT,
-                GlobalEventSteps::ENCHANT,
-            ],
-            'current_event_goal_step' => GlobalEventSteps::BATTLE,
-        ]);
+                return;
+            }
 
-        event(new GlobalMessageEvent('The twisted and delusional laughter of a mad man haunts your ears: Fliniguss\'s realm opens to those who dare to delve the delusional memories of a mad man,'));
+            $createdEvent = Event::create([
+                'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+                'started_at' => $scheduledEvent->start_date,
+                'ends_at' => $scheduledEvent->end_date,
+                'scheduled_event_id' => $scheduledEvent->id,
+                'event_goal_steps' => [
+                    GlobalEventSteps::BATTLE,
+                    GlobalEventSteps::CRAFT,
+                    GlobalEventSteps::ENCHANT,
+                ],
+                'current_event_goal_step' => GlobalEventSteps::BATTLE,
+            ]);
 
-        AnnouncementHandler::createAnnouncement('delusional_memories_event', $createdEvent);
+            event(new GlobalMessageEvent('The twisted and delusional laughter of a mad man haunts your ears: Fliniguss\'s realm opens to those who dare to delve the delusional memories of a mad man,'));
 
-        $this->kickOffGlobalEventGoal();
+            AnnouncementHandler::createAnnouncement('delusional_memories_event', $createdEvent);
 
-        event(new GlobalMessageEvent('Guide quests will also have a set of new quests to introduce them to the Delusional Memories Event. These are geared at new and existing players.'));
+            $this->kickOffGlobalEventGoal($createdEvent);
 
-        $buildQuestCacheService->buildQuestCache(true);
+            event(new GlobalMessageEvent('Guide quests will also have a set of new quests to introduce them to the Delusional Memories Event. These are geared at new and existing players.'));
 
-        $eventSchedulerService->createRaidEventsForScheduledEventWith($event);
+            $buildQuestCacheService->buildQuestCache(true);
 
-        $this->scheduleNextYearsEvent($event);
+            $eventSchedulerService->createRaidEventsForScheduledEventWith($scheduledEvent);
+
+            $this->scheduleNextYearsEvent($scheduledEvent);
+
+            $scheduledEvent->applyStatus(ScheduledEventStatus::RUNNING);
+        } catch (Throwable $throwable) {
+            $scheduledEvent->applyStatus(ScheduledEventStatus::FAILED);
+
+            throw $throwable;
+        }
+
+        $this->dispatchWaitingChildren($scheduledEvent, $scheduledEventDispatchService);
     }
 
-    public function kickOffGlobalEventGoal(): void
+    public function kickOffGlobalEventGoal(Event $event): void
     {
         $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents(EventType::DELUSIONAL_MEMORIES_EVENT);
+        $globalEventGoalData['event_id'] = $event->id;
 
         GlobalEventGoal::create($globalEventGoalData);
 
@@ -94,6 +114,13 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
             ' via Traverse (under the map for desktop, under the map inside Map Movement action drop down for mobile)' . ' ' .
             'And completing either Fighting monsters, Crafting: Weapons, Spells, Armour and Rings or enchanting the already crafted items.' .
             ' You can see the event goal for the map specified by being on the map and clicking the Event Goal tab from the map.'));
+    }
+
+    private function dispatchWaitingChildren(ScheduledEvent $scheduledEvent, ScheduledEventDispatchService $scheduledEventDispatchService): void
+    {
+        $scheduledEvent->children()->where('status', ScheduledEventStatus::SCHEDULED)->each(function (ScheduledEvent $child) use ($scheduledEventDispatchService) {
+            $scheduledEventDispatchService->dispatch($child, now());
+        });
     }
 
     private function scheduleNextYearsEvent(ScheduledEvent $scheduledEvent): void

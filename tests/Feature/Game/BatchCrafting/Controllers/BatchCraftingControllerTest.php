@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\BatchCrafting\Controllers;
 
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\AutomationType;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
@@ -11,6 +12,7 @@ use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -928,8 +930,9 @@ class BatchCraftingControllerTest extends TestCase
             ->assignSkill($spellCrafting, 5, false)
             ->getCharacter();
         $character->update(['gold' => 100, 'inventory_max' => 10]);
-        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
-        $this->createGlobalEventGoal(['event_type' => $event->type, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $schedule = ScheduledEvent::factory()->create(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
+        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $character = $character->refresh();
@@ -950,8 +953,9 @@ class BatchCraftingControllerTest extends TestCase
         $character->skills()
             ->whereHas('baseSkill', fn ($query) => $query->where('type', SkillTypeValue::ENCHANTING->value))
             ->update(['level' => 5]);
-        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
-        $this->createGlobalEventGoal(['event_type' => $event->type, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $schedule = ScheduledEvent::factory()->create(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
+        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $character = $character->refresh();

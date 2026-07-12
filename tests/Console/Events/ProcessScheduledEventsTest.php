@@ -54,7 +54,8 @@ class ProcessScheduledEventsTest extends TestCase
 
         $this->createScheduledEvent([
             'event_type' => EventType::RAID_EVENT,
-            'start_date' => now()->addMinutes(5),
+            'start_date' => now()->subMinute(),
+            'end_date' => now()->addHour(),
             'raid_id' => $raid->id,
         ]);
 
@@ -68,7 +69,8 @@ class ProcessScheduledEventsTest extends TestCase
     {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
-            'start_date' => now()->addMinutes(5),
+            'start_date' => now()->subMinute(),
+            'end_date' => now()->addHour(),
         ]);
 
         $this->artisan('process:scheduled-events');
@@ -81,7 +83,8 @@ class ProcessScheduledEventsTest extends TestCase
     {
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_CELESTIALS,
-            'start_date' => now()->addMinutes(5),
+            'start_date' => now()->subMinute(),
+            'end_date' => now()->addHour(),
         ]);
 
         $this->artisan('process:scheduled-events');
@@ -98,7 +101,8 @@ class ProcessScheduledEventsTest extends TestCase
 
         $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
-            'start_date' => now()->addMinutes(5),
+            'start_date' => now()->subMinute(),
+            'end_date' => now()->addHour(),
         ]);
 
         $this->artisan('process:scheduled-events');
@@ -116,7 +120,8 @@ class ProcessScheduledEventsTest extends TestCase
 
         $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'start_date' => now()->addMinutes(5),
+            'start_date' => now()->subMinute(),
+            'end_date' => now()->addHour(),
         ]);
 
         $this->artisan('process:scheduled-events');
@@ -131,7 +136,8 @@ class ProcessScheduledEventsTest extends TestCase
 
         $this->createScheduledEvent([
             'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
-            'start_date' => now()->addMinutes(5),
+            'start_date' => now()->subMinute(),
+            'end_date' => now()->addHour(),
         ]);
 
         $this->artisan('process:scheduled-events');

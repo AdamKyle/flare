@@ -33,7 +33,7 @@ class GlobalEventGoalProgressionService
             return false;
         }
 
-        $event = Event::where('type', $goal->event_type)->first();
+        $event = $goal->event;
 
         if (is_null($event)) {
             return false;
@@ -90,8 +90,14 @@ class GlobalEventGoalProgressionService
 
         $globalEventGoalData = GlobalEventForEventTypeValue::returnGlobalEventInfoForSeasonalEvents($event->type);
         $globalEventGoalData = $this->setUpDelusionalMemoriesAdditionalEventGoals($newStep, $globalEventGoalData);
+        $globalEventGoalData['event_id'] = $event->id;
 
         $newGoal = GlobalEventGoal::create($globalEventGoalData);
+
+        if ($newStep === GlobalEventSteps::ENCHANT) {
+            GlobalEventCraftingInventory::where('global_event_goal_id', $completedGoal->id)
+                ->update(['global_event_goal_id' => $newGoal->id]);
+        }
 
         $this->resetParticipationForCompletedGoal($completedGoal);
         $completedGoal->delete();
@@ -114,10 +120,10 @@ class GlobalEventGoalProgressionService
     public function resetParticipationForCompletedGoal(GlobalEventGoal $completedGoal): void
     {
         if ((int) $completedGoal->event_type === EventType::DELUSIONAL_MEMORIES_EVENT && ! is_null($completedGoal->max_enchants)) {
-            $inventoryIds = GlobalEventCraftingInventory::where('global_event_id', $completedGoal->id)->pluck('id');
+            $inventoryIds = GlobalEventCraftingInventory::where('global_event_goal_id', $completedGoal->id)->pluck('id');
 
             GlobalEventCraftingInventorySlot::whereIn('global_event_crafting_inventory_id', $inventoryIds)->delete();
-            GlobalEventCraftingInventory::where('global_event_id', $completedGoal->id)->delete();
+            GlobalEventCraftingInventory::where('global_event_goal_id', $completedGoal->id)->delete();
         }
 
         GlobalEventParticipation::where('global_event_goal_id', $completedGoal->id)->delete();

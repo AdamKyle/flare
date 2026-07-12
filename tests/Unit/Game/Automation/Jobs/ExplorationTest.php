@@ -256,6 +256,7 @@ class ExplorationTest extends TestCase
     public function testBeginExplorationAcceptsClearedSelectionsAndUsesDefaultValues(): void
     {
         Event::fake();
+        Queue::fake();
 
         resolve(ExplorationAutomationService::class)->beginAutomation($this->character, [
             'auto_attack_length' => null,
@@ -273,6 +274,10 @@ class ExplorationTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $automation->attack_type);
         $this->assertNull($automation->move_down_monster_list_every);
         $this->assertTrue($automation->completed_at->greaterThan(now()));
+
+        Queue::assertPushedOn('exploration', Exploration::class, function ($job) {
+            return $job->connection === 'long_running';
+        });
     }
 
     public function testHandleCapsGoldWhenAutomationRewardWouldExceedMaxGold(): void

@@ -16,6 +16,7 @@ use App\Flare\Values\RandomAffixDetails;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,10 +38,11 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
+use Tests\Traits\CreateScheduledEvent;
 
 class GuideQuestRequirementsServiceTest extends TestCase
 {
-    use CreateBatchCrafting, CreateDelveAutomation, CreateEvent, CreateFactionLoyalty, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateGuideQuest, CreateInventorySets, CreateItem, CreateItemAffix, CreateNpc, CreateQuest, RefreshDatabase;
+    use CreateBatchCrafting, CreateDelveAutomation, CreateEvent, CreateFactionLoyalty, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateGuideQuest, CreateInventorySets, CreateItem, CreateItemAffix, CreateNpc, CreateQuest, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -908,13 +910,16 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
             'max_kills' => 1000,
             'event_type' => EventType::WINTER_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
@@ -933,7 +938,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
         ]);
 
         $guideQuest = $this->createGuideQuest([
-            'required_event_goal_participation' => 10
+            'required_event_goal_participation' => 10,
+            'only_during_event' => EventType::WINTER_EVENT,
         ]);
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventKillAmount($character, $guideQuest)->getFinishedRequirements();;
@@ -960,9 +966,17 @@ class GuideQuestRequirementsServiceTest extends TestCase
     public function testPlayerHasGlobalEventCraftAmount()
     {
         $character = $this->character->getCharacter();
+
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+        ]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'max_crafts' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
@@ -975,6 +989,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $guideQuest = $this->createGuideQuest([
             'required_event_goal_crafting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
@@ -1022,9 +1037,17 @@ class GuideQuestRequirementsServiceTest extends TestCase
     public function testPlayerHasGlobalEventEnchantAmount()
     {
         $character = $this->character->getCharacter();
+
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+        ]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'max_enchants' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
@@ -1037,6 +1060,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $guideQuest = $this->createGuideQuest([
             'required_event_goal_enchanting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character->refresh(), $guideQuest)->getFinishedRequirements();

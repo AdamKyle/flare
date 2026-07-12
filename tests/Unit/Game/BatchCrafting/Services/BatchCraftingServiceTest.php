@@ -31,6 +31,7 @@ use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\NpcActions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Services\AlchemyService;
@@ -67,11 +68,12 @@ use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateInventorySlot;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateScheduledEvent;
 use Tests\Traits\CreateUser;
 
 class BatchCraftingServiceTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateCharacterBoon, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateUser, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateCharacterBoon, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateScheduledEvent, CreateUser, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testStopOnDeath(): void
     {
@@ -3981,8 +3983,9 @@ class BatchCraftingServiceTest extends TestCase
                 $mock->shouldReceive('characterRoll')->andReturn(100);
             })
         );
-        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
-        $this->createGlobalEventGoal(['event_type' => $event->type, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
+        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $this->createItem(['name' => 'Event XP Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -4012,12 +4015,13 @@ class BatchCraftingServiceTest extends TestCase
                 $mock->shouldReceive('characterRoll')->andReturn(100);
             })
         );
-        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
-        $goal = $this->createGlobalEventGoal(['event_type' => $event->type, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
+        $goal = $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $item = $this->createItem(['name' => 'Event XP Enchant Target', 'type' => 'weapon', 'crafting_type' => 'weapon']);
-        $inventory = $this->createGlobalCraftingInventory(['global_event_id' => $goal->id, 'character_id' => $character->id]);
+        $inventory = $this->createGlobalCraftingInventory(['global_event_goal_id' => $goal->id, 'character_id' => $character->id]);
         $this->createGlobalCraftingInventorySlot(['global_event_crafting_inventory_id' => $inventory->id, 'item_id' => $item->id]);
         $this->createItemAffix(['name' => 'Event XP Enchant Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = resolve(BatchCraftingService::class)->start($character->refresh(), [
@@ -7028,8 +7032,9 @@ class BatchCraftingServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
-        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
-        $goal = $this->createGlobalEventGoal(['event_type' => $event->type, 'max_crafts' => 1, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
+        $goal = $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 1, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $this->createGlobalEventParticipation(['global_event_goal_id' => $goal->id, 'character_id' => $character->id, 'current_crafts' => 1]);
@@ -7056,8 +7061,11 @@ class BatchCraftingServiceTest extends TestCase
         $result = (new BatchCraftingService($processor, resolve(CraftingService::class), $logger, resolve(EnchantingService::class), resolve(BatchCraftingSetService::class), resolve(HolyItemService::class)))->process($batchCrafting);
 
         $this->assertNull($result->ended_reason);
-        $this->assertSame($goal->id, $result->progress['event_goal_id'] ?? null);
         $this->assertSame(0, GlobalEventParticipation::where('global_event_goal_id', $goal->id)->count());
+
+        $newGoalId = $result->progress['event_goal_id'] ?? null;
+        $this->assertNotNull($newGoalId);
+        $this->assertSame($event->id, \App\Flare\Models\GlobalEventGoal::find($newGoalId)?->event_id);
     }
 
     public function testEventCraftStopsWithEventGoalCompleteWhenNoNextGoalExists(): void
@@ -7065,7 +7073,7 @@ class BatchCraftingServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->subMinute()]);
-        $goal = $this->createGlobalEventGoal(['event_type' => $event->type, 'max_crafts' => 1, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $goal = $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 1, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $this->createGlobalEventParticipation(['global_event_goal_id' => $goal->id, 'character_id' => $character->id, 'current_crafts' => 1]);
@@ -9137,8 +9145,9 @@ class BatchCraftingServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
-        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
-        $this->createGlobalEventGoal(['event_type' => $event->type, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
+        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $batchCrafting = resolve(BatchCraftingService::class)->start($character->refresh(), [

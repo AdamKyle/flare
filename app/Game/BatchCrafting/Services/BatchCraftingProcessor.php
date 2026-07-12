@@ -2468,7 +2468,7 @@ class BatchCraftingProcessor
     {
         $goal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
         $inventory = GlobalEventCraftingInventory::firstOrCreate([
-            'global_event_id' => $goal?->id,
+            'global_event_goal_id' => $goal?->id,
             'character_id' => $character->id,
         ]);
 
@@ -2883,7 +2883,7 @@ class BatchCraftingProcessor
 
     private function nextEventInventorySlot(Character $character, GlobalEventGoal $goal): ?GlobalEventCraftingInventorySlot
     {
-        $inventory = GlobalEventCraftingInventory::where('global_event_id', $goal->id)
+        $inventory = GlobalEventCraftingInventory::where('global_event_goal_id', $goal->id)
             ->where('character_id', $character->id)
             ->first();
 
@@ -2903,7 +2903,7 @@ class BatchCraftingProcessor
             return BatchCraftingEndReason::EVENT_GOAL_COMPLETE;
         }
 
-        $event = Event::where('type', $progress['event_type'] ?? null)->first();
+        $event = Event::find($progress['event_id'] ?? null);
 
         if (is_null($event) || ! $this->globalEventGoalEligibilityService->isEventRunning($event)) {
             return BatchCraftingEndReason::EVENT_NOT_RUNNING;
@@ -2929,7 +2929,7 @@ class BatchCraftingProcessor
             return BatchCraftingEndReason::EVENT_GOAL_COMPLETE;
         }
 
-        $event = Event::where('type', $progress['event_type'] ?? null)->first();
+        $event = Event::find($progress['event_id'] ?? null);
 
         if (is_null($event) || ! $this->globalEventGoalEligibilityService->isEventRunning($event)) {
             return BatchCraftingEndReason::EVENT_NOT_RUNNING;

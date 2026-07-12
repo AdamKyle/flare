@@ -3,12 +3,9 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
-use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -19,7 +16,7 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
-use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -45,6 +42,8 @@ class EnchantingService
 
     private HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal;
 
+    private GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
+
     private bool $sentToEasyMessage = false;
 
     /**
@@ -60,12 +59,14 @@ class EnchantingService
         CharacterInventoryService $characterInventoryService,
         EnchantItemService $enchantItemService,
         RandomEnchantmentService $randomEnchantmentService,
+        GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
     ) {
 
         $this->characterStatBuilder = $characterStatBuilder;
         $this->characterInventoryService = $characterInventoryService;
         $this->enchantItemService = $enchantItemService;
         $this->randomEnchantmentService = $randomEnchantmentService;
+        $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService;
     }
 
     /**
@@ -296,7 +297,15 @@ class EnchantingService
         $foundInInventory = InventorySlot::where('id', $slotId)->where('inventory_id', $inventory->id)->where('equipped', false)->first();
 
         if (is_null($foundInInventory)) {
-            $inventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
+            $globalEventGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
+
+            if (is_null($globalEventGoal)) {
+                return null;
+            }
+
+            $inventory = GlobalEventCraftingInventory::where('character_id', $character->id)
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->first();
 
             if (is_null($inventory)) {
                 return null;
@@ -423,30 +432,22 @@ class EnchantingService
 
     private function fetchEventItemsForEnchanting(Character $character): array
     {
-        $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
+        $globalEventGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
         $itemsForEvent = [];
 
-        if (! is_null($event)) {
+        if (! is_null($globalEventGoal)) {
 
-            $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
+            $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->first();
 
-            if ($character->map->game_map_id === $gameMap->id) {
-
-                $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
-
-                if (! is_null($eventInventory)) {
-
-                    $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
-
-                    if (! is_null($globalEventGoal)) {
-                        $itemsForEvent = $eventInventory->craftingSlots->map(function ($slot) {
-                            return [
-                                'slot_id' => $slot->id,
-                                'item_name' => $slot->item->name,
-                            ];
-                        })->toArray();
-                    }
-                }
+            if (! is_null($eventInventory)) {
+                $itemsForEvent = $eventInventory->craftingSlots->map(function ($slot) {
+                    return [
+                        'slot_id' => $slot->id,
+                        'item_name' => $slot->item->name,
+                    ];
+                })->toArray();
             }
         }
 

@@ -3,11 +3,14 @@
 namespace Tests\Feature\Game\Events\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -28,7 +31,20 @@ class EventGoalsControllerTest extends TestCase
 
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = Event::create([
+            'type' => EventType::WINTER_EVENT,
+            'started_at' => now(),
+            'ends_at' => now()->addDay(),
+            'scheduled_event_id' => $schedule->id,
+        ]);
+
         $this->eventGoal = $this->createGlobalEventGoal([
+            'event_id' => $event->id,
             'max_kills' => 1000,
             'reward_every' => 100,
             'next_reward_at' => 100,

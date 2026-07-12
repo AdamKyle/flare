@@ -24,15 +24,15 @@ class RestartGlobalEventGoal extends Command
 
     /**
      * Handle restarting the global event.
+     *
+     * Every currently active owned goal is processed independently, so
+     * concurrent Winter and Delusional Memories goals both advance without
+     * interfering with each other.
      */
     public function handle(GlobalEventGoalProgressionService $globalEventGoalProgressionService): void
     {
-        $globalEvent = GlobalEventGoal::first();
-
-        if (is_null($globalEvent)) {
-            return;
-        }
-
-        $globalEventGoalProgressionService->advanceIfCurrentGoalComplete($globalEvent);
+        GlobalEventGoal::whereNotNull('event_id')->get()->each(function (GlobalEventGoal $globalEventGoal) use ($globalEventGoalProgressionService) {
+            $globalEventGoalProgressionService->advanceIfCurrentGoalComplete($globalEventGoal);
+        });
     }
 }

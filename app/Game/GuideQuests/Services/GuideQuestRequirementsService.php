@@ -9,9 +9,11 @@ use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +21,13 @@ use Illuminate\Support\Facades\Log;
 class GuideQuestRequirementsService
 {
     private array $finishedRequirements = [];
+
+    private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
+
+    public function __construct(?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null)
+    {
+        $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService ?? new GlobalEventGoalEligibilityService();
+    }
 
     /**
      * Get the finished requirements.
@@ -657,11 +666,15 @@ class GuideQuestRequirementsService
     public function requiredGlobalEventKillAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService
     {
 
-        if (is_null($character->globalEventKills)) {
+        $goal = $this->eventOwnedGoalForGuideQuest($guideQuest);
+
+        if (is_null($goal)) {
             return $this;
         }
 
-        if ($character->globalEventKills->kills >= $guideQuest->required_event_goal_participation) {
+        $kills = $character->globalEventKills()->where('global_event_goal_id', $goal->id)->first()?->kills ?? 0;
+
+        if ($kills >= $guideQuest->required_event_goal_participation) {
             $this->finishedRequirements[] = 'required_event_goal_participation';
         }
 
@@ -674,11 +687,15 @@ class GuideQuestRequirementsService
             return $this;
         }
 
-        if (is_null($character->globalEventCrafts)) {
+        $goal = $this->eventOwnedGoalForGuideQuest($guideQuest);
+
+        if (is_null($goal)) {
             return $this;
         }
 
-        if ($character->globalEventCrafts->crafts >= $guideQuest->required_event_goal_crafting_participation) {
+        $crafts = $character->globalEventCrafts()->where('global_event_goal_id', $goal->id)->first()?->crafts ?? 0;
+
+        if ($crafts >= $guideQuest->required_event_goal_crafting_participation) {
             $this->finishedRequirements[] = 'required_event_goal_crafting_participation';
         }
 
@@ -691,15 +708,39 @@ class GuideQuestRequirementsService
             return $this;
         }
 
-        if (is_null($character->globalEventEnchants)) {
+        $goal = $this->eventOwnedGoalForGuideQuest($guideQuest);
+
+        if (is_null($goal)) {
             return $this;
         }
 
-        if ($character->globalEventEnchants->enchants >= $guideQuest->required_event_goal_enchanting_participation) {
+        $enchants = $character->globalEventEnchants()->where('global_event_goal_id', $goal->id)->first()?->enchants ?? 0;
+
+        if ($enchants >= $guideQuest->required_event_goal_enchanting_participation) {
             $this->finishedRequirements[] = 'required_event_goal_enchanting_participation';
         }
 
         return $this;
+    }
+
+    /**
+     * Resolves the event-owned goal for the guide quest's event type. Only one
+     * runtime event of a given seasonal type can be active at a time, so this
+     * lookup is never ambiguous between concurrent Winter/Delusional events.
+     */
+    private function eventOwnedGoalForGuideQuest(GuideQuest $guideQuest): ?GlobalEventGoal
+    {
+        if (is_null($guideQuest->only_during_event)) {
+            return null;
+        }
+
+        $event = $this->globalEventGoalEligibilityService->activeEventForType($guideQuest->only_during_event);
+
+        if (is_null($event)) {
+            return null;
+        }
+
+        return $event->globalEventGoals()->latest('id')->first();
     }
 
     /**
