@@ -4,4 +4,6 @@ export default interface CraftingSkillsProps {
     crafting_skills: SkillType[] | [];
 
     dark_table: boolean;
+
+    read_only?: boolean;
 }

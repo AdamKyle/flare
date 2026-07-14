@@ -2,6 +2,7 @@ import React from "react";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import SuccessAlert from "../../../../game/components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../../../game/components/ui/alerts/simple-alerts/warning-alert";
 import TabLayout from "../components/tab-labout";
 import clsx from "clsx";
 import {
@@ -21,6 +22,8 @@ interface GuideQuestDetailsProps {
     success_message: string | null;
     error_message: string | null;
     view_port: number;
+    read_only?: boolean;
+    viewer_has_access?: boolean;
 }
 
 export default class GuideQuestDetails extends React.Component<GuideQuestDetailsProps> {
@@ -177,6 +180,11 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
     render() {
         return (
             <>
+                {this.props.read_only && !this.props.viewer_has_access ? (
+                    <WarningAlert additional_css={"my-4"}>
+                        You have not completed this guide quest yet.
+                    </WarningAlert>
+                ) : null}
                 <InfoAlert
                     additional_css={clsx("my-4", {
                         hidden:
@@ -244,18 +252,23 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                     is_small={this.props.view_port < 1600}
                 />
 
-                <p className={"mt-4 mb-4"}>
-                    The Hand in button will become available when you meet the
-                    requirements. Unless exploration is running.
-                </p>
+                {!this.props.read_only ? (
+                    <>
+                        <p className={"mt-4 mb-4"}>
+                            The Hand in button will become available when you
+                            meet the requirements. Unless exploration is
+                            running.
+                        </p>
 
-                <p className={"mt-4 mb-4"}>
-                    You can click the top right button in the header called
-                    Guide Quests to re-open this modal. You can also see
-                    previous Guide Quests by opening the top left menu,
-                    selecting Quest Log and then selecting Completed Guide
-                    Quests.
-                </p>
+                        <p className={"mt-4 mb-4"}>
+                            You can click the top right button in the header
+                            called Guide Quests to re-open this modal. You can
+                            also see previous Guide Quests by opening the top
+                            left menu, selecting Quest Log and then selecting
+                            Completed Guide Quests.
+                        </p>
+                    </>
+                ) : null}
             </>
         );
     }

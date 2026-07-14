@@ -4,9 +4,11 @@ namespace Tests\Feature\Game\Tops;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Models\Map;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
@@ -166,7 +168,7 @@ class CharacterTopsApiTest extends TestCase
 
         $this->assertArrayHasKey('item_name', $itemPayload);
         $this->assertArrayHasKey('item_id', $itemPayload);
-        $this->assertArrayHasKey('attached_affixes_count', $itemPayload);
+        $this->assertArrayHasKey('affix_count', $itemPayload);
         $this->assertArrayHasKey('str_modifier', $itemPayload);
         $this->assertArrayHasKey('base_damage', $itemPayload);
         $this->assertArrayHasKey('base_ac_mod', $itemPayload);
@@ -174,16 +176,17 @@ class CharacterTopsApiTest extends TestCase
         $this->assertArrayHasKey('item_prefix', $itemPayload);
         $this->assertArrayHasKey('item_suffix', $itemPayload);
         $this->assertArrayHasKey('socket_amount', $itemPayload);
-        $this->assertArrayHasKey('has_holy_stacks_applied', $itemPayload);
+        $this->assertArrayHasKey('holy_stacks_applied', $itemPayload);
         $this->assertArrayHasKey('sockets', $itemPayload);
-        $this->assertArrayHasKey('item_skill', $itemPayload);
         $this->assertSame('Color Sword', $itemPayload['item_name']);
+        $this->assertSame($item->getTotalDamage(), $itemPayload['base_damage']);
     }
 
     public function testProfileIncludesCompletedQuestDetailsAndRealCompletionChart(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $npc = Npc::factory()->create();
+        $gameMap = GameMap::factory()->create();
+        $npc = Npc::factory()->create(['game_map_id' => $gameMap->id]);
         $quest = Quest::factory()->create([
             'name' => 'Public Quest Detail',
             'npc_id' => $npc->id,
@@ -203,8 +206,9 @@ class CharacterTopsApiTest extends TestCase
         $quests = json_decode($response->getContent(), true)['quests'];
 
         $this->assertSame('Public Quest Detail', $quests['completed_quests'][0]['name']);
-        $this->assertSame('Quest before text.', $quests['completed_quests'][0]['before_completion_description']);
-        $this->assertSame(100, $quests['completed_quests'][0]['rewards']['gold']);
+        $this->assertTrue($quests['completed_quests'][0]['inspected_character_completed']);
+        $this->assertSame('Quest before text.', $quests['completed_quests'][0]['details']['before_completion_description']);
+        $this->assertSame(100, $quests['completed_quests'][0]['details']['reward_gold']);
         $this->assertSame('hours', $quests['completion_chart']['granularity']);
         $this->assertSame('Quests', $quests['completion_chart']['series'][0]['label']);
         $this->assertSame(1, $quests['completion_chart']['series'][0]['points'][0]['value']);
@@ -212,7 +216,7 @@ class CharacterTopsApiTest extends TestCase
 
     public function testProfileIncludesCompletedGuideQuestDetails(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $guideQuest = GuideQuest::factory()->create([
             'name' => 'Public Guide Quest Detail',
             'intro_text' => 'Guide intro.',
@@ -233,7 +237,7 @@ class CharacterTopsApiTest extends TestCase
         $this->assertSame('Public Guide Quest Detail', $quests['completed_guide_quests'][0]['name']);
         $this->assertSame('Guide intro.', $quests['completed_guide_quests'][0]['intro_text']);
         $this->assertSame('Guide instructions.', $quests['completed_guide_quests'][0]['instructions']);
-        $this->assertSame(50, $quests['completed_guide_quests'][0]['rewards']['gold']);
+        $this->assertSame(50, $quests['completed_guide_quests'][0]['gold_reward']);
         $this->assertSame('Guide Quests', $quests['completion_chart']['series'][1]['label']);
         $this->assertSame(1, $quests['completion_chart']['series'][1]['points'][0]['value']);
     }
@@ -246,11 +250,16 @@ class CharacterTopsApiTest extends TestCase
         $data = json_decode($response->getContent(), true);
 
         $this->assertArrayHasKey('kingdom_summary_chart', $data['kingdoms']);
+        $this->assertArrayHasKey('kingdom_treasury_chart', $data['kingdoms']);
+        $this->assertArrayHasKey('kingdom_gold_bars_chart', $data['kingdoms']);
         $this->assertArrayHasKey('resource_totals_chart', $data['kingdoms']);
-        $this->assertArrayHasKey('top_kingdoms_chart', $data['kingdoms']);
+        $this->assertArrayNotHasKey('top_kingdoms_chart', $data['kingdoms']);
         $this->assertArrayNotHasKey('map_distribution', $data['kingdoms']);
-        $this->assertArrayHasKey('analytics_summary_chart', $data['analytics']);
-        $this->assertSame('Analytics Summary', $data['analytics']['analytics_summary_chart']['source']);
+        $this->assertArrayHasKey('analytics_kills_chart', $data['analytics']);
+        $this->assertArrayHasKey('analytics_runs_chart', $data['analytics']);
+        $this->assertArrayNotHasKey('analytics_summary_chart', $data['analytics']);
+        $this->assertArrayNotHasKey('tables', $data['analytics']);
+        $this->assertArrayNotHasKey('summary', $data['analytics']);
     }
 
     public function testClassMasteryPayloadIncludesActiveLeveledEquippedAndUnlockedDetails(): void
@@ -338,5 +347,45 @@ class CharacterTopsApiTest extends TestCase
         $this->assertArrayHasKey('weapon_damage', $stats['stat_breakdown']);
         $this->assertArrayHasKey('description', $stats['stat_breakdown']['weapon_damage']);
         $this->assertArrayNotHasKey('mutation_url', $stats['stat_breakdown']['weapon_damage']);
+    }
+
+    public function testQuestDetailsPayloadDoesNotExposeMutationUrlsOrPrivateViewerFields(): void
+    {
+        $owner = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $owner->id, 'name' => 'Owner Hero']);
+        $viewer = User::factory()->create(['email' => 'viewer-private@example.com']);
+        Character::factory()->create(['user_id' => $viewer->id, 'name' => 'Viewer Hero']);
+        $gameMap = GameMap::factory()->create();
+        $npc = Npc::factory()->create(['game_map_id' => $gameMap->id]);
+        $quest = Quest::factory()->create(['name' => 'Mutation Safe Quest', 'npc_id' => $npc->id]);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $quest->id, 'created_at' => now()]);
+
+        $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertFalse($data['quests']['completed_quests'][0]['viewer_has_completed']);
+        $this->assertStringNotContainsString('viewer-private@example.com', $response->getContent());
+        $this->assertStringNotContainsString('hand_in_url', $response->getContent());
+    }
+
+    public function testGuideQuestDetailsPayloadDoesNotExposeMutationUrlsOrPrivateViewerFields(): void
+    {
+        $owner = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $owner->id, 'name' => 'Owner Hero']);
+        $viewer = User::factory()->create(['email' => 'guide-viewer-private@example.com']);
+        $viewerCharacter = Character::factory()->create(['user_id' => $viewer->id, 'name' => 'Viewer Hero']);
+        $viewerGameMap = GameMap::factory()->create();
+        Map::factory()->create(['character_id' => $viewerCharacter->id, 'game_map_id' => $viewerGameMap->id]);
+        $guideQuest = GuideQuest::factory()->create(['name' => 'Mutation Safe Guide Quest']);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'guide_quest_id' => $guideQuest->id, 'created_at' => now()]);
+
+        $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertFalse($data['quests']['completed_guide_quests'][0]['viewer_has_completed']);
+        $this->assertStringNotContainsString('guide-viewer-private@example.com', $response->getContent());
+        $this->assertStringNotContainsString('hand_in_url', $response->getContent());
     }
 }

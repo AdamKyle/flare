@@ -10,6 +10,12 @@ import ComponentLoading from "../../../components/ui/loading/component-loading";
 import CharacterSkillTabsState from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-state";
 import { watchForDarkModeSkillsChange } from "../../../lib/game/dark-mode-watcher";
 import CharacterSkillTabsProps from "../../../lib/game/character-sheet/types/skills/character-skill-tabs-props";
+import SkillType from "../../../lib/game/character-sheet/types/skills/skill-type";
+
+interface CharacterSkillsEvent {
+    trainingSkills: SkillType[];
+    craftingSkills: SkillType[];
+}
 
 export default class CharacterSkillsTabs extends React.Component<
     CharacterSkillTabsProps,
@@ -17,7 +23,12 @@ export default class CharacterSkillsTabs extends React.Component<
 > {
     private tabs: { name: string; key: string }[];
 
-    private updateCharacterSkills: any;
+    private updateCharacterSkills?: {
+        listen: (
+            event: string,
+            callback: (event: CharacterSkillsEvent) => void,
+        ) => void;
+    };
 
     constructor(props: CharacterSkillTabsProps) {
         super(props);
@@ -38,19 +49,28 @@ export default class CharacterSkillsTabs extends React.Component<
         ];
 
         this.state = {
-            loading: true,
+            loading: !(props.read_only && props.preloaded_skills),
             dark_tables: false,
-            skills: null,
+            skills:
+                props.read_only && props.preloaded_skills
+                    ? props.preloaded_skills
+                    : null,
         };
 
-        // @ts-ignore
-        this.updateCharacterSkills = Echo.private(
-            "update-skill-" + this.props.user_id,
-        );
+        if (!props.read_only) {
+            // @ts-ignore
+            this.updateCharacterSkills = Echo.private(
+                "update-skill-" + this.props.user_id,
+            );
+        }
     }
 
     componentDidMount() {
         watchForDarkModeSkillsChange(this);
+
+        if (this.props.read_only) {
+            return;
+        }
 
         if (this.props.finished_loading) {
             new Ajax()
@@ -70,9 +90,9 @@ export default class CharacterSkillsTabs extends React.Component<
         }
 
         // @ts-ignore
-        this.updateCharacterSkills.listen(
+        this.updateCharacterSkills?.listen(
             "Game.Skills.Events.UpdateCharacterSkills",
-            (event: any) => {
+            (event: CharacterSkillsEvent) => {
                 let skills = JSON.parse(JSON.stringify(this.state.skills));
 
                 if (event.trainingSkills.length > 0) {
@@ -90,7 +110,12 @@ export default class CharacterSkillsTabs extends React.Component<
         );
     }
 
-    updateSkills(skills: any) {
+    updateSkills(
+        skills?: Partial<{
+            training_skills: SkillType[];
+            crafting_skills: SkillType[];
+        }>,
+    ) {
         if (typeof skills !== "undefined") {
             let stateSkills = JSON.parse(JSON.stringify(this.state.skills));
 
@@ -123,12 +148,14 @@ export default class CharacterSkillsTabs extends React.Component<
                         update_skills={this.updateSkills.bind(this)}
                         character_id={this.props.character_id}
                         is_automation_running={this.props.is_automation_running}
+                        read_only={this.props.read_only}
                     />
                 </TabPanel>
                 <TabPanel key={"crafting"}>
                     <CraftingSkills
                         crafting_skills={this.state.skills.crafting_skills}
                         dark_table={this.state.dark_tables}
+                        read_only={this.props.read_only}
                     />
                 </TabPanel>
                 <TabPanel key={"kingdom-passives"}>
@@ -141,6 +168,10 @@ export default class CharacterSkillsTabs extends React.Component<
                         }
                         is_delve_running={this.props.is_delve_running}
                         active_automation={this.props.active_automation}
+                        read_only={this.props.read_only}
+                        preloaded_kingdom_passives={
+                            this.props.preloaded_kingdom_passives
+                        }
                     />
                 </TabPanel>
             </Tabs>

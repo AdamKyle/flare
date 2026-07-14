@@ -1,5 +1,5 @@
-import TopsValue from "../../../../shared/types/tops-value";
+import { ActivityProfile } from "../../character-profile";
 
 export default interface ProfileActivitySectionProps {
-    activity?: Record<string, TopsValue>;
+    activity?: ActivityProfile;
 }

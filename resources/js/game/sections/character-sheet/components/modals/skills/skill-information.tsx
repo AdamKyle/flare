@@ -7,22 +7,47 @@ import { upperFirst } from "lodash";
 import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import ComponentLoading from "../../../../../components/ui/loading/component-loading";
-import SkillHelpModal from "./skill-help-modal";
 import SkillBonusBreakDown from "./skill-bonus-break-down";
+import SkillType from "../../../../../lib/game/character-sheet/types/skills/skill-type";
+import SkillDetails from "../../../../../lib/game/character-sheet/types/skills/skill-details";
 
-export default class SkillInformation extends React.Component<any, any> {
-    constructor(props: any) {
+interface SkillInformationProps {
+    is_open: boolean;
+    manage_modal: () => void;
+    skill: SkillType;
+    is_trainable: boolean;
+    preloaded_skill_details?: SkillDetails;
+}
+
+interface SkillInformationState {
+    loading: boolean;
+    skill_data: SkillDetails | null;
+    show_help: boolean;
+    bonus_type: "skill" | "xp" | null;
+    error_message: string | null;
+}
+
+export default class SkillInformation extends React.Component<
+    SkillInformationProps,
+    SkillInformationState
+> {
+    constructor(props: SkillInformationProps) {
         super(props);
 
         this.state = {
-            loading: true,
-            skill_data: {},
+            loading: typeof props.preloaded_skill_details === "undefined",
+            skill_data: props.preloaded_skill_details ?? null,
             show_help: false,
             bonus_type: null,
+            error_message: null,
         };
     }
 
     componentDidMount() {
+        if (typeof this.props.preloaded_skill_details !== "undefined") {
+            return;
+        }
+
         new Ajax()
             .setRoute(
                 "character/skill/" +
@@ -38,7 +63,14 @@ export default class SkillInformation extends React.Component<any, any> {
                         skill_data: response.data,
                     });
                 },
-                (error: AxiosError) => {},
+                (error: AxiosError) => {
+                    this.setState({
+                        loading: false,
+                        error_message:
+                            error.response?.data?.message ??
+                            "Unable to load skill details.",
+                    });
+                },
             );
     }
 
@@ -49,8 +81,8 @@ export default class SkillInformation extends React.Component<any, any> {
         });
     }
 
-    getFilteredFields() {
-        const validFields = [
+    getFilteredFields(): (keyof SkillDetails)[] {
+        const validFields: (keyof SkillDetails)[] = [
             "unit_time_reduction",
             "building_time_reduction",
             "unit_movement_time_reduction",
@@ -62,8 +94,8 @@ export default class SkillInformation extends React.Component<any, any> {
             "class_bonus",
         ];
 
-        return validFields.filter((field: string) => {
-            return this.state.skill_data[field] > 0.0;
+        return validFields.filter((field) => {
+            return Number(this.state.skill_data?.[field] ?? 0) > 0.0;
         });
     }
 
@@ -72,14 +104,16 @@ export default class SkillInformation extends React.Component<any, any> {
     }
 
     renderDetails() {
-        return this.getFilteredFields().map((attributeName: string) => {
+        return this.getFilteredFields().map((attributeName) => {
             return (
                 <Fragment>
                     <dt>{upperFirst(attributeName.replaceAll("_", " "))}</dt>
                     <dd>
-                        {(this.state.skill_data[attributeName] * 100).toFixed(
-                            2,
-                        )}
+                        {(
+                            Number(
+                                this.state.skill_data?.[attributeName] ?? 0,
+                            ) * 100
+                        ).toFixed(2)}
                         %
                     </dd>
                 </Fragment>
@@ -96,12 +130,18 @@ export default class SkillInformation extends React.Component<any, any> {
             <Dialogue
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
-                title={this.state.skill_data.name}
+                title={this.state.skill_data?.name ?? "Skill Details"}
             >
                 {this.state.loading ? (
                     <div className="p-4 m-4">
                         <ComponentLoading />
                     </div>
+                ) : this.state.error_message !== null ||
+                  this.state.skill_data === null ? (
+                    <DangerAlert additional_css="my-4">
+                        {this.state.error_message ??
+                            "Unable to load skill details."}
+                    </DangerAlert>
                 ) : (
                     <Fragment>
                         {this.state.skill_data.is_locked ? (

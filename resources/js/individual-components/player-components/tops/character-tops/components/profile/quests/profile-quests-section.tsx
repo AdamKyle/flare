@@ -4,12 +4,12 @@ import BasicCard from "../../../../../../../game/components/ui/cards/basic-card"
 import Tabs from "../../../../../../../game/components/ui/tabs/tabs";
 import TabPanel from "../../../../../../../game/components/ui/tabs/tab-panel";
 import TopsEmptyState from "../../../../shared/components/tops-empty-state";
-import { formatTopsValue } from "../../../../shared/helpers/tops-format-value";
-import { asTopsRecordList } from "../../../../shared/helpers/tops-value-helpers";
-import TopsValue from "../../../../shared/types/tops-value";
 import ProfileQuestsSectionProps from "../../../types/profile/quests/profile-quests-section-props";
 import TopsChartCard from "../sheet-inspect/tops-chart-card";
 import { formatLocalDateTime } from "../../../../../../../game/lib/game/format-local-date";
+import QuestDetailsModal from "../../../../../../../game/sections/components/quests/modals/quest-details-modal";
+import GuideQuest from "../../../../../guide-quests/modals/guide-quest";
+import { PublicQuestRow } from "../../../types/character-profile";
 
 const QUEST_TABS = [
     { key: "quests", name: "Quests" },
@@ -22,155 +22,11 @@ type Option = {
     value: string;
 };
 
-function readableLabel(value: string): string {
-    return value
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-function DetailRows({ rows }: { rows: Record<string, TopsValue> }) {
-    const keys = Object.keys(rows).filter((key) => {
-        const value = rows[key];
-
-        return value !== null && typeof value !== "undefined" && value !== "";
-    });
-
-    if (keys.length === 0) {
-        return null;
-    }
-
-    return (
-        <dl className="grid gap-3 sm:grid-cols-2">
-            {keys.map((key: string) => (
-                <div key={key}>
-                    <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {readableLabel(key)}
-                    </dt>
-                    <dd className="text-gray-900 dark:text-gray-100">
-                        {key.includes("date") || key.endsWith("_at")
-                            ? formatLocalDateTime(rows[key])
-                            : formatTopsValue(rows[key])}
-                    </dd>
-                </div>
-            ))}
-        </dl>
-    );
-}
-
-function QuestDetailModal({
-    quest,
-    onClose,
-}: {
-    quest: Record<string, TopsValue>;
-    onClose: () => void;
-}) {
-    React.useEffect(() => {
-        const handler = (event: KeyboardEvent) => {
-            if (event.key === "Escape") {
-                onClose();
-            }
-        };
-
-        document.addEventListener("keydown", handler);
-
-        return () => document.removeEventListener("keydown", handler);
-    }, [onClose]);
-
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="quest-detail-title"
-        >
-            <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-sm bg-white p-6 shadow-lg dark:bg-gray-800 dark:text-gray-100">
-                <div className="flex items-start justify-between gap-4">
-                    <h2
-                        id="quest-detail-title"
-                        className="text-xl font-semibold"
-                    >
-                        {quest.name ?? "Quest Details"}
-                    </h2>
-                    <button
-                        type="button"
-                        className="rounded-sm border border-gray-300 px-3 py-1 text-sm font-semibold dark:border-gray-600"
-                        onClick={onClose}
-                    >
-                        Close
-                    </button>
-                </div>
-                <div className="mt-4 space-y-4">
-                    {quest.before_completion_description ? (
-                        <section>
-                            <h3 className="font-semibold">About</h3>
-                            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
-                                {quest.before_completion_description}
-                            </p>
-                        </section>
-                    ) : null}
-                    {quest.after_completion_description ? (
-                        <section>
-                            <h3 className="font-semibold">Completion</h3>
-                            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
-                                {quest.after_completion_description}
-                            </p>
-                        </section>
-                    ) : null}
-                    {quest.intro_text || quest.instructions ? (
-                        <section>
-                            <h3 className="font-semibold">Instructions</h3>
-                            <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
-                                {quest.intro_text ?? quest.instructions}
-                            </p>
-                            {quest.desktop_instructions ? (
-                                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                    {quest.desktop_instructions}
-                                </p>
-                            ) : null}
-                            {quest.mobile_instructions ? (
-                                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                                    {quest.mobile_instructions}
-                                </p>
-                            ) : null}
-                        </section>
-                    ) : null}
-                    <DetailRows
-                        rows={{
-                            completed_at: quest.completed_at,
-                            plane: quest.plane,
-                            faction_plane: quest.faction_plane,
-                            only_for_event: quest.only_for_event,
-                            reincarnated_times: quest.reincarnated_times,
-                            required_faction_level:
-                                quest.required_faction_level,
-                            required_fame_level: quest.required_fame_level,
-                            ...((quest.requirements as Record<
-                                string,
-                                TopsValue
-                            > | null) ?? {}),
-                        }}
-                    />
-                    <section>
-                        <h3 className="mb-2 font-semibold">Rewards</h3>
-                        <DetailRows
-                            rows={
-                                ((quest.rewards as Record<
-                                    string,
-                                    TopsValue
-                                > | null) ?? {}) as Record<string, TopsValue>
-                            }
-                        />
-                    </section>
-                </div>
-            </div>
-        </div>
-    );
-}
-
 export default class ProfileQuestsSection extends React.Component<
     ProfileQuestsSectionProps,
     {
-        selectedQuest: Record<string, TopsValue> | null;
+        selectedNormalQuest: PublicQuestRow | null;
+        selectedGuideQuest: PublicQuestRow | null;
         questSearch: string;
         guideQuestSearch: string;
         selectedPlane: Option | null;
@@ -179,7 +35,8 @@ export default class ProfileQuestsSection extends React.Component<
     }
 > {
     state = {
-        selectedQuest: null,
+        selectedNormalQuest: null,
+        selectedGuideQuest: null,
         questSearch: "",
         guideQuestSearch: "",
         selectedPlane: null,
@@ -187,11 +44,9 @@ export default class ProfileQuestsSection extends React.Component<
         guideQuestPage: 1,
     };
 
-    planeOptions(quests: Record<string, TopsValue>[]): Option[] {
+    planeOptions(quests: PublicQuestRow[]): Option[] {
         return quests
-            .map((quest: Record<string, TopsValue>) =>
-                String(quest.plane ?? ""),
-            )
+            .map((quest) => String(quest.plane ?? ""))
             .filter((plane: string) => plane !== "")
             .filter(
                 (plane: string, index: number, planes: string[]) =>
@@ -201,10 +56,10 @@ export default class ProfileQuestsSection extends React.Component<
             .map((plane: string) => ({ label: plane, value: plane }));
     }
 
-    filteredQuests(quests: Record<string, TopsValue>[]) {
+    filteredQuests(quests: PublicQuestRow[]) {
         const search = this.state.questSearch.toLowerCase();
 
-        return quests.filter((quest: Record<string, TopsValue>) => {
+        return quests.filter((quest) => {
             const matchesSearch = String(quest.name ?? "")
                 .toLowerCase()
                 .includes(search);
@@ -216,29 +71,29 @@ export default class ProfileQuestsSection extends React.Component<
         });
     }
 
-    filteredGuideQuests(quests: Record<string, TopsValue>[]) {
+    filteredGuideQuests(quests: PublicQuestRow[]) {
         const search = this.state.guideQuestSearch.toLowerCase();
 
-        return quests.filter((quest: Record<string, TopsValue>) =>
+        return quests.filter((quest) =>
             String(quest.name ?? "")
                 .toLowerCase()
                 .includes(search),
         );
     }
 
-    paginatedRows(rows: Record<string, TopsValue>[], page: number) {
+    paginatedRows(rows: PublicQuestRow[], page: number) {
         const start = (page - 1) * perPage;
 
         return rows.slice(start, start + perPage);
     }
 
-    totalPages(rows: Record<string, TopsValue>[]) {
+    totalPages(rows: PublicQuestRow[]) {
         return Math.max(1, Math.ceil(rows.length / perPage));
     }
 
     renderPagination(
         page: number,
-        rows: Record<string, TopsValue>[],
+        rows: PublicQuestRow[],
         onChange: (page: number) => void,
     ) {
         const totalPages = this.totalPages(rows);
@@ -270,7 +125,7 @@ export default class ProfileQuestsSection extends React.Component<
         );
     }
 
-    renderQuestRows(rows: Record<string, TopsValue>[]) {
+    renderQuestRows(rows: PublicQuestRow[], guideQuest = false) {
         if (rows.length === 0) {
             return (
                 <TopsEmptyState message="No public quest completions match these filters." />
@@ -279,7 +134,7 @@ export default class ProfileQuestsSection extends React.Component<
 
         return (
             <ul className="grid gap-2">
-                {rows.map((quest: Record<string, TopsValue>, index: number) => (
+                {rows.map((quest, index: number) => (
                     <li
                         key={String(quest.id ?? quest.name) + index}
                         className="rounded-sm border border-gray-200 p-3 dark:border-gray-700"
@@ -288,27 +143,27 @@ export default class ProfileQuestsSection extends React.Component<
                             type="button"
                             className="text-left font-semibold text-gray-900 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-regent-st-blue-400 dark:text-gray-100"
                             onClick={() =>
-                                this.setState({ selectedQuest: quest })
+                                this.setState(
+                                    guideQuest
+                                        ? { selectedGuideQuest: quest }
+                                        : { selectedNormalQuest: quest },
+                                )
                             }
                         >
                             {quest.name ?? "Unknown Quest"}
                         </button>
-                        <dl className="mt-2 grid gap-2 text-sm sm:grid-cols-2">
-                            <div>
-                                <dt className="font-semibold text-gray-700 dark:text-gray-300">
-                                    Completed
-                                </dt>
-                                <dd>
-                                    {formatLocalDateTime(quest.completed_at)}
-                                </dd>
-                            </div>
+                        <dl className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2 text-sm">
+                            <dt className="font-semibold text-gray-700 dark:text-gray-300">
+                                Completed
+                            </dt>
+                            <dd>{formatLocalDateTime(quest.completed_at)}</dd>
                             {quest.plane ? (
-                                <div>
+                                <React.Fragment>
                                     <dt className="font-semibold text-gray-700 dark:text-gray-300">
                                         Plane
                                     </dt>
                                     <dd>{String(quest.plane)}</dd>
-                                </div>
+                                </React.Fragment>
                             ) : null}
                         </dl>
                     </li>
@@ -317,7 +172,7 @@ export default class ProfileQuestsSection extends React.Component<
         );
     }
 
-    renderQuestsTab(quests: Record<string, TopsValue>[]) {
+    renderQuestsTab(quests: PublicQuestRow[]) {
         const filteredRows = this.filteredQuests(quests);
         const visibleRows = this.paginatedRows(
             filteredRows,
@@ -371,7 +226,7 @@ export default class ProfileQuestsSection extends React.Component<
         );
     }
 
-    renderGuideQuestsTab(quests: Record<string, TopsValue>[]) {
+    renderGuideQuestsTab(quests: PublicQuestRow[]) {
         const filteredRows = this.filteredGuideQuests(quests);
         const visibleRows = this.paginatedRows(
             filteredRows,
@@ -394,7 +249,7 @@ export default class ProfileQuestsSection extends React.Component<
                         }
                     />
                 </label>
-                {this.renderQuestRows(visibleRows)}
+                {this.renderQuestRows(visibleRows, true)}
                 {this.renderPagination(
                     this.state.guideQuestPage,
                     filteredRows,
@@ -405,45 +260,24 @@ export default class ProfileQuestsSection extends React.Component<
     }
 
     render() {
-        const quests = this.props.quests ?? {};
-        const completedQuests = asTopsRecordList(quests.completed_quests);
-        const completedGuideQuests = asTopsRecordList(
-            quests.completed_guide_quests,
-        );
+        const quests = this.props.quests;
+        const completedQuests = quests?.completed_quests ?? [];
+        const completedGuideQuests = quests?.completed_guide_quests ?? [];
 
         return (
             <section className="space-y-4" aria-label="Completed quests">
-                <BasicCard>
-                    <h2 className="text-xl font-semibold">Quest Summary</h2>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        Completed normal quests and guide quests from public
-                        completion records.
-                    </p>
-                    <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-                        <div>
-                            <dt className="text-sm font-semibold">
-                                Completed Quests
-                            </dt>
-                            <dd className="text-2xl font-bold tabular-nums">
-                                {formatTopsValue(quests.completed_quest_count)}
-                            </dd>
-                        </div>
-                        <div>
-                            <dt className="text-sm font-semibold">
-                                Completed Guide Quests
-                            </dt>
-                            <dd className="text-2xl font-bold tabular-nums">
-                                {formatTopsValue(
-                                    quests.completed_guide_quest_count,
-                                )}
-                            </dd>
-                        </div>
-                    </dl>
-                </BasicCard>
+                <TopsChartCard
+                    title="Quest Summary"
+                    description="Inspected character cumulative quest completions compared with everyone else."
+                    chart={quests?.summary_chart}
+                    xAxisLabel="Date"
+                    yAxisLabel="Completed Quests"
+                    timeSeries={true}
+                />
                 <TopsChartCard
                     title="Quest Completion"
                     description="Completed normal quests and guide quests from real completion timestamps."
-                    chart={quests.completion_chart as any}
+                    chart={quests?.completion_chart}
                     xAxisLabel="Completion Time"
                     yAxisLabel="Completions"
                     timeSeries={true}
@@ -469,10 +303,59 @@ export default class ProfileQuestsSection extends React.Component<
                         </Tabs>
                     </div>
                 </BasicCard>
-                {this.state.selectedQuest !== null ? (
-                    <QuestDetailModal
-                        quest={this.state.selectedQuest}
-                        onClose={() => this.setState({ selectedQuest: null })}
+                {this.state.selectedNormalQuest !== null ? (
+                    <QuestDetailsModal
+                        is_open={true}
+                        handle_close={() =>
+                            this.setState({ selectedNormalQuest: null })
+                        }
+                        quest_id={this.state.selectedNormalQuest.id}
+                        character_id={0}
+                        read_only={true}
+                        preloaded_quest_details={
+                            this.state.selectedNormalQuest.details
+                        }
+                        is_quest_complete={
+                            this.state.selectedNormalQuest.viewer_has_completed
+                        }
+                        is_parent_complete={
+                            this.state.selectedNormalQuest
+                                .viewer_parent_complete
+                        }
+                        is_required_quest_complete={
+                            this.state.selectedNormalQuest
+                                .viewer_required_quest_complete
+                        }
+                        is_required_quest_chain_complete={
+                            this.state.selectedNormalQuest
+                                .viewer_required_quest_chain_complete
+                        }
+                        required_quest_chain_details={
+                            this.state.selectedNormalQuest
+                                .required_quest_chain_details
+                        }
+                        completed_quests={
+                            this.state.selectedNormalQuest
+                                .viewer_completed_quest_ids ?? []
+                        }
+                    />
+                ) : null}
+                {this.state.selectedGuideQuest !== null ? (
+                    <GuideQuest
+                        is_open={true}
+                        manage_modal={() =>
+                            this.setState({ selectedGuideQuest: null })
+                        }
+                        user_id={0}
+                        view_port={window.innerWidth}
+                        read_only={true}
+                        preloaded_guide_quest={this.state.selectedGuideQuest}
+                        viewer_has_access={Boolean(
+                            this.state.selectedGuideQuest
+                                .viewer_has_completed ||
+                                this.state.selectedGuideQuest
+                                    .viewer_has_unlocked,
+                        )}
                     />
                 ) : null}
             </section>

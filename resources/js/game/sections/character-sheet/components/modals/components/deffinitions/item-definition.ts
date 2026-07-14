@@ -1,6 +1,7 @@
 import ItemAtonementDefinition from "./item-atonement-definition";
 import { AppliedStack } from "./holy-definition";
 import AffixDefinition from "./affix-definition";
+import GemBagSlotDetails from "../../../../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
 
 export interface ItemDefinition {
     id: number;
@@ -43,4 +44,5 @@ export interface ItemDefinition {
     applied_stacks: AppliedStack[];
     affix: AffixDefinition;
     gem_slots: number;
+    sockets: GemBagSlotDetails[];
 }

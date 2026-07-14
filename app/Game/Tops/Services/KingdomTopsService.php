@@ -106,6 +106,11 @@ class KingdomTopsService
                 'gold_bars' => $kingdom->gold_bars,
                 'current_population' => $kingdom->current_population,
                 'current_morale' => $kingdom->current_morale,
+                'current_stone' => $kingdom->current_stone,
+                'current_wood' => $kingdom->current_wood,
+                'current_clay' => $kingdom->current_clay,
+                'current_iron' => $kingdom->current_iron,
+                'current_steel' => $kingdom->current_steel,
             ])->values()->all(),
         ];
     }

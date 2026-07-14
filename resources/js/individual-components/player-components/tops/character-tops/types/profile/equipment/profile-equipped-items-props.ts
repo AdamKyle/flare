@@ -1,5 +1,6 @@
-import TopsValue from "../../../../shared/types/tops-value";
+import { EquipmentProfile } from "../../character-profile";
 
 export default interface ProfileWornItemsProps {
-    equipment?: Record<string, TopsValue>;
+    equipment?: EquipmentProfile;
+    character_id: number;
 }

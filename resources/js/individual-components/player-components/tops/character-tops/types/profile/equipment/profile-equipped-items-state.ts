@@ -1,5 +1,5 @@
-import TopsValue from "../../../../shared/types/tops-value";
+import InventoryDetails from "../../../../../../../game/lib/game/character-sheet/types/inventory/inventory-details";
 
 export default interface ProfileWornItemsState {
-    selectedItem: Record<string, TopsValue> | null;
+    selectedItem: InventoryDetails | null;
 }

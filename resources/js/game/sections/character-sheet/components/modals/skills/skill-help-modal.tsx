@@ -1,11 +1,11 @@
 import React from "react";
 import HelpDialogue from "../../../../../components/ui/dialogue/help-dialogue";
 
-export default class SkillHelpModal extends React.Component<any, any> {
-    constructor(props: any) {
-        super(props);
-    }
+interface SkillHelpModalProps {
+    manage_modal: () => void;
+}
 
+export default class SkillHelpModal extends React.Component<SkillHelpModalProps> {
     render() {
         return (
             <HelpDialogue

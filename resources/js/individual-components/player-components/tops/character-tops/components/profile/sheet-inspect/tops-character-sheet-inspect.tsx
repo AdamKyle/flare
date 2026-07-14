@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import TopsCharacterInfoTabs from "./tops-character-info-tabs";
 import TopsCharacterSummaryCard from "./tops-character-summary-card";
-import TopsCharacterSkillsTabs from "./tops-character-skills-tabs";
+import TopsCharacterSkills from "../skills/tops-character-skills";
 import TopsCharacterInventoryTabs from "./tops-character-inventory-tabs";
 import TopsCharacterAdditionalStats from "./tops-character-additional-stats";
 import DangerButton from "../../../../../../../game/components/ui/buttons/danger-button";
@@ -51,7 +51,7 @@ export default function TopsCharacterSheetInspect({
                         <TopsCharacterSummaryCard profile={profile} />
                     </div>
                     <div className="grid gap-4 xl:grid-cols-2">
-                        <TopsCharacterSkillsTabs profile={profile} />
+                        <TopsCharacterSkills profile={profile} />
                         <TopsCharacterInventoryTabs
                             profile={profile}
                             on_item_select={setSelectedItem}

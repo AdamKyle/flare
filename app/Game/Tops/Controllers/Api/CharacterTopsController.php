@@ -26,9 +26,9 @@ class CharacterTopsController extends Controller
         return response()->json($this->characterTopsInspectionService->overview($character));
     }
 
-    public function profile(Character $character): JsonResponse
+    public function profile(Request $request, Character $character): JsonResponse
     {
-        return response()->json($this->characterTopsInspectionService->fullProfile($character));
+        return response()->json($this->characterTopsInspectionService->fullProfile($character, $request->user()));
     }
 
     public function stats(Character $character): JsonResponse

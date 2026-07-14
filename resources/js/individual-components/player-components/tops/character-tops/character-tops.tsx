@@ -198,11 +198,11 @@ export default class CharacterTops extends React.Component<
         return (
             <TopsPageShell
                 title={
-                    isProfile ? "Character Inspect" : "Character Progression"
+                    isProfile ? "Character Profile" : "Character Progression"
                 }
                 description={
                     isProfile
-                        ? "A read-only public inspect view built from verified game progression data."
+                        ? "A read-only public character sheet and progression profile."
                         : "The highest progressing characters, ranked by reincarnations, level, XP, and gold."
                 }
                 resetDescription={isProfile ? undefined : resetDescription}

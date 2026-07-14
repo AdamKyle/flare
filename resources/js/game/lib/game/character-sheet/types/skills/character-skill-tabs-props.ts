@@ -1,3 +1,6 @@
+import SkillType from "./skill-type";
+import KingdomPassiveRow from "./kingdom-passive-row";
+
 export default interface CharacterSkillTabsProps {
     character_id: number;
 
@@ -18,4 +21,13 @@ export default interface CharacterSkillTabsProps {
     } | null;
 
     finished_loading: boolean;
+
+    read_only?: boolean;
+
+    preloaded_skills?: {
+        training_skills: SkillType[];
+        crafting_skills: SkillType[];
+    };
+
+    preloaded_kingdom_passives?: KingdomPassiveRow[];
 }

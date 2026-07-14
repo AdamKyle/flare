@@ -1,5 +1,5 @@
-import TopsValue from "../../../../shared/types/tops-value";
+import { AnalyticsProfile } from "../../character-profile";
 
 export default interface ProfileAnalyticsSectionProps {
-    analytics?: Record<string, TopsValue>;
+    analytics?: AnalyticsProfile;
 }

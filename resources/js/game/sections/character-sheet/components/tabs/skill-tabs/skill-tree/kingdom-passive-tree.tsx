@@ -2,9 +2,33 @@ import React, { Fragment } from "react";
 import Node from "./node";
 import { Tree, TreeNode } from "react-organizational-chart";
 import TrainPassive from "../../../modals/skill-tree/train-passive";
+import KingdomPassiveRow from "../../../../../../lib/game/character-sheet/types/skills/kingdom-passive-row";
 
-export default class KingdomPassiveTree extends React.Component<any, any> {
-    constructor(props: any) {
+interface KingdomPassiveTreeProps {
+    passives: KingdomPassiveRow;
+    read_only?: boolean;
+    manage_success_message?: (message: string) => void;
+    update_passives?: (
+        passives: KingdomPassiveRow[],
+        passive?: KingdomPassiveRow,
+    ) => void;
+    character_id?: number;
+    is_dead?: boolean;
+    is_automation_running?: boolean;
+    active_automation?: { name: string } | null;
+    skill_in_training?: KingdomPassiveRow | null;
+}
+
+interface KingdomPassiveTreeState {
+    show_training_modal: boolean;
+    skill: KingdomPassiveRow | null;
+}
+
+export default class KingdomPassiveTree extends React.Component<
+    KingdomPassiveTreeProps,
+    KingdomPassiveTreeState
+> {
+    constructor(props: KingdomPassiveTreeProps) {
         super(props);
 
         this.state = {
@@ -13,16 +37,17 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
         };
     }
 
-    buildNodes(passive: any) {
-        let nodes: [] = [];
+    buildNodes(passive: KingdomPassiveRow): JSX.Element[] {
+        let nodes: JSX.Element[] = [];
 
         if (passive.children.length > 0) {
-            nodes = passive.children.map((child: any) => {
+            nodes = passive.children.map((child) => {
                 return (
                     <TreeNode
                         label={
                             <Node
                                 passive={child}
+                                read_only={this.props.read_only}
                                 show_passive_modal={this.showTrainingModal.bind(
                                     this,
                                 )}
@@ -38,7 +63,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
         return nodes;
     }
 
-    showTrainingModal(skill?: any) {
+    showTrainingModal(skill?: KingdomPassiveRow) {
         this.setState({
             show_training_modal: !this.state.show_training_modal,
             skill: typeof skill === "undefined" ? null : skill,
@@ -55,6 +80,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                     label={
                         <Node
                             passive={this.props.passives}
+                            read_only={this.props.read_only}
                             show_passive_modal={this.showTrainingModal.bind(
                                 this,
                             )}
@@ -78,6 +104,7 @@ export default class KingdomPassiveTree extends React.Component<any, any> {
                         is_automation_running={this.props.is_automation_running}
                         active_automation={this.props.active_automation}
                         skill_in_training={this.props.skill_in_training}
+                        read_only={this.props.read_only}
                     />
                 ) : null}
             </div>

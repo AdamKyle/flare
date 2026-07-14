@@ -16,6 +16,27 @@ enum EVENT_TYPE {
     WINTER_EVENT = 4,
 }
 
+function normalizePreloadedGuideQuest(guideQuest: any): any {
+    if (!guideQuest) {
+        return guideQuest;
+    }
+
+    const requirements = guideQuest.requirements ?? {};
+    const rewards = guideQuest.rewards ?? {};
+
+    return {
+        only_during_event: null,
+        unlock_at_level: null,
+        faction_points_per_kill: null,
+        ...guideQuest,
+        ...requirements,
+        gold_reward: rewards.gold ?? null,
+        gold_dust_reward: rewards.gold_dust ?? null,
+        shards_reward: rewards.shards ?? null,
+        xp_reward: rewards.xp ?? null,
+    };
+}
+
 export default class GuideQuest extends React.Component<
     GuideQuestProps,
     GuideQuestState
@@ -25,16 +46,28 @@ export default class GuideQuest extends React.Component<
     constructor(props: GuideQuestProps) {
         super(props);
 
+        const hasPreloadedGuideQuest = Boolean(
+            props.read_only && props.preloaded_guide_quest,
+        );
+
+        const normalizedPreloadedGuideQuest = hasPreloadedGuideQuest
+            ? normalizePreloadedGuideQuest(props.preloaded_guide_quest)
+            : null;
+
         this.state = {
-            loading: true,
+            loading: !hasPreloadedGuideQuest,
             action_loading: false,
             error_message: null,
             success_message: null,
-            quest_data: [],
+            quest_data: hasPreloadedGuideQuest
+                ? [normalizedPreloadedGuideQuest]
+                : [],
             can_hand_in: [],
             is_handing_in: false,
             completed_requirements: [],
-            selected_quest_data_to_show: null,
+            selected_quest_data_to_show: hasPreloadedGuideQuest
+                ? normalizedPreloadedGuideQuest
+                : null,
         };
 
         this.guideQuestAjax =
@@ -42,6 +75,10 @@ export default class GuideQuest extends React.Component<
     }
 
     componentDidMount() {
+        if (this.props.read_only) {
+            return;
+        }
+
         this.guideQuestAjax.doGuideQuestAction(this, GUIDE_QUEST_ACTIONS.FETCH);
     }
 
@@ -184,18 +221,27 @@ export default class GuideQuest extends React.Component<
                 is_open={this.props.is_open}
                 handle_close={this.props.manage_modal}
                 title={this.buildTitle() + " [GUIDE QUEST]"}
-                secondary_actions={{
-                    secondary_button_label: "Hand in",
-                    secondary_button_disabled: !this.canHandInQuest(),
-                    handle_action: this.handInQuest.bind(this),
-                }}
-                tertiary_actions={{
-                    tertiary_button_label: "View Quests",
-                    handle_action: this.viewQuests.bind(this),
-                    tertiary_button_disabled:
-                        this.state.quest_data.length <= 1 ||
-                        this.state.selected_quest_data_to_show === null,
-                }}
+                secondary_actions={
+                    this.props.read_only
+                        ? null
+                        : {
+                              secondary_button_label: "Hand in",
+                              secondary_button_disabled: !this.canHandInQuest(),
+                              handle_action: this.handInQuest.bind(this),
+                          }
+                }
+                tertiary_actions={
+                    this.props.read_only
+                        ? undefined
+                        : {
+                              tertiary_button_label: "View Quests",
+                              handle_action: this.viewQuests.bind(this),
+                              tertiary_button_disabled:
+                                  this.state.quest_data.length <= 1 ||
+                                  this.state.selected_quest_data_to_show ===
+                                      null,
+                          }
+                }
                 medium_modal={this.state.quest_data.length > 0}
                 primary_button_disabled={this.state.action_loading}
             >
@@ -226,6 +272,8 @@ export default class GuideQuest extends React.Component<
                                 success_message={this.state.success_message}
                                 error_message={this.state.error_message}
                                 view_port={this.props.view_port}
+                                read_only={this.props.read_only}
+                                viewer_has_access={this.props.viewer_has_access}
                             />
                         ) : (
                             <div>
@@ -286,7 +334,8 @@ export default class GuideQuest extends React.Component<
                         )}
 
                         <div className="overflow-y-auto max-h-[450px] lg:max-h-none lg:overflow-visible">
-                            {this.state.is_handing_in ? (
+                            {!this.props.read_only &&
+                            this.state.is_handing_in ? (
                                 <LoadingProgressBar />
                             ) : null}
                         </div>

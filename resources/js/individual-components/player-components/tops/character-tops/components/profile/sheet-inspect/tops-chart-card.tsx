@@ -3,18 +3,18 @@ import { AxisOptions, Chart } from "react-charts";
 import BasicCard from "../../../../../../../game/components/ui/cards/basic-card";
 import { formatNumber } from "../../../../../../../game/lib/game/format-number";
 
-type ChartPoint = {
+export type ChartPoint = {
     label: string;
     value: number;
     date?: string;
 };
 
-type ChartSeries = {
+export type ChartSeries = {
     label: string;
     points: ChartPoint[];
 };
 
-type ChartPayload = {
+export type ChartPayload = {
     source?: string;
     unit?: string;
     granularity?: string | null;
@@ -30,6 +30,22 @@ type ReactChartPoint = {
 type ReactChartSeries = {
     label: string;
     data: ReactChartPoint[];
+};
+
+type TopsChartCardProps = {
+    title: string;
+    description: string;
+    chart: ChartPayload | null | undefined;
+    xAxisLabel?: string;
+    yAxisLabel?: string;
+    timeSeries?: boolean;
+};
+
+type TopsChartCardState = {
+    visibleSeries: string[];
+    startDate: string;
+    endDate: string;
+    darkChart: boolean;
 };
 
 function chartId(title: string): string {
@@ -84,212 +100,313 @@ function filteredPoints(
     });
 }
 
-export default function TopsChartCard({
-    title,
-    description,
-    chart,
-    xAxisLabel = "Label",
-    yAxisLabel,
-    timeSeries = false,
-}: {
-    title: string;
-    description: string;
-    chart: ChartPayload | null | undefined;
-    xAxisLabel?: string;
-    yAxisLabel?: string;
-    timeSeries?: boolean;
-}) {
-    const sourceSeries =
-        chart?.series && chart.series.length > 0
-            ? chart.series
-            : [
-                  {
-                      label: title,
-                      points: chart?.points ?? [],
-                  },
-              ];
-    const [visibleSeries, setVisibleSeries] = React.useState<string[]>(
-        sourceSeries.map((series: ChartSeries) => series.label),
-    );
-    const [startDate, setStartDate] = React.useState("");
-    const [endDate, setEndDate] = React.useState("");
-    const id = chartId(title);
-    const yLabel = yAxisLabel ?? chart?.unit ?? "Value";
-    const canFilterDates = timeSeries || Boolean(chart?.granularity);
-    const series = sourceSeries
-        .filter((item: ChartSeries) => visibleSeries.includes(item.label))
-        .map((item: ChartSeries) => ({
-            ...item,
-            points: canFilterDates
-                ? filteredPoints(item.points, startDate, endDate)
-                : item.points,
+function defaultSourceSeries(props: TopsChartCardProps): ChartSeries[] {
+    const chart = props.chart;
+
+    return chart?.series && chart.series.length > 0
+        ? chart.series
+        : [
+              {
+                  label: props.title,
+                  points: chart?.points ?? [],
+              },
+          ];
+}
+
+export default class TopsChartCard extends React.Component<
+    TopsChartCardProps,
+    TopsChartCardState
+> {
+    private themeObserver: MutationObserver | null = null;
+    private readonly primaryAxis: AxisOptions<ReactChartPoint> = {
+        getValue: (datum) => datum.label,
+    };
+
+    private readonly secondaryAxes: AxisOptions<ReactChartPoint>[] = [
+        {
+            getValue: (datum) => datum.value,
+            elementType: "line",
+        },
+    ];
+
+    constructor(props: TopsChartCardProps) {
+        super(props);
+
+        this.state = {
+            visibleSeries: defaultSourceSeries(props).map(
+                (series: ChartSeries) => series.label,
+            ),
+            startDate: "",
+            endDate: "",
+            darkChart: window.localStorage.getItem("scheme") === "dark",
+        };
+    }
+
+    componentDidMount(): void {
+        this.themeObserver = new MutationObserver(() => {
+            const darkChart = window.localStorage.getItem("scheme") === "dark";
+
+            if (darkChart !== this.state.darkChart) {
+                this.setState({ darkChart });
+            }
+        });
+        this.themeObserver.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["class"],
+        });
+    }
+
+    componentDidUpdate(previousProps: TopsChartCardProps): void {
+        const previousLabels = defaultSourceSeries(previousProps).map(
+            (series) => series.label,
+        );
+        const labels = this.sourceSeries().map((series) => series.label);
+
+        if (previousLabels.join("|") !== labels.join("|")) {
+            this.setState((state) => ({
+                visibleSeries: labels.filter(
+                    (label) =>
+                        !previousLabels.includes(label) ||
+                        state.visibleSeries.includes(label),
+                ),
+            }));
+        }
+    }
+
+    componentWillUnmount(): void {
+        this.themeObserver?.disconnect();
+    }
+
+    sourceSeries(): ChartSeries[] {
+        return defaultSourceSeries(this.props);
+    }
+
+    canFilterDates(): boolean {
+        return (
+            Boolean(this.props.timeSeries) ||
+            Boolean(this.props.chart?.granularity)
+        );
+    }
+
+    toggleSeries(label: string, checked: boolean): void {
+        this.setState((state: TopsChartCardState) => ({
+            visibleSeries: checked
+                ? [...state.visibleSeries, label]
+                : state.visibleSeries.filter(
+                      (visibleLabel: string) => visibleLabel !== label,
+                  ),
         }));
-    const hasData = series.some((item) => item.points.length > 0);
-    const data: ReactChartSeries[] = series.map((item) => ({
-        label: item.label,
-        data: item.points.map((point) => ({
-            label: point.label,
-            value: Number(point.value ?? 0),
-        })),
-    }));
-    const primaryAxis = React.useMemo(
-        (): AxisOptions<ReactChartPoint> => ({
-            getValue: (datum) => datum.label,
-        }),
-        [],
-    );
-    const secondaryAxes = React.useMemo(
-        (): AxisOptions<ReactChartPoint>[] => [
-            {
-                getValue: (datum) => datum.value,
-                elementType: "line",
-            },
-        ],
-        [],
-    );
-    const rows = series.flatMap((item) =>
-        item.points.map((point) => ({
-            series: item.label,
-            label: point.label,
-            value: point.value,
-        })),
-    );
+    }
 
-    return (
-        <BasicCard>
-            <section aria-labelledby={id} className="space-y-4">
-                <div>
-                    <h2 id={id} className="text-xl font-semibold">
-                        {title}
-                    </h2>
-                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                        {description}
-                    </p>
-                </div>
+    showAllSeries(): void {
+        this.setState({
+            visibleSeries: this.sourceSeries().map(
+                (series: ChartSeries) => series.label,
+            ),
+        });
+    }
 
-                {sourceSeries.length > 1 ? (
-                    <fieldset className="flex flex-wrap gap-3 text-sm">
-                        <legend className="sr-only">
-                            Toggle {title} series
-                        </legend>
-                        {sourceSeries.map((item: ChartSeries) => (
-                            <label
-                                key={item.label}
-                                className="inline-flex items-center gap-2 rounded-sm border border-gray-200 px-3 py-2 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300"
+    setStartDate(value: string): void {
+        this.setState({ startDate: value });
+    }
+
+    setEndDate(value: string): void {
+        this.setState({ endDate: value });
+    }
+
+    visibleSeriesData(): ChartSeries[] {
+        const canFilterDates = this.canFilterDates();
+
+        return this.sourceSeries()
+            .filter((item: ChartSeries) =>
+                this.state.visibleSeries.includes(item.label),
+            )
+            .map((item: ChartSeries) => ({
+                ...item,
+                points: canFilterDates
+                    ? filteredPoints(
+                          item.points,
+                          this.state.startDate,
+                          this.state.endDate,
+                      )
+                    : item.points,
+            }));
+    }
+
+    render() {
+        const {
+            title,
+            description,
+            xAxisLabel = "Label",
+            yAxisLabel,
+            chart,
+        } = this.props;
+        const sourceSeries = this.sourceSeries();
+        const id = chartId(title);
+        const yLabel = yAxisLabel ?? chart?.unit ?? "Value";
+        const canFilterDates = this.canFilterDates();
+        const series = this.visibleSeriesData();
+        const hasData = series.some((item) => item.points.length > 0);
+        const data: ReactChartSeries[] = series.map((item) => ({
+            label: item.label,
+            data: item.points.map((point) => ({
+                label: point.label,
+                value: Number(point.value ?? 0),
+            })),
+        }));
+        const rows = series.flatMap((item) =>
+            item.points.map((point) => ({
+                series: item.label,
+                label: point.label,
+                value: point.value,
+            })),
+        );
+
+        return (
+            <BasicCard>
+                <section aria-labelledby={id} className="space-y-4">
+                    <div>
+                        <h2 id={id} className="text-xl font-semibold">
+                            {title}
+                        </h2>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                            {description}
+                        </p>
+                    </div>
+
+                    {sourceSeries.length > 1 ? (
+                        <fieldset className="flex flex-wrap items-center gap-3 text-sm">
+                            <legend className="sr-only">
+                                Toggle {title} series
+                            </legend>
+                            <button
+                                type="button"
+                                className="rounded-sm border border-gray-300 px-3 py-2 font-semibold text-gray-700 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300"
+                                disabled={
+                                    this.state.visibleSeries.length ===
+                                    sourceSeries.length
+                                }
+                                onClick={() => this.showAllSeries()}
                             >
+                                Show All
+                            </button>
+                            {sourceSeries.map((item: ChartSeries) => (
+                                <label
+                                    key={item.label}
+                                    className="inline-flex items-center gap-2 rounded-sm border border-gray-200 px-3 py-2 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={this.state.visibleSeries.includes(
+                                            item.label,
+                                        )}
+                                        onChange={(event) =>
+                                            this.toggleSeries(
+                                                item.label,
+                                                event.target.checked,
+                                            )
+                                        }
+                                    />
+                                    <span>{item.label}</span>
+                                </label>
+                            ))}
+                        </fieldset>
+                    ) : null}
+
+                    {canFilterDates ? (
+                        <div className="grid gap-3 sm:grid-cols-2">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                Start Date
                                 <input
-                                    type="checkbox"
-                                    checked={visibleSeries.includes(item.label)}
-                                    onChange={(event) => {
-                                        setVisibleSeries((current) =>
-                                            event.target.checked
-                                                ? [...current, item.label]
-                                                : current.filter(
-                                                      (label) =>
-                                                          label !== item.label,
-                                                  ),
-                                        );
+                                    type="date"
+                                    className="mt-1 w-full rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    value={this.state.startDate}
+                                    onChange={(event) =>
+                                        this.setStartDate(event.target.value)
+                                    }
+                                />
+                            </label>
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                End Date
+                                <input
+                                    type="date"
+                                    className="mt-1 w-full rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                                    value={this.state.endDate}
+                                    onChange={(event) =>
+                                        this.setEndDate(event.target.value)
+                                    }
+                                />
+                            </label>
+                        </div>
+                    ) : null}
+
+                    {hasData ? (
+                        <div>
+                            <div className="mb-2 flex justify-between text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                <span>{xAxisLabel}</span>
+                                <span>{yLabel}</span>
+                            </div>
+                            <div className="h-80 min-h-80 w-full overflow-hidden rounded-sm border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-900">
+                                <Chart
+                                    options={{
+                                        data,
+                                        primaryAxis: this.primaryAxis,
+                                        secondaryAxes: this.secondaryAxes,
+                                        dark: this.state.darkChart,
                                     }}
                                 />
-                                <span>{item.label}</span>
-                            </label>
-                        ))}
-                    </fieldset>
-                ) : null}
-
-                {canFilterDates ? (
-                    <div className="grid gap-3 sm:grid-cols-2">
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Start Date
-                            <input
-                                type="date"
-                                className="mt-1 w-full rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                                value={startDate}
-                                onChange={(event) =>
-                                    setStartDate(event.target.value)
-                                }
-                            />
-                        </label>
-                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            End Date
-                            <input
-                                type="date"
-                                className="mt-1 w-full rounded-sm border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                                value={endDate}
-                                onChange={(event) =>
-                                    setEndDate(event.target.value)
-                                }
-                            />
-                        </label>
-                    </div>
-                ) : null}
-
-                {hasData ? (
-                    <div>
-                        <div className="mb-2 flex justify-between text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
-                            <span>{xAxisLabel}</span>
-                            <span>{yLabel}</span>
+                            </div>
                         </div>
-                        <div className="h-80 min-h-80 w-full overflow-hidden rounded-sm border border-gray-100 bg-white dark:border-gray-700 dark:bg-gray-900">
-                            <Chart
-                                options={{
-                                    data,
-                                    primaryAxis,
-                                    secondaryAxes,
-                                    dark: true,
-                                }}
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    <p className="rounded-sm bg-gray-100 p-3 text-sm text-gray-700 dark:bg-gray-900 dark:text-gray-300">
-                        No public chart data is available for the selected
-                        filters.
-                    </p>
-                )}
+                    ) : (
+                        <p className="rounded-sm bg-gray-100 p-3 text-sm text-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                            No public chart data is available for the selected
+                            filters.
+                        </p>
+                    )}
 
-                <details>
-                    <summary className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        Data table
-                    </summary>
-                    <div className="mt-3 overflow-x-auto">
-                        <table className="min-w-full text-left text-sm">
-                            <thead>
-                                <tr>
-                                    <th className="border-b border-gray-200 py-2 pr-4 dark:border-gray-700">
-                                        Series
-                                    </th>
-                                    <th className="border-b border-gray-200 py-2 pr-4 dark:border-gray-700">
-                                        {xAxisLabel}
-                                    </th>
-                                    <th className="border-b border-gray-200 py-2 dark:border-gray-700">
-                                        {yLabel}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {rows.map((row) => (
-                                    <tr
-                                        key={`${title}-${row.series}-${row.label}`}
-                                    >
-                                        <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-700">
-                                            {row.series}
-                                        </td>
-                                        <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-700">
-                                            {row.label}
-                                        </td>
-                                        <td className="border-b border-gray-100 py-2 dark:border-gray-700">
-                                            {formatNumber(
-                                                Number(row.value ?? 0),
-                                            )}
-                                        </td>
+                    <details>
+                        <summary className="cursor-pointer text-sm font-semibold text-gray-900 dark:text-gray-100">
+                            Data table
+                        </summary>
+                        <div className="mt-3 overflow-x-auto">
+                            <table className="min-w-full text-left text-sm">
+                                <thead>
+                                    <tr>
+                                        <th className="border-b border-gray-200 py-2 pr-4 dark:border-gray-700">
+                                            Series
+                                        </th>
+                                        <th className="border-b border-gray-200 py-2 pr-4 dark:border-gray-700">
+                                            {xAxisLabel}
+                                        </th>
+                                        <th className="border-b border-gray-200 py-2 dark:border-gray-700">
+                                            {yLabel}
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </details>
-            </section>
-        </BasicCard>
-    );
+                                </thead>
+                                <tbody>
+                                    {rows.map((row) => (
+                                        <tr
+                                            key={`${title}-${row.series}-${row.label}`}
+                                        >
+                                            <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-700">
+                                                {row.series}
+                                            </td>
+                                            <td className="border-b border-gray-100 py-2 pr-4 dark:border-gray-700">
+                                                {row.label}
+                                            </td>
+                                            <td className="border-b border-gray-100 py-2 dark:border-gray-700">
+                                                {formatNumber(
+                                                    Number(row.value ?? 0),
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
+                </section>
+            </BasicCard>
+        );
+    }
 }

@@ -4,7 +4,6 @@ import { topsServiceContainer } from "../../shared/container/tops-container";
 import CharacterTops from "../character-tops";
 import CharacterTopsListenerDefinition from "./character-tops-listener-definition";
 import TopsEventPayload from "../../shared/types/tops-event-payload";
-import CharacterProfile from "../types/character-profile";
 
 @injectable()
 export default class CharacterTopsListener
@@ -45,9 +44,9 @@ export default class CharacterTopsListener
                 "tops-character-inspection-" + this.selectedCharacterId,
                 "Game.Tops.Events.CharacterTopsInspectionUpdated",
                 (event: TopsEventPayload) => {
-                    if (this.component && event.profile) {
-                        this.component.applyProfile(
-                            event.profile as CharacterProfile,
+                    if (this.component && event.profile !== undefined) {
+                        this.component.fetchProfile(
+                            this.selectedCharacterId as number,
                         );
                     }
                 },

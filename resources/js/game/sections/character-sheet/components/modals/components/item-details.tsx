@@ -623,6 +623,9 @@ export default class ItemDetails extends React.Component<
                         character_id={this.props.character_id}
                         item_id={this.props.item.id}
                         manage_modal={this.viewSockets.bind(this)}
+                        preloaded_attached_gems={
+                            this.props.preloaded_attached_gems
+                        }
                     />
                 ) : null}
             </div>

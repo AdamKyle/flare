@@ -2,9 +2,8 @@ import React from "react";
 import Select, { SingleValue } from "react-select";
 import BasicCard from "../../../../../game/components/ui/cards/basic-card";
 import TopsEmptyState from "../../shared/components/tops-empty-state";
-import ProfileSectionProps from "../types/profile-section-props";
+import { KingdomProfile } from "../types/character-profile";
 import TopsValue from "../../shared/types/tops-value";
-import { asTopsRecordList } from "../../shared/helpers/tops-value-helpers";
 import TopsChartCard from "./profile/sheet-inspect/tops-chart-card";
 import { formatTopsValue } from "../../shared/helpers/tops-format-value";
 
@@ -16,7 +15,7 @@ type Option = {
 };
 
 export default class ProfileKingdoms extends React.Component<
-    ProfileSectionProps,
+    { kingdoms?: KingdomProfile },
     {
         search: string;
         selectedPlane: Option | null;
@@ -28,10 +27,6 @@ export default class ProfileKingdoms extends React.Component<
         selectedPlane: null,
         page: 1,
     };
-
-    kingdoms(): Record<string, TopsValue> {
-        return this.props.kingdoms ?? {};
-    }
 
     planeOptions(rows: Record<string, TopsValue>[]): Option[] {
         return rows
@@ -72,54 +67,111 @@ export default class ProfileKingdoms extends React.Component<
         return Math.max(1, Math.ceil(rows.length / perPage));
     }
 
-    renderKingdom(kingdom: Record<string, TopsValue>) {
+    tableHeaders(): {
+        key: string;
+        label: string;
+        align: "left" | "right" | "center";
+    }[] {
+        return [
+            { key: "name", label: "Kingdom Name", align: "left" },
+            { key: "map", label: "Plane", align: "left" },
+            { key: "is_capital", label: "Capital", align: "center" },
+            { key: "treasury", label: "Treasury", align: "right" },
+            { key: "gold_bars", label: "Gold Bars", align: "right" },
+            { key: "current_population", label: "Population", align: "right" },
+            { key: "current_morale", label: "Morale", align: "right" },
+            { key: "current_stone", label: "Stone", align: "right" },
+            { key: "current_wood", label: "Wood", align: "right" },
+            { key: "current_clay", label: "Clay", align: "right" },
+            { key: "current_iron", label: "Iron", align: "right" },
+            { key: "current_steel", label: "Steel", align: "right" },
+        ];
+    }
+
+    alignmentClasses(alignment: "left" | "right" | "center"): string {
+        if (alignment === "right") {
+            return "text-right";
+        }
+
+        if (alignment === "center") {
+            return "text-center";
+        }
+
+        return "text-left";
+    }
+
+    renderKingdomRow(kingdom: Record<string, TopsValue>) {
         return (
-            <article
-                key={String(kingdom.id)}
-                className="rounded-sm border border-gray-200 p-4 dark:border-gray-700"
-            >
-                <h3 className="font-semibold">
-                    {kingdom.name ?? "Unknown Kingdom"}
-                </h3>
-                <dl className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    <div>
-                        <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Plane
-                        </dt>
-                        <dd>{formatTopsValue(kingdom.map)}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Capital
-                        </dt>
-                        <dd>{kingdom.is_capital ? "Yes" : "No"}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Treasury
-                        </dt>
-                        <dd>{formatTopsValue(kingdom.treasury)}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Gold Bars
-                        </dt>
-                        <dd>{formatTopsValue(kingdom.gold_bars)}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Population
-                        </dt>
-                        <dd>{formatTopsValue(kingdom.current_population)}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                            Morale
-                        </dt>
-                        <dd>{formatTopsValue(kingdom.current_morale)}%</dd>
-                    </div>
-                </dl>
-            </article>
+            <tr key={String(kingdom.id)}>
+                <td className="whitespace-nowrap px-4 py-3 text-left font-semibold text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.name)}
+                </td>
+                <td className="px-4 py-3 text-left text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.map)}
+                </td>
+                <td className="px-4 py-3 text-center text-gray-900 dark:text-gray-100">
+                    {kingdom.is_capital ? "Yes" : "No"}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.treasury)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.gold_bars)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_population)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_morale)}%
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_stone)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_wood)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_clay)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_iron)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-gray-900 dark:text-gray-100">
+                    {formatTopsValue(kingdom.current_steel)}
+                </td>
+            </tr>
+        );
+    }
+
+    renderKingdomTable(rows: Record<string, TopsValue>[]) {
+        const headers = this.tableHeaders();
+
+        return (
+            <div className="overflow-x-auto rounded-sm border border-gray-200 dark:border-gray-700">
+                <table className="w-full min-w-[960px] table-auto border-collapse text-sm">
+                    <thead className="bg-gray-50 dark:bg-gray-900">
+                        <tr>
+                            {headers.map((header) => (
+                                <th
+                                    key={header.key}
+                                    scope="col"
+                                    className={
+                                        this.alignmentClasses(header.align) +
+                                        " px-4 py-3 text-xs font-bold uppercase tracking-wide text-gray-700 dark:text-gray-300"
+                                    }
+                                >
+                                    {header.label}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                        {rows.map((kingdom: Record<string, TopsValue>) =>
+                            this.renderKingdomRow(kingdom),
+                        )}
+                    </tbody>
+                </table>
+            </div>
         );
     }
 
@@ -162,7 +214,7 @@ export default class ProfileKingdoms extends React.Component<
     }
 
     render() {
-        const kingdomRows = asTopsRecordList(this.kingdoms().kingdoms);
+        const kingdomRows = this.props.kingdoms?.kingdoms ?? [];
         const filteredRows = this.filteredRows(kingdomRows);
         const visibleRows = this.paginatedRows(filteredRows);
         const planeOptions = this.planeOptions(kingdomRows);
@@ -172,28 +224,39 @@ export default class ProfileKingdoms extends React.Component<
                 <div className="grid gap-4 lg:grid-cols-2">
                     <TopsChartCard
                         title="Kingdom Summary"
-                        description="Public kingdom totals from this character profile."
-                        chart={this.kingdoms().kingdom_summary_chart as any}
-                        xAxisLabel="Metric"
-                        yAxisLabel="Value"
+                        description="Public kingdom, capital, and population totals over time."
+                        chart={this.props.kingdoms?.kingdom_summary_chart}
+                        xAxisLabel="Date"
+                        yAxisLabel="Count"
+                        timeSeries={true}
                     />
                     <TopsChartCard
-                        title="Resource Totals"
-                        description="Current public resource totals across player-owned kingdoms."
-                        chart={this.kingdoms().resource_totals_chart as any}
-                        xAxisLabel="Resource"
-                        yAxisLabel="Amount"
+                        title="Kingdom Treasury"
+                        description="Public treasury totals across player-owned kingdoms over time."
+                        chart={this.props.kingdoms?.kingdom_treasury_chart}
+                        xAxisLabel="Date"
+                        yAxisLabel="Gold"
+                        timeSeries={true}
+                    />
+                    <TopsChartCard
+                        title="Kingdom Gold Bars"
+                        description="Public gold bar totals across player-owned kingdoms over time."
+                        chart={this.props.kingdoms?.kingdom_gold_bars_chart}
+                        xAxisLabel="Date"
+                        yAxisLabel="Gold Bars"
+                        timeSeries={true}
                     />
                 </div>
                 <TopsChartCard
-                    title="Top Kingdoms"
-                    description="Treasury, gold bars, population, and morale for each public kingdom row."
-                    chart={this.kingdoms().top_kingdoms_chart as any}
-                    xAxisLabel="Metric"
-                    yAxisLabel="Value"
+                    title="Resource Totals"
+                    description="Public resource totals across player-owned kingdoms over time."
+                    chart={this.props.kingdoms?.resource_totals_chart}
+                    xAxisLabel="Date"
+                    yAxisLabel="Amount"
+                    timeSeries={true}
                 />
                 <BasicCard>
-                    <h2 className="text-xl font-semibold">Top Kingdoms</h2>
+                    <h2 className="text-xl font-semibold">Kingdoms</h2>
                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         Search and filter public kingdom rows.
                     </p>
@@ -231,14 +294,11 @@ export default class ProfileKingdoms extends React.Component<
                             />
                         </label>
                     </div>
-                    <div className="mt-4 grid gap-3">
+                    <div className="mt-4">
                         {visibleRows.length === 0 ? (
                             <TopsEmptyState message="No player-owned kingdoms match these filters." />
                         ) : (
-                            visibleRows.map(
-                                (kingdom: Record<string, TopsValue>) =>
-                                    this.renderKingdom(kingdom),
-                            )
+                            this.renderKingdomTable(visibleRows)
                         )}
                     </div>
                     {this.renderPagination(filteredRows)}

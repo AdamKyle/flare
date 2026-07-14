@@ -24,7 +24,6 @@ use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Services\GameTimerService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\TraverseService;
@@ -49,14 +48,12 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ExplorationCreatureCountCalculator::class),
                 $app->make(ExplorationLogService::class),
                 $app->make(ExplorationWarningService::class),
-                $app->make(GameTimerService::class),
             );
         });
 
         $this->app->bind(DelveExplorationAutomationService::class, function ($app) {
             return new DelveExplorationAutomationService(
                 $app->make(CharacterCacheData::class),
-                $app->make(GameTimerService::class),
             );
         });
 
@@ -67,7 +64,6 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(FactionLoyaltyAutomationService::class, function ($app) {
             return new FactionLoyaltyAutomationService(
                 $app->make(CharacterCacheData::class),
-                $app->make(GameTimerService::class),
             );
         });
 

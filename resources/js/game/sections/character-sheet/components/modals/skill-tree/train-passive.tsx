@@ -4,9 +4,35 @@ import { AxiosError, AxiosResponse } from "axios";
 import Ajax from "../../../../../lib/ajax/ajax";
 import LoadingProgressBar from "../../../../../components/ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
+import KingdomPassiveRow from "../../../../../lib/game/character-sheet/types/skills/kingdom-passive-row";
 
-export default class TrainPassive extends React.Component<any, any> {
-    constructor(props: any) {
+interface TrainPassiveProps {
+    is_open: boolean;
+    manage_modal: () => void;
+    skill: KingdomPassiveRow;
+    manage_success_message?: (message: string) => void;
+    update_passives?: (
+        passives: KingdomPassiveRow[],
+        passive?: KingdomPassiveRow,
+    ) => void;
+    character_id?: number;
+    is_dead?: boolean;
+    is_automation_running?: boolean;
+    active_automation?: { name: string } | null;
+    skill_in_training?: KingdomPassiveRow | null;
+    read_only?: boolean;
+}
+
+interface TrainPassiveState {
+    loading: boolean;
+    error_message: string;
+}
+
+export default class TrainPassive extends React.Component<
+    TrainPassiveProps,
+    TrainPassiveState
+> {
+    constructor(props: TrainPassiveProps) {
         super(props);
 
         this.state = {
@@ -36,10 +62,10 @@ export default class TrainPassive extends React.Component<any, any> {
                                     loading: false,
                                 },
                                 () => {
-                                    this.props.manage_success_message(
+                                    this.props.manage_success_message?.(
                                         result.data.message,
                                     );
-                                    this.props.update_passives(
+                                    this.props.update_passives?.(
                                         result.data.kingdom_passives,
                                         result.data.passive_training,
                                     );
@@ -84,10 +110,10 @@ export default class TrainPassive extends React.Component<any, any> {
                                     loading: false,
                                 },
                                 () => {
-                                    this.props.manage_success_message(
+                                    this.props.manage_success_message?.(
                                         result.data.message,
                                     );
-                                    this.props.update_passives(
+                                    this.props.update_passives?.(
                                         result.data.kingdom_passives,
                                     );
                                     this.props.manage_modal();
@@ -110,7 +136,7 @@ export default class TrainPassive extends React.Component<any, any> {
 
     hasAnotherPassiveTraining() {
         return (
-            this.props.skill_in_training !== null &&
+            this.props.skill_in_training != null &&
             this.props.skill_in_training.id !== this.props.skill.id
         );
     }
@@ -134,28 +160,32 @@ export default class TrainPassive extends React.Component<any, any> {
                 handle_close={this.props.manage_modal}
                 title={this.props.skill.name}
                 primary_button_disabled={this.state.loading}
-                secondary_actions={{
-                    secondary_button_disabled: disableTrainingAction,
-                    secondary_button_label: this.isTraining()
-                        ? "Stop Training"
-                        : "Train",
-                    handle_action: this.isTraining()
-                        ? this.cancelTrainingSkill.bind(this)
-                        : this.trainSkill.bind(this),
-                }}
+                secondary_actions={
+                    this.props.read_only
+                        ? null
+                        : {
+                              secondary_button_disabled: disableTrainingAction,
+                              secondary_button_label: this.isTraining()
+                                  ? "Stop Training"
+                                  : "Train",
+                              handle_action: this.isTraining()
+                                  ? this.cancelTrainingSkill.bind(this)
+                                  : this.trainSkill.bind(this),
+                          }
+                }
             >
                 <p className="mt-4 mb-4">
                     {this.props.skill.passive_skill.description}
                 </p>
 
-                {this.props.is_dead ? (
+                {!this.props.read_only && this.props.is_dead ? (
                     <p className="mb-4 text-red-700 dark:text-red-500">
                         No no child! You dead! You ain't training nothing, till
                         you head to the Game tab and click revive.
                     </p>
                 ) : null}
 
-                {this.props.is_automation_running ? (
+                {!this.props.read_only && this.props.is_automation_running ? (
                     <p className="mb-4 text-orange-700 dark:text-orange-400">
                         {this.automationName()} automation is running. You can
                         inspect this passive, but you cannot train or stop
@@ -163,7 +193,7 @@ export default class TrainPassive extends React.Component<any, any> {
                     </p>
                 ) : null}
 
-                {this.hasAnotherPassiveTraining() ? (
+                {!this.props.read_only && this.hasAnotherPassiveTraining() ? (
                     <p className="mb-4 text-orange-700 dark:text-orange-400">
                         {this.props.skill_in_training.name} is already training.
                         Only one passive can train at a time.
@@ -205,22 +235,26 @@ export default class TrainPassive extends React.Component<any, any> {
                             <dd>{this.props.skill.hours_to_next}</dd>
                         </dl>
 
-                        <p className="mt-4 mb-4">
-                            <strong>Caution:</strong> Canceling this skill
-                            before it is done training, will result in you
-                            having to start the progress all over again.{" "}
-                            <strong>
-                                We do not take into account, time elapsed when
-                                canceling
-                            </strong>
-                            .
-                        </p>
+                        {!this.props.read_only ? (
+                            <p className="mt-4 mb-4">
+                                <strong>Caution:</strong> Canceling this skill
+                                before it is done training, will result in you
+                                having to start the progress all over again.{" "}
+                                <strong>
+                                    We do not take into account, time elapsed
+                                    when canceling
+                                </strong>
+                                .
+                            </p>
+                        ) : null}
                     </Fragment>
                 )}
 
-                {this.state.loading ? <LoadingProgressBar /> : null}
+                {!this.props.read_only && this.state.loading ? (
+                    <LoadingProgressBar />
+                ) : null}
 
-                {this.state.error_message !== "" ? (
+                {!this.props.read_only && this.state.error_message !== "" ? (
                     <DangerAlert additional_css={"mt-4"}>
                         {this.state.error_message}
                     </DangerAlert>

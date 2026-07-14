@@ -137,6 +137,11 @@ class DelveAutomationServiceTest extends TestCase
     {
         Queue::fake();
         Event::fake();
+        config([
+            'game_timers.development_cap.enabled' => true,
+            'game_timers.development_cap.environments' => ['testing'],
+            'game_timers.development_cap.max_seconds' => 60,
+        ]);
 
         $now = Carbon::parse('2026-01-01 12:00:00');
 

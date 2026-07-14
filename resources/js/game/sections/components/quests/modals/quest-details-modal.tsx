@@ -20,9 +20,13 @@ export default class QuestDetailsModal extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
 
+        const hasPreloadedQuestDetails = Boolean(props.preloaded_quest_details);
+
         this.state = {
-            quest_details: null,
-            loading: true,
+            quest_details: hasPreloadedQuestDetails
+                ? props.preloaded_quest_details
+                : null,
+            loading: !hasPreloadedQuestDetails,
             handing_in: false,
             success_message: null,
             error_message: null,
@@ -45,6 +49,10 @@ export default class QuestDetailsModal extends React.Component<any, any> {
     }
 
     componentDidMount() {
+        if (this.props.preloaded_quest_details) {
+            return;
+        }
+
         if (this.props.quest_id === null) {
             return;
         }
@@ -555,14 +563,18 @@ export default class QuestDetailsModal extends React.Component<any, any> {
             <Dialogue
                 is_open={this.props.is_open}
                 handle_close={this.props.handle_close}
-                secondary_actions={{
-                    secondary_button_disabled:
-                        !this.props.is_parent_complete ||
-                        this.props.is_quest_complete ||
-                        this.isAutomationRunning(),
-                    secondary_button_label: "Hand in",
-                    handle_action: this.handInQuest.bind(this),
-                }}
+                secondary_actions={
+                    this.props.read_only
+                        ? null
+                        : {
+                              secondary_button_disabled:
+                                  !this.props.is_parent_complete ||
+                                  this.props.is_quest_complete ||
+                                  this.isAutomationRunning(),
+                              secondary_button_label: "Hand in",
+                              handle_action: this.handInQuest.bind(this),
+                          }
+                }
                 title={this.buildTitle()}
                 large_modal={false}
             >
@@ -708,7 +720,8 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             </TabPanel>
                         </Tabs>
 
-                        {this.state.success_message !== null ? (
+                        {!this.props.read_only &&
+                        this.state.success_message !== null ? (
                             <div className="mb-4 mt-4">
                                 <SuccessAlert>
                                     {this.state.success_message}
@@ -716,7 +729,8 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             </div>
                         ) : null}
 
-                        {this.state.error_message !== null ? (
+                        {!this.props.read_only &&
+                        this.state.error_message !== null ? (
                             <div className="mb-4 mt-4">
                                 <DangerAlert>
                                     {this.state.error_message}
@@ -724,7 +738,9 @@ export default class QuestDetailsModal extends React.Component<any, any> {
                             </div>
                         ) : null}
 
-                        {this.state.handing_in ? <LoadingProgressBar /> : null}
+                        {!this.props.read_only && this.state.handing_in ? (
+                            <LoadingProgressBar />
+                        ) : null}
                     </Fragment>
                 )}
             </Dialogue>

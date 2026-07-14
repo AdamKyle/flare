@@ -7,19 +7,42 @@ import ComponentLoading from "../../../../components/ui/loading/component-loadin
 import ItemDetails from "./components/item-details";
 import InventoryQuestItemDetails from "./components/inventory-quest-item-details";
 import QuestItem from "../../../../components/modals/item-details/item-views/quest-item";
+import InventoryDetails from "../../../../lib/game/character-sheet/types/inventory/inventory-details";
 
-export default class InventoryUseDetails extends React.Component<any, any> {
-    constructor(props: any) {
+interface InventoryUseDetailsProps {
+    is_open: boolean;
+    manage_modal: () => void;
+    character_id: number;
+    item_id?: number;
+    slot_id?: number;
+    preloaded_item?: InventoryDetails;
+}
+
+interface InventoryUseDetailsState {
+    loading: boolean;
+    item: InventoryDetails | null;
+    error_message: string | null;
+}
+
+export default class InventoryUseDetails extends React.Component<
+    InventoryUseDetailsProps,
+    InventoryUseDetailsState
+> {
+    constructor(props: InventoryUseDetailsProps) {
         super(props);
 
         this.state = {
-            loading: true,
-            item: null,
+            loading: typeof props.preloaded_item === "undefined",
+            item: props.preloaded_item ?? null,
             error_message: null,
         };
     }
 
     componentDidMount() {
+        if (typeof this.props.preloaded_item !== "undefined") {
+            return;
+        }
+
         new Ajax()
             .setRoute(
                 "character/" +
@@ -110,6 +133,9 @@ export default class InventoryUseDetails extends React.Component<any, any> {
                                 <ItemDetails
                                     item={this.state.item}
                                     character_id={this.props.character_id}
+                                    preloaded_attached_gems={
+                                        this.props.preloaded_item?.sockets
+                                    }
                                 />
                             )}
                         </Fragment>

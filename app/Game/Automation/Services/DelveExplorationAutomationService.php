@@ -17,7 +17,6 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Core\Services\GameTimerService;
 use Illuminate\Support\Facades\Cache;
 
 class DelveExplorationAutomationService
@@ -29,7 +28,6 @@ class DelveExplorationAutomationService
 
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
-        private readonly GameTimerService $gameTimerService,
     ) {}
 
     public function beginAutomation(Character $character, Location $location, array $params)
@@ -50,7 +48,7 @@ class DelveExplorationAutomationService
             'monster_id' => $monsterId,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
-            'completed_at' => $this->gameTimerService->availableAtFromHours(8),
+            'completed_at' => now()->addHours(8),
             'attack_type' => $params['attack_type'],
         ]);
 

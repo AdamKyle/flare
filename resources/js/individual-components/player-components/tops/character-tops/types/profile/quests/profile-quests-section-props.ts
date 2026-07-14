@@ -1,5 +1,5 @@
-import TopsValue from "../../../../shared/types/tops-value";
+import { QuestProfile } from "../../character-profile";
 
 export default interface ProfileQuestsSectionProps {
-    quests?: Record<string, TopsValue>;
+    quests?: QuestProfile;
 }

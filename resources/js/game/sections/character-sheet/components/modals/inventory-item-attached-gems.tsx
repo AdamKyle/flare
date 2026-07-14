@@ -6,20 +6,39 @@ import LoadingProgressBar from "../../../../components/ui/progress-bars/loading-
 import GemBagSlotDetails from "../../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
 import BasicCard from "../../../../components/ui/cards/basic-card";
 
+interface InventoryItemAttachedGemsProps {
+    is_open: boolean;
+    manage_modal: () => void;
+    character_id: number;
+    item_id: number;
+    preloaded_attached_gems?: GemBagSlotDetails[];
+}
+
+interface InventoryItemAttachedGemsState {
+    loading: boolean;
+    attached_gems: GemBagSlotDetails[];
+    error_message: string | null;
+}
+
 export default class InventoryItemAttachedGems extends React.Component<
-    any,
-    any
+    InventoryItemAttachedGemsProps,
+    InventoryItemAttachedGemsState
 > {
-    constructor(props: any) {
+    constructor(props: InventoryItemAttachedGemsProps) {
         super(props);
 
         this.state = {
-            loading: true,
-            attached_gems: [],
+            loading: typeof props.preloaded_attached_gems === "undefined",
+            attached_gems: props.preloaded_attached_gems ?? [],
+            error_message: null,
         };
     }
 
     componentDidMount() {
+        if (typeof this.props.preloaded_attached_gems !== "undefined") {
+            return;
+        }
+
         new Ajax()
             .setRoute(
                 "socketed-gems/" +
@@ -36,7 +55,12 @@ export default class InventoryItemAttachedGems extends React.Component<
                     });
                 },
                 (error: AxiosError) => {
-                    console.error(error);
+                    this.setState({
+                        loading: false,
+                        error_message:
+                            error.response?.data?.message ??
+                            "Unable to load attached gems.",
+                    });
                 },
             );
     }
@@ -79,6 +103,10 @@ export default class InventoryItemAttachedGems extends React.Component<
             >
                 {this.state.loading ? (
                     <LoadingProgressBar />
+                ) : this.state.error_message !== null ? (
+                    <p className="my-4 text-red-500 dark:text-red-400">
+                        {this.state.error_message}
+                    </p>
                 ) : this.state.attached_gems.length > 0 ? (
                     <div className="max-h-[350px] overflow-y-scroll">
                         {this.renderGems()}

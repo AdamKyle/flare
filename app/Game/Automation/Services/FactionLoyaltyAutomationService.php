@@ -13,7 +13,6 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\AutomatedFactionLoyalty;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Log;
 
@@ -32,7 +31,6 @@ class FactionLoyaltyAutomationService
      */
     public function __construct(
         private readonly CharacterCacheData $characterCacheData,
-        private readonly GameTimerService $gameTimerService,
     ) {}
 
     /**
@@ -63,7 +61,7 @@ class FactionLoyaltyAutomationService
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
-            'completed_at' => $this->gameTimerService->availableAtFromHours(8),
+            'completed_at' => now()->addHours(8),
             'attack_type' => $attackType,
         ]);
 

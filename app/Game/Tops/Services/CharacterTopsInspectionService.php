@@ -5,12 +5,29 @@ namespace App\Game\Tops\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
-use App\Flare\Models\FactionLoyaltyAutomation;
+use App\Flare\Models\GameClassSpecial;
+use App\Flare\Models\GameSkill;
+use App\Flare\Models\GuideQuest;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
+use App\Flare\Models\Npc;
+use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
+use App\Flare\Models\Skill;
+use App\Flare\Models\TopsMonthlySnapshot;
+use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
+use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\CharacterStatDetailsTransformer;
+use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\SkillsTransformer;
+use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Core\Services\CharacterPassiveSkills;
+use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Tops\Services\Concerns\BuildsTopsResponses;
+use Carbon\Carbon;
 
 class CharacterTopsInspectionService
 {
@@ -20,6 +37,12 @@ class CharacterTopsInspectionService
         private readonly FactionLoyaltyTopsService $factionLoyaltyTopsService,
         private readonly KingdomTopsService $kingdomTopsService,
         private readonly CharacterStatDetailsTransformer $characterStatDetailsTransformer,
+        private readonly BasicSkillsTransformer $basicSkillsTransformer,
+        private readonly ItemTransformer $itemTransformer,
+        private readonly GuideQuestService $guideQuestService,
+        private readonly CharacterPassiveSkills $characterPassiveSkills,
+        private readonly SkillsTransformer $skillsTransformer,
+        private readonly CharacterGemsTransformer $characterGemsTransformer,
     ) {}
 
     public function overview(Character $character): array
@@ -205,34 +228,40 @@ class CharacterTopsInspectionService
                 'name' => $rank->gameClass?->name,
                 'description' => $rank->gameClass?->description,
             ],
+            'game_class' => [
+                'id' => $rank->gameClass?->id,
+                'name' => $rank->gameClass?->name,
+                'to_hit_stat' => $rank->gameClass?->to_hit_stat,
+                'accuracy_mod' => $rank->gameClass?->accuracy_mod,
+                'looting_mod' => $rank->gameClass?->looting_mod,
+            ],
             'requirements' => [
                 'required_xp' => $rank->required_xp,
             ],
             'weapon_masteries' => $rank->weaponMasteries->filter(fn ($mastery): bool => $mastery->level > 1)->map(fn ($mastery) => [
                 'id' => $mastery->id,
                 'name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
+                'mastery_name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
                 'weapon_type' => $mastery->weapon_type,
                 'current_xp' => $mastery->current_xp,
                 'required_xp' => $mastery->required_xp,
                 'level' => $mastery->level,
             ])->values()->all(),
+            'current_class_skills' => $character->skills
+                ->filter(fn ($skill): bool => $skill->level > 1 && $skill->baseSkill?->game_class_id === $rank->game_class_id)
+                ->map(fn ($skill): array => $this->basicSkillsTransformer->transform($skill))
+                ->values()
+                ->all(),
             'equipped_specialties' => $this->classSpecialtiesForClass($character, $rank->game_class_id, true),
             'unlocked_specialties' => $this->classSpecialtiesForClass($character, $rank->game_class_id, false),
         ])->values()->all();
 
         $meaningfulSkills = $character->skills->filter(fn ($skill): bool => $skill->level > 1 || $skill->xp > 0);
-        $craftingSkills = $meaningfulSkills->filter(fn ($skill): bool => $this->isCraftingSkillName($skill->baseSkill?->name));
-        $regularSkills = $meaningfulSkills->reject(fn ($skill): bool => $this->isCraftingSkillName($skill->baseSkill?->name));
+        $regularSkills = $meaningfulSkills->filter(fn ($skill): bool => (bool) $skill->baseSkill?->can_train);
+        $craftingSkills = $meaningfulSkills->reject(fn ($skill): bool => (bool) $skill->baseSkill?->can_train);
 
         return [
-            'regular_skills' => $regularSkills->map(fn ($skill) => [
-                'id' => $skill->id,
-                'name' => $skill->baseSkill?->name,
-                'level' => $skill->level,
-                'xp' => $skill->xp,
-                'xp_max' => $skill->xp_max,
-                'skill_type' => $skill->skill_type,
-            ])->values()->all(),
+            'regular_skills' => $regularSkills->map(fn ($skill) => $this->publicSkill($skill))->values()->all(),
             'passive_skills' => $character->passiveSkills->filter(fn ($skill): bool => $skill->current_level > 1)->map(fn ($skill) => [
                 'id' => $skill->passive_skill_id,
                 'name' => $skill->passiveSkill?->name,
@@ -251,21 +280,11 @@ class CharacterTopsInspectionService
                 'equipped' => $special->equipped,
                 'class_name' => $special->gameClassSpecial?->gameClass?->name,
             ])->values()->all(),
-            'crafting_skills' => $craftingSkills->map(fn ($skill) => [
-                'id' => $skill->id,
-                'name' => $skill->baseSkill?->name,
-                'level' => $skill->level,
-                'xp' => $skill->xp,
-                'xp_max' => $skill->xp_max,
-                'skill_type' => $skill->skill_type,
-            ])->values()->all(),
-            'kingdom_passives' => $character->passiveSkills->filter(fn ($skill): bool => $skill->current_level > 1)->map(fn ($skill) => [
-                'id' => $skill->passive_skill_id,
-                'name' => $skill->passiveSkill?->name,
-                'description' => $skill->passiveSkill?->description,
-                'current_level' => $skill->current_level,
-                'max_level' => $skill->passiveSkill?->max_level,
-            ])->values()->all(),
+            'crafting_skills' => $craftingSkills->map(fn ($skill) => $this->publicSkill($skill))->values()->all(),
+            'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character)
+                ->map(fn ($passive): array => $this->publicPassiveTree($passive))
+                ->values()
+                ->all(),
         ];
     }
 
@@ -287,113 +306,136 @@ class CharacterTopsInspectionService
 
     public function activity(Character $character): array
     {
-        $loginRows = UserLoginDuration::where('user_id', $character->user_id)->get();
+        $loginRows = UserLoginDuration::where('user_id', $character->user_id)->whereNotNull('logged_in_at')->get();
 
         return [
-            'last_login_at' => $loginRows->max('logged_in_at')?->toISOString(),
-            'last_activity_at' => $loginRows->max('last_activity')?->toISOString(),
-            'login_duration_7_days' => $this->loginDuration($loginRows, 7),
-            'login_duration_14_days' => $this->loginDuration($loginRows, 14),
-            'login_duration_30_days' => $this->loginDuration($loginRows, 30),
-            'login_count_7_days' => $this->loginCount($loginRows, 7),
-            'login_count_14_days' => $this->loginCount($loginRows, 14),
-            'login_count_30_days' => $this->loginCount($loginRows, 30),
-            'exploration_run_count' => ExplorationLog::where('character_id', $character->id)->count(),
-            'exploration_kills' => ExplorationLog::where('character_id', $character->id)->sum('kills'),
-            'delve_run_count' => DelveExploration::where('character_id', $character->id)->count(),
-            'delve_outcome_counts' => DelveExploration::where('character_id', $character->id)->pluck('ended_reason')->countBy()->all(),
-            'faction_loyalty_automation_count' => FactionLoyaltyAutomation::where('character_id', $character->id)->count(),
-            'latest_faction_loyalty_action' => FactionLoyaltyAutomation::where('character_id', $character->id)->latest('last_automation_action_at')->value('last_automation_action'),
-            'latest_faction_loyalty_outcome' => FactionLoyaltyAutomation::where('character_id', $character->id)->latest('last_automation_action_at')->value('last_fight_outcome'),
-            'quest_completion_count' => QuestsCompleted::where('character_id', $character->id)->whereNotNull('quest_id')->count(),
-            'guide_quest_completion_count' => QuestsCompleted::where('character_id', $character->id)->whereNotNull('guide_quest_id')->count(),
+            'login_count_chart' => $this->loginCountChart($character, $loginRows),
+            'login_duration_chart' => $this->loginDurationChart($character, $loginRows),
         ];
     }
 
-    public function quests(Character $character): array
+    public function quests(Character $character, ?User $viewer = null): array
     {
         $quests = QuestsCompleted::where('character_id', $character->id)->with(['quest.rewardItem', 'quest.requiredPlane', 'quest.factionMap', 'guideQuest'])->get();
+
+        $viewerCharacter = $viewer?->character;
+
+        $viewerCompletedQuestIds = is_null($viewerCharacter) ? [] : QuestsCompleted::where('character_id', $viewerCharacter->id)->whereNotNull('quest_id')->pluck('quest_id')->all();
+
+        $viewerCompletedGuideQuestIds = is_null($viewerCharacter) ? [] : QuestsCompleted::where('character_id', $viewerCharacter->id)->whereNotNull('guide_quest_id')->pluck('guide_quest_id')->all();
 
         return [
             'completed_quest_count' => $quests->whereNotNull('quest_id')->count(),
             'completed_guide_quest_count' => $quests->whereNotNull('guide_quest_id')->count(),
-            'completed_quests' => $quests->whereNotNull('quest_id')->map(fn ($quest) => $this->questDetails($quest))->values()->all(),
-            'completed_guide_quests' => $quests->whereNotNull('guide_quest_id')->map(fn ($quest) => $this->guideQuestDetails($quest))->values()->all(),
+            'completed_quests' => $quests->whereNotNull('quest_id')->map(fn ($quest) => $this->questDetails($quest, $viewerCharacter, $viewerCompletedQuestIds))->values()->all(),
+            'completed_guide_quests' => $quests->whereNotNull('guide_quest_id')->map(fn ($quest) => $this->guideQuestDetails($quest, $viewerCharacter, $viewerCompletedGuideQuestIds))->values()->all(),
             'completion_chart' => $this->questCompletionChart($quests),
+            'summary_chart' => $this->questSummaryChart($character, $quests),
         ];
     }
 
     public function kingdoms(Character $character): array
     {
         $kingdoms = $this->kingdomTopsService->detail($character);
-        $resourceTotals = $kingdoms['resource_totals'] ?? [];
 
         unset($kingdoms['map_distribution']);
 
-        $kingdoms['kingdom_summary_chart'] = $this->chartPayload('Kingdom Summary', 'count', [
-            ['label' => 'Kingdoms', 'value' => $kingdoms['kingdom_count'] ?? 0],
-            ['label' => 'Capitals', 'value' => $kingdoms['capital_count'] ?? 0],
-            ['label' => 'Treasury', 'value' => $kingdoms['total_treasury'] ?? 0],
-            ['label' => 'Gold Bars', 'value' => $kingdoms['total_gold_bars'] ?? 0],
-            ['label' => 'Population', 'value' => $kingdoms['population_total'] ?? 0],
-            ['label' => 'Morale', 'value' => $kingdoms['morale_average'] ?? 0],
-        ]);
-        $kingdoms['resource_totals_chart'] = $this->chartPayload('Resource Totals', 'resources', [
-            ['label' => 'Stone', 'value' => $resourceTotals['stone'] ?? 0],
-            ['label' => 'Wood', 'value' => $resourceTotals['wood'] ?? 0],
-            ['label' => 'Clay', 'value' => $resourceTotals['clay'] ?? 0],
-            ['label' => 'Iron', 'value' => $resourceTotals['iron'] ?? 0],
-            ['label' => 'Steel', 'value' => $resourceTotals['steel'] ?? 0],
-        ]);
-        $kingdoms['top_kingdoms_chart'] = [
-            'source' => 'kingdoms',
-            'unit' => 'value',
-            'series' => collect($kingdoms['kingdoms'] ?? [])->map(fn (array $kingdom): array => [
-                'label' => $kingdom['name'] ?? 'Kingdom',
-                'points' => [
-                    ['label' => 'Treasury', 'value' => (int) ($kingdom['treasury'] ?? 0)],
-                    ['label' => 'Gold Bars', 'value' => (int) ($kingdom['gold_bars'] ?? 0)],
-                    ['label' => 'Population', 'value' => (int) ($kingdom['current_population'] ?? 0)],
-                    ['label' => 'Morale', 'value' => (int) ($kingdom['current_morale'] ?? 0)],
-                ],
-            ])->values()->all(),
-        ];
+        $snapshots = TopsMonthlySnapshot::where('board_type', 'kingdoms')
+            ->where('character_id', $character->id)
+            ->orderBy('period_start')
+            ->get();
+
+        $kingdoms['kingdom_summary_chart'] = $this->kingdomSummarySnapshotChart($snapshots);
+        $kingdoms['kingdom_treasury_chart'] = $this->kingdomTreasurySnapshotChart($snapshots);
+        $kingdoms['kingdom_gold_bars_chart'] = $this->kingdomGoldBarsSnapshotChart($snapshots);
+        $kingdoms['resource_totals_chart'] = $this->kingdomResourceSnapshotChart($snapshots);
 
         return $kingdoms;
     }
 
     public function analytics(Character $character): array
     {
-        $summary = [
-            'exploration_kills' => ExplorationLog::where('character_id', $character->id)->sum('kills'),
-            'exploration_runs' => ExplorationLog::where('character_id', $character->id)->count(),
-            'delve_runs' => DelveExploration::where('character_id', $character->id)->count(),
-            'quests_completed' => QuestsCompleted::where('character_id', $character->id)->count(),
-        ];
+        $explorationLogs = ExplorationLog::where('character_id', $character->id)->whereNotNull('started_at')->get(['started_at', 'kills']);
+        $delveExplorations = DelveExploration::where('character_id', $character->id)->whereNotNull('started_at')->get(['started_at']);
+        $questsCompleted = QuestsCompleted::where('character_id', $character->id)->whereNotNull('created_at')->get(['created_at']);
+
+        $allDates = $explorationLogs->pluck('started_at')->merge($delveExplorations->pluck('started_at'))->merge($questsCompleted->pluck('created_at'));
+
+        if ($allDates->isEmpty()) {
+            return [
+                'analytics_kills_chart' => $this->emptyChart('exploration_logs.started_at', 'kills', ['Exploration Kills']),
+                'analytics_runs_chart' => $this->emptyChart('exploration_logs.started_at,delve_explorations.started_at,quests_completed.created_at', 'count', ['Exploration Runs', 'Delve Runs', 'Quests Completed']),
+            ];
+        }
+
+        $granularity = $this->chartGranularity($allDates->min(), $allDates->max());
 
         return [
-            'summary' => [
-                ...$summary,
+            'analytics_kills_chart' => [
+                'source' => 'exploration_logs.started_at',
+                'unit' => 'kills',
+                'granularity' => $granularity,
+                'series' => [
+                    ['label' => 'Exploration Kills', 'points' => $this->cumulativeSumPoints($explorationLogs, 'started_at', 'kills', $granularity)],
+                ],
             ],
-            'analytics_summary_chart' => $this->chartPayload('Analytics Summary', 'count', [
-                ['label' => 'Exploration Kills', 'value' => $summary['exploration_kills']],
-                ['label' => 'Exploration Runs', 'value' => $summary['exploration_runs']],
-                ['label' => 'Delve Runs', 'value' => $summary['delve_runs']],
-                ['label' => 'Quests Completed', 'value' => $summary['quests_completed']],
-            ]),
-            'tables' => [
-                'exploration_by_day' => ExplorationLog::where('character_id', $character->id)
-                    ->selectRaw('DATE(started_at) as date, SUM(kills) as kills, COUNT(*) as runs')
-                    ->groupByRaw('DATE(started_at)')
-                    ->orderBy('date')
-                    ->get()
-                    ->map(fn ($row) => ['date' => $row->date, 'kills' => (int) $row->kills, 'runs' => (int) $row->runs])
-                    ->all(),
+            'analytics_runs_chart' => [
+                'source' => 'exploration_logs.started_at,delve_explorations.started_at,quests_completed.created_at',
+                'unit' => 'count',
+                'granularity' => $granularity,
+                'series' => [
+                    ['label' => 'Exploration Runs', 'points' => $this->cumulativeCountPoints($explorationLogs, 'started_at', $granularity)],
+                    ['label' => 'Delve Runs', 'points' => $this->cumulativeCountPoints($delveExplorations, 'started_at', $granularity)],
+                    ['label' => 'Quests Completed', 'points' => $this->cumulativeCountPoints($questsCompleted, 'created_at', $granularity)],
+                ],
             ],
         ];
     }
 
-    public function fullProfile(Character $character): array
+    public function classRanksOffered(Character $character): array
+    {
+        $character->loadMissing(['classRanks.gameClass', 'classRanks.weaponMasteries', 'classSpecialsEquipped.gameClassSpecial', 'skills.baseSkill']);
+
+        return $character->classRanks->map(function ($rank) use ($character): array {
+            $classId = $rank->game_class_id;
+
+            $unlockedSpecialtyIds = $character->classSpecialsEquipped
+                ->filter(fn ($special): bool => $special->level > 1 && $special->gameClassSpecial?->game_class_id === $classId)
+                ->pluck('game_class_special_id')
+                ->all();
+            $leveledSkillIds = $character->skills
+                ->filter(fn ($skill): bool => $skill->level > 1 && $skill->baseSkill?->game_class_id === $classId)
+                ->pluck('game_skill_id')
+                ->all();
+
+            return [
+                'class_id' => $classId,
+                'class_name' => $rank->gameClass?->name,
+                'offered_game_skills' => GameSkill::where('game_class_id', $classId)->whereNotIn('id', $leveledSkillIds)->get()->map(fn (GameSkill $gameSkill): array => [
+                    'id' => $gameSkill->id,
+                    'name' => $gameSkill->name,
+                    'description' => $gameSkill->description,
+                    'max_level' => $gameSkill->max_level,
+                ])->values()->all(),
+                'remaining_weapon_masteries' => $rank->weaponMasteries->filter(fn ($mastery): bool => $mastery->level <= 1)->map(fn ($mastery): array => [
+                    'id' => $mastery->id,
+                    'name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
+                    'weapon_type' => $mastery->weapon_type,
+                    'current_xp' => $mastery->current_xp,
+                    'required_xp' => $mastery->required_xp,
+                    'level' => $mastery->level,
+                ])->values()->all(),
+                'remaining_specialties' => GameClassSpecial::where('game_class_id', $classId)->get()->reject(fn (GameClassSpecial $special): bool => in_array($special->id, $unlockedSpecialtyIds, true))->map(fn (GameClassSpecial $special): array => [
+                    'id' => $special->id,
+                    'name' => $special->name,
+                    'description' => $special->description,
+                    'requires_class_rank_level' => $special->requires_class_rank_level,
+                ])->values()->all(),
+            ];
+        })->values()->all();
+    }
+
+    public function fullProfile(Character $character, ?User $viewer = null): array
     {
         $overview = $this->overview($character);
         $stats = $this->stats($character);
@@ -411,10 +453,11 @@ class CharacterTopsInspectionService
             'crafting_skills' => $skills['crafting_skills'],
             'kingdom_passives' => $skills['kingdom_passives'],
             'class_ranks' => $skills['class_ranks'],
+            'class_ranks_offered' => $this->classRanksOffered($character),
             'factions' => $this->factions($character),
             'reincarnation' => $reincarnation,
             'activity' => $this->activity($character),
-            'quests' => $this->quests($character),
+            'quests' => $this->quests($character, $viewer),
             'kingdoms' => $this->kingdoms($character),
             'analytics' => $this->analytics($character),
         ];
@@ -467,182 +510,276 @@ class CharacterTopsInspectionService
         ];
     }
 
-    private function equipmentItem(?string $position, $item, ?int $slotId = null): array
+    private function equipmentItem(?string $position, ?Item $item, ?int $slotId = null): array
     {
-        $attachedAffixesCount = (int) (! is_null($item?->itemPrefix)) + (int) (! is_null($item?->itemSuffix));
-        $socketAmount = (int) ($item?->socket_count ?? $item?->sockets?->count() ?? 0);
+        if (is_null($item)) {
+            return [
+                'position' => $position,
+                'slot_id' => $slotId,
+                'item_id' => null,
+                'item_name' => null,
+            ];
+        }
+
+        $transformedItem = $this->itemTransformer->transform($item);
+        $transformedItem['sockets'] = $item->sockets
+            ->filter(fn ($socket): bool => ! is_null($socket->gem))
+            ->map(fn ($socket): array => $this->characterGemsTransformer->transform($socket->gem))
+            ->values()
+            ->all();
 
         return [
+            ...$transformedItem,
             'position' => $position,
-            'id' => $item?->id,
-            'item_id' => $item?->id,
             'slot_id' => $slotId,
-            'item_name' => $item?->affix_name,
-            'name' => $item?->affix_name,
-            'type' => $item?->type,
-            'description' => $item?->description,
-            'is_unique' => (bool) $item?->is_unique,
-            'is_mythic' => (bool) $item?->is_mythic,
-            'is_cosmic' => (bool) $item?->is_cosmic,
-            'attached_affixes_count' => $attachedAffixesCount,
-            'affix_count' => $attachedAffixesCount,
-            'has_holy_stacks_applied' => (int) ($item?->holy_stacks ?? 0) > 0,
-            'attack' => $item?->base_damage,
-            'healing' => $item?->base_healing,
-            'ac' => $item?->base_ac,
-            'item_atonements' => [
-                'atonements' => [],
-                'elemental_damage' => [
-                    'name' => 'None',
-                    'amount' => 0,
-                ],
-            ],
-            'str_modifier' => $item?->str_mod ?? 0,
-            'dex_modifier' => $item?->dex_mod ?? 0,
-            'agi_modifier' => $item?->agi_mod ?? 0,
-            'chr_modifier' => $item?->chr_mod ?? 0,
-            'dur_modifier' => $item?->dur_mod ?? 0,
-            'int_modifier' => $item?->int_mod ?? 0,
-            'focus_modifier' => $item?->focus_mod ?? 0,
-            'base_damage' => $item?->base_damage ?? 0,
-            'base_ac' => $item?->base_ac ?? 0,
-            'base_healing' => $item?->base_healing ?? 0,
-            'base_damage_mod' => $item?->base_damage_mod ?? 0,
-            'base_ac_mod' => $item?->base_ac_mod ?? 0,
-            'base_healing_mod' => $item?->base_healing_mod ?? 0,
-            'skill_name' => $item?->skill_name,
-            'skill_bonus' => $item?->skill_bonus ?? 0,
-            'skill_training_bonus' => $item?->skill_training_bonus ?? 0,
-            'spell_evasion' => $item?->spell_evasion ?? 0,
-            'healing_reduction' => $item?->healing_reduction ?? 0,
-            'affix_damage_reduction' => $item?->affix_damage_reduction ?? 0,
-            'devouring_light' => $item?->devouring_light ?? 0,
-            'devouring_darkness' => $item?->devouring_darkness ?? 0,
-            'ambush_chance' => $item?->ambush_chance ?? 0,
-            'ambush_resistance' => $item?->ambush_resistance ?? 0,
-            'counter_chance' => $item?->counter_chance ?? 0,
-            'counter_resistance' => $item?->counter_resistance ?? 0,
-            'socket_amount' => $socketAmount,
-            'holy_stack_count' => $item?->holy_stacks ?? 0,
-            'holy_stacks_applied' => $item?->holy_stacks ?? 0,
-            'holy_stack_stat_bonus' => 0,
-            'resurrection_chance' => $item?->resurrection_chance ?? 0,
-            'applied_stacks' => [],
-            'gem_slots' => $socketAmount,
-            'stat_modifiers' => [
-                'str' => $item?->str_mod,
-                'dur' => $item?->dur_mod,
-                'dex' => $item?->dex_mod,
-                'chr' => $item?->chr_mod,
-                'int' => $item?->int_mod,
-                'agi' => $item?->agi_mod,
-                'focus' => $item?->focus_mod,
-            ],
-            'prefix' => $item?->itemPrefix ? [
-                'name' => $item->itemPrefix->name,
-                'description' => $item->itemPrefix->description,
-            ] : null,
-            'item_prefix' => $this->affixDetails($item?->itemPrefix),
-            'suffix' => $item?->itemSuffix ? [
-                'name' => $item->itemSuffix->name,
-                'description' => $item->itemSuffix->description,
-            ] : null,
-            'item_suffix' => $this->affixDetails($item?->itemSuffix),
-            'holy_stacks' => $item?->holy_stacks,
-            'sockets' => $item?->sockets?->map(fn ($socket) => [
-                'gem_name' => $socket->gem?->name,
-                'gem_type' => $socket->gem?->gem_type,
-                'tier' => $socket->gem?->tier,
-            ])->values()->all() ?? [],
-            'attached_gems' => $item?->sockets?->map(fn ($socket) => ['name' => $socket->gem?->name])->values()->all() ?? [],
-            'item_skill' => $item?->itemSkill ? [
-                'name' => $item->itemSkill->name,
-                'description' => $item->itemSkill->description,
-            ] : null,
-            'item_skills' => $item?->itemSkill ? [[
-                'name' => $item->itemSkill->name,
-                'description' => $item->itemSkill->description,
-            ]] : [],
-            'item_skill_progressions' => [],
-            'usable' => (bool) $item?->usable,
+            'item_id' => $item->id,
+            'item_name' => $item->affix_name,
         ];
     }
 
-    private function affixDetails($affix): ?array
+    private function publicSkill(Skill $skill): array
     {
-        if (is_null($affix)) {
+        $details = $this->skillsTransformer->transform($skill);
+        unset($details['character_id']);
+
+        return [
+            ...$this->basicSkillsTransformer->transform($skill),
+            'details' => $details,
+        ];
+    }
+
+    private function questDetails(QuestsCompleted $questCompletion, ?Character $viewerCharacter, array $viewerCompletedQuestIds): array
+    {
+        $quest = $questCompletion->quest;
+
+        if (is_null($quest)) {
+            return [
+                'id' => $questCompletion->quest_id,
+                'name' => null,
+                'completed_at' => $questCompletion->created_at?->toISOString(),
+                'inspected_character_completed' => true,
+                'parent_quest_id' => null,
+                'required_quest_id' => null,
+                'required_quest_chain_details' => null,
+                'viewer_has_completed' => false,
+                'viewer_parent_complete' => false,
+                'viewer_required_quest_complete' => false,
+                'viewer_required_quest_chain_complete' => false,
+                'viewer_completed_quest_ids' => [],
+                'details' => null,
+            ];
+        }
+
+        $chainDetails = $quest->required_quest_chain_details;
+
+        $viewerHasCompleted = ! is_null($viewerCharacter) && in_array($questCompletion->quest_id, $viewerCompletedQuestIds, true);
+        $viewerParentComplete = ! is_null($viewerCharacter) && ((bool) $quest->is_parent || in_array($quest->parent_quest_id, $viewerCompletedQuestIds, true));
+        $viewerRequiredQuestComplete = ! is_null($viewerCharacter) && (is_null($quest->required_quest_id) || in_array($quest->required_quest_id, $viewerCompletedQuestIds, true));
+        $viewerRequiredQuestChainComplete = ! is_null($viewerCharacter) && (is_null($chainDetails) || collect($chainDetails['quest_ids'])->every(fn (int $chainQuestId): bool => in_array($chainQuestId, $viewerCompletedQuestIds, true)));
+
+        return [
+            'id' => $questCompletion->quest_id,
+            'name' => $quest->name,
+            'completed_at' => $questCompletion->created_at?->toISOString(),
+            'inspected_character_completed' => true,
+            'parent_quest_id' => $quest->parent_quest_id,
+            'required_quest_id' => $quest->required_quest_id,
+            'required_quest_chain_details' => $chainDetails,
+            'viewer_has_completed' => $viewerHasCompleted,
+            'viewer_parent_complete' => $viewerParentComplete,
+            'viewer_required_quest_complete' => $viewerRequiredQuestComplete,
+            'viewer_required_quest_chain_complete' => $viewerRequiredQuestChainComplete,
+            'viewer_completed_quest_ids' => is_null($viewerCharacter) ? [] : $viewerCompletedQuestIds,
+            'details' => $this->questDetailPayload($quest),
+        ];
+    }
+
+    private function questDetailPayload(Quest $quest): array
+    {
+        $quest->loadRelations();
+
+        return [
+            'id' => $quest->id,
+            'name' => $quest->name,
+            'before_completion_description' => $quest->before_completion_description,
+            'after_completion_description' => $quest->after_completion_description,
+            'gold_cost' => $quest->gold_cost,
+            'gold_dust_cost' => $quest->gold_dust_cost,
+            'shard_cost' => $quest->shard_cost,
+            'copper_coin_cost' => $quest->copper_coin_cost,
+            'reincarnated_times' => $quest->reincarnated_times,
+            'access_to_map_id' => $quest->access_to_map_id,
+            'faction_game_map_id' => $quest->faction_game_map_id,
+            'required_faction_level' => $quest->required_faction_level,
+            'required_quest_id' => $quest->required_quest_id,
+            'assisting_npc_id' => $quest->assisting_npc_id,
+            'required_fame_level' => $quest->required_fame_level,
+            'reward_xp' => $quest->reward_xp,
+            'reward_gold' => $quest->reward_gold,
+            'reward_gold_dust' => $quest->reward_gold_dust,
+            'reward_shards' => $quest->reward_shards,
+            'unlocks_skill' => $quest->unlocks_skill,
+            'unlocks_skill_name' => $quest->unlocks_skill
+                ? SkillTypeValue::tryFrom($quest->unlocks_skill_type)?->getNamedValue()
+                : 'N/A',
+            'feature_to_unlock_name' => is_null($quest->unlocks_feature)
+                ? null
+                : $quest->unlocksFeature()?->getNameOfFeature(),
+            'unlocks_passive_name' => $quest->unlocks_passive_name,
+            'npc' => $this->publicQuestNpc($quest->npc),
+            'item' => $this->publicQuestItem($quest->item),
+            'secondary_item' => $this->publicQuestItem($quest->secondaryItem),
+            'required_plane' => $this->publicQuestMap($quest->requiredPlane),
+            'faction_map' => $this->publicQuestMap($quest->factionMap),
+            'faction_loyalty_npc' => $this->publicQuestNpc($quest->factionLoyaltyNpc),
+            'required_quest' => $this->publicRequiredQuest($quest->requiredQuest),
+            'reward_item' => is_null($quest->rewardItem) ? null : [
+                'id' => $quest->rewardItem->id,
+                'name' => $quest->rewardItem->name,
+            ],
+        ];
+    }
+
+    private function publicRequiredQuest(?Quest $quest): ?array
+    {
+        if (is_null($quest)) {
             return null;
         }
 
         return [
-            'id' => $affix->id,
-            'name' => $affix->name,
-            'description' => $affix->description,
-            'str_mod' => $affix->str_mod ?? 0,
-            'dex_mod' => $affix->dex_mod ?? 0,
-            'agi_mod' => $affix->agi_mod ?? 0,
-            'chr_mod' => $affix->chr_mod ?? 0,
-            'dur_mod' => $affix->dur_mod ?? 0,
-            'int_mod' => $affix->int_mod ?? 0,
-            'focus_mod' => $affix->focus_mod ?? 0,
+            'id' => $quest->id,
+            'name' => $quest->name,
+            'raid_id' => $quest->raid_id,
+            'belongs_to_map_name' => $quest->belongs_to_map_name,
+            'npc' => $this->publicQuestNpc($quest->npc),
+            'raid' => is_null($quest->raid) ? null : [
+                'id' => $quest->raid->id,
+                'name' => $quest->raid->name,
+            ],
         ];
     }
 
-    private function questDetails(QuestsCompleted $questCompletion): array
+    private function publicQuestNpc(?Npc $npc): ?array
     {
-        $quest = $questCompletion->quest;
+        if (is_null($npc)) {
+            return null;
+        }
 
         return [
-            'id' => $questCompletion->quest_id,
-            'name' => $quest?->name,
-            'before_completion_description' => $quest?->before_completion_description,
-            'after_completion_description' => $quest?->after_completion_description,
-            'reincarnated_times' => $quest?->reincarnated_times,
-            'required_faction_level' => $quest?->required_faction_level,
-            'required_fame_level' => $quest?->required_fame_level,
-            'access_to_map_id' => $quest?->access_to_map_id,
-            'plane' => $quest?->requiredPlane?->name,
-            'faction_plane' => $quest?->factionMap?->name,
-            'only_for_event' => $quest?->only_for_event,
-            'rewards' => [
-                'gold' => $quest?->reward_gold ?? 0,
-                'gold_dust' => $quest?->reward_gold_dust ?? 0,
-                'shards' => $quest?->reward_shards ?? 0,
-                'copper_coins' => 0,
-                'xp' => $quest?->reward_xp ?? 0,
-                'item_name' => $quest?->rewardItem?->affix_name,
-            ],
-            'completed_at' => $questCompletion->created_at?->toISOString(),
+            'id' => $npc->id,
+            'real_name' => $npc->real_name,
+            'x_position' => $npc->x_position,
+            'y_position' => $npc->y_position,
+            'must_be_at_same_location' => $npc->must_be_at_same_location,
+            'game_map' => $this->publicQuestMap($npc->gameMap),
         ];
     }
 
-    private function guideQuestDetails(QuestsCompleted $questCompletion): array
+    private function publicQuestMap(?GameMap $gameMap, int $depth = 0): ?array
+    {
+        if (is_null($gameMap)) {
+            return null;
+        }
+
+        $requiredItem = $depth >= 4 ? null : $gameMap->map_required_item;
+
+        return [
+            'id' => $gameMap->id,
+            'name' => $gameMap->name,
+            'map_required_item' => $this->publicQuestItem($requiredItem, $depth + 1),
+        ];
+    }
+
+    private function publicQuestItem(?Item $item, int $depth = 0): ?array
+    {
+        if (is_null($item)) {
+            return null;
+        }
+
+        $requiredQuest = $item->required_quest;
+        $requiredMonster = $item->required_monster;
+        $dropLocation = $item->dropLocation;
+
+        return [
+            'id' => $item->id,
+            'name' => $item->name,
+            'drop_location_id' => $item->drop_location_id,
+            'required_quest' => $depth >= 4 || is_null($requiredQuest) ? null : $this->publicRequiredQuest($requiredQuest),
+            'required_monster' => is_null($requiredMonster) ? null : [
+                'name' => $requiredMonster->name,
+                'is_celestial_entity' => (bool) $requiredMonster->is_celestial_entity,
+                'is_raid_boss' => (bool) $requiredMonster->is_raid_boss,
+                'is_raid_monster' => (bool) $requiredMonster->is_raid_monster,
+                'game_map' => $this->publicQuestMap($requiredMonster->gameMap, $depth + 1),
+            ],
+            'drop_location' => is_null($dropLocation) ? null : [
+                'name' => $dropLocation->name,
+                'x' => $dropLocation->x,
+                'y' => $dropLocation->y,
+                'hours_to_drop' => $dropLocation->hours_to_drop,
+                'delve_enemy_strength_increase' => $dropLocation->delve_enemy_strength_increase,
+                'map' => $this->publicQuestMap($dropLocation->map, $depth + 1),
+            ],
+            'locations' => collect($item->locations)->map(fn ($location): array => [
+                'id' => $location->id,
+                'name' => $location->name,
+                'x' => $location->x,
+                'y' => $location->y,
+                'map' => $this->publicQuestMap($location->map, $depth + 1),
+            ])->values()->all(),
+            'drop_sources' => collect($item->drop_sources)->map(fn (array $source): array => [
+                'source_type' => $source['source_type'] ?? null,
+                'monster_name' => $source['monster_name'] ?? null,
+                'map_name' => $source['map_name'] ?? null,
+                'location_name' => $source['location_name'] ?? null,
+                'location_x' => $source['location_x'] ?? null,
+                'location_y' => $source['location_y'] ?? null,
+                'location_map' => $source['location_map'] ?? null,
+            ])->values()->all(),
+        ];
+    }
+
+    private function guideQuestDetails(QuestsCompleted $questCompletion, ?Character $viewerCharacter, array $viewerCompletedGuideQuestIds): array
     {
         $quest = $questCompletion->guideQuest;
 
+        $viewerHasCompleted = ! is_null($viewerCharacter) && in_array($questCompletion->guide_quest_id, $viewerCompletedGuideQuestIds, true);
+
+        $viewerHasUnlocked = false;
+
+        if (! is_null($viewerCharacter) && ! is_null($quest)) {
+            $viewerHasUnlocked = collect($this->guideQuestService->getCurrentQuestsForCharacter($viewerCharacter))
+                ->contains(fn (GuideQuest $currentQuest): bool => $currentQuest->id === $quest->id);
+        }
+
+        $details = is_null($quest) ? [] : $quest->only([
+            'id', 'name', 'intro_text', 'instructions', 'desktop_instructions', 'mobile_instructions',
+            'required_level', 'required_reincarnation_amount', 'required_skill', 'required_skill_level',
+            'required_secondary_skill', 'required_secondary_skill_level', 'required_faction_id', 'required_faction_level',
+            'required_game_map_id', 'required_quest_id', 'required_quest_item_id', 'secondary_quest_item_id',
+            'required_kingdoms', 'required_kingdom_level', 'required_kingdom_units', 'required_kingdom_building_id',
+            'required_kingdom_building_level', 'required_passive_skill', 'required_passive_level', 'required_skill_type',
+            'required_skill_type_level', 'required_class_specials_equipped', 'required_class_rank_level', 'required_gold',
+            'required_gold_dust', 'required_shards', 'required_copper_coins', 'required_gold_bars', 'required_stats',
+            'required_str', 'required_dex', 'required_int', 'required_dur', 'required_chr', 'required_agi', 'required_focus',
+            'faction_points_per_kill', 'gold_dust_reward', 'shards_reward', 'gold_reward', 'xp_reward', 'unlock_at_level',
+            'only_during_event', 'be_on_game_map', 'required_event_goal_participation',
+            'required_event_goal_crafting_participation', 'required_event_goal_enchanting_participation',
+            'required_holy_stacks', 'required_attached_gems', 'required_specialty_type', 'must_be_pledged_to_faction',
+            'must_be_assisting_npc', 'required_fame_level', 'required_delve_survival_time', 'required_delve_pack_size',
+            'required_batch_crafting_type', 'required_batch_crafting_hours', 'required_batch_crafted_items',
+            'skill_name', 'faction_name', 'game_map_name', 'quest_name', 'quest_item_name', 'secondary_quest_item_name',
+            'passive_name', 'secondary_skill_name', 'skill_type_name', 'kingdom_building_name', 'parent_quest_name',
+            'required_to_be_on_game_map_name', 'required_batch_crafting_type_name', 'required_batch_crafted_item_names',
+        ]);
+
         return [
+            ...$details,
             'id' => $questCompletion->guide_quest_id,
-            'name' => $quest?->name,
-            'intro_text' => $quest?->intro_text,
-            'instructions' => $quest?->instructions,
-            'desktop_instructions' => $quest?->desktop_instructions,
-            'mobile_instructions' => $quest?->mobile_instructions,
-            'requirements' => [
-                'required_level' => $quest?->required_level,
-                'required_reincarnation_amount' => $quest?->required_reincarnation_amount,
-                'required_skill_level' => $quest?->required_skill_level,
-                'required_faction_level' => $quest?->required_faction_level,
-                'required_kingdoms' => $quest?->required_kingdoms,
-                'required_class_rank_level' => $quest?->required_class_rank_level,
-                'required_fame_level' => $quest?->required_fame_level,
-            ],
-            'rewards' => [
-                'gold' => $quest?->gold_reward ?? 0,
-                'gold_dust' => $quest?->gold_dust_reward ?? 0,
-                'shards' => $quest?->shards_reward ?? 0,
-                'xp' => $quest?->xp_reward ?? 0,
-            ],
             'completed_at' => $questCompletion->created_at?->toISOString(),
+            'inspected_character_completed' => true,
+            'viewer_has_completed' => $viewerHasCompleted,
+            'viewer_has_unlocked' => $viewerHasUnlocked,
         ];
     }
 
@@ -651,27 +788,10 @@ class CharacterTopsInspectionService
         $datedQuests = $quests->filter(fn (QuestsCompleted $quest): bool => ! is_null($quest->created_at));
 
         if ($datedQuests->isEmpty()) {
-            return [
-                'source' => 'quests_completed.created_at',
-                'unit' => 'completions',
-                'granularity' => null,
-                'series' => [
-                    ['label' => 'Quests', 'points' => []],
-                    ['label' => 'Guide Quests', 'points' => []],
-                ],
-            ];
+            return $this->emptyChart('quests_completed.created_at', 'completions', ['Quests', 'Guide Quests']);
         }
 
-        $oldest = $datedQuests->min('created_at');
-        $newest = $datedQuests->max('created_at');
-        $rangeDays = max(1, $oldest->diffInDays($newest) + 1);
-        $granularity = match (true) {
-            $oldest->diffInHours($newest) <= 48 => 'hours',
-            $rangeDays <= 90 => 'days',
-            $rangeDays <= 365 => 'weeks',
-            $rangeDays <= 1095 => 'months',
-            default => 'years',
-        };
+        $granularity = $this->chartGranularity($datedQuests->min('created_at'), $datedQuests->max('created_at'));
 
         return [
             'source' => 'quests_completed.created_at',
@@ -680,81 +800,348 @@ class CharacterTopsInspectionService
             'series' => [
                 [
                     'label' => 'Quests',
-                    'points' => $this->questCompletionPoints($datedQuests->whereNotNull('quest_id'), $granularity),
+                    'points' => $this->cumulativeCountPoints($datedQuests->whereNotNull('quest_id'), 'created_at', $granularity),
                 ],
                 [
                     'label' => 'Guide Quests',
-                    'points' => $this->questCompletionPoints($datedQuests->whereNotNull('guide_quest_id'), $granularity),
+                    'points' => $this->cumulativeCountPoints($datedQuests->whereNotNull('guide_quest_id'), 'created_at', $granularity),
                 ],
             ],
         ];
     }
 
-    private function questCompletionPoints($quests, string $granularity): array
+    private function questSummaryChart(Character $character, $quests): array
     {
-        return $quests
-            ->groupBy(fn (QuestsCompleted $quest): string => match ($granularity) {
-                'hours' => $quest->created_at->copy()->startOfHour()->toISOString(),
-                'days' => $quest->created_at->copy()->startOfDay()->toISOString(),
-                'weeks' => $quest->created_at->copy()->startOfWeek()->toISOString(),
-                'months' => $quest->created_at->copy()->startOfMonth()->toISOString(),
-                default => $quest->created_at->copy()->startOfYear()->toISOString(),
-            })
-            ->map(fn ($rows, string $date): array => [
-                'label' => match ($granularity) {
-                    'hours' => $rows->first()->created_at->copy()->startOfHour()->format('Y-m-d H:00'),
-                    'days' => $rows->first()->created_at->format('Y-m-d'),
-                    'weeks' => $rows->first()->created_at->copy()->startOfWeek()->format('Y-m-d'),
-                    'months' => $rows->first()->created_at->format('Y-m'),
-                    default => $rows->first()->created_at->format('Y'),
-                },
-                'date' => $date,
-                'value' => $rows->count(),
-            ])
-            ->values()
-            ->all();
+        $inspectedDates = $quests->filter(fn (QuestsCompleted $quest): bool => ! is_null($quest->created_at))->pluck('created_at');
+
+        $otherCompletions = QuestsCompleted::where('character_id', '!=', $character->id)
+            ->whereNotNull('created_at')
+            ->get(['character_id', 'created_at']);
+
+        $inspectedLabel = $character->name.' Completed Quests';
+        $othersLabel = 'Average Completed Quests For Everyone Else';
+
+        $allDates = $inspectedDates->merge($otherCompletions->pluck('created_at'));
+
+        if ($allDates->isEmpty()) {
+            return $this->emptyChart('quests_completed.created_at,characters.created_at', 'completions', [$inspectedLabel, $othersLabel]);
+        }
+
+        $granularity = $this->chartGranularity($allDates->min(), $allDates->max());
+        $buckets = $this->bucketSequence($allDates->min(), $allDates->max(), $granularity);
+
+        $otherCharacters = Character::where('id', '!=', $character->id)->get(['id', 'created_at']);
+
+        $inspectedSorted = $inspectedDates->sort()->values();
+        $inspectedIndex = 0;
+        $inspectedCount = $inspectedSorted->count();
+        $inspectedCumulative = 0;
+
+        $inspectedPoints = [];
+        $averagePoints = [];
+
+        foreach ($buckets as $bucketStart) {
+            $bucketEnd = $this->bucketEnd($bucketStart, $granularity);
+
+            while ($inspectedIndex < $inspectedCount && $inspectedSorted[$inspectedIndex]->lte($bucketEnd)) {
+                $inspectedCumulative++;
+                $inspectedIndex++;
+            }
+
+            $inspectedPoints[] = [
+                'label' => $this->bucketLabel($bucketStart, $granularity),
+                'date' => $bucketStart->toISOString(),
+                'value' => $inspectedCumulative,
+            ];
+
+            $eligibleCharacterCount = $otherCharacters->filter(fn ($otherCharacter): bool => ! is_null($otherCharacter->created_at) && $otherCharacter->created_at->lte($bucketEnd))->count();
+            $totalOtherCompletions = $otherCompletions->filter(fn ($completion) => $completion->created_at->lte($bucketEnd))->count();
+
+            $averagePoints[] = [
+                'label' => $this->bucketLabel($bucketStart, $granularity),
+                'date' => $bucketStart->toISOString(),
+                'value' => $eligibleCharacterCount > 0 ? round($totalOtherCompletions / $eligibleCharacterCount, 2) : 0.0,
+            ];
+        }
+
+        return [
+            'source' => 'quests_completed.created_at,characters.created_at',
+            'unit' => 'completions',
+            'granularity' => $granularity,
+            'series' => [
+                ['label' => $inspectedLabel, 'points' => $inspectedPoints],
+                ['label' => $othersLabel, 'points' => $averagePoints],
+            ],
+        ];
     }
 
-    private function chartPayload(string $source, string $unit, array $points): array
+    private function kingdomSummarySnapshotChart($snapshots): array
+    {
+        return [
+            'source' => 'tops_monthly_snapshots.kingdoms',
+            'unit' => 'count',
+            'series' => [
+                ['label' => 'Kingdom Count', 'points' => $this->kingdomSnapshotSeries($snapshots, 'kingdom_count')],
+                ['label' => 'Capital Count', 'points' => $this->kingdomSnapshotSeries($snapshots, 'capital_count')],
+                ['label' => 'Population', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_population')],
+            ],
+        ];
+    }
+
+    private function kingdomTreasurySnapshotChart($snapshots): array
+    {
+        return [
+            'source' => 'tops_monthly_snapshots.kingdoms',
+            'unit' => 'gold',
+            'series' => [
+                ['label' => 'Treasury', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_treasury')],
+            ],
+        ];
+    }
+
+    private function kingdomGoldBarsSnapshotChart($snapshots): array
+    {
+        return [
+            'source' => 'tops_monthly_snapshots.kingdoms',
+            'unit' => 'gold bars',
+            'series' => [
+                ['label' => 'Gold Bars', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_gold_bars')],
+            ],
+        ];
+    }
+
+    private function publicPassiveTree($passive): array
+    {
+        return [
+            'id' => $passive->passive_skill_id,
+            'parent_skill_id' => $passive->parent_skill_id,
+            'name' => $passive->name,
+            'current_level' => $passive->current_level,
+            'max_level' => $passive->max_level,
+            'hours_to_next' => $passive->hours_to_next,
+            'is_locked' => (bool) $passive->is_locked,
+            'quest_name' => $passive->quest_name,
+            'is_quest_complete' => (bool) $passive->is_quest_complete,
+            'passive_skill' => [
+                'description' => $passive->passiveSkill?->description,
+                'unlocks_at_level' => $passive->passiveSkill?->unlocks_at_level,
+            ],
+            'children' => $passive->children->map(fn ($child): array => $this->publicPassiveTree($child))->values()->all(),
+        ];
+    }
+
+    private function kingdomResourceSnapshotChart($snapshots): array
+    {
+        return [
+            'source' => 'tops_monthly_snapshots.kingdoms',
+            'unit' => 'resources',
+            'series' => [
+                ['label' => 'Stone', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_stone')],
+                ['label' => 'Wood', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_wood')],
+                ['label' => 'Clay', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_clay')],
+                ['label' => 'Iron', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_iron')],
+                ['label' => 'Steel', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_steel')],
+            ],
+        ];
+    }
+
+    private function kingdomSnapshotSeries($snapshots, string $key): array
+    {
+        return $snapshots->map(fn (TopsMonthlySnapshot $snapshot): array => [
+            'label' => $snapshot->period_start->format('Y-m'),
+            'date' => $snapshot->period_start->toISOString(),
+            'value' => (int) ($snapshot->snapshot_data[$key] ?? 0),
+        ])->values()->all();
+    }
+
+    private function loginCountChart(Character $character, $loginRows): array
+    {
+        if ($loginRows->isEmpty()) {
+            return $this->emptyChart('user_login_durations.logged_in_at', 'count', ['Login Count']);
+        }
+
+        $granularity = $this->chartGranularity($this->loginChartStart($character, $loginRows), $loginRows->max('logged_in_at'));
+
+        return [
+            'source' => 'user_login_durations.logged_in_at',
+            'unit' => 'count',
+            'granularity' => $granularity,
+            'series' => [
+                ['label' => 'Login Count', 'points' => $this->cumulativeCountPoints($loginRows, 'logged_in_at', $granularity)],
+            ],
+        ];
+    }
+
+    private function loginDurationChart(Character $character, $loginRows): array
+    {
+        if ($loginRows->isEmpty()) {
+            return $this->emptyChart('user_login_durations.logged_in_at', 'hours', ['Login Duration (Hours)']);
+        }
+
+        $granularity = $this->chartGranularity($this->loginChartStart($character, $loginRows), $loginRows->max('logged_in_at'));
+
+        return [
+            'source' => 'user_login_durations.logged_in_at',
+            'unit' => 'hours',
+            'granularity' => $granularity,
+            'series' => [
+                ['label' => 'Login Duration (Hours)', 'points' => $this->cumulativeDurationHoursPoints($loginRows, $granularity)],
+            ],
+        ];
+    }
+
+    private function loginChartStart(Character $character, $loginRows): Carbon
+    {
+        $registeredAt = $character->user?->created_at;
+
+        if (! is_null($registeredAt)) {
+            return $registeredAt;
+        }
+
+        return $loginRows->min('logged_in_at');
+    }
+
+    private function cumulativeDurationHoursPoints($rows, string $granularity): array
+    {
+        $sorted = $rows->filter(fn ($row): bool => ! is_null($row->logged_in_at))->sortBy(fn ($row): int => $row->logged_in_at->getTimestamp())->values();
+
+        $grouped = $sorted->groupBy(fn ($row): string => $this->bucketStart($row->logged_in_at, $granularity)->toISOString());
+
+        $runningSeconds = 0;
+        $points = [];
+
+        foreach ($grouped as $date => $bucketRows) {
+            $runningSeconds += (int) $bucketRows->sum('duration_in_seconds');
+
+            $points[] = [
+                'label' => $this->bucketLabel($bucketRows->first()->logged_in_at, $granularity),
+                'date' => $date,
+                'value' => round($runningSeconds / 3600, 2),
+            ];
+        }
+
+        return $points;
+    }
+
+    private function cumulativeCountPoints($rows, string $dateField, string $granularity): array
+    {
+        $sorted = $rows->filter(fn ($row) => ! is_null($row->{$dateField}))->sortBy(fn ($row): int => $row->{$dateField}->getTimestamp())->values();
+
+        $grouped = $sorted->groupBy(fn ($row): string => $this->bucketStart($row->{$dateField}, $granularity)->toISOString());
+
+        $runningTotal = 0;
+        $points = [];
+
+        foreach ($grouped as $date => $bucketRows) {
+            $runningTotal += $bucketRows->count();
+
+            $points[] = [
+                'label' => $this->bucketLabel($bucketRows->first()->{$dateField}, $granularity),
+                'date' => $date,
+                'value' => $runningTotal,
+            ];
+        }
+
+        return $points;
+    }
+
+    private function cumulativeSumPoints($rows, string $dateField, string $sumField, string $granularity): array
+    {
+        $sorted = $rows->filter(fn ($row) => ! is_null($row->{$dateField}))->sortBy(fn ($row): int => $row->{$dateField}->getTimestamp())->values();
+
+        $grouped = $sorted->groupBy(fn ($row): string => $this->bucketStart($row->{$dateField}, $granularity)->toISOString());
+
+        $runningTotal = 0;
+        $points = [];
+
+        foreach ($grouped as $date => $bucketRows) {
+            $runningTotal += (int) $bucketRows->sum($sumField);
+
+            $points[] = [
+                'label' => $this->bucketLabel($bucketRows->first()->{$dateField}, $granularity),
+                'date' => $date,
+                'value' => $runningTotal,
+            ];
+        }
+
+        return $points;
+    }
+
+    private function emptyChart(string $source, string $unit, array $labels): array
     {
         return [
             'source' => $source,
             'unit' => $unit,
-            'points' => collect($points)->map(fn (array $point): array => [
-                'label' => $point['label'],
-                'value' => (int) $point['value'],
-            ])->values()->all(),
+            'granularity' => null,
+            'series' => collect($labels)->map(fn (string $label): array => ['label' => $label, 'points' => []])->values()->all(),
         ];
     }
 
-    private function isCraftingSkillName(?string $name): bool
+    private function chartGranularity(Carbon $oldest, Carbon $newest): string
     {
-        if (is_null($name)) {
-            return false;
+        $rangeDays = max(1, $oldest->diffInDays($newest) + 1);
+
+        return match (true) {
+            $oldest->diffInHours($newest) <= 48 => 'hours',
+            $rangeDays <= 90 => 'days',
+            $rangeDays <= 365 => 'weeks',
+            $rangeDays <= 1095 => 'months',
+            default => 'years',
+        };
+    }
+
+    private function bucketStart(Carbon $date, string $granularity): Carbon
+    {
+        return match ($granularity) {
+            'hours' => $date->copy()->startOfHour(),
+            'days' => $date->copy()->startOfDay(),
+            'weeks' => $date->copy()->startOfWeek(),
+            'months' => $date->copy()->startOfMonth(),
+            default => $date->copy()->startOfYear(),
+        };
+    }
+
+    private function bucketEnd(Carbon $bucketStart, string $granularity): Carbon
+    {
+        return match ($granularity) {
+            'hours' => $bucketStart->copy()->endOfHour(),
+            'days' => $bucketStart->copy()->endOfDay(),
+            'weeks' => $bucketStart->copy()->endOfWeek(),
+            'months' => $bucketStart->copy()->endOfMonth(),
+            default => $bucketStart->copy()->endOfYear(),
+        };
+    }
+
+    private function bucketLabel(Carbon $date, string $granularity): string
+    {
+        return match ($granularity) {
+            'hours' => $date->format('Y-m-d H:00'),
+            'days' => $date->format('Y-m-d'),
+            'weeks' => $date->copy()->startOfWeek()->format('Y-m-d'),
+            'months' => $date->format('Y-m'),
+            default => $date->format('Y'),
+        };
+    }
+
+    private function bucketSequence(Carbon $oldest, Carbon $newest, string $granularity): array
+    {
+        $buckets = [];
+        $cursor = $this->bucketStart($oldest, $granularity);
+        $end = $this->bucketStart($newest, $granularity);
+
+        while ($cursor->lte($end)) {
+            $buckets[] = $cursor->copy();
+
+            $cursor = match ($granularity) {
+                'hours' => $cursor->addHour(),
+                'days' => $cursor->addDay(),
+                'weeks' => $cursor->addWeek(),
+                'months' => $cursor->addMonthNoOverflow(),
+                default => $cursor->addYear(),
+            };
         }
 
-        return in_array(strtolower($name), [
-            'weapon crafting',
-            'armour crafting',
-            'armor crafting',
-            'ring crafting',
-            'spell crafting',
-            'enchanting',
-            'disenchanting',
-            'trinketry',
-            'gem crafting',
-            'alchemy',
-        ], true);
-    }
-
-    private function loginDuration($rows, int $days): int
-    {
-        return (int) $rows->filter(fn ($row) => $row->logged_in_at?->gte(now()->subDays($days)))->sum('duration_in_seconds');
-    }
-
-    private function loginCount($rows, int $days): int
-    {
-        return $rows->filter(fn ($row) => $row->logged_in_at?->gte(now()->subDays($days)))->count();
+        return $buckets;
     }
 
     private function statBreakdown(Character $character, array $statDetails): array

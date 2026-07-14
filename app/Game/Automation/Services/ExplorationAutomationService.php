@@ -14,7 +14,6 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Services\GameTimerService;
 use Illuminate\Support\Facades\Cache;
 
 class ExplorationAutomationService
@@ -26,7 +25,6 @@ class ExplorationAutomationService
         private readonly ExplorationCreatureCountCalculator $explorationCreatureCountCalculator,
         private readonly ExplorationLogService $explorationLogService,
         private readonly ExplorationWarningService $explorationWarningService,
-        private readonly GameTimerService $gameTimerService,
     ) {}
 
     public function beginAutomation(Character $character, array $params)
@@ -51,7 +49,7 @@ class ExplorationAutomationService
             'monster_id' => $selectedMonsterId,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
-            'completed_at' => $this->gameTimerService->availableAtFromHours($params['auto_attack_length'] ?? 1),
+            'completed_at' => now()->addHours($params['auto_attack_length'] ?? 1),
             'move_down_monster_list_every' => $params['move_down_the_list_every'] ?? null,
             'previous_level' => $character->level,
             'current_level' => $character->level,
