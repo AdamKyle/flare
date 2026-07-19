@@ -11,7 +11,9 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\Setup\Character\CharacterFactory;
@@ -80,6 +82,39 @@ class BattleEventHandlerTest extends TestCase
         resolve(BattleEventHandler::class)->processDeadCharacter($character);
 
         $this->assertSame(BatchCraftingEndReason::DIED->value, BatchCrafting::where('character_id', $character->id)->first()->ended_reason);
+    }
+
+    public function testProcessDeadCharacterSendsReviveMessageOnceAcrossRepeatedCalls(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $battleEventHandler = resolve(BattleEventHandler::class);
+
+        $battleEventHandler->processDeadCharacter($character);
+        $battleEventHandler->processDeadCharacter($character->refresh());
+
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+    }
+
+    public function testProcessDeadCharacterRunsDeathOnlySideEffectsOnlyOnceAcrossRepeatedCalls(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $batchCraftingService = Mockery::mock(BatchCraftingService::class);
+        $batchCraftingService->shouldReceive('completeForDeath')->once();
+
+        $battleEventHandler = new BattleEventHandler(
+            Mockery::mock(BattleRewardProcessingQueueManager::class),
+            Mockery::mock(WeeklyBattleService::class),
+            $batchCraftingService,
+        );
+
+        $battleEventHandler->processDeadCharacter($character);
+        $battleEventHandler->processDeadCharacter($character->refresh());
+
+        $this->assertTrue((bool) $character->refresh()->is_dead);
     }
 
 }

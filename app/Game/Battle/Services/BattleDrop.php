@@ -4,6 +4,7 @@ namespace App\Game\Battle\Services;
 
 use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
+use App\Flare\Models\Inventory;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
@@ -20,6 +21,7 @@ use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Support\Facades\DB;
 
 class BattleDrop
 {
@@ -569,25 +571,58 @@ class BattleDrop
      */
     private function giveItemToPlayer(Character $character, Item $item, bool $isMythic = false)
     {
-        if ($this->canHaveItem($character, $item)) {
-            $slot = $character->inventory->slots()->create([
+        if ($item->type === 'quest') {
+            $this->giveQuestItemToPlayer($character, $item);
+
+            return;
+        }
+
+        if (! $this->canHaveItem($character, $item)) {
+            return;
+        }
+
+        $slot = $character->inventory->slots()->create([
+            'item_id' => $item->id,
+            'inventory_id' => $character->inventory->id,
+        ]);
+
+        ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id);
+
+        if ($isMythic) {
+            event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));
+        }
+    }
+
+    /**
+     * Give a quest item to the player.
+     *
+     * Locks the character's inventory row for the duration of the ownership
+     * check and slot creation so concurrent drop processes cannot both
+     * insert the same quest item.
+     *
+     * @param Character $character
+     * @param Item $item
+     * @return void
+     */
+    private function giveQuestItemToPlayer(Character $character, Item $item): void
+    {
+        DB::transaction(function () use ($character, $item): void {
+            $inventory = Inventory::where('character_id', $character->id)->lockForUpdate()->first();
+
+            if (! $this->canHaveItem($character, $item)) {
+                return;
+            }
+
+            $slot = $inventory->slots()->create([
                 'item_id' => $item->id,
-                'inventory_id' => $character->inventory->id,
+                'inventory_id' => $inventory->id,
             ]);
 
-            if ($item->type === 'quest') {
-                $message = $character->name . ' has found: ' . $item->affix_name;
+            $message = $character->name . ' has found: ' . $item->affix_name;
 
-                ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id);
+            ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id);
 
-                broadcast(new GlobalMessageEvent($message));
-            } else {
-                ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: ' . $item->affix_name . ' on the enemies corpse.', $slot->id);
-
-                if ($isMythic) {
-                    event(new GlobalMessageEvent($character->name . ' Has found a mythical item on the enemies corpse! Such a rare drop!'));
-                }
-            }
-        }
+            broadcast(new GlobalMessageEvent($message));
+        });
     }
 }

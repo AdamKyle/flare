@@ -5,4 +5,5 @@ export default interface BatchCraftingStatusDisplayState {
     openSnapshot: any | null;
     affixDetailsModalAffix: any | null;
     affixDetailsModalOpen: boolean;
+    continuationNow: number;
 }

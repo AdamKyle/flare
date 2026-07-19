@@ -443,6 +443,22 @@ export default class SetsTable
         if (this.isSelectedSetBatchCraftingSet()) {
             return [
                 {
+                    name: "Sell Selected",
+                    icon_class: "far fa-money-bill-alt",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.SELL_SELECTED_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Disenchant Selected",
+                    icon_class: "ra ra-fire",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET,
+                        ),
+                },
+                {
                     name: "Destroy Selected",
                     icon_class: "fas fa-trash",
                     on_click: () =>
@@ -506,19 +522,51 @@ export default class SetsTable
     }
 
     buildActionsDropDown() {
-        const actions = [];
         const selectedSet =
             this.state.selected_set !== null
                 ? this.props.sets[this.state.selected_set]
                 : null;
 
-        if (!selectedSet?.is_batch_crafting_set) {
-            actions.push({
-                name: "Rename set",
-                icon_class: "fas fa-edit",
-                on_click: () => this.manageRenameSet(),
-            });
+        if (selectedSet?.is_batch_crafting_set) {
+            if (selectedSet.items.length === 0) {
+                return [];
+            }
+
+            return [
+                {
+                    name: "Sell All",
+                    icon_class: "far fa-money-bill-alt",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.SELL_ALL_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Disenchant All",
+                    icon_class: "ra ra-fire",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DISENCHANT_ALL_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Destroy All",
+                    icon_class: "fas fa-trash",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DESTROY_ALL_FROM_SET,
+                        ),
+                },
+            ];
         }
+
+        const actions = [];
+
+        actions.push({
+            name: "Rename set",
+            icon_class: "fas fa-edit",
+            on_click: () => this.manageRenameSet(),
+        });
 
         if (this.state.selected_set !== null && selectedSet !== null) {
             if (
@@ -676,17 +724,13 @@ export default class SetsTable
                             disabled={this.props.is_dead || this.state.loading}
                         />
                     </div>
-                    {!this.isSelectedSetBatchCraftingSet() ? (
-                        <div className="w-full md:w-auto mt-[-10px] md:mt-0">
-                            <DropDown
-                                menu_items={this.buildActionsDropDown()}
-                                button_title="Actions"
-                                disabled={
-                                    this.props.is_dead || this.state.loading
-                                }
-                            />
-                        </div>
-                    ) : null}
+                    <div className="w-full md:w-auto mt-[-10px] md:mt-0">
+                        <DropDown
+                            menu_items={this.buildActionsDropDown()}
+                            button_title="Actions"
+                            disabled={this.props.is_dead || this.state.loading}
+                        />
+                    </div>
                     {this.isSelectedSetBatchCraftingSet() &&
                     this.state.data.length > 0 ? (
                         <div className="w-full md:w-auto mt-[-10px] md:mt-0">
@@ -711,23 +755,6 @@ export default class SetsTable
                                     }
                                 />
                             )}
-                        </div>
-                    ) : null}
-                    {this.isSelectedSetBatchCraftingSet() &&
-                    this.state.data.length > 0 ? (
-                        <div className="w-full md:w-auto mt-[-10px] md:mt-0">
-                            <DangerButton
-                                button_label={"Destroy All"}
-                                on_click={() =>
-                                    this.manageConfirmationModal(
-                                        InventoryActionConfirmationType.DESTROY_ALL_FROM_SET,
-                                    )
-                                }
-                                additional_css="w-full md:w-auto"
-                                disabled={
-                                    this.props.is_dead || this.state.loading
-                                }
-                            />
                         </div>
                     ) : null}
                     {this.isSelectedSetBatchCraftingSet() &&

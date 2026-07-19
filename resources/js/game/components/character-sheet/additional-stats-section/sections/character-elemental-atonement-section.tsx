@@ -4,22 +4,33 @@ import WarningAlert from "../../../ui/alerts/simple-alerts/warning-alert";
 import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
+import { AdditionalInfoProps } from "../../../../sections/character-sheet/components/types/additional-info-props";
 
 export default class CharacterElementalAtonementSection extends React.Component<
-    any,
+    AdditionalInfoProps,
     any
 > {
-    constructor(props: any) {
+    constructor(props: AdditionalInfoProps) {
         super(props);
 
+        const preloadedElementalAtonement = props.preloaded_elemental_atonement;
+
         this.state = {
-            is_loading: true,
-            elemental_atonement: null,
+            is_loading: typeof preloadedElementalAtonement === "undefined",
+            elemental_atonement: preloadedElementalAtonement ?? null,
             error_message: "",
         };
     }
 
     componentDidMount(): void {
+        if (typeof this.props.preloaded_elemental_atonement !== "undefined") {
+            return;
+        }
+
+        if (this.props.character === null) {
+            return;
+        }
+
         new Ajax()
             .setRoute(
                 "character-sheet/" +

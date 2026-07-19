@@ -42,7 +42,7 @@ type TopsChartCardProps = {
 };
 
 type TopsChartCardState = {
-    visibleSeries: string[];
+    selectedSeries: string;
     startDate: string;
     endDate: string;
     darkChart: boolean;
@@ -132,10 +132,11 @@ export default class TopsChartCard extends React.Component<
     constructor(props: TopsChartCardProps) {
         super(props);
 
+        const sourceSeries = defaultSourceSeries(props);
+
         this.state = {
-            visibleSeries: defaultSourceSeries(props).map(
-                (series: ChartSeries) => series.label,
-            ),
+            selectedSeries:
+                sourceSeries.length > 0 ? sourceSeries[0].label : "",
             startDate: "",
             endDate: "",
             darkChart: window.localStorage.getItem("scheme") === "dark",
@@ -164,11 +165,9 @@ export default class TopsChartCard extends React.Component<
 
         if (previousLabels.join("|") !== labels.join("|")) {
             this.setState((state) => ({
-                visibleSeries: labels.filter(
-                    (label) =>
-                        !previousLabels.includes(label) ||
-                        state.visibleSeries.includes(label),
-                ),
+                selectedSeries: labels.includes(state.selectedSeries)
+                    ? state.selectedSeries
+                    : (labels[0] ?? ""),
             }));
         }
     }
@@ -188,21 +187,9 @@ export default class TopsChartCard extends React.Component<
         );
     }
 
-    toggleSeries(label: string, checked: boolean): void {
-        this.setState((state: TopsChartCardState) => ({
-            visibleSeries: checked
-                ? [...state.visibleSeries, label]
-                : state.visibleSeries.filter(
-                      (visibleLabel: string) => visibleLabel !== label,
-                  ),
-        }));
-    }
-
-    showAllSeries(): void {
+    selectSeries(label: string): void {
         this.setState({
-            visibleSeries: this.sourceSeries().map(
-                (series: ChartSeries) => series.label,
-            ),
+            selectedSeries: label,
         });
     }
 
@@ -218,8 +205,8 @@ export default class TopsChartCard extends React.Component<
         const canFilterDates = this.canFilterDates();
 
         return this.sourceSeries()
-            .filter((item: ChartSeries) =>
-                this.state.visibleSeries.includes(item.label),
+            .filter(
+                (item: ChartSeries) => item.label === this.state.selectedSeries,
             )
             .map((item: ChartSeries) => ({
                 ...item,
@@ -277,34 +264,22 @@ export default class TopsChartCard extends React.Component<
                     {sourceSeries.length > 1 ? (
                         <fieldset className="flex flex-wrap items-center gap-3 text-sm">
                             <legend className="sr-only">
-                                Toggle {title} series
+                                Select {title} series
                             </legend>
-                            <button
-                                type="button"
-                                className="rounded-sm border border-gray-300 px-3 py-2 font-semibold text-gray-700 disabled:opacity-50 dark:border-gray-600 dark:text-gray-300"
-                                disabled={
-                                    this.state.visibleSeries.length ===
-                                    sourceSeries.length
-                                }
-                                onClick={() => this.showAllSeries()}
-                            >
-                                Show All
-                            </button>
                             {sourceSeries.map((item: ChartSeries) => (
                                 <label
                                     key={item.label}
                                     className="inline-flex items-center gap-2 rounded-sm border border-gray-200 px-3 py-2 font-semibold text-gray-700 dark:border-gray-700 dark:text-gray-300"
                                 >
                                     <input
-                                        type="checkbox"
-                                        checked={this.state.visibleSeries.includes(
-                                            item.label,
-                                        )}
-                                        onChange={(event) =>
-                                            this.toggleSeries(
-                                                item.label,
-                                                event.target.checked,
-                                            )
+                                        type="radio"
+                                        name={id}
+                                        checked={
+                                            this.state.selectedSeries ===
+                                            item.label
+                                        }
+                                        onChange={() =>
+                                            this.selectSeries(item.label)
                                         }
                                     />
                                     <span>{item.label}</span>

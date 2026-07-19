@@ -6,9 +6,13 @@ import CharacterReincarnationSection from "./sections/character-reincarnation-se
 import CharacterClassRanksSection from "./sections/character-class-ranks-section";
 import CharacterElementalAtonementSection from "./sections/character-elemental-atonement-section";
 import ResurrectionChance from "./sections/resurrection-chance";
+import AdditionalStatSectionProps from "./types/additional-stat-section-props";
 
-export default class AdditionalStatSection extends React.Component<any, any> {
-    constructor(props: any) {
+export default class AdditionalStatSection extends React.Component<
+    AdditionalStatSectionProps,
+    any
+> {
+    constructor(props: AdditionalStatSectionProps) {
         super(props);
     }
 
@@ -27,6 +31,10 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                             title={""}
                             finished_loading={true}
                             when_tab_changes={() => {}}
+                            read_only={this.props.read_only}
+                            preloaded_stat_details={
+                                this.props.preloaded_stat_details
+                            }
                         />
                     </BasicCard>
                     <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3 block md:hidden"></div>
@@ -41,6 +49,16 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                             title={""}
                             finished_loading={true}
                             when_tab_changes={() => {}}
+                            read_only={this.props.read_only}
+                            preloaded_class_ranks={
+                                this.props.preloaded_class_ranks
+                            }
+                            preloaded_class_ranks_offered={
+                                this.props.preloaded_class_ranks_offered
+                            }
+                            preloaded_class_rank_specialties={
+                                this.props.preloaded_class_rank_specialties
+                            }
                         />
                         <p className="my-4">
                             Learn more about:{" "}
@@ -78,6 +96,10 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                                         manage_modal={() => {}}
                                         title={""}
                                         finished_loading={true}
+                                        read_only={this.props.read_only}
+                                        preloaded_resistance_info={
+                                            this.props.preloaded_resistance_info
+                                        }
                                     />
                                     <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                                     <h3>Resurrection Chance</h3>
@@ -99,11 +121,16 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                                 <h3>Elemental Atonement</h3>
                                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2"></div>
                                 <CharacterElementalAtonementSection
+                                    view_port={0}
                                     character={this.props.character}
                                     is_open={true}
                                     manage_modal={() => {}}
                                     title={""}
                                     finished_loading={true}
+                                    read_only={this.props.read_only}
+                                    preloaded_elemental_atonement={
+                                        this.props.preloaded_elemental_atonement
+                                    }
                                 />
                             </div>
                         </div>
@@ -142,6 +169,10 @@ export default class AdditionalStatSection extends React.Component<any, any> {
                             manage_modal={() => {}}
                             title={""}
                             finished_loading={true}
+                            read_only={this.props.read_only}
+                            preloaded_reincarnation_details={
+                                this.props.preloaded_reincarnation_details
+                            }
                         />
                     </BasicCard>
                 </div>

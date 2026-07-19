@@ -3,6 +3,7 @@
 namespace App\Game\Core\Traits;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Quest;
 
@@ -18,11 +19,11 @@ trait CanHaveQuestItem
             return true;
         }
 
-        $foundItem = $character->inventory->slots->filter(function ($slot) use ($item) {
-            return $slot->item_id === $item->id && $slot->item->type === 'quest';
-        })->first();
+        $alreadyOwnsItem = InventorySlot::where('inventory_id', $character->inventory->id)
+            ->where('item_id', $item->id)
+            ->exists();
 
-        if (is_null($foundItem)) {
+        if (! $alreadyOwnsItem) {
             $questThatNeedsThisItem = Quest::where('item_id', $item->id)->orWhere('secondary_required_item', $item->id)->first();
 
             if (! is_null($questThatNeedsThisItem)) {
@@ -44,11 +45,17 @@ trait CanHaveQuestItem
      */
     public static function canReceiveItem(Character $character, int $itemId): bool
     {
-        $foundItem = $character->inventory->slots->filter(function ($slot) use ($itemId) {
-            return $slot->item_id === $itemId && $slot->item->type === 'quest';
-        })->first();
+        $item = Item::find($itemId);
 
-        if (is_null($foundItem)) {
+        if (! is_null($item) && $item->type !== 'quest') {
+            return true;
+        }
+
+        $alreadyOwnsItem = InventorySlot::where('inventory_id', $character->inventory->id)
+            ->where('item_id', $itemId)
+            ->exists();
+
+        if (! $alreadyOwnsItem) {
             $questThatNeedsThisItem = Quest::where('item_id', $itemId)->first();
 
             if (! is_null($questThatNeedsThisItem)) {

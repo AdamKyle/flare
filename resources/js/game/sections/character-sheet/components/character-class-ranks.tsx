@@ -209,7 +209,7 @@ export default class CharacterClassRanks extends React.Component<
     masteryTableColumns() {
         return [
             {
-                name: "Mastery Name",
+                name: "Mastery",
                 selector: (row: WeaponMastery) => row.mastery_name,
             },
             {
@@ -221,17 +221,79 @@ export default class CharacterClassRanks extends React.Component<
                 ),
             },
             {
-                name: "XP",
+                name: "Current XP",
                 selector: (row: WeaponMastery) => row.current_xp,
                 cell: (row: WeaponMastery) => (
-                    <span>
-                        {formatNumber(row.current_xp) +
-                            "/" +
-                            formatNumber(row.required_xp)}
-                    </span>
+                    <span>{formatNumber(row.current_xp)}</span>
+                ),
+            },
+            {
+                name: "Required XP",
+                selector: (row: WeaponMastery) => row.required_xp,
+                cell: (row: WeaponMastery) => (
+                    <span>{formatNumber(row.required_xp)}</span>
                 ),
             },
         ];
+    }
+
+    renderMasteriesOnlyForRank(rank: ClassRankType): JSX.Element {
+        const offered = (this.props.preloaded_class_ranks_offered ?? []).find(
+            (item) => item.class_id === rank.game_class_id,
+        );
+        const remainingMasteries = (
+            offered?.remaining_weapon_masteries ?? []
+        ).map((mastery) => ({
+            mastery_name: mastery.name,
+            level: mastery.level,
+            current_xp: mastery.current_xp,
+            required_xp: mastery.required_xp,
+        }));
+
+        return (
+            <div key={rank.game_class_id} className="mb-8">
+                <h2 className="text-sky-700 dark:text-sky-500 font-bold my-4">
+                    {rank.class_name}
+                </h2>
+                <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
+
+                <h3 className="my-3">Leveled Masteries</h3>
+                {(rank.weapon_masteries ?? []).length > 0 ? (
+                    <Table
+                        data={rank.weapon_masteries}
+                        columns={this.masteryTableColumns()}
+                        dark_table={this.state.dark_tables}
+                    />
+                ) : (
+                    <p>
+                        No weapon masteries have been levelled for this class.
+                    </p>
+                )}
+
+                <h3 className="my-3">Remaining Masteries</h3>
+                {remainingMasteries.length > 0 ? (
+                    <Table
+                        data={remainingMasteries}
+                        columns={this.masteryTableColumns()}
+                        dark_table={this.state.dark_tables}
+                    />
+                ) : (
+                    <p>
+                        All weapon masteries for this class have been levelled.
+                    </p>
+                )}
+            </div>
+        );
+    }
+
+    renderMasteriesOnly() {
+        return (
+            <div>
+                {this.state.class_ranks.map((rank: ClassRankType) =>
+                    this.renderMasteriesOnlyForRank(rank),
+                )}
+            </div>
+        );
     }
 
     manageClassSpecialties() {
@@ -343,8 +405,16 @@ export default class CharacterClassRanks extends React.Component<
             );
         }
 
+        if (this.props.read_only && this.props.masteries_only) {
+            return <div>{this.renderMasteriesOnly()}</div>;
+        }
+
         return (
-            <div className="max-h-[375px] overflow-y-auto">
+            <div
+                className={
+                    this.props.read_only ? "" : "max-h-[375px] overflow-y-auto"
+                }
+            >
                 {this.state.open_class_details &&
                 this.state.class_name_selected !== null ? (
                     <div>

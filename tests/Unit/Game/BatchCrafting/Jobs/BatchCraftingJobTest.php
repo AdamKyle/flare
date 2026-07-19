@@ -40,4 +40,27 @@ class BatchCraftingJobTest extends TestCase
         $this->assertSame(BatchCraftingEndReason::CANCELLED->value, $batchCrafting->refresh()->ended_reason);
         $this->assertSame(0, $batchCrafting->refresh()->crafted_count);
     }
+
+    public function testJobIsConfiguredForTheDedicatedBatchCraftingConnectionAndQueue(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id]);
+
+        $job = new BatchCraftingJob($batchCrafting->id);
+
+        $this->assertSame('long_running', $job->connection);
+        $this->assertSame('batch_crafting', $job->queue);
+    }
+
+    public function testJobNeverTargetsTheDefaultLongQueue(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id]);
+
+        $job = new BatchCraftingJob($batchCrafting->id);
+
+        $this->assertNotSame('default_long', $job->queue);
+    }
 }

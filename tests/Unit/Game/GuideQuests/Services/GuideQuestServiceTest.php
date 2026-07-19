@@ -859,4 +859,227 @@ class GuideQuestServiceTest extends TestCase
         $this->assertNotNull(InventorySlot::find($slot->id));
         $this->assertSame(2, AlchemyBagSlot::find($alchemyBagSlot->id)->amount);
     }
+
+    public function testFetchNextRegularGuideQuestReturnsFirstIncompleteRoot(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $firstRoot = $this->createGuideQuest(['name' => 'First Root']);
+        $this->createGuideQuest(['name' => 'Second Root']);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertCount(1, $questDetails['quests']);
+        $this->assertSame($firstRoot->id, $questDetails['quests'][0]->id);
+    }
+
+    public function testFetchNextRegularGuideQuestReturnsIncompleteParentEvenWhenChildCompletedOutOfOrder(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $parent = $this->createGuideQuest(['name' => 'Parent Quest']);
+        $child = $this->createGuideQuest(['name' => 'Child Quest', 'parent_id' => $parent->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $child->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertCount(1, $questDetails['quests']);
+        $this->assertSame($parent->id, $questDetails['quests'][0]->id);
+    }
+
+    public function testFetchNextRegularGuideQuestReturnsFirstIncompleteChildAfterRootCompleted(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $root = $this->createGuideQuest(['name' => 'Root Quest']);
+        $child = $this->createGuideQuest(['name' => 'Child Quest', 'parent_id' => $root->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $root->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertCount(1, $questDetails['quests']);
+        $this->assertSame($child->id, $questDetails['quests'][0]->id);
+    }
+
+    public function testFetchNextRegularGuideQuestReturnsNextIncompleteGrandchildAfterParentAndChildCompleted(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $root = $this->createGuideQuest(['name' => 'Root Quest']);
+        $child = $this->createGuideQuest(['name' => 'Child Quest', 'parent_id' => $root->id]);
+        $grandchild = $this->createGuideQuest(['name' => 'Grandchild Quest', 'parent_id' => $child->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $root->id,
+        ]);
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $child->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertCount(1, $questDetails['quests']);
+        $this->assertSame($grandchild->id, $questDetails['quests'][0]->id);
+    }
+
+    public function testFetchNextRegularGuideQuestReturnsNextRootAfterCompleteDescendantTree(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $firstRoot = $this->createGuideQuest(['name' => 'First Root']);
+        $firstRootChild = $this->createGuideQuest(['name' => 'First Root Child', 'parent_id' => $firstRoot->id]);
+        $secondRoot = $this->createGuideQuest(['name' => 'Second Root']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $firstRoot->id,
+        ]);
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $firstRootChild->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertCount(1, $questDetails['quests']);
+        $this->assertSame($secondRoot->id, $questDetails['quests'][0]->id);
+    }
+
+    public function testFetchNextRegularGuideQuestOrdersMultipleChildrenById(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $root = $this->createGuideQuest(['name' => 'Root Quest']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $root->id,
+        ]);
+
+        $lowerIdChild = $this->createGuideQuest(['name' => 'Z Child', 'parent_id' => $root->id]);
+        $this->createGuideQuest(['name' => 'A Child', 'parent_id' => $root->id]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertCount(1, $questDetails['quests']);
+        $this->assertSame($lowerIdChild->id, $questDetails['quests'][0]->id);
+    }
+
+    public function testFetchNextRegularGuideQuestExactSequenceWhenAutomatingTheSmithingProcessAlreadyCompleted(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $blacksmithsLife = $this->createGuideQuest(['name' => 'Blacksmiths Life']);
+        $automatingSmithing = $this->createGuideQuest(['name' => 'Automating the smithing process', 'parent_id' => $blacksmithsLife->id]);
+        $theEnchantress = $this->createGuideQuest(['name' => 'The Enchantress']);
+        $efficiencyIsKey = $this->createGuideQuest(['name' => 'Effeciency is key', 'parent_id' => $theEnchantress->id]);
+        $enchantingIsKey = $this->createGuideQuest(['name' => 'Enchanting is key']);
+        $allureQuest = $this->createGuideQuest(['name' => 'The alure of The Entranchtress', 'parent_id' => $enchantingIsKey->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $automatingSmithing->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+        $this->assertSame($blacksmithsLife->id, $questDetails['quests'][0]->id);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $blacksmithsLife->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+        $this->assertSame($theEnchantress->id, $questDetails['quests'][0]->id);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $theEnchantress->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+        $this->assertSame($efficiencyIsKey->id, $questDetails['quests'][0]->id);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $efficiencyIsKey->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+        $this->assertSame($enchantingIsKey->id, $questDetails['quests'][0]->id);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $enchantingIsKey->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+        $this->assertSame($allureQuest->id, $questDetails['quests'][0]->id);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $allureQuest->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+        $this->assertEmpty($questDetails['quests']);
+    }
+
+    public function testFetchNextRegularGuideQuestDoesNotAffectEventGuideQuests(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $character->update(['level' => 10]);
+        $character = $character->refresh();
+
+        $eventQuest = $this->createGuideQuest([
+            'name' => 'Unlocks At Level Quest',
+            'unlock_at_level' => 10,
+        ]);
+
+        $regularRoot = $this->createGuideQuest(['name' => 'Regular Root']);
+        $regularChild = $this->createGuideQuest(['name' => 'Regular Child', 'parent_id' => $regularRoot->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $regularRoot->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $questIds = collect($questDetails['quests'])->pluck('id')->all();
+
+        $this->assertContains($eventQuest->id, $questIds);
+        $this->assertContains($regularChild->id, $questIds);
+    }
+
+    public function testFetchNextRegularGuideQuestReturnsNullWhenAllRegularGuideQuestsComplete(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $root = $this->createGuideQuest(['name' => 'Root Quest']);
+        $child = $this->createGuideQuest(['name' => 'Child Quest', 'parent_id' => $root->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $root->id,
+        ]);
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $child->id,
+        ]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character);
+
+        $this->assertEmpty($questDetails['quests']);
+    }
 }

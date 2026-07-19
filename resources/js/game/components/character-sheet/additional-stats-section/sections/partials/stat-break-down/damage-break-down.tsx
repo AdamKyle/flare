@@ -5,6 +5,7 @@ import Ajax from "../../../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../../../../ui/progress-bars/loading-progress-bar";
 import ItemNameColorationText from "../../../../../items/item-name/item-name-coloration-text";
+import DangerAlert from "../../../../../ui/alerts/simple-alerts/danger-alert";
 
 export default class DamageBreakDown extends React.Component<any, any> {
     constructor(props: any) {
@@ -29,7 +30,9 @@ export default class DamageBreakDown extends React.Component<any, any> {
 
                 new Ajax()
                     .setRoute(
-                        "character-sheet/" +
+                        (this.props.read_only
+                            ? "game/tops/characters/"
+                            : "character-sheet/") +
                             this.props.character_id +
                             "/specific-attribute-break-down",
                     )
@@ -46,15 +49,22 @@ export default class DamageBreakDown extends React.Component<any, any> {
                             });
                         },
                         (error: AxiosError) => {
-                            this.setState({ is_loading: false });
+                            let errorMessage: string =
+                                "Unable to load the damage breakdown.";
 
                             if (typeof error.response !== "undefined") {
                                 const response: AxiosResponse = error.response;
 
-                                this.setState({
-                                    error_message: response.data.mmessage,
-                                });
+                                errorMessage =
+                                    response.data.error ??
+                                    response.data.message ??
+                                    errorMessage;
                             }
+
+                            this.setState({
+                                is_loading: false,
+                                error_message: errorMessage,
+                            });
                         },
                     );
             },
@@ -507,8 +517,27 @@ export default class DamageBreakDown extends React.Component<any, any> {
     }
 
     render() {
-        if (this.state.loading || this.state.details === null) {
+        if (this.state.is_loading) {
             return <LoadingProgressBar />;
+        }
+
+        if (
+            typeof this.state.error_message === "string" &&
+            this.state.error_message.length > 0
+        ) {
+            return (
+                <DangerAlert additional_css={"my-4"}>
+                    {this.state.error_message}
+                </DangerAlert>
+            );
+        }
+
+        if (this.state.details === null) {
+            return (
+                <DangerAlert additional_css={"my-4"}>
+                    Unable to load the damage breakdown.
+                </DangerAlert>
+            );
         }
 
         return (

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="w-full lg:w-3/4 ml-auto mr-auto pb-10">
+    <div class="w-full px-4 sm:px-6 lg:px-8 pb-10">
         <x-core.page-title
             title="{{$character->name}}"
             route="{{route('game.tops')}}"

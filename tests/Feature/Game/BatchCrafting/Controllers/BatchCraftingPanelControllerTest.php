@@ -465,4 +465,78 @@ class BatchCraftingPanelControllerTest extends TestCase
         $this->assertSame(6, $response->json('batch.event_fallback_enchanted_this_tick'));
         $this->assertSame('craft fallback items and double-enchant them', $response->json('batch.next_action'));
     }
+
+    public function testStatusEndpointReturnsCraftEnchantSetWorkProgressAndRetryStateContract(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $user->id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_enchant_set',
+                'craft_enchant_set_requested' => 23,
+                'craft_enchant_set_craft_index' => 23,
+                'craft_enchant_set_enchant_index' => 8,
+                'craft_enchant_set_finalize_index' => 0,
+                'craft_enchant_set_completed_work_units' => 31,
+                'craft_enchant_set_total_work_units' => 69,
+                'craft_enchant_set_completed_final_count' => 0,
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertSame(23, $response->json('batch.craft_enchant_set_craft_completed_count'));
+        $this->assertSame(8, $response->json('batch.craft_enchant_set_enchant_completed_count'));
+        $this->assertSame(0, $response->json('batch.craft_enchant_set_finalize_completed_count'));
+        $this->assertSame(69, $response->json('batch.craft_enchant_set_total_work_units'));
+        $this->assertSame(31, $response->json('batch.craft_enchant_set_completed_work_units'));
+        $this->assertSame(38, $response->json('batch.craft_enchant_set_remaining_work_units'));
+        $this->assertSame(44, $response->json('batch.craft_enchant_set_overall_percent'));
+        $this->assertArrayHasKey('retry_state', $response->json('batch'));
+        $this->assertArrayHasKey('active', $response->json('batch.retry_state'));
+        $this->assertArrayHasKey('failed_count', $response->json('batch.retry_state'));
+        $this->assertArrayHasKey('delay_seconds', $response->json('batch.retry_state'));
+        $this->assertArrayHasKey('failure_reason', $response->json('batch.retry_state'));
+        $this->assertArrayHasKey('failure_phase', $response->json('batch.retry_state'));
+        $this->assertArrayHasKey('failure_action', $response->json('batch.retry_state'));
+        $this->assertFalse($response->json('batch.retry_state.active'));
+    }
+
+    public function testStatusEndpointExposesOutputDestinationLabel(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $user->id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'output_destination' => 'inventory'],
+        ]);
+
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertSame('Inventory', $response->json('batch.output_destination_label'));
+    }
+
+    public function testStatusEndpointDoesNotExposeKeptOutputCommittedFlag(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $user->id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'output_destination' => 'inventory'],
+        ]);
+
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
+
+        $this->assertArrayNotHasKey('kept_output_committed', $response->json('batch') ?? []);
+    }
 }

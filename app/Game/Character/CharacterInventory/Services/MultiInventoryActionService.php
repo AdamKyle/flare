@@ -149,6 +149,29 @@ class MultiInventoryActionService
         ]);
     }
 
+    public function sellAllCraftedItemsSetSlots(Character $character, InventorySet $set): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        if (! $set->isBatchCraftingSet()) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $setSlotIds = $set->slots()->pluck('id')->all();
+
+        $result = $this->sellManySetSlots($character, $set, $setSlotIds);
+
+        if ($result['status'] !== 200) {
+            return $result;
+        }
+
+        $result['message'] = str_replace('Sold selected set items', 'Sold all set items', $result['message']);
+
+        return $result;
+    }
+
     public function disenchantManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
     {
         if ($set->character_id !== $character->id) {
@@ -181,6 +204,29 @@ class MultiInventoryActionService
             selected Server Messages from the Orange Chat Dropdown.',
             'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
+    }
+
+    public function disenchantAllCraftedItemsSetSlots(Character $character, InventorySet $set): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        if (! $set->isBatchCraftingSet()) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $setSlotIds = $set->slots()->pluck('id')->all();
+
+        $result = $this->disenchantManySetSlots($character, $set, $setSlotIds);
+
+        if ($result['status'] !== 200) {
+            return $result;
+        }
+
+        $result['message'] = str_replace('Set items are queued', 'All eligible set items are queued', $result['message']);
+
+        return $result;
     }
 
     public function disenchantManyItems(Character $character, array $slotIds): array

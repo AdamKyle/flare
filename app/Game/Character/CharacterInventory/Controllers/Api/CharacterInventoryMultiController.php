@@ -175,4 +175,48 @@ class CharacterInventoryMultiController extends Controller
 
         return response()->json($result, $status);
     }
+
+    public function sellAllFromSet(DestroyAllFromSetRequest $request, Character $character): JsonResponse
+    {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
+        $set = InventorySet::find($request->set_id);
+
+        if (is_null($set)) {
+            return response()->json(['message' => 'Cannot do that.'], 422);
+        }
+
+        $result = $this->multiInventoryActionService->sellAllCraftedItemsSetSlots($character, $set);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
+
+    public function disenchantAllFromSet(DestroyAllFromSetRequest $request, Character $character): JsonResponse
+    {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
+        $set = InventorySet::find($request->set_id);
+
+        if (is_null($set)) {
+            return response()->json(['message' => 'Cannot do that.'], 422);
+        }
+
+        $result = $this->multiInventoryActionService->disenchantAllCraftedItemsSetSlots($character, $set);
+
+        $status = $result['status'];
+        unset($result['status']);
+
+        return response()->json($result, $status);
+    }
 }

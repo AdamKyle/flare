@@ -42,6 +42,7 @@ import {
     HolyOilMode,
     HolyOilPreviewItemEntry,
     InventorySetOption,
+    OutputDestination,
 } from "./types/batch-crafting-types";
 
 const selectAllHolyOilItemsValue = -1;
@@ -314,6 +315,8 @@ export default class BatchCraftingSection extends React.Component<
             inventorySets: [],
             inventorySetsLoading: false,
             selectedSetId: null,
+            outputDestination: "crafted_items_set",
+            outputSetId: null,
             craftEnchantSetMode: "build_new",
             craftEnchantSetPlan: {},
             craftEnchantSetBulkPrefixId: null,
@@ -853,6 +856,8 @@ export default class BatchCraftingSection extends React.Component<
                             current_slots: set.current_slots,
                             max_slots: set.max_slots,
                             remaining_slots: set.remaining_slots,
+                            equipped: set.equipped,
+                            is_batch_crafting_set: set.is_batch_crafting_set,
                         }));
 
                     const selectedSetId = options.some(
@@ -861,10 +866,21 @@ export default class BatchCraftingSection extends React.Component<
                         ? this.state.selectedSetId
                         : (options[0]?.set_id ?? null);
 
+                    const eligibleOutputSets = options.filter(
+                        (option) =>
+                            !option.equipped && option.current_slots === 0,
+                    );
+                    const outputSetId = eligibleOutputSets.some(
+                        (option) => option.set_id === this.state.outputSetId,
+                    )
+                        ? this.state.outputSetId
+                        : (eligibleOutputSets[0]?.set_id ?? null);
+
                     this.setState({
                         inventorySets: options,
                         inventorySetsLoading: false,
                         selectedSetId,
+                        outputSetId,
                     });
                 },
                 (_error: AxiosError) => {
@@ -915,6 +931,8 @@ export default class BatchCraftingSection extends React.Component<
             selectedItems: [],
             selectedOils: [],
             selectedSetId: null,
+            outputDestination: "crafted_items_set",
+            outputSetId: null,
             inventorySets: [],
             craftEnchantSetPlan: {},
             craftEnchantSetBulkPrefixId: null,
@@ -1069,7 +1087,13 @@ export default class BatchCraftingSection extends React.Component<
 
         const needsHolyOilsSet =
             batchType === "holy_oils" && holyOilMode === "set";
-        const needsInventorySet = needsHolyOilsSet;
+        const needsOutputDestinationSelector = this.isFiniteRetainedOutputMode(
+            batchType,
+            craftMode,
+            disposition,
+        );
+        const needsInventorySet =
+            needsHolyOilsSet || needsOutputDestinationSelector;
 
         if (!needsInventorySet) {
             if (
@@ -1084,6 +1108,53 @@ export default class BatchCraftingSection extends React.Component<
         } else {
             this.fetchInventorySets();
         }
+
+        if (
+            !needsOutputDestinationSelector &&
+            this.state.outputSetId !== null
+        ) {
+            this.setState({
+                outputSetId: null,
+            });
+        }
+    }
+
+    isFiniteRetainedOutputMode(
+        batchType: BatchType,
+        craftMode: CraftMode,
+        disposition: Disposition,
+    ): boolean {
+        if (disposition !== "keep") {
+            return false;
+        }
+
+        return (
+            (batchType === "craft" &&
+                (craftMode === "specific_item" || craftMode === "craft_set")) ||
+            (batchType === "craft_and_enchant" &&
+                (craftMode === "specific_item" ||
+                    craftMode === "craft_enchant_set"))
+        );
+    }
+
+    outputDestinationDescription(): string {
+        const { inventorySets, outputDestination, outputSetId } = this.state;
+
+        if (outputDestination === "inventory") {
+            return "your Inventory";
+        }
+
+        if (outputDestination === "inventory_set") {
+            const selectedSet = inventorySets.find(
+                (set) => set.set_id === outputSetId,
+            );
+
+            return selectedSet
+                ? `your set: ${selectedSet.label}`
+                : "the selected set";
+        }
+
+        return "your Crafted Items Set";
     }
 
     fetchCraftableItems() {
@@ -1208,6 +1279,8 @@ export default class BatchCraftingSection extends React.Component<
             disposition,
             holyOilMode,
             listingPrice,
+            outputDestination,
+            outputSetId,
             selectedAlchemyItemId,
             selectedItems,
             selectedOils,
@@ -1233,6 +1306,20 @@ export default class BatchCraftingSection extends React.Component<
 
         if (batchType === "craft" || batchType === "craft_and_enchant") {
             progress.craft_mode = craftModeForRequest;
+
+            if (
+                this.isFiniteRetainedOutputMode(
+                    batchType,
+                    craftModeForRequest,
+                    disposition,
+                )
+            ) {
+                progress.output_destination = outputDestination;
+
+                if (outputDestination === "inventory_set") {
+                    progress.output_set_id = outputSetId;
+                }
+            }
 
             if (craftModeForRequest === "specific_item") {
                 progress.specific_crafting_type =
@@ -1325,7 +1412,10 @@ export default class BatchCraftingSection extends React.Component<
             batchType,
             craftEnchantSetPlan,
             craftMode,
+            disposition,
             holyOilMode,
+            outputDestination,
+            outputSetId,
             selectedItems,
             selectedOils,
             selectedSetId,
@@ -1351,7 +1441,14 @@ export default class BatchCraftingSection extends React.Component<
             (batchType === "holy_oils" && selectedOils.length === 0) ||
             (batchType === "holy_oils" &&
                 holyOilMode === "set" &&
-                selectedSetId === null)
+                selectedSetId === null) ||
+            (this.isFiniteRetainedOutputMode(
+                batchType,
+                resolvedCraftMode,
+                disposition,
+            ) &&
+                outputDestination === "inventory_set" &&
+                outputSetId === null)
         );
     }
 
@@ -2767,6 +2864,127 @@ export default class BatchCraftingSection extends React.Component<
         );
     }
 
+    renderOutputDestinationSelector() {
+        const {
+            batchType,
+            craftMode,
+            disposition,
+            inventorySets,
+            inventorySetsLoading,
+            isSaving,
+            outputDestination,
+            outputSetId,
+            status,
+        } = this.state;
+        const resolvedCraftMode = this.getResolvedCraftMode(
+            status,
+            batchType,
+            craftMode,
+        );
+
+        if (
+            !this.isFiniteRetainedOutputMode(
+                batchType,
+                resolvedCraftMode,
+                disposition,
+            )
+        ) {
+            return null;
+        }
+
+        const outputDestinationOptions: {
+            value: OutputDestination;
+            label: string;
+        }[] = [
+            { value: "inventory", label: "Inventory" },
+            { value: "inventory_set", label: "Specified Empty Set" },
+            { value: "crafted_items_set", label: "Crafted Items Set" },
+        ];
+
+        const eligibleOutputSets = inventorySets.filter(
+            (set) =>
+                !set.equipped &&
+                !set.is_batch_crafting_set &&
+                set.current_slots === 0,
+        );
+        const eligibleOutputSetOptions = eligibleOutputSets.map((set) => ({
+            value: set.set_id,
+            label: set.label,
+        }));
+
+        return (
+            <div className="grid gap-3">
+                <label className="grid gap-1 text-sm font-semibold">
+                    Output Destination
+                    <Select
+                        onChange={(opt) =>
+                            this.setState({
+                                outputDestination: (opt?.value ??
+                                    "crafted_items_set") as OutputDestination,
+                            })
+                        }
+                        options={outputDestinationOptions}
+                        isDisabled={isSaving}
+                        menuPosition={"absolute"}
+                        menuPlacement={"bottom"}
+                        styles={{
+                            menuPortal: (base) => ({
+                                ...base,
+                                zIndex: 9999,
+                                color: "#000000",
+                            }),
+                        }}
+                        menuPortalTarget={document.body}
+                        value={
+                            outputDestinationOptions.find(
+                                (option) => option.value === outputDestination,
+                            ) ?? outputDestinationOptions[2]
+                        }
+                    />
+                </label>
+                {outputDestination === "inventory_set" ? (
+                    eligibleOutputSetOptions.length === 0 &&
+                    !inventorySetsLoading ? (
+                        <WarningAlert additional_css="text-sm">
+                            You do not have an empty, unequipped set available
+                            for Batch Crafting output.
+                        </WarningAlert>
+                    ) : (
+                        <label className="grid gap-1 text-sm font-semibold">
+                            Empty Set
+                            <Select
+                                isLoading={inventorySetsLoading}
+                                onChange={(opt) =>
+                                    this.setState({
+                                        outputSetId: opt?.value ?? null,
+                                    })
+                                }
+                                options={eligibleOutputSetOptions}
+                                isDisabled={isSaving}
+                                menuPosition={"absolute"}
+                                menuPlacement={"bottom"}
+                                styles={{
+                                    menuPortal: (base) => ({
+                                        ...base,
+                                        zIndex: 9999,
+                                        color: "#000000",
+                                    }),
+                                }}
+                                menuPortalTarget={document.body}
+                                value={
+                                    eligibleOutputSetOptions.find(
+                                        (option) =>
+                                            option.value === outputSetId,
+                                    ) ?? null
+                                }
+                            />
+                        </label>
+                    )
+                ) : null}
+            </div>
+        );
+    }
+
     renderDestinationCapacity() {
         const destinationCapacity = this.state.preview?.destination_capacity;
 
@@ -3234,12 +3452,11 @@ export default class BatchCraftingSection extends React.Component<
                 {storesOutput ? (
                     <>
                         <InfoAlert additional_css="text-sm my-2">
-                            Kept output for this batch is moved into the Crafted
-                            Items Set, not your normal inventory. You can sell
-                            or disenchant items out of that set later.
+                            Kept output for this batch will be placed in{" "}
+                            {preview.destination_label}.
                         </InfoAlert>
                         <ProgressBar
-                            label="Crafted Items Set Space"
+                            label={`${preview.destination_label} Space`}
                             current={preview.destination_current_slots}
                             max={preview.destination_max_slots}
                             percent={
@@ -3264,7 +3481,10 @@ export default class BatchCraftingSection extends React.Component<
                 !hasStartBlockers ? (
                     <WarningAlert additional_css="my-2">
                         This batch cannot complete any items with your current
-                        gold{storesOutput ? " and Crafted Items Set space" : ""}
+                        gold
+                        {storesOutput
+                            ? ` and ${preview.destination_label} space`
+                            : ""}
                         .
                     </WarningAlert>
                 ) : preview.capped ? (
@@ -3274,11 +3494,15 @@ export default class BatchCraftingSection extends React.Component<
                         the requested{" "}
                         {formatNumber(preview.remaining_requested_amount)} items
                         with your current gold
-                        {storesOutput ? " and Crafted Items Set space" : ""}.
+                        {storesOutput
+                            ? ` and ${preview.destination_label} space`
+                            : ""}
+                        .
                     </WarningAlert>
                 ) : null}
-                {preview.requested_amount >
-                (this.state.status?.inventory_max ?? Infinity) ? (
+                {preview.destination === "inventory" &&
+                preview.requested_amount >
+                    (this.state.status?.inventory_max ?? Infinity) ? (
                     <WarningAlert additional_css="my-2">
                         You cannot empty all of this into your normal inventory
                         at once. Your normal inventory can only hold{" "}
@@ -3906,14 +4130,7 @@ export default class BatchCraftingSection extends React.Component<
                         {alchemyLocked ? (
                             <WarningAlert additional_css="text-sm my-2">
                                 You need to unlock Alchemy before you can batch
-                                craft alchemy items.
-                            </WarningAlert>
-                        ) : null}
-
-                        {alchemyLocked ? (
-                            <WarningAlert additional_css="text-sm my-2">
-                                You need to unlock Alchemy before you can batch
-                                craft with Holy Oils.
+                                craft Alchemy items or use Holy Oils.
                             </WarningAlert>
                         ) : null}
 
@@ -4117,9 +4334,10 @@ export default class BatchCraftingSection extends React.Component<
                                     version of one of each weapon type, a full
                                     armour set including a shield, two rings, a
                                     spell damage item, and a spell healing item,
-                                    placing each completed piece directly into
-                                    your Crafted Items Set.
+                                    placing each completed piece into{" "}
+                                    {this.outputDestinationDescription()}.
                                 </p>
+                                {this.renderOutputDestinationSelector()}
                                 {this.renderDestinationCapacity()}
                                 {this.renderCraftSetPlanner()}
                             </div>
@@ -4132,9 +4350,10 @@ export default class BatchCraftingSection extends React.Component<
                             <div className="grid gap-3">
                                 <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
                                     23 new crafted and enchanted items will be
-                                    placed directly into your Crafted Items Set.
-                                    No inventory set is needed.
+                                    placed into{" "}
+                                    {this.outputDestinationDescription()}.
                                 </p>
+                                {this.renderOutputDestinationSelector()}
                                 {this.renderDestinationCapacity()}
                                 {this.renderCraftEnchantSetPlanner()}
                             </div>
@@ -4445,6 +4664,7 @@ export default class BatchCraftingSection extends React.Component<
                                         }
                                     />
                                 </label>
+                                {this.renderOutputDestinationSelector()}
                                 {this.renderCraftAmountPreview()}
                             </>
                         ) : null}

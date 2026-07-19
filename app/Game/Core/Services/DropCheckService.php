@@ -4,6 +4,7 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
@@ -119,47 +120,32 @@ class DropCheckService
             ->resetRewardTotals();
 
         $plannedDrops = [];
+        $plannedQuestItemIds = [];
 
         for ($killIndex = 0; $killIndex < $killCount; $killIndex++) {
             $normalDrop = $this->battleDrop->handleDrop($character, $this->canHaveDrop($character), true);
 
             if (! is_null($normalDrop)) {
-                $plannedDrops[] = [
-                    'item_id' => $normalDrop->id,
-                    'is_mythic' => false,
-                    'source' => 'monster_drop',
-                ];
+                $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $normalDrop, 'monster_drop');
             }
 
             $monsterQuestDrop = $this->battleDrop->handleMonsterQuestDrop($character, true);
 
             if (! is_null($monsterQuestDrop)) {
-                $plannedDrops[] = [
-                    'item_id' => $monsterQuestDrop->id,
-                    'is_mythic' => false,
-                    'source' => 'monster_quest_drop',
-                ];
+                $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $monsterQuestDrop, 'monster_quest_drop');
             }
 
             $delveQuestDrop = $this->battleDrop->planDelveLocationQuestItem($character);
 
             if (! is_null($delveQuestDrop)) {
-                $plannedDrops[] = [
-                    'item_id' => $delveQuestDrop->id,
-                    'is_mythic' => false,
-                    'source' => 'delve_location_quest_drop',
-                ];
+                $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $delveQuestDrop, 'delve_location_quest_drop');
             }
 
             if (! is_null($this->manualQuestItemLocation)) {
                 $specialLocationQuestDrop = $this->battleDrop->planSpecialLocationQuestItem($character);
 
                 if (! is_null($specialLocationQuestDrop)) {
-                    $plannedDrops[] = [
-                        'item_id' => $specialLocationQuestDrop->id,
-                        'is_mythic' => false,
-                        'source' => 'special_location_quest_drop',
-                    ];
+                    $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $specialLocationQuestDrop, 'special_location_quest_drop');
                 }
             }
         }
@@ -207,6 +193,32 @@ class DropCheckService
         }
 
         return $this->battleDrop->rewardTotals();
+    }
+
+    /**
+     * Append a planned drop, skipping quest items already planned in this batch.
+     *
+     * @param array $plannedDrops
+     * @param array $plannedQuestItemIds
+     * @param Item $item
+     * @param string $source
+     * @return void
+     */
+    private function appendPlannedDrop(array &$plannedDrops, array &$plannedQuestItemIds, Item $item, string $source): void
+    {
+        if ($item->type === 'quest') {
+            if (in_array($item->id, $plannedQuestItemIds, true)) {
+                return;
+            }
+
+            $plannedQuestItemIds[] = $item->id;
+        }
+
+        $plannedDrops[] = [
+            'item_id' => $item->id,
+            'is_mythic' => false,
+            'source' => $source,
+        ];
     }
 
     /**

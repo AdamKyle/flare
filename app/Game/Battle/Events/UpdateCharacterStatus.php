@@ -4,6 +4,7 @@ namespace App\Game\Battle\Events;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\BatchCrafting;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -65,6 +66,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 ->where('type', AutomationType::DELVE)
                 ->where('completed_at', '>', now())
                 ->exists(),
+            'is_delve_visible' => $this->isDelveVisible($character),
             'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
             'is_batch_crafting_visible' => $this->visibleBatchCrafting($character),
             'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
@@ -156,6 +158,24 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 $query->whereNotNull('completed_at')
                     ->orWhereNotNull('cancelled_at');
             })
+            ->exists();
+    }
+
+    private function isDelveVisible(Character $character): bool
+    {
+        $isDelveActive = $character->currentAutomations()
+            ->where('character_id', $character->id)
+            ->where('type', AutomationType::DELVE)
+            ->where('completed_at', '>', now())
+            ->exists();
+
+        if ($isDelveActive) {
+            return true;
+        }
+
+        return DelveExploration::where('character_id', $character->id)
+            ->whereNotNull('completed_at')
+            ->whereNull('panel_dismissed_at')
             ->exists();
     }
 

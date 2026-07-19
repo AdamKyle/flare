@@ -2,14 +2,23 @@
 
 namespace Tests\Unit\Game\Core\Services;
 
+use App\Flare\Builders\BuildMythicItem;
+use App\Flare\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Values\CelestialType;
 use App\Flare\Values\LocationType;
+use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Services\DropCheckService;
+use App\Game\Messages\Events\GlobalMessageEvent;
+use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Shop\Services\ShopService;
+use App\Game\Skills\Services\DisenchantService;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -532,6 +541,109 @@ class DropCheckServiceTest extends TestCase
         $this->service?->process($character->refresh(), $monster->refresh());
 
         $this->assertFalse($character->refresh()->inventory->slots()->where('item_id', $questItem->id)->exists());
+    }
+
+    public function testPlanDropsProducesOnlyOnePlannedQuestDropAcrossMultipleKills(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->times(3)
+            ->andReturnFalse();
+
+        DropCheckCalculator::shouldReceive('fetchQuestItemDropCheck')
+            ->times(3)
+            ->andReturnTrue();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter()->refresh();
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => $questItem->id,
+        ]);
+
+        $plan = $this->service?->planDrops($character->refresh(), $monster->refresh(), 3, 0.0);
+
+        $questDrops = array_filter($plan['drops'], function (array $drop) use ($questItem): bool {
+            return $drop['item_id'] === $questItem->id;
+        });
+
+        $this->assertCount(1, $questDrops);
+    }
+
+    public function testPlanDropsProducesEveryNormalDropEvenWhenSameItemPlannedMultipleTimes(): void
+    {
+        DropCheckCalculator::shouldReceive('fetchDropCheckChance')
+            ->twice()
+            ->andReturnTrue();
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter()->refresh();
+
+        $drop = $this->createItem([
+            'type' => 'weapon',
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+            'specialty_type' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+        ]);
+
+        $randomItemDropBuilder = Mockery::mock(RandomItemDropBuilder::class);
+        $randomItemDropBuilder->shouldReceive('generateItem')->twice()->andReturn($drop);
+
+        $battleDrop = new BattleDrop($randomItemDropBuilder, Mockery::mock(DisenchantService::class), Mockery::mock(ShopService::class));
+
+        $service = new DropCheckService($battleDrop, resolve(BuildMythicItem::class));
+
+        $plan = $service->planDrops($character->refresh(), $monster->refresh(), 2, 0.0);
+
+        $normalDrops = array_filter($plan['drops'], function (array $plannedDrop): bool {
+            return $plannedDrop['source'] === 'monster_drop';
+        });
+
+        $this->assertCount(2, $normalDrops);
+    }
+
+    public function testApplyPlannedDropsCreatesOnlyOneSlotAndOneMessageWhenSameQuestItemPlannedTwice(): void
+    {
+        Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
+
+        $characterFactory = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter()->refresh();
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => null,
+        ]);
+
+        $plan = [
+            'game_map_bonus' => 0.0,
+            'looting_chance' => 0.0,
+            'drops' => [
+                ['item_id' => $questItem->id, 'is_mythic' => false, 'source' => 'monster_quest_drop'],
+                ['item_id' => $questItem->id, 'is_mythic' => false, 'source' => 'monster_quest_drop'],
+            ],
+        ];
+
+        $this->service?->applyPlannedDrops($character->refresh(), $monster->refresh(), $plan);
+
+        $this->assertSame(1, $character->refresh()->inventory->slots()->where('item_id', $questItem->id)->count());
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
     }
 
 

@@ -612,4 +612,160 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals(1, $character->inventory->slots()->where('item_id', $normalItem->id)->count());
         $this->assertEquals(4, $gemSlot->refresh()->amount);
     }
+
+    public function testSellAllFromSetSellsEligibleCraftedItemsSetSlots(): void
+    {
+        $weapon = $this->createItem(['type' => 'weapon', 'cost' => 100]);
+        $trinket = $this->createItem(['type' => 'trinket']);
+
+        $character = $this->character->getCharacter();
+
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $set->slots()->create(['item_id' => $weapon->id]);
+        $trinketSlot = $set->slots()->create(['item_id' => $trinket->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/sell-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(1, $set->refresh()->slots()->count());
+        $this->assertTrue($set->slots()->where('id', $trinketSlot->id)->exists());
+    }
+
+    public function testSellAllFromSetRejectsNormalSet(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($item, 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/sell-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Cannot do that.', $jsonData['message']);
+        $this->assertEquals(1, $set->refresh()->slots()->count());
+    }
+
+    public function testDestroyAllFromSetDestroysCraftedItemsSetSlots(): void
+    {
+        $item = $this->createItem(['type' => 'weapon']);
+
+        $character = $this->character->getCharacter();
+
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $set->slots()->create(['item_id' => $item->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/destroy-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(0, $set->refresh()->slots()->count());
+    }
+
+    public function testDisenchantAllFromSetReturns200ForCraftedItemsSet(): void
+    {
+        $prefix = $this->createItemAffix(['name' => 'Controller Disenchant All Prefix', 'type' => 'prefix']);
+        $item = $this->createItem(['type' => 'weapon', 'item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->getCharacter();
+
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $enchantedSlot = $set->slots()->create(['item_id' => $item->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/disenchant-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertFalse($set->slots()->where('id', $enchantedSlot->id)->exists());
+    }
+
+    public function testDisenchantAllFromSetReturns422ForNormalSet(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($item, 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/disenchant-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Cannot do that.', $jsonData['message']);
+        $this->assertEquals(1, $set->refresh()->slots()->count());
+    }
+
+    public function testDisenchantAllFromSetReturns422ForAnotherCharactersSet(): void
+    {
+        $prefix = $this->createItemAffix(['name' => 'Controller Other Character Prefix', 'type' => 'prefix']);
+        $item = $this->createItem(['item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $otherSet = $otherCharacter->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+        $otherSlot = $otherSet->slots()->create(['item_id' => $item->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/disenchant-all', [
+                'set_id' => $otherSet->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Cannot do that.', $jsonData['message']);
+        $this->assertTrue($otherSet->slots()->where('id', $otherSlot->id)->exists());
+    }
 }

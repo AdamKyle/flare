@@ -427,7 +427,9 @@ class EnchantingService
 
         $this->enchantItemService->deleteSlot($slot);
 
-        event(new UpdateCharacterInventoryCountEvent($character));
+        if ($slot instanceof InventorySlot) {
+            event(new UpdateCharacterInventoryCountEvent($character));
+        }
     }
 
     private function fetchEventItemsForEnchanting(Character $character): array

@@ -60,6 +60,47 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertArrayHasKey('stat_breakdown', $data);
     }
 
+    public function testStatsForCharacterWithNoInventoryReturnsNullDetailFieldsInsteadOfEmptyArrays(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->stats($character);
+
+        $this->assertArrayHasKey('base_stats', $data);
+        $this->assertArrayHasKey('modded_stats', $data);
+        $this->assertArrayHasKey('stat_details', $data);
+        $this->assertArrayHasKey('resistance_info', $data);
+        $this->assertArrayHasKey('elemental_atonement', $data);
+        $this->assertArrayHasKey('resurrection_chance', $data);
+        $this->assertNull($data['stat_details']);
+        $this->assertNull($data['resistance_info']);
+        $this->assertNull($data['elemental_atonement']);
+        $this->assertSame(0.0, $data['resurrection_chance']);
+    }
+
+    public function testStatBreakDownMatchesStatModifierDetailsForStat(): void
+    {
+        $character = (new \Tests\Setup\Character\CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $expected = $this->app->make(\App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails::class)->setCharacter($character)->forStat('str');
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->statBreakDown($character, 'str');
+
+        $this->assertSame($expected, $data);
+    }
+
+    public function testSpecificStatBreakDownMatchesBuildSpecificBreakDown(): void
+    {
+        $character = (new \Tests\Setup\Character\CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $expected = $this->app->make(\App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails::class)->setCharacter($character)->buildSpecificBreakDown('health', false);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->specificStatBreakDown($character, 'health', false);
+
+        $this->assertSame($expected, $data);
+    }
+
     public function testEquipmentReturnsExplicitEquipmentRows(): void
     {
         $user = User::factory()->create();
@@ -704,5 +745,158 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertSame('Location Plane', $location['map']['name']);
         $this->assertArrayNotHasKey('character_id', $location);
         $this->assertArrayNotHasKey('mutation_url', $location);
+    }
+
+    public function testStatsPreservesExistingFieldsAndIncludesPreloadedCharacterSheetData(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        Inventory::factory()->create(['character_id' => $character->id]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->stats($character->refresh());
+
+        $this->assertArrayHasKey('base_stats', $data);
+        $this->assertArrayHasKey('modded_stats', $data);
+        $this->assertArrayHasKey('resistances', $data);
+        $this->assertArrayHasKey('stat_breakdown', $data);
+        $this->assertArrayHasKey('stat_details', $data);
+        $this->assertArrayHasKey('resistance_info', $data);
+        $this->assertArrayHasKey('elemental_atonement', $data);
+        $this->assertArrayHasKey('resurrection_chance', $data);
+        $this->assertSame($data['base_stats']['str'], $data['stat_details']['str']);
+        $this->assertSame(0.0, $data['resistance_info']['spell_evasion']);
+    }
+
+    public function testReincarnationPreservesExistingKeysAndIncludesReincarnationDetails(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create([
+            'user_id' => $user->id,
+            'times_reincarnated' => 2,
+            'reincarnated_stat_increase' => 5,
+            'xp_penalty' => 0.1,
+            'base_stat_mod' => 0.2,
+            'base_damage_stat_mod' => 0.3,
+        ]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->reincarnation($character);
+
+        $this->assertSame(2, $data['times_reincarnated']);
+        $this->assertSame(5, $data['reincarnated_stat_increase']);
+        $this->assertArrayHasKey('reincarnation_details', $data);
+        $this->assertSame(2, $data['reincarnation_details']['reincarnated_times']);
+        $this->assertSame(5, $data['reincarnation_details']['reincarnated_stat_increase']);
+        $this->assertSame(0.1, $data['reincarnation_details']['xp_penalty']);
+        $this->assertSame(0.2, $data['reincarnation_details']['base_stat_mod']);
+        $this->assertSame(0.3, $data['reincarnation_details']['base_damage_stat_mod']);
+    }
+
+    public function testSkillsIncludesClassRanksOfferedAndClassRankSpecialties(): void
+    {
+        $user = User::factory()->create();
+        $gameClass = GameClass::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id, 'game_class_id' => $gameClass->id]);
+        CharacterClassRank::factory()->create(['character_id' => $character->id, 'game_class_id' => $gameClass->id, 'level' => 2]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->skills($character);
+
+        $this->assertArrayHasKey('class_ranks_offered', $data);
+        $this->assertArrayHasKey('class_rank_specialties', $data);
+        $this->assertArrayHasKey('class_specialties', $data['class_rank_specialties']);
+        $this->assertArrayHasKey('specials_equipped', $data['class_rank_specialties']);
+        $this->assertArrayHasKey('class_ranks', $data['class_rank_specialties']);
+        $this->assertArrayHasKey('other_class_specials', $data['class_rank_specialties']);
+    }
+
+    public function testClassRanksOfferedReturnsCorrectOfferedSkillsForEachOfMultipleClasses(): void
+    {
+        $user = User::factory()->create();
+        $firstClass = GameClass::factory()->create();
+        $secondClass = GameClass::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id, 'game_class_id' => $firstClass->id]);
+        CharacterClassRank::factory()->create(['character_id' => $character->id, 'game_class_id' => $firstClass->id, 'level' => 2]);
+        CharacterClassRank::factory()->create(['character_id' => $character->id, 'game_class_id' => $secondClass->id, 'level' => 2]);
+        $firstClassSkill = GameSkill::factory()->create(['game_class_id' => $firstClass->id, 'name' => 'First Class Skill']);
+        $secondClassSkill = GameSkill::factory()->create(['game_class_id' => $secondClass->id, 'name' => 'Second Class Skill']);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->classRanksOffered($character);
+
+        $firstOffered = collect($data)->firstWhere('class_id', $firstClass->id);
+        $secondOffered = collect($data)->firstWhere('class_id', $secondClass->id);
+
+        $this->assertSame('First Class Skill', $firstOffered['offered_game_skills'][0]['name']);
+        $this->assertSame('Second Class Skill', $secondOffered['offered_game_skills'][0]['name']);
+        $this->assertCount(1, $firstOffered['offered_game_skills']);
+        $this->assertCount(1, $secondOffered['offered_game_skills']);
+    }
+
+    public function testQuestDetailPayloadIncludesRequiredQuestChainAfterRemovingPerQuestLoadRelations(): void
+    {
+        $owner = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $owner->id]);
+        $gameMap = GameMap::factory()->create();
+        $npc = Npc::factory()->create(['game_map_id' => $gameMap->id]);
+        $requiredQuest = Quest::factory()->create(['npc_id' => $npc->id, 'name' => 'Required First']);
+        $quest = Quest::factory()->create(['npc_id' => $npc->id, 'required_quest_id' => $requiredQuest->id, 'name' => 'Public Quest']);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $quest->id]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->quests($character, $owner);
+        $details = $data['completed_quests'][0]['details'];
+
+        $this->assertSame('Required First', $details['required_quest']['name']);
+    }
+
+    public function testQuestSummaryChartProducesCumulativeAndAverageValuesForDeterministicFixture(): void
+    {
+        $owner = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $owner->id, 'name' => 'Inspected', 'created_at' => now()->subDays(10)]);
+        $otherOwnerOne = User::factory()->create();
+        $otherOwnerTwo = User::factory()->create();
+        $otherCharacterOne = Character::factory()->create(['user_id' => $otherOwnerOne->id, 'name' => 'Other One', 'created_at' => now()->subDays(10)]);
+        $otherCharacterTwo = Character::factory()->create(['user_id' => $otherOwnerTwo->id, 'name' => 'Other Two', 'created_at' => now()->subDays(10)]);
+
+        $npc = Npc::factory()->create();
+        $questOne = Quest::factory()->create(['npc_id' => $npc->id]);
+        $questTwo = Quest::factory()->create(['npc_id' => $npc->id]);
+
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $questOne->id, 'created_at' => now()->subDays(9)]);
+        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $questTwo->id, 'created_at' => now()->subDays(8)]);
+        QuestsCompleted::factory()->create(['character_id' => $otherCharacterOne->id, 'quest_id' => $questOne->id, 'created_at' => now()->subDays(9)]);
+        QuestsCompleted::factory()->create(['character_id' => $otherCharacterTwo->id, 'quest_id' => $questOne->id, 'created_at' => now()->subDays(9)]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->quests($character, $owner);
+        $summaryChart = $data['summary_chart'];
+
+        $inspectedSeries = collect($summaryChart['series'])->firstWhere('label', 'Inspected Completed Quests');
+        $othersSeries = collect($summaryChart['series'])->firstWhere('label', 'Average Completed Quests For Everyone Else');
+
+        $this->assertSame(2, end($inspectedSeries['points'])['value']);
+        $this->assertSame(1.0, end($othersSeries['points'])['value']);
+    }
+
+    public function testFullProfileStillReturnsAllExistingSections(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->fullProfile($character, $user);
+
+        $this->assertArrayHasKey('overview', $data);
+        $this->assertArrayHasKey('summary', $data);
+        $this->assertArrayHasKey('info', $data);
+        $this->assertArrayHasKey('stats', $data);
+        $this->assertArrayHasKey('additional_stats', $data);
+        $this->assertArrayHasKey('equipment', $data);
+        $this->assertArrayHasKey('skills', $data);
+        $this->assertArrayHasKey('crafting_skills', $data);
+        $this->assertArrayHasKey('kingdom_passives', $data);
+        $this->assertArrayHasKey('class_ranks', $data);
+        $this->assertArrayHasKey('class_ranks_offered', $data);
+        $this->assertArrayHasKey('factions', $data);
+        $this->assertArrayHasKey('reincarnation', $data);
+        $this->assertArrayHasKey('activity', $data);
+        $this->assertArrayHasKey('quests', $data);
+        $this->assertArrayHasKey('kingdoms', $data);
+        $this->assertArrayHasKey('analytics', $data);
     }
 }

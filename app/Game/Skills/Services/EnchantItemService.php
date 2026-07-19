@@ -101,7 +101,7 @@ class EnchantItemService
      * Never deletes the item if it is still referenced by another
      * inventory slot, set slot, market listing, or market history entry.
      */
-    public function deleteSlot(InventorySlot $slot): void
+    public function deleteSlot(InventorySlot|GlobalEventCraftingInventorySlot $slot): void
     {
         $slot->delete();
 

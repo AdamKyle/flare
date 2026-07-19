@@ -9,6 +9,8 @@ export default class CharacterProfile extends React.Component<CharacterProfilePr
                 profile={this.props.profile}
                 activeTab={this.props.activeTab}
                 onTabChange={this.props.onTabChange}
+                deferred_loading={this.props.deferred_loading}
+                deferred_errors={this.props.deferred_errors}
             />
         );
     }

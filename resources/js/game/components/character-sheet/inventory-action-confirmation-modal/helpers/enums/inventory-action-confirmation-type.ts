@@ -12,4 +12,6 @@ export enum InventoryActionConfirmationType {
     DISENCHANT_SELECTED_FROM_SET = "disenchant-selected-from-set",
     DESTROY_SELECTED_FROM_SET = "destroy-selected-from-set",
     DESTROY_ALL_FROM_SET = "destroy-all-from-set",
+    SELL_ALL_FROM_SET = "sell-all-from-set",
+    DISENCHANT_ALL_FROM_SET = "disenchant-all-from-set",
 }

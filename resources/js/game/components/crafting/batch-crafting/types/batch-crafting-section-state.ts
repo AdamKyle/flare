@@ -15,6 +15,7 @@ import {
     HolyOilMode,
     HolyOilOption,
     InventorySetOption,
+    OutputDestination,
 } from "./batch-crafting-types";
 
 export default interface BatchCraftingSectionState {
@@ -52,6 +53,8 @@ export default interface BatchCraftingSectionState {
     inventorySets: InventorySetOption[];
     inventorySetsLoading: boolean;
     selectedSetId: number | null;
+    outputDestination: OutputDestination;
+    outputSetId: number | null;
     craftEnchantSetMode: "build_new";
     craftEnchantSetPlan: CraftEnchantSetPlan;
     craftEnchantSetBulkPrefixId: number | null;

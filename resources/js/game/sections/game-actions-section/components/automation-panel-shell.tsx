@@ -85,7 +85,7 @@ export default function AutomationPanelShell({
                         ) : null}
                         {timerText ? (
                             <span className="rounded bg-orange-100 px-2 py-0.5 font-medium text-orange-800 dark:bg-orange-900 dark:text-orange-200">
-                                {timerText}
+                                {timerText} elapsed
                             </span>
                         ) : null}
                         <span aria-hidden="true">{isExpanded ? "▲" : "▼"}</span>

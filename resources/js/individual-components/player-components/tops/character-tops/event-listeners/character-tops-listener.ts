@@ -28,17 +28,6 @@ export default class CharacterTopsListener
     }
 
     register(): void {
-        this.leaderboardListener.initialize(
-            "tops-character-leaderboard",
-            "Game.Tops.Events.CharacterTopsUpdated",
-            (event: TopsEventPayload) => {
-                if (this.component && event.leaderboard) {
-                    this.component.fetchLeaderboard();
-                }
-            },
-        );
-        this.leaderboardListener.register();
-
         if (this.selectedCharacterId !== null) {
             this.profileListener.initialize(
                 "tops-character-inspection-" + this.selectedCharacterId,
@@ -52,11 +41,29 @@ export default class CharacterTopsListener
                 },
             );
             this.profileListener.register();
+
+            return;
         }
+
+        this.leaderboardListener.initialize(
+            "tops-character-leaderboard",
+            "Game.Tops.Events.CharacterTopsUpdated",
+            (event: TopsEventPayload) => {
+                if (this.component && event.leaderboard) {
+                    this.component.fetchLeaderboard();
+                }
+            },
+        );
+        this.leaderboardListener.register();
     }
 
     listen(): void {
+        if (this.selectedCharacterId !== null) {
+            this.profileListener.listen();
+
+            return;
+        }
+
         this.leaderboardListener.listen();
-        this.profileListener.listen();
     }
 }

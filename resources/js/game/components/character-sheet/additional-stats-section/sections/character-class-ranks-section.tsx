@@ -78,8 +78,33 @@ export default class CharacterClassRanksSection extends React.Component<
     renderSelectedType() {
         switch (this.state.class_rank_type_to_show) {
             case "class-ranks":
-                return <CharacterClassRanks character={this.props.character} />;
+                return (
+                    <CharacterClassRanks
+                        character={this.props.character}
+                        read_only={this.props.read_only}
+                        preloaded_class_ranks={this.props.preloaded_class_ranks}
+                        preloaded_class_ranks_offered={
+                            this.props.preloaded_class_ranks_offered
+                        }
+                    />
+                );
             case "class-masteries":
+                if (this.props.read_only) {
+                    return (
+                        <CharacterClassRanks
+                            character={this.props.character}
+                            read_only={this.props.read_only}
+                            preloaded_class_ranks={
+                                this.props.preloaded_class_ranks
+                            }
+                            preloaded_class_ranks_offered={
+                                this.props.preloaded_class_ranks_offered
+                            }
+                            masteries_only={true}
+                        />
+                    );
+                }
+
                 return (
                     <CharacterClassRankSpecialtiesSection
                         view_port={0}
@@ -89,10 +114,23 @@ export default class CharacterClassRanksSection extends React.Component<
                         character={this.props.character}
                         finished_loading={true}
                         selected_type={this.state.class_special_type_to_show}
+                        read_only={this.props.read_only}
+                        preloaded_class_rank_specialties={
+                            this.props.preloaded_class_rank_specialties
+                        }
                     />
                 );
             default:
-                return <CharacterClassRanks character={this.props.character} />;
+                return (
+                    <CharacterClassRanks
+                        character={this.props.character}
+                        read_only={this.props.read_only}
+                        preloaded_class_ranks={this.props.preloaded_class_ranks}
+                        preloaded_class_ranks_offered={
+                            this.props.preloaded_class_ranks_offered
+                        }
+                    />
+                );
         }
     }
 
@@ -113,8 +151,9 @@ export default class CharacterClassRanksSection extends React.Component<
                     <div
                         className={clsx("my-4 max-w-full md:max-w-[25%] ml-4", {
                             hidden:
+                                this.props.read_only ||
                                 this.state.class_rank_type_to_show !==
-                                "class-masteries",
+                                    "class-masteries",
                         })}
                     >
                         <DropDown

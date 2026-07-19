@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GuideQuest;
+use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Map;
@@ -65,6 +66,51 @@ class CharacterTopsApiTest extends TestCase
         $this->assertSame('Profile Hero', $data['name']);
         $this->assertArrayNotHasKey('email', $data);
         $this->assertArrayNotHasKey('password', $data);
+    }
+
+    public function testSignedInUserCanRequestAnotherPublicCharactersStatBreakDown(): void
+    {
+        $viewer = User::factory()->create();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/stat-break-down', ['stat_type' => 'str']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('break_down', $data);
+    }
+
+    public function testSignedInUserCanRequestAnotherPublicCharactersSpecificStatBreakDown(): void
+    {
+        $viewer = User::factory()->create();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/specific-attribute-break-down', ['type' => 'health', 'is_voided' => 0]);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('break_down', $data);
+    }
+
+    public function testTopsStatBreakDownRequestDoesNotMutateCharacter(): void
+    {
+        $viewer = User::factory()->create();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $goldBeforeRequest = $character->gold;
+
+        $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/stat-break-down', ['stat_type' => 'str']);
+
+        $this->assertSame($goldBeforeRequest, $character->refresh()->gold);
+    }
+
+    public function testPrivateCharacterSheetStatBreakDownRouteRemainsOwnerAuthorized(): void
+    {
+        $otherCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($otherCharacter->user)->call('GET', '/api/character-sheet/'.$character->id.'/stat-break-down', ['stat_type' => 'str']);
+
+        $this->assertSame(302, $response->getStatusCode());
     }
 
     public function testCharacterProfileOverviewDoesNotExposeIp(): void
@@ -387,5 +433,74 @@ class CharacterTopsApiTest extends TestCase
         $this->assertFalse($data['quests']['completed_guide_quests'][0]['viewer_has_completed']);
         $this->assertStringNotContainsString('guide-viewer-private@example.com', $response->getContent());
         $this->assertStringNotContainsString('hand_in_url', $response->getContent());
+    }
+
+    public function testStatsEndpointPreservesExistingFieldsAndIncludesPreloadedCharacterSheetData(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/stats');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('base_stats', $data);
+        $this->assertArrayHasKey('modded_stats', $data);
+        $this->assertArrayHasKey('resistances', $data);
+        $this->assertArrayHasKey('stat_details', $data);
+        $this->assertArrayHasKey('resistance_info', $data);
+        $this->assertArrayHasKey('elemental_atonement', $data);
+        $this->assertArrayHasKey('resurrection_chance', $data);
+    }
+
+    public function testStatsEndpointForCharacterWithNoInventoryReturnsNullDetailFieldsAndDoesNotCreateAnInventory(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters/'.$character->id.'/stats');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('stat_details', $data);
+        $this->assertArrayHasKey('resistance_info', $data);
+        $this->assertArrayHasKey('elemental_atonement', $data);
+        $this->assertArrayHasKey('resurrection_chance', $data);
+        $this->assertNull($data['stat_details']);
+        $this->assertNull($data['resistance_info']);
+        $this->assertNull($data['elemental_atonement']);
+        $this->assertSame(0, $data['resurrection_chance']);
+        $this->assertFalse(Inventory::where('character_id', $character->id)->exists());
+    }
+
+    public function testReincarnationEndpointPreservesExistingKeysAndIncludesReincarnationDetails(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/reincarnation');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('times_reincarnated', $data);
+        $this->assertArrayHasKey('reincarnated_stat_increase', $data);
+        $this->assertArrayHasKey('xp_penalty', $data);
+        $this->assertArrayHasKey('base_stat_mod', $data);
+        $this->assertArrayHasKey('base_damage_stat_mod', $data);
+        $this->assertArrayHasKey('reincarnation_details', $data);
+    }
+
+    public function testSkillsEndpointIncludesClassRanksOfferedAndClassRankSpecialties(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/skills');
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('regular_skills', $data);
+        $this->assertArrayHasKey('crafting_skills', $data);
+        $this->assertArrayHasKey('class_ranks', $data);
+        $this->assertArrayHasKey('kingdom_passives', $data);
+        $this->assertArrayHasKey('class_ranks_offered', $data);
+        $this->assertArrayHasKey('class_rank_specialties', $data);
     }
 }

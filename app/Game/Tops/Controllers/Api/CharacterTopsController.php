@@ -3,6 +3,8 @@
 namespace App\Game\Tops\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Game\Core\Requests\SpecificDetailsRequest;
+use App\Game\Core\Requests\StatDetailsRequest;
 use App\Game\Tops\Services\CharacterTopsInspectionService;
 use App\Game\Tops\Services\CharacterTopsService;
 use App\Http\Controllers\Controller;
@@ -74,5 +76,19 @@ class CharacterTopsController extends Controller
     public function analytics(Character $character): JsonResponse
     {
         return response()->json($this->characterTopsInspectionService->analytics($character));
+    }
+
+    public function statBreakDown(StatDetailsRequest $request, Character $character): JsonResponse
+    {
+        return response()->json([
+            'break_down' => $this->characterTopsInspectionService->statBreakDown($character, $request->stat_type),
+        ]);
+    }
+
+    public function specificStatBreakDown(SpecificDetailsRequest $request, Character $character): JsonResponse
+    {
+        return response()->json([
+            'break_down' => $this->characterTopsInspectionService->specificStatBreakDown($character, $request->type, $request->is_voided),
+        ]);
     }
 }

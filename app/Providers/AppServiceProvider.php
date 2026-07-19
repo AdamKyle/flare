@@ -9,6 +9,7 @@ use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\BackfillSpecialLocationTypes;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
+use App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots;
 use App\Console\AfterDeployment\CreateLocationDataCache;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\MoveAlchemyAndGemsToBags;
@@ -52,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
             AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
+            CleanDuplicateQuestInventorySlots::class,
             CreateMonsterCache::class,
             CreateLocationDataCache::class,
             MoveAlchemyAndGemsToBags::class,

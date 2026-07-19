@@ -30,8 +30,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     constructor(props: ClassSpecialtiesEquippedProps) {
         super(props);
 
+        const preloaded = props.preloaded_class_rank_specialties;
+
         this.state = {
-            loading: true,
+            loading: typeof preloaded === "undefined",
             equipping: false,
             equipping_special_id: null,
             class_specialties: [],
@@ -71,6 +73,38 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
         watchForDarkModeClassSpecialtyChange(this);
 
         if (this.props.character === null) {
+            return;
+        }
+
+        if (
+            typeof this.props.preloaded_class_rank_specialties !== "undefined"
+        ) {
+            const preloaded = this.props.preloaded_class_rank_specialties;
+
+            this.setState(
+                {
+                    loading: false,
+                    class_specialties: preloaded.class_specialties,
+                    class_specials_for_table: preloaded.class_specialties,
+                    specialties_equipped: preloaded.specials_equipped,
+                    class_ranks: preloaded.class_ranks,
+                    other_class_specialties: preloaded.other_class_specials,
+                    original_class_specialties: preloaded.other_class_specials,
+                    selected_filter:
+                        this.props.character === null
+                            ? null
+                            : this.props.character.class,
+                    other_selected_filter:
+                        this.props.character === null
+                            ? null
+                            : this.props.character.class,
+                },
+                () => {
+                    this.filterTable();
+                    this.filterOtherClassSpecialsTable();
+                },
+            );
+
             return;
         }
 
@@ -260,6 +294,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     }
 
     unequipSpecial(specialId: number) {
+        if (this.props.read_only) {
+            return;
+        }
+
         if (this.isAutomationRunning()) {
             return;
         }
@@ -326,6 +364,10 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     }
 
     equipSpecial(specialId: number) {
+        if (this.props.read_only) {
+            return;
+        }
+
         if (this.isAutomationRunning()) {
             return;
         }
@@ -410,7 +452,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     }
 
     classSpecialtiesTable() {
-        return [
+        const columns = [
             {
                 name: "Name",
                 selector: (row: ClassSpecialtiesType) => row.name,
@@ -439,6 +481,14 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                 selector: (row: ClassSpecialtiesType) =>
                     this.doesSpecialtyDealDamage(row) ? "Yes" : "No",
             },
+        ];
+
+        if (this.props.read_only) {
+            return columns;
+        }
+
+        return [
+            ...columns,
             {
                 name: "Actions",
                 selector: (row: ClassSpecialtiesType) => row.id,
@@ -490,7 +540,7 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
     }
 
     classSpecialtiesEquippedTable(equipSpecial: boolean) {
-        return [
+        const columns = [
             {
                 name: "Name",
                 selector: (row: CharacterSpecialsEquippedTyp) =>
@@ -534,6 +584,14 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
                 selector: (row: ClassSpecialtiesType) =>
                     this.doesSpecialtyDealDamage(row) ? "Yes" : "No",
             },
+        ];
+
+        if (this.props.read_only) {
+            return columns;
+        }
+
+        return [
+            ...columns,
             {
                 name: "Actions",
                 selector: (row: CharacterSpecialsEquippedTyp) => row.id,
@@ -1109,7 +1167,13 @@ export default class CharacterClassRankSpecialtiesSection extends React.Componen
         }
 
         return (
-            <div className="max-h-[475px] lg:max-h-[525px] overflow-y-auto">
+            <div
+                className={
+                    this.props.read_only
+                        ? "w-full"
+                        : "max-h-[475px] lg:max-h-[525px] overflow-y-auto"
+                }
+            >
                 {this.state.loading ? (
                     <div className="p-10">
                         <LoadingProgressBar />

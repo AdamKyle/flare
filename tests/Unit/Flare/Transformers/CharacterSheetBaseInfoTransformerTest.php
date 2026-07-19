@@ -4,11 +4,13 @@ namespace Tests\Unit\Flare\Transformers;
 
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\MapNameValue;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -436,5 +438,61 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
 
         $this->assertFalse($data['is_batch_crafting_visible']);
+    }
+
+    public function testDelveVisibleIsTrueForActiveDelve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->addSeconds(600),
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertTrue($data['is_delve_visible']);
+    }
+
+    public function testDelveVisibleIsTrueForCompletedUndismissedDelve(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertTrue($data['is_delve_visible']);
+    }
+
+    public function testDelveVisibleIsFalseAfterDismissed(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());
+
+        $this->assertFalse($data['is_delve_visible']);
+    }
+
+    public function testDelveVisibleMatchesBetweenTransformerAndStatusUpdateEvent(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $character = $this->character->refresh();
+
+        $transformerData = resolve(CharacterSheetBaseInfoTransformer::class)->transform($character);
+        $event = new UpdateCharacterStatus($character);
+
+        $this->assertTrue($transformerData['is_delve_visible']);
+        $this->assertSame($transformerData['is_delve_visible'], $event->characterStatuses['is_delve_visible']);
     }
 }

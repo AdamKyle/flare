@@ -641,14 +641,17 @@ export default class Actions extends React.Component<
         const actionSlot = this.renderActionSlot();
         const automationPanels = [
             !this.state.show_exploration &&
-            this.props.exploration_output?.type === "active" ? (
+            (this.props.exploration_output?.type === "active" ||
+                this.props.exploration_output?.type === "warning" ||
+                this.props.exploration_output?.type === "ended") ? (
                 <ExplorationOutputSection
                     key="exploration-output"
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
             ) : null,
-            !this.state.show_exploration && this.isDelveRunning() ? (
+            !this.state.show_exploration &&
+            this.props.character.is_delve_visible ? (
                 <DelveStatusPanel
                     key="delve-status"
                     character_id={this.props.character.id}

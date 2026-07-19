@@ -20,6 +20,7 @@ use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
+use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -38,6 +39,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BatchCraftingSetService::class),
                 $app->make(InventorySetService::class),
                 $app->make(HandleUpdatingCraftingGlobalEventGoal::class),
+                $app->make(HandleUpdatingEnchantingGlobalEventGoal::class),
                 $app->make(ServerMessageHandler::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(EventBatchEnchantingAffixSelector::class),

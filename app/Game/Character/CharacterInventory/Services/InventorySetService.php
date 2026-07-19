@@ -62,13 +62,13 @@ class  InventorySetService
     /**
      * Put an item into the characters inventory set.
      */
-    public function putItemIntoSet(InventorySet $set, Item $item): void
+    public function putItemIntoSet(InventorySet $set, Item $item): ?SetSlot
     {
         if ($set->isBatchCraftingSet()) {
-            return;
+            return null;
         }
 
-        $set->slots()->create([
+        $setSlot = $set->slots()->create([
             'inventory_set_id' => $set->id,
             'item_id' => $item->id,
         ]);
@@ -79,6 +79,8 @@ class  InventorySetService
         $set->update([
             'can_be_equipped' => $this->isSetEquippable($set),
         ]);
+
+        return $setSlot;
     }
 
     /**

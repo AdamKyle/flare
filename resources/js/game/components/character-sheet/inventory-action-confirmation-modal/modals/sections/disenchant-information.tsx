@@ -1,18 +1,42 @@
 import React from "react";
 
-export default class DisenchantInformation extends React.Component<{}, {}> {
-    constructor(props: any) {
+interface DisenchantInformationProps {
+    from_set?: boolean;
+}
+
+export default class DisenchantInformation extends React.Component<
+    DisenchantInformationProps,
+    {}
+> {
+    constructor(props: DisenchantInformationProps) {
         super(props);
+    }
+
+    renderDescription() {
+        if (this.props.from_set) {
+            return (
+                <p>
+                    Are you sure you want to do this? Every enchanted,
+                    disenchantable item in your Crafted Items Set will be queued
+                    for disenchanting. Unenchanted items, Alchemy items, Gems,
+                    Quest items, Artifacts and Trinkets will remain in the set.
+                    You cannot undo this action.
+                </p>
+            );
+        }
+
+        return (
+            <p>
+                Are you sure you want to do this? This action will disenchant
+                all items in your inventory. You cannot undo this action.
+            </p>
+        );
     }
 
     render() {
         return (
             <>
-                <p>
-                    Are you sure you want to do this? This action will
-                    disenchant all items in your inventory. You cannot undo this
-                    action.
-                </p>
+                {this.renderDescription()}
                 <p className="mt-2">
                     When you disenchant items you will get some{" "}
                     <a href={"/information/currencies"} target="_blank">

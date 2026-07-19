@@ -98,6 +98,10 @@ export default class SectionBuilder extends React.Component<
                         }
                     />
                 );
+            case InventoryActionConfirmationType.SELL_ALL_FROM_SET:
+                return <SellInformation from_set={true} />;
+            case InventoryActionConfirmationType.DISENCHANT_ALL_FROM_SET:
+                return <DisenchantInformation from_set={true} />;
             default:
                 return null;
         }

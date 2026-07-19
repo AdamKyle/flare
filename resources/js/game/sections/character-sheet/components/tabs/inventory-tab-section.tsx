@@ -274,14 +274,28 @@ export default class InventoryTabSection extends React.Component<
     }
 
     updateInventory(inventory: { [key: string]: InventoryDetails[] }) {
-        this.setState(
-            {
-                search_string: "",
-            },
-            () => {
-                this.props.update_inventory(inventory);
-            },
-        );
+        const stateUpdate: {
+            search_string: string;
+            selected_items: SelectItems[];
+            data?: InventoryDetails[];
+            usable_items?: UsableItemsDetails[];
+        } = {
+            search_string: "",
+            selected_items: [],
+        };
+
+        if (Array.isArray(inventory.inventory)) {
+            stateUpdate.data = inventory.inventory;
+        }
+
+        if (Array.isArray(inventory.usable_items)) {
+            stateUpdate.usable_items =
+                inventory.usable_items as unknown as UsableItemsDetails[];
+        }
+
+        this.setState(stateUpdate, () => {
+            this.props.update_inventory(inventory);
+        });
     }
 
     selectAllItems() {
@@ -502,7 +516,7 @@ export default class InventoryTabSection extends React.Component<
                         is_open={this.state.show_action_confirmation_modal}
                         manage_modal={this.manageConfirmationModal.bind(this)}
                         title={modalPropsBuilder.fetchModalName()}
-                        update_inventory={this.props.update_inventory}
+                        update_inventory={this.updateInventory.bind(this)}
                         set_success_message={this.setSuccessMessage.bind(this)}
                         selected_item_names={this.state.selected_items.map(
                             (selectedItem) => selectedItem.item_name,
@@ -530,7 +544,7 @@ export default class InventoryTabSection extends React.Component<
                         is_open={this.state.show_use_many}
                         manage_modal={this.manageUseManyItems.bind(this)}
                         items={this.state.usable_items}
-                        update_inventory={this.props.update_inventory}
+                        update_inventory={this.updateInventory.bind(this)}
                         character_id={this.props.character_id}
                         set_success_message={this.setSuccessMessage.bind(this)}
                     />

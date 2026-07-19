@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\GuideQuest\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Flare\Models\QuestsCompleted;
 use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use Tests\Setup\Character\CharacterFactory;
@@ -123,5 +124,88 @@ class GuideQuestsControllerTest extends TestCase
             ->dontSee('Required Crafted or Alchemy Items')
             ->dontSee('required_batch_crafted_items')
             ->dontSee('item_id');
+    }
+
+    public function testApiRefreshReturnsExactRegularGuideQuestProgressionSequence(): void
+    {
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $blacksmithsLife = $this->createGuideQuest(['name' => 'Blacksmiths Life']);
+        $automatingSmithing = $this->createGuideQuest(['name' => 'Automating the smithing process', 'parent_id' => $blacksmithsLife->id]);
+        $theEnchantress = $this->createGuideQuest(['name' => 'The Enchantress']);
+        $efficiencyIsKey = $this->createGuideQuest(['name' => 'Effeciency is key', 'parent_id' => $theEnchantress->id]);
+        $enchantingIsKey = $this->createGuideQuest(['name' => 'Enchanting is key']);
+        $allureQuest = $this->createGuideQuest(['name' => 'The alure of The Entranchtress', 'parent_id' => $enchantingIsKey->id]);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $automatingSmithing->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertSame($blacksmithsLife->id, $jsonData['quests'][0]['id']);
+        $this->assertSame('Blacksmiths Life', $jsonData['quests'][0]['name']);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertSame($blacksmithsLife->id, $jsonData['quests'][0]['id']);
+        $this->assertSame('Blacksmiths Life', $jsonData['quests'][0]['name']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $blacksmithsLife->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertSame($theEnchantress->id, $jsonData['quests'][0]['id']);
+        $this->assertSame('The Enchantress', $jsonData['quests'][0]['name']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $theEnchantress->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertSame($efficiencyIsKey->id, $jsonData['quests'][0]['id']);
+        $this->assertSame('Effeciency is key', $jsonData['quests'][0]['name']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $efficiencyIsKey->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertSame($enchantingIsKey->id, $jsonData['quests'][0]['id']);
+        $this->assertSame('Enchanting is key', $jsonData['quests'][0]['name']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $enchantingIsKey->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertSame($allureQuest->id, $jsonData['quests'][0]['id']);
+        $this->assertSame('The alure of The Entranchtress', $jsonData['quests'][0]['name']);
+
+        QuestsCompleted::create([
+            'character_id' => $character->id,
+            'guide_quest_id' => $allureQuest->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/guide-quest/' . $character->user->id, ['_token' => csrf_token()]);
+        $jsonData = json_decode($response->getContent(), true);
+        $this->assertEmpty($jsonData['quests']);
     }
 }

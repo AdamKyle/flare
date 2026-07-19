@@ -14,6 +14,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/game/tops/characters/{character}/quests', ['uses' => 'Api\CharacterTopsController@quests']);
     Route::get('/game/tops/characters/{character}/kingdoms', ['uses' => 'Api\CharacterTopsController@kingdoms']);
     Route::get('/game/tops/characters/{character}/analytics', ['uses' => 'Api\CharacterTopsController@analytics']);
+    Route::get('/game/tops/characters/{character}/stat-break-down', ['uses' => 'Api\CharacterTopsController@statBreakDown']);
+    Route::get('/game/tops/characters/{character}/specific-attribute-break-down', ['uses' => 'Api\CharacterTopsController@specificStatBreakDown']);
     Route::get('/game/tops/exploration', ['uses' => 'Api\ExplorationTopsController@index']);
     Route::get('/game/tops/exploration/{explorationLog}', ['uses' => 'Api\ExplorationTopsController@show']);
     Route::get('/game/tops/delve', ['uses' => 'Api\DelveTopsController@index']);

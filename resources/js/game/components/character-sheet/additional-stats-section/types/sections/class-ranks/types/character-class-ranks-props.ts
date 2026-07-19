@@ -20,5 +20,12 @@ export default interface CharacterClassRanksProps {
     // remains) for the currently selected class.
     preloaded_class_ranks_offered?: ClassRankOfferedType[];
 
+    // When true (alongside `read_only`), renders a weapon-masteries-only
+    // view for every class rank instead of the normal class ranks table:
+    // levelled weapon masteries and remaining weapon masteries, with no
+    // "Switch To" action and no specialties. Used by the public Tops
+    // Class Masteries view.
+    masteries_only?: boolean;
+
     [key: string]: any;
 }

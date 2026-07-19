@@ -539,11 +539,15 @@ export default class ExplorationOutputSection extends React.Component<
 
         const contentId = "exploration-output-warning-body";
         const reason = data.reason ?? data.type ?? "unknown";
+        const duration = Number(data.duration ?? 0);
+        const durationLabel =
+            duration > 0 ? this.formatDurationCompact(duration) : undefined;
 
         return (
             <div className="mt-3">
                 <AutomationPanelShell
                     title="Exploration Ended"
+                    timerText={durationLabel}
                     statusText={this.formatReason(reason)}
                     tone={toneForExplorationReason(reason)}
                 >
@@ -583,11 +587,15 @@ export default class ExplorationOutputSection extends React.Component<
 
         const contentId = "exploration-output-ended-body";
         const reason = data.reason ?? data.stopped_reason ?? "completed";
+        const duration = Number(data.duration ?? 0);
+        const durationLabel =
+            duration > 0 ? this.formatDurationCompact(duration) : undefined;
 
         return (
             <div className="mt-3">
                 <AutomationPanelShell
                     title="Exploration Ended"
+                    timerText={durationLabel}
                     statusText={this.formatReason(reason)}
                     tone={toneForExplorationReason(reason)}
                 >

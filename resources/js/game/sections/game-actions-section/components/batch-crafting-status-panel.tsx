@@ -183,8 +183,8 @@ export default function BatchCraftingStatusPanel({
         ? "Running"
         : (status.batch.ended_reason ?? "Completed").replace(/_/g, " ");
     const timerText = status.active
-        ? `${formatSeconds(elapsedSeconds)} elapsed`
-        : `${status.batch.elapsed_human ?? "0s"} total`;
+        ? formatSeconds(elapsedSeconds)
+        : (status.batch.elapsed_human ?? "0s");
     const tone: AutomationPanelTone = status.active
         ? "neutral"
         : toneForEndedReason(status.batch.ended_reason);

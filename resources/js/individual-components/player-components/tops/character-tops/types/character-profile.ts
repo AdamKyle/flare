@@ -3,6 +3,7 @@ import SkillType from "../../../../../game/lib/game/character-sheet/types/skills
 import KingdomPassiveRow from "../../../../../game/lib/game/character-sheet/types/skills/kingdom-passive-row";
 import ClassRankType from "../../../../../game/components/character-sheet/additional-stats-section/types/sections/class-ranks/deffinitions/class-rank-type";
 import ClassRankOfferedType from "../../../../../game/components/character-sheet/additional-stats-section/types/sections/class-ranks/deffinitions/class-rank-offered-type";
+import ClassRankSpecialtiesPreloadedType from "../../../../../game/components/character-sheet/additional-stats-section/types/class-rank-specialties-preloaded-type";
 import TopsValue from "../../shared/types/tops-value";
 import { ChartPayload } from "../components/profile/sheet-inspect/tops-chart-card";
 
@@ -63,6 +64,7 @@ export default interface CharacterProfile {
     kingdom_passives: KingdomPassiveRow[];
     class_ranks: ClassRankType[];
     class_ranks_offered: ClassRankOfferedType[];
+    class_rank_specialties: ClassRankSpecialtiesPreloadedType;
     factions: Record<string, TopsValue>;
     reincarnation: Record<string, TopsValue>;
     activity: ActivityProfile;

@@ -27,6 +27,7 @@ use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -952,5 +953,33 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertFalse($response->json('completed'));
         $this->assertNotNull($olderDelve->refresh()->panel_dismissed_at);
         $this->assertNotNull($newerDelve->refresh()->panel_dismissed_at);
+    }
+
+    public function testDismissDispatchesUpdateCharacterStatusBuiltFromTheSameCharacter(): void
+    {
+        Event::fake();
+
+        $delve = $this->createDelveAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/delve/' . $this->character->id . '/dismiss', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNotNull($delve->refresh()->panel_dismissed_at);
+        Event::assertDispatchedTimes(UpdateCharacterStatus::class, 1);
+        Event::assertDispatched(UpdateCharacterStatus::class, function (UpdateCharacterStatus $event): bool {
+            return $event->broadcastOn()->name === 'private-update-character-status-' . $this->character->user_id;
+        });
+        $this->assertFalse($response->json('active'));
+        $this->assertFalse($response->json('completed'));
     }
 }

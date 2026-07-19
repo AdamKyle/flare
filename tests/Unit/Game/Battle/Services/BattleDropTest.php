@@ -1002,6 +1002,106 @@ class BattleDropTest extends TestCase
         );
     }
 
+    public function testApplyPlannedItemDoesNotGiveSecondQuestItemCopyWhenPreloadedInventorySlotsIsStale(): void
+    {
+        Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
+
+        $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
+
+        $characterFactory = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation(16, 16, $gameMap)
+            ->updateUser(['auto_disenchant' => false]);
+
+        $character = $characterFactory->getCharacter()->refresh();
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'item_suffix_id' => null,
+            'item_prefix_id' => null,
+        ]);
+
+        $character->load('inventory.slots');
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
+
+        $battleDrop = $this->buildBattleDrop($monster);
+
+        $battleDrop->applyPlannedItem($character, $questItem->id, false);
+        $battleDrop->applyPlannedItem($character, $questItem->id, false);
+
+        $this->assertSame(1, $character->refresh()->inventory->slots()->where('item_id', $questItem->id)->count());
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+    }
+
+    public function testApplyPlannedItemDoesNotGiveQuestItemWhenRelatedQuestIsAlreadyCompleted(): void
+    {
+        $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
+
+        $characterFactory = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation(16, 16, $gameMap)
+            ->updateUser(['auto_disenchant' => false]);
+
+        $character = $characterFactory->getCharacter()->refresh();
+
+        $questItem = $this->createItem([
+            'type' => 'quest',
+            'item_suffix_id' => null,
+            'item_prefix_id' => null,
+        ]);
+
+        $npc = $this->createNpc();
+
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'item_id' => $questItem->id,
+        ]);
+
+        $this->createCompletedQuest([
+            'character_id' => $character->id,
+            'quest_id' => $quest->id,
+        ]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
+
+        $battleDrop = $this->buildBattleDrop($monster);
+
+        $battleDrop->applyPlannedItem($character->refresh(), $questItem->id, false);
+
+        $this->assertSame(0, $character->refresh()->inventory->slots()->where('item_id', $questItem->id)->count());
+    }
+
+    public function testApplyPlannedItemAllowsDuplicateNormalItems(): void
+    {
+        Event::fake([ServerMessageEvent::class, GlobalMessageEvent::class]);
+
+        $gameMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'path' => 'path', 'default' => true]);
+
+        $characterFactory = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation(16, 16, $gameMap)
+            ->updateUser(['auto_disenchant' => false]);
+
+        $character = $characterFactory->getCharacter()->refresh();
+
+        $drop = $this->createItem([
+            'type' => 'weapon',
+            'item_suffix_id' => null,
+            'item_prefix_id' => null,
+            'specialty_type' => null,
+        ]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id]);
+
+        $battleDrop = $this->buildBattleDrop($monster);
+
+        $battleDrop->applyPlannedItem($character, $drop->id, false);
+        $battleDrop->applyPlannedItem($character, $drop->id, false);
+
+        $this->assertSame(2, $character->refresh()->inventory->slots()->where('item_id', $drop->id)->count());
+    }
+
 
     private function buildBattleDrop(Monster $monster, ?RandomItemDropBuilder $randomItemDropBuilder = null): BattleDrop
     {

@@ -5,8 +5,29 @@ import StatBreakDown from "../stat-break-down/stat-break-down";
 import HealthBreakDown from "../stat-break-down/health-break-down";
 import ArmourClassBreakDown from "../stat-break-down/armour-class-break-down";
 import DamageBreakDown from "../stat-break-down/damage-break-down";
+import StatDetailsType from "../../../types/stat-details-type";
+import { CharacterType } from "../../../../../../lib/game/character/character-type";
 
-export default class StatDetails extends React.Component<any, any> {
+interface StatDetailsProps {
+    stat_details: StatDetailsType;
+
+    character: CharacterType | null;
+
+    read_only?: boolean;
+}
+
+interface StatDetailsState {
+    show_detailed_section: boolean;
+
+    details_type: string | null;
+
+    show_voided: boolean;
+}
+
+export default class StatDetails extends React.Component<
+    StatDetailsProps,
+    StatDetailsState
+> {
     private STAT_MODIFIERS = [
         "str",
         "dex",
@@ -26,7 +47,7 @@ export default class StatDetails extends React.Component<any, any> {
         "heal_for",
     ];
 
-    constructor(props: any) {
+    constructor(props: StatDetailsProps) {
         super(props);
 
         this.state = {
@@ -63,6 +84,7 @@ export default class StatDetails extends React.Component<any, any> {
                         close_section={this.closeTypeDetails.bind(this)}
                         type={this.state.details_type}
                         character_id={this.props.character.id}
+                        read_only={this.props.read_only}
                     />
                 );
             }
@@ -76,6 +98,7 @@ export default class StatDetails extends React.Component<any, any> {
                                 type={this.state.details_type}
                                 character_id={this.props.character.id}
                                 is_voided={this.state.show_voided}
+                                read_only={this.props.read_only}
                             />
                         );
                     case "ac":
@@ -85,6 +108,7 @@ export default class StatDetails extends React.Component<any, any> {
                                 type={this.state.details_type}
                                 character_id={this.props.character.id}
                                 is_voided={this.state.show_voided}
+                                read_only={this.props.read_only}
                             />
                         );
                     case "weapon_damage":
@@ -97,6 +121,7 @@ export default class StatDetails extends React.Component<any, any> {
                                 type={this.state.details_type}
                                 character_id={this.props.character.id}
                                 is_voided={this.state.show_voided}
+                                read_only={this.props.read_only}
                             />
                         );
                     default:

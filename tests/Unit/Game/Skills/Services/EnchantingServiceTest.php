@@ -3,11 +3,13 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
@@ -543,6 +545,67 @@ class EnchantingServiceTest extends TestCase
         Event::assertDispatched(function (ServerMessageEvent $event) use ($itemName) {
             return $event->message === 'You failed to apply ' . $this->prefix->name . ' to: ' . $itemName . '. The item shatters before you. You lost the investment.';
         });
+    }
+
+    public function testFailedEnchantOnGlobalEventCraftingInventorySlotDoesNotDispatchInventoryCountEventOrThrowTypeError()
+    {
+        Event::fake();
+
+        $this->instance(
+            EnchantItemService::class,
+            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+            })
+        );
+
+        $character = $this->character->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $goal = $this->createGlobalEventGoal();
+        $inventory = $this->createGlobalCraftingInventory(['character_id' => $character->id, 'global_event_goal_id' => $goal->id]);
+        $slot = $this->createGlobalCraftingInventorySlot(['global_event_crafting_inventory_id' => $inventory->id, 'item_id' => $this->itemToEnchant->id]);
+
+        $enchantingService = resolve(EnchantingService::class);
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
+        ], $slot, 1000);
+
+        Event::assertNotDispatched(UpdateCharacterInventoryCountEvent::class);
+        $this->assertNull(GlobalEventCraftingInventorySlot::find($slot->id));
+    }
+
+    public function testFailedEnchantOnNormalInventorySlotStillDispatchesInventoryCountEvent()
+    {
+        Event::fake();
+
+        $this->instance(
+            EnchantItemService::class,
+            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+            })
+        );
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->first();
+
+        $enchantingService = resolve(EnchantingService::class);
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
+        ], $slot, 1000);
+
+        Event::assertDispatched(UpdateCharacterInventoryCountEvent::class);
     }
 
     public function testGetTimeAdditionForEnchantingShouldBeTriple()

@@ -384,30 +384,55 @@ class GuideQuestService
 
     private function fetchNextRegularGuideQuest(Character $character): ?GuideQuest
     {
-        $lastCompletedGuideQuest = $character->questsCompleted()
+        $completedGuideQuestIds = $character->questsCompleted()
             ->whereNotNull('guide_quest_id')
-            ->orderByDesc('guide_quest_id')
-            ->first();
+            ->pluck('guide_quest_id')
+            ->all();
 
-        if (is_null($lastCompletedGuideQuest)) {
-            return GuideQuest::whereNull('only_during_event')->whereNull('unlock_at_level')->first();
+        $roots = GuideQuest::whereNull('only_during_event')
+            ->whereNull('unlock_at_level')
+            ->whereNull('parent_id')
+            ->orderBy('id')
+            ->get();
+
+        foreach ($roots as $root) {
+            $nextIncompleteQuest = $this->findNextIncompleteRegularGuideQuest($root, $completedGuideQuestIds);
+
+            if (! is_null($nextIncompleteQuest)) {
+                return $nextIncompleteQuest;
+            }
         }
 
-        $nextChild = GuideQuest::whereNull('only_during_event')
-            ->whereNull('unlock_at_level')
-            ->where('parent_id', $lastCompletedGuideQuest->guide_quest_id)
-            ->first();
+        return null;
+    }
 
-        if (!is_null($nextChild)) {
-            return $nextChild;
+    /**
+     * Depth-first search for the first incomplete regular guide quest.
+     *
+     * Only descends into a quest's children once the quest itself is
+     * completed, so a child is never returned before its parent.
+     */
+    private function findNextIncompleteRegularGuideQuest(GuideQuest $quest, array $completedGuideQuestIds): ?GuideQuest
+    {
+        if (! in_array($quest->id, $completedGuideQuestIds, true)) {
+            return $quest;
         }
 
-        $questId = GuideQuest::whereNull('only_during_event')
+        $children = GuideQuest::whereNull('only_during_event')
             ->whereNull('unlock_at_level')
-            ->where('id', '>', $lastCompletedGuideQuest->guide_quest_id)
-            ->min('id');
+            ->where('parent_id', $quest->id)
+            ->orderBy('id')
+            ->get();
 
-        return GuideQuest::find($questId);
+        foreach ($children as $child) {
+            $nextIncompleteQuest = $this->findNextIncompleteRegularGuideQuest($child, $completedGuideQuestIds);
+
+            if (! is_null($nextIncompleteQuest)) {
+                return $nextIncompleteQuest;
+            }
+        }
+
+        return null;
     }
 
     private function fetchNextEventQuest(Character $character, GuideQuest $initialEventGuideQuest): ?GuideQuest

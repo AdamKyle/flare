@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Battle\Events;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use Carbon\Carbon;
@@ -250,5 +251,57 @@ class UpdateCharacterStatusTest extends TestCase
         $event = new UpdateCharacterStatus($this->character->refresh());
 
         $this->assertFalse($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function testPayloadIncludesDelveVisibleTrueForActiveDelve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->addSeconds(600),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function testPayloadIncludesDelveVisibleTrueForCompletedUndismissedDelve(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function testPayloadIncludesDelveVisibleFalseAfterDismissed(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function testPayloadKeepsDelveRunningFalseForCompletedDelveRecord(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_delve_running']);
     }
 }

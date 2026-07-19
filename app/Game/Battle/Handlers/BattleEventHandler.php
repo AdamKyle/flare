@@ -32,7 +32,13 @@ class BattleEventHandler
      */
     public function processDeadCharacter(Character $character, ?Monster $monster = null): void
     {
-        $character->update(['is_dead' => true]);
+        $updatedRows = Character::where('id', $character->id)
+            ->where('is_dead', false)
+            ->update(['is_dead' => true]);
+
+        if ($updatedRows === 0) {
+            return;
+        }
 
         $character = $character->refresh();
 

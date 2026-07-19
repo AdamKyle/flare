@@ -16,7 +16,9 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -1327,5 +1329,163 @@ class FactionHandlerTest extends TestCase
         $this->assertSame(0, $factionAfter->current_points);
     }
 
+    public function test_award_faction_points_from_batch_sends_one_message_with_batch_total_and_final_progress_when_no_level_up(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        $character = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->updateUser(['show_faction_point_message' => true])
+            ->createSessionForCharacter()
+            ->getCharacter();
+
+        $gameMap = GameMap::find($character->map->game_map_id);
+
+        $faction = Faction::where('character_id', $character->id)
+            ->where('game_map_id', $gameMap->id)
+            ->first();
+
+        $faction->current_level = 1;
+        $faction->current_points = 10;
+        $faction->points_needed = 200;
+        $faction->maxed = false;
+        $faction->save();
+
+        $this->factionHandler->awardFactionPointsFromBatch($character->refresh(), 50);
+
+        $matchingMessages = Event::dispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return $event->message === 'You gained: 50 Faction Points, which puts you at: 60 points. You need: 140 more points to gain a new level!';
+        });
+
+        $this->assertCount(1, $matchingMessages);
+    }
+
+    public function test_award_faction_points_from_batch_sends_one_message_and_still_levels_up_when_crossing_a_level(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        $this->createItemAffix([
+            'type' => 'prefix',
+            'cost' => 1,
+            'affix_type' => 7,
+        ]);
+
+        $this->createItemAffix([
+            'type' => 'suffix',
+            'cost' => 1,
+            'affix_type' => 7,
+        ]);
+
+        $this->createItem([
+            'cost' => RandomAffixDetails::LEGENDARY,
+            'type' => 'weapon',
+            'item_prefix_id' => null,
+            'item_suffix_id' => null,
+            'specialty_type' => null,
+        ]);
+
+        $character = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->updateUser(['show_faction_point_message' => true])
+            ->createSessionForCharacter()
+            ->getCharacter();
+
+        $gameMap = GameMap::find($character->map->game_map_id);
+
+        $faction = Faction::where('character_id', $character->id)
+            ->where('game_map_id', $gameMap->id)
+            ->first();
+
+        $faction->current_level = 1;
+        $faction->current_points = 90;
+        $faction->points_needed = 100;
+        $faction->maxed = false;
+        $faction->save();
+
+        $this->factionHandler->awardFactionPointsFromBatch($character->refresh(), 25);
+
+        $factionAfter = Faction::where('character_id', $character->id)->where('game_map_id', $gameMap->id)->first();
+
+        $this->assertSame(2, $factionAfter->current_level);
+        $this->assertSame(15, $factionAfter->current_points);
+
+        $matchingMessages = Event::dispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return str_starts_with($event->message, 'You gained: 25 Faction Points, which puts you at: 15 points.');
+        });
+
+        $this->assertCount(1, $matchingMessages);
+    }
+
+    public function test_award_faction_points_from_batch_reports_only_points_actually_applied_when_batch_becomes_maxed(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        $character = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->updateUser(['show_faction_point_message' => true])
+            ->createSessionForCharacter()
+            ->getCharacter();
+
+        $maxLevel = $this->getMaxFactionLevel();
+
+        $gameMap = GameMap::find($character->map->game_map_id);
+
+        $faction = Faction::where('character_id', $character->id)
+            ->where('game_map_id', $gameMap->id)
+            ->first();
+
+        $faction->current_level = $maxLevel;
+        $faction->current_points = 99;
+        $faction->points_needed = 100;
+        $faction->maxed = false;
+        $faction->save();
+
+        $this->factionHandler->awardFactionPointsFromBatch($character->refresh(), 100000);
+
+        $factionAfter = Faction::where('character_id', $character->id)->where('game_map_id', $gameMap->id)->first();
+
+        $this->assertTrue($factionAfter->maxed);
+
+        $matchingMessages = Event::dispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return str_starts_with($event->message, 'You gained: 1 Faction Points');
+        });
+
+        $this->assertCount(1, $matchingMessages);
+    }
+
+    public function test_award_faction_points_from_batch_sends_no_message_when_zero_points_are_applied(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        $character = (new CharacterFactory())
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->assignFactionSystem()
+            ->updateUser(['show_faction_point_message' => true])
+            ->createSessionForCharacter()
+            ->getCharacter();
+
+        $gameMap = GameMap::find($character->map->game_map_id);
+
+        $faction = Faction::where('character_id', $character->id)
+            ->where('game_map_id', $gameMap->id)
+            ->first();
+
+        $faction->current_level = 3;
+        $faction->current_points = 0;
+        $faction->points_needed = 100;
+        $faction->maxed = true;
+        $faction->save();
+
+        $this->factionHandler->awardFactionPointsFromBatch($character->refresh(), 500);
+
+        Event::assertNotDispatched(ServerMessageEvent::class);
+    }
 
 }

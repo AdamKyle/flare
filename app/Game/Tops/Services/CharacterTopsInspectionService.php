@@ -21,9 +21,15 @@ use App\Flare\Models\UserLoginDuration;
 use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\CharacterStatDetailsTransformer;
 use App\Flare\Transformers\CharacterGemsTransformer;
+use App\Flare\Transformers\CharacterResistanceInfoTransformer;
+use App\Flare\Transformers\CharacterElementalAtonementTransformer;
+use App\Flare\Transformers\CharacterReincarnationInfoTransformer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\ClassRanks\Services\ClassRankService;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Tops\Services\Concerns\BuildsTopsResponses;
@@ -43,6 +49,12 @@ class CharacterTopsInspectionService
         private readonly CharacterPassiveSkills $characterPassiveSkills,
         private readonly SkillsTransformer $skillsTransformer,
         private readonly CharacterGemsTransformer $characterGemsTransformer,
+        private readonly CharacterResistanceInfoTransformer $characterResistanceInfoTransformer,
+        private readonly CharacterElementalAtonementTransformer $characterElementalAtonementTransformer,
+        private readonly CharacterReincarnationInfoTransformer $characterReincarnationInfoTransformer,
+        private readonly CharacterStatBuilder $characterStatBuilder,
+        private readonly ClassRankService $classRankService,
+        private readonly StatModifierDetails $statModifierDetails,
     ) {}
 
     public function overview(Character $character): array
@@ -126,8 +138,11 @@ class CharacterTopsInspectionService
                     'spell_evasion' => $character->spell_evasion,
                     'artifact_annulment' => $character->artifact_annulment,
                 ],
-                'elemental_atonement' => [],
+                'elemental_atonement' => null,
                 'stat_breakdown' => [],
+                'stat_details' => null,
+                'resistance_info' => null,
+                'resurrection_chance' => 0.0,
             ];
         }
 
@@ -168,8 +183,11 @@ class CharacterTopsInspectionService
                 'devouring_light_resistance' => $statDetails['devouring_light_res'],
                 'devouring_darkness_resistance' => $statDetails['devouring_darkness_res'],
             ],
-            'elemental_atonement' => $character->getInformation()->buildElementalAtonement() ?? [],
-            'stat_breakdown' => $this->statBreakdown($character, $statDetails),
+            'elemental_atonement' => $this->characterElementalAtonementTransformer->transform($character)['elemental_atonement'] ?? [],
+            'stat_breakdown' => $this->statBreakdownSummary($character, $statDetails),
+            'stat_details' => $statDetails,
+            'resistance_info' => $this->characterResistanceInfoTransformer->transform($character),
+            'resurrection_chance' => $this->characterStatBuilder->setCharacter($character)->buildResurrectionChance(),
         ];
     }
 
@@ -213,6 +231,8 @@ class CharacterTopsInspectionService
             'classRanks.weaponMasteries',
             'classSpecialsEquipped.gameClassSpecial.gameClass',
         ]);
+
+        $character->loadMissing('inventory');
 
         $classRanks = $character->classRanks->filter(fn ($rank): bool => $rank->level > 1)->map(fn ($rank) => [
             'class_id' => $rank->game_class_id,
@@ -285,6 +305,13 @@ class CharacterTopsInspectionService
                 ->map(fn ($passive): array => $this->publicPassiveTree($passive))
                 ->values()
                 ->all(),
+            'class_ranks_offered' => $this->classRanksOffered($character),
+            'class_rank_specialties' => is_null($character->inventory) ? [
+                'class_specialties' => GameClassSpecial::all(),
+                'specials_equipped' => [],
+                'class_ranks' => $character->classRanks->toArray(),
+                'other_class_specials' => [],
+            ] : $this->classRankService->getSpecials($character),
         ];
     }
 
@@ -301,6 +328,7 @@ class CharacterTopsInspectionService
             'xp_penalty' => $character->xp_penalty ?? 0,
             'base_stat_mod' => $character->base_stat_mod ?? 0,
             'base_damage_stat_mod' => $character->base_damage_stat_mod ?? 0,
+            'reincarnation_details' => $this->characterReincarnationInfoTransformer->transform($character),
         ];
     }
 
@@ -316,7 +344,23 @@ class CharacterTopsInspectionService
 
     public function quests(Character $character, ?User $viewer = null): array
     {
-        $quests = QuestsCompleted::where('character_id', $character->id)->with(['quest.rewardItem', 'quest.requiredPlane', 'quest.factionMap', 'guideQuest'])->get();
+        $quests = QuestsCompleted::where('character_id', $character->id)->with([
+            'quest.rewardItem',
+            'quest.item',
+            'quest.item.dropLocation',
+            'quest.requiredQuest',
+            'quest.requiredQuest.raid',
+            'quest.factionMap',
+            'quest.secondaryItem',
+            'quest.secondaryItem.dropLocation',
+            'quest.requiredPlane',
+            'quest.factionLoyaltyNpc',
+            'quest.factionLoyaltyNpc.gameMap',
+            'quest.npc',
+            'quest.npc.gameMap',
+            'quest.raid',
+            'guideQuest',
+        ])->get();
 
         $viewerCharacter = $viewer?->character;
 
@@ -392,11 +436,26 @@ class CharacterTopsInspectionService
         ];
     }
 
+    public function statBreakDown(Character $character, string $statType): array
+    {
+        return $this->statModifierDetails->setCharacter($character)->forStat($statType);
+    }
+
+    public function specificStatBreakDown(Character $character, string $type, bool $isVoided): array
+    {
+        return $this->statModifierDetails->setCharacter($character)->buildSpecificBreakDown($type, $isVoided);
+    }
+
     public function classRanksOffered(Character $character): array
     {
         $character->loadMissing(['classRanks.gameClass', 'classRanks.weaponMasteries', 'classSpecialsEquipped.gameClassSpecial', 'skills.baseSkill']);
 
-        return $character->classRanks->map(function ($rank) use ($character): array {
+        $classIds = $character->classRanks->pluck('game_class_id')->unique()->values()->all();
+
+        $gameSkillsByClass = GameSkill::whereIn('game_class_id', $classIds)->get()->groupBy('game_class_id');
+        $gameClassSpecialsByClass = GameClassSpecial::whereIn('game_class_id', $classIds)->get()->groupBy('game_class_id');
+
+        return $character->classRanks->map(function ($rank) use ($character, $gameSkillsByClass, $gameClassSpecialsByClass): array {
             $classId = $rank->game_class_id;
 
             $unlockedSpecialtyIds = $character->classSpecialsEquipped
@@ -408,15 +467,28 @@ class CharacterTopsInspectionService
                 ->pluck('game_skill_id')
                 ->all();
 
-            return [
-                'class_id' => $classId,
-                'class_name' => $rank->gameClass?->name,
-                'offered_game_skills' => GameSkill::where('game_class_id', $classId)->whereNotIn('id', $leveledSkillIds)->get()->map(fn (GameSkill $gameSkill): array => [
+            $offeredGameSkills = ($gameSkillsByClass->get($classId) ?? collect())
+                ->whereNotIn('id', $leveledSkillIds)
+                ->map(fn (GameSkill $gameSkill): array => [
                     'id' => $gameSkill->id,
                     'name' => $gameSkill->name,
                     'description' => $gameSkill->description,
                     'max_level' => $gameSkill->max_level,
-                ])->values()->all(),
+                ])->values()->all();
+
+            $remainingSpecialties = ($gameClassSpecialsByClass->get($classId) ?? collect())
+                ->reject(fn (GameClassSpecial $special): bool => in_array($special->id, $unlockedSpecialtyIds, true))
+                ->map(fn (GameClassSpecial $special): array => [
+                    'id' => $special->id,
+                    'name' => $special->name,
+                    'description' => $special->description,
+                    'requires_class_rank_level' => $special->requires_class_rank_level,
+                ])->values()->all();
+
+            return [
+                'class_id' => $classId,
+                'class_name' => $rank->gameClass?->name,
+                'offered_game_skills' => $offeredGameSkills,
                 'remaining_weapon_masteries' => $rank->weaponMasteries->filter(fn ($mastery): bool => $mastery->level <= 1)->map(fn ($mastery): array => [
                     'id' => $mastery->id,
                     'name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
@@ -425,12 +497,7 @@ class CharacterTopsInspectionService
                     'required_xp' => $mastery->required_xp,
                     'level' => $mastery->level,
                 ])->values()->all(),
-                'remaining_specialties' => GameClassSpecial::where('game_class_id', $classId)->get()->reject(fn (GameClassSpecial $special): bool => in_array($special->id, $unlockedSpecialtyIds, true))->map(fn (GameClassSpecial $special): array => [
-                    'id' => $special->id,
-                    'name' => $special->name,
-                    'description' => $special->description,
-                    'requires_class_rank_level' => $special->requires_class_rank_level,
-                ])->values()->all(),
+                'remaining_specialties' => $remainingSpecialties,
             ];
         })->values()->all();
     }
@@ -596,8 +663,6 @@ class CharacterTopsInspectionService
 
     private function questDetailPayload(Quest $quest): array
     {
-        $quest->loadRelations();
-
         return [
             'id' => $quest->id,
             'name' => $quest->name,
@@ -837,6 +902,16 @@ class CharacterTopsInspectionService
         $inspectedCount = $inspectedSorted->count();
         $inspectedCumulative = 0;
 
+        $otherCompletionsSorted = $otherCompletions->pluck('created_at')->sort()->values();
+        $otherCompletionsIndex = 0;
+        $otherCompletionsCount = $otherCompletionsSorted->count();
+        $otherCompletionsCumulative = 0;
+
+        $otherCharactersSorted = $otherCharacters->pluck('created_at')->filter(fn (?Carbon $createdAt): bool => ! is_null($createdAt))->sort()->values();
+        $otherCharactersIndex = 0;
+        $otherCharactersCount = $otherCharactersSorted->count();
+        $otherCharactersCumulative = 0;
+
         $inspectedPoints = [];
         $averagePoints = [];
 
@@ -854,13 +929,20 @@ class CharacterTopsInspectionService
                 'value' => $inspectedCumulative,
             ];
 
-            $eligibleCharacterCount = $otherCharacters->filter(fn ($otherCharacter): bool => ! is_null($otherCharacter->created_at) && $otherCharacter->created_at->lte($bucketEnd))->count();
-            $totalOtherCompletions = $otherCompletions->filter(fn ($completion) => $completion->created_at->lte($bucketEnd))->count();
+            while ($otherCharactersIndex < $otherCharactersCount && $otherCharactersSorted[$otherCharactersIndex]->lte($bucketEnd)) {
+                $otherCharactersCumulative++;
+                $otherCharactersIndex++;
+            }
+
+            while ($otherCompletionsIndex < $otherCompletionsCount && $otherCompletionsSorted[$otherCompletionsIndex]->lte($bucketEnd)) {
+                $otherCompletionsCumulative++;
+                $otherCompletionsIndex++;
+            }
 
             $averagePoints[] = [
                 'label' => $this->bucketLabel($bucketStart, $granularity),
                 'date' => $bucketStart->toISOString(),
-                'value' => $eligibleCharacterCount > 0 ? round($totalOtherCompletions / $eligibleCharacterCount, 2) : 0.0,
+                'value' => $otherCharactersCumulative > 0 ? round($otherCompletionsCumulative / $otherCharactersCumulative, 2) : 0.0,
             ];
         }
 
@@ -1144,7 +1226,7 @@ class CharacterTopsInspectionService
         return $buckets;
     }
 
-    private function statBreakdown(Character $character, array $statDetails): array
+    private function statBreakdownSummary(Character $character, array $statDetails): array
     {
         return [
             'damage_stat' => [

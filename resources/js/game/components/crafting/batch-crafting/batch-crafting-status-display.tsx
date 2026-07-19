@@ -1,4 +1,5 @@
 import React from "react";
+import { startCase } from "lodash";
 import { AxisOptions, Chart } from "react-charts";
 import DangerButton from "../../ui/buttons/danger-button";
 import PrimaryButton from "../../ui/buttons/primary-button";
@@ -301,6 +302,13 @@ export type BatchCraftingStatus = {
         craft_enchant_set_prefix_applied_count?: number | null;
         craft_enchant_set_suffix_applied_count?: number | null;
         craft_enchant_set_completed_final_count?: number | null;
+        craft_enchant_set_craft_completed_count?: number | null;
+        craft_enchant_set_enchant_completed_count?: number | null;
+        craft_enchant_set_finalize_completed_count?: number | null;
+        craft_enchant_set_total_work_units?: number | null;
+        craft_enchant_set_completed_work_units?: number | null;
+        craft_enchant_set_remaining_work_units?: number | null;
+        craft_enchant_set_overall_percent?: number | null;
         craft_enchant_set_current_item?: BatchCraftingItemSnapshot | null;
         craft_enchant_set_current_prefix?: string | null;
         craft_enchant_set_current_suffix?: string | null;
@@ -355,6 +363,15 @@ export type BatchCraftingStatus = {
         phase?: string | null;
         last_action?: string | null;
         selected_set?: {
+            id: number;
+            name: string;
+            current_slots: number;
+            max_slots: number | null;
+            remaining_slots: number;
+        } | null;
+        output_destination?: string | null;
+        output_destination_label?: string | null;
+        output_set?: {
             id: number;
             name: string;
             current_slots: number;
@@ -425,7 +442,8 @@ export type BatchCraftingStatus = {
             suffix_affix_name: string | null;
             enchant_can_destroy_item: boolean;
             enchant_has_failure_risk: boolean;
-            destination: string;
+            destination: string | null;
+            destination_label: string | null;
             destination_current_slots: number;
             destination_max_slots: number;
             destination_remaining_slots: number;
@@ -483,6 +501,24 @@ export type BatchCraftingStatus = {
             effective_craftable_amount: number;
             capped: boolean;
         } | null;
+        retry_state?: {
+            active: boolean;
+            failed_count: number;
+            delay_seconds: number;
+            failure_reason: string | null;
+            failure_phase: string | null;
+            failure_action: string | null;
+        };
+        continuation_state?: {
+            active: boolean;
+            state: "processing" | "waiting" | null;
+            reason: string | null;
+            message: string | null;
+            phase: string | null;
+            item: string | null;
+            delay_seconds: number;
+            next_attempt_at: string | null;
+        };
         action_log?: BatchCraftingActionLogEntry[];
         action_history?: BatchCraftingActionLogEntry[];
     };
@@ -755,6 +791,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
     BatchCraftingStatusDisplayProps,
     BatchCraftingStatusDisplayState
 > {
+    private continuationInterval: ReturnType<typeof setInterval> | null = null;
+
     public constructor(props: BatchCraftingStatusDisplayProps) {
         super(props);
 
@@ -765,7 +803,55 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             openSnapshot: null,
             affixDetailsModalAffix: null,
             affixDetailsModalOpen: false,
+            continuationNow: Date.now(),
         };
+    }
+
+    componentDidMount() {
+        this.syncContinuationInterval();
+    }
+
+    componentDidUpdate() {
+        this.syncContinuationInterval();
+    }
+
+    componentWillUnmount() {
+        this.clearContinuationInterval();
+    }
+
+    /**
+     * Starts a one-second interval only while the batch is active and the persisted
+     * continuation state is genuinely waiting on a known next-attempt timestamp;
+     * clears it as soon as any of those stop being true (processing starts, the batch
+     * ends, or next_attempt_at goes away) so it never runs needlessly in the
+     * background.
+     */
+    syncContinuationInterval() {
+        const continuationState = this.props.status.batch?.continuation_state;
+        const shouldRun =
+            (this.props.status.active ?? false) &&
+            continuationState?.active === true &&
+            continuationState?.state === "waiting" &&
+            typeof continuationState?.next_attempt_at === "string";
+
+        if (shouldRun && this.continuationInterval === null) {
+            this.continuationInterval = setInterval(() => {
+                this.setState({ continuationNow: Date.now() });
+            }, 1000);
+
+            return;
+        }
+
+        if (!shouldRun && this.continuationInterval !== null) {
+            this.clearContinuationInterval();
+        }
+    }
+
+    clearContinuationInterval() {
+        if (this.continuationInterval !== null) {
+            clearInterval(this.continuationInterval);
+            this.continuationInterval = null;
+        }
     }
 
     actionLog() {
@@ -1648,37 +1734,159 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         );
     }
 
-    renderProcessingStatusText(
-        batch: NonNullable<BatchCraftingStatus["batch"]>,
-        isActive: boolean,
-    ) {
+    completionPercent(current: number, max: number): number {
+        if (max <= 0) {
+            return 0;
+        }
+
+        return Math.min(100, Math.max(0, Math.floor((current / max) * 100)));
+    }
+
+    /**
+     * Single shared continuation renderer used by every active finite panel, backed by
+     * the persisted server continuation_state (processing/waiting, reason, phase,
+     * item, and next_attempt_at). Replaces the old renderRetryAlert()/
+     * renderProcessingStatusText() combination, which only covered plain failures and
+     * went silent (and looked frozen) during replacement-crafting waits and
+     * remaining-work waits.
+     */
+    renderContinuation(isActive: boolean) {
         if (!isActive) {
             return null;
         }
 
-        const remaining =
-            typeof batch.remaining_amount === "number"
-                ? batch.remaining_amount
-                : Math.max(
-                      0,
-                      (batch.requested_amount ?? 0) -
-                          (batch.completed_amount ?? 0),
-                  );
-        const hasFailures = (batch.counts?.failed ?? 0) > 0;
+        const continuationState = this.props.status.batch?.continuation_state;
 
-        let text = "Waiting for next batch tick";
+        if (!continuationState || !continuationState.active) {
+            return null;
+        }
 
-        if (remaining > 0 && hasFailures) {
-            text = "Retrying failed items and processing remaining items";
-        } else if (remaining > 0) {
-            text = "Processing remaining items";
-        } else if (hasFailures) {
-            text = "Retrying failed items";
+        const { state, message, phase, item, next_attempt_at } =
+            continuationState;
+
+        let secondsRemaining: number | null = null;
+
+        if (state === "waiting" && next_attempt_at) {
+            const nextAttemptTime = new Date(next_attempt_at).getTime();
+            secondsRemaining = Math.max(
+                0,
+                Math.ceil(
+                    (nextAttemptTime - this.state.continuationNow) / 1000,
+                ),
+            );
         }
 
         return (
-            <p className="text-xs text-gray-500 dark:text-gray-400">{text}</p>
+            <InfoAlert additional_css="text-sm my-2">
+                <div className="space-y-1" role="status" aria-live="polite">
+                    {state === "processing" ? (
+                        <p>
+                            Batch Crafting is processing the next attempt now.
+                        </p>
+                    ) : null}
+                    {state === "waiting" &&
+                    secondsRemaining !== null &&
+                    secondsRemaining > 0 ? (
+                        <>
+                            {message ? <p>{message}</p> : null}
+                            <p>
+                                Next attempt in: {secondsRemaining}{" "}
+                                {secondsRemaining === 1 ? "second" : "seconds"}.
+                            </p>
+                        </>
+                    ) : null}
+                    {state === "waiting" &&
+                    (secondsRemaining === null || secondsRemaining === 0) ? (
+                        <p>
+                            The next attempt is waiting for the Batch Crafting
+                            worker.
+                        </p>
+                    ) : null}
+                    {phase ? <p>Current phase: {startCase(phase)}</p> : null}
+                    {item ? <p>Current item: {item}</p> : null}
+                </div>
+            </InfoAlert>
         );
+    }
+
+    renderOutputDestinationCapacity(
+        batch: NonNullable<BatchCraftingStatus["batch"]>,
+    ) {
+        const isFiniteKeepOutputMode =
+            batch.disposition === "keep" &&
+            ((batch.batch_type === "craft" &&
+                (batch.mode === "specific_item" ||
+                    batch.mode === "craft_set")) ||
+                (batch.batch_type === "craft_and_enchant" &&
+                    (batch.mode === "specific_item" ||
+                        batch.mode === "craft_enchant_set")));
+
+        if (!isFiniteKeepOutputMode || !batch.output_destination) {
+            return null;
+        }
+
+        if (batch.output_destination === "inventory") {
+            const current = batch.inventory_count ?? 0;
+            const max = batch.inventory_max ?? 0;
+
+            return (
+                <ProgressBar
+                    label="Inventory Used"
+                    current={current}
+                    max={max}
+                    percent={
+                        max > 0
+                            ? Math.min(100, Math.floor((current / max) * 100))
+                            : 0
+                    }
+                    barClassName="bg-regent-st-blue-500"
+                />
+            );
+        }
+
+        if (batch.output_destination === "inventory_set" && batch.output_set) {
+            const current = batch.output_set.current_slots ?? 0;
+            const max = batch.output_set.max_slots ?? 0;
+
+            return (
+                <ProgressBar
+                    label={`${batch.output_set.name} Used`}
+                    current={current}
+                    max={max}
+                    percent={
+                        max > 0
+                            ? Math.min(100, Math.floor((current / max) * 100))
+                            : 0
+                    }
+                    barClassName="bg-regent-st-blue-500"
+                />
+            );
+        }
+
+        if (
+            batch.output_destination === "crafted_items_set" &&
+            batch.batch_crafting_set
+        ) {
+            const current = batch.batch_crafting_set.current_slots ?? 0;
+            const max = batch.batch_crafting_set.max_slots ?? 0;
+
+            return (
+                <ProgressBar
+                    label="Crafted Items Set Used"
+                    current={current}
+                    max={max}
+                    percent={
+                        batch.batch_crafting_set.percent ??
+                        (max > 0
+                            ? Math.min(100, Math.floor((current / max) * 100))
+                            : 0)
+                    }
+                    barClassName="bg-regent-st-blue-500"
+                />
+            );
+        }
+
+        return null;
     }
 
     renderAmountPreview(batch: NonNullable<BatchCraftingStatus["batch"]>) {
@@ -1700,11 +1908,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         return (
             <div className="grid gap-3">
-                <InfoAlert additional_css="text-sm my-2">
-                    Kept output for this batch is moved into the Crafted Items
-                    Set, not your normal inventory. You can sell or disenchant
-                    items out of that set later.
-                </InfoAlert>
+                {preview.destination_label ? (
+                    <InfoAlert additional_css="text-sm my-2">
+                        Kept output for this batch will be placed in{" "}
+                        {preview.destination_label}.
+                    </InfoAlert>
+                ) : null}
                 <h5 className="font-semibold">Craft Amount</h5>
                 <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
@@ -1738,13 +1947,24 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     <dd>{formatNumber(preview.total_cost)}</dd>
                     <dt className="font-semibold">Available Gold</dt>
                     <dd>{formatNumber(preview.available_gold)}</dd>
-                    <dt className="font-semibold">Crafted Items Set Space</dt>
-                    <dd>
-                        {formatNumber(preview.destination_current_slots)} /{" "}
-                        {formatNumber(preview.destination_max_slots)} (
-                        {formatNumber(preview.destination_remaining_slots)}{" "}
-                        remaining)
-                    </dd>
+                    {preview.destination_label ? (
+                        <>
+                            <dt className="font-semibold">
+                                {preview.destination_label} Space
+                            </dt>
+                            <dd>
+                                {formatNumber(
+                                    preview.destination_current_slots,
+                                )}{" "}
+                                / {formatNumber(preview.destination_max_slots)}{" "}
+                                (
+                                {formatNumber(
+                                    preview.destination_remaining_slots,
+                                )}{" "}
+                                remaining)
+                            </dd>
+                        </>
+                    ) : null}
                     <dt className="font-semibold">
                         Effective Craftable Amount
                     </dt>
@@ -1766,7 +1986,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         {formatNumber(preview.effective_craftable_amount)} of
                         the requested{" "}
                         {formatNumber(preview.remaining_requested_amount)} items
-                        with your current gold and Crafted Items Set space.
+                        with your current gold
+                        {preview.destination_label
+                            ? ` and ${preview.destination_label} space.`
+                            : "."}
                     </WarningAlert>
                 ) : null}
             </div>
@@ -1805,7 +2028,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </p>
                 </div>
 
-                {this.renderProcessingStatusText(batch, isActive)}
+                {this.renderContinuation(isActive)}
 
                 {this.renderCompletionSummary(
                     isActive,
@@ -1821,7 +2044,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     label="Batch Progress"
                     current={completed}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(completed, requested)}
                     barClassName="bg-orange-600"
                 />
 
@@ -1848,15 +2071,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     <dd>{formatNumber(batch.gold_left ?? 0)}</dd>
                 </dl>
 
-                {batch.batch_crafting_set ? (
-                    <ProgressBar
-                        label="Crafted Items Set Used"
-                        current={batch.batch_crafting_set.current_slots}
-                        max={batch.batch_crafting_set.max_slots}
-                        percent={batch.batch_crafting_set.percent ?? 0}
-                        barClassName="bg-regent-st-blue-500"
-                    />
-                ) : null}
+                {this.renderOutputDestinationCapacity(batch)}
 
                 {this.renderAmountPreview(batch)}
 
@@ -1918,6 +2133,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </p>
                 </div>
 
+                {this.renderContinuation(isActive)}
+
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
                     <dt className="font-semibold">Status</dt>
                     <dd className="capitalize">
@@ -1969,13 +2186,18 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         isActive: boolean,
         isSaving: boolean,
     ) {
-        const set = batch.selected_set;
         const requested = batch.requested_amount ?? 0;
         const completed = batch.completed_amount ?? 0;
         const remaining =
             batch.remaining_amount ?? Math.max(0, requested - completed);
         const item =
             batch.craft_set_current_item ?? batch.current_item_snapshot;
+        const outputDestinationDisplay =
+            batch.output_destination === "inventory_set" && batch.output_set
+                ? typeof batch.output_set.max_slots === "number"
+                    ? `${batch.output_set.name} (${batch.output_set.current_slots} / ${batch.output_set.max_slots})`
+                    : `${batch.output_set.name} (${batch.output_set.current_slots} used / unlimited)`
+                : (batch.output_destination_label ?? "Crafted Items Set");
 
         return (
             <div className="space-y-4 text-sm" role="status" aria-live="polite">
@@ -1983,10 +2205,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     <h3 className="text-lg font-semibold">Craft Set</h3>
                     <p className="mt-1 text-gray-700 dark:text-gray-300">
                         {isActive
-                            ? `Crafting set entries into ${set?.name ?? "the selected set"}.`
+                            ? `Crafting set entries into ${outputDestinationDisplay}.`
                             : `Craft Set ended: ${formatStatus(batch.ended_reason)}.`}
                     </p>
                 </div>
+
+                {this.renderContinuation(isActive)}
 
                 {this.renderCompletionSummary(
                     isActive,
@@ -2002,23 +2226,17 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     label="Set Entries Completed"
                     current={completed}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(completed, requested)}
                     barClassName="bg-orange-600"
                 />
+
+                {this.renderOutputDestinationCapacity(batch)}
 
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
                     <dt className="font-semibold">Status</dt>
                     <dd>{this.statusText(batch, isActive)}</dd>
-                    <dt className="font-semibold">Selected Set</dt>
-                    <dd>
-                        {set
-                            ? typeof set.max_slots === "number"
-                                ? `${set.name} (${set.current_slots} / ${set.max_slots})`
-                                : `${set.name} (${set.current_slots} used / unlimited)`
-                            : "None"}
-                    </dd>
-                    <dt className="font-semibold">Remaining Slots</dt>
-                    <dd>{set ? formatNumber(set.remaining_slots) : "—"}</dd>
+                    <dt className="font-semibold">Output Destination</dt>
+                    <dd>{outputDestinationDisplay}</dd>
                     <dt className="font-semibold">Requested Entries</dt>
                     <dd>{formatNumber(requested)}</dd>
                     <dt className="font-semibold">Completed Entries</dt>
@@ -2049,12 +2267,23 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         isActive: boolean,
         isSaving: boolean,
     ) {
-        const set = batch.selected_set;
         const requested = batch.craft_enchant_set_requested ?? 0;
         const completedFinal =
             batch.craft_enchant_set_completed_final_count ?? 0;
+        const craftCompleted =
+            batch.craft_enchant_set_craft_completed_count ?? 0;
+        const enchantCompleted =
+            batch.craft_enchant_set_enchant_completed_count ?? 0;
+        const totalWorkUnits =
+            batch.craft_enchant_set_total_work_units ?? requested * 3;
+        const completedWorkUnits =
+            batch.craft_enchant_set_completed_work_units ?? 0;
         const remainingWorkUnits =
-            batch.remaining_amount ?? Math.max(0, requested * 3);
+            batch.craft_enchant_set_remaining_work_units ??
+            Math.max(0, totalWorkUnits - completedWorkUnits);
+        const overallPercent =
+            batch.craft_enchant_set_overall_percent ??
+            this.completionPercent(completedWorkUnits, totalWorkUnits);
         const item =
             batch.craft_enchant_set_current_item ?? batch.current_item_snapshot;
         const phaseLabels: Record<string, string> = {
@@ -2066,6 +2295,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             ? (phaseLabels[batch.craft_enchant_set_phase ?? ""] ??
               "Crafting set")
             : formatStatus(batch.ended_reason);
+        const outputDestinationDisplay =
+            batch.output_destination === "inventory_set" && batch.output_set
+                ? typeof batch.output_set.max_slots === "number"
+                    ? `${batch.output_set.name} (${batch.output_set.current_slots} / ${batch.output_set.max_slots})`
+                    : `${batch.output_set.name} (${batch.output_set.current_slots} used / unlimited)`
+                : (batch.output_destination_label ?? "Crafted Items Set");
 
         return (
             <div className="space-y-4 text-sm" role="status" aria-live="polite">
@@ -2075,14 +2310,14 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </h3>
                     <p className="mt-1 text-gray-700 dark:text-gray-300">
                         {isActive
-                            ? `Building and enchanting the full set into ${set?.name ?? "the selected set"}.`
+                            ? `Building and enchanting the full set into ${outputDestinationDisplay}.`
                             : `Craft and Enchant Set ended: ${formatStatus(batch.ended_reason)}.`}
                     </p>
                 </div>
 
                 {this.renderIntTooLowWarning(batch, isActive)}
                 {this.renderIntPreemptiveInfo(batch, isActive)}
-                {this.renderProcessingStatusText(batch, isActive)}
+                {this.renderContinuation(isActive)}
 
                 {this.renderCompletionSummary(
                     isActive,
@@ -2095,10 +2330,27 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 )}
 
                 <ProgressBar
-                    label="Items Completed"
-                    current={completedFinal}
+                    label="Overall Pipeline Progress"
+                    current={completedWorkUnits}
+                    max={totalWorkUnits}
+                    percent={overallPercent}
+                    barClassName="bg-orange-600"
+                />
+                <ProgressBar
+                    label="Items Crafted"
+                    current={craftCompleted}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(craftCompleted, requested)}
+                    barClassName="bg-orange-600"
+                />
+                <ProgressBar
+                    label="Items Processed Through Enchanting"
+                    current={enchantCompleted}
+                    max={requested}
+                    percent={this.completionPercent(
+                        enchantCompleted,
+                        requested,
+                    )}
                     barClassName="bg-orange-600"
                 />
 
@@ -2107,14 +2359,8 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     <dd>{this.statusText(batch, isActive)}</dd>
                     <dt className="font-semibold">Phase</dt>
                     <dd className="capitalize">{phaseLabel}</dd>
-                    <dt className="font-semibold">Destination Set</dt>
-                    <dd>
-                        {set
-                            ? typeof set.max_slots === "number"
-                                ? `${set.name} (${set.current_slots} / ${set.max_slots})`
-                                : `${set.name} (${set.current_slots} used / unlimited)`
-                            : "None"}
-                    </dd>
+                    <dt className="font-semibold">Output Destination</dt>
+                    <dd>{outputDestinationDisplay}</dd>
                     <dt className="font-semibold">Full Set Requested</dt>
                     <dd>{formatNumber(requested)}</dd>
                     <dt className="font-semibold">Crafted</dt>
@@ -2198,12 +2444,16 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 </div>
 
                 {this.renderIntTooLowWarning(batch, isActive)}
+                {this.renderContinuation(isActive)}
 
                 <ProgressBar
                     label="Items Enchanted"
                     current={enchantedCount}
                     max={eligibleTotal}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(
+                        enchantedCount,
+                        eligibleTotal,
+                    )}
                     barClassName="bg-orange-600"
                 />
 
@@ -2386,11 +2636,13 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </p>
                 </div>
 
+                {this.renderContinuation(isActive)}
+
                 <ProgressBar
                     label="Oils Applied"
                     current={completed}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(completed, requested)}
                     barClassName="bg-orange-600"
                 />
 
@@ -2490,6 +2742,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 {this.renderExperienceRateLabel(batch)}
                 {this.renderIntTooLowWarning(batch, isActive)}
                 {this.renderIntPreemptiveInfo(batch, isActive)}
+                {this.renderContinuation(isActive)}
                 {this.renderDetailGrid([
                     {
                         label: "Status",
@@ -2573,23 +2826,15 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 </h3>
                 {this.renderIntTooLowWarning(batch, isActive)}
                 {this.renderIntPreemptiveInfo(batch, isActive)}
-                {this.renderProcessingStatusText(batch, isActive)}
+                {this.renderContinuation(isActive)}
                 <ProgressBar
                     label="Batch Progress"
                     current={completed}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(completed, requested)}
                     barClassName="bg-orange-600"
                 />
-                {batch.disposition === "keep" && batch.batch_crafting_set ? (
-                    <ProgressBar
-                        label="Crafted Items Set Used"
-                        current={batch.batch_crafting_set.current_slots}
-                        max={batch.batch_crafting_set.max_slots}
-                        percent={batch.batch_crafting_set.percent ?? 0}
-                        barClassName="bg-regent-st-blue-500"
-                    />
-                ) : null}
+                {this.renderOutputDestinationCapacity(batch)}
                 {this.renderAmountPreview(batch)}
                 {this.renderDetailGrid([
                     {
@@ -2667,6 +2912,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 {isEnchant
                     ? this.renderIntTooLowWarning(batch, isActive)
                     : null}
+                {this.renderContinuation(isActive)}
                 {this.renderDetailGrid([
                     {
                         label: "Status",
@@ -2751,6 +2997,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     Alchemy for Experience
                 </h3>
                 {this.renderExperienceRateLabel(batch)}
+                {this.renderContinuation(isActive)}
                 {this.renderSkillsList(batch.skills)}
                 <ProgressBar
                     label="Alchemy Bag Used"
@@ -2826,12 +3073,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         return (
             <div className="space-y-4 text-sm" role="status" aria-live="polite">
                 <h3 className="text-lg font-semibold">Alchemy Amount</h3>
-                {this.renderProcessingStatusText(batch, isActive)}
+                {this.renderContinuation(isActive)}
                 <ProgressBar
                     label="Batch Progress"
                     current={completed}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(completed, requested)}
                     barClassName="bg-orange-600"
                 />
                 {this.renderDetailGrid([
@@ -2954,6 +3201,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     Trinketry for Experience
                 </h3>
                 {this.renderExperienceRateLabel(batch)}
+                {this.renderContinuation(isActive)}
                 {this.renderSkillsList(batch.skills)}
                 {this.renderDetailGrid([
                     {
@@ -3019,11 +3267,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 <h3 className="text-lg font-semibold">
                     Holy Oils Selected Gear
                 </h3>
+                {this.renderContinuation(isActive)}
                 <ProgressBar
                     label="Oils Applied"
                     current={completed}
                     max={requested}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(completed, requested)}
                     barClassName="bg-orange-600"
                 />
                 {this.renderDetailGrid([
@@ -3279,11 +3528,15 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         value: this.renderItem(batch.current_item_snapshot),
                     },
                 ])}
+                {this.renderContinuation(isActive)}
                 <ProgressBar
                     label="Batch Progress"
                     current={batch.completed_amount ?? 0}
                     max={batch.requested_amount ?? 100}
-                    percent={batch.progress_percent ?? 0}
+                    percent={this.completionPercent(
+                        batch.completed_amount ?? 0,
+                        batch.requested_amount ?? 100,
+                    )}
                     barClassName="bg-orange-600"
                 />
                 {this.renderUsefulCounts(batch)}

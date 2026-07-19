@@ -161,7 +161,7 @@ export default class KingdomPassives extends React.Component<
     }
 
     renderReadOnly(): JSX.Element {
-        const passives = this.props.preloaded_kingdom_passives ?? [];
+        const passives = this.state.kingdom_passives;
 
         if (passives.length === 0) {
             return (
@@ -171,17 +171,7 @@ export default class KingdomPassives extends React.Component<
             );
         }
 
-        return (
-            <div className="grid gap-6">
-                {passives.map((passive) => (
-                    <KingdomPassiveTree
-                        key={passive.id}
-                        passives={passive}
-                        read_only={true}
-                    />
-                ))}
-            </div>
-        );
+        return <KingdomPassiveTree passives={passives[0]} read_only={true} />;
     }
 
     render() {

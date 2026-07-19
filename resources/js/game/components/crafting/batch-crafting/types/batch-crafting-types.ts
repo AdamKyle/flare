@@ -25,12 +25,19 @@ export type EnchantMode = "event";
 
 export type HolyOilMode = "selected" | "set";
 
+export type OutputDestination =
+    | "inventory"
+    | "inventory_set"
+    | "crafted_items_set";
+
 export type InventorySetOption = {
     set_id: number;
     label: string;
     current_slots: number;
     max_slots: number;
     remaining_slots: number;
+    equipped: boolean;
+    is_batch_crafting_set: boolean;
 };
 
 export type Disposition =
@@ -276,7 +283,11 @@ export type BatchCraftingStartBlocker = {
 };
 
 export type DestinationCapacity = {
-    destination: "crafted_items_set" | "alchemy_bag";
+    destination:
+        | "crafted_items_set"
+        | "alchemy_bag"
+        | "inventory"
+        | "inventory_set";
     destination_label: string;
     current: number;
     max: number;

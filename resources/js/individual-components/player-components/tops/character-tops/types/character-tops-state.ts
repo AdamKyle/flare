@@ -1,5 +1,9 @@
 import TopsApiResponse from "../../shared/types/tops-api-response";
 import CharacterProfile from "./character-profile";
+import {
+    DeferredProfileSectionLoading,
+    DeferredProfileSectionErrors,
+} from "./deferred-profile-section-state";
 
 export default interface CharacterTopsState {
     loading: boolean;
@@ -12,4 +16,6 @@ export default interface CharacterTopsState {
     metric: string;
     search: string;
     online_only: boolean;
+    deferred_loading: DeferredProfileSectionLoading;
+    deferred_errors: DeferredProfileSectionErrors;
 }

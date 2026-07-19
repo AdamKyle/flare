@@ -5,6 +5,7 @@ namespace App\Game\Character\CharacterInventory\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
+use Illuminate\Support\Facades\DB;
 
 class BatchCraftingSetService
 {
@@ -39,18 +40,29 @@ class BatchCraftingSetService
      */
     public function createItemInBatchCraftingSet(Character $character, Item $item, ?string $position = null): array
     {
-        $set = $this->getOrCreateForCharacter($character);
+        $this->getOrCreateForCharacter($character);
 
-        if (! $this->canAccept($character, 1)) {
-            return ['success' => false, 'reason' => 'set_full', 'set_slot' => null];
-        }
+        $result = ['success' => false, 'reason' => 'set_full', 'set_slot' => null];
 
-        $setSlot = $set->slots()->create([
-            'inventory_set_id' => $set->id,
-            'item_id' => $item->id,
-            'position' => $position,
-        ]);
+        DB::transaction(function () use ($character, $item, $position, &$result) {
+            $set = InventorySet::where('character_id', $character->id)
+                ->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)
+                ->lockForUpdate()
+                ->first();
 
-        return ['success' => true, 'reason' => null, 'set_slot' => $setSlot];
+            if ($set->remainingSlots() < 1) {
+                return;
+            }
+
+            $setSlot = $set->slots()->create([
+                'inventory_set_id' => $set->id,
+                'item_id' => $item->id,
+                'position' => $position,
+            ]);
+
+            $result = ['success' => true, 'reason' => null, 'set_slot' => $setSlot];
+        });
+
+        return $result;
     }
 }

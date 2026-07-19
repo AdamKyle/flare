@@ -6,9 +6,11 @@ use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
+use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -28,6 +30,7 @@ use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Values\ArmourType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Handlers\ServerMessageHandler;
@@ -37,10 +40,12 @@ use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
+use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Flare\Calculators\SellItemCalculator;
 use Facades\App\Flare\Calculators\SkillXPCalculator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class BatchCraftingProcessor
 {
@@ -59,6 +64,7 @@ class BatchCraftingProcessor
         private readonly BatchCraftingSetService $batchCraftingSetService,
         private readonly InventorySetService $inventorySetService,
         private readonly HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal,
+        private readonly HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal,
         private readonly ServerMessageHandler $serverMessageHandler,
         ?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null,
         ?EventBatchEnchantingAffixSelector $eventBatchEnchantingAffixSelector = null,
@@ -184,21 +190,28 @@ class BatchCraftingProcessor
         }
 
         if ($craftMode === 'experience') {
-            $itemsPerTick = BatchCraftingService::FULL_SETS_PER_EXPERIENCE_TICK * BatchCraftingService::ITEMS_PER_FULL_SET;
-            $requiredCapacity = $this->retainedCraftedItemsSetSlotsForExperience($disposition);
+            $requiredCapacity = $this->retainedCraftedItemsSetSlotsForExperience($disposition, $progress);
 
-            if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, $requiredCapacity)) {
+            if ($this->shouldCommitKeptOutput($disposition) && ! $this->batchCraftingSetService->canAccept($character, $requiredCapacity)) {
                 return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
             }
 
-            return $this->processRepeatedActions($itemsPerTick, function () use ($batchCrafting, $character, $disposition, $progress) {
+            $chunkSize = $this->experienceCycleChunkSize($progress);
+
+            $result = $this->processRepeatedActions($chunkSize, function () use ($batchCrafting, $character, $disposition, $progress) {
                 return $this->processCraftExperience($batchCrafting->refresh(), $character->refresh(), $disposition, $batchCrafting->refresh()->progress ?? $progress, true);
             });
+
+            $this->recordExperienceCycleProgress($batchCrafting, $progress, $result);
+
+            return $result;
         }
 
         if ($craftMode === 'specific_item') {
-            if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, 1)) {
-                return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+            $capacityEndReason = $this->retainedOutputCapacityEndReason($batchCrafting, $character, 1);
+
+            if (! is_null($capacityEndReason)) {
+                return ['end_reason' => $capacityEndReason];
             }
 
             return $this->processCraftSpecificItem($batchCrafting, $character, $disposition, $progress);
@@ -223,8 +236,10 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::CRAFT_SET_COMPLETE];
         }
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, 1)) {
-            return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+        $capacityEndReason = $this->retainedOutputCapacityEndReason($batchCrafting, $character, 1);
+
+        if (! is_null($capacityEndReason)) {
+            return ['end_reason' => $capacityEndReason];
         }
 
         $target = $queue[$index];
@@ -248,7 +263,7 @@ class BatchCraftingProcessor
             ]]];
         }
 
-        $craftResult = $this->craftingService->craftForBatch($character->refresh(), $item, $target['crafting_type'], $this->shouldMoveKeptOutputToBatchSet($disposition));
+        $craftResult = $this->craftingService->craftForBatch($character->refresh(), $item, $target['crafting_type'], $this->shouldCommitKeptOutput($disposition));
 
         if (! $craftResult['success'] || is_null($craftResult['item'])) {
             return ['counts' => ['failed_count' => 1], 'actions' => [[
@@ -262,20 +277,27 @@ class BatchCraftingProcessor
         $craftedItemSnapshot = $this->itemDetails($craftedItem, null, false);
         $dispositionResult = $this->applyDispositionForItem($batchCrafting, $character->refresh(), $craftedItem, $disposition);
 
+        $result = [
+            'counts' => $this->mergeCounts(['crafted_count' => 1], $dispositionResult['counts']),
+            'actions' => [array_merge(['action' => 'craft_set', 'crafted_item' => $craftedItemSnapshot], $dispositionResult['details'])],
+            'kept_output_committed' => false,
+        ];
+
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
+
+            if (! $committed) {
+                return $result;
+            }
+
+            $result['kept_output_committed'] = true;
+        }
+
         $progress = $batchCrafting->fresh()->progress ?? [];
         $progress['craft_set_index'] = $index + 1;
         $progress['craft_set_completed'] = ((int) ($progress['craft_set_completed'] ?? 0)) + 1;
         $progress['craft_set_current_item'] = $craftedItemSnapshot;
         $batchCrafting->update(['progress' => $progress]);
-
-        $result = [
-            'counts' => $this->mergeCounts(['crafted_count' => 1], $dispositionResult['counts']),
-            'actions' => [array_merge(['action' => 'craft_set', 'crafted_item' => $craftedItemSnapshot], $dispositionResult['details'])],
-        ];
-
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-            $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
-        }
 
         return $result;
     }
@@ -290,21 +312,28 @@ class BatchCraftingProcessor
                 return ['end_reason' => BatchCraftingEndReason::SKILL_MAXED];
             }
 
-            $itemsPerTick = BatchCraftingService::FULL_SETS_PER_EXPERIENCE_TICK * BatchCraftingService::ITEMS_PER_FULL_SET;
-            $requiredCapacity = $this->retainedCraftedItemsSetSlotsForExperience($disposition);
+            $requiredCapacity = $this->retainedCraftedItemsSetSlotsForExperience($disposition, $progress);
 
-            if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, $requiredCapacity)) {
+            if ($this->shouldCommitKeptOutput($disposition) && ! $this->batchCraftingSetService->canAccept($character, $requiredCapacity)) {
                 return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
             }
 
-            return $this->processRepeatedActions($itemsPerTick, function () use ($batchCrafting, $character, $disposition, $progress) {
+            $chunkSize = $this->experienceCycleChunkSize($progress);
+
+            $result = $this->processRepeatedActions($chunkSize, function () use ($batchCrafting, $character, $disposition, $progress) {
                 return $this->processCraftAndEnchantExperience($batchCrafting->refresh(), $character->refresh(), $disposition, $batchCrafting->refresh()->progress ?? $progress);
             });
+
+            $this->recordExperienceCycleProgress($batchCrafting, $progress, $result);
+
+            return $result;
         }
 
         if ($craftMode === 'specific_item') {
-            if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, 1)) {
-                return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+            $capacityEndReason = $this->retainedOutputCapacityEndReason($batchCrafting, $character, 1);
+
+            if (! is_null($capacityEndReason)) {
+                return ['end_reason' => $capacityEndReason];
             }
 
             return $this->processCraftAndEnchantSpecificItem($batchCrafting, $character, $disposition, $progress);
@@ -329,9 +358,10 @@ class BatchCraftingProcessor
         }
 
         if (($progress['craft_enchant_phase'] ?? 'craft') !== 'enchant' && $craftAmount > 0) {
-            $remaining = $craftAmount - $completedSoFar;
+            $remainingOperations = max(1, ($craftAmount - $completedSoFar) * 2);
+            $attempts = min(BatchCraftingService::ITEMS_PER_RECURRING_TICK, $remainingOperations);
 
-            $result = $this->processRepeatedActions($remaining * 2, function () use ($batchCrafting, $character, $disposition, $progress) {
+            $result = $this->processRepeatedActions($attempts, function () use ($batchCrafting, $character, $disposition, $progress) {
                 return $this->processCraftAndEnchantSpecificItemSingle($batchCrafting->refresh(), $character->refresh(), $disposition, $batchCrafting->refresh()->progress ?? $progress);
             });
 
@@ -357,7 +387,11 @@ class BatchCraftingProcessor
         if (($progress['craft_enchant_phase'] ?? 'craft') === 'enchant') {
             $result = $this->processCraftAndEnchantEnchantPhase($batchCrafting, $character, $disposition, $progress);
 
-            if (($result['counts']['enchanted_count'] ?? 0) > 0) {
+            $enchantedCount = $result['counts']['enchanted_count'] ?? 0;
+            $noEndReason = ! isset($result['end_reason']);
+            $retainedOutputOk = ! $this->shouldCommitKeptOutput($disposition) || ($result['kept_output_committed'] ?? false) === true;
+
+            if ($noEndReason && $enchantedCount > 0 && $retainedOutputOk) {
                 $updatedProgress = $batchCrafting->fresh()->progress ?? [];
                 $updatedProgress['craft_enchant_specific_count'] = $completedSoFar + 1;
                 $batchCrafting->update(['progress' => $updatedProgress]);
@@ -366,8 +400,10 @@ class BatchCraftingProcessor
             return $result;
         }
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, 1)) {
-            return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+        $capacityEndReason = $this->retainedOutputCapacityEndReason($batchCrafting, $character, 1);
+
+        if (! is_null($capacityEndReason)) {
+            return ['end_reason' => $capacityEndReason];
         }
 
         $craftingType = $progress['specific_crafting_type'] ?? null;
@@ -398,6 +434,7 @@ class BatchCraftingProcessor
 
         $progress['craft_enchant_phase'] = 'enchant';
         $progress['pending_enchant_item_id'] = $craftResult['item']->id;
+        $progress['craft_enchant_specific_surviving_crafted_count'] = 1;
         $batchCrafting->update(['progress' => $progress]);
 
         return ['counts' => ['crafted_count' => 1], 'actions' => [[
@@ -412,12 +449,11 @@ class BatchCraftingProcessor
         $pendingItemId = $progress['pending_enchant_item_id'] ?? null;
         $index = (int) ($progress['craft_enchant_index'] ?? 0);
 
-        $progress['craft_enchant_phase'] = 'craft';
-        $progress['pending_enchant_item_id'] = null;
-        $progress['craft_enchant_index'] = $index + 1;
-        $batchCrafting->update(['progress' => $progress]);
-
         if (is_null($pendingItemId)) {
+            $progress['craft_enchant_phase'] = 'craft';
+            $progress['craft_enchant_specific_surviving_crafted_count'] = 0;
+            $batchCrafting->update(['progress' => $progress]);
+
             return ['counts' => ['failed_count' => 1], 'actions' => [[
                 'action' => 'craft_and_enchant',
                 'status' => 'failed',
@@ -428,16 +464,22 @@ class BatchCraftingProcessor
         $item = Item::find($pendingItemId);
 
         if (is_null($item)) {
+            $progress['craft_enchant_phase'] = 'craft';
+            $progress['pending_enchant_item_id'] = null;
+            $progress['craft_enchant_specific_surviving_crafted_count'] = 0;
+            $batchCrafting->update(['progress' => $progress]);
+
             return ['counts' => ['failed_count' => 1], 'actions' => [[
                 'action' => 'craft_and_enchant',
                 'status' => 'failed',
-                'failure' => 'Crafted item was removed before enchanting.',
+                'failure' => 'Crafted item was removed before enchanting. A replacement will be crafted.',
             ]]];
         }
 
         $craftedSnapshot = $this->itemDetails($item);
+        $requestedAffixIds = array_values(array_filter($progress['enchant_affix_ids'] ?? [], fn ($affixId) => ! is_null($affixId)));
 
-        if ($this->intBlockedForEnchant($character, $progress['enchant_affix_ids'] ?? null)) {
+        if ($this->intBlockedForEnchant($character, $requestedAffixIds)) {
             return ['end_reason' => BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING, 'actions' => [[
                 'action' => 'craft_and_enchant',
                 'status' => 'stopped',
@@ -446,8 +488,8 @@ class BatchCraftingProcessor
             ]]];
         }
 
-        $suppressEnchantSuccessMessage = $this->shouldMoveKeptOutputToBatchSet($disposition);
-        $enchantAttempt = $this->tryEnchantItem($character, $item, $progress['enchant_affix_ids'] ?? null, $suppressEnchantSuccessMessage);
+        $suppressEnchantSuccessMessage = $this->shouldCommitKeptOutput($disposition);
+        $enchantAttempt = $this->tryEnchantItem($character, $item, $requestedAffixIds, $suppressEnchantSuccessMessage);
 
         if (! $enchantAttempt['attempted']) {
             return ['counts' => ['failed_count' => 1], 'actions' => [[
@@ -459,15 +501,37 @@ class BatchCraftingProcessor
         }
 
         if (is_null($enchantAttempt['item'])) {
+            $progress['craft_enchant_phase'] = 'craft';
+            $progress['pending_enchant_item_id'] = null;
+            $progress['craft_enchant_specific_surviving_crafted_count'] = 0;
+            $batchCrafting->update(['progress' => $progress]);
+
             return ['counts' => ['destroyed_count' => 1], 'actions' => [[
                 'action' => 'craft_and_enchant',
                 'status' => 'destroyed',
                 'destroyed_item' => $this->removedItemDetails($craftedSnapshot, 'destroyed'),
-                'failure' => 'The item shattered while enchanting and was destroyed.',
+                'failure' => 'The item shattered while enchanting and was destroyed. A replacement will be crafted.',
             ]]];
         }
 
         $enchantedItem = $enchantAttempt['item'];
+
+        if (! $this->requestedAffixesSatisfied($enchantedItem, $enchantAttempt['affix_ids'])) {
+            $this->discardPartialBatchItem($enchantedItem);
+
+            $progress['craft_enchant_phase'] = 'craft';
+            $progress['pending_enchant_item_id'] = null;
+            $progress['craft_enchant_specific_surviving_crafted_count'] = 0;
+            $batchCrafting->update(['progress' => $progress]);
+
+            return ['counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => 'craft_and_enchant',
+                'status' => 'partial_enchant_discarded',
+                'crafted_item' => $craftedSnapshot,
+                'failure' => 'The item did not receive every requested enchantment and was discarded. A replacement will be crafted.',
+            ]]];
+        }
+
         $action = [
             'action' => 'craft_and_enchant',
             'crafted_item' => $craftedSnapshot,
@@ -480,11 +544,26 @@ class BatchCraftingProcessor
         $counts = $this->mergeCounts($counts, $dispositionResult['counts']);
         $action = array_merge($action, $dispositionResult['details']);
 
-        $result = ['counts' => $counts, 'actions' => [$action]];
+        $result = ['counts' => $counts, 'actions' => [$action], 'kept_output_committed' => false];
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-            $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
+
+            if (! $committed) {
+                $result['counts']['enchanted_count'] = 0;
+
+                return $result;
+            }
+
+            $result['kept_output_committed'] = true;
         }
+
+        $progress = $batchCrafting->fresh()->progress ?? [];
+        $progress['craft_enchant_phase'] = 'craft';
+        $progress['pending_enchant_item_id'] = null;
+        $progress['craft_enchant_index'] = $index + 1;
+        $progress['craft_enchant_specific_surviving_crafted_count'] = 0;
+        $batchCrafting->update(['progress' => $progress]);
 
         return $result;
     }
@@ -621,7 +700,9 @@ class BatchCraftingProcessor
             }
 
             if ($craftAmount > 0) {
-                $result = $this->processRepeatedActions($craftAmount - $craftedSoFar, function () use ($batchCrafting, $character, $disposition) {
+                $attempts = min(BatchCraftingService::ITEMS_PER_RECURRING_TICK, $craftAmount - $craftedSoFar);
+
+                $result = $this->processRepeatedActions($attempts, function () use ($batchCrafting, $character, $disposition) {
                     return $this->processAlchemySingle($batchCrafting->refresh(), $character->refresh(), $disposition);
                 });
 
@@ -1027,7 +1108,9 @@ class BatchCraftingProcessor
         $progress['holy_oil_requested_applications'] = $progress['holy_oil_requested_applications'] ?? $requestedApplications;
         $batchCrafting->update(['progress' => $progress]);
 
-        $result = $this->processRepeatedActions($requestedApplications, function () use ($batchCrafting, $character, $disposition) {
+        $attempts = min(BatchCraftingService::ITEMS_PER_RECURRING_TICK, $requestedApplications);
+
+        $result = $this->processRepeatedActions($attempts, function () use ($batchCrafting, $character, $disposition) {
             return $this->processHolyOilSingle($batchCrafting->refresh(), $character->refresh(), $disposition);
         });
 
@@ -1503,7 +1586,7 @@ class BatchCraftingProcessor
     {
         $requiredCapacity = $disposition === BatchCraftingDisposition::KEEP ? BatchCraftingService::ITEMS_PER_RECURRING_TICK : 1;
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, $requiredCapacity)) {
+        if ($this->shouldCommitKeptOutput($disposition) && ! $this->batchCraftingSetService->canAccept($character, $requiredCapacity)) {
             return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
         }
 
@@ -1540,7 +1623,7 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::MAXED_OR_NOTHING_LEFT];
         }
 
-        $craftResult = $this->trinketCraftingService->craftForBatch($character, $item, $this->shouldMoveKeptOutputToBatchSet($disposition));
+        $craftResult = $this->trinketCraftingService->craftForBatch($character, $item, $this->shouldCommitKeptOutput($disposition));
         $character = $character->refresh();
 
         if (! $craftResult['success'] || is_null($craftResult['item'])) {
@@ -1558,10 +1641,11 @@ class BatchCraftingProcessor
             'trinketry_item' => $this->itemDetails($craftedItem),
         ] + $dispositionResult['details']];
 
-        $result = ['counts' => $counts, 'actions' => $actions];
+        $result = ['counts' => $counts, 'actions' => $actions, 'kept_output_committed' => false];
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-            $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
+            $result['kept_output_committed'] = $committed;
         }
 
         return $result;
@@ -1658,11 +1742,13 @@ class BatchCraftingProcessor
         $progress['craft_experience_current_type'] = $craftingType;
         $batchCrafting->update(['progress' => $progress]);
 
-        $shouldMoveKeptOutputToBatchSet = $moveKeptOutputToBatchSet && $this->shouldMoveKeptOutputToBatchSet($disposition);
+        $shouldMoveKeptOutputToBatchSet = $moveKeptOutputToBatchSet && $this->shouldCommitKeptOutput($disposition);
         $result = $this->craftItem($batchCrafting, $character, $disposition, $item, $craftingType, $shouldMoveKeptOutputToBatchSet);
+        $result['kept_output_committed'] = false;
 
         if ($shouldMoveKeptOutputToBatchSet) {
-            $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
+            $result['kept_output_committed'] = $committed;
         }
 
         return $result;
@@ -1670,53 +1756,104 @@ class BatchCraftingProcessor
 
     private function processCraftAndEnchantExperience(BatchCrafting $batchCrafting, Character $character, BatchCraftingDisposition $disposition, array $progress): array
     {
+        // Step 1: the forced-KEEP call below only exists to obtain an item to enchant.
+        // Its kept-state is intermediate and must never leak into the final result.
         $result = $this->processCraftExperience($batchCrafting, $character, BatchCraftingDisposition::KEEP, $progress, false);
-        $itemId = $result['actions'][0]['kept_item']['item_id'] ?? $result['actions'][0]['crafted_item']['item_id'] ?? null;
+        $this->removeIntermediateKeptOutput($result, 0);
 
-        if (! is_null($itemId)) {
-            $item = Item::find($itemId);
+        if (isset($result['actions'][0])) {
+            $result['actions'][0]['action'] = 'craft_and_enchant';
+        }
 
-            if (! is_null($item)) {
-                if ($this->intBlockedForEnchant($character->refresh(), $progress['enchant_affix_ids'] ?? null)) {
-                    $result['end_reason'] = BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING;
-                    $result['actions'][0]['failure'] = 'Your Intelligence is too low for the selected enchantment.';
+        $itemId = $result['actions'][0]['crafted_item']['item_id'] ?? null;
 
-                    return $result;
-                }
+        // Step 2: no crafted item to enchant — nothing further to do.
+        if (is_null($itemId)) {
+            return $result;
+        }
 
-                $suppressEnchantSuccessMessage = $this->shouldMoveKeptOutputToBatchSet($disposition);
-                $enchantAttempt = $this->tryEnchantItem($character->refresh(), $item, $progress['enchant_affix_ids'] ?? null, $suppressEnchantSuccessMessage);
+        $item = Item::find($itemId);
 
-                if ($enchantAttempt['attempted'] && is_null($enchantAttempt['item'])) {
-                    $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['destroyed_count' => 1]);
-                    $result['actions'][0]['status'] = 'destroyed';
-                    $result['actions'][0]['destroyed_item'] = $this->removedItemDetails(
-                        $result['actions'][0]['kept_item'] ?? $result['actions'][0]['crafted_item'] ?? null,
-                        'destroyed'
-                    );
-                    $result['actions'][0]['failure'] = 'The item shattered while enchanting and was destroyed.';
-                } elseif ($enchantAttempt['attempted']) {
-                    $enchantedItem = $enchantAttempt['item'];
-                    $dispositionResult = $this->applyDispositionForItem($batchCrafting, $character->refresh(), $enchantedItem, $disposition);
-                    $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['enchanted_count' => 1]);
-                    $result['counts'] = $this->mergeCounts($result['counts'], $dispositionResult['counts']);
-                    $result['actions'][0] = array_merge($result['actions'][0], ['enchanted_item' => $this->itemDetails($enchantedItem), 'enchant_affix_name' => implode(', ', $enchantAttempt['affix_names'])], $dispositionResult['details']);
+        // Step 2b: the crafted item row is gone before enchanting could even be
+        // attempted — report it as a failed attempt instead of silently doing nothing.
+        if (is_null($item)) {
+            $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['failed_count' => 1]);
+            $result['actions'][0]['status'] = 'failed';
+            $result['actions'][0]['failure'] = 'The crafted item could not be found before enchanting. Another item will be crafted on a later attempt.';
 
-                    if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-                        $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
-                    }
-                } else {
-                    $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['failed_count' => 1]);
-                    $result['actions'][0]['failure'] = 'Enchanting service did not apply an enchantment.';
-                    $dispositionResult = $this->applyDispositionForItem($batchCrafting, $character->refresh(), $item, $disposition);
-                    $result['counts'] = $this->mergeCounts($result['counts'], $dispositionResult['counts']);
-                    $result['actions'][0] = array_merge($result['actions'][0], $dispositionResult['details']);
+            return $result;
+        }
 
-                    if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-                        $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
-                    }
-                }
+        // Step 3: INT-blocked is a terminal stop for this attempt — discard the crafted
+        // item, apply no disposition, attempt no commit.
+        if ($this->intBlockedForEnchant($character->refresh(), $progress['enchant_affix_ids'] ?? null)) {
+            $this->discardBatchClonedItemIfOrphaned($item);
+            $result['end_reason'] = BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING;
+            $result['actions'][0]['status'] = 'stopped';
+            $result['actions'][0]['failure'] = 'Your Intelligence is too low for the selected enchantment.';
+
+            return $result;
+        }
+
+        $requestedAffixIds = array_values(array_filter($progress['enchant_affix_ids'] ?? [], fn ($affixId) => ! is_null($affixId)));
+        $suppressEnchantSuccessMessage = $this->shouldCommitKeptOutput($disposition);
+        $enchantAttempt = $this->tryEnchantItem($character->refresh(), $item, $requestedAffixIds, $suppressEnchantSuccessMessage);
+
+        // Step 4: enchanting was not attempted — the unenchanted item is discarded, no
+        // disposition is applied, and no commit is attempted.
+        if (! $enchantAttempt['attempted']) {
+            $this->discardBatchClonedItemIfOrphaned($item);
+            $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['failed_count' => 1]);
+            $result['actions'][0]['status'] = 'failed';
+            $result['actions'][0]['failure'] = 'Enchanting was not attempted. The unenchanted item was discarded and another item will be crafted on a later attempt.';
+
+            return $result;
+        }
+
+        // Step 5: shattered while enchanting — destroyed, no disposition/commit.
+        if (is_null($enchantAttempt['item'])) {
+            $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['destroyed_count' => 1]);
+            $result['actions'][0]['status'] = 'destroyed';
+            $result['actions'][0]['destroyed_item'] = $this->removedItemDetails($result['actions'][0]['crafted_item'] ?? null, 'destroyed');
+            $result['actions'][0]['failure'] = 'The item shattered while enchanting and was destroyed.';
+
+            return $result;
+        }
+
+        // Step 6: partial affix result — discard the item and require a replacement, no
+        // disposition/commit.
+        if (! $this->requestedAffixesSatisfied($enchantAttempt['item'], $enchantAttempt['affix_ids'])) {
+            $this->discardPartialBatchItem($enchantAttempt['item']);
+
+            $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['failed_count' => 1]);
+            $result['actions'][0]['status'] = 'partial_enchant_discarded';
+            $result['actions'][0]['failure'] = 'The item did not receive every requested enchantment and was discarded. A replacement will be crafted.';
+
+            return $result;
+        }
+
+        // Step 7: every requested affix landed — apply the real disposition exactly once.
+        $enchantedItem = $enchantAttempt['item'];
+        $dispositionResult = $this->applyDispositionForItem($batchCrafting, $character->refresh(), $enchantedItem, $disposition);
+        $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['enchanted_count' => 1]);
+        $result['counts'] = $this->mergeCounts($result['counts'], $dispositionResult['counts']);
+        $result['actions'][0] = array_merge($result['actions'][0], [
+            'enchanted_item' => $this->itemDetails($enchantedItem),
+            'enchant_affix_name' => implode(', ', $enchantAttempt['affix_names']),
+        ], $dispositionResult['details']);
+
+        // Step 8: gate the retained-output destination commit on its real boolean result.
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $result['kept_output_committed'] = false;
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
+
+            if (! $committed) {
+                $result['counts']['enchanted_count'] = 0;
+
+                return $result;
             }
+
+            $result['kept_output_committed'] = true;
         }
 
         return $result;
@@ -1733,6 +1870,10 @@ class BatchCraftingProcessor
 
         if ($phase === 'enchanting') {
             return $this->craftEnchantSetEnchantPhaseSingle($batchCrafting, $character);
+        }
+
+        if ($phase === 'replacement_crafting') {
+            return $this->craftEnchantSetReplacementCraftPhaseSingle($batchCrafting, $character);
         }
 
         if ($phase === 'finalizing') {
@@ -1970,8 +2111,26 @@ class BatchCraftingProcessor
         $goldSpent = max(0, $goldBeforeCraft - $character->refresh()->gold);
 
         $progress = $batchCrafting->fresh()->progress ?? [];
+        $countedKeys = array_values(array_unique(array_map('strval', $progress['craft_enchant_set_counted_crafted_keys'] ?? [])));
+
+        if (in_array($key, $countedKeys, true)) {
+            $this->discardBatchClonedItemIfOrphaned($craftedItem);
+            $progress['craft_enchant_set_counted_crafted_keys'] = $countedKeys;
+            $batchCrafting->update(['progress' => $progress]);
+
+            return ['counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => 'craft_enchant_set_craft',
+                'phase' => 'crafting',
+                'status' => 'failed',
+                'failure' => 'This plan key was already counted toward progress. The duplicate crafted item was discarded.',
+            ]]];
+        }
+
+        $countedKeys[] = $key;
+        $progress['craft_enchant_set_counted_crafted_keys'] = array_values(array_unique($countedKeys));
         $progress['craft_enchant_set_craft_index'] = $index + 1;
         $progress['craft_enchant_set_completed_work_units'] = ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) + 1;
+        $progress['craft_enchant_set_surviving_crafted_count'] = ((int) ($progress['craft_enchant_set_surviving_crafted_count'] ?? 0)) + 1;
         $progress['craft_enchant_set_crafted_item_ids'][$key] = $craftedItem->id;
         $progress['craft_enchant_set_current_item'] = $craftedItemSnapshot;
         $batchCrafting->update(['progress' => $progress]);
@@ -1979,6 +2138,142 @@ class BatchCraftingProcessor
         return ['counts' => ['crafted_count' => 1], 'actions' => [[
             'action' => 'craft_enchant_set_craft',
             'phase' => 'crafting',
+            'status' => 'crafted',
+            'crafted_item' => $craftedItemSnapshot,
+            'gold_spent' => $goldSpent,
+        ]]];
+    }
+
+    /**
+     * Marks a Craft and Enchant Set plan key as having lost its surviving pipeline item
+     * (null stored id, missing Item model, shattered, or discarded partial enchant).
+     * Idempotent: a key already present in craft_enchant_set_lost_item_keys is left
+     * unchanged so the same loss is never decremented twice. Only decrements the
+     * surviving-crafted and completed-work-unit counts, and only by exactly 1, when the
+     * key is currently in craft_enchant_set_counted_crafted_keys — a key that never
+     * contributed to those counters cannot steal progress from another key.
+     */
+    private function markCraftEnchantSetItemLost(array $progress, string $key): array
+    {
+        $lostKeys = array_values(array_unique(array_map('strval', $progress['craft_enchant_set_lost_item_keys'] ?? [])));
+        $countedKeys = array_values(array_unique(array_map('strval', $progress['craft_enchant_set_counted_crafted_keys'] ?? [])));
+
+        if (in_array($key, $lostKeys, true)) {
+            $progress['craft_enchant_set_lost_item_keys'] = $lostKeys;
+            $progress['craft_enchant_set_counted_crafted_keys'] = $countedKeys;
+
+            return $progress;
+        }
+
+        $lostKeys[] = $key;
+        $progress['craft_enchant_set_lost_item_keys'] = array_values(array_unique($lostKeys));
+
+        if (in_array($key, $countedKeys, true)) {
+            $progress['craft_enchant_set_counted_crafted_keys'] = array_values(array_diff($countedKeys, [$key]));
+            $progress['craft_enchant_set_surviving_crafted_count'] = max(0, ((int) ($progress['craft_enchant_set_surviving_crafted_count'] ?? 0)) - 1);
+            $progress['craft_enchant_set_completed_work_units'] = max(0, ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) - 1);
+        } else {
+            $progress['craft_enchant_set_counted_crafted_keys'] = $countedKeys;
+        }
+
+        return $progress;
+    }
+
+    /**
+     * Re-crafts the exact planned item/crafting type for the plan key that lost its
+     * surviving pipeline item to a shattered or partial enchant. Before restoring
+     * progress, confirms the key is genuinely in craft_enchant_set_lost_item_keys and not
+     * already in craft_enchant_set_counted_crafted_keys — otherwise the replacement item
+     * is discarded and the batch stops with FAILED rather than double-restoring progress.
+     * On success, moves the key from lost to counted, restores the surviving count and
+     * work units by exactly 1, and returns to the enchanting phase at the same enchant
+     * index so the full requested affix plan is attempted again for this key.
+     */
+    private function craftEnchantSetReplacementCraftPhaseSingle(BatchCrafting $batchCrafting, Character $character): array
+    {
+        $progress = $batchCrafting->progress ?? [];
+        $queue = $progress['craft_enchant_set_queue'] ?? [];
+        $keys = $progress['craft_enchant_set_keys'] ?? [];
+        $replacementKey = $progress['craft_enchant_set_replacement_key'] ?? null;
+
+        if (is_null($replacementKey)) {
+            $progress['craft_enchant_set_phase'] = 'enchanting';
+            $batchCrafting->update(['progress' => $progress]);
+
+            return ['counts' => []];
+        }
+
+        $keyIndex = array_search($replacementKey, $keys, true);
+        $target = $keyIndex === false ? null : ($queue[$keyIndex] ?? null);
+
+        if (is_null($target)) {
+            return ['counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => 'craft_enchant_set_replacement_craft',
+                'phase' => 'replacement_crafting',
+                'status' => 'failed',
+                'failure' => 'Could not find the planned target for the replacement item.',
+            ]]];
+        }
+
+        $selectedItemId = $progress['craft_enchant_set_selected_item_ids'][$replacementKey] ?? null;
+        $item = is_null($selectedItemId)
+            ? $this->highestCraftableItemForTarget($character, $target['type'], $target['crafting_type'])
+            : Item::find($selectedItemId);
+
+        if (is_null($item)) {
+            return ['counts' => ['skipped_count' => 1], 'actions' => [[
+                'action' => 'craft_enchant_set_replacement_craft',
+                'phase' => 'replacement_crafting',
+                'status' => 'skipped',
+                'failure' => 'No craftable item found for type: ' . $target['type'],
+            ]]];
+        }
+
+        $goldBeforeCraft = $character->gold;
+        $craftResult = $this->craftingService->craftForBatch($character->refresh(), $item, $target['crafting_type']);
+
+        if (! $craftResult['success'] || is_null($craftResult['item'])) {
+            return ['counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => 'craft_enchant_set_replacement_craft',
+                'phase' => 'replacement_crafting',
+                'status' => 'failed',
+                'failure' => 'Replacement crafting attempt failed. No item was produced.',
+            ]]];
+        }
+
+        $craftedItem = $craftResult['item'];
+        $craftedItemSnapshot = $this->itemDetails($craftedItem, null, false);
+        $goldSpent = max(0, $goldBeforeCraft - $character->refresh()->gold);
+
+        $progress = $batchCrafting->fresh()->progress ?? [];
+        $lostKeys = array_values(array_unique(array_map('strval', $progress['craft_enchant_set_lost_item_keys'] ?? [])));
+        $countedKeys = array_values(array_unique(array_map('strval', $progress['craft_enchant_set_counted_crafted_keys'] ?? [])));
+
+        if (! in_array($replacementKey, $lostKeys, true) || in_array($replacementKey, $countedKeys, true)) {
+            $this->discardBatchClonedItemIfOrphaned($craftedItem);
+
+            return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
+                'action' => 'craft_enchant_set_replacement_craft',
+                'phase' => 'replacement_crafting',
+                'status' => 'stopped',
+                'failure' => 'Replacement progress could not be restored because the plan key was not in a valid lost-item state.',
+            ]]];
+        }
+
+        $progress['craft_enchant_set_crafted_item_ids'][$replacementKey] = $craftedItem->id;
+        $progress['craft_enchant_set_lost_item_keys'] = array_values(array_diff($lostKeys, [$replacementKey]));
+        $countedKeys[] = $replacementKey;
+        $progress['craft_enchant_set_counted_crafted_keys'] = array_values(array_unique($countedKeys));
+        $progress['craft_enchant_set_surviving_crafted_count'] = ((int) ($progress['craft_enchant_set_surviving_crafted_count'] ?? 0)) + 1;
+        $progress['craft_enchant_set_completed_work_units'] = ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) + 1;
+        $progress['craft_enchant_set_replacement_key'] = null;
+        $progress['craft_enchant_set_phase'] = 'enchanting';
+        $progress['craft_enchant_set_current_item'] = $craftedItemSnapshot;
+        $batchCrafting->update(['progress' => $progress]);
+
+        return ['counts' => ['crafted_count' => 1], 'actions' => [[
+            'action' => 'craft_enchant_set_replacement_craft',
+            'phase' => 'replacement_crafting',
             'status' => 'crafted',
             'crafted_item' => $craftedItemSnapshot,
             'gold_spent' => $goldSpent,
@@ -2003,23 +2298,33 @@ class BatchCraftingProcessor
         $craftedItemId = $progress['craft_enchant_set_crafted_item_ids'][$key] ?? null;
 
         if (is_null($craftedItemId)) {
-            $progress['craft_enchant_set_enchant_index'] = $index + 1;
+            $progress = $this->markCraftEnchantSetItemLost($progress, $key);
+            $progress['craft_enchant_set_replacement_key'] = $key;
+            $progress['craft_enchant_set_phase'] = 'replacement_crafting';
             $batchCrafting->update(['progress' => $progress]);
 
-            return ['counts' => []];
+            return ['counts' => ['skipped_count' => 1], 'actions' => [[
+                'action' => 'craft_enchant_set_enchant',
+                'phase' => 'enchanting',
+                'status' => 'missing_item_replacement_required',
+                'failure' => 'The crafted item is missing. A replacement will be crafted before enchanting continues.',
+            ]]];
         }
 
         $craftedItem = Item::find($craftedItemId);
 
         if (is_null($craftedItem)) {
-            $progress['craft_enchant_set_enchant_index'] = $index + 1;
+            $progress['craft_enchant_set_crafted_item_ids'][$key] = null;
+            $progress = $this->markCraftEnchantSetItemLost($progress, $key);
+            $progress['craft_enchant_set_replacement_key'] = $key;
+            $progress['craft_enchant_set_phase'] = 'replacement_crafting';
             $batchCrafting->update(['progress' => $progress]);
 
-            return ['counts' => ['failed_count' => 1], 'actions' => [[
+            return ['counts' => ['skipped_count' => 1], 'actions' => [[
                 'action' => 'craft_enchant_set_enchant',
                 'phase' => 'enchanting',
-                'status' => 'failed',
-                'failure' => 'Crafted item was removed before enchanting.',
+                'status' => 'missing_item_replacement_required',
+                'failure' => 'The crafted item is missing. A replacement will be crafted before enchanting continues.',
             ]]];
         }
 
@@ -2032,15 +2337,12 @@ class BatchCraftingProcessor
         $affixIds = array_values(array_filter([$prefixId, $suffixId], fn ($affixId) => ! is_null($affixId)));
 
         if (empty($affixIds)) {
-            $progress['craft_enchant_set_enchant_index'] = $index + 1;
-            $batchCrafting->update(['progress' => $progress]);
-
-            return ['counts' => ['failed_count' => 1], 'actions' => [[
+            return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
                 'action' => 'craft_enchant_set_enchant',
                 'phase' => 'enchanting',
-                'status' => 'failed',
+                'status' => 'stopped',
                 'crafted_item' => $beforeSnapshot,
-                'failure' => 'This item has no prefix or suffix selected to enchant.',
+                'failure' => 'No valid prefix or suffix was configured for this Craft and Enchant Set entry.',
             ]]];
         }
 
@@ -2089,9 +2391,10 @@ class BatchCraftingProcessor
         $afterItem = $enchantAttempt['item'];
 
         if (is_null($afterItem)) {
-            $progress['craft_enchant_set_enchant_index'] = $index + 1;
-            $progress['craft_enchant_set_completed_work_units'] = ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) + 2;
             $progress['craft_enchant_set_crafted_item_ids'][$key] = null;
+            $progress = $this->markCraftEnchantSetItemLost($progress, $key);
+            $progress['craft_enchant_set_replacement_key'] = $key;
+            $progress['craft_enchant_set_phase'] = 'replacement_crafting';
             $progress['craft_enchant_set_current_prefix'] = $prefixAffix?->name;
             $progress['craft_enchant_set_current_suffix'] = $suffixAffix?->name;
             $progress['craft_enchant_set_current_prefix_affix'] = $prefixAffix?->toArray();
@@ -2110,13 +2413,44 @@ class BatchCraftingProcessor
                 'prefix_applied' => false,
                 'suffix_applied' => false,
                 'gold_spent' => $goldSpent,
-                'failure' => 'The item shattered while enchanting and was destroyed.',
+                'failure' => 'The item shattered while enchanting and was destroyed. A replacement will be crafted.',
             ]]];
         }
 
         $prefixApplied = ! is_null($prefixId) && $afterItem->item_prefix_id === $prefixId;
         $suffixApplied = ! is_null($suffixId) && $afterItem->item_suffix_id === $suffixId;
         $enchantedSnapshot = $this->itemDetails($afterItem, null, false);
+        $requestedAffixesSatisfied = $this->requestedAffixesSatisfied($afterItem, $affixIds);
+
+        $progress['craft_enchant_set_current_prefix'] = $prefixAffix?->name;
+        $progress['craft_enchant_set_current_suffix'] = $suffixAffix?->name;
+        $progress['craft_enchant_set_current_prefix_affix'] = $prefixAffix?->toArray();
+        $progress['craft_enchant_set_current_suffix_affix'] = $suffixAffix?->toArray();
+
+        if (! $requestedAffixesSatisfied) {
+            $this->discardPartialBatchItem($afterItem);
+
+            $progress['craft_enchant_set_crafted_item_ids'][$key] = null;
+            $progress = $this->markCraftEnchantSetItemLost($progress, $key);
+            $progress['craft_enchant_set_replacement_key'] = $key;
+            $progress['craft_enchant_set_phase'] = 'replacement_crafting';
+            $batchCrafting->update(['progress' => $progress]);
+
+            return ['counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => 'craft_enchant_set_enchant',
+                'phase' => 'enchanting',
+                'status' => 'partial_enchant_discarded',
+                'crafted_item' => $beforeSnapshot,
+                'prefix_affix_name' => $prefixAffix?->name,
+                'suffix_affix_name' => $suffixAffix?->name,
+                'prefix_affix' => $prefixAffix?->toArray(),
+                'suffix_affix' => $suffixAffix?->toArray(),
+                'prefix_applied' => $prefixApplied,
+                'suffix_applied' => $suffixApplied,
+                'gold_spent' => $goldSpent,
+                'failure' => 'The item did not receive every requested enchantment and was discarded. A replacement will be crafted.',
+            ]]];
+        }
 
         if ($prefixApplied) {
             $progress['craft_enchant_set_prefix_applied_count'] = ((int) ($progress['craft_enchant_set_prefix_applied_count'] ?? 0)) + 1;
@@ -2128,32 +2462,8 @@ class BatchCraftingProcessor
 
         $progress['craft_enchant_set_crafted_item_ids'][$key] = $afterItem->id;
         $progress['craft_enchant_set_current_item'] = $enchantedSnapshot;
-        $progress['craft_enchant_set_current_prefix'] = $prefixAffix?->name;
-        $progress['craft_enchant_set_current_suffix'] = $suffixAffix?->name;
-        $progress['craft_enchant_set_current_prefix_affix'] = $prefixAffix?->toArray();
-        $progress['craft_enchant_set_current_suffix_affix'] = $suffixAffix?->toArray();
-
-        if (! $prefixApplied && ! $suffixApplied) {
-            $batchCrafting->update(['progress' => $progress]);
-
-            return ['counts' => ['failed_count' => 1], 'actions' => [[
-                'action' => 'craft_enchant_set_enchant',
-                'phase' => 'enchanting',
-                'status' => 'failed',
-                'crafted_item' => $beforeSnapshot,
-                'prefix_affix_name' => $prefixAffix?->name,
-                'suffix_affix_name' => $suffixAffix?->name,
-                'prefix_affix' => $prefixAffix?->toArray(),
-                'suffix_affix' => $suffixAffix?->toArray(),
-                'prefix_applied' => false,
-                'suffix_applied' => false,
-                'gold_spent' => $goldSpent,
-                'failure' => 'Enchanting service did not apply either enchantment.',
-            ]]];
-        }
-
         $progress['craft_enchant_set_enchant_index'] = $index + 1;
-        $progress['craft_enchant_set_completed_work_units'] = ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) + 2;
+        $progress['craft_enchant_set_completed_work_units'] = ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) + 1;
         $batchCrafting->update(['progress' => $progress]);
 
         return ['counts' => ['enchanted_count' => 1], 'actions' => [[
@@ -2180,31 +2490,82 @@ class BatchCraftingProcessor
         $index = (int) ($progress['craft_enchant_set_finalize_index'] ?? 0);
 
         if ($index >= count($queue)) {
+            $expectedKeys = array_values(array_unique(array_map('strval', $keys)));
+            $finalizedKeys = array_values(array_unique(array_map('strval', $progress['craft_enchant_set_finalized_keys'] ?? [])));
+            $allKeysFinalized = count($expectedKeys) === count($finalizedKeys) && empty(array_diff($expectedKeys, $finalizedKeys));
+
+            if (! $allKeysFinalized) {
+                return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
+                    'action' => 'craft_enchant_set_finalize',
+                    'phase' => 'finalizing',
+                    'status' => 'stopped',
+                    'failure' => 'Craft and Enchant Set could not complete because one or more planned entries were not finalized successfully.',
+                ]]];
+            }
+
             return ['end_reason' => BatchCraftingEndReason::CRAFT_ENCHANT_SET_COMPLETE];
         }
 
         $key = $keys[$index] ?? (string) $index;
-        $progress['craft_enchant_set_finalize_index'] = $index + 1;
-        $batchCrafting->update(['progress' => $progress]);
+        $plan = $progress['enchant_plan'][$key] ?? [];
+        $prefixId = $plan['prefix_affix_id'] ?? null;
+        $suffixId = $plan['suffix_affix_id'] ?? null;
+        $requestedAffixIds = array_values(array_filter([$prefixId, $suffixId], fn ($affixId) => ! is_null($affixId)));
+
+        if (empty($requestedAffixIds)) {
+            return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
+                'action' => 'craft_enchant_set_finalize',
+                'phase' => 'finalizing',
+                'status' => 'stopped',
+                'failure' => 'No valid prefix or suffix was configured for this Craft and Enchant Set entry.',
+            ]]];
+        }
 
         $itemId = $progress['craft_enchant_set_crafted_item_ids'][$key] ?? null;
 
         if (is_null($itemId)) {
-            return ['counts' => []];
+            return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
+                'action' => 'craft_enchant_set_finalize',
+                'phase' => 'finalizing',
+                'status' => 'failed',
+                'failure' => 'The finalized set entry has no surviving crafted item.',
+            ]]];
         }
 
         $item = Item::find($itemId);
 
         if (is_null($item)) {
-            return ['counts' => []];
+            return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
+                'action' => 'craft_enchant_set_finalize',
+                'phase' => 'finalizing',
+                'status' => 'failed',
+                'failure' => 'The finalized set entry references a missing crafted item.',
+            ]]];
+        }
+
+        if (! $this->requestedAffixesSatisfied($item, $requestedAffixIds)) {
+            $this->discardPartialBatchItem($item);
+
+            return ['end_reason' => BatchCraftingEndReason::FAILED, 'actions' => [[
+                'action' => 'craft_enchant_set_finalize',
+                'phase' => 'finalizing',
+                'status' => 'failed',
+                'failure' => 'The finalized set entry does not contain every requested enchantment.',
+            ]]];
+        }
+
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $capacityEndReason = $this->retainedOutputCapacityEndReason($batchCrafting, $character, 1);
+
+            if (! is_null($capacityEndReason)) {
+                $this->discardBatchClonedItemIfOrphaned($item);
+
+                return ['end_reason' => $capacityEndReason];
+            }
         }
 
         $finalSnapshot = $this->itemDetails($item, null, false);
         $dispositionResult = $this->applyDispositionForItem($batchCrafting, $character->refresh(), $item, $disposition);
-
-        $progress = $batchCrafting->fresh()->progress ?? [];
-        $progress['craft_enchant_set_completed_final_count'] = ((int) ($progress['craft_enchant_set_completed_final_count'] ?? 0)) + 1;
-        $batchCrafting->update(['progress' => $progress]);
 
         $result = [
             'counts' => $dispositionResult['counts'],
@@ -2213,22 +2574,36 @@ class BatchCraftingProcessor
                 'phase' => 'finalizing',
                 'crafted_item' => $finalSnapshot,
             ], $dispositionResult['details'])],
+            'kept_output_committed' => false,
         ];
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-            $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
 
-            if (isset($result['end_reason']) && $result['end_reason'] === BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL) {
+            if (! $committed) {
                 return $result;
             }
 
-            foreach ($result['actions'] as $actionIndex => $action) {
-                if (isset($action['kept_item']['set_slot_id'])) {
-                    $result['actions'][$actionIndex]['destination_set'] = InventorySet::BATCH_CRAFTING_SET_NAME;
-                    $result['actions'][$actionIndex]['created_in_crafted_items_set'] = true;
+            $result['kept_output_committed'] = true;
+
+            $resolvedDestination = ($batchCrafting->fresh()->progress ?? [])['output_destination'] ?? 'crafted_items_set';
+
+            if ($resolvedDestination === 'crafted_items_set') {
+                foreach ($result['actions'] as $actionIndex => $action) {
+                    if (isset($action['kept_item']['set_slot_id'])) {
+                        $result['actions'][$actionIndex]['destination_set'] = InventorySet::BATCH_CRAFTING_SET_NAME;
+                        $result['actions'][$actionIndex]['created_in_crafted_items_set'] = true;
+                    }
                 }
             }
         }
+
+        $progress = $batchCrafting->fresh()->progress ?? [];
+        $progress['craft_enchant_set_finalized_keys'] = array_values(array_unique(array_merge($progress['craft_enchant_set_finalized_keys'] ?? [], [$key])));
+        $progress['craft_enchant_set_finalize_index'] = $index + 1;
+        $progress['craft_enchant_set_completed_work_units'] = ((int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)) + 1;
+        $progress['craft_enchant_set_completed_final_count'] = ((int) ($progress['craft_enchant_set_completed_final_count'] ?? 0)) + 1;
+        $batchCrafting->update(['progress' => $progress]);
 
         return $result;
     }
@@ -2367,17 +2742,76 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::NO_CURRENCY];
         }
 
+        return $this->finalizeEventEnchantAttempt($character, $slot, $affixIds, $cost, $goal, 'event_enchant');
+    }
+
+    /**
+     * Applies the selected event affixes to $slot with the event handover suppressed
+     * (enchant_for_event => false), then only hands the item to the event goal — via
+     * the existing HandleUpdatingEnchantingGlobalEventGoal handler, which remains the
+     * only place event-goal progress is mutated — once every exact selected affix is
+     * confirmed to be on the surviving item. A shattered item is reported destroyed, a
+     * surviving item missing a selected affix is reported failed and left available for
+     * a later attempt, and a fully enchanted item the handler does not accept is also
+     * reported failed rather than counted as enchanted.
+     */
+    private function finalizeEventEnchantAttempt(
+        Character $character,
+        GlobalEventCraftingInventorySlot $slot,
+        array $affixIds,
+        int $cost,
+        GlobalEventGoal $goal,
+        string $actionName
+    ): array {
+        $preEnchantSnapshot = $this->itemDetails($slot->item, $slot->id);
+        $slotId = $slot->id;
         $skillBefore = $this->skillSnapshot($character, SkillTypeValue::ENCHANTING->value, true);
+
         $this->enchantingService->enchant($character, [
             'affix_ids' => $affixIds,
-            'enchant_for_event' => true,
+            'enchant_for_event' => false,
         ], $slot, $cost);
+
+        $character = $character->refresh();
+        $remainingSlot = GlobalEventCraftingInventorySlot::with('item')->find($slotId);
+
+        if (is_null($remainingSlot)) {
+            return ['pause_tick' => true, 'counts' => ['destroyed_count' => 1], 'actions' => [[
+                'action' => $actionName,
+                'status' => 'destroyed',
+                'destroyed_item' => $this->removedItemDetails($preEnchantSnapshot, 'destroyed'),
+                'failure' => 'The event item shattered while enchanting and was destroyed.',
+            ]]];
+        }
+
+        if (! $this->requestedAffixesSatisfied($remainingSlot->item, $affixIds)) {
+            return ['pause_tick' => true, 'counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => $actionName,
+                'status' => 'failed',
+                'crafted_item' => $this->itemDetails($remainingSlot->item, $remainingSlot->id),
+                'failure' => 'The event item did not receive every selected enchantment. It will be attempted again.',
+            ]]];
+        }
+
+        $enchantedSnapshot = $this->itemDetails($remainingSlot->item, $remainingSlot->id);
         $enchantingXpGained = $this->skillExperienceGained($skillBefore, $this->skillSnapshot($character->refresh(), SkillTypeValue::ENCHANTING->value, true));
-        $enchantingXpGained = $enchantingXpGained > 0 ? $enchantingXpGained : $this->acceptedEventEnchantExperience($character->refresh(), $slot);
+
+        $this->handleUpdatingEnchantingGlobalEventGoal->handleUpdatingEnchantingGlobalEventGoal($character->refresh(), $remainingSlot);
+
+        if (! is_null(GlobalEventCraftingInventorySlot::find($slotId))) {
+            return ['pause_tick' => true, 'counts' => ['failed_count' => 1], 'actions' => [[
+                'action' => $actionName,
+                'status' => 'failed',
+                'crafted_item' => $enchantedSnapshot,
+                'failure' => 'The fully enchanted event item could not be handed over. It will be attempted again.',
+            ]]];
+        }
+
+        $enchantingXpGained = $enchantingXpGained > 0 ? $enchantingXpGained : $this->acceptedEventEnchantExperience($character->refresh(), $remainingSlot);
 
         return ['counts' => ['enchanted_count' => 1], 'actions' => [[
-            'action' => 'event_enchant',
-            'enchanted_item' => $this->itemDetails($slot->item, $slot->id),
+            'action' => $actionName,
+            'enchanted_item' => $enchantedSnapshot,
             'event_goal_id' => $goal->id,
             'affix_count' => count($affixIds),
             'enchanting_xp_gained' => $enchantingXpGained,
@@ -2485,8 +2919,10 @@ class BatchCraftingProcessor
         });
 
         $progress = $batchCrafting->refresh()->progress ?? [];
-        $progress['event_enchant_phase'] = 'craft_fallback_set';
-        $progress['event_fallback_phase'] = 'craft_fallback_set';
+        $slotIds = array_values($progress['event_fallback_event_slot_ids'] ?? []);
+        $nextPhase = empty($slotIds) ? 'craft_fallback_set' : 'enchant_fallback_set';
+        $progress['event_enchant_phase'] = $nextPhase;
+        $progress['event_fallback_phase'] = $nextPhase;
         $progress['event_fallback_enchanted_this_tick'] = $result['counts']['enchanted_count'] ?? 0;
         $batchCrafting->update(['progress' => $progress]);
 
@@ -2502,18 +2938,20 @@ class BatchCraftingProcessor
         }
 
         $progress = $batchCrafting->progress ?? [];
-        $slotIds = $progress['event_fallback_event_slot_ids'] ?? [];
-        $slotId = array_shift($slotIds);
+        $slotIds = array_values($progress['event_fallback_event_slot_ids'] ?? []);
+        $slotId = $slotIds[0] ?? null;
 
         if (is_null($slotId)) {
             return ['depleted' => true];
         }
 
-        $progress['event_fallback_event_slot_ids'] = $slotIds;
-        $batchCrafting->update(['progress' => $progress]);
         $slot = GlobalEventCraftingInventorySlot::find($slotId);
 
         if (is_null($slot)) {
+            array_shift($slotIds);
+            $progress['event_fallback_event_slot_ids'] = $slotIds;
+            $batchCrafting->update(['progress' => $progress]);
+
             return ['counts' => ['skipped_count' => 1], 'actions' => [[
                 'action' => 'event_fallback_enchant',
                 'status' => 'skipped',
@@ -2542,21 +2980,17 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::NO_CURRENCY];
         }
 
-        $skillBefore = $this->skillSnapshot($character, SkillTypeValue::ENCHANTING->value, true);
-        $this->enchantingService->enchant($character, [
-            'affix_ids' => $affixIds,
-            'enchant_for_event' => true,
-        ], $slot, $cost);
-        $enchantingXpGained = $this->skillExperienceGained($skillBefore, $this->skillSnapshot($character->refresh(), SkillTypeValue::ENCHANTING->value, true));
-        $enchantingXpGained = $enchantingXpGained > 0 ? $enchantingXpGained : $this->acceptedEventEnchantExperience($character->refresh(), $slot);
+        $result = $this->finalizeEventEnchantAttempt($character, $slot, $affixIds, $cost, $goal, 'event_fallback_enchant');
 
-        return ['counts' => ['enchanted_count' => 1], 'actions' => [[
-            'action' => 'event_fallback_enchant',
-            'enchanted_item' => $this->itemDetails($slot->item, $slot->id),
-            'event_goal_id' => $goal->id,
-            'affix_count' => count($affixIds),
-            'enchanting_xp_gained' => $enchantingXpGained,
-        ]]];
+        if (is_null(GlobalEventCraftingInventorySlot::find($slotId))) {
+            array_shift($slotIds);
+        }
+
+        $progress = $batchCrafting->refresh()->progress ?? [];
+        $progress['event_fallback_event_slot_ids'] = $slotIds;
+        $batchCrafting->update(['progress' => $progress]);
+
+        return $result;
     }
 
     private function processCraftSpecificItem(BatchCrafting $batchCrafting, Character $character, BatchCraftingDisposition $disposition, array $progress): array
@@ -2569,7 +3003,9 @@ class BatchCraftingProcessor
         }
 
         if ($craftAmount > 0) {
-            $result = $this->processRepeatedActions($craftAmount - $craftedSoFar, function () use ($batchCrafting, $character, $disposition, $progress) {
+            $attempts = min(BatchCraftingService::ITEMS_PER_RECURRING_TICK, $craftAmount - $craftedSoFar);
+
+            $result = $this->processRepeatedActions($attempts, function () use ($batchCrafting, $character, $disposition, $progress) {
                 return $this->processCraftSpecificItemSingle($batchCrafting->refresh(), $character->refresh(), $disposition, $batchCrafting->refresh()->progress ?? $progress);
             });
 
@@ -2592,8 +3028,10 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::AMOUNT_REACHED];
         }
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition) && ! $this->batchCraftingSetService->canAccept($character, 1)) {
-            return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+        $capacityEndReason = $this->retainedOutputCapacityEndReason($batchCrafting, $character, 1);
+
+        if (! is_null($capacityEndReason)) {
+            return ['end_reason' => $capacityEndReason];
         }
 
         $craftingType = $progress['specific_crafting_type'] ?? null;
@@ -2614,15 +3052,23 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::MAXED_OR_NOTHING_LEFT];
         }
 
-        $result = $this->craftItem($batchCrafting, $character, $disposition, $item, $craftingType, $this->shouldMoveKeptOutputToBatchSet($disposition));
+        $result = $this->craftItem($batchCrafting, $character, $disposition, $item, $craftingType, $this->shouldCommitKeptOutput($disposition));
+        $result['kept_output_committed'] = false;
 
-        if (isset($result['counts']['crafted_count']) && $result['counts']['crafted_count'] > 0) {
-            $progress['craft_specific_count'] = $craftedSoFar + 1;
-            $batchCrafting->update(['progress' => $progress]);
+        if ($this->shouldCommitKeptOutput($disposition)) {
+            $committed = $this->commitKeptItemToDestination($batchCrafting, $character->refresh(), $result);
+
+            if (! $committed) {
+                return $result;
+            }
+
+            $result['kept_output_committed'] = true;
         }
 
-        if ($this->shouldMoveKeptOutputToBatchSet($disposition)) {
-            $this->commitKeptItemToBatchSet($batchCrafting, $character->refresh(), $result);
+        if (isset($result['counts']['crafted_count']) && $result['counts']['crafted_count'] > 0) {
+            $progress = $batchCrafting->fresh()->progress ?? [];
+            $progress['craft_specific_count'] = $craftedSoFar + 1;
+            $batchCrafting->update(['progress' => $progress]);
         }
 
         return $result;
@@ -2985,26 +3431,26 @@ class BatchCraftingProcessor
         for ($attempt = 0; $attempt < $attempts; $attempt++) {
             $result = $callback();
 
-            if (($result['depleted'] ?? false) === true) {
-                break;
-            }
+            $counts = $this->mergeCounts($counts, $result['counts'] ?? []);
+            $actions = array_merge($actions, $result['actions'] ?? []);
 
             if (isset($result['end_reason'])) {
                 return [
                     'end_reason' => $result['end_reason'],
-                    'counts' => $this->mergeCounts($counts, $result['counts'] ?? []),
-                    'actions' => array_merge($actions, $result['actions'] ?? []),
+                    'counts' => $counts,
+                    'actions' => $actions,
                 ];
             }
 
-            $counts = $this->mergeCounts($counts, $result['counts'] ?? []);
-            $actions = array_merge($actions, $result['actions'] ?? []);
+            if (($result['depleted'] ?? false) === true || ($result['pause_tick'] ?? false) === true) {
+                break;
+            }
         }
 
         return ['counts' => $counts, 'actions' => $actions];
     }
 
-    private function shouldMoveKeptOutputToBatchSet(BatchCraftingDisposition $disposition): bool
+    private function shouldCommitKeptOutput(BatchCraftingDisposition $disposition): bool
     {
         return in_array($disposition, [
             BatchCraftingDisposition::KEEP,
@@ -3015,17 +3461,261 @@ class BatchCraftingProcessor
         ], true);
     }
 
-    private function retainedCraftedItemsSetSlotsForExperience(BatchCraftingDisposition $disposition): int
+    /**
+     * Resolves whether the retained output for the next kept item has enough capacity
+     * at its destination before crafting is attempted. Craft Amount, Craft Set, Craft
+     * and Enchant Amount and Craft and Enchant Set are selectable finite KEEP modes:
+     * their destination (Inventory, a specific Inventory Set, or the Crafted Items Set)
+     * comes from progress.output_destination. Every other retained-output workflow
+     * (experience mode, Trinketry, and the legacy Keep Highest/Keep Best dispositions)
+     * always uses the Crafted Items Set and is never destination-selectable.
+     */
+    private function retainedOutputCapacityEndReason(BatchCrafting $batchCrafting, Character $character, int $requiredSlots = 1): ?BatchCraftingEndReason
+    {
+        $disposition = BatchCraftingDisposition::from($batchCrafting->disposition);
+
+        if (! $this->shouldCommitKeptOutput($disposition)) {
+            return null;
+        }
+
+        $progress = $batchCrafting->progress ?? [];
+        $craftMode = $progress['craft_mode'] ?? 'experience';
+        $isSelectableFiniteKeepMode = $disposition === BatchCraftingDisposition::KEEP
+            && in_array($batchCrafting->batch_type, [BatchCraftingType::CRAFT->value, BatchCraftingType::CRAFT_AND_ENCHANT->value], true)
+            && in_array($craftMode, ['specific_item', 'craft_set', 'craft_enchant_set'], true);
+
+        if (! $isSelectableFiniteKeepMode) {
+            if (! $this->batchCraftingSetService->canAccept($character, $requiredSlots)) {
+                return BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL;
+            }
+
+            return null;
+        }
+
+        $destination = $progress['output_destination'] ?? 'crafted_items_set';
+
+        if ($destination === 'inventory') {
+            $character = $character->refresh();
+            $freeSlots = $character->inventory_max - $character->getInventoryCount();
+
+            if ($freeSlots < $requiredSlots) {
+                return BatchCraftingEndReason::NO_INVENTORY_SPACE;
+            }
+
+            return null;
+        }
+
+        if ($destination === 'inventory_set') {
+            $outputSet = InventorySet::where('id', (int) ($progress['output_set_id'] ?? 0))
+                ->where('character_id', $character->id)
+                ->first();
+
+            if (is_null($outputSet) || $outputSet->isBatchCraftingSet() || $outputSet->is_equipped) {
+                return BatchCraftingEndReason::CRAFT_ENCHANT_SET_TARGET_SET_CHANGED;
+            }
+
+            if ($outputSet->remainingSlots() < $requiredSlots) {
+                return BatchCraftingEndReason::CRAFT_SET_FULL;
+            }
+
+            return null;
+        }
+
+        if (! $this->batchCraftingSetService->canAccept($character, $requiredSlots)) {
+            return BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL;
+        }
+
+        return null;
+    }
+
+    /**
+     * Bounds a single Craft / Craft and Enchant experience-mode tick to at most
+     * ITEMS_PER_EXPERIENCE_TICK actions, so a full ITEMS_PER_FULL_SET cycle is
+     * spread across sequential 6/6/6/5 chunks instead of running all at once.
+     */
+    private function experienceCycleChunkSize(array $progress): int
+    {
+        $cycleActionsSoFar = (int) ($progress['experience_cycle_actions'] ?? 0);
+
+        return max(0, min(BatchCraftingService::ITEMS_PER_EXPERIENCE_TICK, BatchCraftingService::ITEMS_PER_FULL_SET - $cycleActionsSoFar));
+    }
+
+    /**
+     * Advances experience_cycle_actions by however many actions this chunk actually
+     * completed, resetting it to 0 once a full ITEMS_PER_FULL_SET cycle is reached.
+     * Skipped when the tick ended the batch, since the progress row no longer matters.
+     */
+    private function recordExperienceCycleProgress(BatchCrafting $batchCrafting, array $progress, array $result): void
+    {
+        if (isset($result['end_reason'])) {
+            return;
+        }
+
+        $cycleActionsSoFar = (int) ($progress['experience_cycle_actions'] ?? 0);
+        $newCycleActions = $cycleActionsSoFar + count($result['actions'] ?? []);
+
+        if ($newCycleActions >= BatchCraftingService::ITEMS_PER_FULL_SET) {
+            $newCycleActions = 0;
+        }
+
+        $updatedProgress = $batchCrafting->fresh()->progress ?? [];
+        $updatedProgress['experience_cycle_actions'] = $newCycleActions;
+        $batchCrafting->update(['progress' => $updatedProgress]);
+    }
+
+    private function retainedCraftedItemsSetSlotsForExperience(BatchCraftingDisposition $disposition, array $progress): int
     {
         if ($disposition === BatchCraftingDisposition::KEEP) {
-            return BatchCraftingService::ITEMS_PER_FULL_SET;
+            $cycleActionsSoFar = (int) ($progress['experience_cycle_actions'] ?? 0);
+            $cycleActionsSoFar = max(0, min(BatchCraftingService::ITEMS_PER_FULL_SET, $cycleActionsSoFar));
+
+            return BatchCraftingService::ITEMS_PER_FULL_SET - $cycleActionsSoFar;
         }
 
         return count(collect($this->craftSetQueue())->unique('type'));
     }
 
-    private function commitKeptItemToBatchSet(BatchCrafting $batchCrafting, Character $character, array &$result): void
+    /**
+     * Commits a kept item (already crafted, disposition KEEP) to its resolved output
+     * destination: the Crafted Items Set (default/backward-compatible), normal
+     * Inventory, or a specific empty inventory set selected at start. Never places the
+     * same item in more than one destination. Re-checks actual current capacity so a
+     * destination filled by something else between ticks stops cleanly instead of
+     * losing the item.
+     */
+    /**
+     * Exact requested-affix atomicity rule shared by every build-new Craft and Enchant
+     * path: every requested prefix/suffix id must exist exactly on the item. An empty
+     * requested list is never success for a path that requires enchanting, and "at
+     * least one affix applied" is never treated as success.
+     */
+    private function requestedAffixesSatisfied(Item $item, array $requestedAffixIds): bool
     {
+        $requestedAffixIds = array_values(array_filter($requestedAffixIds, fn ($affixId) => ! is_null($affixId)));
+
+        if (empty($requestedAffixIds)) {
+            return false;
+        }
+
+        $affixesById = ItemAffix::whereIn('id', $requestedAffixIds)->get()->keyBy('id');
+
+        foreach ($requestedAffixIds as $affixId) {
+            $affix = $affixesById->get($affixId);
+
+            if (is_null($affix)) {
+                return false;
+            }
+
+            if ($affix->type === 'prefix' && (int) $item->item_prefix_id !== (int) $affixId) {
+                return false;
+            }
+
+            if ($affix->type === 'suffix' && (int) $item->item_suffix_id !== (int) $affixId) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Deletes an uncommitted Batch Crafting item that failed the atomic affix
+     * requirement. Never deletes a committed, player-owned item: confirms the item is
+     * not referenced by any Inventory, Set, Alchemy Bag, Gem Bag or Market Board slot
+     * before deleting.
+     */
+    private function discardPartialBatchItem(Item $item): void
+    {
+        if (InventorySlot::where('item_id', $item->id)->exists()) {
+            return;
+        }
+
+        if (SetSlot::where('item_id', $item->id)->exists()) {
+            return;
+        }
+
+        if (AlchemyBagSlot::where('item_id', $item->id)->exists()) {
+            return;
+        }
+
+        if (GemBagSlot::where('gem_id', $item->id)->exists()) {
+            return;
+        }
+
+        if (MarketBoard::where('item_id', $item->id)->exists()) {
+            return;
+        }
+
+        $item->delete();
+    }
+
+    /**
+     * Strips an unfulfilled kept/disposition state off a single action so an
+     * intermediate KEEP result (e.g. the crafting step of Craft and Enchant Experience)
+     * never leaks kept_count or a kept_item into a final result. Never touches an action
+     * that already has a real slot_id/set_slot_id, never marks the action failed, and
+     * preserves crafted_item and any existing failure info.
+     */
+    private function removeIntermediateKeptOutput(array &$result, int $actionIndex): void
+    {
+        if (! isset($result['actions'][$actionIndex])) {
+            return;
+        }
+
+        $action = $result['actions'][$actionIndex];
+
+        if (! is_null($action['kept_item']['set_slot_id'] ?? null) || ! is_null($action['kept_item']['slot_id'] ?? null)) {
+            return;
+        }
+
+        if (isset($result['counts']['kept_count'])) {
+            $result['counts']['kept_count'] = max(0, ((int) $result['counts']['kept_count']) - 1);
+
+            if ($result['counts']['kept_count'] === 0) {
+                unset($result['counts']['kept_count']);
+            }
+        }
+
+        unset(
+            $result['actions'][$actionIndex]['kept_item'],
+            $result['actions'][$actionIndex]['disposition'],
+            $result['actions'][$actionIndex]['destination_set'],
+        );
+    }
+
+    /**
+     * Normalizes a destination-commit failure onto the exact action that attempted it,
+     * rather than appending a second synthetic action: strips the unfulfilled kept
+     * state, marks that action failed with the given message, and clears
+     * kept_output_committed so no later step treats this tick as having produced a real
+     * kept item. Never touches an already-committed action with a real slot_id/set_slot_id.
+     */
+    private function markKeptOutputCommitFailure(array &$result, int $actionIndex, string $failure): void
+    {
+        if (! isset($result['actions'][$actionIndex])) {
+            return;
+        }
+
+        $action = $result['actions'][$actionIndex];
+
+        if (! is_null($action['kept_item']['set_slot_id'] ?? null) || ! is_null($action['kept_item']['slot_id'] ?? null)) {
+            return;
+        }
+
+        $this->removeIntermediateKeptOutput($result, $actionIndex);
+
+        unset($result['actions'][$actionIndex]['created_in_crafted_items_set']);
+
+        $result['actions'][$actionIndex]['status'] = 'failed';
+        $result['actions'][$actionIndex]['failure'] = $failure;
+        $result['kept_output_committed'] = false;
+    }
+
+    private function commitKeptItemToDestination(BatchCrafting $batchCrafting, Character $character, array &$result): bool
+    {
+        $progress = $batchCrafting->progress ?? [];
+        $destination = $progress['output_destination'] ?? 'crafted_items_set';
+
         foreach ($result['actions'] ?? [] as $actionIndex => $action) {
             $itemId = $action['kept_item']['item_id'] ?? null;
 
@@ -3033,13 +3723,138 @@ class BatchCraftingProcessor
                 continue;
             }
 
-            if (! is_null($action['kept_item']['set_slot_id'] ?? null)) {
+            if (! is_null($action['kept_item']['set_slot_id'] ?? null) || ! is_null($action['kept_item']['slot_id'] ?? null)) {
                 continue;
             }
 
             $item = Item::find($itemId);
 
             if (is_null($item)) {
+                $this->markKeptOutputCommitFailure($result, $actionIndex, 'The retained Batch Crafting item could not be found and was not committed.');
+                $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['failed_count' => 1]);
+                $result['end_reason'] = BatchCraftingEndReason::FAILED;
+
+                return false;
+            }
+
+            $itemName = $item->affix_name ?? $item->name;
+            $enchantAffixName = $action['enchant_affix_name'] ?? null;
+            $manualStyleMessage = empty($enchantAffixName)
+                ? 'You crafted a: ' . $itemName . '!'
+                : 'Applied enchantment: ' . $enchantAffixName . ' to: ' . $itemName;
+
+            if ($destination === 'inventory') {
+                $slotId = null;
+
+                DB::transaction(function () use ($character, $item, &$slotId) {
+                    $inventory = Inventory::where('character_id', $character->id)->lockForUpdate()->first();
+
+                    if (is_null($inventory)) {
+                        return;
+                    }
+
+                    $currentCount = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)
+                        ->where('inventory_slots.equipped', false)
+                        ->join('items', function ($join) {
+                            $join->on('items.id', '=', 'inventory_slots.item_id')
+                                ->where('items.type', '!=', 'quest')
+                                ->where('items.type', '!=', 'alchemy')
+                                ->where('items.type', '!=', 'gem');
+                        })
+                        ->count();
+
+                    if ($currentCount >= $character->inventory_max) {
+                        return;
+                    }
+
+                    $slot = $inventory->slots()->create([
+                        'item_id' => $item->id,
+                        'inventory_id' => $inventory->id,
+                    ]);
+
+                    $slotId = $slot->id;
+                });
+
+                if (is_null($slotId)) {
+                    $this->discardBatchClonedItemIfOrphaned($item);
+                    $this->markKeptOutputCommitFailure($result, $actionIndex, 'The retained item could not be placed in Inventory.');
+                    $result['end_reason'] = BatchCraftingEndReason::NO_INVENTORY_SPACE;
+
+                    return false;
+                }
+
+                $character = $character->refresh();
+                $result['actions'][$actionIndex]['kept_item']['slot_id'] = $slotId;
+                $result['actions'][$actionIndex]['destination_set'] = 'Inventory';
+
+                $this->serverMessageHandler->sendBasicMessageWithLink($character->user, $manualStyleMessage, $slotId, 'inventory', $itemName);
+                $this->serverMessageHandler->sendBasicMessageWithLink($character->user, 'Kept: ' . $itemName . ' in your Inventory.', $slotId, 'inventory', $itemName);
+
+                event(new UpdateCharacterInventoryCountEvent($character));
+
+                continue;
+            }
+
+            if ($destination === 'inventory_set') {
+                $setSlotId = null;
+                $outputSetName = null;
+                $targetChanged = false;
+                $capacityFull = false;
+
+                DB::transaction(function () use ($character, $item, $progress, &$setSlotId, &$outputSetName, &$targetChanged, &$capacityFull) {
+                    $outputSet = InventorySet::where('id', (int) ($progress['output_set_id'] ?? 0))
+                        ->where('character_id', $character->id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (is_null($outputSet) || $outputSet->isBatchCraftingSet() || $outputSet->is_equipped) {
+                        $targetChanged = true;
+
+                        return;
+                    }
+
+                    if ($outputSet->remainingSlots() <= 0) {
+                        $capacityFull = true;
+
+                        return;
+                    }
+
+                    $setSlot = $this->inventorySetService->putItemIntoSet($outputSet, $item);
+
+                    if (is_null($setSlot)) {
+                        $targetChanged = true;
+
+                        return;
+                    }
+
+                    $setSlotId = $setSlot->id;
+                    $outputSetName = $outputSet->name;
+                });
+
+                if ($targetChanged || (is_null($setSlotId) && ! $capacityFull)) {
+                    $this->discardBatchClonedItemIfOrphaned($item);
+                    $this->markKeptOutputCommitFailure($result, $actionIndex, 'The selected output set is no longer valid.');
+                    $result['end_reason'] = BatchCraftingEndReason::CRAFT_ENCHANT_SET_TARGET_SET_CHANGED;
+
+                    return false;
+                }
+
+                if ($capacityFull) {
+                    $this->discardBatchClonedItemIfOrphaned($item);
+                    $this->markKeptOutputCommitFailure($result, $actionIndex, 'The selected output set does not have enough space.');
+                    $result['end_reason'] = BatchCraftingEndReason::CRAFT_SET_FULL;
+
+                    return false;
+                }
+
+                $result['actions'][$actionIndex]['kept_item']['set_slot_id'] = $setSlotId;
+                $result['actions'][$actionIndex]['destination_set'] = $outputSetName;
+
+                $this->serverMessageHandler->sendBasicMessageWithLink($character->user, $manualStyleMessage, $setSlotId, 'inventory_set', $itemName);
+                $this->serverMessageHandler->sendBasicMessageWithLink($character->user, 'Kept: ' . $itemName . ' in: ' . $outputSetName . '.', $setSlotId, 'inventory_set', $itemName);
+
+                event(new UpdateCharacterInventoryCountEvent($character));
+
                 continue;
             }
 
@@ -3047,13 +3862,8 @@ class BatchCraftingProcessor
 
             if ($createResult['success']) {
                 $result['actions'][$actionIndex]['kept_item']['set_slot_id'] = $createResult['set_slot']->id;
+                $result['actions'][$actionIndex]['destination_set'] = 'Crafted Items Set';
                 $this->rememberCommittedKeepBestSlot($batchCrafting, $item, $createResult['set_slot']->id);
-
-                $itemName = $item->affix_name ?? $item->name;
-                $enchantAffixName = $action['enchant_affix_name'] ?? null;
-                $manualStyleMessage = empty($enchantAffixName)
-                    ? 'You crafted a: ' . $itemName . '!'
-                    : 'Applied enchantment: ' . $enchantAffixName . ' to: ' . $itemName;
 
                 $this->serverMessageHandler->sendBasicMessageWithLink(
                     $character->user,
@@ -3075,18 +3885,22 @@ class BatchCraftingProcessor
             }
 
             if ($createResult['reason'] === 'set_full') {
+                $this->discardBatchClonedItemIfOrphaned($item);
+                $this->markKeptOutputCommitFailure($result, $actionIndex, 'The Crafted Items Set does not have enough space.');
                 $result['end_reason'] = BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL;
 
-                return;
+                return false;
             }
 
+            $this->discardBatchClonedItemIfOrphaned($item);
+            $this->markKeptOutputCommitFailure($result, $actionIndex, 'Could not create item in Crafted Items Set: ' . ($createResult['reason'] ?? 'unknown'));
             $result['counts'] = $this->mergeCounts($result['counts'] ?? [], ['failed_count' => 1]);
-            $result['actions'][] = [
-                'action' => 'keep',
-                'status' => 'failed',
-                'failure' => 'Could not create item in Crafted Items Set: ' . ($createResult['reason'] ?? 'unknown'),
-            ];
+            $result['end_reason'] = BatchCraftingEndReason::FAILED;
+
+            return false;
         }
+
+        return true;
     }
 
     private function rememberCommittedKeepBestSlot(BatchCrafting $batchCrafting, Item $item, int $setSlotId): void
@@ -3164,16 +3978,31 @@ class BatchCraftingProcessor
             return [];
         }
 
-        $affix = ItemAffix::where('skill_level_required', '<=', $enchantingSkill->level)
+        $resolvedAffixIds = [];
+
+        $prefix = ItemAffix::where('type', 'prefix')
+            ->where('skill_level_required', '<=', $enchantingSkill->level)
             ->where('skill_level_trivial', '>=', $enchantingSkill->level)
             ->orderByDesc('skill_level_required')
+            ->orderBy('id')
             ->first();
 
-        if (is_null($affix)) {
-            return [];
+        if (! is_null($prefix)) {
+            $resolvedAffixIds[] = $prefix->id;
         }
 
-        return [$affix->id];
+        $suffix = ItemAffix::where('type', 'suffix')
+            ->where('skill_level_required', '<=', $enchantingSkill->level)
+            ->where('skill_level_trivial', '>=', $enchantingSkill->level)
+            ->orderByDesc('skill_level_required')
+            ->orderBy('id')
+            ->first();
+
+        if (! is_null($suffix)) {
+            $resolvedAffixIds[] = $suffix->id;
+        }
+
+        return $resolvedAffixIds;
     }
 
     private function intBlockedForEnchant(Character $character, ?array $affixIds = null): bool
@@ -3228,23 +4057,28 @@ class BatchCraftingProcessor
         $resolvedAffixIds = $this->resolveIntendedAffixIdsForEnchant($character, $affixIds);
 
         if (empty($resolvedAffixIds)) {
-            return ['attempted' => false, 'item' => null, 'affix_names' => []];
+            return ['attempted' => false, 'item' => null, 'affix_names' => [], 'affix_ids' => []];
         }
 
         if ($this->intBlockedForEnchant($character, $resolvedAffixIds)) {
-            return ['attempted' => false, 'item' => null, 'affix_names' => []];
+            return ['attempted' => false, 'item' => null, 'affix_names' => [], 'affix_ids' => []];
         }
 
         $cost = $this->enchantingService->getCostOfEnchantment($character, $resolvedAffixIds, $item->id);
 
         if ($character->gold < $cost) {
-            return ['attempted' => false, 'item' => null, 'affix_names' => []];
+            return ['attempted' => false, 'item' => null, 'affix_names' => [], 'affix_ids' => []];
         }
 
-        $affixNames = ItemAffix::whereIn('id', $resolvedAffixIds)->pluck('name')->all();
+        $affixesById = ItemAffix::whereIn('id', $resolvedAffixIds)->get()->keyBy('id');
+        $affixNames = collect($resolvedAffixIds)
+            ->map(fn (int $affixId) => $affixesById->get($affixId)?->name)
+            ->filter()
+            ->values()
+            ->all();
         $enchantResult = $this->enchantingService->enchantItemForBatch($character, $item, $resolvedAffixIds, $cost, $suppressSuccessServerMessage);
 
-        return ['attempted' => true, 'item' => $enchantResult['success'] ? $enchantResult['item'] : null, 'affix_names' => $affixNames];
+        return ['attempted' => true, 'item' => $enchantResult['success'] ? $enchantResult['item'] : null, 'affix_names' => $affixNames, 'affix_ids' => $resolvedAffixIds];
     }
 
     private function applyDispositionForItem(BatchCrafting $batchCrafting, Character $character, Item $item, BatchCraftingDisposition $disposition): array

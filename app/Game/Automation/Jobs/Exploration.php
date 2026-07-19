@@ -606,6 +606,10 @@ class Exploration implements ShouldQueue
             return false;
         }
 
+        if ($data['health']['current_character_health'] <= 0) {
+            return false;
+        }
+
         if ($data['health']['current_monster_health'] > 0) {
             return true;
         }

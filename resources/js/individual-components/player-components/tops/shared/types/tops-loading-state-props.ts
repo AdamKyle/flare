@@ -1,1 +1,3 @@
-export default interface TopsLoadingStateProps {}
+export default interface TopsLoadingStateProps {
+    label?: string;
+}

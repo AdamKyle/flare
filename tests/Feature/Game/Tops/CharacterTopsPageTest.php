@@ -40,6 +40,21 @@ class CharacterTopsPageTest extends TestCase
         $this->assertStringContainsString('data-selected-character-id="'.$character->id.'"', $response->getContent());
     }
 
+    public function testCharacterProfileRouteWrapperIsFullWidthAndMountsCharacterTops(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+
+        $response = $this->actingAs($user)->call('GET', '/game/tops/characters/'.$character->id);
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertStringContainsString('id="character-tops"', $response->getContent());
+        $this->assertStringContainsString('w-full px-4 sm:px-6 lg:px-8 pb-10', $response->getContent());
+        $this->assertStringContainsString('data-selected-character-id="'.$character->id.'"', $response->getContent());
+        $this->assertStringNotContainsString('lg:w-3/4', $response->getContent());
+        $this->assertStringNotContainsString('max-w-7xl', $response->getContent());
+    }
+
     public function testOldNumericRouteRedirectsToCharacterProfileRoute(): void
     {
         $user = User::factory()->create();
