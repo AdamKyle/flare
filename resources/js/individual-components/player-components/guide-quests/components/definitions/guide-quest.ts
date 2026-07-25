@@ -72,7 +72,9 @@ export default interface GuideQuest {
     required_batch_crafting_type_name: string | null;
     required_batch_crafted_item_names:
         | {
+              requirement_index: number;
               source: string;
+              item_id: number;
               name: string;
               type: string;
               type_name: string;

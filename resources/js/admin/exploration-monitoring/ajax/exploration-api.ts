@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleUnauthenticatedAxiosRequest } from "../../../game/lib/ajax/unauthenticated-response-handler";
 import {
     ActiveExplorer,
     ExplorationChartPoint,
@@ -11,7 +12,11 @@ import {
 const base = "/api/admin/monitoring/exploration";
 
 export async function fetchExplorationActive(): Promise<ActiveExplorer[]> {
-    return (await axios.get<ActiveExplorer[]>(`${base}/active`)).data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ActiveExplorer[]>(`${base}/active`),
+        )
+    ).data;
 }
 
 export async function fetchExplorationLogs(
@@ -19,9 +24,11 @@ export async function fetchExplorationLogs(
     page: number,
 ): Promise<Paginated<ExplorationLogRow>> {
     return (
-        await axios.get<Paginated<ExplorationLogRow>>(`${base}/logs`, {
-            params: { ...filters, page },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<Paginated<ExplorationLogRow>>(`${base}/logs`, {
+                params: { ...filters, page },
+            }),
+        )
     ).data;
 }
 
@@ -29,9 +36,11 @@ export async function fetchExplorationSummary(
     days: string,
 ): Promise<ExplorationSummary> {
     return (
-        await axios.get<ExplorationSummary>(`${base}/summary`, {
-            params: { days },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ExplorationSummary>(`${base}/summary`, {
+                params: { days },
+            }),
+        )
     ).data;
 }
 
@@ -39,8 +48,10 @@ export async function fetchExplorationChart(
     days: string,
 ): Promise<ExplorationChartPoint[]> {
     return (
-        await axios.get<ExplorationChartPoint[]>(`${base}/chart`, {
-            params: { days },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ExplorationChartPoint[]>(`${base}/chart`, {
+                params: { days },
+            }),
+        )
     ).data;
 }

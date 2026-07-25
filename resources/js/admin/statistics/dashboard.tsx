@@ -1,9 +1,11 @@
 import React from "react";
+import axios, { AxiosError } from "axios";
 import ChartCard from "./components/chart-card";
 import OnlineCharacterList from "./components/online-character-list";
 import RankedTable from "./components/ranked-table";
 import StatCard from "./components/stat-card";
 import { AdminStatisticsDashboardSnapshot } from "./types/admin-statistics-dashboard";
+import { handleUnauthenticatedResponse } from "../../game/lib/ajax/unauthenticated-response-handler";
 
 interface DashboardState {
     snapshot: AdminStatisticsDashboardSnapshot | null;
@@ -46,28 +48,27 @@ export default class Dashboard extends React.Component<any, DashboardState> {
         this.setState({ error: "", refreshing: true });
 
         try {
-            const response = await fetch(
+            const response = await axios.get<AdminStatisticsDashboardSnapshot>(
                 "/api/admin/statistics/dashboard-data",
                 {
-                    credentials: "same-origin",
                     headers: {
                         Accept: "application/json",
                     },
                 },
             );
 
-            if (!response.ok) {
-                throw new Error("Dashboard data request failed.");
-            }
-
-            const snapshot = await response.json();
+            const snapshot = response.data;
 
             this.setState({
                 snapshot,
                 loading: false,
                 refreshing: false,
             });
-        } catch {
+        } catch (error) {
+            if (handleUnauthenticatedResponse(error as AxiosError)) {
+                return;
+            }
+
             this.setState({
                 error: "Statistics dashboard data could not be loaded.",
                 loading: false,

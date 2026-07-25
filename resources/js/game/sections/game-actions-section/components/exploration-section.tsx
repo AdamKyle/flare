@@ -554,12 +554,14 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 additional_css={"h-10"}
                             />
                         ) : null}
-                        <PrimaryButton
-                            button_label={"Close"}
-                            on_click={this.closeExploration.bind(this)}
-                            disabled={this.state.loading}
-                            additional_css={"h-10"}
-                        />
+                        {this.props.character.is_delve_running ? (
+                            <PrimaryButton
+                                button_label={"Close"}
+                                on_click={this.closeExploration.bind(this)}
+                                disabled={this.state.loading}
+                                additional_css={"h-10"}
+                            />
+                        ) : null}
                     </div>
                     <div className="mt-3 text-center">
                         <a href="/information/delve" target="_blank">
@@ -590,12 +592,14 @@ export default class ExplorationSection extends React.Component<any, any> {
                                 additional_css={"h-10"}
                             />
                         ) : null}
-                        <PrimaryButton
-                            button_label={"Close Exploration"}
-                            on_click={this.closeExploration.bind(this)}
-                            disabled={this.state.loading}
-                            additional_css={"h-10"}
-                        />
+                        {this.props.exploration_output?.type === "active" ? (
+                            <PrimaryButton
+                                button_label={"Close Exploration"}
+                                on_click={this.closeExploration.bind(this)}
+                                disabled={this.state.loading}
+                                additional_css={"h-10"}
+                            />
+                        ) : null}
                     </div>
                     <div className="mt-3 text-center">
                         <a href="/information/automation" target="_blank">

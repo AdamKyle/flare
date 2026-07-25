@@ -7,7 +7,7 @@ import WarningAlert from "../../ui/alerts/simple-alerts/warning-alert";
 import LoadingProgressBar from "../../ui/progress-bars/loading-progress-bar";
 import DangerButton from "../../ui/buttons/danger-button";
 import PrimaryButton from "../../ui/buttons/primary-button";
-import Select from "react-select";
+import Select, { StylesConfig } from "react-select";
 import BatchCraftingStatusPanel from "../../../sections/game-actions-section/components/batch-crafting-status-panel";
 import { updateTimers } from "../../../lib/ajax/update-timers";
 import { craftingGetEndPoints } from "../general-crafting/helpers/crafting-type-url";
@@ -35,10 +35,12 @@ import {
     CostBreakdown,
     CraftableItem,
     CraftCategory,
+    CraftEnchantSetAvailableItem,
     CraftMode,
     Disposition,
     EnchantMode,
     EnchantmentOption,
+    HandSelectionType,
     HolyOilMode,
     HolyOilPreviewItemEntry,
     InventorySetOption,
@@ -46,6 +48,30 @@ import {
 } from "./types/batch-crafting-types";
 
 const selectAllHolyOilItemsValue = -1;
+
+const batchCraftingSelectStyles: StylesConfig<any, boolean> = {
+    menu: (base) => ({
+        ...base,
+        backgroundColor: "#ffffff",
+        color: "#111827",
+    }),
+    menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+    option: (base, state) => ({
+        ...base,
+        backgroundColor: state.isDisabled
+            ? "#ffffff"
+            : state.isSelected
+              ? "#2684ff"
+              : state.isFocused
+                ? "#deebff"
+                : "#ffffff",
+        color: state.isDisabled
+            ? "#9ca3af"
+            : state.isSelected
+              ? "#ffffff"
+              : "#111827",
+    }),
+};
 
 const batchTypes: { value: BatchType; label: string; isDisabled?: boolean }[] =
     [
@@ -109,48 +135,151 @@ const craftCategoryOptions: { value: CraftCategory; label: string }[] = [
 
 type CraftEnchantSetPlanItem = {
     key: string;
-    category: "weapon" | "armour" | "ring" | "spell";
+    category: "hand" | "armour" | "ring" | "spell";
     label: string;
-};
-
-// The Set planner shows one row per individual target slot, so it needs the
-// singular form of each weapon type (weaponTypeOptions' labels are plural,
-// which is correct for the "Weapon type" category dropdown but wrong here).
-const weaponTypeSingularLabels: Record<string, string> = {
-    dagger: "Dagger",
-    sword: "Sword",
-    claw: "Claw",
-    wand: "Wand",
-    censer: "Censer",
-    stave: "Stave",
-    hammer: "Hammer",
-    bow: "Bow",
-    gun: "Gun",
-    fan: "Fan",
-    mace: "Mace",
-    "scratch-awl": "Scratch Awl",
+    optional?: boolean;
 };
 
 const craftEnchantSetPlanItems: CraftEnchantSetPlanItem[] = [
-    ...weaponTypeOptions.map((option) => ({
-        key: option.value,
-        category: "weapon" as const,
-        label: weaponTypeSingularLabels[option.value] ?? option.label,
-    })),
-    ...armourTypeOptions.map((option) => ({
-        key: option.value,
-        category: "armour" as const,
-        label: option.label,
-    })),
+    { key: "left_hand", category: "hand", label: "Left Hand", optional: true },
+    {
+        key: "right_hand",
+        category: "hand",
+        label: "Right Hand",
+        optional: true,
+    },
+    { key: "body", category: "armour", label: "Body" },
+    { key: "leggings", category: "armour", label: "Leggings" },
+    { key: "sleeves", category: "armour", label: "Sleeves" },
+    { key: "gloves", category: "armour", label: "Gloves" },
+    { key: "feet", category: "armour", label: "Feet" },
+    { key: "helmet", category: "armour", label: "Helmet" },
     { key: "ring_0", category: "ring" as const, label: "Ring 1" },
     { key: "ring_1", category: "ring" as const, label: "Ring 2" },
-    { key: "spell-damage", category: "spell" as const, label: "Spell Damage" },
+    { key: "spell-damage", category: "spell" as const, label: "Damage Spell" },
     {
         key: "spell-healing",
         category: "spell" as const,
-        label: "Spell Healing",
+        label: "Healing Spell",
     },
 ];
+
+const handSelectionOptions: {
+    value: Exclude<HandSelectionType, null>;
+    label: string;
+}[] = [
+    { value: "single_handed", label: "Single Handed" },
+    { value: "shield", label: "Shield" },
+    { value: "two_handed", label: "Duel Wield" },
+];
+
+function getHandWeaponTypes(
+    availableItems: CraftEnchantSetAvailableItem[],
+    handedness: "single_handed" | "two_handed",
+) {
+    return availableItems
+        .filter((item) => item.handedness === handedness)
+        .reduce<CraftEnchantSetAvailableItem[]>((types, item) => {
+            const existing = types.find(
+                (candidate) => candidate.type === item.type,
+            );
+
+            if (
+                !existing ||
+                item.skill_level_required < existing.skill_level_required
+            ) {
+                return [
+                    ...types.filter(
+                        (candidate) => candidate.type !== item.type,
+                    ),
+                    item,
+                ];
+            }
+
+            return types;
+        }, [])
+        .sort(
+            (a, b) =>
+                a.skill_level_required - b.skill_level_required ||
+                a.type.localeCompare(b.type),
+        )
+        .map((item) => ({ value: item.type, label: item.type }));
+}
+
+function getHandExactItems(
+    availableItems: CraftEnchantSetAvailableItem[],
+    handSelectionType: HandSelectionType,
+    selectedWeaponType: string | null,
+) {
+    if (
+        (handSelectionType === "single_handed" ||
+            handSelectionType === "two_handed") &&
+        selectedWeaponType === null
+    ) {
+        return [];
+    }
+
+    return availableItems
+        .filter(
+            (item) =>
+                item.handedness === handSelectionType &&
+                ((handSelectionType !== "single_handed" &&
+                    handSelectionType !== "two_handed") ||
+                    item.type === selectedWeaponType),
+        )
+        .sort(
+            (a, b) =>
+                a.skill_level_required - b.skill_level_required ||
+                a.cost - b.cost ||
+                a.id - b.id,
+        );
+}
+
+function synchronizeHandPlanEntry(
+    entry: any,
+    availableItems: CraftEnchantSetAvailableItem[],
+    clearAffixes: boolean,
+) {
+    const handSelectionType = entry?.handSelectionType ?? null;
+    const selectedWeaponType = entry?.selectedWeaponType ?? null;
+    const handSelectionStillAvailable =
+        handSelectionType === null ||
+        availableItems.some((item) => item.handedness === handSelectionType);
+    const weaponTypeStillAvailable =
+        (handSelectionType !== "single_handed" &&
+            handSelectionType !== "two_handed") ||
+        selectedWeaponType === null ||
+        availableItems.some(
+            (item) =>
+                item.handedness === handSelectionType &&
+                item.type === selectedWeaponType,
+        );
+    const selectedItemStillAvailable =
+        entry?.selectedItemId === null ||
+        entry?.selectedItemId === undefined ||
+        availableItems.some((item) => item.id === entry.selectedItemId);
+
+    if (
+        handSelectionStillAvailable &&
+        weaponTypeStillAvailable &&
+        selectedItemStillAvailable
+    ) {
+        return entry;
+    }
+
+    return {
+        ...entry,
+        selectedItemId: null,
+        handSelectionType: handSelectionStillAvailable
+            ? handSelectionType
+            : null,
+        selectedWeaponType:
+            handSelectionStillAvailable && weaponTypeStillAvailable
+                ? selectedWeaponType
+                : null,
+        ...(clearAffixes ? { prefixAffixId: null, suffixAffixId: null } : {}),
+    };
+}
 
 type CraftModeOption = { value: CraftMode; label: string };
 type EnchantModeOption = { value: EnchantMode; label: string };
@@ -321,6 +450,8 @@ export default class BatchCraftingSection extends React.Component<
             craftEnchantSetPlan: {},
             craftEnchantSetBulkPrefixId: null,
             craftEnchantSetBulkSuffixId: null,
+            craftEnchantSetAppliedPrefixId: null,
+            craftEnchantSetAppliedSuffixId: null,
             craftSetPlan: {},
             preview: null,
             previewLoading: false,
@@ -399,6 +530,7 @@ export default class BatchCraftingSection extends React.Component<
             previousState.selectedSetId !== this.state.selectedSetId ||
             previousState.craftEnchantSetPlan !==
                 this.state.craftEnchantSetPlan ||
+            previousState.craftSetPlan !== this.state.craftSetPlan ||
             previousState.selectedItems !== this.state.selectedItems ||
             previousState.selectedOils !== this.state.selectedOils
         ) {
@@ -937,6 +1069,8 @@ export default class BatchCraftingSection extends React.Component<
             craftEnchantSetPlan: {},
             craftEnchantSetBulkPrefixId: null,
             craftEnchantSetBulkSuffixId: null,
+            craftEnchantSetAppliedPrefixId: null,
+            craftEnchantSetAppliedSuffixId: null,
             craftSetPlan: {},
             preview: null,
             previewError: null,
@@ -1045,12 +1179,16 @@ export default class BatchCraftingSection extends React.Component<
             if (
                 Object.keys(this.state.craftEnchantSetPlan).length > 0 ||
                 this.state.craftEnchantSetBulkPrefixId !== null ||
-                this.state.craftEnchantSetBulkSuffixId !== null
+                this.state.craftEnchantSetBulkSuffixId !== null ||
+                this.state.craftEnchantSetAppliedPrefixId !== null ||
+                this.state.craftEnchantSetAppliedSuffixId !== null
             ) {
                 this.setState({
                     craftEnchantSetPlan: {},
                     craftEnchantSetBulkPrefixId: null,
                     craftEnchantSetBulkSuffixId: null,
+                    craftEnchantSetAppliedPrefixId: null,
+                    craftEnchantSetAppliedSuffixId: null,
                 });
             }
         } else if (Object.keys(this.state.craftEnchantSetPlan).length === 0) {
@@ -1062,6 +1200,10 @@ export default class BatchCraftingSection extends React.Component<
                             prefixAffixId: null,
                             suffixAffixId: null,
                             selectedItemId: null,
+                            handSelectionType:
+                                item.category === "hand" ? null : undefined,
+                            selectedWeaponType:
+                                item.category === "hand" ? null : undefined,
                         },
                     ]),
                 ),
@@ -1079,7 +1221,13 @@ export default class BatchCraftingSection extends React.Component<
                 craftSetPlan: Object.fromEntries(
                     craftEnchantSetPlanItems.map((item) => [
                         item.key,
-                        { selectedItemId: null },
+                        {
+                            selectedItemId: null,
+                            handSelectionType:
+                                item.category === "hand" ? null : undefined,
+                            selectedWeaponType:
+                                item.category === "hand" ? null : undefined,
+                        },
                     ]),
                 ),
             });
@@ -1452,6 +1600,281 @@ export default class BatchCraftingSection extends React.Component<
         );
     }
 
+    startDisabledReasons(
+        selectedCraftMode: CraftMode,
+        selectedAlchemyMode: AlchemyMode,
+    ): BatchCraftingStartBlocker[] {
+        const {
+            batchType,
+            craftAmount,
+            craftEnchantSetPlan,
+            craftSetPlan,
+            disposition,
+            holyOilMode,
+            isSaving,
+            listingPrice,
+            outputDestination,
+            outputSetId,
+            preview,
+            previewLoading,
+            selectedAlchemyItemId,
+            selectedItems,
+            selectedOils,
+            selectedPrefixId,
+            selectedSetId,
+            selectedSuffixId,
+            specificItemId,
+            status,
+        } = this.state;
+        const reasons: BatchCraftingStartBlocker[] = [];
+        const addReason = (code: string, message: string) =>
+            reasons.push({ code, message, blocking: true });
+        const alchemyLocked = status?.event_batch?.alchemy_locked ?? false;
+        const alchemyMaxed = status?.event_batch?.alchemy_maxed ?? false;
+        const trinketryMaxed = status?.event_batch?.trinketry_maxed ?? false;
+        const isAmountMode =
+            ((batchType === "craft" || batchType === "craft_and_enchant") &&
+                selectedCraftMode === "specific_item") ||
+            (batchType === "alchemy" && selectedAlchemyMode === "amount");
+
+        if (isSaving) {
+            addReason("start_request_pending", "Starting Batch Crafting...");
+        }
+
+        if (
+            (batchType === "alchemy" || batchType === "holy_oils") &&
+            alchemyLocked
+        ) {
+            addReason(
+                "alchemy_locked",
+                "Alchemy has not been unlocked for this character.",
+            );
+        }
+
+        if (
+            batchType === "alchemy" &&
+            selectedAlchemyMode === "experience" &&
+            alchemyMaxed
+        ) {
+            addReason(
+                "alchemy_experience_maxed",
+                "Alchemy Experience cannot start because the Alchemy skill is maxed.",
+            );
+        }
+
+        if (batchType === "trinketry" && trinketryMaxed) {
+            addReason(
+                "trinketry_experience_maxed",
+                "Trinketry Experience cannot start because the Trinketry skill is maxed.",
+            );
+        }
+
+        if (
+            (batchType === "craft" || batchType === "craft_and_enchant") &&
+            selectedCraftMode === "specific_item" &&
+            specificItemId === null
+        ) {
+            addReason(
+                "required_item_missing",
+                "Select the item required for this Batch Crafting mode.",
+            );
+        }
+
+        if (
+            batchType === "alchemy" &&
+            selectedAlchemyMode === "amount" &&
+            selectedAlchemyItemId === null
+        ) {
+            addReason(
+                "alchemy_item_missing",
+                "Select the Alchemy item to craft.",
+            );
+        }
+
+        if (
+            batchType === "craft" &&
+            selectedCraftMode === "craft_set" &&
+            Object.keys(craftSetPlan).length === 0
+        ) {
+            addReason(
+                "craft_set_plan_missing",
+                "Craft Set has no valid configured plan.",
+            );
+        }
+
+        if (
+            batchType === "craft_and_enchant" &&
+            selectedCraftMode === "craft_enchant_set" &&
+            Object.keys(craftEnchantSetPlan).length === 0
+        ) {
+            addReason(
+                "craft_enchant_set_plan_missing",
+                "Craft-and-Enchant Set has no valid configured plan.",
+            );
+        }
+
+        if (
+            batchType === "craft_and_enchant" &&
+            selectedCraftMode === "craft_enchant_set" &&
+            craftEnchantSetPlanItems.some((item) => {
+                const entry = craftEnchantSetPlan[item.key];
+
+                if (item.optional && (entry?.selectedItemId ?? null) === null) {
+                    return false;
+                }
+
+                return (
+                    (entry?.prefixAffixId === null ||
+                        typeof entry?.prefixAffixId === "undefined") &&
+                    (entry?.suffixAffixId === null ||
+                        typeof entry?.suffixAffixId === "undefined")
+                );
+            })
+        ) {
+            addReason(
+                "craft_enchant_set_affix_missing",
+                "Every Craft-and-Enchant Set row must have a prefix or suffix selected.",
+            );
+        }
+
+        if (
+            batchType === "craft_and_enchant" &&
+            selectedCraftMode === "specific_item" &&
+            selectedPrefixId === null &&
+            selectedSuffixId === null
+        ) {
+            addReason(
+                "craft_enchant_amount_affix_missing",
+                "Craft-and-Enchant Amount requires a prefix or suffix selection.",
+            );
+        }
+
+        if (
+            batchType === "holy_oils" &&
+            holyOilMode === "selected" &&
+            selectedItems.length === 0
+        ) {
+            addReason(
+                "holy_oil_gear_missing",
+                "Select at least one gear item for Holy Oils.",
+            );
+        }
+
+        if (batchType === "holy_oils" && selectedOils.length === 0) {
+            addReason("holy_oils_missing", "Select at least one Holy Oil.");
+        }
+
+        if (
+            batchType === "holy_oils" &&
+            holyOilMode === "set" &&
+            selectedSetId === null
+        ) {
+            addReason(
+                "holy_oil_set_missing",
+                "Select the Inventory Set to receive Holy Oils.",
+            );
+        }
+
+        if (
+            this.isFiniteRetainedOutputMode(
+                batchType,
+                selectedCraftMode,
+                disposition,
+            ) &&
+            outputDestination === "inventory_set" &&
+            outputSetId === null
+        ) {
+            addReason(
+                "output_inventory_set_missing",
+                "Select the destination Inventory Set.",
+            );
+        }
+
+        if (isAmountMode && craftAmount === "") {
+            addReason("amount_blank", "Enter an amount to craft.");
+        } else if (
+            isAmountMode &&
+            (typeof craftAmount !== "number" || !Number.isInteger(craftAmount))
+        ) {
+            addReason("amount_not_whole", "The amount must be a whole number.");
+        } else if (isAmountMode && craftAmount < 1) {
+            addReason("amount_below_one", "The amount must be at least one.");
+        } else if (
+            isAmountMode &&
+            preview !== null &&
+            craftAmount > preview.maximum_request_amount
+        ) {
+            addReason(
+                "amount_above_maximum",
+                `The amount may not exceed ${formatNumber(preview.maximum_request_amount)} for the selected destination.`,
+            );
+        }
+
+        if (
+            disposition === "list" &&
+            (listingPrice === "" ||
+                !Number.isInteger(listingPrice) ||
+                listingPrice < 1)
+        ) {
+            addReason(
+                "listing_price_invalid",
+                "Enter a valid whole-number listing price of at least one Gold.",
+            );
+        }
+
+        if (preview !== null && !previewLoading) {
+            const effectiveAmountIsZero =
+                ((batchType === "craft" || batchType === "craft_and_enchant") &&
+                    selectedCraftMode === "specific_item" &&
+                    preview.amount_preview?.effective_craftable_amount === 0) ||
+                (batchType === "alchemy" &&
+                    selectedAlchemyMode === "amount" &&
+                    preview.alchemy_amount_preview
+                        ?.effective_craftable_amount === 0) ||
+                (batchType === "holy_oils" &&
+                    holyOilMode === "selected" &&
+                    preview.holy_oil_selected_preview
+                        ?.max_applications_possible === 0) ||
+                (batchType === "holy_oils" &&
+                    holyOilMode === "set" &&
+                    preview.holy_oil_set_preview?.max_applications_possible ===
+                        0);
+
+            if (effectiveAmountIsZero) {
+                addReason(
+                    "effective_amount_zero",
+                    "The current selections, resources, and destination capacity cannot complete an item.",
+                );
+            }
+
+            if (
+                preview.cost_breakdown.can_afford_start === false ||
+                preview.cost_breakdown.can_afford_full_plan === false
+            ) {
+                if (
+                    !preview.start_blockers.some((blocker) => blocker.blocking)
+                ) {
+                    addReason(
+                        "cost_breakdown_blocking",
+                        preview.cost_breakdown.message ??
+                            `You do not have enough ${preview.cost_breakdown.currency_label} to start this complete batch plan. Required: ${formatNumber(preview.cost_breakdown.required_to_start)}, Available: ${formatNumber(preview.cost_breakdown.available_currency_amount)}, Missing: ${formatNumber(preview.cost_breakdown.missing_currency_amount ?? 0)}.`,
+                    );
+                }
+            }
+
+            reasons.push(
+                ...preview.start_blockers.filter((blocker) => blocker.blocking),
+            );
+        }
+
+        return reasons.filter(
+            (blocker, index, blockers) =>
+                blockers.findIndex(
+                    (candidate) => candidate.message === blocker.message,
+                ) === index,
+        );
+    }
+
     fetchPreview() {
         const { batchType, craftMode } = this.state;
         const resolvedCraftMode = this.getResolvedCraftMode(
@@ -1522,12 +1945,40 @@ export default class BatchCraftingSection extends React.Component<
                             const existingEnchantSetEntry =
                                 craftEnchantSetPlan[planEntry.key];
 
+                            if (planEntry.optional && existingEnchantSetEntry) {
+                                const synchronizedEntry =
+                                    synchronizeHandPlanEntry(
+                                        existingEnchantSetEntry,
+                                        planEntry.available_items,
+                                        true,
+                                    );
+
+                                if (
+                                    synchronizedEntry !==
+                                    existingEnchantSetEntry
+                                ) {
+                                    if (
+                                        craftEnchantSetPlan ===
+                                        prevState.craftEnchantSetPlan
+                                    ) {
+                                        craftEnchantSetPlan = {
+                                            ...craftEnchantSetPlan,
+                                        };
+                                    }
+
+                                    craftEnchantSetPlan[planEntry.key] =
+                                        synchronizedEntry;
+                                }
+                            }
+
                             if (
                                 existingEnchantSetEntry !== undefined &&
+                                !planEntry.optional &&
                                 (existingEnchantSetEntry.selectedItemId ===
                                     null ||
                                     existingEnchantSetEntry.selectedItemId ===
                                         undefined) &&
+                                planEntry.included &&
                                 planEntry.selected_item_id !== null &&
                                 planEntry.selected_item_id !== undefined
                             ) {
@@ -1549,12 +2000,36 @@ export default class BatchCraftingSection extends React.Component<
                             const existingCraftSetEntry =
                                 craftSetPlan[planEntry.key];
 
+                            if (planEntry.optional && existingCraftSetEntry) {
+                                const synchronizedEntry =
+                                    synchronizeHandPlanEntry(
+                                        existingCraftSetEntry,
+                                        planEntry.available_items,
+                                        false,
+                                    );
+
+                                if (
+                                    synchronizedEntry !== existingCraftSetEntry
+                                ) {
+                                    if (
+                                        craftSetPlan === prevState.craftSetPlan
+                                    ) {
+                                        craftSetPlan = { ...craftSetPlan };
+                                    }
+
+                                    craftSetPlan[planEntry.key] =
+                                        synchronizedEntry;
+                                }
+                            }
+
                             if (
                                 existingCraftSetEntry !== undefined &&
+                                !planEntry.optional &&
                                 (existingCraftSetEntry.selectedItemId ===
                                     null ||
                                     existingCraftSetEntry.selectedItemId ===
                                         undefined) &&
+                                planEntry.included &&
                                 planEntry.selected_item_id !== null &&
                                 planEntry.selected_item_id !== undefined
                             ) {
@@ -1707,6 +2182,122 @@ export default class BatchCraftingSection extends React.Component<
             );
     }
 
+    renderHandSelectionControls(
+        label: string,
+        entry: {
+            selectedItemId: number | null;
+            handSelectionType?: HandSelectionType;
+            selectedWeaponType?: string | null;
+        },
+        availableItems: CraftEnchantSetAvailableItem[],
+        loading: boolean,
+        disabled: boolean,
+        duelWieldUnavailable: boolean,
+        setHandSelectionType: (value: HandSelectionType) => void,
+        setSelectedWeaponType: (value: string | null) => void,
+        setSelectedItemId: (value: number | null) => void,
+    ) {
+        const handSelectionType = entry.handSelectionType ?? null;
+        const selectedWeaponType = entry.selectedWeaponType ?? null;
+        const weaponTypeOptions =
+            handSelectionType === "single_handed" ||
+            handSelectionType === "two_handed"
+                ? getHandWeaponTypes(availableItems, handSelectionType)
+                : [];
+        const exactItemOptions = getHandExactItems(
+            availableItems,
+            handSelectionType,
+            selectedWeaponType,
+        ).map((item) => ({ value: item.id, label: item.name }));
+        const options = duelWieldUnavailable
+            ? handSelectionOptions.filter(
+                  (option) => option.value !== "two_handed",
+              )
+            : handSelectionOptions;
+
+        return (
+            <div className="grid gap-2 sm:grid-cols-2">
+                <label className="grid gap-1 text-sm font-semibold">
+                    {label} option
+                    <Select
+                        isClearable
+                        isSearchable={true}
+                        isDisabled={disabled}
+                        onChange={(option) =>
+                            setHandSelectionType(option?.value ?? null)
+                        }
+                        options={options}
+                        styles={batchCraftingSelectStyles}
+                        menuPortalTarget={document.body}
+                        value={
+                            handSelectionOptions.find(
+                                (option) => option.value === handSelectionType,
+                            ) ?? null
+                        }
+                    />
+                </label>
+                {handSelectionType === "single_handed" ||
+                handSelectionType === "two_handed" ? (
+                    <label className="grid gap-1 text-sm font-semibold">
+                        {label} weapon type
+                        <Select
+                            isClearable
+                            isSearchable={true}
+                            isDisabled={disabled}
+                            onChange={(option) =>
+                                setSelectedWeaponType(option?.value ?? null)
+                            }
+                            options={weaponTypeOptions}
+                            styles={batchCraftingSelectStyles}
+                            menuPortalTarget={document.body}
+                            value={
+                                weaponTypeOptions.find(
+                                    (option) =>
+                                        option.value === selectedWeaponType,
+                                ) ?? null
+                            }
+                        />
+                    </label>
+                ) : null}
+                {handSelectionType !== null &&
+                ((handSelectionType !== "single_handed" &&
+                    handSelectionType !== "two_handed") ||
+                    selectedWeaponType !== null) ? (
+                    <label className="grid gap-1 text-sm font-semibold">
+                        {label} item
+                        <Select
+                            isClearable
+                            isSearchable={true}
+                            isDisabled={disabled}
+                            isLoading={loading}
+                            placeholder="No item selected"
+                            noOptionsMessage={() =>
+                                loading ? "Loading..." : "No options"
+                            }
+                            onChange={(option) =>
+                                setSelectedItemId(option?.value ?? null)
+                            }
+                            options={exactItemOptions}
+                            styles={batchCraftingSelectStyles}
+                            menuPortalTarget={document.body}
+                            value={
+                                exactItemOptions.find(
+                                    (option) =>
+                                        option.value === entry.selectedItemId,
+                                ) ?? null
+                            }
+                        />
+                    </label>
+                ) : null}
+                {disabled ? (
+                    <p className="text-xs font-semibold text-yellow-sea-800 dark:text-yellow-sea-300 sm:col-span-2">
+                        The selected Duel Wield item occupies both hands.
+                    </p>
+                ) : null}
+            </div>
+        );
+    }
+
     renderCraftEnchantSetPlanner() {
         const {
             craftEnchantSetBulkPrefixId,
@@ -1722,8 +2313,8 @@ export default class BatchCraftingSection extends React.Component<
             return (
                 <div className="grid gap-3">
                     <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                        Loading the Craft and Enchant Set planner and selecting
-                        defaults for all 23 items...
+                        Loading the configurable 10–12 item Craft and Enchant
+                        Set planner...
                     </p>
                     <LoadingProgressBar />
                 </div>
@@ -1731,90 +2322,179 @@ export default class BatchCraftingSection extends React.Component<
         }
 
         const setPrefixAffixId = (key: string, prefixAffixId: number | null) =>
-            this.setState((prevState) => {
-                const craftEnchantSetPlan = {
-                    ...prevState.craftEnchantSetPlan,
-                    [key]: {
-                        ...prevState.craftEnchantSetPlan[key],
-                        prefixAffixId,
-                    },
-                };
-                const bulkStillUniform =
-                    prevState.craftEnchantSetBulkPrefixId !== null &&
-                    Object.values(craftEnchantSetPlan).every(
-                        (entry) =>
-                            entry.prefixAffixId ===
-                            prevState.craftEnchantSetBulkPrefixId,
-                    );
-
-                return {
-                    craftEnchantSetPlan,
-                    craftEnchantSetBulkPrefixId: bulkStillUniform
-                        ? prevState.craftEnchantSetBulkPrefixId
-                        : null,
-                };
-            });
-        const setSuffixAffixId = (key: string, suffixAffixId: number | null) =>
-            this.setState((prevState) => {
-                const craftEnchantSetPlan = {
-                    ...prevState.craftEnchantSetPlan,
-                    [key]: {
-                        ...prevState.craftEnchantSetPlan[key],
-                        suffixAffixId,
-                    },
-                };
-                const bulkStillUniform =
-                    prevState.craftEnchantSetBulkSuffixId !== null &&
-                    Object.values(craftEnchantSetPlan).every(
-                        (entry) =>
-                            entry.suffixAffixId ===
-                            prevState.craftEnchantSetBulkSuffixId,
-                    );
-
-                return {
-                    craftEnchantSetPlan,
-                    craftEnchantSetBulkSuffixId: bulkStillUniform
-                        ? prevState.craftEnchantSetBulkSuffixId
-                        : null,
-                };
-            });
-        const setSelectedItemId = (
-            key: string,
-            selectedItemId: number | null,
-        ) =>
             this.setState((prevState) => ({
                 craftEnchantSetPlan: {
                     ...prevState.craftEnchantSetPlan,
                     [key]: {
                         ...prevState.craftEnchantSetPlan[key],
-                        selectedItemId,
+                        prefixAffixId,
                     },
                 },
             }));
+        const setSuffixAffixId = (key: string, suffixAffixId: number | null) =>
+            this.setState((prevState) => ({
+                craftEnchantSetPlan: {
+                    ...prevState.craftEnchantSetPlan,
+                    [key]: {
+                        ...prevState.craftEnchantSetPlan[key],
+                        suffixAffixId,
+                    },
+                },
+            }));
+        const setSelectedItemId = (
+            key: string,
+            selectedItemId: number | null,
+        ) =>
+            this.setState((prevState) => {
+                const nextPlan = {
+                    ...prevState.craftEnchantSetPlan,
+                    [key]: {
+                        ...prevState.craftEnchantSetPlan[key],
+                        selectedItemId,
+                        ...(selectedItemId === null
+                            ? { prefixAffixId: null, suffixAffixId: null }
+                            : {
+                                  prefixAffixId:
+                                      prevState.craftEnchantSetAppliedPrefixId,
+                                  suffixAffixId:
+                                      prevState.craftEnchantSetAppliedSuffixId,
+                              }),
+                    },
+                };
+                const selected = (
+                    prevState.preview?.cost_breakdown?.plan_entries ?? []
+                )
+                    .find((entry) => entry.key === key)
+                    ?.available_items.find(
+                        (candidate) => candidate.id === selectedItemId,
+                    );
+
+                if (selected?.handedness === "two_handed") {
+                    const otherKey =
+                        key === "left_hand" ? "right_hand" : "left_hand";
+                    nextPlan[otherKey] = {
+                        ...nextPlan[otherKey],
+                        selectedItemId: null,
+                        handSelectionType: null,
+                        selectedWeaponType: null,
+                        prefixAffixId: null,
+                        suffixAffixId: null,
+                    };
+                }
+
+                return { craftEnchantSetPlan: nextPlan };
+            });
         const setBulkPrefixId = (bulkPrefixAffixId: number | null) =>
             this.setState({ craftEnchantSetBulkPrefixId: bulkPrefixAffixId });
         const setBulkSuffixId = (bulkSuffixAffixId: number | null) =>
             this.setState({ craftEnchantSetBulkSuffixId: bulkSuffixAffixId });
-        const applyBulkPrefixToAll = () => {
-            if (craftEnchantSetBulkPrefixId === null) {
-                return;
-            }
+        const setHandSelectionType = (
+            key: string,
+            handSelectionType: HandSelectionType,
+        ) =>
+            this.setState((prevState) => {
+                const availableItems =
+                    (
+                        prevState.preview?.cost_breakdown?.plan_entries ?? []
+                    ).find((entry) => entry.key === key)?.available_items ?? [];
+                const bestShield =
+                    handSelectionType === "shield"
+                        ? (availableItems
+                              .filter((item) => item.handedness === "shield")
+                              .sort(
+                                  (a, b) =>
+                                      b.skill_level_required -
+                                          a.skill_level_required ||
+                                      b.cost - a.cost ||
+                                      a.id - b.id,
+                              )[0] ?? null)
+                        : null;
+                const nextPlan = {
+                    ...prevState.craftEnchantSetPlan,
+                    [key]: {
+                        ...prevState.craftEnchantSetPlan[key],
+                        selectedItemId: bestShield?.id ?? null,
+                        prefixAffixId:
+                            bestShield === null
+                                ? null
+                                : prevState.craftEnchantSetAppliedPrefixId,
+                        suffixAffixId:
+                            bestShield === null
+                                ? null
+                                : prevState.craftEnchantSetAppliedSuffixId,
+                        handSelectionType,
+                        selectedWeaponType: null,
+                    },
+                };
 
-            this.setState((prevState) => ({
-                craftEnchantSetPlan: Object.fromEntries(
-                    craftEnchantSetPlanItems.map((item) => [
-                        item.key,
-                        {
-                            ...prevState.craftEnchantSetPlan[item.key],
+                if (handSelectionType === "two_handed") {
+                    const otherKey =
+                        key === "left_hand" ? "right_hand" : "left_hand";
+                    nextPlan[otherKey] = {
+                        ...nextPlan[otherKey],
+                        selectedItemId: null,
+                        prefixAffixId: null,
+                        suffixAffixId: null,
+                        handSelectionType: null,
+                        selectedWeaponType: null,
+                    };
+                }
+
+                return { craftEnchantSetPlan: nextPlan };
+            });
+        const setSelectedWeaponType = (
+            key: string,
+            selectedWeaponType: string | null,
+        ) =>
+            this.setState((prevState) => {
+                const availableItems =
+                    (
+                        prevState.preview?.cost_breakdown?.plan_entries ?? []
+                    ).find((entry) => entry.key === key)?.available_items ?? [];
+                const handSelectionType =
+                    prevState.craftEnchantSetPlan[key]?.handSelectionType ??
+                    null;
+                const bestItem =
+                    selectedWeaponType === null
+                        ? null
+                        : (availableItems
+                              .filter(
+                                  (item) =>
+                                      item.handedness === handSelectionType &&
+                                      item.type === selectedWeaponType,
+                              )
+                              .sort(
+                                  (a, b) =>
+                                      b.skill_level_required -
+                                          a.skill_level_required ||
+                                      b.cost - a.cost ||
+                                      a.id - b.id,
+                              )[0] ?? null);
+
+                return {
+                    craftEnchantSetPlan: {
+                        ...prevState.craftEnchantSetPlan,
+                        [key]: {
+                            ...prevState.craftEnchantSetPlan[key],
+                            selectedItemId: bestItem?.id ?? null,
                             prefixAffixId:
-                                prevState.craftEnchantSetBulkPrefixId,
+                                bestItem === null
+                                    ? null
+                                    : prevState.craftEnchantSetAppliedPrefixId,
+                            suffixAffixId:
+                                bestItem === null
+                                    ? null
+                                    : prevState.craftEnchantSetAppliedSuffixId,
+                            selectedWeaponType,
                         },
-                    ]),
-                ),
-            }));
-        };
-        const applyBulkSuffixToAll = () => {
-            if (craftEnchantSetBulkSuffixId === null) {
+                    },
+                };
+            });
+        const applyBulkEnchantsToAll = () => {
+            if (
+                craftEnchantSetBulkPrefixId === null ||
+                craftEnchantSetBulkSuffixId === null
+            ) {
                 return;
             }
 
@@ -1822,13 +2502,28 @@ export default class BatchCraftingSection extends React.Component<
                 craftEnchantSetPlan: Object.fromEntries(
                     craftEnchantSetPlanItems.map((item) => [
                         item.key,
-                        {
-                            ...prevState.craftEnchantSetPlan[item.key],
-                            suffixAffixId:
-                                prevState.craftEnchantSetBulkSuffixId,
-                        },
+                        item.optional &&
+                        (prevState.craftEnchantSetPlan[item.key]
+                            ?.selectedItemId ?? null) === null
+                            ? {
+                                  ...prevState.craftEnchantSetPlan[item.key],
+                                  selectedItemId: null,
+                                  prefixAffixId: null,
+                                  suffixAffixId: null,
+                              }
+                            : {
+                                  ...prevState.craftEnchantSetPlan[item.key],
+                                  prefixAffixId:
+                                      prevState.craftEnchantSetBulkPrefixId,
+                                  suffixAffixId:
+                                      prevState.craftEnchantSetBulkSuffixId,
+                              },
                     ]),
                 ),
+                craftEnchantSetAppliedPrefixId:
+                    prevState.craftEnchantSetBulkPrefixId,
+                craftEnchantSetAppliedSuffixId:
+                    prevState.craftEnchantSetBulkSuffixId,
             }));
         };
         const clearAllEnchants = () =>
@@ -1845,17 +2540,35 @@ export default class BatchCraftingSection extends React.Component<
                 ),
                 craftEnchantSetBulkPrefixId: null,
                 craftEnchantSetBulkSuffixId: null,
+                craftEnchantSetAppliedPrefixId: null,
+                craftEnchantSetAppliedSuffixId: null,
             }));
         const openAffixDetailsModal = (affix: EnchantmentOption) =>
             this.setState({ affixDetailsModalAffix: affix });
         const openItemDetailsModal = (item: any) =>
             this.setState({ craftEnchantSetItemDetailsModalItem: item });
-
         const planEntriesByKey = new Map(
             (this.state.preview?.cost_breakdown?.plan_entries ?? []).map(
                 (entry) => [entry.key, entry],
             ),
         );
+        const isHandDisabled = (key: string) => {
+            const otherKey = key === "left_hand" ? "right_hand" : "left_hand";
+            return (
+                craftEnchantSetPlan[otherKey]?.handSelectionType ===
+                "two_handed"
+            );
+        };
+        const isDuelWieldUnavailable = (key: string) => {
+            const otherKey = key === "left_hand" ? "right_hand" : "left_hand";
+            const otherSelection =
+                craftEnchantSetPlan[otherKey]?.handSelectionType ?? null;
+
+            return (
+                otherSelection === "single_handed" ||
+                otherSelection === "shield"
+            );
+        };
 
         const prefixOptions = enchantments
             .filter((enchantment) => enchantment.type === "prefix")
@@ -1868,7 +2581,7 @@ export default class BatchCraftingSection extends React.Component<
             category: CraftEnchantSetPlanItem["category"];
             label: string;
         }[] = [
-            { category: "weapon", label: "Weapons" },
+            { category: "hand", label: "Hands" },
             { category: "armour", label: "Armour" },
             { category: "ring", label: "Rings" },
             { category: "spell", label: "Spells" },
@@ -1877,10 +2590,11 @@ export default class BatchCraftingSection extends React.Component<
         return (
             <div className="grid gap-3">
                 <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                    Craft and Enchant Set crafts the highest craftable version
-                    of a full set, then applies the prefix and suffix you choose
-                    for each item, placing each completed piece directly into
-                    the inventory set you choose below.
+                    Craft and Enchant Set creates one equippable set with six
+                    armour pieces, two Rings, one Damage Spell, and one Healing
+                    Spell. Left Hand and Right Hand are optional; Shields are
+                    hand items and two-handed weapons occupy both hands. Your
+                    selected affixes are applied to every included item.
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
                     <label className="grid gap-1 text-sm font-semibold">
@@ -1901,13 +2615,7 @@ export default class BatchCraftingSection extends React.Component<
                             formatOptionLabel={formatAffixOptionLabel}
                             menuPosition={"absolute"}
                             menuPlacement={"bottom"}
-                            styles={{
-                                menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                    color: "#000000",
-                                }),
-                            }}
+                            styles={batchCraftingSelectStyles}
                             menuPortalTarget={document.body}
                             value={
                                 prefixOptions.find(
@@ -1918,12 +2626,6 @@ export default class BatchCraftingSection extends React.Component<
                             }
                         />
                     </label>
-                    <PrimaryButton
-                        button_label={"Apply Selected Prefix To All"}
-                        on_click={applyBulkPrefixToAll}
-                        disabled={craftEnchantSetBulkPrefixId === null}
-                        additional_css={"w-full self-end"}
-                    />
                     <label className="grid gap-1 text-sm font-semibold">
                         Bulk suffix enchant
                         <Select
@@ -1942,13 +2644,7 @@ export default class BatchCraftingSection extends React.Component<
                             formatOptionLabel={formatAffixOptionLabel}
                             menuPosition={"absolute"}
                             menuPlacement={"bottom"}
-                            styles={{
-                                menuPortal: (base) => ({
-                                    ...base,
-                                    zIndex: 9999,
-                                    color: "#000000",
-                                }),
-                            }}
+                            styles={batchCraftingSelectStyles}
                             menuPortalTarget={document.body}
                             value={
                                 suffixOptions.find(
@@ -1959,13 +2655,16 @@ export default class BatchCraftingSection extends React.Component<
                             }
                         />
                     </label>
-                    <PrimaryButton
-                        button_label={"Apply Selected Suffix To All"}
-                        on_click={applyBulkSuffixToAll}
-                        disabled={craftEnchantSetBulkSuffixId === null}
-                        additional_css={"w-full self-end"}
-                    />
                 </div>
+                <PrimaryButton
+                    button_label={"Apply Selected Enchants To All"}
+                    on_click={applyBulkEnchantsToAll}
+                    disabled={
+                        craftEnchantSetBulkPrefixId === null ||
+                        craftEnchantSetBulkSuffixId === null
+                    }
+                    additional_css={"w-full"}
+                />
                 <DangerButton
                     button_label={"Clear All Enchants"}
                     on_click={clearAllEnchants}
@@ -1977,6 +2676,11 @@ export default class BatchCraftingSection extends React.Component<
                     );
                     const configuredCount = itemsInCategory.filter((item) => {
                         const entry = craftEnchantSetPlan[item.key];
+
+                        if (category === "hand") {
+                            return (entry?.selectedItemId ?? null) !== null;
+                        }
+
                         const hasPrefix =
                             entry?.prefixAffixId !== null &&
                             entry?.prefixAffixId !== undefined;
@@ -1987,6 +2691,7 @@ export default class BatchCraftingSection extends React.Component<
                         return hasPrefix || hasSuffix;
                     }).length;
                     const isCategoryComplete =
+                        category === "hand" ||
                         configuredCount === itemsInCategory.length;
 
                     return (
@@ -1994,23 +2699,28 @@ export default class BatchCraftingSection extends React.Component<
                             key={category}
                             className={
                                 isCategoryComplete
-                                    ? "rounded border border-green-300 bg-green-50/40 dark:border-green-700 dark:bg-green-950/20"
-                                    : "rounded border border-orange-300 bg-orange-50/40 dark:border-orange-700 dark:bg-orange-950/20"
+                                    ? "group rounded border border-green-300 bg-green-50/40 dark:border-green-700 dark:bg-green-950/20"
+                                    : "group rounded border border-orange-300 bg-orange-50/40 dark:border-orange-700 dark:bg-orange-950/20"
                             }
                         >
-                            <summary className="cursor-pointer rounded p-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
-                                <span className="flex flex-wrap items-center justify-between gap-2">
-                                    <span>{label}</span>
-                                    <span
-                                        className={
-                                            isCategoryComplete
-                                                ? "rounded border border-green-300 bg-green-100 px-2 py-0.5 text-xs text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-100"
-                                                : "rounded border border-orange-300 bg-orange-100 px-2 py-0.5 text-xs text-orange-800 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-100"
-                                        }
-                                    >
-                                        {configuredCount}/
-                                        {itemsInCategory.length} configured
-                                    </span>
+                            <summary className="flex cursor-pointer list-none flex-nowrap items-center gap-2 rounded p-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden">
+                                <span
+                                    aria-hidden="true"
+                                    className="shrink-0 transition-transform group-open:rotate-90"
+                                >
+                                    ▸
+                                </span>
+                                <span>{label}</span>
+                                <span
+                                    className={
+                                        isCategoryComplete
+                                            ? "ml-auto shrink-0 rounded border border-green-300 bg-green-100 px-2 py-0.5 text-xs text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-100"
+                                            : "ml-auto shrink-0 rounded border border-orange-300 bg-orange-100 px-2 py-0.5 text-xs text-orange-800 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-100"
+                                    }
+                                >
+                                    {category === "hand"
+                                        ? `${configuredCount} of 2 optional hands selected`
+                                        : `${configuredCount}/${itemsInCategory.length} configured`}
                                 </span>
                             </summary>
                             <div className="grid gap-2 p-2">
@@ -2064,15 +2774,23 @@ export default class BatchCraftingSection extends React.Component<
                                                 undefined) ||
                                         (entry.suffixAffixId !== null &&
                                             entry.suffixAffixId !== undefined);
+                                    const availableItems =
+                                        planPreviewEntry?.available_items ?? [];
                                     const availableItemOptions = (
-                                        planPreviewEntry?.available_items ?? []
-                                    )
-                                        .slice()
-                                        .sort((a, b) => a.cost - b.cost)
-                                        .map((availableItem) => ({
-                                            value: availableItem.id,
-                                            label: availableItem.name,
-                                        }));
+                                        item.category === "hand"
+                                            ? availableItems
+                                            : availableItems
+                                                  .slice()
+                                                  .sort(
+                                                      (a, b) => a.cost - b.cost,
+                                                  )
+                                    ).map((availableItem) => ({
+                                        value: availableItem.id,
+                                        label:
+                                            item.category === "hand"
+                                                ? `${availableItem.name} — ${availableItem.type} — ${availableItem.handedness === "two_handed" ? "Two-handed" : availableItem.handedness === "shield" ? "Shield" : "Single-handed"}`
+                                                : availableItem.name,
+                                    }));
                                     const selectedItemIdValue =
                                         entry.selectedItemId ??
                                         planPreviewEntry?.selected_item_id ??
@@ -2100,7 +2818,7 @@ export default class BatchCraftingSection extends React.Component<
                                     );
 
                                     return (
-                                        <details
+                                        <div
                                             key={item.key}
                                             className={
                                                 isItemConfigured
@@ -2108,7 +2826,7 @@ export default class BatchCraftingSection extends React.Component<
                                                     : "rounded border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
                                             }
                                         >
-                                            <summary className="cursor-pointer rounded p-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
+                                            <div className="p-2 text-sm">
                                                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
                                                     <dt className="font-semibold sm:whitespace-nowrap">
                                                         Target
@@ -2232,11 +2950,7 @@ export default class BatchCraftingSection extends React.Component<
                                                         )}
                                                     </dd>
                                                 </dl>
-                                                <p className="my-2 text-xs text-gray-500 dark:text-gray-400">
-                                                    Click anywhere to edit the
-                                                    attached affixes.
-                                                </p>
-                                            </summary>
+                                            </div>
                                             <div className="grid gap-2 p-2 sm:grid-cols-2">
                                                 {rowBlockers.length > 0 ? (
                                                     <div className="sm:col-span-2">
@@ -2247,11 +2961,9 @@ export default class BatchCraftingSection extends React.Component<
                                                                         blocker,
                                                                     ) => (
                                                                         <li
-                                                                            key={
-                                                                                blocker.code +
-                                                                                (blocker.affix_id ??
-                                                                                    "")
-                                                                            }
+                                                                            key={this.startBlockerKey(
+                                                                                blocker,
+                                                                            )}
                                                                         >
                                                                             <p>
                                                                                 {
@@ -2297,153 +3009,214 @@ export default class BatchCraftingSection extends React.Component<
                                                         </WarningAlert>
                                                     </div>
                                                 ) : null}
-                                                <label className="grid gap-1 text-sm font-semibold sm:col-span-2">
-                                                    Item to craft
-                                                    <Select
-                                                        isSearchable={true}
-                                                        isLoading={
-                                                            previewLoading
-                                                        }
-                                                        noOptionsMessage={() =>
-                                                            previewLoading
-                                                                ? "Loading..."
-                                                                : "No options"
-                                                        }
-                                                        onChange={(opt) =>
-                                                            setSelectedItemId(
+                                                {item.category === "hand" ? (
+                                                    <div className="sm:col-span-2">
+                                                        {this.renderHandSelectionControls(
+                                                            item.label,
+                                                            entry,
+                                                            availableItems,
+                                                            previewLoading,
+                                                            isHandDisabled(
                                                                 item.key,
-                                                                opt?.value ??
-                                                                    null,
-                                                            )
-                                                        }
-                                                        options={
-                                                            availableItemOptions
-                                                        }
-                                                        menuPosition={
-                                                            "absolute"
-                                                        }
-                                                        menuPlacement={"bottom"}
-                                                        styles={{
-                                                            menuPortal: (
-                                                                base,
-                                                            ) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                                color: "#000000",
-                                                            }),
-                                                        }}
-                                                        menuPortalTarget={
-                                                            document.body
-                                                        }
-                                                        value={
-                                                            availableItemOptions.find(
-                                                                (option) =>
-                                                                    option.value ===
-                                                                    selectedItemIdValue,
-                                                            ) ?? null
-                                                        }
-                                                    />
-                                                </label>
-                                                <label className="grid gap-1 text-sm font-semibold">
-                                                    Prefix enchant
-                                                    <Select
-                                                        isClearable
-                                                        isSearchable={true}
-                                                        isLoading={
-                                                            enchantmentsLoading
-                                                        }
-                                                        noOptionsMessage={() =>
-                                                            enchantmentsLoading
-                                                                ? "Loading..."
-                                                                : "No options"
-                                                        }
-                                                        onChange={(opt) =>
-                                                            setPrefixAffixId(
+                                                            ),
+                                                            isDuelWieldUnavailable(
                                                                 item.key,
-                                                                opt?.value ??
-                                                                    null,
-                                                            )
-                                                        }
-                                                        options={prefixOptions}
-                                                        formatOptionLabel={
-                                                            formatAffixOptionLabel
-                                                        }
-                                                        menuPosition={
-                                                            "absolute"
-                                                        }
-                                                        menuPlacement={"bottom"}
-                                                        styles={{
-                                                            menuPortal: (
-                                                                base,
-                                                            ) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                                color: "#000000",
-                                                            }),
-                                                        }}
-                                                        menuPortalTarget={
-                                                            document.body
-                                                        }
-                                                        value={
-                                                            prefixOptions.find(
-                                                                (option) =>
-                                                                    option.value ===
-                                                                    entry.prefixAffixId,
-                                                            ) ?? null
-                                                        }
-                                                    />
-                                                </label>
-                                                <label className="grid gap-1 text-sm font-semibold">
-                                                    Suffix enchant
-                                                    <Select
-                                                        isClearable
-                                                        isSearchable={true}
-                                                        isLoading={
-                                                            enchantmentsLoading
-                                                        }
-                                                        noOptionsMessage={() =>
-                                                            enchantmentsLoading
-                                                                ? "Loading..."
-                                                                : "No options"
-                                                        }
-                                                        onChange={(opt) =>
-                                                            setSuffixAffixId(
-                                                                item.key,
-                                                                opt?.value ??
-                                                                    null,
-                                                            )
-                                                        }
-                                                        options={suffixOptions}
-                                                        formatOptionLabel={
-                                                            formatAffixOptionLabel
-                                                        }
-                                                        menuPosition={
-                                                            "absolute"
-                                                        }
-                                                        menuPlacement={"bottom"}
-                                                        styles={{
-                                                            menuPortal: (
-                                                                base,
-                                                            ) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                                color: "#000000",
-                                                            }),
-                                                        }}
-                                                        menuPortalTarget={
-                                                            document.body
-                                                        }
-                                                        value={
-                                                            suffixOptions.find(
-                                                                (option) =>
-                                                                    option.value ===
-                                                                    entry.suffixAffixId,
-                                                            ) ?? null
-                                                        }
-                                                    />
-                                                </label>
+                                                            ),
+                                                            (value) =>
+                                                                setHandSelectionType(
+                                                                    item.key,
+                                                                    value,
+                                                                ),
+                                                            (value) =>
+                                                                setSelectedWeaponType(
+                                                                    item.key,
+                                                                    value,
+                                                                ),
+                                                            (value) =>
+                                                                setSelectedItemId(
+                                                                    item.key,
+                                                                    value,
+                                                                ),
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <label className="grid gap-1 text-sm font-semibold sm:col-span-2">
+                                                        Item to craft
+                                                        <Select
+                                                            isClearable={false}
+                                                            isSearchable={true}
+                                                            placeholder="No item selected"
+                                                            isLoading={
+                                                                previewLoading
+                                                            }
+                                                            noOptionsMessage={() =>
+                                                                previewLoading
+                                                                    ? "Loading..."
+                                                                    : "No options"
+                                                            }
+                                                            onChange={(opt) =>
+                                                                setSelectedItemId(
+                                                                    item.key,
+                                                                    opt?.value ??
+                                                                        null,
+                                                                )
+                                                            }
+                                                            options={
+                                                                availableItemOptions
+                                                            }
+                                                            menuPosition={
+                                                                "absolute"
+                                                            }
+                                                            menuPlacement={
+                                                                "bottom"
+                                                            }
+                                                            styles={
+                                                                batchCraftingSelectStyles
+                                                            }
+                                                            menuPortalTarget={
+                                                                document.body
+                                                            }
+                                                            value={
+                                                                availableItemOptions.find(
+                                                                    (option) =>
+                                                                        option.value ===
+                                                                        selectedItemIdValue,
+                                                                ) ?? null
+                                                            }
+                                                        />
+                                                    </label>
+                                                )}
+                                                {!item.optional ||
+                                                selectedItemIdValue !== null ? (
+                                                    <>
+                                                        <label className="grid gap-1 text-sm font-semibold">
+                                                            Prefix enchant
+                                                            <Select
+                                                                isClearable
+                                                                isSearchable={
+                                                                    true
+                                                                }
+                                                                isDisabled={
+                                                                    item.optional &&
+                                                                    selectedItemIdValue ===
+                                                                        null
+                                                                }
+                                                                isLoading={
+                                                                    enchantmentsLoading
+                                                                }
+                                                                noOptionsMessage={() =>
+                                                                    enchantmentsLoading
+                                                                        ? "Loading..."
+                                                                        : "No options"
+                                                                }
+                                                                onChange={(
+                                                                    opt,
+                                                                ) =>
+                                                                    setPrefixAffixId(
+                                                                        item.key,
+                                                                        opt?.value ??
+                                                                            null,
+                                                                    )
+                                                                }
+                                                                options={
+                                                                    prefixOptions
+                                                                }
+                                                                formatOptionLabel={
+                                                                    formatAffixOptionLabel
+                                                                }
+                                                                menuPosition={
+                                                                    "absolute"
+                                                                }
+                                                                menuPlacement={
+                                                                    "bottom"
+                                                                }
+                                                                styles={
+                                                                    batchCraftingSelectStyles
+                                                                }
+                                                                menuPortalTarget={
+                                                                    document.body
+                                                                }
+                                                                value={
+                                                                    prefixOptions.find(
+                                                                        (
+                                                                            option,
+                                                                        ) =>
+                                                                            option.value ===
+                                                                            entry.prefixAffixId,
+                                                                    ) ?? null
+                                                                }
+                                                            />
+                                                        </label>
+                                                        <label className="grid gap-1 text-sm font-semibold">
+                                                            Suffix enchant
+                                                            <Select
+                                                                isClearable
+                                                                isSearchable={
+                                                                    true
+                                                                }
+                                                                isDisabled={
+                                                                    item.optional &&
+                                                                    selectedItemIdValue ===
+                                                                        null
+                                                                }
+                                                                isLoading={
+                                                                    enchantmentsLoading
+                                                                }
+                                                                noOptionsMessage={() =>
+                                                                    enchantmentsLoading
+                                                                        ? "Loading..."
+                                                                        : "No options"
+                                                                }
+                                                                onChange={(
+                                                                    opt,
+                                                                ) =>
+                                                                    setSuffixAffixId(
+                                                                        item.key,
+                                                                        opt?.value ??
+                                                                            null,
+                                                                    )
+                                                                }
+                                                                options={
+                                                                    suffixOptions
+                                                                }
+                                                                formatOptionLabel={
+                                                                    formatAffixOptionLabel
+                                                                }
+                                                                menuPosition={
+                                                                    "absolute"
+                                                                }
+                                                                menuPlacement={
+                                                                    "bottom"
+                                                                }
+                                                                styles={
+                                                                    batchCraftingSelectStyles
+                                                                }
+                                                                menuPortalTarget={
+                                                                    document.body
+                                                                }
+                                                                value={
+                                                                    suffixOptions.find(
+                                                                        (
+                                                                            option,
+                                                                        ) =>
+                                                                            option.value ===
+                                                                            entry.suffixAffixId,
+                                                                    ) ?? null
+                                                                }
+                                                            />
+                                                        </label>
+                                                    </>
+                                                ) : null}
+                                                {item.optional &&
+                                                selectedItemIdValue === null ? (
+                                                    <p className="text-xs text-gray-600 dark:text-gray-300 sm:col-span-2">
+                                                        Optional hand omitted.
+                                                        Select a hand item to
+                                                        configure its enchants.
+                                                    </p>
+                                                ) : null}
                                             </div>
-                                        </details>
+                                        </div>
                                     );
                                 })}
                             </div>
@@ -2459,33 +3232,6 @@ export default class BatchCraftingSection extends React.Component<
                         }
                     />
                 ) : null}
-                {this.state.craftEnchantSetItemDetailsModalItem ? (
-                    <Dialogue
-                        is_open={true}
-                        handle_close={() =>
-                            this.setState({
-                                craftEnchantSetItemDetailsModalItem: null,
-                            })
-                        }
-                        title={
-                            <ItemNameColorationText
-                                custom_width={false}
-                                item={
-                                    this.state
-                                        .craftEnchantSetItemDetailsModalItem
-                                }
-                            />
-                        }
-                        large_modal={true}
-                    >
-                        <ItemDetails
-                            item={
-                                this.state.craftEnchantSetItemDetailsModalItem
-                            }
-                            character_id={this.props.character_id}
-                        />
-                    </Dialogue>
-                ) : null}
             </div>
         );
     }
@@ -2497,8 +3243,7 @@ export default class BatchCraftingSection extends React.Component<
             return (
                 <div className="grid gap-3">
                     <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                        Loading the Craft Set planner and selecting defaults for
-                        all 23 items...
+                        Loading the configurable 10–12 item Craft Set planner...
                     </p>
                     <LoadingProgressBar />
                 </div>
@@ -2509,29 +3254,141 @@ export default class BatchCraftingSection extends React.Component<
             key: string,
             selectedItemId: number | null,
         ) =>
-            this.setState((prevState) => ({
-                craftSetPlan: {
+            this.setState((prevState) => {
+                const nextPlan = {
                     ...prevState.craftSetPlan,
                     [key]: {
                         ...prevState.craftSetPlan[key],
                         selectedItemId,
                     },
-                },
-            }));
+                };
+                const selected = (
+                    prevState.preview?.cost_breakdown?.plan_entries ?? []
+                )
+                    .find((entry) => entry.key === key)
+                    ?.available_items.find(
+                        (candidate) => candidate.id === selectedItemId,
+                    );
+
+                if (selected?.handedness === "two_handed") {
+                    const otherKey =
+                        key === "left_hand" ? "right_hand" : "left_hand";
+                    nextPlan[otherKey] = { selectedItemId: null };
+                }
+
+                return { craftSetPlan: nextPlan };
+            });
         const openItemDetailsModal = (item: any) =>
             this.setState({ craftEnchantSetItemDetailsModalItem: item });
+        const setHandSelectionType = (
+            key: string,
+            handSelectionType: HandSelectionType,
+        ) =>
+            this.setState((prevState) => {
+                const availableItems =
+                    (
+                        prevState.preview?.cost_breakdown?.plan_entries ?? []
+                    ).find((entry) => entry.key === key)?.available_items ?? [];
+                const bestShield =
+                    handSelectionType === "shield"
+                        ? (availableItems
+                              .filter((item) => item.handedness === "shield")
+                              .sort(
+                                  (a, b) =>
+                                      b.skill_level_required -
+                                          a.skill_level_required ||
+                                      b.cost - a.cost ||
+                                      a.id - b.id,
+                              )[0] ?? null)
+                        : null;
+                const nextPlan = {
+                    ...prevState.craftSetPlan,
+                    [key]: {
+                        ...prevState.craftSetPlan[key],
+                        selectedItemId: bestShield?.id ?? null,
+                        handSelectionType,
+                        selectedWeaponType: null,
+                    },
+                };
+
+                if (handSelectionType === "two_handed") {
+                    const otherKey =
+                        key === "left_hand" ? "right_hand" : "left_hand";
+                    nextPlan[otherKey] = {
+                        ...nextPlan[otherKey],
+                        selectedItemId: null,
+                        handSelectionType: null,
+                        selectedWeaponType: null,
+                    };
+                }
+
+                return { craftSetPlan: nextPlan };
+            });
+        const setSelectedWeaponType = (
+            key: string,
+            selectedWeaponType: string | null,
+        ) =>
+            this.setState((prevState) => {
+                const availableItems =
+                    (
+                        prevState.preview?.cost_breakdown?.plan_entries ?? []
+                    ).find((entry) => entry.key === key)?.available_items ?? [];
+                const handSelectionType =
+                    prevState.craftSetPlan[key]?.handSelectionType ?? null;
+                const bestItem =
+                    selectedWeaponType === null
+                        ? null
+                        : (availableItems
+                              .filter(
+                                  (item) =>
+                                      item.handedness === handSelectionType &&
+                                      item.type === selectedWeaponType,
+                              )
+                              .sort(
+                                  (a, b) =>
+                                      b.skill_level_required -
+                                          a.skill_level_required ||
+                                      b.cost - a.cost ||
+                                      a.id - b.id,
+                              )[0] ?? null);
+
+                return {
+                    craftSetPlan: {
+                        ...prevState.craftSetPlan,
+                        [key]: {
+                            ...prevState.craftSetPlan[key],
+                            selectedItemId: bestItem?.id ?? null,
+                            selectedWeaponType,
+                        },
+                    },
+                };
+            });
 
         const planEntriesByKey = new Map(
             (this.state.preview?.cost_breakdown?.plan_entries ?? []).map(
                 (entry) => [entry.key, entry],
             ),
         );
+        const isHandDisabled = (key: string) => {
+            const otherKey = key === "left_hand" ? "right_hand" : "left_hand";
+            return craftSetPlan[otherKey]?.handSelectionType === "two_handed";
+        };
+        const isDuelWieldUnavailable = (key: string) => {
+            const otherKey = key === "left_hand" ? "right_hand" : "left_hand";
+            const otherSelection =
+                craftSetPlan[otherKey]?.handSelectionType ?? null;
+
+            return (
+                otherSelection === "single_handed" ||
+                otherSelection === "shield"
+            );
+        };
 
         const categories: {
             category: CraftEnchantSetPlanItem["category"];
             label: string;
         }[] = [
-            { category: "weapon", label: "Weapons" },
+            { category: "hand", label: "Hands" },
             { category: "armour", label: "Armour" },
             { category: "ring", label: "Rings" },
             { category: "spell", label: "Spells" },
@@ -2540,9 +3397,12 @@ export default class BatchCraftingSection extends React.Component<
         return (
             <div className="grid gap-3">
                 <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                    Each slot below defaults to the highest craftable item.
-                    Expand a slot to choose a different craftable item for it,
-                    or click the item name to view its details.
+                    Craft Set creates one equippable set with six armour pieces,
+                    two Rings, one Damage Spell, and one Healing Spell. Required
+                    rows default to the highest craftable item. Left Hand and
+                    Right Hand are optional; Shields are hand items and
+                    two-handed weapons occupy both hands. The final set contains
+                    10–12 items depending on your hand choices.
                 </p>
                 {categories.map(({ category, label }) => {
                     const itemsInCategory = craftEnchantSetPlanItems.filter(
@@ -2560,6 +3420,7 @@ export default class BatchCraftingSection extends React.Component<
                         );
                     }).length;
                     const isCategoryComplete =
+                        category === "hand" ||
                         configuredCount === itemsInCategory.length;
 
                     return (
@@ -2567,23 +3428,28 @@ export default class BatchCraftingSection extends React.Component<
                             key={category}
                             className={
                                 isCategoryComplete
-                                    ? "rounded border border-green-300 bg-green-50/40 dark:border-green-700 dark:bg-green-950/20"
-                                    : "rounded border border-orange-300 bg-orange-50/40 dark:border-orange-700 dark:bg-orange-950/20"
+                                    ? "group rounded border border-green-300 bg-green-50/40 dark:border-green-700 dark:bg-green-950/20"
+                                    : "group rounded border border-orange-300 bg-orange-50/40 dark:border-orange-700 dark:bg-orange-950/20"
                             }
                         >
-                            <summary className="cursor-pointer rounded p-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
-                                <span className="flex flex-wrap items-center justify-between gap-2">
-                                    <span>{label}</span>
-                                    <span
-                                        className={
-                                            isCategoryComplete
-                                                ? "rounded border border-green-300 bg-green-100 px-2 py-0.5 text-xs text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-100"
-                                                : "rounded border border-orange-300 bg-orange-100 px-2 py-0.5 text-xs text-orange-800 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-100"
-                                        }
-                                    >
-                                        {configuredCount}/
-                                        {itemsInCategory.length} resolved
-                                    </span>
+                            <summary className="flex cursor-pointer list-none flex-nowrap items-center gap-2 rounded p-2 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 [&::-webkit-details-marker]:hidden">
+                                <span
+                                    aria-hidden="true"
+                                    className="shrink-0 transition-transform group-open:rotate-90"
+                                >
+                                    ▸
+                                </span>
+                                <span>{label}</span>
+                                <span
+                                    className={
+                                        isCategoryComplete
+                                            ? "ml-auto shrink-0 rounded border border-green-300 bg-green-100 px-2 py-0.5 text-xs text-green-800 dark:border-green-700 dark:bg-green-950 dark:text-green-100"
+                                            : "ml-auto shrink-0 rounded border border-orange-300 bg-orange-100 px-2 py-0.5 text-xs text-orange-800 dark:border-orange-700 dark:bg-orange-950 dark:text-orange-100"
+                                    }
+                                >
+                                    {category === "hand"
+                                        ? `${configuredCount} of 2 optional hands selected`
+                                        : `${configuredCount}/${itemsInCategory.length} resolved`}
                                 </span>
                             </summary>
                             <div className="grid gap-2 p-2">
@@ -2593,15 +3459,23 @@ export default class BatchCraftingSection extends React.Component<
                                     };
                                     const planPreviewEntry =
                                         planEntriesByKey.get(item.key) ?? null;
+                                    const availableItems =
+                                        planPreviewEntry?.available_items ?? [];
                                     const availableItemOptions = (
-                                        planPreviewEntry?.available_items ?? []
-                                    )
-                                        .slice()
-                                        .sort((a, b) => a.cost - b.cost)
-                                        .map((availableItem) => ({
-                                            value: availableItem.id,
-                                            label: availableItem.name,
-                                        }));
+                                        item.category === "hand"
+                                            ? availableItems
+                                            : availableItems
+                                                  .slice()
+                                                  .sort(
+                                                      (a, b) => a.cost - b.cost,
+                                                  )
+                                    ).map((availableItem) => ({
+                                        value: availableItem.id,
+                                        label:
+                                            item.category === "hand"
+                                                ? `${availableItem.name} — ${availableItem.type} — ${availableItem.handedness === "two_handed" ? "Two-handed" : availableItem.handedness === "shield" ? "Shield" : "Single-handed"}`
+                                                : availableItem.name,
+                                    }));
                                     const selectedItemIdValue =
                                         entry.selectedItemId ??
                                         planPreviewEntry?.selected_item_id ??
@@ -2619,7 +3493,7 @@ export default class BatchCraftingSection extends React.Component<
                                         null;
 
                                     return (
-                                        <details
+                                        <div
                                             key={item.key}
                                             className={
                                                 selectedItemIdValue !== null
@@ -2627,7 +3501,7 @@ export default class BatchCraftingSection extends React.Component<
                                                     : "rounded border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
                                             }
                                         >
-                                            <summary className="cursor-pointer rounded p-2 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500">
+                                            <div className="p-2 text-sm">
                                                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
                                                     <dt className="font-semibold sm:whitespace-nowrap">
                                                         Target
@@ -2670,94 +3544,91 @@ export default class BatchCraftingSection extends React.Component<
                                                         )}
                                                     </dd>
                                                 </dl>
-                                                <p className="my-2 text-xs text-gray-500 dark:text-gray-400">
-                                                    Click anywhere to choose a
-                                                    different craftable item.
-                                                </p>
-                                            </summary>
+                                            </div>
                                             <div className="grid gap-2 p-2">
-                                                <label className="grid gap-1 text-sm font-semibold">
-                                                    Item to craft
-                                                    <Select
-                                                        isSearchable={true}
-                                                        isLoading={
-                                                            previewLoading
-                                                        }
-                                                        noOptionsMessage={() =>
-                                                            previewLoading
-                                                                ? "Loading..."
-                                                                : "No options"
-                                                        }
-                                                        onChange={(opt) =>
+                                                {item.category === "hand" ? (
+                                                    this.renderHandSelectionControls(
+                                                        item.label,
+                                                        entry,
+                                                        availableItems,
+                                                        previewLoading,
+                                                        isHandDisabled(
+                                                            item.key,
+                                                        ),
+                                                        isDuelWieldUnavailable(
+                                                            item.key,
+                                                        ),
+                                                        (value) =>
+                                                            setHandSelectionType(
+                                                                item.key,
+                                                                value,
+                                                            ),
+                                                        (value) =>
+                                                            setSelectedWeaponType(
+                                                                item.key,
+                                                                value,
+                                                            ),
+                                                        (value) =>
                                                             setSelectedItemId(
                                                                 item.key,
-                                                                opt?.value ??
-                                                                    null,
-                                                            )
-                                                        }
-                                                        options={
-                                                            availableItemOptions
-                                                        }
-                                                        menuPosition={
-                                                            "absolute"
-                                                        }
-                                                        menuPlacement={"bottom"}
-                                                        styles={{
-                                                            menuPortal: (
-                                                                base,
-                                                            ) => ({
-                                                                ...base,
-                                                                zIndex: 9999,
-                                                                color: "#000000",
-                                                            }),
-                                                        }}
-                                                        menuPortalTarget={
-                                                            document.body
-                                                        }
-                                                        value={
-                                                            availableItemOptions.find(
-                                                                (option) =>
-                                                                    option.value ===
-                                                                    selectedItemIdValue,
-                                                            ) ?? null
-                                                        }
-                                                    />
-                                                </label>
+                                                                value,
+                                                            ),
+                                                    )
+                                                ) : (
+                                                    <label className="grid gap-1 text-sm font-semibold">
+                                                        Item to craft
+                                                        <Select
+                                                            isClearable={false}
+                                                            isSearchable={true}
+                                                            placeholder="No item selected"
+                                                            isLoading={
+                                                                previewLoading
+                                                            }
+                                                            noOptionsMessage={() =>
+                                                                previewLoading
+                                                                    ? "Loading..."
+                                                                    : "No options"
+                                                            }
+                                                            onChange={(opt) =>
+                                                                setSelectedItemId(
+                                                                    item.key,
+                                                                    opt?.value ??
+                                                                        null,
+                                                                )
+                                                            }
+                                                            options={
+                                                                availableItemOptions
+                                                            }
+                                                            menuPosition={
+                                                                "absolute"
+                                                            }
+                                                            menuPlacement={
+                                                                "bottom"
+                                                            }
+                                                            styles={
+                                                                batchCraftingSelectStyles
+                                                            }
+                                                            menuPortalTarget={
+                                                                document.body
+                                                            }
+                                                            value={
+                                                                availableItemOptions.find(
+                                                                    (option) =>
+                                                                        option.value ===
+                                                                        selectedItemIdValue,
+                                                                ) ?? null
+                                                            }
+                                                        />
+                                                    </label>
+                                                )}
                                             </div>
-                                        </details>
+                                        </div>
                                     );
                                 })}
                             </div>
                         </details>
                     );
                 })}
-                {this.state.craftEnchantSetItemDetailsModalItem ? (
-                    <Dialogue
-                        is_open={true}
-                        handle_close={() =>
-                            this.setState({
-                                craftEnchantSetItemDetailsModalItem: null,
-                            })
-                        }
-                        title={
-                            <ItemNameColorationText
-                                custom_width={false}
-                                item={
-                                    this.state
-                                        .craftEnchantSetItemDetailsModalItem
-                                }
-                            />
-                        }
-                        large_modal={true}
-                    >
-                        <ItemDetails
-                            item={
-                                this.state.craftEnchantSetItemDetailsModalItem
-                            }
-                            character_id={this.props.character_id}
-                        />
-                    </Dialogue>
-                ) : null}
             </div>
         );
     }
@@ -2770,19 +3641,31 @@ export default class BatchCraftingSection extends React.Component<
         }
 
         return (
-            <ItemNameColorationText
-                item={{
-                    name: item.name,
-                    type: item.type ?? "item",
-                    affix_count: item.affix_count ?? 0,
-                    is_unique: item.is_unique ?? false,
-                    is_mythic: item.is_mythic ?? false,
-                    is_cosmic: item.is_cosmic ?? false,
-                    holy_stacks_applied: item.holy_stacks_applied ?? 0,
-                }}
-                custom_width={false}
-                additional_css={""}
-            />
+            <button
+                type="button"
+                className="text-left"
+                onClick={() =>
+                    this.setState({
+                        craftEnchantSetItemDetailsModalItem:
+                            item.full_item_details,
+                    })
+                }
+                aria-label={`View details for ${item.name}`}
+            >
+                <ItemNameColorationText
+                    item={{
+                        name: item.name,
+                        type: item.type ?? "item",
+                        affix_count: item.affix_count ?? 0,
+                        is_unique: item.is_unique ?? false,
+                        is_mythic: item.is_mythic ?? false,
+                        is_cosmic: item.is_cosmic ?? false,
+                        holy_stacks_applied: item.holy_stacks_applied ?? 0,
+                    }}
+                    custom_width={false}
+                    additional_css={""}
+                />
+            </button>
         );
     }
 
@@ -2828,9 +3711,18 @@ export default class BatchCraftingSection extends React.Component<
         );
     }
 
-    renderStartBlockers() {
-        const blockers = this.state.preview?.start_blockers ?? [];
+    startBlockerKey(blocker: BatchCraftingStartBlocker): string {
+        return [
+            blocker.code,
+            blocker.affix_id ?? "",
+            blocker.plan_key ?? "",
+            blocker.selected_item_id ?? "",
+            blocker.target_label ?? "",
+            blocker.message,
+        ].join(":");
+    }
 
+    renderStartBlockers(blockers: BatchCraftingStartBlocker[]) {
         if (blockers.length === 0) {
             return null;
         }
@@ -2839,7 +3731,7 @@ export default class BatchCraftingSection extends React.Component<
             <WarningAlert additional_css="my-2">
                 <ul className="grid gap-3">
                     {blockers.map((blocker: BatchCraftingStartBlocker) => (
-                        <li key={blocker.code}>
+                        <li key={this.startBlockerKey(blocker)}>
                             <p>{blocker.message}</p>
                             {blocker.links && blocker.links.length > 0 ? (
                                 <ul className="list-disc space-y-1 pl-5">
@@ -2927,13 +3819,7 @@ export default class BatchCraftingSection extends React.Component<
                         isDisabled={isSaving}
                         menuPosition={"absolute"}
                         menuPlacement={"bottom"}
-                        styles={{
-                            menuPortal: (base) => ({
-                                ...base,
-                                zIndex: 9999,
-                                color: "#000000",
-                            }),
-                        }}
+                        styles={batchCraftingSelectStyles}
                         menuPortalTarget={document.body}
                         value={
                             outputDestinationOptions.find(
@@ -2963,13 +3849,7 @@ export default class BatchCraftingSection extends React.Component<
                                 isDisabled={isSaving}
                                 menuPosition={"absolute"}
                                 menuPlacement={"bottom"}
-                                styles={{
-                                    menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                        color: "#000000",
-                                    }),
-                                }}
+                                styles={batchCraftingSelectStyles}
                                 menuPortalTarget={document.body}
                                 value={
                                     eligibleOutputSetOptions.find(
@@ -3612,26 +4492,53 @@ export default class BatchCraftingSection extends React.Component<
         return (
             <ul className="grid gap-2">
                 {items.map((entry, index) => (
-                    <li key={index}>
-                        <dl className="grid grid-cols-2 gap-1 text-xs sm:grid-cols-4">
+                    <li
+                        key={entry.target_slot_id}
+                        className="rounded border border-gray-300 p-3 dark:border-gray-600"
+                    >
+                        <dl className="grid grid-cols-2 gap-1 text-xs">
                             <dt className="font-semibold">Item</dt>
-                            <dd>{this.renderPreviewItem(entry.item)}</dd>
-                            <dt className="font-semibold">Stacks</dt>
                             <dd>
-                                {formatNumber(entry.current_stacks)} /{" "}
-                                {formatNumber(entry.max_stacks)}
-                            </dd>
-                            <dt className="font-semibold">Remaining</dt>
-                            <dd>{formatNumber(entry.remaining_capacity)}</dd>
-                            <dt className="font-semibold">
-                                Gold Dust / Application
-                            </dt>
-                            <dd>
-                                {formatNumber(
-                                    entry.gold_dust_cost_per_application,
+                                {this.renderPreviewItem(
+                                    entry.item
+                                        ? {
+                                              ...entry.item,
+                                              full_item_details:
+                                                  entry.full_item_details,
+                                          }
+                                        : null,
                                 )}
                             </dd>
+                            <dt className="font-semibold">
+                                Applications Planned
+                            </dt>
+                            <dd>{formatNumber(entry.planned_applications)}</dd>
+                            <dt className="font-semibold">Result</dt>
+                            <dd>
+                                {formatNumber(entry.current_stacks)} /{" "}
+                                {formatNumber(entry.maximum_stacks)} →{" "}
+                                {formatNumber(entry.resulting_stacks)} /{" "}
+                                {formatNumber(entry.maximum_stacks)}
+                            </dd>
+                            <dt className="font-semibold">
+                                Exact Gold Dust Cost
+                            </dt>
+                            <dd>{formatNumber(entry.exact_gold_dust_cost)}</dd>
                         </dl>
+                        <div className="mt-3">
+                            <ProgressBar
+                                label="Holy Oil Stacks"
+                                current={entry.resulting_stacks}
+                                max={entry.maximum_stacks}
+                                percent={
+                                    entry.maximum_stacks > 0
+                                        ? (entry.resulting_stacks /
+                                              entry.maximum_stacks) *
+                                          100
+                                        : 0
+                                }
+                            />
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -3661,31 +4568,17 @@ export default class BatchCraftingSection extends React.Component<
                 <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
                 {this.renderHolyOilPreviewItemsList(preview.items)}
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-                    <dt className="font-semibold">
-                        Total Remaining Applications
-                    </dt>
-                    <dd>
-                        {formatNumber(preview.total_remaining_applications)}
-                    </dd>
-                    <dt className="font-semibold">Selected Oils Available</dt>
-                    <dd>{formatNumber(preview.selected_oils_available)}</dd>
-                    <dt className="font-semibold">Gold Dust Available</dt>
-                    <dd>{formatNumber(preview.gold_dust_available)}</dd>
-                    <dt className="font-semibold">Max Applications Possible</dt>
-                    <dd>{formatNumber(preview.max_applications_possible)}</dd>
+                    <dt className="font-semibold">Applications Planned</dt>
+                    <dd>{formatNumber(preview.applications_planned)}</dd>
+                    <dt className="font-semibold">Items Affected</dt>
+                    <dd>{formatNumber(preview.items_affected)}</dd>
+                    <dt className="font-semibold">Gold Dust Required</dt>
+                    <dd>{formatNumber(preview.exact_gold_dust_required)}</dd>
                 </dl>
-                {preview.max_applications_possible === 0 ? (
+                {preview.capped ? (
                     <WarningAlert additional_css="my-2">
-                        There are no valid Holy Oil applications with the
-                        current selection.
-                    </WarningAlert>
-                ) : preview.capped ? (
-                    <WarningAlert additional_css="my-2">
-                        This can apply{" "}
-                        {formatNumber(preview.max_applications_possible)} of{" "}
-                        {formatNumber(preview.total_remaining_applications)}{" "}
-                        remaining Holy Oil stacks with your current oils and
-                        gold dust.
+                        {formatNumber(preview.oils_not_applicable)} selected
+                        Holy Oils cannot be used. {preview.unapplied_reason}
                     </WarningAlert>
                 ) : null}
             </div>
@@ -3717,36 +4610,20 @@ export default class BatchCraftingSection extends React.Component<
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
                     <dt className="font-semibold">Selected Set</dt>
                     <dd>{preview.set_name}</dd>
-                    <dt className="font-semibold">Total Eligible Items</dt>
-                    <dd>{formatNumber(preview.total_eligible_items)}</dd>
+                    <dt className="font-semibold">Items Affected</dt>
+                    <dd>{formatNumber(preview.items_affected)}</dd>
                 </dl>
                 {this.renderHolyOilPreviewItemsList(preview.items)}
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-                    <dt className="font-semibold">
-                        Total Remaining Applications
-                    </dt>
-                    <dd>
-                        {formatNumber(preview.total_remaining_applications)}
-                    </dd>
-                    <dt className="font-semibold">Selected Oils Available</dt>
-                    <dd>{formatNumber(preview.selected_oils_available)}</dd>
-                    <dt className="font-semibold">Gold Dust Available</dt>
-                    <dd>{formatNumber(preview.gold_dust_available)}</dd>
-                    <dt className="font-semibold">Max Applications Possible</dt>
-                    <dd>{formatNumber(preview.max_applications_possible)}</dd>
+                    <dt className="font-semibold">Applications Planned</dt>
+                    <dd>{formatNumber(preview.applications_planned)}</dd>
+                    <dt className="font-semibold">Gold Dust Required</dt>
+                    <dd>{formatNumber(preview.exact_gold_dust_required)}</dd>
                 </dl>
-                {preview.max_applications_possible === 0 ? (
+                {preview.capped ? (
                     <WarningAlert additional_css="my-2">
-                        There are no valid Holy Oil applications with the
-                        current selection.
-                    </WarningAlert>
-                ) : preview.capped ? (
-                    <WarningAlert additional_css="my-2">
-                        This can apply{" "}
-                        {formatNumber(preview.max_applications_possible)} of{" "}
-                        {formatNumber(preview.total_remaining_applications)}{" "}
-                        remaining Holy Oil stacks with your current oils and
-                        gold dust.
+                        {formatNumber(preview.oils_not_applicable)} selected
+                        Holy Oils cannot be used. {preview.unapplied_reason}
                     </WarningAlert>
                 ) : null}
             </div>
@@ -3928,8 +4805,6 @@ export default class BatchCraftingSection extends React.Component<
         );
         const isActive = status?.active ?? false;
         const isCompleted = status?.completed ?? false;
-        const needsSelectedSet =
-            batchType === "holy_oils" && holyOilMode === "set";
         const needsEmptySelectedSet = false;
         const selectedSetNotEmpty = false;
         const hasBlockingTargetSetBlocker = (
@@ -3938,66 +4813,11 @@ export default class BatchCraftingSection extends React.Component<
             (blocker) =>
                 blocker.blocking && blocker.code.startsWith("target_set_"),
         );
-        const craftEnchantSetPlanIncomplete =
-            batchType === "craft_and_enchant" &&
-            selectedCraftMode === "craft_enchant_set" &&
-            craftEnchantSetPlanItems.some((item) => {
-                const entry = craftEnchantSetPlan[item.key];
-                const hasPrefix =
-                    entry?.prefixAffixId !== null &&
-                    typeof entry?.prefixAffixId !== "undefined";
-                const hasSuffix =
-                    entry?.suffixAffixId !== null &&
-                    typeof entry?.suffixAffixId !== "undefined";
-
-                return !hasPrefix && !hasSuffix;
-            });
-        const craftAndEnchantMissingAffix =
-            batchType === "craft_and_enchant" &&
-            selectedCraftMode === "specific_item" &&
-            selectedPrefixId === null &&
-            selectedSuffixId === null;
-        const previewBlocksStart =
-            preview !== null &&
-            !previewLoading &&
-            (((batchType === "craft" || batchType === "craft_and_enchant") &&
-            selectedCraftMode === "specific_item"
-                ? (preview.amount_preview?.effective_craftable_amount ?? 1) ===
-                  0
-                : false) ||
-                (batchType === "alchemy" &&
-                selectedAlchemyModeOption?.value === "amount"
-                    ? (preview.alchemy_amount_preview
-                          ?.effective_craftable_amount ?? 1) === 0
-                    : false) ||
-                (batchType === "holy_oils" && holyOilMode === "selected"
-                    ? (preview.holy_oil_selected_preview
-                          ?.max_applications_possible ?? 1) === 0
-                    : false) ||
-                (batchType === "holy_oils" && holyOilMode === "set"
-                    ? (preview.holy_oil_set_preview
-                          ?.max_applications_possible ?? 1) === 0
-                    : false) ||
-                preview.cost_breakdown?.can_afford_start === false ||
-                preview.cost_breakdown?.can_afford_full_plan === false);
-        const hasBlockingStartBlocker = (preview?.start_blockers ?? []).some(
-            (blocker) => blocker.blocking,
+        const disabledReasons = this.startDisabledReasons(
+            selectedCraftMode,
+            (selectedAlchemyModeOption?.value ?? "amount") as AlchemyMode,
         );
-        const startDisabled =
-            isSaving ||
-            (batchType === "alchemy" && alchemyLocked) ||
-            (batchType === "holy_oils" && alchemyLocked) ||
-            (batchType === "alchemy" &&
-                selectedAlchemyModeOption?.value === "experience" &&
-                alchemyMaxed) ||
-            (batchType === "trinketry" && trinketryMaxed) ||
-            (needsSelectedSet && selectedSetId === null) ||
-            selectedSetNotEmpty ||
-            craftEnchantSetPlanIncomplete ||
-            craftAndEnchantMissingAffix ||
-            this.missingRequiredSelections() ||
-            previewBlocksStart ||
-            hasBlockingStartBlocker;
+        const startDisabled = disabledReasons.length > 0;
 
         if (statusLoadError) {
             return (
@@ -4055,14 +4875,16 @@ export default class BatchCraftingSection extends React.Component<
                         onDismissed={() => this.fetchStatus()}
                     />
 
-                    <div className="mt-4 flex flex-col items-center justify-center gap-2 md:flex-row">
-                        <DangerButton
-                            button_label={"Close"}
-                            on_click={remove_crafting}
-                            additional_css={"w-full md:w-auto"}
-                            disabled={isSaving}
-                        />
-                    </div>
+                    {isActive ? (
+                        <div className="mt-4 flex flex-col items-center justify-center gap-2 md:flex-row">
+                            <DangerButton
+                                button_label={"Close"}
+                                on_click={remove_crafting}
+                                additional_css={"w-full md:w-auto"}
+                                disabled={isSaving}
+                            />
+                        </div>
+                    ) : null}
                 </section>
             );
         }
@@ -4115,13 +4937,7 @@ export default class BatchCraftingSection extends React.Component<
                                 options={availableBatchTypes}
                                 menuPosition={"absolute"}
                                 menuPlacement={"bottom"}
-                                styles={{
-                                    menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 9999,
-                                        color: "#000000",
-                                    }),
-                                }}
+                                styles={batchCraftingSelectStyles}
                                 menuPortalTarget={document.body}
                                 value={selectedBatchType}
                             />
@@ -4146,13 +4962,7 @@ export default class BatchCraftingSection extends React.Component<
                                     options={availableDispositions}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
-                                    styles={{
-                                        menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                            color: "#000000",
-                                        }),
-                                    }}
+                                    styles={batchCraftingSelectStyles}
                                     menuPortalTarget={document.body}
                                     value={selectedDisposition}
                                 />
@@ -4176,13 +4986,7 @@ export default class BatchCraftingSection extends React.Component<
                                     options={craftModeOptions}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
-                                    styles={{
-                                        menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                            color: "#000000",
-                                        }),
-                                    }}
+                                    styles={batchCraftingSelectStyles}
                                     menuPortalTarget={document.body}
                                     value={selectedCraftModeOption}
                                 />
@@ -4330,12 +5134,13 @@ export default class BatchCraftingSection extends React.Component<
                         selectedCraftMode === "craft_set" ? (
                             <div className="grid gap-3">
                                 <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                                    Craft Set crafts the highest craftable
-                                    version of one of each weapon type, a full
-                                    armour set including a shield, two rings, a
-                                    spell damage item, and a spell healing item,
-                                    placing each completed piece into{" "}
-                                    {this.outputDestinationDescription()}.
+                                    Craft Set creates one equippable set with
+                                    six armour pieces, two Rings, one Damage
+                                    Spell, and one Healing Spell. Left Hand and
+                                    Right Hand are optional; Shields are hand
+                                    items and two-handed weapons occupy both
+                                    hands. The resulting 10–12 items are placed
+                                    into {this.outputDestinationDescription()}.
                                 </p>
                                 {this.renderOutputDestinationSelector()}
                                 {this.renderDestinationCapacity()}
@@ -4343,14 +5148,17 @@ export default class BatchCraftingSection extends React.Component<
                             </div>
                         ) : null}
 
-                        {this.renderStartBlockers()}
-
                         {batchType === "craft_and_enchant" &&
                         selectedCraftMode === "craft_enchant_set" ? (
                             <div className="grid gap-3">
                                 <p className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100">
-                                    23 new crafted and enchanted items will be
-                                    placed into{" "}
+                                    Craft and Enchant Set creates the same
+                                    configurable equippable 10–12 item set and
+                                    applies the selected affixes to every
+                                    included item. Left Hand and Right Hand are
+                                    optional; Shields are hand items and
+                                    two-handed weapons occupy both hands.
+                                    Completed items are placed into{" "}
                                     {this.outputDestinationDescription()}.
                                 </p>
                                 {this.renderOutputDestinationSelector()}
@@ -4389,13 +5197,7 @@ export default class BatchCraftingSection extends React.Component<
                                     options={craftCategoryOptions}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
-                                    styles={{
-                                        menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                            color: "#000000",
-                                        }),
-                                    }}
+                                    styles={batchCraftingSelectStyles}
                                     menuPortalTarget={document.body}
                                     value={{
                                         value: craftCategory,
@@ -4427,13 +5229,7 @@ export default class BatchCraftingSection extends React.Component<
                                             options={weaponTypeOptions}
                                             menuPosition={"absolute"}
                                             menuPlacement={"bottom"}
-                                            styles={{
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                    color: "#000000",
-                                                }),
-                                            }}
+                                            styles={batchCraftingSelectStyles}
                                             menuPortalTarget={document.body}
                                             value={
                                                 weaponTypeOptions.find(
@@ -4458,13 +5254,7 @@ export default class BatchCraftingSection extends React.Component<
                                             options={armourTypeOptions}
                                             menuPosition={"absolute"}
                                             menuPlacement={"bottom"}
-                                            styles={{
-                                                menuPortal: (base) => ({
-                                                    ...base,
-                                                    zIndex: 9999,
-                                                    color: "#000000",
-                                                }),
-                                            }}
+                                            styles={batchCraftingSelectStyles}
                                             menuPortalTarget={document.body}
                                             value={
                                                 armourTypeOptions.find(
@@ -4513,13 +5303,7 @@ export default class BatchCraftingSection extends React.Component<
                                         )}
                                         menuPosition={"absolute"}
                                         menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
+                                        styles={batchCraftingSelectStyles}
                                         menuPortalTarget={document.body}
                                         value={
                                             specificItemId === null
@@ -4569,13 +5353,9 @@ export default class BatchCraftingSection extends React.Component<
                                                 }
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
-                                                styles={{
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                        color: "#000000",
-                                                    }),
-                                                }}
+                                                styles={
+                                                    batchCraftingSelectStyles
+                                                }
                                                 menuPortalTarget={document.body}
                                                 value={
                                                     enchantments
@@ -4618,13 +5398,9 @@ export default class BatchCraftingSection extends React.Component<
                                                 }
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
-                                                styles={{
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                        color: "#000000",
-                                                    }),
-                                                }}
+                                                styles={
+                                                    batchCraftingSelectStyles
+                                                }
                                                 menuPortalTarget={document.body}
                                                 value={
                                                     enchantments
@@ -4649,6 +5425,10 @@ export default class BatchCraftingSection extends React.Component<
                                         type="number"
                                         inputMode="numeric"
                                         min={1}
+                                        max={
+                                            this.state.preview
+                                                ?.maximum_request_amount ?? 2000
+                                        }
                                         step={1}
                                         disabled={isSaving}
                                         value={craftAmount}
@@ -4663,6 +5443,11 @@ export default class BatchCraftingSection extends React.Component<
                                             )
                                         }
                                     />
+                                    <span className="text-xs font-normal text-gray-600 dark:text-gray-400">
+                                        Maximum for this destination:{" "}
+                                        {this.state.preview
+                                            ?.maximum_request_amount ?? 2000}
+                                    </span>
                                 </label>
                                 {this.renderOutputDestinationSelector()}
                                 {this.renderCraftAmountPreview()}
@@ -4682,13 +5467,7 @@ export default class BatchCraftingSection extends React.Component<
                                     options={alchemyModeOptions}
                                     menuPosition={"absolute"}
                                     menuPlacement={"bottom"}
-                                    styles={{
-                                        menuPortal: (base) => ({
-                                            ...base,
-                                            zIndex: 9999,
-                                            color: "#000000",
-                                        }),
-                                    }}
+                                    styles={batchCraftingSelectStyles}
                                     menuPortalTarget={document.body}
                                     value={selectedAlchemyModeOption}
                                 />
@@ -4744,13 +5523,7 @@ export default class BatchCraftingSection extends React.Component<
                                         )}
                                         menuPosition={"absolute"}
                                         menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
+                                        styles={batchCraftingSelectStyles}
                                         menuPortalTarget={document.body}
                                         value={
                                             selectedAlchemyItemId === null
@@ -4781,6 +5554,10 @@ export default class BatchCraftingSection extends React.Component<
                                         type="number"
                                         inputMode="numeric"
                                         min={1}
+                                        max={
+                                            this.state.preview
+                                                ?.maximum_request_amount ?? 2000
+                                        }
                                         step={1}
                                         disabled={isSaving}
                                         value={craftAmount}
@@ -4795,6 +5572,11 @@ export default class BatchCraftingSection extends React.Component<
                                             )
                                         }
                                     />
+                                    <span className="text-xs font-normal text-gray-600 dark:text-gray-400">
+                                        Maximum for this destination:{" "}
+                                        {this.state.preview
+                                            ?.maximum_request_amount ?? 2000}
+                                    </span>
                                 </label>
                                 {this.renderAlchemyAmountPreview()}
                             </>
@@ -4835,13 +5617,7 @@ export default class BatchCraftingSection extends React.Component<
                                         options={holyOilModeOptions}
                                         menuPosition={"absolute"}
                                         menuPlacement={"bottom"}
-                                        styles={{
-                                            menuPortal: (base) => ({
-                                                ...base,
-                                                zIndex: 9999,
-                                                color: "#000000",
-                                            }),
-                                        }}
+                                        styles={batchCraftingSelectStyles}
                                         menuPortalTarget={document.body}
                                         value={selectedHolyOilModeOption}
                                     />
@@ -4880,13 +5656,9 @@ export default class BatchCraftingSection extends React.Component<
                                                 options={inventorySets}
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
-                                                styles={{
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                        color: "#000000",
-                                                    }),
-                                                }}
+                                                styles={
+                                                    batchCraftingSelectStyles
+                                                }
                                                 menuPortalTarget={document.body}
                                                 value={
                                                     selectedInventorySetOption
@@ -4953,13 +5725,9 @@ export default class BatchCraftingSection extends React.Component<
                                                 ]}
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
-                                                styles={{
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                        color: "#000000",
-                                                    }),
-                                                }}
+                                                styles={
+                                                    batchCraftingSelectStyles
+                                                }
                                                 menuPortalTarget={document.body}
                                                 value={holyOilItems
                                                     .filter((slot) =>
@@ -5011,13 +5779,9 @@ export default class BatchCraftingSection extends React.Component<
                                                 )}
                                                 menuPosition={"absolute"}
                                                 menuPlacement={"bottom"}
-                                                styles={{
-                                                    menuPortal: (base) => ({
-                                                        ...base,
-                                                        zIndex: 9999,
-                                                        color: "#000000",
-                                                    }),
-                                                }}
+                                                styles={
+                                                    batchCraftingSelectStyles
+                                                }
                                                 menuPortalTarget={document.body}
                                                 value={holyOilOptions
                                                     .filter((slot) =>
@@ -5052,6 +5816,19 @@ export default class BatchCraftingSection extends React.Component<
                             </p>
                         ) : null}
 
+                        {isSaving ? (
+                            <InfoAlert additional_css="my-2">
+                                Starting Batch Crafting...
+                            </InfoAlert>
+                        ) : null}
+
+                        {this.renderStartBlockers(
+                            disabledReasons.filter(
+                                (blocker) =>
+                                    blocker.code !== "start_request_pending",
+                            ),
+                        )}
+
                         <div className="flex flex-col items-center justify-center gap-2 md:flex-row">
                             <PrimaryButton
                                 button_label={"Start Batch"}
@@ -5076,6 +5853,33 @@ export default class BatchCraftingSection extends React.Component<
                             </a>
                         </div>
                     </div>
+                ) : null}
+                {this.state.craftEnchantSetItemDetailsModalItem ? (
+                    <Dialogue
+                        is_open={true}
+                        handle_close={() =>
+                            this.setState({
+                                craftEnchantSetItemDetailsModalItem: null,
+                            })
+                        }
+                        title={
+                            <ItemNameColorationText
+                                custom_width={false}
+                                item={
+                                    this.state
+                                        .craftEnchantSetItemDetailsModalItem
+                                }
+                            />
+                        }
+                        large_modal={true}
+                    >
+                        <ItemDetails
+                            item={
+                                this.state.craftEnchantSetItemDetailsModalItem
+                            }
+                            character_id={this.props.character_id}
+                        />
+                    </Dialogue>
                 ) : null}
             </section>
         );

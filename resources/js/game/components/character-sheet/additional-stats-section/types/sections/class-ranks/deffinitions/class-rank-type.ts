@@ -1,20 +1,6 @@
 import GameClassType from "./game-class-type";
 import WeaponMastery from "./weapon-mastery";
 
-export interface ClassRankSkillProgress {
-    id: number;
-    name: string;
-    level: number;
-}
-
-export interface ClassRankSpecialtyProgress {
-    id: number;
-    name: string;
-    description: string | null;
-    level: number;
-    equipped: boolean;
-}
-
 export default interface ClassRankType {
     character_id?: number;
     class_name: string;
@@ -44,7 +30,4 @@ export default interface ClassRankType {
     requirements?: {
         required_xp: number;
     };
-    equipped_specialties?: ClassRankSpecialtyProgress[];
-    unlocked_specialties?: ClassRankSpecialtyProgress[];
-    current_class_skills?: ClassRankSkillProgress[];
 }

@@ -37,10 +37,6 @@ export interface QuestProfile {
 }
 
 export interface KingdomProfile {
-    kingdom_summary_chart: ChartPayload;
-    kingdom_treasury_chart: ChartPayload;
-    kingdom_gold_bars_chart: ChartPayload;
-    resource_totals_chart: ChartPayload;
     kingdoms: Record<string, TopsValue>[];
 }
 

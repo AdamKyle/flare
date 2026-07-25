@@ -64,6 +64,10 @@ class GuideQuestService
             $completedAttributes[] = [
                 'quest_id' => $quest->id,
                 'completed_requirements' => $this->completedAttributes,
+                'required_batch_crafted_item_requirements' => $this->guideQuestRequirementsService->batchCraftedItemRequirements(
+                    $character,
+                    $quest->required_batch_crafted_items ?? [],
+                ),
             ];
         }
 

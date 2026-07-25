@@ -1,6 +1,7 @@
 import AjaxInterface from "./ajax-interface";
 import axios, { AxiosError, AxiosHeaders, AxiosResponse, Method } from "axios";
 import { injectable } from "tsyringe";
+import { handleUnauthenticatedResponse } from "./unauthenticated-response-handler";
 
 @injectable()
 export default class Ajax implements AjaxInterface {
@@ -17,37 +18,22 @@ export default class Ajax implements AjaxInterface {
         successCallBack: (result: AxiosResponse) => void,
         errorCallBack: (error: AxiosError) => void,
     ): void {
-        if (method.toLowerCase() === "get") {
-            this.getRequest(this.route, this.params)
-                .then((result: AxiosResponse) => successCallBack(result))
-                .catch((error: AxiosError) => {
-                    if (error.response) {
-                        const response: AxiosResponse = error.response;
+        const request =
+            method.toLowerCase() === "get"
+                ? this.getRequest(this.route, this.params)
+                : method.toLowerCase() === "post"
+                  ? this.postRequest(this.route, this.params)
+                  : null;
 
-                        if (response.status === 401) {
-                            window.location.reload();
-                        }
-                    }
+        request
+            ?.then((result: AxiosResponse) => successCallBack(result))
+            .catch((error: AxiosError) => {
+                if (handleUnauthenticatedResponse(error)) {
+                    return;
+                }
 
-                    return errorCallBack(error);
-                });
-        }
-
-        if (method.toLowerCase() === "post") {
-            this.postRequest(this.route, this.params)
-                .then((result: AxiosResponse) => successCallBack(result))
-                .catch((error: AxiosError) => {
-                    if (error.response) {
-                        const response: AxiosResponse = error.response;
-
-                        if (response.status === 401) {
-                            window.location.reload();
-                        }
-                    }
-
-                    return errorCallBack(error);
-                });
-        }
+                return errorCallBack(error);
+            });
     }
 
     setParameters(params: Object): AjaxInterface {

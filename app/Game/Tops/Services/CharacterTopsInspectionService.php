@@ -15,7 +15,6 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\Skill;
-use App\Flare\Models\TopsMonthlySnapshot;
 use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
 use App\Flare\Transformers\BasicSkillsTransformer;
@@ -193,7 +192,13 @@ class CharacterTopsInspectionService
 
     public function equipment(Character $character): array
     {
-        $equippedSet = $character->inventorySets()->where('is_equipped', true)->with('slots.item.itemPrefix', 'slots.item.itemSuffix', 'slots.item.sockets.gem', 'slots.item.itemSkill')->first();
+        $equippedSet = $character->inventorySets()->where('is_equipped', true)->with(
+            'slots.item.itemPrefix',
+            'slots.item.itemSuffix',
+            'slots.item.sockets.gem',
+            'slots.item.itemSkill.children',
+            'slots.item.itemSkillProgressions.itemSkill',
+        )->first();
 
         if (! is_null($equippedSet)) {
             return [
@@ -211,7 +216,13 @@ class CharacterTopsInspectionService
 
         $slots = InventorySlot::where('inventory_id', $inventory->id)
             ->where('equipped', true)
-            ->with('item.itemPrefix', 'item.itemSuffix', 'item.sockets.gem', 'item.itemSkill')
+            ->with(
+                'item.itemPrefix',
+                'item.itemSuffix',
+                'item.sockets.gem',
+                'item.itemSkill.children',
+                'item.itemSkillProgressions.itemSkill',
+            )
             ->get();
 
         return [
@@ -267,13 +278,6 @@ class CharacterTopsInspectionService
                 'required_xp' => $mastery->required_xp,
                 'level' => $mastery->level,
             ])->values()->all(),
-            'current_class_skills' => $character->skills
-                ->filter(fn ($skill): bool => $skill->level > 1 && $skill->baseSkill?->game_class_id === $rank->game_class_id)
-                ->map(fn ($skill): array => $this->basicSkillsTransformer->transform($skill))
-                ->values()
-                ->all(),
-            'equipped_specialties' => $this->classSpecialtiesForClass($character, $rank->game_class_id, true),
-            'unlocked_specialties' => $this->classSpecialtiesForClass($character, $rank->game_class_id, false),
         ])->values()->all();
 
         $meaningfulSkills = $character->skills->filter(fn ($skill): bool => $skill->level > 1 || $skill->xp > 0);
@@ -383,16 +387,6 @@ class CharacterTopsInspectionService
         $kingdoms = $this->kingdomTopsService->detail($character);
 
         unset($kingdoms['map_distribution']);
-
-        $snapshots = TopsMonthlySnapshot::where('board_type', 'kingdoms')
-            ->where('character_id', $character->id)
-            ->orderBy('period_start')
-            ->get();
-
-        $kingdoms['kingdom_summary_chart'] = $this->kingdomSummarySnapshotChart($snapshots);
-        $kingdoms['kingdom_treasury_chart'] = $this->kingdomTreasurySnapshotChart($snapshots);
-        $kingdoms['kingdom_gold_bars_chart'] = $this->kingdomGoldBarsSnapshotChart($snapshots);
-        $kingdoms['resource_totals_chart'] = $this->kingdomResourceSnapshotChart($snapshots);
 
         return $kingdoms;
     }
@@ -957,40 +951,6 @@ class CharacterTopsInspectionService
         ];
     }
 
-    private function kingdomSummarySnapshotChart($snapshots): array
-    {
-        return [
-            'source' => 'tops_monthly_snapshots.kingdoms',
-            'unit' => 'count',
-            'series' => [
-                ['label' => 'Kingdom Count', 'points' => $this->kingdomSnapshotSeries($snapshots, 'kingdom_count')],
-                ['label' => 'Capital Count', 'points' => $this->kingdomSnapshotSeries($snapshots, 'capital_count')],
-                ['label' => 'Population', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_population')],
-            ],
-        ];
-    }
-
-    private function kingdomTreasurySnapshotChart($snapshots): array
-    {
-        return [
-            'source' => 'tops_monthly_snapshots.kingdoms',
-            'unit' => 'gold',
-            'series' => [
-                ['label' => 'Treasury', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_treasury')],
-            ],
-        ];
-    }
-
-    private function kingdomGoldBarsSnapshotChart($snapshots): array
-    {
-        return [
-            'source' => 'tops_monthly_snapshots.kingdoms',
-            'unit' => 'gold bars',
-            'series' => [
-                ['label' => 'Gold Bars', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_gold_bars')],
-            ],
-        ];
-    }
 
     private function publicPassiveTree($passive): array
     {
@@ -1012,30 +972,6 @@ class CharacterTopsInspectionService
         ];
     }
 
-    private function kingdomResourceSnapshotChart($snapshots): array
-    {
-        return [
-            'source' => 'tops_monthly_snapshots.kingdoms',
-            'unit' => 'resources',
-            'series' => [
-                ['label' => 'Stone', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_stone')],
-                ['label' => 'Wood', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_wood')],
-                ['label' => 'Clay', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_clay')],
-                ['label' => 'Iron', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_iron')],
-                ['label' => 'Steel', 'points' => $this->kingdomSnapshotSeries($snapshots, 'total_current_steel')],
-            ],
-        ];
-    }
-
-    private function kingdomSnapshotSeries($snapshots, string $key): array
-    {
-        return $snapshots->map(fn (TopsMonthlySnapshot $snapshot): array => [
-            'label' => $snapshot->period_start->format('Y-m'),
-            'date' => $snapshot->period_start->toISOString(),
-            'value' => (int) ($snapshot->snapshot_data[$key] ?? 0),
-        ])->values()->all();
-    }
-
     private function loginCountChart(Character $character, $loginRows): array
     {
         if ($loginRows->isEmpty()) {
@@ -1049,7 +985,7 @@ class CharacterTopsInspectionService
             'unit' => 'count',
             'granularity' => $granularity,
             'series' => [
-                ['label' => 'Login Count', 'points' => $this->cumulativeCountPoints($loginRows, 'logged_in_at', $granularity)],
+                ['label' => 'Login Count', 'points' => $this->loginCountPoints($loginRows, $granularity)],
             ],
         ];
     }
@@ -1060,14 +996,16 @@ class CharacterTopsInspectionService
             return $this->emptyChart('user_login_durations.logged_in_at', 'hours', ['Login Duration (Hours)']);
         }
 
-        $granularity = $this->chartGranularity($this->loginChartStart($character, $loginRows), $loginRows->max('logged_in_at'));
+        $intervals = $this->mergedLoginIntervals($loginRows);
+        $latestEnd = collect($intervals)->max(fn (array $interval): Carbon => $interval['end']);
+        $granularity = $this->chartGranularity($this->loginChartStart($character, $loginRows), $latestEnd ?? $loginRows->max('logged_in_at'));
 
         return [
             'source' => 'user_login_durations.logged_in_at',
             'unit' => 'hours',
             'granularity' => $granularity,
             'series' => [
-                ['label' => 'Login Duration (Hours)', 'points' => $this->cumulativeDurationHoursPoints($loginRows, $granularity)],
+                ['label' => 'Login Duration (Hours)', 'points' => $this->loginDurationHoursPoints($intervals, $granularity)],
             ],
         ];
     }
@@ -1083,26 +1021,104 @@ class CharacterTopsInspectionService
         return $loginRows->min('logged_in_at');
     }
 
-    private function cumulativeDurationHoursPoints($rows, string $granularity): array
+    private function loginCountPoints($rows, string $granularity): array
     {
         $sorted = $rows->filter(fn ($row): bool => ! is_null($row->logged_in_at))->sortBy(fn ($row): int => $row->logged_in_at->getTimestamp())->values();
 
         $grouped = $sorted->groupBy(fn ($row): string => $this->bucketStart($row->logged_in_at, $granularity)->toISOString());
 
-        $runningSeconds = 0;
-        $points = [];
-
-        foreach ($grouped as $date => $bucketRows) {
-            $runningSeconds += (int) $bucketRows->sum('duration_in_seconds');
-
-            $points[] = [
+        return $grouped->map(function ($bucketRows, string $date) use ($granularity): array {
+            return [
                 'label' => $this->bucketLabel($bucketRows->first()->logged_in_at, $granularity),
                 'date' => $date,
-                'value' => round($runningSeconds / 3600, 2),
+                'value' => $bucketRows->count(),
             ];
+        })->values()->all();
+    }
+
+    private function mergedLoginIntervals($rows): array
+    {
+        $intervals = $rows->map(function ($row): ?array {
+            $end = $row->logged_out_at ?? $row->last_heart_beat;
+
+            if (is_null($row->logged_in_at) || is_null($end) || $end->lt($row->logged_in_at)) {
+                return null;
+            }
+
+            return ['start' => $row->logged_in_at->copy(), 'end' => $end->copy()];
+        })->filter()->sortBy(fn (array $interval): int => $interval['start']->getTimestamp())->values();
+
+        $merged = [];
+
+        foreach ($intervals as $interval) {
+            $lastIndex = count($merged) - 1;
+
+            if ($lastIndex < 0 || $interval['start']->gt($merged[$lastIndex]['end'])) {
+                $merged[] = $interval;
+
+                continue;
+            }
+
+            if ($interval['end']->gt($merged[$lastIndex]['end'])) {
+                $merged[$lastIndex]['end'] = $interval['end'];
+            }
         }
 
-        return $points;
+        return $merged;
+    }
+
+    private function loginDurationHoursPoints(array $intervals, string $granularity): array
+    {
+        if (empty($intervals)) {
+            return [];
+        }
+
+        $buckets = $this->loginDurationBucketSequence($intervals[0]['start'], $intervals[count($intervals) - 1]['end'], $granularity);
+
+        return collect($buckets)->map(function (Carbon $bucketStart) use ($intervals, $granularity): array {
+            $bucketEnd = $this->nextLoginDurationBucketStart($bucketStart, $granularity);
+            $seconds = 0;
+
+            foreach ($intervals as $interval) {
+                $start = $interval['start']->gt($bucketStart) ? $interval['start'] : $bucketStart;
+                $end = $interval['end']->lt($bucketEnd) ? $interval['end'] : $bucketEnd;
+
+                if ($end->gt($start)) {
+                    $seconds += $start->diffInSeconds($end);
+                }
+            }
+
+            return [
+                'label' => $this->bucketLabel($bucketStart, $granularity),
+                'date' => $bucketStart->toISOString(),
+                'value' => (float) ($seconds / 3600),
+                'seconds' => $seconds,
+            ];
+        })->all();
+    }
+
+    private function nextLoginDurationBucketStart(Carbon $bucketStart, string $granularity): Carbon
+    {
+        return match ($granularity) {
+            'hours' => $bucketStart->copy()->addHour(),
+            'days' => $bucketStart->copy()->addDay(),
+            'weeks' => $bucketStart->copy()->addWeek(),
+            'months' => $bucketStart->copy()->addMonthNoOverflow(),
+            default => $bucketStart->copy()->addYear(),
+        };
+    }
+
+    private function loginDurationBucketSequence(Carbon $oldest, Carbon $newest, string $granularity): array
+    {
+        $buckets = [];
+        $cursor = $this->bucketStart($oldest, $granularity);
+
+        while ($cursor->lt($newest)) {
+            $buckets[] = $cursor->copy();
+            $cursor = $this->nextLoginDurationBucketStart($cursor, $granularity);
+        }
+
+        return $buckets;
     }
 
     private function cumulativeCountPoints($rows, string $dateField, string $granularity): array

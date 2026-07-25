@@ -19,10 +19,50 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateMonster;
 
 class BattleEventHandlerTest extends TestCase
 {
-    use CreateBatchCrafting, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateBatchCrafting, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+
+    public function testNormalMonsterDeathClaimsWeeklyFightBeforeEnqueue(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster();
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldReceive('claimMonsterDeath')->once()->ordered()->with(
+            Mockery::on(fn ($value): bool => $value->id === $character->id),
+            Mockery::on(fn ($value): bool => $value->id === $monster->id),
+        );
+        $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
+        $queueManager->shouldReceive('enqueue')->once()->ordered()->with(
+            $character->id,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::BATTLE,
+            Mockery::on(fn (string $sourceId): bool => str_starts_with($sourceId, 'battle:' . $character->id . ':' . $monster->id . ':')),
+            ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => []],
+        )->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))->processMonsterDeath($character->id, $monster->id);
+    }
+
+    public function testExplorationMonsterDeathClaimsWeeklyFightBeforeEnqueue(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster();
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldReceive('claimMonsterDeath')->once()->ordered();
+        $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
+        $queueManager->shouldReceive('enqueue')->once()->ordered()->with(
+            $character->id,
+            BattleRewardRequestPriority::SECOND,
+            BattleRewardRequestSourceType::EXPLORATION,
+            Mockery::on(fn (string $sourceId): bool => str_starts_with($sourceId, 'exploration:' . $character->id . ':30:' . $monster->id . ':')),
+            ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => ['exploration_log_id' => 30]],
+        )->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))->processMonsterDeath($character->id, $monster->id, ['exploration_log_id' => 30]);
+    }
 
     public function testBattleRewardUsesSecondPriorityAndPreservesPayload(): void
     {
@@ -45,7 +85,10 @@ class BattleEventHandlerTest extends TestCase
             )
             ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
 
-        (new BattleEventHandler($queueManager, Mockery::mock(WeeklyBattleService::class), Mockery::mock(BatchCraftingService::class)))
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldNotReceive('claimMonsterDeath');
+
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))
             ->processMonsterDeath(10, 20, ['attack_type' => 'attack']);
     }
 
@@ -70,7 +113,10 @@ class BattleEventHandlerTest extends TestCase
             )
             ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
 
-        (new BattleEventHandler($queueManager, Mockery::mock(WeeklyBattleService::class), Mockery::mock(BatchCraftingService::class)))
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldNotReceive('claimMonsterDeath');
+
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))
             ->processMonsterDeath(10, 20, ['exploration_log_id' => 30]);
     }
 

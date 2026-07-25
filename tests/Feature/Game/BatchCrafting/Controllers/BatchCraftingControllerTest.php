@@ -4,6 +4,7 @@ namespace Tests\Feature\Game\BatchCrafting\Controllers;
 
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\Item;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\AutomationType;
@@ -1013,7 +1014,7 @@ class BatchCraftingControllerTest extends TestCase
                 'craft_mode' => 'craft_enchant_set',
                 'selected_set_id' => $set->id,
                 'enchant_plan' => [
-                    'dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id],
+                    'left_hand' => ['selected_item_id' => $this->createItem(['name' => 'Selected Preview Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 1])->id, 'prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id],
                 ],
             ],
         ]);
@@ -1021,7 +1022,7 @@ class BatchCraftingControllerTest extends TestCase
         $this->assertSame(70, $response->json('cost_breakdown.enchant_cost_total'));
     }
 
-    public function testPreviewCraftEnchantSetReturnsAllTwentyThreeSetTargets(): void
+    public function testPreviewCraftEnchantSetReturnsAllTwelveSetTargets(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
@@ -1031,7 +1032,7 @@ class BatchCraftingControllerTest extends TestCase
             'progress' => ['craft_mode' => 'craft_enchant_set'],
         ]);
 
-        $this->assertCount(23, $response->json('cost_breakdown.plan_entries'));
+        $this->assertCount(12, $response->json('cost_breakdown.plan_entries'));
     }
 
     public function testPreviewCraftEnchantSetDefaultsToHighestCraftableItemPerTarget(): void
@@ -1047,9 +1048,10 @@ class BatchCraftingControllerTest extends TestCase
             'progress' => ['craft_mode' => 'craft_enchant_set'],
         ]);
 
-        $daggerEntry = collect($response->json('cost_breakdown.plan_entries'))->firstWhere('key', 'dagger');
+        $daggerEntry = collect($response->json('cost_breakdown.plan_entries'))->firstWhere('key', 'left_hand');
 
-        $this->assertSame($highItem->id, $daggerEntry['selected_item_id']);
+        $this->assertNull($daggerEntry['selected_item_id']);
+        $this->assertSame($highItem->id, collect($daggerEntry['available_items'])->first()['id']);
     }
 
     public function testPreviewCraftEnchantSetDefaultsToHighestValidPrefixAndSuffix(): void
@@ -1104,6 +1106,8 @@ class BatchCraftingControllerTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
+        $armour = $this->createGameSkill(['name'=>'Armour Crafting','type'=>SkillTypeValue::CRAFTING->value]); $ring = $this->createGameSkill(['name'=>'Ring Crafting','type'=>SkillTypeValue::CRAFTING->value]); $spell = $this->createGameSkill(['name'=>'Spell Crafting','type'=>SkillTypeValue::CRAFTING->value]); $character->skills()->createMany([['game_skill_id'=>$armour->id,'level'=>5],['game_skill_id'=>$ring->id,'level'=>5],['game_skill_id'=>$spell->id,'level'=>5]]);
+        Item::factory()->state(['can_craft'=>true,'skill_level_required'=>0,'cost'=>1])->sequence(['type'=>'body','crafting_type'=>'armour'],['type'=>'leggings','crafting_type'=>'armour'],['type'=>'sleeves','crafting_type'=>'armour'],['type'=>'gloves','crafting_type'=>'armour'],['type'=>'feet','crafting_type'=>'armour'],['type'=>'helmet','crafting_type'=>'armour'],['type'=>'ring','crafting_type'=>'ring'],['type'=>'ring','crafting_type'=>'ring'],['type'=>'spell-damage','crafting_type'=>'spell'],['type'=>'spell-healing','crafting_type'=>'spell'])->count(10)->create();
         $set = InventorySet::factory()->create(['character_id' => $character->id]);
         $this->createItemAffix(['name' => 'Default Plan Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
         $this->createItemAffix(['name' => 'Default Plan Suffix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
@@ -1167,12 +1171,12 @@ class BatchCraftingControllerTest extends TestCase
             'progress' => [
                 'craft_mode' => 'craft_enchant_set',
                 'enchant_plan' => [
-                    'dagger' => ['selected_item_id' => $lowItem->id],
+                    'left_hand' => ['selected_item_id' => $lowItem->id],
                 ],
             ],
         ]);
 
-        $daggerEntry = collect($response->json('cost_breakdown.plan_entries'))->firstWhere('key', 'dagger');
+        $daggerEntry = collect($response->json('cost_breakdown.plan_entries'))->firstWhere('key', 'left_hand');
 
         $this->assertSame($lowItem->id, $daggerEntry['selected_item_id']);
     }
@@ -1234,7 +1238,7 @@ class BatchCraftingControllerTest extends TestCase
         $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
-        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+        $this->assertStringContainsString('may not exceed 0 for the selected destination', $response->json('errors')['progress.craft_amount'][0]);
     }
 
     public function testCraftForExperienceUsesCraftedItemsSetCapacityNotNormalInventory(): void
@@ -1260,7 +1264,7 @@ class BatchCraftingControllerTest extends TestCase
         $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
-        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors')['batch_crafting'][0]);
     }
 
     public function testCraftAndEnchantAmountUsesCraftedItemsSetCapacityNotNormalInventory(): void
@@ -1292,7 +1296,7 @@ class BatchCraftingControllerTest extends TestCase
         $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
-        $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
+        $this->assertStringContainsString('may not exceed 0 for the selected destination', $response->json('errors')['progress.craft_amount'][0]);
     }
 
     public function testCraftAndEnchantForExperienceUsesCraftedItemsSetCapacityNotNormalInventory(): void
@@ -1499,6 +1503,8 @@ class BatchCraftingControllerTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000000, 'inventory_max' => 30]);
+        $armour = $this->createGameSkill(['name'=>'Armour Crafting','type'=>SkillTypeValue::CRAFTING->value]); $ring = $this->createGameSkill(['name'=>'Ring Crafting','type'=>SkillTypeValue::CRAFTING->value]); $spell = $this->createGameSkill(['name'=>'Spell Crafting','type'=>SkillTypeValue::CRAFTING->value]); $character->skills()->createMany([['game_skill_id'=>$armour->id,'level'=>5],['game_skill_id'=>$ring->id,'level'=>5],['game_skill_id'=>$spell->id,'level'=>5]]);
+        Item::factory()->state(['can_craft'=>true,'skill_level_required'=>0,'cost'=>1])->sequence(['type'=>'body','crafting_type'=>'armour'],['type'=>'leggings','crafting_type'=>'armour'],['type'=>'sleeves','crafting_type'=>'armour'],['type'=>'gloves','crafting_type'=>'armour'],['type'=>'feet','crafting_type'=>'armour'],['type'=>'helmet','crafting_type'=>'armour'],['type'=>'ring','crafting_type'=>'ring'],['type'=>'ring','crafting_type'=>'ring'],['type'=>'spell-damage','crafting_type'=>'spell'],['type'=>'spell-healing','crafting_type'=>'spell'])->count(10)->create();
         $prefix = $this->createItemAffix(['name' => 'Start Finalized Keys Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $processor = resolve(BatchCraftingProcessor::class);
         $keys = $processor->craftEnchantSetPlanKeys($processor->craftSetQueue());

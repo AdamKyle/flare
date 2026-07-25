@@ -20,11 +20,13 @@ class WeeklyMonsterFight extends Model
         'monster_id',
         'character_deaths',
         'monster_was_killed',
+        'reward_processed_at',
     ];
 
     protected $casts = [
         'character_deaths' => 'integer',
         'monster_was_killed' => 'boolean',
+        'reward_processed_at' => 'datetime',
     ];
 
     public function character()

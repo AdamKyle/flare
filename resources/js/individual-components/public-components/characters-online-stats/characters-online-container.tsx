@@ -1,4 +1,6 @@
 import React from "react";
+import axios, { AxiosError } from "axios";
+import { handleUnauthenticatedResponse } from "../../../game/lib/ajax/unauthenticated-response-handler";
 import BasicCard from "../../../game/components/ui/cards/basic-card";
 import LoginDurationChart from "./components/login-duration-chart";
 import CharactersOnlineList from "./components/characters-online-list";
@@ -57,24 +59,27 @@ export default class CharactersOnlineContainer extends React.Component<
 
     async fetchSnapshot() {
         try {
-            const response = await fetch("/api/whos-playing-statistics", {
-                headers: {
-                    Accept: "application/json",
+            const response = await axios.get<WhosPlayingSnapshot>(
+                "/api/whos-playing-statistics",
+                {
+                    headers: {
+                        Accept: "application/json",
+                    },
                 },
-            });
+            );
 
-            if (!response.ok) {
-                throw new Error("Public statistics request failed.");
-            }
-
-            const snapshot = await response.json();
+            const snapshot = response.data;
 
             this.setState({
                 snapshot,
                 loading: false,
                 error_message: "",
             });
-        } catch {
+        } catch (error) {
+            if (handleUnauthenticatedResponse(error as AxiosError)) {
+                return;
+            }
+
             this.setState({
                 loading: false,
                 error_message: "Statistics could not be loaded.",

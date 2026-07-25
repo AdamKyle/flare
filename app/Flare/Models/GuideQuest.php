@@ -313,7 +313,7 @@ class GuideQuest extends Model
             return [];
         }
 
-        return collect($this->required_batch_crafted_items)->map(function (array $requirement): ?array {
+        return collect($this->required_batch_crafted_items)->map(function (array $requirement, int $requirementIndex): ?array {
             $item = Item::find($requirement['item_id'] ?? null);
 
             if (is_null($item)) {
@@ -323,7 +323,9 @@ class GuideQuest extends Model
             $source = $requirement['source'] ?? 'inventory';
 
             return [
+                'requirement_index' => $requirementIndex,
                 'source' => $source,
+                'item_id' => $item->id,
                 'name' => $item->name,
                 'type' => $item->type,
                 'type_name' => $source === 'alchemy_bag'

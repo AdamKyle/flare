@@ -1551,6 +1551,75 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $this->assertTrue($displayRows[0]['must_be_enchanted']);
     }
 
+    public function testConfiguredInventoryRowsReturnIndependentCompletionStatusesAndFactualAmounts(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $mace = $this->createItem(['name' => 'Diamond Mace', 'type' => 'mace', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $chest = $this->createItem(['name' => "Paladin's Oath Chest", 'type' => 'body', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedMace = $this->createItem(['name' => 'Diamond Mace', 'type' => 'mace', 'parent_id' => $mace->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $enchantedChest = $this->createItem(['name' => "Paladin's Oath Chest", 'type' => 'body', 'parent_id' => $chest->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+
+        for ($slotIndex = 0; $slotIndex < 24; $slotIndex++) {
+            $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedMace->id]);
+        }
+
+        for ($slotIndex = 0; $slotIndex < 14; $slotIndex++) {
+            $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedChest->id]);
+        }
+
+        $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
+            ['source' => 'inventory', 'item_id' => $mace->id, 'amount' => 20, 'must_be_enchanted' => true],
+            ['source' => 'inventory', 'item_id' => $chest->id, 'amount' => 15, 'must_be_enchanted' => true],
+        ]);
+
+        $this->assertCount(2, $requirements);
+        $this->assertSame(0, $requirements[0]['requirement_index']);
+        $this->assertSame(24, $requirements[0]['current_amount']);
+        $this->assertTrue($requirements[0]['is_complete']);
+        $this->assertSame(1, $requirements[1]['requirement_index']);
+        $this->assertSame(14, $requirements[1]['current_amount']);
+        $this->assertFalse($requirements[1]['is_complete']);
+    }
+
+    public function testMissingConfiguredItemKeepsAnIncompleteStatusBesideACompletedValidStatus(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
+            ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ['source' => 'inventory', 'item_id' => 999999, 'amount' => 1, 'must_be_enchanted' => true],
+        ]);
+
+        $this->assertTrue($requirements[0]['is_complete']);
+        $this->assertSame(999999, $requirements[1]['item_id']);
+        $this->assertSame(0, $requirements[1]['current_amount']);
+        $this->assertFalse($requirements[1]['is_complete']);
+    }
+
+    public function testMixedInventoryAndAlchemyRowsReturnIndependentStatuses(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 3]);
+
+        $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
+            ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 5, 'must_be_enchanted' => true],
+        ]);
+
+        $this->assertSame(1, $requirements[0]['current_amount']);
+        $this->assertTrue($requirements[0]['is_complete']);
+        $this->assertSame(3, $requirements[1]['current_amount']);
+        $this->assertFalse($requirements[1]['must_be_enchanted']);
+        $this->assertFalse($requirements[1]['is_complete']);
+    }
+
     public function testMultipleConfiguredItemRowsPassOnlyWhenAllRowsAreSatisfied(): void
     {
         $character = $this->character->getCharacter();

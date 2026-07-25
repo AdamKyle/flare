@@ -631,7 +631,7 @@ export default function DelveStatusPanel({
                 {status.completed ? (
                     <div className="mt-4">
                         <DangerButton
-                            button_label={"Close"}
+                            button_label={"Dismiss"}
                             on_click={dismissDelve}
                             disabled={dismissing}
                             additional_css={""}

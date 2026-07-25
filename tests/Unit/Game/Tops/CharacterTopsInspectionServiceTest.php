@@ -15,8 +15,10 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\ItemSkill;
 use App\Flare\Models\ItemSocket;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
@@ -25,7 +27,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\Skill;
-use App\Flare\Models\TopsMonthlySnapshot;
+use App\Flare\Models\SetSlot;
 use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
 use App\Game\Tops\Services\CharacterTopsInspectionService;
@@ -227,19 +229,124 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $countPoints = $data['login_count_chart']['series'][0]['points'];
 
         $this->assertSame(1, $countPoints[0]['value']);
-        $this->assertSame(2, end($countPoints)['value']);
+        $this->assertSame(1, end($countPoints)['value']);
     }
 
     public function testActivityLoginDurationChartConvertsSecondsToHours(): void
     {
         $user = User::factory()->create();
         $character = Character::factory()->create(['user_id' => $user->id]);
-        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subDay(), 'last_activity' => now()->subDay(), 'last_heart_beat' => now()->subDay(), 'duration_in_seconds' => 7200]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subDay(), 'logged_out_at' => now()->subDay()->addHours(2), 'last_activity' => now()->subDay(), 'last_heart_beat' => now()->subDay()->addHours(2), 'duration_in_seconds' => 1]);
 
         $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
 
         $this->assertSame('Login Duration (Hours)', $data['login_duration_chart']['series'][0]['label']);
-        $this->assertSame(2.0, $data['login_duration_chart']['series'][0]['points'][0]['value']);
+        $this->assertSame(2.0, round(array_sum(array_column($data['login_duration_chart']['series'][0]['points'], 'value')), 2));
+    }
+
+    public function testActivityLoginCountChartCountsMultipleLoginsInOneBucket(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay()->addHour()->addMinutes(10), 'last_activity' => now()->startOfDay()->addHour()->addMinutes(10), 'last_heart_beat' => now()->startOfDay()->addHour()->addMinutes(10)]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay()->addHour()->addMinutes(20), 'last_activity' => now()->startOfDay()->addHour()->addMinutes(20), 'last_heart_beat' => now()->startOfDay()->addHour()->addMinutes(20)]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame(2, $data['login_count_chart']['series'][0]['points'][0]['value']);
+    }
+
+    public function testActivityOpenLoginDurationUsesLastHeartbeat(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHour()]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame(2.0, round(array_sum(array_column($data['login_duration_chart']['series'][0]['points'], 'value')), 2));
+    }
+
+    public function testActivityInvertedLoginIntervalIsIgnored(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now(), 'logged_out_at' => now()->subHour(), 'last_activity' => now(), 'last_heart_beat' => now()]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame([], $data['login_duration_chart']['series'][0]['points']);
+    }
+
+    public function testActivityOverlappingLoginIntervalsAreMerged(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay(), 'logged_out_at' => now()->startOfDay()->addHours(3), 'last_activity' => now()->startOfDay()->addHours(3), 'last_heart_beat' => now()->startOfDay()->addHours(3)]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay()->addHour(), 'logged_out_at' => now()->startOfDay()->addHours(4), 'last_activity' => now()->startOfDay()->addHours(4), 'last_heart_beat' => now()->startOfDay()->addHours(4)]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame(4.0, round(array_sum(array_column($data['login_duration_chart']['series'][0]['points'], 'value')), 2));
+    }
+
+    public function testActivityLoginIntervalCrossingDayBoundaryIsSplit(): void
+    {
+        $user = User::factory()->create(['created_at' => now()->subDays(2)]);
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay()->subHour(), 'logged_out_at' => now()->startOfDay()->addHour(), 'last_activity' => now()->startOfDay()->addHour(), 'last_heart_beat' => now()->startOfDay()->addHour()]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+        $points = $data['login_duration_chart']['series'][0]['points'];
+        $nonZeroValues = array_values(array_filter(array_column($points, 'value'), fn (float $value): bool => $value > 0));
+
+        $this->assertSame([1.0, 1.0], $nonZeroValues);
+    }
+
+    public function testActivityFullDayLoginDurationIsExactlyTwentyFourHours(): void
+    {
+        $user = User::factory()->create(['created_at' => now()->subDays(2)]);
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay(), 'logged_out_at' => now()->startOfDay()->addDay(), 'last_activity' => now()->startOfDay()->addDay(), 'last_heart_beat' => now()->startOfDay()->addDay()]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+        $points = $data['login_duration_chart']['series'][0]['points'];
+
+        $this->assertSame(24.0, array_sum(array_column($points, 'value')));
+        $this->assertSame(86400, array_sum(array_column($points, 'seconds')));
+    }
+
+    public function testActivityDayEndingOneSecondBeforeBoundaryHas86399Seconds(): void
+    {
+        $user = User::factory()->create(['created_at' => now()->subDays(2)]);
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfDay(), 'logged_out_at' => now()->startOfDay()->addDay()->subSecond(), 'last_activity' => now()->startOfDay()->addDay()->subSecond(), 'last_heart_beat' => now()->startOfDay()->addDay()->subSecond()]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame(86399, array_sum(array_column($data['login_duration_chart']['series'][0]['points'], 'seconds')));
+    }
+
+    public function testActivitySessionEndingAtNextBucketStartsNoFollowingBucketDuration(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfHour(), 'logged_out_at' => now()->startOfHour()->addHour(), 'last_activity' => now()->startOfHour()->addHour(), 'last_heart_beat' => now()->startOfHour()->addHour()]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame([3600], array_column($data['login_duration_chart']['series'][0]['points'], 'seconds'));
+    }
+
+    public function testActivityLoginDurationPointIncludesExactSeconds(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->startOfHour(), 'logged_out_at' => now()->startOfHour()->addSeconds(1234), 'last_activity' => now()->startOfHour()->addSeconds(1234), 'last_heart_beat' => now()->startOfHour()->addSeconds(1234)]);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->activity($character);
+
+        $this->assertSame(1234, $data['login_duration_chart']['series'][0]['points'][0]['seconds']);
     }
 
     public function testQuestsCompletionChartNormalQuestPointsAreCumulative(): void
@@ -491,20 +598,6 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertFalse($data['completed_guide_quests'][0]['viewer_has_unlocked']);
     }
 
-    public function testLeveledUnequippedClassSpecialtyIsCurrentProgress(): void
-    {
-        $user = User::factory()->create();
-        $gameClass = GameClass::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id, 'game_class_id' => $gameClass->id]);
-        CharacterClassRank::factory()->create(['character_id' => $character->id, 'game_class_id' => $gameClass->id, 'level' => 2]);
-        $specialty = GameClassSpecial::factory()->create(['game_class_id' => $gameClass->id, 'name' => 'Stored Flame']);
-        CharacterClassSpecialtiesEquipped::factory()->create(['character_id' => $character->id, 'game_class_special_id' => $specialty->id, 'level' => 3, 'equipped' => false]);
-
-        $data = $this->app->make(CharacterTopsInspectionService::class)->skills($character);
-
-        $this->assertSame('Stored Flame', $data['class_ranks'][0]['unlocked_specialties'][0]['name']);
-    }
-
     public function testQuestDetailPayloadRetainsPublicModalFields(): void
     {
         $owner = User::factory()->create();
@@ -537,48 +630,6 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertStringNotContainsString('private-owner@example.com', $encodedDetails);
         $this->assertStringNotContainsString('hand_in_url', $encodedDetails);
         $this->assertStringNotContainsString('mutation_url', $encodedDetails);
-    }
-
-    public function testKingdomsResourceTotalsChartIncludesRealHistoricalSnapshotPoint(): void
-    {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        TopsMonthlySnapshot::factory()->create([
-            'board_type' => 'kingdoms',
-            'metric_key' => 'kingdom_count',
-            'character_id' => $character->id,
-            'period_start' => now()->subMonthNoOverflow()->startOfMonth()->toDateString(),
-            'period_end' => now()->subMonthNoOverflow()->endOfMonth()->toDateString(),
-            'rank' => 1,
-            'snapshot_data' => [
-                'kingdom_count' => 2,
-                'capital_count' => 1,
-                'total_treasury' => 5000,
-                'total_gold_bars' => 20,
-                'total_current_population' => 300,
-                'total_current_stone' => 100,
-                'total_current_wood' => 200,
-                'total_current_clay' => 300,
-                'total_current_iron' => 400,
-                'total_current_steel' => 500,
-            ],
-        ]);
-
-        $data = $this->app->make(CharacterTopsInspectionService::class)->kingdoms($character);
-        $stoneSeries = collect($data['resource_totals_chart']['series'])->firstWhere('label', 'Stone');
-
-        $this->assertSame(100, $stoneSeries['points'][0]['value']);
-    }
-
-    public function testKingdomsChartsAreEmptyWhenCharacterHasNoSnapshots(): void
-    {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-
-        $data = $this->app->make(CharacterTopsInspectionService::class)->kingdoms($character);
-
-        $this->assertSame([], $data['resource_totals_chart']['series'][0]['points']);
-        $this->assertSame([], $data['kingdom_summary_chart']['series'][0]['points']);
     }
 
     public function testKingdomsTableRowsIncludeResourceFields(): void
@@ -725,6 +776,44 @@ class CharacterTopsInspectionServiceTest extends TestCase
         $this->assertStringNotContainsString('private-gem-owner@example.com', $encodedSockets);
         $this->assertStringNotContainsString('mutation_url', $encodedSockets);
         $this->assertStringNotContainsString('inventory_id', $encodedSockets);
+    }
+
+    public function testEquipmentIncludesArtifactSkillsAndProgressionsForEquippedInventorySetItem(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        $rootSkill = ItemSkill::create(['name' => 'Set Artifact Root', 'description' => 'Root', 'max_level' => 10, 'total_kills_needed' => 10]);
+        $childSkill = ItemSkill::create(['name' => 'Set Artifact Child', 'description' => 'Child', 'max_level' => 10, 'total_kills_needed' => 10, 'parent_id' => $rootSkill->id, 'parent_level_needed' => 1]);
+        $item = Item::factory()->create(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $progression = $item->itemSkillProgressions()->create(['item_skill_id' => $rootSkill->id, 'current_level' => 1, 'current_kill' => 0, 'is_training' => false]);
+        $inventorySet = InventorySet::factory()->create(['character_id' => $character->id, 'is_equipped' => true]);
+        SetSlot::factory()->create(['inventory_set_id' => $inventorySet->id, 'item_id' => $item->id, 'equipped' => true, 'position' => 'artifact']);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->equipment($character);
+
+        $this->assertSame($rootSkill->id, $data['items'][0]['item_skills'][0]['id']);
+        $this->assertSame($childSkill->id, $data['items'][0]['item_skills'][0]['children'][0]['id']);
+        $this->assertSame($progression->id, $data['items'][0]['item_skill_progressions'][0]['id']);
+        $this->assertSame($rootSkill->id, $data['items'][0]['item_skill_progressions'][0]->itemSkill->id);
+    }
+
+    public function testEquipmentIncludesArtifactSkillsAndProgressionsForNormalEquippedInventoryItem(): void
+    {
+        $user = User::factory()->create();
+        $character = Character::factory()->create(['user_id' => $user->id]);
+        $inventory = Inventory::factory()->create(['character_id' => $character->id]);
+        $rootSkill = ItemSkill::create(['name' => 'Inventory Artifact Root', 'description' => 'Root', 'max_level' => 10, 'total_kills_needed' => 10]);
+        $childSkill = ItemSkill::create(['name' => 'Inventory Artifact Child', 'description' => 'Child', 'max_level' => 10, 'total_kills_needed' => 10, 'parent_id' => $rootSkill->id, 'parent_level_needed' => 1]);
+        $item = Item::factory()->create(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $progression = $item->itemSkillProgressions()->create(['item_skill_id' => $rootSkill->id, 'current_level' => 1, 'current_kill' => 0, 'is_training' => false]);
+        InventorySlot::factory()->create(['inventory_id' => $inventory->id, 'item_id' => $item->id, 'equipped' => true, 'position' => 'artifact']);
+
+        $data = $this->app->make(CharacterTopsInspectionService::class)->equipment($character);
+
+        $this->assertSame($rootSkill->id, $data['items'][0]['item_skills'][0]['id']);
+        $this->assertSame($childSkill->id, $data['items'][0]['item_skills'][0]['children'][0]['id']);
+        $this->assertSame($progression->id, $data['items'][0]['item_skill_progressions'][0]['id']);
+        $this->assertSame($rootSkill->id, $data['items'][0]['item_skill_progressions'][0]->itemSkill->id);
     }
 
     public function testQuestItemLocationUsesNestedPublicMapShape(): void

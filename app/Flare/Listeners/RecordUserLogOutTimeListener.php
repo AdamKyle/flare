@@ -24,17 +24,25 @@ class RecordUserLogOutTimeListener
 
         $user = $event->user;
 
-        $foundRecord = UserLoginDuration::where('user_id', $user->id)->latest()->first();
+        $foundRecord = UserLoginDuration::where('user_id', $user->id)
+            ->whereNull('logged_out_at')
+            ->whereNull('duration_in_seconds')
+            ->latest('logged_in_at')
+            ->first();
 
         if (is_null($foundRecord)) {
             return;
         }
 
-        $now = now();
+        $loggedOutAt = now();
+
+        if ($loggedOutAt->lt($foundRecord->logged_in_at)) {
+            $loggedOutAt = $foundRecord->logged_in_at;
+        }
 
         $foundRecord->update([
-            'logged_out_at' => $now,
-            'duration_in_seconds' => $now->diffInSeconds($foundRecord->logged_in_at),
+            'logged_out_at' => $loggedOutAt,
+            'duration_in_seconds' => $foundRecord->logged_in_at->diffInSeconds($loggedOutAt),
             'last_heart_beat' => now(),
             'last_activity' => now(),
         ]);

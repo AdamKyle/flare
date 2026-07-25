@@ -873,6 +873,32 @@ class GuideQuestServiceTest extends TestCase
         $this->assertSame($firstRoot->id, $questDetails['quests'][0]->id);
     }
 
+    public function testFetchQuestReturnsIndependentItemStatusesAndKeepsHandInDisabled(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $mace = $this->createItem(['name' => 'Diamond Mace', 'type' => 'mace', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $chest = $this->createItem(['name' => "Paladin's Oath Chest", 'type' => 'body', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedMace = $this->createItem(['name' => 'Diamond Mace', 'type' => 'mace', 'parent_id' => $mace->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $quest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $mace->id, 'amount' => 2, 'must_be_enchanted' => true],
+                ['source' => 'inventory', 'item_id' => $chest->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedMace->id]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedMace->id]);
+
+        $questDetails = $this->guideQuestService->fetchQuestForCharacter($character->refresh());
+        $completedRequirements = collect($questDetails['completed_requirements'])->firstWhere('quest_id', $quest->id);
+
+        $this->assertTrue($completedRequirements['required_batch_crafted_item_requirements'][0]['is_complete']);
+        $this->assertFalse($completedRequirements['required_batch_crafted_item_requirements'][1]['is_complete']);
+        $this->assertNotContains('required_batch_crafted_items', $completedRequirements['completed_requirements']);
+        $this->assertFalse(collect($questDetails['can_hand_in'])->firstWhere('quest_id', $quest->id)['can_hand_in']);
+    }
+
     public function testFetchNextRegularGuideQuestReturnsIncompleteParentEvenWhenChildCompletedOutOfOrder(): void
     {
         $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();

@@ -19,7 +19,24 @@ export function handleUnauthenticatedResponse(errorOrResponse) {
         return false;
     }
 
-    window.location.reload();
+    if (!reloadStarted) {
+        reloadStarted = true;
+        window.location.reload();
+    }
 
     return true;
+}
+
+let reloadStarted = false;
+
+export async function handleUnauthenticatedAxiosRequest(request) {
+    try {
+        return await request;
+    } catch (error) {
+        if (handleUnauthenticatedResponse(error)) {
+            return await new Promise(() => {});
+        }
+
+        throw error;
+    }
 }

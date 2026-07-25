@@ -420,11 +420,10 @@ class BattleRewardService
     {
         $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
         $payload = $step->payload_json ?? [];
+        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
 
         if (! isset($payload['plan'])) {
-            $payload['plan'] = $this->characterRewardService
-                ->setCharacter($this->character)
-                ->planCurrencies($this->monster, $totalKills);
+            $payload['plan'] = $characterRewardService->planCurrencies($this->monster, $totalKills);
 
             $payload['planned_at'] = now()->toIso8601String();
             $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
@@ -432,10 +431,8 @@ class BattleRewardService
 
         $goldBeforeReward = $this->character->gold;
 
-        DB::transaction(function () use ($step, $payload, $goldBeforeReward): void {
-            $this->earnedCurrencies = $this->characterRewardService
-                ->setCharacter($this->character)
-                ->applyPlannedCurrencies($payload['plan']);
+        DB::transaction(function () use ($step, $payload, $goldBeforeReward, $characterRewardService): void {
+            $this->earnedCurrencies = $characterRewardService->applyPlannedCurrencies($payload['plan']);
 
             $character = $this->character->refresh();
             $goldGained = $character->gold - $goldBeforeReward;

@@ -69,6 +69,13 @@ class BattleEventHandler
      */
     public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
     {
+        $character = Character::find($characterId);
+        $monster = Monster::find($monsterId);
+
+        if (! is_null($character) && ! is_null($monster)) {
+            $this->weeklyBattleService->claimMonsterDeath($character, $monster);
+        }
+
         $sourceType = isset($context['exploration_log_id'])
             ? BattleRewardRequestSourceType::EXPLORATION
             : BattleRewardRequestSourceType::BATTLE;

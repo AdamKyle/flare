@@ -2,6 +2,8 @@ import ItemAtonementDefinition from "./item-atonement-definition";
 import { AppliedStack } from "./holy-definition";
 import AffixDefinition from "./affix-definition";
 import GemBagSlotDetails from "../../../../../../lib/game/character-sheet/types/inventory/gem-bag-slot-details";
+import ItemSkill from "../../../item-skill-management/types/deffinitions/item-skill";
+import ItemSkillProgression from "../../../item-skill-management/types/deffinitions/item-skill-progression";
 
 export interface ItemDefinition {
     id: number;
@@ -45,4 +47,6 @@ export interface ItemDefinition {
     affix: AffixDefinition;
     gem_slots: number;
     sockets: GemBagSlotDetails[];
+    item_skills?: ItemSkill[];
+    item_skill_progressions?: ItemSkillProgression[];
 }

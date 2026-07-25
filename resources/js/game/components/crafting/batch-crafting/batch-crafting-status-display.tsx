@@ -296,7 +296,7 @@ export type BatchCraftingStatus = {
         craft_enchant_set_phase?:
             | "crafting"
             | "enchanting"
-            | "finalizing"
+            | "replacement_crafting"
             | null;
         craft_enchant_set_requested?: number | null;
         craft_enchant_set_prefix_applied_count?: number | null;
@@ -304,7 +304,6 @@ export type BatchCraftingStatus = {
         craft_enchant_set_completed_final_count?: number | null;
         craft_enchant_set_craft_completed_count?: number | null;
         craft_enchant_set_enchant_completed_count?: number | null;
-        craft_enchant_set_finalize_completed_count?: number | null;
         craft_enchant_set_total_work_units?: number | null;
         craft_enchant_set_completed_work_units?: number | null;
         craft_enchant_set_remaining_work_units?: number | null;
@@ -453,37 +452,52 @@ export type BatchCraftingStatus = {
         holy_oil_selected_preview?: {
             items: {
                 item: BatchCraftingItemSnapshot | null;
+                target_slot_id: number;
                 current_stacks: number;
-                max_stacks: number;
-                remaining_capacity: number;
-                gold_dust_cost_per_application: number;
+                planned_applications: number;
+                resulting_stacks: number;
+                maximum_stacks: number;
+                exact_gold_dust_cost: number;
             }[];
-            total_eligible_items: number;
-            total_remaining_applications: number;
             selected_oils_available: number;
+            applications_planned: number;
+            items_affected: number;
+            exact_gold_dust_required: number;
             gold_dust_available: number;
-            total_cost_if_fully_applied: number;
-            max_applications_possible: number;
+            oils_not_applicable: number;
+            unapplied_reason: string | null;
             capped: boolean;
         } | null;
         holy_oil_set_preview?: {
             set_name: string;
             items: {
                 item: BatchCraftingItemSnapshot | null;
+                target_slot_id: number;
                 current_stacks: number;
-                max_stacks: number;
-                remaining_capacity: number;
-                gold_dust_cost_per_application: number;
+                planned_applications: number;
+                resulting_stacks: number;
+                maximum_stacks: number;
+                exact_gold_dust_cost: number;
             }[];
-            total_eligible_items: number;
-            total_remaining_applications: number;
             selected_oils_available: number;
+            applications_planned: number;
+            items_affected: number;
+            exact_gold_dust_required: number;
             gold_dust_available: number;
-            total_cost_if_fully_applied: number;
-            max_applications_possible: number;
+            oils_not_applicable: number;
+            unapplied_reason: string | null;
             capped: boolean;
-            capped_message: string | null;
         } | null;
+        holy_oil_application_results?: {
+            target_slot_id: number;
+            item: BatchCraftingItemSnapshot;
+            initial_stack_count: number;
+            actual_applications_completed: number;
+            actual_resulting_stack_count: number;
+            maximum_stacks: number;
+            actual_gold_dust_spent: number;
+            oil_applications_consumed: number;
+        }[];
         alchemy_amount_preview?: {
             selected_item: BatchCraftingItemSnapshot | null;
             requested_amount: number;
@@ -500,6 +514,17 @@ export type BatchCraftingStatus = {
             bag_remaining: number;
             effective_craftable_amount: number;
             capped: boolean;
+        } | null;
+        int_stop_details?: {
+            character_int: number;
+            required_int: number | null;
+            missing_int: number | null;
+            affixes: {
+                id: number;
+                name: string;
+                type: string;
+                int_required: number;
+            }[];
         } | null;
         retry_state?: {
             active: boolean;
@@ -537,13 +562,8 @@ function formatStatus(value?: string | null): string {
 function actionHistoryStatusLabel(entry: BatchCraftingActionLogEntry): string {
     const disposition = entry.disposition ?? null;
 
-    // Craft+Enchant Amount/Experience attach enchanted_item to the same row as the
-    // disposition; Craft+Enchant Set's finalize row never carries enchanted_item, so
-    // its action_type is the only signal that this row is an enchanted final output.
     const isEnchantedOutput =
-        disposition !== null &&
-        (entry.enchanted_item != null ||
-            entry.action_type === "craft_enchant_set_finalize");
+        disposition !== null && entry.enchanted_item != null;
 
     if (isEnchantedOutput) {
         if (disposition === "keep" || disposition.startsWith("keep_best")) {
@@ -791,8 +811,6 @@ export default class BatchCraftingStatusDisplay extends React.Component<
     BatchCraftingStatusDisplayProps,
     BatchCraftingStatusDisplayState
 > {
-    private continuationInterval: ReturnType<typeof setInterval> | null = null;
-
     public constructor(props: BatchCraftingStatusDisplayProps) {
         super(props);
 
@@ -803,55 +821,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             openSnapshot: null,
             affixDetailsModalAffix: null,
             affixDetailsModalOpen: false,
-            continuationNow: Date.now(),
         };
-    }
-
-    componentDidMount() {
-        this.syncContinuationInterval();
-    }
-
-    componentDidUpdate() {
-        this.syncContinuationInterval();
-    }
-
-    componentWillUnmount() {
-        this.clearContinuationInterval();
-    }
-
-    /**
-     * Starts a one-second interval only while the batch is active and the persisted
-     * continuation state is genuinely waiting on a known next-attempt timestamp;
-     * clears it as soon as any of those stop being true (processing starts, the batch
-     * ends, or next_attempt_at goes away) so it never runs needlessly in the
-     * background.
-     */
-    syncContinuationInterval() {
-        const continuationState = this.props.status.batch?.continuation_state;
-        const shouldRun =
-            (this.props.status.active ?? false) &&
-            continuationState?.active === true &&
-            continuationState?.state === "waiting" &&
-            typeof continuationState?.next_attempt_at === "string";
-
-        if (shouldRun && this.continuationInterval === null) {
-            this.continuationInterval = setInterval(() => {
-                this.setState({ continuationNow: Date.now() });
-            }, 1000);
-
-            return;
-        }
-
-        if (!shouldRun && this.continuationInterval !== null) {
-            this.clearContinuationInterval();
-        }
-    }
-
-    clearContinuationInterval() {
-        if (this.continuationInterval !== null) {
-            clearInterval(this.continuationInterval);
-            this.continuationInterval = null;
-        }
     }
 
     actionLog() {
@@ -1652,7 +1622,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                         additional_css={"w-full md:w-auto"}
                     />
                 )}
-                {onClose ? (
+                {onClose && batch.status === "running" ? (
                     <DangerButton
                         button_label={"Close"}
                         on_click={onClose}
@@ -1698,14 +1668,52 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             return null;
         }
 
+        const details = batch.int_stop_details;
+
         return (
             <WarningAlert additional_css="my-2">
                 <div className="space-y-2">
-                    <p>
-                        Batch crafting stopped because your Intelligence is too
-                        low for the selected enchantment. Raise INT and try
-                        again.
-                    </p>
+                    <h3 className="font-bold">
+                        Batch Crafting stopped: Intelligence too low
+                    </h3>
+                    {details !== null &&
+                    details !== undefined &&
+                    details.required_int !== null &&
+                    details.missing_int !== null &&
+                    details.affixes.length > 0 ? (
+                        <>
+                            <dl className="grid grid-cols-2 gap-2 text-sm">
+                                <dt className="font-semibold">Required INT</dt>
+                                <dd>{details.required_int.toLocaleString()}</dd>
+                                <dt className="font-semibold">Your INT</dt>
+                                <dd>
+                                    {details.character_int.toLocaleString()}
+                                </dd>
+                                <dt className="font-semibold">Missing INT</dt>
+                                <dd>{details.missing_int.toLocaleString()}</dd>
+                            </dl>
+                            <h4 className="font-semibold">
+                                Blocking enchantments
+                            </h4>
+                            <ul className="list-disc space-y-1 pl-5">
+                                {details.affixes.map((affix) => (
+                                    <li key={affix.id}>
+                                        {affix.name} ({affix.type}) requires{" "}
+                                        {affix.int_required.toLocaleString()}{" "}
+                                        INT
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    ) : (
+                        <p>
+                            The exact blocking enchantment details could not be
+                            resolved.
+                        </p>
+                    )}
+                    <h4 className="font-semibold">
+                        Ways to raise Intelligence
+                    </h4>
                     <IntEnchantLinksList />
                 </div>
             </WarningAlert>
@@ -1761,20 +1769,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             return null;
         }
 
-        const { state, message, phase, item, next_attempt_at } =
-            continuationState;
-
-        let secondsRemaining: number | null = null;
-
-        if (state === "waiting" && next_attempt_at) {
-            const nextAttemptTime = new Date(next_attempt_at).getTime();
-            secondsRemaining = Math.max(
-                0,
-                Math.ceil(
-                    (nextAttemptTime - this.state.continuationNow) / 1000,
-                ),
-            );
-        }
+        const { state, message, phase, item } = continuationState;
 
         return (
             <InfoAlert additional_css="text-sm my-2">
@@ -1784,22 +1779,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                             Batch Crafting is processing the next attempt now.
                         </p>
                     ) : null}
-                    {state === "waiting" &&
-                    secondsRemaining !== null &&
-                    secondsRemaining > 0 ? (
-                        <>
-                            {message ? <p>{message}</p> : null}
-                            <p>
-                                Next attempt in: {secondsRemaining}{" "}
-                                {secondsRemaining === 1 ? "second" : "seconds"}.
-                            </p>
-                        </>
-                    ) : null}
-                    {state === "waiting" &&
-                    (secondsRemaining === null || secondsRemaining === 0) ? (
+                    {state === "waiting" ? (
                         <p>
-                            The next attempt is waiting for the Batch Crafting
-                            worker.
+                            {message ??
+                                "The next attempt is waiting for the Batch Crafting worker."}
                         </p>
                     ) : null}
                     {phase ? <p>Current phase: {startCase(phase)}</p> : null}
@@ -2270,26 +2253,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
         const requested = batch.craft_enchant_set_requested ?? 0;
         const completedFinal =
             batch.craft_enchant_set_completed_final_count ?? 0;
-        const craftCompleted =
-            batch.craft_enchant_set_craft_completed_count ?? 0;
-        const enchantCompleted =
-            batch.craft_enchant_set_enchant_completed_count ?? 0;
-        const totalWorkUnits =
-            batch.craft_enchant_set_total_work_units ?? requested * 3;
-        const completedWorkUnits =
-            batch.craft_enchant_set_completed_work_units ?? 0;
-        const remainingWorkUnits =
-            batch.craft_enchant_set_remaining_work_units ??
-            Math.max(0, totalWorkUnits - completedWorkUnits);
-        const overallPercent =
-            batch.craft_enchant_set_overall_percent ??
-            this.completionPercent(completedWorkUnits, totalWorkUnits);
         const item =
             batch.craft_enchant_set_current_item ?? batch.current_item_snapshot;
         const phaseLabels: Record<string, string> = {
             crafting: "Crafting set",
             enchanting: "Enchanting set",
-            finalizing: "Finalizing set",
+            replacement_crafting: "Crafting replacement",
         };
         const phaseLabel = isActive
             ? (phaseLabels[batch.craft_enchant_set_phase ?? ""] ??
@@ -2330,27 +2299,10 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                 )}
 
                 <ProgressBar
-                    label="Overall Pipeline Progress"
-                    current={completedWorkUnits}
-                    max={totalWorkUnits}
-                    percent={overallPercent}
-                    barClassName="bg-orange-600"
-                />
-                <ProgressBar
-                    label="Items Crafted"
-                    current={craftCompleted}
+                    label="Set Items Completed"
+                    current={completedFinal}
                     max={requested}
-                    percent={this.completionPercent(craftCompleted, requested)}
-                    barClassName="bg-orange-600"
-                />
-                <ProgressBar
-                    label="Items Processed Through Enchanting"
-                    current={enchantCompleted}
-                    max={requested}
-                    percent={this.completionPercent(
-                        enchantCompleted,
-                        requested,
-                    )}
+                    percent={this.completionPercent(completedFinal, requested)}
                     barClassName="bg-orange-600"
                 />
 
@@ -2379,8 +2331,6 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     </dd>
                     <dt className="font-semibold">Completed Final Items</dt>
                     <dd>{formatNumber(completedFinal)}</dd>
-                    <dt className="font-semibold">Remaining Work Units</dt>
-                    <dd>{formatNumber(remainingWorkUnits)}</dd>
                     <dt className="font-semibold">Current Item</dt>
                     <dd>{this.renderItem(item)}</dd>
                     <dt className="font-semibold">Current Prefix</dt>
@@ -2503,10 +2453,12 @@ export default class BatchCraftingStatusDisplay extends React.Component<
     renderHolyOilItemsPreviewList(
         items: {
             item: BatchCraftingItemSnapshot | null;
+            target_slot_id: number;
             current_stacks: number;
-            max_stacks: number;
-            remaining_capacity: number;
-            gold_dust_cost_per_application: number;
+            planned_applications: number;
+            resulting_stacks: number;
+            maximum_stacks: number;
+            exact_gold_dust_cost: number;
         }[],
     ) {
         if (items.length === 0) {
@@ -2515,27 +2467,42 @@ export default class BatchCraftingStatusDisplay extends React.Component<
 
         return (
             <ul className="grid gap-2">
-                {items.map((entry, index) => (
-                    <li key={index}>
-                        <dl className="grid grid-cols-2 gap-1 text-xs sm:grid-cols-4">
+                {items.map((entry) => (
+                    <li
+                        key={entry.target_slot_id}
+                        className="rounded border border-gray-300 p-3 dark:border-gray-600"
+                    >
+                        <dl className="grid grid-cols-2 gap-1 text-xs">
                             <dt className="font-semibold">Item</dt>
                             <dd>{this.renderItem(entry.item)}</dd>
                             <dt className="font-semibold">Stacks</dt>
                             <dd>
                                 {formatNumber(entry.current_stacks)} /{" "}
-                                {formatNumber(entry.max_stacks)}
+                                {formatNumber(entry.maximum_stacks)}
                             </dd>
-                            <dt className="font-semibold">Remaining</dt>
-                            <dd>{formatNumber(entry.remaining_capacity)}</dd>
-                            <dt className="font-semibold">
-                                Gold Dust / Application
-                            </dt>
+                            <dt className="font-semibold">Applications</dt>
+                            <dd>{formatNumber(entry.planned_applications)}</dd>
+                            <dt className="font-semibold">Resulting Stacks</dt>
                             <dd>
-                                {formatNumber(
-                                    entry.gold_dust_cost_per_application,
-                                )}
+                                {formatNumber(entry.resulting_stacks)} /{" "}
+                                {formatNumber(entry.maximum_stacks)}
                             </dd>
+                            <dt className="font-semibold">
+                                Exact Gold Dust Cost
+                            </dt>
+                            <dd>{formatNumber(entry.exact_gold_dust_cost)}</dd>
                         </dl>
+                        <div className="mt-3">
+                            <ProgressBar
+                                label="Holy Oil Stacks"
+                                current={entry.resulting_stacks}
+                                max={entry.maximum_stacks}
+                                percent={this.completionPercent(
+                                    entry.resulting_stacks,
+                                    entry.maximum_stacks,
+                                )}
+                            />
+                        </div>
                     </li>
                 ))}
             </ul>
@@ -2555,26 +2522,17 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             <div className="grid gap-3">
                 {this.renderHolyOilItemsPreviewList(preview.items)}
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-                    <dt className="font-semibold">
-                        Total Remaining Applications
-                    </dt>
-                    <dd>
-                        {formatNumber(preview.total_remaining_applications)}
-                    </dd>
-                    <dt className="font-semibold">Selected Oils Available</dt>
-                    <dd>{formatNumber(preview.selected_oils_available)}</dd>
-                    <dt className="font-semibold">Gold Dust Available</dt>
-                    <dd>{formatNumber(preview.gold_dust_available)}</dd>
-                    <dt className="font-semibold">Max Applications Possible</dt>
-                    <dd>{formatNumber(preview.max_applications_possible)}</dd>
+                    <dt className="font-semibold">Applications Planned</dt>
+                    <dd>{formatNumber(preview.applications_planned)}</dd>
+                    <dt className="font-semibold">Items Affected</dt>
+                    <dd>{formatNumber(preview.items_affected)}</dd>
+                    <dt className="font-semibold">Gold Dust Required</dt>
+                    <dd>{formatNumber(preview.exact_gold_dust_required)}</dd>
                 </dl>
                 {preview.capped ? (
                     <WarningAlert>
-                        This can apply{" "}
-                        {formatNumber(preview.max_applications_possible)} of{" "}
-                        {formatNumber(preview.total_remaining_applications)}{" "}
-                        remaining Holy Oil stacks with your current oils and
-                        gold dust.
+                        {formatNumber(preview.oils_not_applicable)} selected
+                        Holy Oils cannot be used. {preview.unapplied_reason}
                     </WarningAlert>
                 ) : null}
             </div>
@@ -2592,22 +2550,97 @@ export default class BatchCraftingStatusDisplay extends React.Component<
             <div className="grid gap-3">
                 {this.renderHolyOilItemsPreviewList(preview.items)}
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-                    <dt className="font-semibold">Total Eligible Items</dt>
-                    <dd>{formatNumber(preview.total_eligible_items)}</dd>
-                    <dt className="font-semibold">
-                        Total Remaining Applications
-                    </dt>
-                    <dd>
-                        {formatNumber(preview.total_remaining_applications)}
-                    </dd>
-                    <dt className="font-semibold">Selected Oils Available</dt>
-                    <dd>{formatNumber(preview.selected_oils_available)}</dd>
-                    <dt className="font-semibold">Max Applications Possible</dt>
-                    <dd>{formatNumber(preview.max_applications_possible)}</dd>
+                    <dt className="font-semibold">Applications Planned</dt>
+                    <dd>{formatNumber(preview.applications_planned)}</dd>
+                    <dt className="font-semibold">Items Affected</dt>
+                    <dd>{formatNumber(preview.items_affected)}</dd>
+                    <dt className="font-semibold">Gold Dust Required</dt>
+                    <dd>{formatNumber(preview.exact_gold_dust_required)}</dd>
                 </dl>
-                {preview.capped && preview.capped_message ? (
-                    <WarningAlert>{preview.capped_message}</WarningAlert>
+                {preview.capped ? (
+                    <WarningAlert>
+                        {formatNumber(preview.oils_not_applicable)} selected
+                        Holy Oils cannot be used. {preview.unapplied_reason}
+                    </WarningAlert>
                 ) : null}
+            </div>
+        );
+    }
+
+    renderHolyOilApplicationResults(
+        batch: NonNullable<BatchCraftingStatus["batch"]>,
+    ) {
+        const results = batch.holy_oil_application_results ?? [];
+
+        if (results.length === 0) {
+            return null;
+        }
+
+        return (
+            <div className="grid gap-3">
+                <h4 className="font-semibold">Holy Oil Results</h4>
+                <ul className="grid gap-2">
+                    {results.map((result) => (
+                        <li
+                            key={result.target_slot_id}
+                            className="rounded border border-gray-300 p-3 dark:border-gray-600"
+                        >
+                            <div className="mb-2 w-full">
+                                {this.renderItem(result.item)}
+                            </div>
+                            <dl className="grid grid-cols-2 gap-1 text-xs">
+                                <dt className="font-semibold">
+                                    Applications Completed
+                                </dt>
+                                <dd>
+                                    {formatNumber(
+                                        result.actual_applications_completed,
+                                    )}
+                                </dd>
+                                <dt className="font-semibold">Actual Stacks</dt>
+                                <dd>
+                                    {formatNumber(
+                                        result.actual_resulting_stack_count,
+                                    )}{" "}
+                                    / {formatNumber(result.maximum_stacks)}
+                                </dd>
+                                <dt className="font-semibold">
+                                    Maximum Stacks
+                                </dt>
+                                <dd>{formatNumber(result.maximum_stacks)}</dd>
+                                <dt className="font-semibold">
+                                    Gold Dust Spent
+                                </dt>
+                                <dd>
+                                    {formatNumber(
+                                        result.actual_gold_dust_spent,
+                                    )}
+                                </dd>
+                                <dt className="font-semibold">
+                                    Oil Applications Consumed
+                                </dt>
+                                <dd>
+                                    {formatNumber(
+                                        result.oil_applications_consumed,
+                                    )}
+                                </dd>
+                            </dl>
+                            <div className="mt-3">
+                                <ProgressBar
+                                    label="Holy Oil Stacks"
+                                    current={
+                                        result.actual_resulting_stack_count
+                                    }
+                                    max={result.maximum_stacks}
+                                    percent={this.completionPercent(
+                                        result.actual_resulting_stack_count,
+                                        result.maximum_stacks,
+                                    )}
+                                />
+                            </div>
+                        </li>
+                    ))}
+                </ul>
             </div>
         );
     }
@@ -2703,7 +2736,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     {this.renderListingValueDtDd(batch)}
                 </dl>
 
-                {this.renderHolyOilsSetPreview(batch)}
+                {this.renderHolyOilApplicationResults(batch)}
 
                 {this.renderCharts(batch)}
                 {this.renderActionHistory(isActive, batch.ended_reason)}
@@ -3346,7 +3379,7 @@ export default class BatchCraftingStatusDisplay extends React.Component<
                     },
                     ...this.listingSummaryRows(batch),
                 ])}
-                {this.renderHolyOilsSelectedPreview(batch)}
+                {this.renderHolyOilApplicationResults(batch)}
                 {this.renderCharts(batch)}
                 {this.renderActionHistory(isActive, batch.ended_reason)}
                 {this.renderActionButtons(isActive, isSaving)}

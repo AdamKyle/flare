@@ -278,7 +278,11 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
             'user_id' => $this->character->user_id,
             'batch_type' => BatchCraftingType::HOLY_OILS->value,
             'started_at' => now(),
-            'progress' => ['tick_delay_seconds' => 60, 'holy_oil_mode' => 'selected'],
+            'progress' => [
+                'tick_delay_seconds' => 60,
+                'holy_oil_mode' => 'selected',
+                'next_attempt_at' => now()->addSeconds(60)->toIso8601String(),
+            ],
         ]);
 
         $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($this->character->refresh());

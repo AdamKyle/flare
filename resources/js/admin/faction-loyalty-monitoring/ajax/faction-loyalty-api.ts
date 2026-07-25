@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleUnauthenticatedAxiosRequest } from "../../../game/lib/ajax/unauthenticated-response-handler";
 import {
     ActiveFactionLoyaltyRunner,
     FactionLoyaltyChartPoint,
@@ -13,8 +14,11 @@ const base = "/api/admin/monitoring/faction-loyalty";
 export async function fetchFactionLoyaltyActive(): Promise<
     ActiveFactionLoyaltyRunner[]
 > {
-    return (await axios.get<ActiveFactionLoyaltyRunner[]>(`${base}/active`))
-        .data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ActiveFactionLoyaltyRunner[]>(`${base}/active`),
+        )
+    ).data;
 }
 
 export async function fetchFactionLoyaltyRuns(
@@ -22,9 +26,11 @@ export async function fetchFactionLoyaltyRuns(
     page: number,
 ): Promise<Paginated<FactionLoyaltyRunRow>> {
     return (
-        await axios.get<Paginated<FactionLoyaltyRunRow>>(`${base}/runs`, {
-            params: { ...filters, page },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<Paginated<FactionLoyaltyRunRow>>(`${base}/runs`, {
+                params: { ...filters, page },
+            }),
+        )
     ).data;
 }
 
@@ -32,9 +38,11 @@ export async function fetchFactionLoyaltySummary(
     days: string,
 ): Promise<FactionLoyaltySummary> {
     return (
-        await axios.get<FactionLoyaltySummary>(`${base}/summary`, {
-            params: { days },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<FactionLoyaltySummary>(`${base}/summary`, {
+                params: { days },
+            }),
+        )
     ).data;
 }
 
@@ -42,8 +50,10 @@ export async function fetchFactionLoyaltyChart(
     days: string,
 ): Promise<FactionLoyaltyChartPoint[]> {
     return (
-        await axios.get<FactionLoyaltyChartPoint[]>(`${base}/chart`, {
-            params: { days },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<FactionLoyaltyChartPoint[]>(`${base}/chart`, {
+                params: { days },
+            }),
+        )
     ).data;
 }

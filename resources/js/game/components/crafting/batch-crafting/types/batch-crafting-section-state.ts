@@ -59,6 +59,8 @@ export default interface BatchCraftingSectionState {
     craftEnchantSetPlan: CraftEnchantSetPlan;
     craftEnchantSetBulkPrefixId: number | null;
     craftEnchantSetBulkSuffixId: number | null;
+    craftEnchantSetAppliedPrefixId: number | null;
+    craftEnchantSetAppliedSuffixId: number | null;
     craftSetPlan: CraftSetPlan;
     preview: BatchCraftingPreview | null;
     previewLoading: boolean;

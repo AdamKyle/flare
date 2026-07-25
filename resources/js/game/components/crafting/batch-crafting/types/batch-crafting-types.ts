@@ -104,13 +104,23 @@ export type CraftEnchantSetPlanEntry = {
     prefixAffixId: number | null;
     suffixAffixId: number | null;
     selectedItemId: number | null;
+    handSelectionType?: HandSelectionType;
+    selectedWeaponType?: string | null;
 };
 
 export type CraftEnchantSetPlan = Record<string, CraftEnchantSetPlanEntry>;
 
 export type CraftSetPlanEntry = {
     selectedItemId: number | null;
+    handSelectionType?: HandSelectionType;
+    selectedWeaponType?: string | null;
 };
+
+export type HandSelectionType =
+    | "single_handed"
+    | "shield"
+    | "two_handed"
+    | null;
 
 export type CraftSetPlan = Record<string, CraftSetPlanEntry>;
 
@@ -118,15 +128,26 @@ export type CraftEnchantSetAvailableItem = {
     id: number;
     name: string;
     cost: number;
+    skill_level_required: number;
+    type: string;
+    handedness: "single_handed" | "two_handed" | "shield" | null;
 };
 
 export type CraftEnchantSetPlanPreviewEntry = {
     key: string;
-    target: { type: string; crafting_type: string };
+    label: string;
+    category: "hand" | "armour" | "ring" | "spell";
+    optional: boolean;
+    included: boolean;
+    target: { type?: string; crafting_type?: string };
+    requested_selected_item_id: number | null;
+    selected_item_available: boolean;
     selected_item_id: number | null;
     selected_item_name: string | null;
     selected_item_cost: number;
     selected_item_details: any | null;
+    selected_item_type: string | null;
+    selected_item_handedness: "single_handed" | "two_handed" | "shield" | null;
     prefix_cost: number;
     suffix_cost: number;
     available_items: CraftEnchantSetAvailableItem[];
@@ -204,32 +225,38 @@ export type AlchemyAmountPreview = {
 
 export type HolyOilPreviewItemEntry = {
     item: BatchCraftingItemPreviewSnapshot | null;
+    full_item_details: any;
+    target_slot_id: number;
     current_stacks: number;
-    max_stacks: number;
-    remaining_capacity: number;
-    gold_dust_cost_per_application: number;
+    planned_applications: number;
+    resulting_stacks: number;
+    maximum_stacks: number;
+    exact_gold_dust_cost: number;
+    oils_consumed: number;
 };
 
 export type HolyOilSelectedPreview = {
     items: HolyOilPreviewItemEntry[];
-    total_eligible_items: number;
-    total_remaining_applications: number;
     selected_oils_available: number;
+    applications_planned: number;
+    items_affected: number;
+    exact_gold_dust_required: number;
     gold_dust_available: number;
-    total_cost_if_fully_applied: number;
-    max_applications_possible: number;
+    oils_not_applicable: number;
+    unapplied_reason: string | null;
     capped: boolean;
 } | null;
 
 export type HolyOilSetPreview = {
     set_name: string;
     items: HolyOilPreviewItemEntry[];
-    total_eligible_items: number;
-    total_remaining_applications: number;
     selected_oils_available: number;
+    applications_planned: number;
+    items_affected: number;
+    exact_gold_dust_required: number;
     gold_dust_available: number;
-    total_cost_if_fully_applied: number;
-    max_applications_possible: number;
+    oils_not_applicable: number;
+    unapplied_reason: string | null;
     capped: boolean;
 } | null;
 
@@ -275,6 +302,8 @@ export type BatchCraftingStartBlocker = {
     blocking: boolean;
     links?: BatchCraftingStartBlockerLink[];
     plan_key?: string;
+    selected_item_id?: number;
+    target_label?: string;
     affix_id?: number;
     affix_name?: string;
     affix_type?: string;
@@ -301,5 +330,6 @@ export type BatchCraftingPreview = {
     holy_oil_selected_preview: HolyOilSelectedPreview;
     holy_oil_set_preview: HolyOilSetPreview;
     destination_capacity: DestinationCapacity;
+    maximum_request_amount: number;
     start_blockers: BatchCraftingStartBlocker[];
 };

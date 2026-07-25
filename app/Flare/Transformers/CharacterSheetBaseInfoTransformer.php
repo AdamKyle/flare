@@ -225,12 +225,21 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             return max(0, now()->diffInSeconds($batchCrafting->ends_at, false));
         }
 
-        if (is_null($batchCrafting->started_at)) {
+        if (($progress['continuation_state'] ?? null) === 'processing') {
             return 0;
         }
 
-        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? 60);
-        $pendingUntil = $batchCrafting->started_at->copy()->addSeconds($tickDelay);
+        $nextAttemptAt = $progress['next_attempt_at'] ?? null;
+
+        if (! is_string($nextAttemptAt) || $nextAttemptAt === '') {
+            return 0;
+        }
+
+        try {
+            $pendingUntil = \Carbon\Carbon::parse($nextAttemptAt);
+        } catch (\Throwable) {
+            return 0;
+        }
 
         return max(0, now()->diffInSeconds($pendingUntil, false));
     }

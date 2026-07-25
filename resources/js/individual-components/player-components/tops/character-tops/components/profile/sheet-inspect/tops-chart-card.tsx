@@ -2,11 +2,13 @@ import React from "react";
 import { AxisOptions, Chart } from "react-charts";
 import BasicCard from "../../../../../../../game/components/ui/cards/basic-card";
 import { formatNumber } from "../../../../../../../game/lib/game/format-number";
+import { formatDuration } from "../../../../shared/helpers/tops-format-value";
 
 export type ChartPoint = {
     label: string;
     value: number;
     date?: string;
+    seconds?: number;
 };
 
 export type ChartSeries = {
@@ -246,7 +248,11 @@ export default class TopsChartCard extends React.Component<
                 series: item.label,
                 label: point.label,
                 value: point.value,
+                seconds: point.seconds,
             })),
+        );
+        const hasExactDurations = rows.some(
+            (row) => typeof row.seconds === "number",
         );
 
         return (
@@ -356,6 +362,11 @@ export default class TopsChartCard extends React.Component<
                                         <th className="border-b border-gray-200 py-2 dark:border-gray-700">
                                             {yLabel}
                                         </th>
+                                        {hasExactDurations ? (
+                                            <th className="border-b border-gray-200 py-2 pl-4 dark:border-gray-700">
+                                                Exact Duration
+                                            </th>
+                                        ) : null}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -374,6 +385,16 @@ export default class TopsChartCard extends React.Component<
                                                     Number(row.value ?? 0),
                                                 )}
                                             </td>
+                                            {hasExactDurations ? (
+                                                <td className="border-b border-gray-100 py-2 pl-4 dark:border-gray-700">
+                                                    {typeof row.seconds ===
+                                                    "number"
+                                                        ? formatDuration(
+                                                              row.seconds,
+                                                          )
+                                                        : "—"}
+                                                </td>
+                                            ) : null}
                                         </tr>
                                     ))}
                                 </tbody>

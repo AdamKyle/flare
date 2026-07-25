@@ -288,17 +288,17 @@ class CharacterTopsApiTest extends TestCase
         $this->assertSame(1, $quests['completion_chart']['series'][1]['points'][0]['value']);
     }
 
-    public function testProfileIncludesKingdomAndAnalyticsChartPayloads(): void
+    public function testProfileExcludesKingdomChartsAndIncludesAnalyticsChartPayloads(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         $response = $this->actingAs($character->user)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
         $data = json_decode($response->getContent(), true);
 
-        $this->assertArrayHasKey('kingdom_summary_chart', $data['kingdoms']);
-        $this->assertArrayHasKey('kingdom_treasury_chart', $data['kingdoms']);
-        $this->assertArrayHasKey('kingdom_gold_bars_chart', $data['kingdoms']);
-        $this->assertArrayHasKey('resource_totals_chart', $data['kingdoms']);
+        $this->assertArrayNotHasKey('kingdom_summary_chart', $data['kingdoms']);
+        $this->assertArrayNotHasKey('kingdom_treasury_chart', $data['kingdoms']);
+        $this->assertArrayNotHasKey('kingdom_gold_bars_chart', $data['kingdoms']);
+        $this->assertArrayNotHasKey('resource_totals_chart', $data['kingdoms']);
         $this->assertArrayNotHasKey('top_kingdoms_chart', $data['kingdoms']);
         $this->assertArrayNotHasKey('map_distribution', $data['kingdoms']);
         $this->assertArrayHasKey('analytics_kills_chart', $data['analytics']);
@@ -372,10 +372,10 @@ class CharacterTopsApiTest extends TestCase
         $this->assertSame(200, $response->getStatusCode(), $response->getContent());
         $this->assertTrue($activePayload['is_active']);
         $this->assertTrue(collect($activePayload['weapon_masteries'])->contains('name', 'Weapon'));
-        $this->assertSame('Focused Strike', $activePayload['equipped_specialties'][0]['name']);
         $this->assertSame('Public Mage', $leveledPayload['class']);
-        $this->assertSame('Stored Flame', $leveledPayload['unlocked_specialties'][0]['name']);
-        $this->assertArrayNotHasKey('equip_url', $activePayload['equipped_specialties'][0]);
+        $this->assertArrayNotHasKey('current_class_skills', $activePayload);
+        $this->assertArrayNotHasKey('equipped_specialties', $activePayload);
+        $this->assertArrayNotHasKey('unlocked_specialties', $leveledPayload);
         $this->assertArrayNotHasKey('train_url', $activePayload);
     }
 

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\ItemSkill;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Values\ItemType;
@@ -133,6 +134,49 @@ class CharacterInventoryControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals($item->name, $jsonData['name']);
+    }
+
+    public function testGetItemDetailsIncludesRootItemSkillWithChildren(): void
+    {
+        $rootSkill = ItemSkill::create(['name' => 'Root Artifact Skill', 'description' => 'Root', 'max_level' => 10, 'total_kills_needed' => 10]);
+        $childSkill = ItemSkill::create(['name' => 'Child Artifact Skill', 'description' => 'Child', 'max_level' => 10, 'total_kills_needed' => 10, 'parent_id' => $rootSkill->id, 'parent_level_needed' => 1]);
+        $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertSame($rootSkill->id, $jsonData['item_skills'][0]['id']);
+        $this->assertSame($childSkill->id, $jsonData['item_skills'][0]['children'][0]['id']);
+    }
+
+    public function testGetItemDetailsIncludesItemSkillProgressionRelation(): void
+    {
+        $rootSkill = ItemSkill::create(['name' => 'Progression Artifact Skill', 'description' => 'Root', 'max_level' => 10, 'total_kills_needed' => 10]);
+        $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $progression = $item->itemSkillProgressions()->create(['item_skill_id' => $rootSkill->id, 'current_level' => 1, 'current_kill' => 0, 'is_training' => false]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertSame($progression->id, $jsonData['item_skill_progressions'][0]['id']);
+        $this->assertSame($rootSkill->id, $jsonData['item_skill_progressions'][0]['item_skill']['id']);
+    }
+
+    public function testGetNonArtifactItemDetailsReturnsEmptySkillArrays(): void
+    {
+        $item = $this->createItem(['type' => 'weapon', 'item_skill_id' => null]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertSame([], $jsonData['item_skills']);
+        $this->assertSame([], $jsonData['item_skill_progressions']);
     }
 
     public function testDestroyItem()

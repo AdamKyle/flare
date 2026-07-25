@@ -14,10 +14,14 @@ import RequiredListItem from "../components/required-list-item";
 import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import GuideQuest from "../components/definitions/guide-quest";
+import {
+    CompletedGuideQuestRequirements,
+    RequiredBatchCraftedItemRequirement,
+} from "./types/guide-quest-state";
 
 interface GuideQuestDetailsProps {
     guide_quest: GuideQuest;
-    completed_requirements: string[] | [];
+    completed_requirements: CompletedGuideQuestRequirements[];
     close_message: () => void;
     success_message: string | null;
     error_message: string | null;
@@ -72,38 +76,45 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                 return [];
             }
 
-            const matchingCompletedRequirements: any =
-                this.props.completed_requirements.filter(
-                    (completedRequirements: any) => {
-                        return (
-                            completedRequirements.quest_id ===
-                            this.props.guide_quest.id
-                        );
-                    },
+            const matchingCompletedRequirements =
+                this.props.completed_requirements.find(
+                    (completedRequirements: CompletedGuideQuestRequirements) =>
+                        completedRequirements.quest_id ===
+                        this.props.guide_quest.id,
                 );
 
             let completedRequirements: string[] = [];
+            let batchCraftedItemRequirements: RequiredBatchCraftedItemRequirement[] =
+                [];
 
-            if (matchingCompletedRequirements.length > 0) {
+            if (matchingCompletedRequirements !== undefined) {
                 completedRequirements =
-                    matchingCompletedRequirements[0].completed_requirements;
+                    matchingCompletedRequirements.completed_requirements;
+                batchCraftedItemRequirements =
+                    matchingCompletedRequirements.required_batch_crafted_item_requirements;
             }
 
             if (key === "required_batch_crafted_items") {
                 (
                     this.props.guide_quest.required_batch_crafted_item_names ??
                     []
-                ).forEach((item: any, index: number) => {
+                ).forEach((item) => {
+                    const itemRequirement = batchCraftedItemRequirements.find(
+                        (requirement) =>
+                            requirement.requirement_index ===
+                                item.requirement_index &&
+                            requirement.item_id === item.item_id,
+                    );
                     const itemLabel =
                         item.source === "alchemy_bag"
-                            ? `Have ${item.amount}x ${item.name} of type ${item.type_name} in your alchemy bag.`
-                            : `Have ${item.amount}x ${item.name} of type ${item.type_name} in your inventory${item.must_be_enchanted ? " with both a prefix and a suffix" : ""}.`;
+                            ? `Have ${item.amount}x ${item.name} of type ${item.type_name} in your alchemy bag. Current: ${itemRequirement?.current_amount ?? 0} / ${item.amount}.`
+                            : `Have ${item.amount}x ${item.name} of type ${item.type_name} in your inventory ${item.must_be_enchanted ? "with both a prefix and a suffix" : "with no prefix or suffix"}. Current: ${itemRequirement?.current_amount ?? 0} / ${item.amount}.`;
 
                     requirementsList.push(
                         <RequiredListItem
-                            key={`${key}-${index}`}
+                            key={`${key}-${item.requirement_index}-${item.item_id}`}
                             label={"Required Item"}
-                            isFinished={completedRequirements.includes(key)}
+                            isFinished={itemRequirement?.is_complete ?? false}
                             requirement={itemLabel}
                         />,
                     );
@@ -113,7 +124,7 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                     <RequiredListItem
                         key={`${key}-consumption`}
                         label={"Item Consumption"}
-                        isFinished={completedRequirements.includes(key)}
+                        isFinished={false}
                         requirement={
                             "These items are consumed when the guide quest is handed in."
                         }

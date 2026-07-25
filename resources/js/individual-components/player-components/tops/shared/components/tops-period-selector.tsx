@@ -2,6 +2,7 @@ import React from "react";
 import Select, { SingleValue } from "react-select";
 import TopsPeriod from "../types/tops-period";
 import TopsPeriodSelectorProps from "../types/tops-period-selector-props";
+import topsSelectStyles from "../styles/tops-select-styles";
 
 export default class TopsPeriodSelector extends React.Component<TopsPeriodSelectorProps> {
     options() {
@@ -34,6 +35,7 @@ export default class TopsPeriodSelector extends React.Component<TopsPeriodSelect
                         option: SingleValue<{ label: string; value: string }>,
                     ) => this.props.onChange(option?.value ?? this.props.value)}
                     aria-label="Select leaderboard period"
+                    styles={topsSelectStyles}
                     menuPortalTarget={document.body}
                 />
             </label>

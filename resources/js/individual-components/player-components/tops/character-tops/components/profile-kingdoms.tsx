@@ -4,8 +4,8 @@ import BasicCard from "../../../../../game/components/ui/cards/basic-card";
 import TopsEmptyState from "../../shared/components/tops-empty-state";
 import { KingdomProfile } from "../types/character-profile";
 import TopsValue from "../../shared/types/tops-value";
-import TopsChartCard from "./profile/sheet-inspect/tops-chart-card";
 import { formatTopsValue } from "../../shared/helpers/tops-format-value";
+import topsSelectStyles from "../../shared/styles/tops-select-styles";
 
 const perPage = 10;
 
@@ -147,8 +147,8 @@ export default class ProfileKingdoms extends React.Component<
         const headers = this.tableHeaders();
 
         return (
-            <div className="overflow-x-auto rounded-sm border border-gray-200 dark:border-gray-700">
-                <table className="w-full min-w-[960px] table-auto border-collapse text-sm">
+            <div className="hidden overflow-x-auto rounded-sm border border-gray-200 dark:border-gray-700 md:block">
+                <table className="w-full table-auto border-collapse text-sm">
                     <thead className="bg-gray-50 dark:bg-gray-900">
                         <tr>
                             {headers.map((header) => (
@@ -175,6 +175,45 @@ export default class ProfileKingdoms extends React.Component<
         );
     }
 
+    renderKingdomCards(rows: Record<string, TopsValue>[]) {
+        return (
+            <div className="grid gap-3 md:hidden">
+                {rows.map((kingdom: Record<string, TopsValue>) => (
+                    <article
+                        key={String(kingdom.id)}
+                        className="rounded-sm border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+                    >
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                            {formatTopsValue(kingdom.name)}
+                        </h3>
+                        <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
+                            {this.tableHeaders()
+                                .slice(1)
+                                .flatMap((header) => [
+                                    <dt
+                                        key={`${header.key}-label`}
+                                        className="font-semibold text-gray-600 dark:text-gray-400"
+                                    >
+                                        {header.label}
+                                    </dt>,
+                                    <dd
+                                        key={`${header.key}-value`}
+                                        className="text-right text-gray-900 dark:text-gray-100"
+                                    >
+                                        {header.key === "is_capital"
+                                            ? kingdom.is_capital
+                                                ? "Yes"
+                                                : "No"
+                                            : `${formatTopsValue(kingdom[header.key])}${header.key === "current_morale" ? "%" : ""}`}
+                                    </dd>,
+                                ])}
+                        </dl>
+                    </article>
+                ))}
+            </div>
+        );
+    }
+
     renderPagination(rows: Record<string, TopsValue>[]) {
         const totalPages = this.totalPages(rows);
 
@@ -186,6 +225,7 @@ export default class ProfileKingdoms extends React.Component<
                 <div className="flex gap-2">
                     <button
                         type="button"
+                        aria-label="Previous kingdom results page"
                         className="rounded-sm border border-gray-300 px-3 py-1 font-semibold disabled:opacity-50 dark:border-gray-600"
                         disabled={this.state.page === 1}
                         onClick={() =>
@@ -198,6 +238,7 @@ export default class ProfileKingdoms extends React.Component<
                     </button>
                     <button
                         type="button"
+                        aria-label="Next kingdom results page"
                         className="rounded-sm border border-gray-300 px-3 py-1 font-semibold disabled:opacity-50 dark:border-gray-600"
                         disabled={this.state.page === totalPages}
                         onClick={() =>
@@ -221,40 +262,6 @@ export default class ProfileKingdoms extends React.Component<
 
         return (
             <section className="space-y-4" aria-label="Kingdoms">
-                <div className="grid gap-4 lg:grid-cols-2">
-                    <TopsChartCard
-                        title="Kingdom Summary"
-                        description="Public kingdom, capital, and population totals over time."
-                        chart={this.props.kingdoms?.kingdom_summary_chart}
-                        xAxisLabel="Date"
-                        yAxisLabel="Count"
-                        timeSeries={true}
-                    />
-                    <TopsChartCard
-                        title="Kingdom Treasury"
-                        description="Public treasury totals across player-owned kingdoms over time."
-                        chart={this.props.kingdoms?.kingdom_treasury_chart}
-                        xAxisLabel="Date"
-                        yAxisLabel="Gold"
-                        timeSeries={true}
-                    />
-                    <TopsChartCard
-                        title="Kingdom Gold Bars"
-                        description="Public gold bar totals across player-owned kingdoms over time."
-                        chart={this.props.kingdoms?.kingdom_gold_bars_chart}
-                        xAxisLabel="Date"
-                        yAxisLabel="Gold Bars"
-                        timeSeries={true}
-                    />
-                </div>
-                <TopsChartCard
-                    title="Resource Totals"
-                    description="Public resource totals across player-owned kingdoms over time."
-                    chart={this.props.kingdoms?.resource_totals_chart}
-                    xAxisLabel="Date"
-                    yAxisLabel="Amount"
-                    timeSeries={true}
-                />
                 <BasicCard>
                     <h2 className="text-xl font-semibold">Kingdoms</h2>
                     <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
@@ -290,6 +297,7 @@ export default class ProfileKingdoms extends React.Component<
                                     })
                                 }
                                 aria-label="Filter kingdoms by plane"
+                                styles={topsSelectStyles}
                                 menuPortalTarget={document.body}
                             />
                         </label>
@@ -298,7 +306,10 @@ export default class ProfileKingdoms extends React.Component<
                         {visibleRows.length === 0 ? (
                             <TopsEmptyState message="No player-owned kingdoms match these filters." />
                         ) : (
-                            this.renderKingdomTable(visibleRows)
+                            <>
+                                {this.renderKingdomCards(visibleRows)}
+                                {this.renderKingdomTable(visibleRows)}
+                            </>
                         )}
                     </div>
                     {this.renderPagination(filteredRows)}

@@ -12,6 +12,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
+use App\Game\BatchCrafting\Services\BatchCraftingProcessor;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
@@ -55,8 +56,8 @@ class BatchCraftingProcessorTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $this->createItem(['name' => 'Processor Selected High Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
-        $lowDagger = $this->createItem(['name' => 'Processor Selected Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $this->createItem(['name' => 'Processor Selected High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
+        $lowDagger = $this->createItem(['name' => 'Processor Selected Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -66,7 +67,7 @@ class BatchCraftingProcessorTest extends TestCase
             'progress' => [
                 'craft_mode' => 'craft_enchant_set',
                 'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'weapon']],
                 'craft_enchant_set_keys' => ['dagger'],
                 'craft_enchant_set_selected_item_ids' => ['dagger' => $lowDagger->id],
                 'enchant_plan' => [],
@@ -74,11 +75,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_crafted_slots' => [],
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
@@ -94,8 +94,8 @@ class BatchCraftingProcessorTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $this->createItem(['name' => 'Processor Fallback High Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
-        $this->createItem(['name' => 'Processor Fallback Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $this->createItem(['name' => 'Processor Fallback High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
+        $this->createItem(['name' => 'Processor Fallback Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -105,7 +105,7 @@ class BatchCraftingProcessorTest extends TestCase
             'progress' => [
                 'craft_mode' => 'craft_enchant_set',
                 'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'weapon']],
                 'craft_enchant_set_keys' => ['dagger'],
                 'craft_enchant_set_selected_item_ids' => [],
                 'enchant_plan' => [],
@@ -113,11 +113,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_crafted_slots' => [],
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
@@ -154,11 +153,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
 
@@ -197,10 +195,9 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
@@ -241,18 +238,17 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 18,
+                'craft_enchant_set_total_work_units' => 6,
                 'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
 
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
-        $this->assertSame(6, $result->progress['craft_enchant_set_craft_index']);
-        $this->assertSame(6, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_craft_index']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
     }
 
     public function testCraftEnchantSetEnchantPhaseAttemptNotMadeWhenGoldInsufficientDoesNotAdvanceIndexOrWorkUnits(): void
@@ -280,18 +276,17 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
 
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
         $this->assertSame(0, $result->progress['craft_enchant_set_enchant_index']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
     }
 
     public function testCraftEnchantSetEnchantPhaseSuccessfulCompletionAdvancesIndexAndWorkUnitsByOneNotTwo(): void
@@ -327,18 +322,17 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 6,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 18,
-                'craft_enchant_set_completed_work_units' => 6,
+                'craft_enchant_set_total_work_units' => 6,
+                'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
 
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
-        $this->assertSame(6, $result->progress['craft_enchant_set_enchant_index']);
-        $this->assertSame(12, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(3, $result->progress['craft_enchant_set_enchant_index']);
+        $this->assertSame(3, $result->progress['craft_enchant_set_completed_work_units']);
     }
 
     public function testCraftEnchantSetEnchantPhaseShatteredItemDoesNotAdvanceIndexDecreasesSurvivingCountAndSwitchesToReplacementCrafting(): void
@@ -379,11 +373,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 6,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 18,
-                'craft_enchant_set_completed_work_units' => 6,
+                'craft_enchant_set_total_work_units' => 6,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 6,
                 'craft_enchant_set_counted_crafted_keys' => $keys,
                 'craft_enchant_set_replacement_key' => null,
@@ -398,84 +391,6 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame('a', $result->progress['craft_enchant_set_replacement_key']);
         $destroyedAction = collect($result->action_log)->first(fn (array $entry) => ($entry['action_type'] ?? null) === 'craft_enchant_set_enchant' && ($entry['status'] ?? null) === 'destroyed');
         $this->assertNotNull($destroyedAction);
-    }
-
-    public function testCraftEnchantSetFinalizePhaseValidItemAdvancesIndexIncrementsWorkUnitsAndFinalCount(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Finalize Valid Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'Finalize Valid Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'item_prefix_id' => $prefix->id]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(1, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(3, $result->progress['craft_enchant_set_completed_work_units']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_final_count']);
-    }
-
-    public function testCraftEnchantSetFinalizePhaseNullItemDoesNotAdvanceAndEndsFailed(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Finalize Null Item Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => null],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(2, $result->progress['craft_enchant_set_completed_work_units']);
-        $this->assertSame(0, $result->progress['craft_enchant_set_completed_final_count']);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
     }
 
     public function testCraftEnchantSetThreeEntryFixtureReachesFullWorkUnitCompletion(): void
@@ -513,11 +428,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
                 'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 9,
+                'craft_enchant_set_total_work_units' => 3,
                 'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
@@ -528,8 +442,8 @@ class BatchCraftingProcessorTest extends TestCase
         $totalWorkUnits = $batchCrafting->progress['craft_enchant_set_total_work_units'];
         $completedWorkUnits = $batchCrafting->progress['craft_enchant_set_completed_work_units'];
 
-        $this->assertSame(9, $totalWorkUnits);
-        $this->assertSame(9, $completedWorkUnits);
+        $this->assertSame(3, $totalWorkUnits);
+        $this->assertSame(3, $completedWorkUnits);
         $this->assertSame(0, max(0, $totalWorkUnits - $completedWorkUnits));
     }
 
@@ -565,11 +479,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
             ],
         ]);
 
@@ -583,6 +496,13 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function testCraftAndEnchantForExperienceResolvesExactIntendedAutoAffixAndStopsWhenItRequiresTooMuchInt(): void
     {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(400);
+            })
+        );
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
@@ -600,6 +520,32 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING->value, $result->ended_reason);
         $this->assertSame(1, $result->crafted_count);
+    }
+
+    public function testCraftAndEnchantForExperiencePersistsAndReturnsExactAutomaticallyResolvedIntStopAffixes(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
+        $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
+        $this->createItem(['name' => 'Exact Auto INT Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $prefix = $this->createItemAffix(['name' => 'Exact Auto INT Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 240, 'skill_level_required' => 10, 'skill_level_trivial' => 400]);
+        $suffix = $this->createItemAffix(['name' => 'Exact Auto INT Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 225, 'skill_level_required' => 10, 'skill_level_trivial' => 400]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingProcessor::class)->processOneTick($batchCrafting, $character);
+        $progress = $batchCrafting->refresh()->progress;
+
+        $this->assertSame(BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING, $result['end_reason']);
+        $this->assertSame([$prefix->id, $suffix->id], $result['int_stop_affix_ids']);
+        $this->assertSame($prefix->id, $progress['craft_experience_current_prefix_affix']['id'] ?? null);
+        $this->assertSame($suffix->id, $progress['craft_experience_current_suffix_affix']['id'] ?? null);
     }
 
     public function testCraftAndEnchantForExperienceDoesNotFallBackToLowerIntAffixWhenHighestEligibleAffixIsTooHigh(): void
@@ -728,6 +674,92 @@ class BatchCraftingProcessorTest extends TestCase
         $craftAction = collect($result->action_log)->first(fn (array $entry) => ($entry['action_type'] ?? null) === 'craft_set');
 
         $this->assertSame('Craft Set Selected Low Dagger', $craftAction['crafted_item']['name'] ?? null);
+    }
+
+    public function testCraftSetProcessorStopsWithoutFallbackWhenPersistedSelectedItemIsUnavailable(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $fallbackDagger = $this->createItem(['name' => 'Craft Set Forbidden Fallback Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
+        $selectedDagger = $this->createItem(['name' => 'Craft Set Unavailable Selected Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $selectedItemId = $selectedDagger->id;
+        $selectedDagger->delete();
+        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_set',
+                'output_destination' => 'crafted_items_set',
+                'craft_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_set_keys' => ['left_hand'],
+                'craft_set_selected_item_ids' => ['left_hand' => $selectedItemId],
+                'craft_set_index' => 0,
+                'craft_set_requested' => 2,
+                'craft_set_completed' => 1,
+                'craft_set_current_item' => ['name' => 'Earlier Completed Item'],
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $stoppedAction = collect($result->action_log)->first(fn (array $entry) => ($entry['action_type'] ?? null) === 'craft_set');
+
+        $this->assertSame(BatchCraftingEndReason::MAXED_OR_NOTHING_LEFT->value, $result->ended_reason);
+        $this->assertSame('Batch Crafting stopped because the selected item for Left Hand is no longer available or craftable.', $result->progress['invalid_plan_message'] ?? null);
+        $this->assertSame('left_hand', $stoppedAction['plan_key'] ?? null);
+        $this->assertSame('Left Hand', $stoppedAction['target_label'] ?? null);
+        $this->assertSame(0, $result->progress['craft_set_index'] ?? null);
+        $this->assertSame(1, $result->progress['craft_set_completed'] ?? null);
+        $this->assertSame('Earlier Completed Item', $result->progress['craft_set_current_item']['name'] ?? null);
+        $this->assertSame(0, $result->crafted_count);
+        $this->assertSame(0, $result->kept_count);
+        $this->assertNull($stoppedAction['disposition'] ?? null);
+        $this->assertSame(0, $outputSet->refresh()->slots()->count());
+        $this->assertFalse(collect($result->action_log)->contains(fn (array $entry) => ($entry['crafted_item']['name'] ?? null) === $fallbackDagger->name));
+    }
+
+    public function testCraftSetProcessorResolvesTheSameSelectedItemForBothHandKeys(): void
+    {
+        $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $dagger = $this->createItem(['name' => 'Shared Hand Selection Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'craft_set',
+                'output_destination' => 'crafted_items_set',
+                'craft_set_queue' => [
+                    ['type' => 'dagger', 'crafting_type' => 'dagger'],
+                    ['type' => 'dagger', 'crafting_type' => 'dagger'],
+                ],
+                'craft_set_keys' => ['left_hand', 'right_hand'],
+                'craft_set_selected_item_ids' => [
+                    'left_hand' => $dagger->id,
+                    'right_hand' => $dagger->id,
+                ],
+                'craft_set_index' => 0,
+                'craft_set_requested' => 2,
+                'craft_set_completed' => 0,
+            ],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $craftActions = collect($result->action_log)->filter(fn (array $entry) => ($entry['action_type'] ?? null) === 'craft_set');
+
+        $this->assertCount(2, $craftActions);
+        $this->assertTrue($craftActions->every(fn (array $entry) => ($entry['crafted_item']['name'] ?? null) === $dagger->name));
+        $this->assertSame(2, $result->progress['craft_set_index'] ?? null);
+        $this->assertSame(2, $result->progress['craft_set_completed'] ?? null);
     }
 
     public function testCraftAndEnchantForExperienceProcessesAtMostSixWorkflowsPerTick(): void
@@ -1218,7 +1250,7 @@ class BatchCraftingProcessorTest extends TestCase
         });
     }
 
-    public function testAlchemyUseNowEmitsAggregateUsedAndKeptMessageWhenTenBoonCapIsReachedMidTick(): void
+    public function testAlchemyUseNowEmitsPerOperationMessagesWhenTenBoonCapIsReached(): void
     {
         Event::fake([ServerMessageEvent::class]);
         Bus::fake([CharacterBoonJob::class]);
@@ -1264,7 +1296,10 @@ class BatchCraftingProcessorTest extends TestCase
         resolve(BatchCraftingService::class)->process($batchCrafting);
 
         Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
-            return $event->message === 'Used 1 Cap Test Boon Item boon on you. Kept 2 extra Cap Test Boon Item in your Alchemy Bag.';
+            return $event->message === 'Used 1 Cap Test Boon Item boon on you.';
+        });
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return $event->message === 'Kept 1 Cap Test Boon Item in your Alchemy Bag because it could not be used on you right now.';
         });
         $this->assertSame(2, AlchemyBagSlot::where('character_id', $character->id)->where('item_id', $item->id)->value('amount'));
     }
@@ -1499,11 +1534,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
                 'craft_enchant_set_replacement_key' => null,
@@ -1548,10 +1582,9 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'replacement_crafting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_replacement_key' => 'dagger',
@@ -1591,10 +1624,9 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'replacement_crafting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_replacement_key' => 'dagger',
@@ -1622,6 +1654,8 @@ class BatchCraftingProcessorTest extends TestCase
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Shatter Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
+        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Shatter Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
             SkillCheckService::class,
@@ -1646,6 +1680,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_phase' => 'enchant',
                 'craft_enchant_index' => 0,
                 'pending_enchant_item_id' => $item->id,
+                'pending_enchant_destination' => ['destination' => 'crafted_items_set', 'destination_label' => InventorySet::BATCH_CRAFTING_SET_NAME, 'slot_id' => null, 'set_slot_id' => $outputSlot->id],
                 'craft_enchant_specific_surviving_crafted_count' => 1,
             ],
         ]);
@@ -1666,6 +1701,8 @@ class BatchCraftingProcessorTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Partial Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
+        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Partial Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $suffix = $this->createItemAffix(['name' => 'Amount Partial Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $item->update(['item_prefix_id' => $prefix->id]);
@@ -1694,6 +1731,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_phase' => 'enchant',
                 'craft_enchant_index' => 0,
                 'pending_enchant_item_id' => $item->id,
+                'pending_enchant_destination' => ['destination' => 'crafted_items_set', 'destination_label' => InventorySet::BATCH_CRAFTING_SET_NAME, 'slot_id' => null, 'set_slot_id' => $outputSlot->id],
                 'craft_enchant_specific_surviving_crafted_count' => 1,
             ],
         ]);
@@ -1850,47 +1888,6 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame('enchant', $result->progress['craft_enchant_phase'] ?? null);
     }
 
-    public function testCraftAndEnchantSetFinalizeWithInventorySetDestinationIsNotBlockedByFullCraftedItemsSet(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Finalize Inventory Set Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'Finalize Inventory Set Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
-        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 5]);
-        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::KEEP->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'output_destination' => 'inventory_set',
-                'output_set_id' => $outputSet->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(1, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_final_count']);
-        $this->assertSame(1, SetSlot::where('inventory_set_id', $outputSet->id)->where('item_id', $item->id)->count());
-    }
-
     public function testCraftAmountWithCraftedItemsSetDestinationRemainsBlockedWhenFull(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
@@ -1978,50 +1975,6 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame(0, $result->progress['craft_specific_count'] ?? 0);
     }
 
-    public function testCraftAndEnchantSetFinalizeCommitFailureDoesNotAdvanceProgressWhenOutputSetBecameEquipped(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Commit Failure Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'Commit Failure Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
-        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 5]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::KEEP->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'output_destination' => 'inventory_set',
-                'output_set_id' => $outputSet->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $outputSet->update(['is_equipped' => true]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(BatchCraftingEndReason::CRAFT_ENCHANT_SET_TARGET_SET_CHANGED->value, $result->ended_reason);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(0, $result->progress['craft_enchant_set_completed_final_count']);
-        $this->assertSame(2, $result->progress['craft_enchant_set_completed_work_units']);
-        $this->assertFalse(Item::where('id', $item->id)->exists());
-    }
-
     public function testCraftAndEnchantAmountEnchantNotAttemptedKeepsPendingItemAndPhase(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
@@ -2063,6 +2016,8 @@ class BatchCraftingProcessorTest extends TestCase
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Exact Success Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
+        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Exact Success Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
             EnchantingService::class,
@@ -2090,6 +2045,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_phase' => 'enchant',
                 'craft_enchant_index' => 0,
                 'pending_enchant_item_id' => $item->id,
+                'pending_enchant_destination' => ['destination' => 'crafted_items_set', 'destination_label' => InventorySet::BATCH_CRAFTING_SET_NAME, 'slot_id' => null, 'set_slot_id' => $outputSlot->id],
                 'craft_enchant_specific_surviving_crafted_count' => 1,
             ],
         ]);
@@ -2112,6 +2068,8 @@ class BatchCraftingProcessorTest extends TestCase
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 1]);
         $item = $this->createItem(['name' => 'Amount Int Too Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
+        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Int Too Low Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 999, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -2127,6 +2085,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_phase' => 'enchant',
                 'craft_enchant_index' => 0,
                 'pending_enchant_item_id' => $item->id,
+                'pending_enchant_destination' => ['destination' => 'crafted_items_set', 'destination_label' => InventorySet::BATCH_CRAFTING_SET_NAME, 'slot_id' => null, 'set_slot_id' => $outputSlot->id],
                 'craft_enchant_specific_surviving_crafted_count' => 1,
             ],
         ]);
@@ -2191,11 +2150,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
             ],
@@ -2232,11 +2190,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
             ],
@@ -2274,11 +2231,10 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
                 'craft_enchant_set_prefix_applied_count' => 0,
                 'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
             ],
         ]);
@@ -2287,128 +2243,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
         $this->assertSame(0, $result->progress['craft_enchant_set_enchant_index']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_work_units']);
-    }
-
-    public function testCraftEnchantSetFinalizePrefixOnlyWhenBothRequiredEndsFailedWithoutCommitting(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Finalize Prefix Only Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $suffix = $this->createItemAffix(['name' => 'Finalize Prefix Only Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'Finalize Prefix Only Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(0, $result->progress['craft_enchant_set_completed_final_count']);
-        $this->assertSame(2, $result->progress['craft_enchant_set_completed_work_units']);
-        $this->assertFalse(Item::where('id', $item->id)->exists());
-    }
-
-    public function testCraftEnchantSetFinalizeBothExactAffixesCommitsAndAdvancesOnce(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Finalize Both Exact Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $suffix = $this->createItemAffix(['name' => 'Finalize Both Exact Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'Finalize Both Exact Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::KEEP->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(1, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_final_count']);
-        $setSlot = SetSlot::whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id)->where('special_type', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE))->where('item_id', $item->id)->first();
-        $this->assertNotNull($setSlot);
-    }
-
-    public function testCraftEnchantSetDoesNotReportCompleteWhileAPlannedKeyLacksASurvivingItem(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Incomplete Set Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => null],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_prefix_applied_count' => 0,
-                'craft_enchant_set_suffix_applied_count' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertNotSame(BatchCraftingEndReason::CRAFT_ENCHANT_SET_COMPLETE->value, $result->ended_reason);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
     }
 
     public function testCraftAmountCommitFailsWhenItemModelIsMissing(): void
@@ -2421,11 +2256,7 @@ class BatchCraftingProcessorTest extends TestCase
             CraftingService::class,
             Mockery::mock(CraftingService::class, function ($mock) use ($item) {
                 $mock->shouldReceive('fetchCraftableItems')->andReturn(Item::whereIn('id', [$item->id])->get());
-                $mock->shouldReceive('craftForBatch')->andReturnUsing(function ($character, $craftedItem) {
-                    Item::where('id', $craftedItem->id)->delete();
-
-                    return ['success' => true, 'item' => $craftedItem, 'reason' => null];
-                });
+                $mock->shouldReceive('craftForBatch')->andThrow(new \RuntimeException('Atomic destination creation failed.'));
             })
         );
         $batchCrafting = $this->createBatchCrafting([
@@ -2440,8 +2271,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
         $this->assertSame(0, $result->progress['craft_specific_count'] ?? 0);
-        $failedAction = collect($result->action_log)->first(fn (array $entry) => ($entry['failure'] ?? null) === 'The retained Batch Crafting item could not be found and was not committed.');
-        $this->assertNotNull($failedAction);
+        $this->assertSame('failed', $result->action_log[0]['status'] ?? null);
     }
 
     public function testCraftAmountCraftedItemsSetNonSetFullFailureReturnsFalseAndDoesNotAdvance(): void
@@ -2469,8 +2299,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
         $this->assertSame(0, $result->progress['craft_specific_count'] ?? 0);
-        $failedAction = collect($result->action_log)->first(fn (array $entry) => str_contains($entry['failure'] ?? '', 'Could not create item in Crafted Items Set'));
-        $this->assertNotNull($failedAction);
+        $this->assertSame('failed', $result->action_log[0]['status'] ?? null);
     }
 
     public function testCraftAmountInventoryCommitCreatesExactlyOneSlotOnSuccess(): void
@@ -2535,7 +2364,7 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame(1, SetSlot::where('inventory_set_id', $craftedItemsSet->id)->where('item_id', $item->id)->count());
     }
 
-    public function testCraftAndEnchantAmountCommitFailureDoesNotAdvanceAndLeavesNoOrphanItem(): void
+    public function testCraftAndEnchantAmountMissingRetainedDestinationFailsAndCleansOrphanItem(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
@@ -2581,11 +2410,12 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame(0, $result->progress['craft_enchant_specific_count'] ?? 0);
         $this->assertSame(0, $result->progress['craft_enchant_index'] ?? 0);
         $this->assertSame(0, SetSlot::where('inventory_set_id', $outputSet->id)->count());
-        $this->assertSame(BatchCraftingEndReason::CRAFT_SET_FULL->value, $result->ended_reason);
-        $this->assertSame($item->id, $result->progress['pending_enchant_item_id'] ?? null);
+        $this->assertNull($result->progress['pending_enchant_item_id'] ?? null);
+        $this->assertSame('craft', $result->progress['craft_enchant_phase'] ?? null);
+        $this->assertFalse(Item::where('id', $item->id)->exists());
     }
 
-    public function testCraftAndEnchantAmountInventoryDestinationCommitFailsWhenInventoryFull(): void
+    public function testCraftAndEnchantAmountCannotAssignInventoryDestinationAfterCraftingReturns(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
@@ -2628,321 +2458,9 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame(0, $result->progress['craft_enchant_specific_count'] ?? 0);
         $this->assertSame(0, $result->progress['craft_enchant_index'] ?? 0);
         $this->assertSame(0, InventorySlot::where('inventory_id', $character->inventory->id)->where('item_id', $item->id)->count());
-        $this->assertSame(BatchCraftingEndReason::NO_INVENTORY_SPACE->value, $result->ended_reason);
-        $this->assertSame($item->id, $result->progress['pending_enchant_item_id'] ?? null);
-    }
-
-    public function testCraftEnchantSetFinalizeCommitFailureDoesNotAdvanceOrLeaveOrphanItem(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'Finalize Orphan Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $suffix = $this->createItemAffix(['name' => 'Finalize Orphan Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'Finalize Orphan Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
-        $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 0]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::KEEP->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'output_destination' => 'inventory_set',
-                'output_set_id' => $outputSet->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id]],
-                'craft_enchant_set_finalized_keys' => [],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(0, $result->progress['craft_enchant_set_completed_final_count']);
-        $this->assertSame([], $result->progress['craft_enchant_set_finalized_keys'] ?? []);
-        $this->assertSame(BatchCraftingEndReason::CRAFT_SET_FULL->value, $result->ended_reason);
+        $this->assertNull($result->progress['pending_enchant_item_id'] ?? null);
+        $this->assertSame('craft', $result->progress['craft_enchant_phase'] ?? null);
         $this->assertFalse(Item::where('id', $item->id)->exists());
-    }
-
-    public function testCraftEnchantSetFinalizeSuccessAppendsExactPlanKey(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'FK Append Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'FK Append Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_finalized_keys' => [],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(['dagger'], $result->progress['craft_enchant_set_finalized_keys'] ?? null);
-    }
-
-    public function testCraftEnchantSetFinalizeNullItemDoesNotAppendFinalizedKey(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'FK Null Item Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => null],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_finalized_keys' => [],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame([], $result->progress['craft_enchant_set_finalized_keys'] ?? []);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-    }
-
-    public function testCraftEnchantSetFinalizeMissingItemDoesNotAppendFinalizedKey(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'FK Missing Item Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => 999999999],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => null]],
-                'craft_enchant_set_finalized_keys' => [],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame([], $result->progress['craft_enchant_set_finalized_keys'] ?? []);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-    }
-
-    public function testCraftEnchantSetFinalizePartialAffixDoesNotAppendFinalizedKey(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $prefix = $this->createItemAffix(['name' => 'FK Partial Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $suffix = $this->createItemAffix(['name' => 'FK Partial Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $item = $this->createItem(['name' => 'FK Partial Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'item_prefix_id' => $prefix->id]);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => ['dagger' => ['prefix_affix_id' => $prefix->id, 'suffix_affix_id' => $suffix->id]],
-                'craft_enchant_set_finalized_keys' => [],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame([], $result->progress['craft_enchant_set_finalized_keys'] ?? []);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-    }
-
-    public function testCraftEnchantSetFinalizeInvalidAffixPlanDoesNotAppendFinalizedKey(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $item = $this->createItem(['name' => 'FK Invalid Plan Item', 'type' => 'dagger', 'crafting_type' => 'weapon']);
-        $set = $this->createInventorySet(['character_id' => $character->id]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'selected_set_id' => $set->id,
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_crafted_item_ids' => ['dagger' => $item->id],
-                'enchant_plan' => [],
-                'craft_enchant_set_finalized_keys' => [],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_craft_index' => 1,
-                'craft_enchant_set_enchant_index' => 1,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_completed_final_count' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 2,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame([], $result->progress['craft_enchant_set_finalized_keys'] ?? []);
-        $this->assertSame(0, $result->progress['craft_enchant_set_finalize_index']);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-    }
-
-    public function testCraftEnchantSetReportsCompleteWhenEveryExpectedKeyIsFinalized(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_finalized_keys' => ['dagger'],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_finalize_index' => 1,
-                'craft_enchant_set_completed_final_count' => 1,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 3,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertSame(BatchCraftingEndReason::CRAFT_ENCHANT_SET_COMPLETE->value, $result->ended_reason);
-    }
-
-    public function testCraftEnchantSetWithOneMissingFinalizedKeyReturnsFailedInsteadOfComplete(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger'], ['type' => 'sword', 'crafting_type' => 'sword']],
-                'craft_enchant_set_keys' => ['dagger', 'sword'],
-                'craft_enchant_set_finalized_keys' => ['dagger'],
-                'craft_enchant_set_requested' => 2,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_finalize_index' => 2,
-                'craft_enchant_set_completed_final_count' => 1,
-                'craft_enchant_set_total_work_units' => 6,
-                'craft_enchant_set_completed_work_units' => 6,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertNotSame(BatchCraftingEndReason::CRAFT_ENCHANT_SET_COMPLETE->value, $result->ended_reason);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
-    }
-
-    public function testCraftEnchantSetLegacyProgressWithoutFinalizedKeysDoesNotReportCompleteFromIndexAlone(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $character->update(['gold' => 1000, 'inventory_max' => 30]);
-        $batchCrafting = $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
-            'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => [
-                'craft_mode' => 'craft_enchant_set',
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
-                'craft_enchant_set_keys' => ['dagger'],
-                'craft_enchant_set_requested' => 1,
-                'craft_enchant_set_phase' => 'finalizing',
-                'craft_enchant_set_finalize_index' => 1,
-                'craft_enchant_set_completed_final_count' => 1,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 3,
-            ],
-        ]);
-
-        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
-
-        $this->assertNotSame(BatchCraftingEndReason::CRAFT_ENCHANT_SET_COMPLETE->value, $result->ended_reason);
-        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
     }
 
     public function testCraftEnchantSetReplacementSuccessRemovesLostKeyAndRestoresProgressOnce(): void
@@ -2950,7 +2468,7 @@ class BatchCraftingProcessorTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
-        $replacementItem = $this->createItem(['name' => 'Lost Key Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $replacementItem = $this->createItem(['name' => 'Lost Key Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -2960,7 +2478,7 @@ class BatchCraftingProcessorTest extends TestCase
             'progress' => [
                 'craft_mode' => 'craft_enchant_set',
                 'output_destination' => 'crafted_items_set',
-                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'dagger']],
+                'craft_enchant_set_queue' => [['type' => 'dagger', 'crafting_type' => 'weapon']],
                 'craft_enchant_set_keys' => ['dagger'],
                 'craft_enchant_set_selected_item_ids' => ['dagger' => $replacementItem->id],
                 'craft_enchant_set_crafted_item_ids' => ['dagger' => null],
@@ -2970,8 +2488,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'replacement_crafting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_replacement_key' => 'dagger',
@@ -2982,7 +2499,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertNotContains('dagger', $result->progress['craft_enchant_set_lost_item_keys'] ?? []);
         $this->assertSame(1, $result->progress['craft_enchant_set_surviving_crafted_count']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
         $this->assertSame(0, $result->progress['craft_enchant_set_enchant_index']);
         $this->assertNull($result->progress['craft_enchant_set_replacement_key']);
     }
@@ -3079,8 +2596,8 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
         $this->assertSame(0, $result->kept_count);
-        $keepAction = collect($result->action_log)->first(fn (array $entry) => str_contains($entry['failure'] ?? '', 'Could not create item in Crafted Items Set'));
-        $this->assertNotNull($keepAction);
+        $keepAction = $result->action_log[0] ?? [];
+        $this->assertSame('failed', $keepAction['status'] ?? null);
         $this->assertArrayNotHasKey('kept_item', $keepAction);
         $this->assertArrayNotHasKey('created_in_crafted_items_set', $keepAction);
     }
@@ -3140,6 +2657,7 @@ class BatchCraftingProcessorTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 0]);
+        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
         $this->createItem(['name' => 'Experience Commit Failure Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -3152,7 +2670,7 @@ class BatchCraftingProcessorTest extends TestCase
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
         $this->assertSame(0, $result->kept_count);
-        $this->assertSame(BatchCraftingEndReason::NO_INVENTORY_SPACE->value, $result->ended_reason);
+        $this->assertSame(BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL->value, $result->ended_reason);
     }
 
     public function testTrinketryCommitFailureLeavesKeptCountAtZero(): void
@@ -3160,6 +2678,7 @@ class BatchCraftingProcessorTest extends TestCase
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'copper_coins' => 1000000, 'inventory_max' => 0]);
+        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
         $this->createItem(['name' => 'Trinketry Commit Failure Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -3172,7 +2691,7 @@ class BatchCraftingProcessorTest extends TestCase
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
         $this->assertSame(0, $result->kept_count);
-        $this->assertSame(BatchCraftingEndReason::NO_INVENTORY_SPACE->value, $result->ended_reason);
+        $this->assertSame(BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL->value, $result->ended_reason);
     }
 
     public function testCraftAndEnchantExperienceSuccessfulKeepAppliesDispositionExactlyOnceWithExactlyOneKeptCount(): void
@@ -3195,10 +2714,11 @@ class BatchCraftingProcessorTest extends TestCase
 
                     return Item::whereIn('id', [$item->id])->get();
                 });
-                $mock->shouldReceive('craftForBatch')->andReturnUsing(function ($character, $craftedItem) use (&$craftAttempted) {
+                $mock->shouldReceive('craftForBatch')->andReturnUsing(function ($character, $craftedItem, $craftingType, $suppressSuccessServerMessage, $destinationCreator) use (&$craftAttempted) {
                     $craftAttempted = true;
+                    $destination = $destinationCreator($craftedItem);
 
-                    return ['success' => true, 'item' => $craftedItem, 'reason' => null];
+                    return ['success' => true, 'item' => $craftedItem, 'reason' => null, 'destination' => $destination];
                 });
             })
         );
@@ -3571,8 +3091,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_counted_crafted_keys' => [],
@@ -3583,7 +3102,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(['dagger'], $result->progress['craft_enchant_set_counted_crafted_keys'] ?? null);
         $this->assertSame(1, $result->progress['craft_enchant_set_surviving_crafted_count']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_craft_index']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_craft_index']);
     }
 
     public function testCraftEnchantSetCraftPhaseDuplicateKeyDoesNotDoubleCountAndDiscardsDuplicateItem(): void
@@ -3608,9 +3127,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'crafting',
                 'craft_enchant_set_craft_index' => 0,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
             ],
@@ -3644,9 +3162,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_counted_crafted_keys' => [],
                 'craft_enchant_set_lost_item_keys' => [],
@@ -3657,7 +3174,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertContains('dagger', $result->progress['craft_enchant_set_lost_item_keys'] ?? []);
         $this->assertSame(0, $result->progress['craft_enchant_set_surviving_crafted_count']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
         $this->assertSame('replacement_crafting', $result->progress['craft_enchant_set_phase']);
     }
 
@@ -3681,9 +3198,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
                 'craft_enchant_set_lost_item_keys' => [],
@@ -3730,9 +3246,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
                 'craft_enchant_set_lost_item_keys' => [],
@@ -3781,9 +3296,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
                 'craft_enchant_set_lost_item_keys' => [],
@@ -3818,9 +3332,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'enchanting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_counted_crafted_keys' => ['dagger'],
                 'craft_enchant_set_lost_item_keys' => ['dagger'],
@@ -3831,7 +3344,7 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertSame(['dagger'], $result->progress['craft_enchant_set_lost_item_keys']);
         $this->assertSame(1, $result->progress['craft_enchant_set_surviving_crafted_count']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
     }
 
     public function testCraftEnchantSetReplacementValidLostStateRestoresCountedKeyExactlyOnce(): void
@@ -3860,8 +3373,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'replacement_crafting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_replacement_key' => 'dagger',
@@ -3873,7 +3385,7 @@ class BatchCraftingProcessorTest extends TestCase
         $this->assertSame(['dagger'], $result->progress['craft_enchant_set_counted_crafted_keys'] ?? null);
         $this->assertNotContains('dagger', $result->progress['craft_enchant_set_lost_item_keys'] ?? []);
         $this->assertSame(1, $result->progress['craft_enchant_set_surviving_crafted_count']);
-        $this->assertSame(1, $result->progress['craft_enchant_set_completed_work_units']);
+        $this->assertSame(0, $result->progress['craft_enchant_set_completed_work_units']);
     }
 
     public function testCraftEnchantSetReplacementRejectsKeyNotInLostState(): void
@@ -3901,8 +3413,7 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'replacement_crafting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
+                'craft_enchant_set_total_work_units' => 1,
                 'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 0,
                 'craft_enchant_set_replacement_key' => 'dagger',
@@ -3945,9 +3456,8 @@ class BatchCraftingProcessorTest extends TestCase
                 'craft_enchant_set_phase' => 'replacement_crafting',
                 'craft_enchant_set_craft_index' => 1,
                 'craft_enchant_set_enchant_index' => 0,
-                'craft_enchant_set_finalize_index' => 0,
-                'craft_enchant_set_total_work_units' => 3,
-                'craft_enchant_set_completed_work_units' => 1,
+                'craft_enchant_set_total_work_units' => 1,
+                'craft_enchant_set_completed_work_units' => 0,
                 'craft_enchant_set_surviving_crafted_count' => 1,
                 'craft_enchant_set_replacement_key' => 'dagger',
             ],
@@ -4074,7 +3584,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold_dust' => 100000, 'inventory_max' => 20]);
-        $item = $this->createItem(['name' => 'Processor Bounded Holy Oil Item', 'type' => 'weapon', 'holy_stacks' => 1, 'cost' => 1]);
+        $item = $this->createItem(['name' => 'Processor Bounded Holy Oil Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'holy_stacks' => 1, 'cost' => 1]);
         $slotOne = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $item->id]);
         $slotTwo = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $item->id]);
         $slotThree = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $item->id]);
@@ -4091,12 +3601,32 @@ class BatchCraftingProcessorTest extends TestCase
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'selected_items' => [$slotOne->id, $slotTwo->id, $slotThree->id, $slotFour->id, $slotFive->id, $slotSix->id, $slotSeven->id],
             'selected_oils' => [$oilSlot->id],
+            'progress' => [
+                'holy_oil_mode' => 'selected',
+                'holy_oil_application_plan' => [
+                    'application_sequence' => [
+                        ['target_slot_id' => $slotOne->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                        ['target_slot_id' => $slotTwo->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                        ['target_slot_id' => $slotThree->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                        ['target_slot_id' => $slotFour->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                        ['target_slot_id' => $slotFive->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                        ['target_slot_id' => $slotSix->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                        ['target_slot_id' => $slotSeven->id, 'oil_slot_id' => $oilSlot->id, 'gold_dust_cost' => 1],
+                    ],
+                ],
+                'holy_oil_application_results' => [],
+            ],
         ]);
 
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
         $this->assertCount(6, $result->action_log);
         $this->assertSame(6, $result->progress['holy_oil_completed_applications'] ?? null);
+        $this->assertCount(6, $result->progress['holy_oil_application_results'] ?? []);
+        $this->assertSame(1, $result->progress['holy_oil_application_results'][0]['actual_applications_completed'] ?? null);
+        $this->assertSame(1, $result->progress['holy_oil_application_results'][0]['actual_resulting_stack_count'] ?? null);
+        $this->assertSame(1, $result->progress['holy_oil_application_results'][0]['oil_applications_consumed'] ?? null);
+        $this->assertNotNull($result->progress['holy_oil_application_results'][0]['item']['full_item_details'] ?? null);
         $this->assertCount(1, $result->selected_items ?? []);
         $this->assertNotSame(BatchCraftingEndReason::ALL_OILS_APPLIED->value, $result->ended_reason);
     }
@@ -4328,5 +3858,49 @@ class BatchCraftingProcessorTest extends TestCase
 
         $this->assertGreaterThan(0, $result->failed_count);
         $this->assertTrue(collect($result->action_log)->contains(fn (array $entry) => ($entry['status'] ?? null) === 'failed'));
+    }
+    public function testAlchemyAmountReturnsAmountReachedOnFinalSuccessfulItem(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 10, 'shards' => 10, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Final Amount Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id, 'batch_type' => BatchCraftingType::ALCHEMY->value, 'disposition' => BatchCraftingDisposition::KEEP->value, 'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_amount_count' => 0, 'alchemy_item_id' => $item->id]]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(BatchCraftingEndReason::AMOUNT_REACHED->value, $result->ended_reason);
+        $this->assertSame(1, $result->progress['alchemy_amount_count']);
+        $this->assertSame('alchemy', $result->action_log[0]['action_type']);
+    }
+
+    public function testAlchemyAmountFinalItemMayConsumeRemainingGoldDustAndEndAmountReached(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1, 'shards' => 10, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Remaining Dust Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id, 'batch_type' => BatchCraftingType::ALCHEMY->value, 'disposition' => BatchCraftingDisposition::KEEP->value, 'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_amount_count' => 0, 'alchemy_item_id' => $item->id]]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(BatchCraftingEndReason::AMOUNT_REACHED->value, $result->ended_reason);
+        $this->assertSame(0, $character->refresh()->gold_dust);
+        $this->assertSame(1, $result->crafted_count);
+    }
+
+    public function testAlchemyAmountRunningOutOfGoldDustBeforeRequestedAmountReturnsCurrencyReason(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
+        $character->update(['gold_dust' => 1, 'shards' => 10, 'alchemy_bag_limit' => 10]);
+        $item = $this->createItem(['name' => 'Insufficient Dust Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
+        $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id, 'batch_type' => BatchCraftingType::ALCHEMY->value, 'disposition' => BatchCraftingDisposition::KEEP->value, 'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 2, 'alchemy_amount_count' => 0, 'alchemy_item_id' => $item->id]]);
+
+        $batchCrafting = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+
+        $this->assertSame(BatchCraftingEndReason::NO_GOLD_DUST->value, $result->ended_reason);
+        $this->assertSame(1, $result->progress['alchemy_amount_count']);
     }
 }

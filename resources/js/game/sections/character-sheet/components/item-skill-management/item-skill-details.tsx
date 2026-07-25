@@ -28,6 +28,10 @@ export default class ItemSkillDetails extends React.Component<
     }
 
     trainSkill() {
+        if (this.props.read_only === true) {
+            return;
+        }
+
         this.setState(
             {
                 loading: true,
@@ -73,6 +77,10 @@ export default class ItemSkillDetails extends React.Component<
     }
 
     stopTrainingSkipp() {
+        if (this.props.read_only === true) {
+            return;
+        }
+
         this.setState(
             {
                 loading: true,
@@ -389,7 +397,8 @@ export default class ItemSkillDetails extends React.Component<
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                 {this.state.loading ? <LoadingProgressBar /> : null}
                 <div className="flex space-x-4 flex-row justify-start">
-                    {this.props.skill_progression_data.is_training ? (
+                    {this.props.read_only ? null : this.props
+                          .skill_progression_data.is_training ? (
                         <PrimaryButton
                             button_label={"Stop Training Skill"}
                             on_click={this.stopTrainingSkipp.bind(this)}
@@ -406,7 +415,11 @@ export default class ItemSkillDetails extends React.Component<
                     )}
 
                     <DangerButton
-                        button_label={"Close Skill Management"}
+                        button_label={
+                            this.props.read_only
+                                ? "Back to Skill Tree"
+                                : "Close Skill Management"
+                        }
                         on_click={() =>
                             this.props.manage_skill_details(null, null)
                         }

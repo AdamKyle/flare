@@ -1,5 +1,6 @@
 import React from "react";
 import Select, { SingleValue } from "react-select";
+import topsSelectStyles from "../styles/tops-select-styles";
 import TopsDisplayField from "../types/tops-display-field";
 import TopsLeaderboardRow from "../types/tops-leaderboard-row";
 import TopsCharacterNameLink from "./tops-character-name-link";
@@ -237,6 +238,7 @@ export default class TopsLeaderboardTable extends React.Component<
                                 }>,
                             ) => this.changePerPage(option?.value ?? "10")}
                             aria-label="Select rows per page"
+                            styles={topsSelectStyles}
                             menuPortalTarget={document.body}
                         />
                     </div>

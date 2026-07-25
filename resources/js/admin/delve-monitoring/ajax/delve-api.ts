@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleUnauthenticatedAxiosRequest } from "../../../game/lib/ajax/unauthenticated-response-handler";
 import {
     ActiveDelveRunner,
     DelveChartPoint,
@@ -11,7 +12,11 @@ import {
 const base = "/api/admin/monitoring/delve";
 
 export async function fetchDelveActive(): Promise<ActiveDelveRunner[]> {
-    return (await axios.get<ActiveDelveRunner[]>(`${base}/active`)).data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ActiveDelveRunner[]>(`${base}/active`),
+        )
+    ).data;
 }
 
 export async function fetchDelveRuns(
@@ -19,15 +24,19 @@ export async function fetchDelveRuns(
     page: number,
 ): Promise<Paginated<DelveRunRow>> {
     return (
-        await axios.get<Paginated<DelveRunRow>>(`${base}/runs`, {
-            params: { ...filters, page },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<Paginated<DelveRunRow>>(`${base}/runs`, {
+                params: { ...filters, page },
+            }),
+        )
     ).data;
 }
 
 export async function fetchDelveSummary(days: string): Promise<DelveSummary> {
     return (
-        await axios.get<DelveSummary>(`${base}/summary`, { params: { days } })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<DelveSummary>(`${base}/summary`, { params: { days } }),
+        )
     ).data;
 }
 
@@ -35,8 +44,10 @@ export async function fetchDelveChart(
     days: string,
 ): Promise<DelveChartPoint[]> {
     return (
-        await axios.get<DelveChartPoint[]>(`${base}/chart`, {
-            params: { days },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<DelveChartPoint[]>(`${base}/chart`, {
+                params: { days },
+            }),
+        )
     ).data;
 }

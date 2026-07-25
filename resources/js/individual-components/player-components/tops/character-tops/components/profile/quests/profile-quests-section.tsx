@@ -1,5 +1,6 @@
 import React from "react";
 import Select, { SingleValue } from "react-select";
+import topsSelectStyles from "../../../../shared/styles/tops-select-styles";
 import BasicCard from "../../../../../../../game/components/ui/cards/basic-card";
 import Tabs from "../../../../../../../game/components/ui/tabs/tabs";
 import TabPanel from "../../../../../../../game/components/ui/tabs/tab-panel";
@@ -212,6 +213,7 @@ export default class ProfileQuestsSection extends React.Component<
                                 })
                             }
                             aria-label="Filter completed quests by plane"
+                            styles={topsSelectStyles}
                             menuPortalTarget={document.body}
                         />
                     </label>

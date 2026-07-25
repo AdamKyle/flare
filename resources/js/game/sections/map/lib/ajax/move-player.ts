@@ -2,7 +2,7 @@ import { Component } from "react";
 import { movePlayer } from "../move-player";
 import { generateServerMessage } from "../../../../lib/ajax/generate-server-message";
 import Ajax from "../../../../lib/ajax/ajax";
-import { AxiosError, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import MapStateManager from "../state/map-state-manager";
 import { getPortLocation } from "../location-helpers";
 import { getNewXPosition, getNewYPosition } from "../map-position";
@@ -77,9 +77,7 @@ export default class MovePlayer {
                 (result: AxiosResponse) => {
                     component.props.update_map_state(result.data);
                 },
-                (error: AxiosError) => {
-                    this.handleErrors(error);
-                },
+                () => {},
             );
     }
 
@@ -96,9 +94,7 @@ export default class MovePlayer {
                 (result: AxiosResponse) => {
                     updateMapState(result.data);
                 },
-                (error: AxiosError) => {
-                    this.handleErrors(error);
-                },
+                () => {},
             );
     }
 
@@ -116,21 +112,7 @@ export default class MovePlayer {
                 (result: AxiosResponse) => {
                     updateMapState(result.data);
                 },
-                (error: AxiosError) => {
-                    this.handleErrors(error);
-                },
+                () => {},
             );
-    }
-
-    handleErrors(error: AxiosError) {
-        if (typeof error.response === "undefined") {
-            return;
-        }
-
-        const response: AxiosResponse = error.response;
-
-        if (response.status === 401) {
-            return location.reload();
-        }
     }
 }

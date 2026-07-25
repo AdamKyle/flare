@@ -26,6 +26,7 @@ use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\DB;
 
 class CraftingService
 {
@@ -206,19 +207,39 @@ class CraftingService
      *
      * @throws Exception
      */
-    public function craftForBatch(Character $character, Item $item, string $craftingType, bool $suppressSuccessServerMessage = false): array
+    public function craftForBatch(
+        Character $character,
+        Item $item,
+        string $craftingType,
+        bool $suppressSuccessServerMessage = false,
+        ?callable $destinationCreator = null,
+    ): array
     {
-        $skill = $this->fetchCraftingSkill($character, $craftingType);
+        return DB::transaction(function () use ($character, $item, $craftingType, $suppressSuccessServerMessage, $destinationCreator): array {
+            $skill = $this->fetchCraftingSkill($character, $craftingType);
 
-        $cost = $this->getItemCost($character, $item);
+            $cost = $this->getItemCost($character, $item);
 
-        if ($cost > $character->gold) {
-            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD);
+            if ($cost > $character->gold) {
+                ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD);
 
-            return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold'];
-        }
+                return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold', 'destination' => null];
+            }
 
-        return $this->attemptToCraftItemForBatch($character, $skill, $item, $suppressSuccessServerMessage);
+            $result = $this->attemptToCraftItemForBatch($character, $skill, $item, $suppressSuccessServerMessage);
+
+            if (! $result['success'] || is_null($destinationCreator)) {
+                return $result + ['destination' => null];
+            }
+
+            $destination = $destinationCreator($result['item']);
+
+            if (! is_array($destination)) {
+                throw new \RuntimeException('The retained Batch Crafting destination could not accept the crafted item.');
+            }
+
+            return $result + ['destination' => $destination];
+        });
     }
 
     /**

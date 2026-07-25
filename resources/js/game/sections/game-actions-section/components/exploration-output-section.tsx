@@ -569,7 +569,7 @@ export default class ExplorationOutputSection extends React.Component<
                         ) : null}
                         {this.renderOutputColumns(data)}
                         <DangerButton
-                            button_label={"Close"}
+                            button_label={"Dismiss"}
                             on_click={this.dismissWarning.bind(this)}
                             disabled={this.state.dismissing}
                             additional_css={""}
@@ -619,7 +619,7 @@ export default class ExplorationOutputSection extends React.Component<
                         ) : null}
                         {this.renderOutputColumns(data)}
                         <DangerButton
-                            button_label={"Close"}
+                            button_label={"Dismiss"}
                             on_click={this.dismissEnded.bind(this)}
                             disabled={this.state.dismissing}
                             additional_css={""}

@@ -16,6 +16,7 @@ use App\Flare\Models\Item;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 
 class GuideQuestRequirementsService
@@ -153,11 +154,13 @@ class GuideQuestRequirementsService
 
     public function requiredBatchCraftedItems(Character $character, GuideQuest $quest): GuideQuestRequirementsService
     {
-        if (empty($quest->required_batch_crafted_items)) {
+        if (is_null($quest->required_batch_crafted_items)) {
             return $this;
         }
 
-        if ($this->hasRequiredBatchCraftedItems($character, $quest->required_batch_crafted_items)) {
+        $requirements = $this->batchCraftedItemRequirements($character, $quest->required_batch_crafted_items);
+
+        if (collect($requirements)->every(fn (array $requirement): bool => $requirement['is_complete'])) {
             $this->finishedRequirements[] = 'required_batch_crafted_items';
         }
 
@@ -166,44 +169,50 @@ class GuideQuestRequirementsService
 
     public function hasRequiredBatchCraftedItems(Character $character, array $requiredBatchCraftedItems): bool
     {
-        if (empty($requiredBatchCraftedItems)) {
-            return true;
-        }
+        $requirements = $this->batchCraftedItemRequirements($character, $requiredBatchCraftedItems);
 
-        foreach ($requiredBatchCraftedItems as $requiredBatchCraftedItem) {
+        return collect($requirements)->every(fn (array $requirement): bool => $requirement['is_complete']);
+    }
+
+    public function batchCraftedItemRequirements(Character $character, array $requiredBatchCraftedItems): array
+    {
+        return collect($requiredBatchCraftedItems)->map(function (array $requiredBatchCraftedItem, int $requirementIndex) use ($character): array {
+            $source = $requiredBatchCraftedItem['source'] ?? 'inventory';
+            $itemId = (int) ($requiredBatchCraftedItem['item_id'] ?? 0);
+            $requiredAmount = (int) ($requiredBatchCraftedItem['amount'] ?? 0);
             $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+            $mustBeEnchanted = $source === 'alchemy_bag'
+                ? false
+                : (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false);
+            $currentAmount = 0;
 
-            if (is_null($item)) {
-                return false;
+            if (! is_null($item) && $source === 'alchemy_bag' && $item->type === 'alchemy') {
+                $currentAmount = (int) AlchemyBagSlot::where('character_id', $character->id)
+                    ->where('item_id', $item->id)
+                    ->sum('amount');
             }
 
-            if (($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
-                if (! $this->hasRequiredAlchemyBagItemAmount($character, $requiredBatchCraftedItem)) {
-                    return false;
-                }
-
-                continue;
+            if (! is_null($item) && $source === 'inventory' && $item->type !== 'alchemy') {
+                $currentAmount = $this->matchingBatchCraftedItemSlotsQuery($character, $item, $mustBeEnchanted)->count();
             }
 
-            if ($item->type === 'alchemy' || count($this->matchingBatchCraftedItemSlotIds($character, $requiredBatchCraftedItem)) < (int) ($requiredBatchCraftedItem['amount'] ?? 0)) {
-                return false;
-            }
-        }
-
-        return true;
+            return [
+                'requirement_index' => $requirementIndex,
+                'source' => $source,
+                'item_id' => $itemId,
+                'required_amount' => $requiredAmount,
+                'current_amount' => $currentAmount,
+                'must_be_enchanted' => $mustBeEnchanted,
+                'is_complete' => ! is_null($item) && $currentAmount >= $requiredAmount,
+            ];
+        })->values()->all();
     }
 
     public function hasRequiredAlchemyBagItemAmount(Character $character, array $requiredBatchCraftedItem): bool
     {
-        $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+        $requirements = $this->batchCraftedItemRequirements($character, [$requiredBatchCraftedItem]);
 
-        if (is_null($item) || $item->type !== 'alchemy') {
-            return false;
-        }
-
-        return AlchemyBagSlot::where('character_id', $character->id)
-            ->where('item_id', $item->id)
-            ->sum('amount') >= (int) ($requiredBatchCraftedItem['amount'] ?? 0);
+        return $requirements[0]['is_complete'];
     }
 
     public function matchingBatchCraftedItemSlotIds(Character $character, array $requiredBatchCraftedItem): array
@@ -214,14 +223,25 @@ class GuideQuestRequirementsService
             return [];
         }
 
+        return $this->matchingBatchCraftedItemSlotsQuery(
+            $character,
+            $item,
+            (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false),
+        )
+            ->orderBy('id')
+            ->limit((int) ($requiredBatchCraftedItem['amount'] ?? 0))
+            ->pluck('id')
+            ->all();
+    }
+
+    private function matchingBatchCraftedItemSlotsQuery(Character $character, Item $item, bool $mustBeEnchanted): Builder
+    {
         return InventorySlot::where('inventory_id', $character->inventory->id)
             ->where(function ($query) {
                 $query->where('equipped', false)
                     ->orWhereNull('equipped');
             })
-            ->whereHas('item', function ($query) use ($item, $requiredBatchCraftedItem) {
-                $mustBeEnchanted = (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false);
-
+            ->whereHas('item', function ($query) use ($item, $mustBeEnchanted) {
                 if (! $mustBeEnchanted) {
                     $query->where('id', $item->id)
                         ->whereNull('item_prefix_id')
@@ -239,11 +259,7 @@ class GuideQuestRequirementsService
                                     ->where('type', $item->type);
                             });
                     });
-            })
-            ->orderBy('id')
-            ->limit((int) ($requiredBatchCraftedItem['amount'] ?? 0))
-            ->pluck('id')
-            ->all();
+            });
     }
 
     /**

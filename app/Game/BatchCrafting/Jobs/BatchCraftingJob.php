@@ -35,7 +35,15 @@ class BatchCraftingJob implements ShouldQueue
 
         $batchCraftingService->markProcessing($batchCrafting);
 
-        $batchCrafting = $batchCraftingService->process($batchCrafting);
+        do {
+            $batchCrafting = BatchCrafting::find($this->batchCraftingId);
+
+            if (is_null($batchCrafting) || ! $batchCrafting->isRunning()) {
+                return;
+            }
+
+            $batchCrafting = $batchCraftingService->processOneOperation($batchCrafting);
+        } while ($batchCraftingService->isContinuousFiniteMode($batchCrafting));
 
         if ($batchCrafting->isRunning() && ! app()->runningUnitTests()) {
             $this->redispatchForNextRun($batchCrafting); // @codeCoverageIgnore

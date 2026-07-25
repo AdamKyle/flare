@@ -2,6 +2,7 @@ import React from "react";
 import Select, { SingleValue } from "react-select";
 import TopsPeriod from "../types/tops-period";
 import TopsMetricSelectorProps from "../types/tops-metric-selector-props";
+import topsSelectStyles from "../styles/tops-select-styles";
 
 export default class TopsMetricSelector extends React.Component<TopsMetricSelectorProps> {
     options() {
@@ -38,6 +39,7 @@ export default class TopsMetricSelector extends React.Component<TopsMetricSelect
                         option: SingleValue<{ label: string; value: string }>,
                     ) => this.props.onChange(option?.value ?? this.props.value)}
                     aria-label="Select leaderboard metric"
+                    styles={topsSelectStyles}
                     menuPortalTarget={document.body}
                 />
             </label>

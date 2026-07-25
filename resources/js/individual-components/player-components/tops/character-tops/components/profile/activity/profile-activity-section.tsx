@@ -11,7 +11,7 @@ export default class ProfileActivitySection extends React.Component<ProfileActiv
             >
                 <TopsChartCard
                     title="Login Count"
-                    description="Cumulative public login count from real login history."
+                    description="Login sessions that began during each displayed period."
                     chart={this.props.activity?.login_count_chart}
                     xAxisLabel="Date"
                     yAxisLabel="Logins"
@@ -19,7 +19,7 @@ export default class ProfileActivitySection extends React.Component<ProfileActiv
                 />
                 <TopsChartCard
                     title="Login Duration"
-                    description="Cumulative public login duration, in hours, from real login history."
+                    description="Time logged in during each displayed period, calculated from recorded session intervals."
                     chart={this.props.activity?.login_duration_chart}
                     xAxisLabel="Date"
                     yAxisLabel="Hours"

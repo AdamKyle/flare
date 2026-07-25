@@ -728,4 +728,171 @@ class SetHandsValidationTest extends TestCase
 
         $this->assertFalse($this->setHandsValidation->isInventorySetHandPositionsValid($character->inventorySets->first()));
     }
+
+    public function testNoHandItemsAreValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect()));
+    }
+
+    public function testOneCurrentSingleHandedWeaponIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([$this->createItem(['type' => 'mace'])])));
+    }
+
+    public function testOneShieldIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([$this->createItem(['type' => 'shield'])])));
+    }
+
+    public function testOneBowIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([$this->createItem(['type' => 'bow'])])));
+    }
+
+    public function testOneStaveIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([$this->createItem(['type' => 'stave'])])));
+    }
+
+    public function testOneHammerIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([$this->createItem(['type' => 'hammer'])])));
+    }
+
+    public function testTwoCurrentSingleHandedWeaponsAreValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'dagger']),
+            $this->createItem(['type' => 'sword']),
+        ])));
+    }
+
+    public function testSameSingleHandedWeaponTypeTwiceIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'dagger']),
+            $this->createItem(['type' => 'dagger']),
+        ])));
+    }
+
+    public function testSingleHandedWeaponPlusShieldIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'sword']),
+            $this->createItem(['type' => 'shield']),
+        ])));
+    }
+
+    public function testShieldPlusSingleHandedWeaponIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'shield']),
+            $this->createItem(['type' => 'wand']),
+        ])));
+    }
+
+    public function testShieldPlusShieldIsValid(): void
+    {
+        $this->assertTrue($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'shield']),
+            $this->createItem(['type' => 'shield']),
+        ])));
+    }
+
+    public function testBowPlusAnySecondHandItemIsInvalid(): void
+    {
+        $this->assertFalse($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'bow']),
+            $this->createItem(['type' => 'shield']),
+        ])));
+    }
+
+    public function testStavePlusAnySecondHandItemIsInvalid(): void
+    {
+        $this->assertFalse($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'stave']),
+            $this->createItem(['type' => 'dagger']),
+        ])));
+    }
+
+    public function testHammerPlusAnySecondHandItemIsInvalid(): void
+    {
+        $this->assertFalse($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'hammer']),
+            $this->createItem(['type' => 'shield']),
+        ])));
+    }
+
+    public function testTwoTwoHandedItemsAreInvalid(): void
+    {
+        $this->assertFalse($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'bow']),
+            $this->createItem(['type' => 'stave']),
+        ])));
+    }
+
+    public function testMoreThanTwoOneHandItemsAreInvalid(): void
+    {
+        $this->assertFalse($this->setHandsValidation->areHandItemsValid(collect([
+            $this->createItem(['type' => 'dagger']),
+            $this->createItem(['type' => 'shield']),
+            $this->createItem(['type' => 'sword']),
+        ])));
+    }
+
+    public function testDaggerIsRecognizedAsSingleHanded(): void
+    {
+        $this->assertSame('single_handed', $this->setHandsValidation->handedness($this->createItem(['type' => 'dagger'])));
+    }
+
+    public function testSwordIsRecognizedAsSingleHanded(): void
+    {
+        $this->assertSame('single_handed', $this->setHandsValidation->handedness($this->createItem(['type' => 'sword'])));
+    }
+
+    public function testClawIsRecognizedAsSingleHanded(): void
+    {
+        $this->assertSame('single_handed', $this->setHandsValidation->handedness($this->createItem(['type' => 'claw'])));
+    }
+
+    public function testWandIsRecognizedAsSingleHanded(): void
+    {
+        $this->assertSame('single_handed', $this->setHandsValidation->handedness($this->createItem(['type' => 'wand'])));
+    }
+
+    public function testCenserIsRecognizedAsSingleHanded(): void
+    {
+        $this->assertSame('single_handed', $this->setHandsValidation->handedness($this->createItem(['type' => 'censer'])));
+    }
+
+    public function testRingsAndSpellsAreNotCountedAsHandItems(): void
+    {
+        $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid(
+            $this->character
+                ->inventoryManagement()
+                ->getCharacterFactory()
+                ->inventorySetManagement()
+                ->createInventorySets(10)
+                ->putItemInSet($this->createItem(['type' => 'ring']), 0)
+                ->putItemInSet($this->createItem(['type' => 'spell-damage']), 0)
+                ->getCharacter()
+                ->inventorySets
+                ->first()
+        ));
+    }
+
+    public function testArmourOtherThanShieldIsNotCountedAsAHandItem(): void
+    {
+        $this->assertTrue($this->setHandsValidation->isInventorySetHandPositionsValid(
+            $this->character
+                ->inventoryManagement()
+                ->getCharacterFactory()
+                ->inventorySetManagement()
+                ->createInventorySets(10)
+                ->putItemInSet($this->createItem(['type' => 'body']), 0)
+                ->getCharacter()
+                ->inventorySets
+                ->first()
+        ));
+    }
 }

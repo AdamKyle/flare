@@ -5,5 +5,5 @@ export default interface WeaponMastery {
     level: number;
     mastery_name: string;
     required_xp: number;
-    weapon_type: number;
+    weapon_type: string;
 }

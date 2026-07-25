@@ -14,4 +14,6 @@ export default interface ItemSkillDetailsProps {
     character_id: number;
 
     is_skill_locked: boolean;
+
+    read_only?: boolean;
 }

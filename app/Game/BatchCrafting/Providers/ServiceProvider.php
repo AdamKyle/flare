@@ -10,6 +10,7 @@ use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
+use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Admin\Services\MonitoredBugReportService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
@@ -43,6 +44,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ServerMessageHandler::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(EventBatchEnchantingAffixSelector::class),
+                $app->make(SetHandsValidation::class),
             );
         });
 
@@ -57,6 +59,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(GlobalEventGoalProgressionService::class),
                 $app->make(MonitoredBugReportService::class),
+                $app->make(SetHandsValidation::class),
             );
         });
     }

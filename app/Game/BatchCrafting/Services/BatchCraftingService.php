@@ -23,6 +23,7 @@ use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
+use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Character\CharacterInventory\Values\ArmourType;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Events\Services\EventGoalsService;
@@ -58,11 +59,15 @@ class BatchCraftingService
 
     public const IMMEDIATE_DELAY_SECONDS = 2;
 
+    public const INITIAL_FINITE_DELAY_SECONDS = 60;
+
     private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
 
     private readonly GlobalEventGoalProgressionService $globalEventGoalProgressionService;
 
     private readonly MonitoredBugReportService $monitoredBugReportService;
+
+    private readonly SetHandsValidation $setHandsValidation;
 
     public function __construct(
         private readonly BatchCraftingProcessor $processor,
@@ -74,10 +79,12 @@ class BatchCraftingService
         ?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null,
         ?GlobalEventGoalProgressionService $globalEventGoalProgressionService = null,
         ?MonitoredBugReportService $monitoredBugReportService = null,
+        ?SetHandsValidation $setHandsValidation = null,
     ) {
         $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService ?? new GlobalEventGoalEligibilityService();
         $this->globalEventGoalProgressionService = $globalEventGoalProgressionService ?? new GlobalEventGoalProgressionService(new EventGoalsService());
         $this->monitoredBugReportService = $monitoredBugReportService ?? new MonitoredBugReportService();
+        $this->setHandsValidation = $setHandsValidation ?? new SetHandsValidation();
     }
 
     public function start(Character $character, array $data): BatchCrafting
@@ -142,6 +149,34 @@ class BatchCraftingService
 
         $progress = $this->validatedProgress($character, $type, $data);
 
+        if ($type === BatchCraftingType::HOLY_OILS) {
+            $holyOilPlan = $this->holyOilApplicationPlan(
+                $character,
+                $data['selected_items'] ?? [],
+                $data['selected_oils'] ?? [],
+                $progress,
+            );
+            $progress['holy_oil_application_plan'] = $holyOilPlan;
+            $progress['holy_oil_application_results'] = [];
+            $progress['holy_oil_requested_applications'] = $holyOilPlan['applications_planned'];
+            $progress['holy_oil_completed_applications'] = 0;
+            $progress['holy_oil_plan_index'] = 0;
+        }
+        $maximumRequestAmount = $this->maximumRequestAmount($character, $type, $progress, $disposition);
+        $requestedAmount = $type === BatchCraftingType::ALCHEMY
+            ? (int) ($progress['alchemy_amount'] ?? 0)
+            : (int) ($progress['craft_amount'] ?? 0);
+
+        $isAmountMode = ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? null) === 'amount')
+            || (in_array($type, [BatchCraftingType::CRAFT, BatchCraftingType::CRAFT_AND_ENCHANT], true) && ($progress['craft_mode'] ?? null) === 'specific_item');
+
+        if ($isAmountMode && $requestedAmount > $maximumRequestAmount) {
+            throw ValidationException::withMessages([
+                ($type === BatchCraftingType::ALCHEMY ? 'progress.alchemy_amount' : 'progress.craft_amount')
+                => 'The requested amount may not exceed ' . number_format($maximumRequestAmount) . ' for the selected destination.',
+            ]);
+        }
+
         if ($disposition === BatchCraftingDisposition::LIST
             && $type === BatchCraftingType::ALCHEMY
             && ($progress['alchemy_mode'] ?? null) === 'amount'
@@ -174,15 +209,34 @@ class BatchCraftingService
             $progress['listing_price'] = (int) $data['listing_price'];
         }
 
-        $firstAttemptAt = now()->addSeconds($progress['tick_delay_seconds']);
-        $progress['continuation_active'] = true;
-        $progress['continuation_state'] = 'waiting';
-        $progress['continuation_reason'] = 'continue_remaining_work';
-        $progress['continuation_message'] = 'Batch Crafting is waiting to begin the first requested attempt.';
-        $progress['continuation_phase'] = 'starting';
-        $progress['continuation_item'] = null;
-        $progress['continuation_delay_seconds'] = $progress['tick_delay_seconds'];
-        $progress['next_attempt_at'] = $firstAttemptAt->toIso8601String();
+        $requiresInitialFiniteDelay = $this->requiresInitialFiniteDelay($type, $progress);
+        $continuousFiniteMode = $this->isContinuousFiniteType($type, $progress);
+        $firstAttemptAt = now()->addSeconds($requiresInitialFiniteDelay
+            ? self::INITIAL_FINITE_DELAY_SECONDS
+            : $progress['tick_delay_seconds']);
+        $progress = array_merge($progress, match (true) {
+            $requiresInitialFiniteDelay => [
+                'continuation_active' => true,
+                'continuation_state' => 'waiting',
+                'continuation_reason' => 'initial_start_delay',
+                'continuation_message' => 'Batch Crafting will begin in one moment.',
+                'continuation_phase' => 'starting',
+                'continuation_item' => null,
+                'continuation_delay_seconds' => self::INITIAL_FINITE_DELAY_SECONDS,
+                'next_attempt_at' => $firstAttemptAt->toIso8601String(),
+            ],
+            $continuousFiniteMode => $this->clearedContinuationState(),
+            default => [
+                'continuation_active' => true,
+                'continuation_state' => 'waiting',
+                'continuation_reason' => 'continue_remaining_work',
+                'continuation_message' => 'Batch Crafting is waiting to begin the first requested attempt.',
+                'continuation_phase' => 'starting',
+                'continuation_item' => null,
+                'continuation_delay_seconds' => $progress['tick_delay_seconds'],
+                'next_attempt_at' => $firstAttemptAt->toIso8601String(),
+            ],
+        });
 
         $batchCrafting = BatchCrafting::create([
             'character_id' => $character->id,
@@ -199,16 +253,51 @@ class BatchCraftingService
 
         $this->logger()->batchStarted($batchCrafting, $character);
 
-        event(new ServerMessageEvent($character->user, 'Batch crafting has started. First action will run in ' . $this->firstActionDelayMessage($progress['tick_delay_seconds']) . '.'));
-        event(new AutomationLogUpdate($character->user_id, 'Batch crafting has started. First action will run in ' . $this->firstActionDelayMessage($progress['tick_delay_seconds']) . '.'));
+        $startMessage = $requiresInitialFiniteDelay
+            ? 'Batch Crafting is scheduled and will begin in one minute.'
+            : 'Batch crafting has started. First action will run in ' . $this->firstActionDelayMessage($progress['tick_delay_seconds']) . '.';
+        event(new ServerMessageEvent($character->user, $startMessage));
+        event(new AutomationLogUpdate($character->user_id, $startMessage));
         event(new BatchCraftingStatusUpdated($character->user_id));
         event(new BatchCraftingMonitoringUpdated($character->id));
 
         if (! app()->runningUnitTests()) {
-            BatchCraftingJob::dispatch($batchCrafting->id)->delay($firstAttemptAt);
+            $pendingDispatch = BatchCraftingJob::dispatch($batchCrafting->id);
+
+            if ($requiresInitialFiniteDelay || ! $this->isContinuousFiniteType($type, $progress)) {
+                $pendingDispatch->delay($firstAttemptAt);
+            }
         }
 
         return $batchCrafting;
+    }
+
+    public function isContinuousFiniteMode(BatchCrafting $batchCrafting): bool
+    {
+        return $batchCrafting->isRunning()
+            && $this->isContinuousFiniteType(BatchCraftingType::from($batchCrafting->batch_type), $batchCrafting->progress ?? []);
+    }
+
+    private function isContinuousFiniteType(BatchCraftingType $type, array $progress): bool
+    {
+        return match ($type) {
+            BatchCraftingType::CRAFT => in_array($progress['craft_mode'] ?? null, ['specific_item', 'craft_set'], true),
+            BatchCraftingType::CRAFT_AND_ENCHANT => in_array($progress['craft_mode'] ?? null, ['specific_item', 'craft_enchant_set'], true),
+            BatchCraftingType::ALCHEMY => ($progress['alchemy_mode'] ?? null) === 'amount',
+            BatchCraftingType::HOLY_OILS => in_array($progress['holy_oil_mode'] ?? 'selected', ['selected', 'set'], true),
+            default => false,
+        };
+    }
+
+    private function requiresInitialFiniteDelay(BatchCraftingType $type, array $progress): bool
+    {
+        return match ($type) {
+            BatchCraftingType::CRAFT => in_array($progress['craft_mode'] ?? null, ['specific_item', 'craft_set'], true),
+            BatchCraftingType::CRAFT_AND_ENCHANT => in_array($progress['craft_mode'] ?? null, ['specific_item', 'craft_enchant_set'], true),
+            BatchCraftingType::ALCHEMY => ($progress['alchemy_mode'] ?? null) === 'amount',
+            BatchCraftingType::HOLY_OILS => in_array($progress['holy_oil_mode'] ?? 'selected', ['selected', 'set'], true),
+            default => false,
+        };
     }
 
     public function preview(Character $character, array $data): array
@@ -227,7 +316,8 @@ class BatchCraftingService
             'holy_oil_selected_preview' => $this->holyOilsSelectedPreview($character, $type, $selectedItemIds, $selectedOilIds, $progress),
             'holy_oil_set_preview' => $this->holyOilsSetPreview($character, $type, $selectedOilIds, $progress),
             'destination_capacity' => $this->destinationCapacityPreview($character, $type, $progress, $disposition),
-            'start_blockers' => $this->startBlockers($character, $type, $progress, $selectedItemIds, $selectedOilIds, $disposition),
+            'maximum_request_amount' => $this->maximumRequestAmount($character, $type, $progress, $disposition),
+            'start_blockers' => $this->startBlockers($character, $type, $progress, $selectedItemIds, $selectedOilIds, $disposition, true),
         ];
     }
 
@@ -288,7 +378,22 @@ class BatchCraftingService
         return null;
     }
 
-    private function startBlockers(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds, BatchCraftingDisposition $disposition): array
+    private function maximumRequestAmount(Character $character, BatchCraftingType $type, array $progress, BatchCraftingDisposition $disposition): int
+    {
+        if (! in_array($disposition, [BatchCraftingDisposition::KEEP], true)) {
+            return 2000;
+        }
+
+        $capacity = $this->destinationCapacityPreview($character, $type, $progress, $disposition);
+
+        if (is_null($capacity)) {
+            return 2000;
+        }
+
+        return min(2000, max(0, (int) $capacity['remaining']));
+    }
+
+    private function startBlockers(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds, BatchCraftingDisposition $disposition, bool $includePreviewPlanBlockers = false): array
     {
         $craftMode = $progress['craft_mode'] ?? null;
 
@@ -297,7 +402,7 @@ class BatchCraftingService
         }
 
         if ($type === BatchCraftingType::CRAFT && $craftMode === 'craft_set') {
-            return $this->craftSetStartBlockers($character, $progress, false, $disposition);
+            return $this->craftSetStartBlockers($character, $progress, false, $disposition, $includePreviewPlanBlockers);
         }
 
         if ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $craftMode === 'specific_item') {
@@ -308,7 +413,7 @@ class BatchCraftingService
         }
 
         if ($type === BatchCraftingType::CRAFT_AND_ENCHANT && $craftMode === 'craft_enchant_set') {
-            return $this->craftSetStartBlockers($character, $progress, true, $disposition);
+            return $this->craftSetStartBlockers($character, $progress, true, $disposition, $includePreviewPlanBlockers);
         }
 
         if ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? null) === 'amount') {
@@ -578,14 +683,53 @@ class BatchCraftingService
         return $blockers;
     }
 
-    private function craftSetStartBlockers(Character $character, array $progress, bool $includeEnchanting, BatchCraftingDisposition $disposition): array
+    private function craftSetStartBlockers(Character $character, array $progress, bool $includeEnchanting, BatchCraftingDisposition $disposition, bool $includePreviewPlanBlockers): array
     {
         $planKey = $includeEnchanting ? 'enchant_plan' : 'craft_set_plan';
         $plan = is_array($progress[$planKey] ?? null) ? $progress[$planKey] : [];
         $breakdown = $this->craftSetCostBreakdown($character, [], $includeEnchanting, $plan, false, $progress);
-        $queue = $this->processor->craftSetQueue();
-
         $blockers = $includeEnchanting ? $this->craftEnchantSetPlanIntBlockers($character, $plan) : [];
+
+        foreach ($includePreviewPlanBlockers ? ($breakdown['plan_entries'] ?? []) : [] as $entry) {
+            $targetLabel = (string) ($entry['label'] ?? ucwords(str_replace('_', ' ', (string) ($entry['target']['type'] ?? $entry['key']))));
+            $requestedSelectedItemId = $entry['requested_selected_item_id'] ?? null;
+
+            if (! is_null($requestedSelectedItemId) && ! ($entry['selected_item_available'] ?? false)) {
+                $blockers[] = $this->blocker(
+                    'craft_plan_selected_item_unavailable',
+                    'The selected item for ' . $targetLabel . ' is no longer craftable. Select another item before starting.',
+                    [],
+                    true,
+                    ['plan_key' => $entry['key'], 'selected_item_id' => $requestedSelectedItemId, 'target_label' => $targetLabel]
+                );
+
+                continue;
+            }
+
+            if (empty($entry['available_items']) && ! ($entry['optional'] ?? false)) {
+                $blockers[] = $this->blocker(
+                    'craft_plan_no_craftable_item',
+                    'No craftable item is currently available for ' . $targetLabel . '.',
+                    [],
+                    true,
+                    ['plan_key' => $entry['key'], 'target_label' => $targetLabel]
+                );
+            }
+        }
+
+        $selectedHands = collect($breakdown['plan_entries'] ?? [])
+            ->filter(fn (array $entry) => $entry['category'] === 'hand' && $entry['included'])
+            ->map(fn (array $entry) => Item::find($entry['selected_item_id']))
+            ->filter();
+
+        if (! $this->setHandsValidation->areHandItemsValid($selectedHands)) {
+            $blockers[] = $this->blocker(
+                'craft_set_invalid_hand_combination',
+                'A two-handed weapon occupies both hands. Clear the other hand before starting.',
+                [],
+                true
+            );
+        }
 
         if (! ($breakdown['can_afford_full_plan'] ?? true)) {
             $blockers[] = $this->blocker(
@@ -600,7 +744,7 @@ class BatchCraftingService
 
         $type = $includeEnchanting ? BatchCraftingType::CRAFT_AND_ENCHANT : BatchCraftingType::CRAFT;
 
-        return array_merge($blockers, $this->outputDestinationStartBlockers($character, $type, $progress, $disposition, count($queue)));
+        return array_merge($blockers, $this->outputDestinationStartBlockers($character, $type, $progress, $disposition, (int) ($breakdown['planned_items'] ?? 0)));
     }
 
     /**
@@ -701,7 +845,7 @@ class BatchCraftingService
         }
 
         if (in_array($craftMode, ['craft_set', 'craft_enchant_set'], true)) {
-            return count($this->processor->craftSetQueue());
+            return count($progress['craft_set_queue'] ?? $progress['craft_enchant_set_queue'] ?? []);
         }
 
         if ($disposition === BatchCraftingDisposition::KEEP) {
@@ -714,7 +858,7 @@ class BatchCraftingService
             return 1;
         }
 
-        return count(collect($this->processor->craftSetQueue())->unique('type'));
+        return self::ITEMS_PER_FULL_SET - 1;
     }
 
     private function retainedAlchemyBagSlots(BatchCraftingDisposition $disposition): int
@@ -943,15 +1087,13 @@ class BatchCraftingService
         $holyOilPreview = $holyOilSelectedPreview ?? $holyOilSetPreview;
 
         if (! is_null($holyOilPreview)) {
-            $breakdown['required_to_start'] = $holyOilPreview['total_remaining_applications'] > 0
-                ? max(1, (int) ceil($holyOilPreview['total_cost_if_fully_applied'] / max(1, $holyOilPreview['total_remaining_applications'])))
-                : 0;
+            $breakdown['required_to_start'] = (int) ($holyOilPreview['application_sequence'][0]['gold_dust_cost'] ?? 0);
             $breakdown['total_cost_known'] = true;
-            $breakdown['total_required'] = (int) $holyOilPreview['total_cost_if_fully_applied'];
+            $breakdown['total_required'] = (int) $holyOilPreview['exact_gold_dust_required'];
             $breakdown['available_currency_amount'] = (int) $holyOilPreview['gold_dust_available'];
-            $breakdown['effective_amount'] = (int) $holyOilPreview['max_applications_possible'];
+            $breakdown['effective_amount'] = (int) $holyOilPreview['applications_planned'];
             $breakdown['destination'] = $holyOilSetPreview ? 'Inventory Set' : 'Selected Gear';
-            $breakdown['can_afford_start'] = $holyOilPreview['max_applications_possible'] > 0;
+            $breakdown['can_afford_start'] = $holyOilPreview['applications_planned'] > 0;
 
             return $breakdown;
         }
@@ -981,8 +1123,9 @@ class BatchCraftingService
 
         foreach ($previewItems as $entry) {
             $item = $entry['item'];
+            $included = (bool) $entry['included'];
 
-            if (! is_null($item)) {
+            if ($included && ! is_null($item)) {
                 $craftCost += (int) $item->cost;
             }
 
@@ -992,7 +1135,7 @@ class BatchCraftingService
             $prefixCost = 0;
             $suffixCost = 0;
 
-            if ($includeEnchanting && ! is_null($item)) {
+            if ($includeEnchanting && $included && ! is_null($item)) {
                 if (! is_null($prefixId)) {
                     $prefixCost = $this->enchantingService->getCostOfEnchantment($character, [$prefixId], $item->id);
                 }
@@ -1009,11 +1152,19 @@ class BatchCraftingService
 
             $planEntries[] = [
                 'key' => $entry['key'],
+                'label' => $entry['target']['label'],
+                'category' => $entry['target']['category'],
+                'optional' => $entry['target']['optional'],
+                'included' => $included,
                 'target' => $entry['target'],
+                'requested_selected_item_id' => $entry['requested_selected_item_id'],
+                'selected_item_available' => $entry['selected_item_available'],
                 'selected_item_id' => $item?->id,
                 'selected_item_name' => $item?->affix_name ?? $item?->name,
                 'selected_item_cost' => (int) ($item?->cost ?? 0),
                 'selected_item_details' => is_null($item) ? null : (new ItemTransformer())->transform($item),
+                'selected_item_type' => $item?->type,
+                'selected_item_handedness' => is_null($item) ? null : $this->setHandsValidation->handedness($item),
                 'prefix_cost' => $prefixCost,
                 'suffix_cost' => $suffixCost,
                 'available_items' => $entry['available_items'],
@@ -1024,8 +1175,9 @@ class BatchCraftingService
 
         $breakdown['total_cost_known'] = true;
         $breakdown['destination'] = $isEnchantExisting ? 'Selected Inventory Set' : $this->outputDestinationLabel($character, $progress);
-        $breakdown['planned_items'] = count($previewItems);
-        $breakdown['configured_items'] = $includeEnchanting ? $configuredItems : count($previewItems);
+        $plannedItems = collect($previewItems)->where('included', true)->count();
+        $breakdown['planned_items'] = $plannedItems;
+        $breakdown['configured_items'] = $includeEnchanting ? $configuredItems : $plannedItems;
         $breakdown['craft_cost_total'] = $craftCost;
         $breakdown['enchant_cost_total'] = $includeEnchanting ? $enchantCost : 0;
         $breakdown['total_required_gold'] = $totalRequired;
@@ -1034,7 +1186,7 @@ class BatchCraftingService
         $breakdown['missing_currency_amount'] = max(0, $totalRequired - (int) $character->gold);
         $breakdown['can_afford_full_plan'] = (int) $character->gold >= $totalRequired;
         $breakdown['can_afford_start'] = (int) $character->gold >= $totalRequired && $totalRequired > 0;
-        $breakdown['effective_amount'] = $breakdown['can_afford_start'] ? count($previewItems) : 0;
+        $breakdown['effective_amount'] = $breakdown['can_afford_start'] ? $plannedItems : 0;
         $breakdown['enchant_has_failure_risk'] = $includeEnchanting && $this->enchantingSkillLevel($character) < 400;
         $breakdown['default_prefix_affix_id'] = $defaultPrefix?->id;
         $breakdown['default_prefix_affix_name'] = $defaultPrefix?->name;
@@ -1286,6 +1438,7 @@ class BatchCraftingService
                 'enchant_affix_ids' => $progress['enchant_affix_ids'] ?? null,
                 'enchant_affix_names' => $this->enchantAffixNames($progress),
                 'enchant_affixes' => $this->enchantAffixDetails($progress),
+                'int_stop_details' => $progress['int_stop_details'] ?? null,
                 'holy_oil_eligible_items' => $progress['holy_oil_eligible_items'] ?? null,
                 'holy_oil_total_stacks' => $progress['holy_oil_total_stacks'] ?? null,
                 'holy_oil_requested_applications' => $progress['holy_oil_requested_applications'] ?? null,
@@ -1299,11 +1452,19 @@ class BatchCraftingService
                 'holy_oil_selected_oil_count' => count($batchCrafting->selected_oils ?? []),
                 'holy_oil_current_target_item' => $progress['holy_oil_current_target_item'] ?? null,
                 'holy_oil_current_oil_item' => $progress['holy_oil_current_oil_item'] ?? null,
+                'holy_oil_application_results' => $progress['holy_oil_application_results'] ?? [],
                 'kept_set_summary' => $this->keptSetSummary($batchCrafting),
                 'amount_preview' => $this->amountPreview($character, $type, $progress, $disposition),
                 'alchemy_amount_preview' => $this->alchemyAmountPreview($character, $type, $progress, $disposition),
-                'holy_oil_selected_preview' => $this->holyOilsSelectedPreview($character, $type, $batchCrafting->selected_items ?? [], $batchCrafting->selected_oils ?? [], $progress),
-                'holy_oil_set_preview' => $this->holyOilsSetPreview($character, $type, $batchCrafting->selected_oils ?? [], $progress),
+                'holy_oil_selected_preview' => ($progress['holy_oil_mode'] ?? 'selected') === 'selected'
+                    ? ($progress['holy_oil_application_plan'] ?? $this->holyOilsSelectedPreview($character, $type, $batchCrafting->selected_items ?? [], $batchCrafting->selected_oils ?? [], $progress))
+                    : null,
+                'holy_oil_set_preview' => ($progress['holy_oil_mode'] ?? 'selected') === 'set'
+                    ? array_merge(
+                        ['set_name' => $this->selectedSetSummary($progress)['name'] ?? 'Set'],
+                        $progress['holy_oil_application_plan'] ?? $this->holyOilsSetPreview($character, $type, $batchCrafting->selected_oils ?? [], $progress) ?? [],
+                    )
+                    : null,
                 'batch_crafting_set' => [
                     'current_slots' => $batchCraftingSet?->currentSlotCount() ?? 0,
                     'max_slots' => $batchCraftingSet?->max_slots ?? InventorySet::BATCH_CRAFTING_MAX_SLOTS,
@@ -1341,6 +1502,23 @@ class BatchCraftingService
     }
 
     public function process(BatchCrafting $batchCrafting): BatchCrafting
+    {
+        if (! $this->isContinuousFiniteMode($batchCrafting)) {
+            return $this->processOneOperation($batchCrafting);
+        }
+
+        for ($operation = 0; $operation < self::ITEMS_PER_RECURRING_TICK; $operation++) {
+            $batchCrafting = $this->processOneOperation($batchCrafting->refresh());
+
+            if (! $this->isContinuousFiniteMode($batchCrafting)) {
+                break;
+            }
+        }
+
+        return $batchCrafting;
+    }
+
+    public function processOneOperation(BatchCrafting $batchCrafting): BatchCrafting
     {
         if (! $batchCrafting->isRunning()) {
             return $batchCrafting;
@@ -1400,6 +1578,22 @@ class BatchCraftingService
         }
 
         if (isset($result['end_reason'])) {
+            if ($result['end_reason'] === BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING) {
+                $progress = $batchCrafting->refresh()->progress ?? [];
+                $progress['int_stop_details'] = $this->intStopDetails($batchCrafting, $progress, $result['int_stop_affix_ids'] ?? []);
+                $batchCrafting->update(['progress' => $progress]);
+                $result['actions'] = array_map(function (array $action) use ($progress): array {
+                    if (($action['status'] ?? null) !== 'stopped') {
+                        return $action;
+                    }
+
+                    $action['int_stop_details'] = $progress['int_stop_details'];
+                    $action['failure'] = $this->intStopMessage($progress['int_stop_details']);
+
+                    return $action;
+                }, $result['actions'] ?? []);
+            }
+
             $counts = $result['counts'] ?? [];
 
             foreach ($counts as $column => $increment) {
@@ -1461,7 +1655,30 @@ class BatchCraftingService
 
         $this->recordProgressTotals($batchCrafting->refresh(), $counts, $result['actions'] ?? []);
         $this->recordChartPoint($batchCrafting->refresh(), $currency, $currencyBefore, $counts, $result['actions'] ?? []);
-        $this->applyRetryDelay($batchCrafting->refresh(), $counts, $result['actions'] ?? []);
+        if ($this->isContinuousFiniteMode($batchCrafting->refresh())) {
+            $latestFailedAction = collect(array_reverse($result['actions'] ?? []))->first(function (array $action): bool {
+                return ($action['status'] ?? $this->actionStatus($action)) === 'failed';
+            });
+            $progress = array_merge($batchCrafting->refresh()->progress ?? [], [
+                'continuation_active' => true,
+                'continuation_state' => 'processing',
+                'continuation_reason' => null,
+                'continuation_message' => 'Batch Crafting is processing the next attempt now.',
+                'continuation_phase' => null,
+                'continuation_item' => null,
+                'continuation_delay_seconds' => 0,
+                'next_attempt_at' => null,
+                'last_tick_failed_count' => (int) ($counts['failed_count'] ?? 0),
+                'last_tick_had_failure' => (int) ($counts['failed_count'] ?? 0) > 0,
+                'last_tick_failure_reason' => $latestFailedAction['failure'] ?? null,
+                'last_tick_failure_phase' => $latestFailedAction['phase'] ?? null,
+                'last_tick_failure_action' => $latestFailedAction['action'] ?? null,
+                'last_tick_retry_delay_seconds' => 0,
+            ]);
+            $batchCrafting->update(['progress' => $progress]);
+        } else {
+            $this->applyRetryDelay($batchCrafting->refresh(), $counts, $result['actions'] ?? []);
+        }
 
         event(new BatchCraftingStatusUpdated($batchCrafting->user_id));
         event(new BatchCraftingMonitoringUpdated($batchCrafting->character_id));
@@ -1694,29 +1911,17 @@ class BatchCraftingService
         return (int) ($progress['experience_cycle_actions'] ?? 0) > 0;
     }
 
-    /**
-     * Exact three-phase Craft and Enchant Set pipeline status: how many queue
-     * entries have been permanently processed by each phase, and the overall
-     * work-unit progress (craft + enchant + finalize, one unit each per entry).
-     */
     private function craftEnchantSetPipelineStatus(array $progress): array
     {
         $requested = max(0, (int) ($progress['craft_enchant_set_requested'] ?? 0));
 
-        // Items Crafted must represent currently-surviving pipeline items, not the
-        // irreversible initial craft index: a shattered/discarded item decreases this
-        // count immediately, and a successful replacement increases it again.
         $craftCompleted = isset($progress['craft_enchant_set_surviving_crafted_count'])
             ? min($requested, max(0, (int) $progress['craft_enchant_set_surviving_crafted_count']))
             : min($requested, max(0, (int) ($progress['craft_enchant_set_craft_index'] ?? 0)));
         $enchantCompleted = min($requested, max(0, (int) ($progress['craft_enchant_set_enchant_index'] ?? 0)));
-        $finalizeCompleted = min($requested, max(0, (int) ($progress['craft_enchant_set_finalize_index'] ?? 0)));
-
-        $totalWorkUnits = isset($progress['craft_enchant_set_total_work_units'])
-            ? max(0, (int) $progress['craft_enchant_set_total_work_units'])
-            : max(0, $requested * 3);
-
-        $completedWorkUnits = min($totalWorkUnits, max(0, (int) ($progress['craft_enchant_set_completed_work_units'] ?? 0)));
+        $queueCount = count($progress['craft_enchant_set_queue'] ?? []);
+        $totalWorkUnits = $requested > 0 ? $requested : $queueCount;
+        $completedWorkUnits = min($totalWorkUnits, max(0, (int) ($progress['craft_enchant_set_completed_final_count'] ?? 0)));
         $remainingWorkUnits = max(0, $totalWorkUnits - $completedWorkUnits);
 
         $overallPercent = $totalWorkUnits === 0
@@ -1726,7 +1931,6 @@ class BatchCraftingService
         return [
             'craft_enchant_set_craft_completed_count' => $craftCompleted,
             'craft_enchant_set_enchant_completed_count' => $enchantCompleted,
-            'craft_enchant_set_finalize_completed_count' => $finalizeCompleted,
             'craft_enchant_set_total_work_units' => $totalWorkUnits,
             'craft_enchant_set_completed_work_units' => $completedWorkUnits,
             'craft_enchant_set_remaining_work_units' => $remainingWorkUnits,
@@ -1772,10 +1976,19 @@ class BatchCraftingService
         }
 
         $progress = $batchCrafting->progress ?? [];
+        $isInitialStartDelay = ($progress['continuation_reason'] ?? null) === 'initial_start_delay'
+            || ($progress['continuation_phase'] ?? null) === 'starting';
         $progress['continuation_active'] = true;
         $progress['continuation_state'] = 'processing';
         $progress['continuation_message'] = 'Batch Crafting is processing the next attempt now.';
         $progress['next_attempt_at'] = null;
+
+        if ($isInitialStartDelay) {
+            $progress['continuation_reason'] = null;
+            $progress['continuation_phase'] = null;
+            $progress['continuation_item'] = null;
+            $progress['continuation_delay_seconds'] = 0;
+        }
 
         $batchCrafting->update(['progress' => $progress]);
 
@@ -1838,7 +2051,13 @@ class BatchCraftingService
 
     private function complete(BatchCrafting $batchCrafting, BatchCraftingEndReason $reason, array $extra = []): BatchCrafting
     {
-        $progress = array_merge($batchCrafting->progress ?? [], $this->clearedContinuationState());
+        $progress = $batchCrafting->progress ?? [];
+
+        if ($reason === BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING && ! isset($progress['int_stop_details'])) {
+            $progress['int_stop_details'] = $this->intStopDetails($batchCrafting, $progress);
+        }
+
+        $progress = array_merge($progress, $this->clearedContinuationState());
 
         $batchCrafting->update(array_merge([
             'completed_at' => now(),
@@ -1859,7 +2078,12 @@ class BatchCraftingService
             $this->logger()->hardStop($batchCrafting, $reason);
             event(new AutomationLogUpdate($batchCrafting->user_id, $playerMessage));
         } elseif ($reason === BatchCraftingEndReason::INT_TOO_LOW_FOR_ENCHANTING) {
-            $playerMessage = 'Batch crafting stopped because your Intelligence is too low for the selected enchantment. Raise INT and try again.';
+            $details = $progress['int_stop_details'];
+            $playerMessage = $this->intStopMessage($details);
+            $this->logger()->hardStop($batchCrafting, $reason);
+            event(new AutomationLogUpdate($batchCrafting->user_id, $playerMessage));
+        } elseif ($reason === BatchCraftingEndReason::MAXED_OR_NOTHING_LEFT && isset($progress['invalid_plan_message'])) {
+            $playerMessage = $progress['invalid_plan_message'];
             $this->logger()->hardStop($batchCrafting, $reason);
             event(new AutomationLogUpdate($batchCrafting->user_id, $playerMessage));
         } elseif ($reason === BatchCraftingEndReason::CRAFT_ENCHANT_SET_TARGET_SET_CHANGED) {
@@ -1891,6 +2115,52 @@ class BatchCraftingService
         event(new BatchCraftingMonitoringUpdated($batchCrafting->character_id));
 
         return $batchCrafting->refresh();
+    }
+
+    private function intStopDetails(BatchCrafting $batchCrafting, array $progress, array $intStopAffixIds = []): array
+    {
+        $affixIds = collect($intStopAffixIds);
+
+        if ($affixIds->filter()->isEmpty()) {
+            $affixIds = collect($progress['enchant_affix_ids'] ?? [])->merge([
+                $progress['craft_enchant_set_current_prefix_affix']['id'] ?? null,
+                $progress['craft_enchant_set_current_suffix_affix']['id'] ?? null,
+                $progress['craft_experience_current_prefix_affix']['id'] ?? null,
+                $progress['craft_experience_current_suffix_affix']['id'] ?? null,
+            ]);
+        }
+
+        $affixIds = $affixIds->filter()
+            ->unique()
+            ->values();
+        $characterInt = (int) $batchCrafting->character()->first()->getInformation()->statMod('int');
+        $affixes = ItemAffix::whereIn('id', $affixIds)->get()
+            ->filter(fn (ItemAffix $affix): bool => $affix->int_required > $characterInt)
+            ->map(fn (ItemAffix $affix): array => [
+                'id' => $affix->id,
+                'name' => $affix->name,
+                'type' => $affix->type,
+                'int_required' => (int) $affix->int_required,
+            ])->values()->all();
+        $requiredInt = collect($affixes)->max('int_required');
+
+        return [
+            'character_int' => $characterInt,
+            'required_int' => $requiredInt,
+            'missing_int' => is_null($requiredInt) ? null : $requiredInt - $characterInt,
+            'affixes' => $affixes,
+        ];
+    }
+
+    private function intStopMessage(array $details): string
+    {
+        if (is_null($details['required_int']) || empty($details['affixes'])) {
+            return 'Batch Crafting stopped: Intelligence too low. The exact blocking enchantment details could not be resolved.';
+        }
+
+        $affixDetails = collect($details['affixes'])->map(fn (array $affix): string => $affix['name'] . ' (' . $affix['type'] . ') requires ' . number_format($affix['int_required']) . ' INT')->implode('; ');
+
+        return 'Batch Crafting stopped: Intelligence too low. Required INT: ' . number_format($details['required_int']) . '. Current INT: ' . number_format($details['character_int']) . '. Missing INT: ' . number_format($details['missing_int']) . '. Blocking enchantments: ' . $affixDetails . '.';
     }
 
     private function logActions(BatchCrafting $batchCrafting, array $actions): void
@@ -2773,54 +3043,7 @@ class BatchCraftingService
             return null;
         }
 
-        $inventory = $character->inventory;
-        $oilSlots = AlchemyBagSlot::whereIn('id', $selectedOilIds)->where('character_id', $character->id)->with('item')->get();
-        $availableOilUnits = (int) $oilSlots->sum('amount');
-        $representativeOil = $oilSlots->first()?->item;
-
-        $items = [];
-        $totalRemainingStacks = 0;
-        $totalCostIfFullyApplied = 0;
-
-        foreach ($selectedItemIds as $slotId) {
-            $slot = $inventory?->slots()->where('id', $slotId)->with('item')->first();
-
-            if (is_null($slot) || is_null($slot->item)) {
-                continue;
-            }
-
-            $remaining = max(0, $slot->item->holy_stacks - $slot->item->holy_stacks_applied);
-            $costPerApplication = is_null($representativeOil) ? 0 : $this->holyItemService->getCost($slot->item, $representativeOil);
-            $totalRemainingStacks += $remaining;
-            $totalCostIfFullyApplied += $costPerApplication * $remaining;
-
-            $items[] = [
-                'item' => $this->itemSnapshot($slot->item),
-                'current_stacks' => $slot->item->holy_stacks_applied,
-                'max_stacks' => $slot->item->holy_stacks,
-                'remaining_capacity' => $remaining,
-                'gold_dust_cost_per_application' => $costPerApplication,
-            ];
-        }
-
-        $maxApplicationsPossible = min($totalRemainingStacks, $availableOilUnits);
-
-        if ($totalCostIfFullyApplied > $character->gold_dust && $totalRemainingStacks > 0) {
-            $averageCost = $totalCostIfFullyApplied / $totalRemainingStacks;
-            $affordable = $averageCost > 0 ? (int) floor($character->gold_dust / $averageCost) : $maxApplicationsPossible;
-            $maxApplicationsPossible = min($maxApplicationsPossible, $affordable);
-        }
-
-        return [
-            'items' => $items,
-            'total_eligible_items' => count($items),
-            'total_remaining_applications' => $totalRemainingStacks,
-            'selected_oils_available' => $availableOilUnits,
-            'gold_dust_available' => (int) $character->gold_dust,
-            'total_cost_if_fully_applied' => $totalCostIfFullyApplied,
-            'max_applications_possible' => max(0, $maxApplicationsPossible),
-            'capped' => $maxApplicationsPossible < $totalRemainingStacks,
-        ];
+        return $this->holyOilApplicationPlan($character, $selectedItemIds, $selectedOilIds, $progress);
     }
 
     private function holyOilsSetPreview(Character $character, BatchCraftingType $type, array $selectedOilIds, array $progress): ?array
@@ -2835,56 +3058,125 @@ class BatchCraftingService
             return null;
         }
 
-        $oilSlots = AlchemyBagSlot::whereIn('id', $selectedOilIds)->where('character_id', $character->id)->with('item')->get();
-        $availableOilUnits = (int) $oilSlots->sum('amount');
-        $representativeOil = $oilSlots->first()?->item;
+        return array_merge(
+            ['set_name' => $set->name ?? 'Set'],
+            $this->holyOilApplicationPlan($character, [], $selectedOilIds, $progress),
+        );
+    }
 
-        $eligibleSlots = $set->slots()->with('item')->get()
+    private function holyOilApplicationPlan(Character $character, array $selectedItemIds, array $selectedOilIds, array $progress): array
+    {
+        $isSetMode = ($progress['holy_oil_mode'] ?? 'selected') === 'set';
+        if ($isSetMode) {
+            $targetSet = InventorySet::where('id', $progress['selected_set_id'] ?? 0)
+                ->where('character_id', $character->id)
+                ->first();
+            $targetSlots = is_null($targetSet)
+                ? collect()
+                : $targetSet->slots()->with('item')->orderBy('id')->get();
+        } else {
+            $targetSlots = is_null($character->inventory)
+                ? collect()
+                : $character->inventory->slots()->whereIn('id', $selectedItemIds)->with('item')->orderBy('id')->get();
+        }
+        $targetSlots = $targetSlots
             ->filter(fn ($slot) => ! is_null($slot->item) && ! in_array($slot->item->type, ['trinket', 'artifact'], true))
-            ->filter(fn ($slot) => ($slot->item->holy_stacks - $slot->item->holy_stacks_applied) > 0);
+            ->filter(fn ($slot) => $slot->item->holy_stacks_applied < $slot->item->holy_stacks)
+            ->values();
+        $oilSlotsById = AlchemyBagSlot::whereIn('id', $selectedOilIds)
+            ->where('character_id', $character->id)
+            ->with('item')
+            ->get()
+            ->keyBy('id');
+        $oilUnits = [];
 
-        $items = [];
-        $totalRemainingStacks = 0;
-        $totalCostIfFullyApplied = 0;
+        foreach ($selectedOilIds as $oilSlotId) {
+            $oilSlot = $oilSlotsById->get($oilSlotId);
 
-        foreach ($eligibleSlots as $slot) {
-            $remaining = max(0, $slot->item->holy_stacks - $slot->item->holy_stacks_applied);
-            $costPerApplication = is_null($representativeOil) ? 0 : $this->holyItemService->getCost($slot->item, $representativeOil);
-            $totalRemainingStacks += $remaining;
-            $totalCostIfFullyApplied += $costPerApplication * $remaining;
+            if (is_null($oilSlot) || is_null($oilSlot->item)) {
+                continue;
+            }
 
-            $items[] = [
-                'item' => $this->itemSnapshot($slot->item),
-                'current_stacks' => $slot->item->holy_stacks_applied,
-                'max_stacks' => $slot->item->holy_stacks,
-                'remaining_capacity' => $remaining,
-                'gold_dust_cost_per_application' => $costPerApplication,
-            ];
+            for ($quantity = 0; $quantity < (int) $oilSlot->amount; $quantity++) {
+                $oilUnits[] = $oilSlot;
+            }
         }
 
-        $maxApplicationsPossible = min($totalRemainingStacks, $availableOilUnits);
+        $selectedOilsAvailable = count($oilUnits);
+        $remainingGoldDust = (int) $character->gold_dust;
+        $plannedItems = [];
+        $applicationSequence = [];
+        $unappliedReason = null;
+        $stopPlanning = false;
 
-        if ($totalCostIfFullyApplied > $character->gold_dust && $totalRemainingStacks > 0) {
-            $averageCost = $totalCostIfFullyApplied / $totalRemainingStacks;
-            $affordable = $averageCost > 0 ? (int) floor($character->gold_dust / $averageCost) : $maxApplicationsPossible;
-            $maxApplicationsPossible = min($maxApplicationsPossible, $affordable);
+        foreach ($targetSlots as $targetSlot) {
+            $currentStacks = (int) $targetSlot->item->holy_stacks_applied;
+            $maximumStacks = (int) $targetSlot->item->holy_stacks;
+            $itemApplications = [];
+            $itemCost = 0;
+
+            while ($currentStacks + count($itemApplications) < $maximumStacks && ! empty($oilUnits)) {
+                $oilSlot = $oilUnits[0];
+                $cost = $this->holyItemService->getCost($targetSlot->item, $oilSlot->item);
+
+                if ($cost > $remainingGoldDust) {
+                    $unappliedReason = 'Insufficient Gold Dust for the next selected Holy Oil and target item.';
+                    $stopPlanning = true;
+
+                    break;
+                }
+
+                array_shift($oilUnits);
+                $remainingGoldDust -= $cost;
+                $itemCost += $cost;
+                $application = [
+                    'target_slot_id' => $targetSlot->id,
+                    'oil_slot_id' => $oilSlot->id,
+                    'gold_dust_cost' => $cost,
+                ];
+                $itemApplications[] = $application;
+                $applicationSequence[] = $application;
+            }
+
+            if (! empty($itemApplications)) {
+                $plannedItems[] = [
+                    'item' => $this->itemSnapshot($targetSlot->item),
+                    'full_item_details' => (new ItemTransformer())->transform($targetSlot->item),
+                    'target_slot_id' => $targetSlot->id,
+                    'current_stacks' => $currentStacks,
+                    'planned_applications' => count($itemApplications),
+                    'resulting_stacks' => $currentStacks + count($itemApplications),
+                    'maximum_stacks' => $maximumStacks,
+                    'exact_gold_dust_cost' => $itemCost,
+                    'oils_consumed' => count($itemApplications),
+                ];
+            }
+
+            if ($stopPlanning) {
+                break;
+            }
         }
 
-        $maxApplicationsPossible = max(0, $maxApplicationsPossible);
+        if (is_null($unappliedReason) && ! empty($oilUnits)) {
+            $unappliedReason = $targetSlots->isEmpty()
+                ? 'No eligible target items have remaining Holy Oil stacks.'
+                : 'Every eligible target item will reach its maximum Holy Oil stacks.';
+        }
+
+        $applicationsPlanned = count($applicationSequence);
+        $oilsNotApplicable = max(0, $selectedOilsAvailable - $applicationsPlanned);
 
         return [
-            'set_name' => $set->name ?? 'Set',
-            'items' => $items,
-            'total_eligible_items' => count($items),
-            'total_remaining_applications' => $totalRemainingStacks,
-            'selected_oils_available' => $availableOilUnits,
+            'items' => $plannedItems,
+            'application_sequence' => $applicationSequence,
+            'selected_oils_available' => $selectedOilsAvailable,
+            'applications_planned' => $applicationsPlanned,
+            'items_affected' => count($plannedItems),
+            'exact_gold_dust_required' => (int) $character->gold_dust - $remainingGoldDust,
             'gold_dust_available' => (int) $character->gold_dust,
-            'total_cost_if_fully_applied' => $totalCostIfFullyApplied,
-            'max_applications_possible' => $maxApplicationsPossible,
-            'capped' => $maxApplicationsPossible < $totalRemainingStacks,
-            'capped_message' => $maxApplicationsPossible < $totalRemainingStacks
-                ? "This can apply {$maxApplicationsPossible} of {$totalRemainingStacks} remaining Holy Oil stacks with your current oils and gold dust."
-                : null,
+            'oils_not_applicable' => $oilsNotApplicable,
+            'unapplied_reason' => $oilsNotApplicable > 0 ? $unappliedReason : null,
+            'capped' => $oilsNotApplicable > 0,
         ];
     }
 
@@ -3675,11 +3967,14 @@ class BatchCraftingService
 
     private function craftSetProgress(Character $character, array $progress): array
     {
-        $queue = $this->processor->craftSetQueue();
-        $keys = $this->processor->craftEnchantSetPlanKeys($queue);
         $plan = is_array($progress['craft_set_plan'] ?? null) ? $progress['craft_set_plan'] : [];
+        $plannerTargets = $this->processor->craftSetPlannerTargets();
+        $plannerKeys = $this->processor->craftEnchantSetPlanKeys($plannerTargets);
 
-        $this->validateCraftSetPlan($character, $queue, $keys, $plan);
+        $this->validateCraftSetPlan($character, $plannerTargets, $plannerKeys, $plan);
+
+        $queue = $this->processor->craftSetExecutionQueue($character, $plan);
+        $keys = $this->processor->craftEnchantSetPlanKeys($queue);
 
         return [
             'craft_mode' => 'craft_set',
@@ -3697,30 +3992,63 @@ class BatchCraftingService
 
     private function validateCraftSetPlan(Character $character, array $queue, array $keys, array $plan): void
     {
+        $selectedHands = collect();
+
         foreach ($keys as $index => $key) {
             $entry = is_array($plan[$key] ?? null) ? $plan[$key] : [];
+            $target = $queue[$index];
+            $isHand = ($target['category'] ?? null) === 'hand';
+            $candidates = $isHand
+                ? $this->processor->craftableHandCandidates($character)
+                : $this->processor->craftableItemCandidatesForTarget($character, $target['type'], $target['crafting_type']);
 
             if (! isset($entry['selected_item_id']) || is_null($entry['selected_item_id'])) {
+                if (! ($target['optional'] ?? false) && $candidates->isEmpty()) {
+                    throw ValidationException::withMessages([
+                        'progress.craft_set_plan' => 'No craftable item is currently available for ' . $target['label'] . '.',
+                    ]);
+                }
+
                 continue;
             }
 
-            $target = $queue[$index];
-            $candidates = $this->processor->craftableItemCandidatesForTarget($character, $target['type'], $target['crafting_type']);
             $selectedItemId = (int) $entry['selected_item_id'];
+            $selectedItem = $candidates->first(fn ($candidate) => (int) $candidate->id === $selectedItemId);
 
-            if (! $candidates->contains(fn ($candidate) => (int) $candidate->id === $selectedItemId)) {
+            if (is_null($selectedItem)) {
                 throw ValidationException::withMessages([
                     'progress.craft_set_plan' => 'One or more selected items are not craftable by this character for the matching slot.',
                 ]);
             }
+
+            if ($isHand) {
+                if (! $this->setHandsValidation->isHandItem($selectedItem)) {
+                    throw ValidationException::withMessages([
+                        'progress.craft_set_plan' => 'Only weapons and Shields may be selected for Left Hand or Right Hand.',
+                    ]);
+                }
+
+                $selectedHands->push($selectedItem);
+            }
+        }
+
+        if (! $this->setHandsValidation->areHandItemsValid($selectedHands)) {
+            throw ValidationException::withMessages([
+                'progress.craft_set_plan' => 'A two-handed weapon occupies both hands. Clear the other hand before starting.',
+            ]);
         }
     }
 
     private function craftEnchantSetProgress(Character $character, array $progress): array
     {
-        $queue = $this->processor->craftSetQueue();
-        $keys = $this->processor->craftEnchantSetPlanKeys($queue);
         $plan = is_array($progress['enchant_plan'] ?? null) ? $progress['enchant_plan'] : [];
+        $plannerTargets = $this->processor->craftSetPlannerTargets();
+        $plannerKeys = $this->processor->craftEnchantSetPlanKeys($plannerTargets);
+
+        $this->validateCraftSetPlan($character, $plannerTargets, $plannerKeys, $plan);
+
+        $queue = $this->processor->craftSetExecutionQueue($character, $plan);
+        $keys = $this->processor->craftEnchantSetPlanKeys($queue);
 
         $this->validateCraftEnchantSetPlan($character, $queue, $keys, $plan);
 
@@ -3737,15 +4065,13 @@ class BatchCraftingService
             'craft_enchant_set_phase' => 'crafting',
             'craft_enchant_set_craft_index' => 0,
             'craft_enchant_set_enchant_index' => 0,
-            'craft_enchant_set_finalize_index' => 0,
             'craft_enchant_set_crafted_item_ids' => [],
             'craft_enchant_set_prefix_applied_count' => 0,
             'craft_enchant_set_suffix_applied_count' => 0,
-            'craft_enchant_set_total_work_units' => count($queue) * 3,
+            'craft_enchant_set_total_work_units' => count($queue),
             'craft_enchant_set_completed_work_units' => 0,
             'craft_enchant_set_surviving_crafted_count' => 0,
             'craft_enchant_set_replacement_key' => null,
-            'craft_enchant_set_finalized_keys' => [],
             'craft_enchant_set_lost_item_keys' => [],
             'craft_enchant_set_counted_crafted_keys' => [],
         ];
