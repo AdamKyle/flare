@@ -496,6 +496,12 @@ export default class ExplorationSection extends React.Component<any, any> {
         });
     }
 
+    isExplorationOutputVisible(): boolean {
+        const type = this.props.exploration_output?.type;
+
+        return type === "active" || type === "warning" || type === "ended";
+    }
+
     renderAudotmationIsRunning() {
         if (this.props.character.is_faction_loyalty_automation_running) {
             return (
@@ -529,7 +535,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             );
         }
 
-        if (this.props.character.is_delve_running) {
+        if (this.props.character.is_delve_visible) {
             return (
                 <Fragment>
                     {this.state.loading ? <LoadingProgressBar /> : null}
@@ -540,18 +546,22 @@ export default class ExplorationSection extends React.Component<any, any> {
                     />
 
                     <div className="flex flex-wrap justify-center items-start gap-2 mt-4">
-                        <DangerButton
-                            button_label={"Stop Delve"}
-                            on_click={this.stopDelveExploration.bind(this)}
-                            disabled={this.state.loading}
-                            additional_css={"h-10"}
-                        />
-                        <PrimaryButton
-                            button_label={"Close"}
-                            on_click={this.closeExploration.bind(this)}
-                            disabled={this.state.loading}
-                            additional_css={"h-10"}
-                        />
+                        {this.props.character.is_delve_running ? (
+                            <DangerButton
+                                button_label={"Stop Delve"}
+                                on_click={this.stopDelveExploration.bind(this)}
+                                disabled={this.state.loading}
+                                additional_css={"h-10"}
+                            />
+                        ) : null}
+                        {this.props.character.is_delve_running ? (
+                            <PrimaryButton
+                                button_label={"Close"}
+                                on_click={this.closeExploration.bind(this)}
+                                disabled={this.state.loading}
+                                additional_css={"h-10"}
+                            />
+                        ) : null}
                     </div>
                     <div className="mt-3 text-center">
                         <a href="/information/delve" target="_blank">
@@ -563,7 +573,7 @@ export default class ExplorationSection extends React.Component<any, any> {
             );
         }
 
-        if (this.props.character.is_automation_running) {
+        if (this.isExplorationOutputVisible()) {
             return (
                 <Fragment>
                     {this.state.loading ? <LoadingProgressBar /> : null}
@@ -574,18 +584,22 @@ export default class ExplorationSection extends React.Component<any, any> {
                     />
 
                     <div className="flex flex-wrap justify-center items-start gap-2 mt-4">
-                        <DangerButton
-                            button_label={"Stop Exploration"}
-                            on_click={this.stopExploration.bind(this)}
-                            disabled={this.state.loading}
-                            additional_css={"h-10"}
-                        />
-                        <PrimaryButton
-                            button_label={"Close Exploration"}
-                            on_click={this.closeExploration.bind(this)}
-                            disabled={this.state.loading}
-                            additional_css={"h-10"}
-                        />
+                        {this.props.exploration_output?.type === "active" ? (
+                            <DangerButton
+                                button_label={"Stop Exploration"}
+                                on_click={this.stopExploration.bind(this)}
+                                disabled={this.state.loading}
+                                additional_css={"h-10"}
+                            />
+                        ) : null}
+                        {this.props.exploration_output?.type === "active" ? (
+                            <PrimaryButton
+                                button_label={"Close Exploration"}
+                                on_click={this.closeExploration.bind(this)}
+                                disabled={this.state.loading}
+                                additional_css={"h-10"}
+                            />
+                        ) : null}
                     </div>
                     <div className="mt-3 text-center">
                         <a href="/information/automation" target="_blank">
@@ -889,8 +903,8 @@ export default class ExplorationSection extends React.Component<any, any> {
     render() {
         if (
             this.props.character.is_faction_loyalty_automation_running ||
-            this.props.character.is_automation_running ||
-            this.props.character.is_delve_running
+            this.props.character.is_delve_visible ||
+            this.isExplorationOutputVisible()
         ) {
             return this.renderAudotmationIsRunning();
         }

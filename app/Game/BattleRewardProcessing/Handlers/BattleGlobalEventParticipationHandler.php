@@ -9,6 +9,7 @@ use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use Exception;
 
 class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipationHandler
@@ -17,7 +18,11 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
      * @param RandomAffixGenerator $randomAffixGenerator
      * @param EventGoalsService $eventGoalService
      */
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalService)
+    public function __construct(
+        RandomAffixGenerator $randomAffixGenerator,
+        EventGoalsService $eventGoalService,
+        private readonly GlobalEventGoalProgressionService $globalEventGoalProgressionService,
+    )
     {
         parent::__construct($randomAffixGenerator, $eventGoalService);
     }
@@ -87,5 +92,11 @@ class BattleGlobalEventParticipationHandler extends BaseGlobalEventGoalParticipa
             ->first()?->kills ?? 0;
 
         event(new UpdateEventGoalCurrentProgressForCharacter($character->user->id, $currentKills));
+
+        $event = $globalEventGoal->event;
+
+        if (! is_null($event?->event_goal_steps)) {
+            $this->globalEventGoalProgressionService->advanceIfCurrentGoalComplete($globalEventGoal);
+        }
     }
 }

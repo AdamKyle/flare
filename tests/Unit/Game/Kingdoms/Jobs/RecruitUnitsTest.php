@@ -2,6 +2,10 @@
 
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
+use Tests\Traits\CreateKingdom;
+
+use Tests\Traits\CreateGameUnit;
+
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitInQueue;
@@ -16,7 +20,7 @@ use Tests\TestCase;
 
 class RecruitUnitsTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameUnit, CreateKingdom, RefreshDatabase;
 
     public function testCompletionRejectsOverMaximumQueueAndRefundsResources(): void
     {
@@ -33,19 +37,19 @@ class RecruitUnitsTest extends TestCase
             'max_iron' => 1000,
             'max_population' => 1000,
         ])->getKingdom();
-        $unit = GameUnit::factory()->create([
+        $unit = $this->createGameUnit([
             'wood_cost' => 10,
             'clay_cost' => 10,
             'stone_cost' => 10,
             'iron_cost' => 10,
             'required_population' => 1,
         ]);
-        KingdomUnit::factory()->create([
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT,
         ]);
-        $queue = UnitInQueue::factory()->create([
+        $queue = $this->createUnitQueue([
             'character_id' => $characterFactory->getCharacter()->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,

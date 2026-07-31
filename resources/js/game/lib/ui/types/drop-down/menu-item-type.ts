@@ -3,5 +3,9 @@ export default interface MenuItemType {
 
     icon_class?: string;
 
+    extra_class?: string;
+
     on_click: (...args: any[]) => void;
+
+    disabled?: boolean;
 }

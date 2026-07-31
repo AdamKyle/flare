@@ -2,20 +2,23 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
 
 class EventGoalServiceTest extends TestCase
 {
-    use CreateGameMap, CreateGlobalEventGoal, RefreshDatabase;
+    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, RefreshDatabase;
 
     private ?EventGoalsService $eventGoalService;
 
@@ -46,8 +49,16 @@ class EventGoalServiceTest extends TestCase
 
         $character = $character->refresh();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -90,8 +101,16 @@ class EventGoalServiceTest extends TestCase
 
         $character = $character->refresh();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -133,8 +152,16 @@ class EventGoalServiceTest extends TestCase
 
         $character = $character->refresh();
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id]);
+
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WINTER_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,

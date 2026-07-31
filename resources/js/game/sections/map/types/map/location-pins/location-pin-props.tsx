@@ -5,6 +5,8 @@ export default interface LocationPinProps {
 
     pin_class: string;
 
+    aria_label?: string;
+
     onMouseEnter?: () => void;
 
     onMouseLeave?: () => void;

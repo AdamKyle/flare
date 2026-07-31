@@ -2,8 +2,11 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\ScheduledEvent;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\AutomationType;
@@ -22,7 +25,9 @@ use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
+use App\Game\Tops\Events\FactionLoyaltyTopsUpdated;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +53,7 @@ use Tests\Traits\CreateScheduledEvent;
 
 class BattleRewardServiceTest extends TestCase
 {
-    use CreateCharacterAutomation, CreateEvent, CreateExplorationLog, CreateGameMap, CreateGlobalEventGoal, CreateMonster, RefreshDatabase, CreateItem, CreateItemAffix, CreateScheduledEvent;
+    use CreateCharacterAutomation, CreateCharacterBattleReward, CreateEvent, CreateExplorationLog, CreateGameMap, CreateGlobalEventGoal, CreateItem, CreateItemAffix, CreateMonster, CreateScheduledEvent, RefreshDatabase;
 
     private ?BattleRewardService $battleRewardService;
 
@@ -272,7 +277,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals($monster->xp, $character->xp - $initialXp);
     }
 
-    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn(): void
+    public function testCurrencyMutationDoesNotSynchronouslyBroadcastWhenLoggedIn(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -296,7 +301,7 @@ class BattleRewardServiceTest extends TestCase
 
         $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
-        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
     public function testBattleRewardsPassActualGoldGainedIntoGoldRush(): void
@@ -386,7 +391,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertFalse($character->globalEventParticipation()->exists());
     }
 
     public function testShouldNotUpdateGlobalEventParticipationWhenNoGlobalEventIsRunning(): void
@@ -397,8 +402,14 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
         $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         Event::fake();
@@ -408,7 +419,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertFalse($character->globalEventParticipation()->exists());
     }
 
     public function testShouldUpdateGlobalEventParticipation(): void
@@ -428,11 +439,18 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createEvent([
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $this->createGlobalEventGoal([
+            'event_id' => $event->id,
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
@@ -446,7 +464,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventParticipation);
+        $this->assertTrue($character->globalEventParticipation()->exists());
     }
 
     public function testShouldUpdateGlobalEventParticipationWhenParticipationExists(): void
@@ -466,11 +484,18 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createEvent([
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
+            'event_id' => $event->id,
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
@@ -497,8 +522,8 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEquals(2, $character->globalEventParticipation->current_kills);
-        $this->assertEquals(2, $character->globalEventKills->kills);
+        $this->assertEquals(2, $character->globalEventParticipation()->where('global_event_goal_id', $eventGoal->id)->first()->current_kills);
+        $this->assertEquals(2, $character->globalEventKills()->where('global_event_goal_id', $eventGoal->id)->first()->kills);
     }
 
     public function testNoFactionRewardsGivenWhenCharacterIsInPurgatory(): void
@@ -645,6 +670,33 @@ class BattleRewardServiceTest extends TestCase
 
         $this->assertEquals(1, $matchingTask['current_amount']);
         Event::assertNotDispatched(FactionLoyaltyUpdate::class);
+    }
+
+    public function testProcessRewardsBroadcastsFactionLoyaltyTopsUpdatedAfterFactionLoyaltyBounty(): void
+    {
+        $character = $this->characterFactory->getCharacter();
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($character);
+
+        $character = $factionLoyaltyFactory->getCharacter();
+        $factionLoyaltyNpc = $factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $monster = $factionLoyaltyFactory->getBountyMonstersForNpc($factionLoyaltyNpc)[0];
+
+        Event::fake();
+        Queue::fake();
+
+        $this->battleRewardService
+            ->setUp($character->id, $monster->id)
+            ->setContext([
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_skill_xp' => 0,
+                'total_faction_points' => 0,
+            ])
+            ->processRewards();
+
+        Event::assertDispatched(FactionLoyaltyUpdate::class);
+        Event::assertDispatched(FactionLoyaltyTopsUpdated::class);
     }
 
     public function testNoFactionRewardsGivenWhenCharacterIsAutoBattling(): void
@@ -1117,11 +1169,18 @@ class BattleRewardServiceTest extends TestCase
             'xp' => 1,
         ]);
 
-        $this->createEvent([
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
+            'event_id' => $event->id,
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
@@ -1151,8 +1210,8 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEquals(3, $character->globalEventParticipation->current_kills);
-        $this->assertEquals(3, $character->globalEventKills->kills);
+        $this->assertEquals(3, $character->globalEventParticipation()->where('global_event_goal_id', $eventGoal->id)->first()->current_kills);
+        $this->assertEquals(3, $character->globalEventKills()->where('global_event_goal_id', $eventGoal->id)->first()->kills);
     }
 
     public function testShouldNotUpdateGlobalEventParticipationWhenCharacterNotOnEventMap(): void
@@ -1163,8 +1222,14 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
         $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $this->createGlobalEventGoal([
@@ -1181,7 +1246,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertFalse($character->globalEventParticipation()->exists());
     }
 
     public function testShouldUpdateGlobalEventParticipationForDelusionalMemoriesEvent(): void
@@ -1201,12 +1266,19 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createEvent([
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::BATTLE,
         ]);
 
         $this->createGlobalEventGoal([
+            'event_id' => $event->id,
             'max_kills' => 100,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
@@ -1220,7 +1292,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventParticipation);
+        $this->assertTrue($character->globalEventParticipation()->exists());
     }
 
     public function testManualBattleKillsOnEventMapCountForThatMapsEventGoal(): void
@@ -1240,11 +1312,18 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createEvent([
-            'type' => EventType::WINTER_EVENT,
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
         ]);
 
-        $this->createGlobalEventGoal([
+        $event = $this->createEvent([
+            'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'event_id' => $event->id,
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
@@ -1258,8 +1337,10 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventParticipation);
-        $this->assertEquals(1, $character->globalEventParticipation->current_kills);
+        $participation = $character->globalEventParticipation()->where('global_event_goal_id', $eventGoal->id)->first();
+
+        $this->assertNotNull($participation);
+        $this->assertEquals(1, $participation->current_kills);
     }
 
     public function testManualBattleKillsDoNotCountWhenMaxKillsIsNull(): void
@@ -1279,8 +1360,14 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
         $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $this->createGlobalEventGoal([
@@ -1297,7 +1384,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertFalse($character->globalEventParticipation()->exists());
     }
 
     public function testProcessLedgerAwareRewardsCreatesFactionLoyaltySpecificStepsForFactionLoyaltyRequest(): void
@@ -1307,7 +1394,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $this->characterFactory->getCharacter();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1358,7 +1445,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1401,7 +1488,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $this->characterFactory->getCharacter();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1443,7 +1530,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $beforeSlotCount = $character->inventory->slots()->count();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1482,7 +1569,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $this->characterFactory->getCharacter();
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1526,7 +1613,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->update(['gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1567,7 +1654,7 @@ class BattleRewardServiceTest extends TestCase
         $character = $this->characterFactory->getCharacter();
         $character->update(['level' => 1, 'xp' => 0, 'xp_next' => 100, 'gold' => 0, 'gold_dust' => 0, 'shards' => 0]);
 
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -1617,8 +1704,14 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::CRAFT,
         ]);
 
@@ -1636,7 +1729,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertFalse($character->globalEventParticipation()->exists());
     }
 
     public function testDelusionalMemoriesKillsDoNotCountWhenCurrentStepIsEnchant(): void
@@ -1656,8 +1749,14 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
+        $schedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
         $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
         ]);
 
@@ -1675,7 +1774,7 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertFalse($character->globalEventParticipation()->exists());
     }
 
     public function testEventKillCountingResolvesEventGoalFromCharactersCurrentMap(): void
@@ -1697,18 +1796,37 @@ class BattleRewardServiceTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
         ]);
 
-        $this->createEvent([
+        $winterSchedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::WINTER_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $delusionalSchedule = ScheduledEvent::factory()->create([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'status' => ScheduledEventStatus::RUNNING,
+        ]);
+
+        $winterEvent = $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $winterSchedule->id,
+        ]);
+
+        $delusionalEvent = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $delusionalSchedule->id,
+            'current_event_goal_step' => GlobalEventSteps::BATTLE,
         ]);
 
         $winterGoal = $this->createGlobalEventGoal([
+            'event_id' => $winterEvent->id,
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
 
-        $this->createGlobalEventGoal([
+        $delusionalGoal = $this->createGlobalEventGoal([
+            'event_id' => $delusionalEvent->id,
             'max_kills' => 100,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
@@ -1722,8 +1840,9 @@ class BattleRewardServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventParticipation);
-        $this->assertEquals($winterGoal->id, $character->globalEventParticipation->global_event_goal_id);
+        $this->assertTrue($character->globalEventParticipation()->exists());
+        $this->assertEquals($winterGoal->id, $character->globalEventParticipation()->first()->global_event_goal_id);
+        $this->assertEquals(0, $character->globalEventParticipation()->where('global_event_goal_id', $delusionalGoal->id)->count());
     }
 
 

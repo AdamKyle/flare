@@ -60,6 +60,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -105,6 +106,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -155,6 +157,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -193,6 +196,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -231,6 +235,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -284,7 +289,7 @@ class RestartGlobalEventGoalTest extends TestCase
         ]);
 
         $inventory = GlobalEventCraftingInventory::create([
-            'global_event_id' => $eventGoal->id,
+            'global_event_goal_id' => $eventGoal->id,
             'character_id' => $this->character->id,
         ]);
 
@@ -320,6 +325,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -339,7 +345,7 @@ class RestartGlobalEventGoalTest extends TestCase
         ]);
 
         $inventory = GlobalEventCraftingInventory::create([
-            'global_event_id' => $eventGoal->id,
+            'global_event_goal_id' => $eventGoal->id,
             'character_id' => $this->character->id,
         ]);
 
@@ -383,6 +389,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -402,7 +409,7 @@ class RestartGlobalEventGoalTest extends TestCase
         ]);
 
         $inventory = GlobalEventCraftingInventory::create([
-            'global_event_id' => $eventGoal->id,
+            'global_event_goal_id' => $eventGoal->id,
             'character_id' => $this->character->id,
         ]);
 
@@ -445,6 +452,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,
@@ -464,7 +472,7 @@ class RestartGlobalEventGoalTest extends TestCase
         ]);
 
         $inventory = GlobalEventCraftingInventory::create([
-            'global_event_id' => $eventGoal->id,
+            'global_event_goal_id' => $eventGoal->id,
             'character_id' => $this->character->id,
         ]);
 
@@ -507,6 +515,7 @@ class RestartGlobalEventGoalTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'should_be_unique' => true,
             'unique_type' => RandomAffixDetails::LEGENDARY,

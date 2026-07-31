@@ -15,6 +15,8 @@ class AccountDeletionController extends Controller
             return redirect()->back()->with('error', 'You cannot do that.');
         }
 
+        $user->update(['will_be_deleted' => true]);
+
         \Auth::logout();
 
         AccountDeletionJob::dispatch($user, true)->delay(now()->addMinutes(1))->onConnection('long_running');

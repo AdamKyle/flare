@@ -8,7 +8,12 @@ Route::middleware([
     'auth',
 ])->group(function () {
     Route::get('/game/tops', ['as' => 'game.tops', 'uses' => 'GameTopsController@tops']);
-    Route::get('/game/tops/{character}', ['as' => 'game.tops.character.stats', 'uses' => 'GameTopsController@characterStats']);
+    Route::get('/game/tops/characters/{character}', ['as' => 'game.tops.character.profile', 'uses' => 'GameTopsController@characterStats']);
+    Route::get('/game/tops/exploration', ['as' => 'game.tops.exploration', 'uses' => 'GameTopsController@exploration']);
+    Route::get('/game/tops/delve', ['as' => 'game.tops.delve', 'uses' => 'GameTopsController@delve']);
+    Route::get('/game/tops/faction-loyalty', ['as' => 'game.tops.faction-loyalty', 'uses' => 'GameTopsController@factionLoyalty']);
+    Route::get('/game/tops/kingdoms', ['as' => 'game.tops.kingdoms', 'uses' => 'GameTopsController@kingdoms']);
+    Route::get('/game/tops/{character}', ['as' => 'game.tops.character.stats', 'uses' => 'GameTopsController@oldCharacterStats'])->where('character', '[0-9]+');
 
     Route::get('/tlessa-donations', ['as' => 'tlessa.donations', 'uses' => 'GameDonationController@donationSection']);
 });

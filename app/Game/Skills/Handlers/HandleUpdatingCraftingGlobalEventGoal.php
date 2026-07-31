@@ -4,7 +4,6 @@ namespace App\Game\Skills\Handlers;
 
 use App\Flare\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventGoal;
@@ -14,6 +13,8 @@ use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\GlobalEventSteps;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -24,7 +25,12 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
 
     private bool $wasItemAccepted = false;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator, EventGoalsService $eventGoalsService)
+    public function __construct(
+        RandomAffixGenerator $randomAffixGenerator,
+        EventGoalsService $eventGoalsService,
+        private readonly GlobalEventGoalProgressionService $globalEventGoalProgressionService,
+        private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
+    )
     {
         parent::__construct($randomAffixGenerator, $eventGoalsService);
     }
@@ -37,13 +43,13 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
     public function handleUpdatingCraftingGlobalEventGoal(Character $character, Item $item): void
     {
 
-        $event = Event::where('current_event_goal_step', GlobalEventSteps::CRAFT)->first();
+        $event = $this->globalEventGoalEligibilityService->eventForCharacterMap($character);
 
-        if (is_null($event)) {
+        if (is_null($event) || $event->current_event_goal_step !== GlobalEventSteps::CRAFT) {
             return;
         }
 
-        $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
+        $globalEventGoal = $event->globalEventGoals()->latest('id')->first();
 
         if (is_null($globalEventGoal)) {
             return;
@@ -82,6 +88,10 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
         ServerMessageHandler::sendBasicMessage($character->user, '"Thank you child! This item will help in the fight against The Federation! we shall save it for when we are ready for to enchant them!" The Red Hawk Soldier takes the item from you. Onto the next child.');
 
         $this->wasItemAccepted = true;
+
+        if (! is_null($event->event_goal_steps)) {
+            $this->globalEventGoalProgressionService->advanceIfCurrentGoalComplete($globalEventGoal);
+        }
     }
 
     /**
@@ -95,10 +105,10 @@ class HandleUpdatingCraftingGlobalEventGoal extends BaseGlobalEventGoalParticipa
     /**
      * Set the item into the characters global event crafting inventory.
      */
-    private function updateOrCreateEventInventory(Character $character, GlobalEventGoal $event, Item $item): void
+    private function updateOrCreateEventInventory(Character $character, GlobalEventGoal $globalEventGoal, Item $item): void
     {
         $inventory = GlobalEventCraftingInventory::firstOrCreate([
-            'global_event_id' => $event->id,
+            'global_event_goal_id' => $globalEventGoal->id,
             'character_id' => $character->id,
         ]);
 

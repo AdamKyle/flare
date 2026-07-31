@@ -62,6 +62,7 @@ use App\Flare\Services\CharacterXPService;
 use App\Flare\Services\DailyGoldDustService;
 use App\Flare\Services\DelveMonsterService;
 use App\Flare\Services\EventSchedulerService;
+use App\Game\Raids\Services\RaidMapConflictService;
 use App\Flare\Services\SiteAccessStatisticService;
 use App\Flare\Services\SkillBonusContextService;
 use App\Flare\Transformers\BasicKingdomTransformer;
@@ -470,8 +471,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ClassRanksWeaponMasteriesBuilder;
         });
 
-        $this->app->bind(EventSchedulerService::class, function () {
-            return new EventSchedulerService;
+        $this->app->bind(EventSchedulerService::class, function ($app) {
+            return new EventSchedulerService($app->make(RaidMapConflictService::class));
         });
 
         $this->app->bind(BuildQuestCacheService::class, function ($app) {

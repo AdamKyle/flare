@@ -45,11 +45,11 @@ class ExplorationController extends Controller
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
             ->whereIn('type', [
-                LocationType::UNDERWATER_CAVES,
-                LocationType::ALCHEMY_CHURCH,
-                LocationType::LORDS_STRONG_HOLD,
-                LocationType::BROKEN_ANVIL,
-                LocationType::TWSITED_MAIDENS_DUNGEONS,
+                LocationType::UNDERWATER_CAVES->value,
+                LocationType::ALCHEMY_CHURCH->value,
+                LocationType::LORDS_STRONG_HOLD->value,
+                LocationType::BROKEN_ANVIL->value,
+                LocationType::TWISTED_MAIDENS_DUNGEONS->value,
             ])
             ->first();
 

@@ -6,6 +6,7 @@ use App\Admin\Services\AdminLogsDashboardService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class AdminLogsDashboardController extends Controller
 {
@@ -23,24 +24,35 @@ class AdminLogsDashboardController extends Controller
         $fileKey = $request->string('file', 'laravel')->toString();
         $page = max(1, $request->integer('page', 1));
         $severity = $request->string('severity', '')->toString();
-        $dateFrom = $request->string('date_from', '')->toString();
-        $dateTo = $request->string('date_to', '')->toString();
+        $dateFrom = $request->string('date_from', now()->subDay()->toDateString())->toString();
+        $dateTo = $request->string('date_to', now()->toDateString())->toString();
+        $cursor = $request->string('cursor', '')->toString();
 
-        return response()->json(
-            $this->adminLogsDashboardService->entries($fileKey, $page, $severity, $dateFrom, $dateTo),
-        );
+        try {
+            return response()->json(
+                $this->adminLogsDashboardService->entries($fileKey, $page, $severity, $dateFrom, $dateTo, $cursor),
+            );
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return response()->json([
+                'message' => $throwable->getMessage(),
+            ], 500);
+        }
     }
 
-    public function summary(Request $request): JsonResponse
+    public function entryDetail(Request $request): JsonResponse
     {
-        $fileKey = $request->string('file', 'laravel')->toString();
-        $severity = $request->string('severity', '')->toString();
-        $dateFrom = $request->string('date_from', '')->toString();
-        $dateTo = $request->string('date_to', '')->toString();
-
-        return response()->json(
-            $this->adminLogsDashboardService->summary($fileKey, $severity, $dateFrom, $dateTo),
+        $detail = $this->adminLogsDashboardService->entryDetail(
+            $request->string('file')->toString(),
+            $request->string('detail_id')->toString(),
         );
+
+        if (is_null($detail)) {
+            return response()->json(['message' => 'The requested log detail is no longer available.'], 404);
+        }
+
+        return response()->json($detail);
     }
 
     public function poll(Request $request): JsonResponse

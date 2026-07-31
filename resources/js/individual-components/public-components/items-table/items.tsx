@@ -24,13 +24,15 @@ export default class Items extends React.Component<
     constructor(props: ItemTableProps) {
         super(props);
 
+        const urlParams = new URLSearchParams(window.location.search);
+
         this.state = {
             loading: true,
             items: [],
             item_to_view: null,
             error_message: null,
-            filter: null,
-            search_text: null,
+            filter: urlParams.get("filter"),
+            search_text: urlParams.get("search_text"),
         };
 
         this.ajax = itemsTableServiceContainer().fetch(ItemTableAjax);
@@ -53,7 +55,10 @@ export default class Items extends React.Component<
             error_message: null,
         });
 
-        this.ajax.fetchTableData(this, this.props.type);
+        this.ajax.fetchTableData(this, this.props.type, {
+            filter: this.state.filter,
+            search_text: this.state.search_text,
+        });
     }
 
     viewItem(itemId: number) {
@@ -121,6 +126,8 @@ export default class Items extends React.Component<
                 )}
                 close_view_item_action={this.closeViewSection.bind(this)}
                 set_item_filter={this.setFilters.bind(this)}
+                initial_filter={this.state.filter}
+                initial_search_text={this.state.search_text}
             />
         );
     }

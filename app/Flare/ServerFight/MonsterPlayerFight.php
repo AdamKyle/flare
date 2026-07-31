@@ -393,11 +393,10 @@ class MonsterPlayerFight
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
 
-        $mapName = $map->gameMap->name;
+        $gameMap = $map->gameMap;
+        $mapName = $gameMap->name;
 
         $monsters = Cache::get('monsters')[$mapName];
-
-        $gameMap = GameMap::where('name', $mapName)->first();
 
         if (is_null($gameMap)) {
             return null;

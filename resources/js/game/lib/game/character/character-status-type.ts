@@ -19,6 +19,8 @@ export default interface CharacterStatusType {
 
     is_delve_running: boolean;
 
+    is_delve_visible: boolean;
+
     active_automation: {
         type: number;
         name: string;

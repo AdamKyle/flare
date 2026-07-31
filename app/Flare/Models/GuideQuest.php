@@ -2,6 +2,9 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\GuideQuestFactory;
@@ -69,6 +72,8 @@ class GuideQuest extends Model
         'only_during_event',
         'be_on_game_map',
         'required_event_goal_participation',
+        'required_event_goal_crafting_participation',
+        'required_event_goal_enchanting_participation',
         'required_holy_stacks',
         'required_attached_gems',
         'required_specialty_type',
@@ -77,6 +82,9 @@ class GuideQuest extends Model
         'required_fame_level',
         'required_delve_survival_time',
         'required_delve_pack_size',
+        'required_batch_crafting_type',
+        'required_batch_crafting_hours',
+        'required_batch_crafted_items',
     ];
 
     /**
@@ -131,11 +139,16 @@ class GuideQuest extends Model
         'only_during_event' => 'integer',
         'be_on_game_map' => 'integer',
         'required_event_goal_participation' => 'integer',
+        'required_event_goal_crafting_participation' => 'integer',
+        'required_event_goal_enchanting_participation' => 'integer',
         'required_holy_stacks' => 'integer',
         'required_attached_gems' => 'integer',
         'required_fame_level' => 'integer',
         'required_delve_survival_time' => 'integer',
         'required_delve_pack_size' => 'integer',
+        'required_batch_crafting_type' => 'string',
+        'required_batch_crafting_hours' => 'integer',
+        'required_batch_crafted_items' => 'array',
     ];
 
     protected $appends = [
@@ -151,6 +164,8 @@ class GuideQuest extends Model
         'kingdom_building_name',
         'parent_quest_name',
         'required_to_be_on_game_map_name',
+        'required_batch_crafting_type_name',
+        'required_batch_crafted_item_names',
     ];
 
     public function getSkillNameAttribute()
@@ -279,6 +294,74 @@ class GuideQuest extends Model
         }
 
         return GameMap::find($this->be_on_game_map)->name;
+    }
+
+    public function getRequiredBatchCraftingTypeNameAttribute(): ?string
+    {
+        return match ($this->required_batch_crafting_type) {
+            'craft' => 'Craft For Experience',
+            'craft_and_enchant' => 'Craft and Enchant For Experience',
+            'alchemy' => 'Alchemy For Experience',
+            'trinketry' => 'Trinketry For Experience',
+            default => null,
+        };
+    }
+
+    public function getRequiredBatchCraftedItemNamesAttribute(): array
+    {
+        if (empty($this->required_batch_crafted_items)) {
+            return [];
+        }
+
+        return collect($this->required_batch_crafted_items)->map(function (array $requirement, int $requirementIndex): ?array {
+            $item = Item::find($requirement['item_id'] ?? null);
+
+            if (is_null($item)) {
+                return null;
+            }
+
+            $source = $requirement['source'] ?? 'inventory';
+
+            return [
+                'requirement_index' => $requirementIndex,
+                'source' => $source,
+                'item_id' => $item->id,
+                'name' => $item->name,
+                'type' => $item->type,
+                'type_name' => $source === 'alchemy_bag'
+                    ? $this->alchemyItemTypeName($item->alchemy_type)
+                    : $this->batchCraftedItemTypeName($item->type),
+                'amount' => (int) ($requirement['amount'] ?? 0),
+                'must_be_enchanted' => $source === 'alchemy_bag' ? false : (bool) ($requirement['must_be_enchanted'] ?? false),
+            ];
+        })->filter()->values()->all();
+    }
+
+    private function batchCraftedItemTypeName(string $type): string
+    {
+        return match ($type) {
+            ItemType::DAGGER->value => 'Daggers',
+            ItemType::SPELL_DAMAGE->value => 'Spell Damage',
+            ItemType::SPELL_HEALING->value => 'Spell Healing',
+            default => in_array($type, ArmourType::allTypes(), true)
+                ? ItemType::getProperNameForType($type)
+                : ItemType::getProperNameForType($type),
+        };
+    }
+
+    private function alchemyItemTypeName(?string $alchemyType): string
+    {
+        return match ($alchemyType) {
+            AlchemyItemType::INCREASE_STATS->value => 'Increases Stats',
+            AlchemyItemType::INCREASE_SKILL_TYPE->value => 'Increases Training Skills',
+            AlchemyItemType::INCREASE_DAMAGE->value => 'Increases Damage',
+            AlchemyItemType::INCREASE_ARMOUR->value => 'Increases Armour',
+            AlchemyItemType::INCREASE_HEALING->value => 'Increases Healing',
+            AlchemyItemType::INCREASE_ALCHEMY_SKILL->value => 'Increases Alchemy Skill',
+            AlchemyItemType::DAMAGES_KINGDOMS->value => 'Damages Kingdoms',
+            AlchemyItemType::HOLY_OILS->value => 'Holy Oils',
+            default => ItemType::getProperNameForType($alchemyType ?? 'alchemy'),
+        };
     }
 
     public function eventType(): ?EventType

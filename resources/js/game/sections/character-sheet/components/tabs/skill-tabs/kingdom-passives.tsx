@@ -8,20 +8,48 @@ import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-al
 import SuccessAlert from "../../../../../components/ui/alerts/simple-alerts/success-alert";
 import { DateTime } from "luxon";
 import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warning-alert";
+import KingdomPassiveRow from "../../../../../lib/game/character-sheet/types/skills/kingdom-passive-row";
 
-export default class KingdomPassives extends React.Component<any, any> {
-    constructor(props: any) {
+interface KingdomPassivesProps {
+    read_only?: boolean;
+    preloaded_kingdom_passives?: KingdomPassiveRow[];
+    character_id: number;
+    is_dead: boolean;
+    is_automation_running: boolean;
+    is_faction_loyalty_automation_running: boolean;
+    is_delve_running: boolean;
+    active_automation: { name: string } | null;
+}
+
+interface KingdomPassivesState {
+    loading: boolean;
+    kingdom_passives: KingdomPassiveRow[];
+    success_message: string | null;
+    skill_in_training: KingdomPassiveRow | null;
+}
+
+export default class KingdomPassives extends React.Component<
+    KingdomPassivesProps,
+    KingdomPassivesState
+> {
+    constructor(props: KingdomPassivesProps) {
         super(props);
 
         this.state = {
-            loading: true,
-            kingdom_passives: [],
+            loading: !props.read_only,
+            kingdom_passives: props.read_only
+                ? (props.preloaded_kingdom_passives ?? [])
+                : [],
             success_message: null,
             skill_in_training: null,
         };
     }
 
     componentDidMount() {
+        if (this.props.read_only) {
+            return;
+        }
+
         new Ajax()
             .setRoute("character/kingdom-passives/" + this.props.character_id)
             .doAjaxCall(
@@ -49,14 +77,17 @@ export default class KingdomPassives extends React.Component<any, any> {
         });
     }
 
-    updatePassives(passives: any, passiveInTraining: any) {
+    updatePassives(
+        passives: KingdomPassiveRow[],
+        passiveInTraining?: KingdomPassiveRow,
+    ) {
         this.setState({
             kingdom_passives: passives,
-            skill_in_training: passiveInTraining,
+            skill_in_training: passiveInTraining ?? null,
         });
     }
 
-    findSkillInTraining(passive: any): void {
+    findSkillInTraining(passive: KingdomPassiveRow): void {
         if (this.updatePassiveTrainingState(passive)) {
             return;
         }
@@ -76,7 +107,7 @@ export default class KingdomPassives extends React.Component<any, any> {
         }
     }
 
-    updatePassiveTrainingState(passive: any): boolean {
+    updatePassiveTrainingState(passive: KingdomPassiveRow): boolean {
         if (passive.started_at !== null) {
             this.setState({
                 skill_in_training: passive,
@@ -129,7 +160,25 @@ export default class KingdomPassives extends React.Component<any, any> {
         return "Exploration";
     }
 
+    renderReadOnly(): JSX.Element {
+        const passives = this.state.kingdom_passives;
+
+        if (passives.length === 0) {
+            return (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                    No public kingdom passive progress is available.
+                </p>
+            );
+        }
+
+        return <KingdomPassiveTree passives={passives[0]} read_only={true} />;
+    }
+
     render() {
+        if (this.props.read_only) {
+            return this.renderReadOnly();
+        }
+
         return (
             <Fragment>
                 {this.state.loading ? (

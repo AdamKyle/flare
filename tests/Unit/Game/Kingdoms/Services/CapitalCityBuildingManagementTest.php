@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomLog;
@@ -26,7 +28,7 @@ use Tests\TestCase;
 
 class CapitalCityBuildingManagementTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -905,7 +907,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             ->getKingdom();
         $building = $targetKingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'building_id' => $building->id,

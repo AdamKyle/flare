@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React from "react";
+import axios from "axios";
 import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
 import {
     fetchBugChart,
+    fetchLogEntryDetail,
     fetchLogEntries,
     fetchLogFiles,
-    fetchLogSummary,
     fetchSystemBugs,
     pollLogs,
 } from "../ajax/logs-api";
@@ -17,294 +18,20 @@ import {
     SEVERITIES,
     SystemBugReport,
 } from "../types/logs-dashboard";
+import LogsDashboardState from "../types/logs-dashboard-state";
+import BugSidePeek from "./bug-side-peek";
+import LogSidePeek from "./log-side-peek";
+import PaginationControls from "./pagination-controls";
+import SeverityBadge from "./severity-badge";
 
-const SEVERITY_COLORS: Record<string, string> = {
-    emergency: "bg-red-700 text-white",
-    alert: "bg-red-600 text-white",
-    critical: "bg-red-500 text-white",
-    error: "bg-red-400 text-white",
-    fatal: "bg-red-700 text-white",
-    warning: "bg-yellow-400 text-gray-900",
-    notice: "bg-blue-400 text-white",
-    info: "bg-blue-300 text-gray-900",
-    debug: "bg-gray-300 text-gray-800",
-    unknown: "bg-gray-200 text-gray-700",
-};
-
-function SeverityBadge({ severity }: { severity: string }) {
-    const cls =
-        SEVERITY_COLORS[severity.toLowerCase()] ?? SEVERITY_COLORS.unknown;
-    return (
-        <span
-            className={`inline-block rounded px-1.5 py-0.5 text-xs font-semibold uppercase ${cls}`}
-        >
-            {severity}
-        </span>
-    );
-}
-
-function PaginationControls({
-    currentPage,
-    lastPage,
-    onPageChange,
-}: {
-    currentPage: number;
-    lastPage: number;
-    onPageChange: (p: number) => void;
-}) {
-    return (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-                Page {currentPage} of {lastPage}
-            </span>
-            <div className="flex gap-2">
-                <button
-                    className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                    disabled={currentPage <= 1}
-                    onClick={() => onPageChange(currentPage - 1)}
-                >
-                    Previous
-                </button>
-                <button
-                    className="rounded border border-gray-300 px-3 py-2 text-sm disabled:opacity-50 dark:border-gray-600"
-                    disabled={currentPage >= lastPage}
-                    onClick={() => onPageChange(currentPage + 1)}
-                >
-                    Next
-                </button>
-            </div>
-        </div>
-    );
-}
-
-function DetailBlock({
-    label,
-    value,
-    pre = false,
-}: {
-    label: string;
-    value: React.ReactNode;
-    pre?: boolean;
-}) {
-    if (value === null || value === undefined || value === "") {
-        return null;
-    }
-
-    return (
-        <div>
-            <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
-                {label}
-            </dt>
-            <dd
-                className={
-                    pre
-                        ? "mt-1 max-h-72 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-all rounded bg-gray-100 p-2 text-xs dark:bg-gray-800"
-                        : "mt-1 break-words text-sm text-gray-900 dark:text-gray-100"
-                }
-            >
-                {value}
-            </dd>
-        </div>
-    );
-}
-
-function LogSidePeek({
-    entry,
-    onClose,
-}: {
-    entry: LogEntry;
-    onClose: () => void;
-}) {
-    const formatJson = (value: unknown): string => {
-        if (value === null || value === undefined || value === "") {
-            return "—";
-        }
-        if (typeof value === "string") {
-            try {
-                return JSON.stringify(JSON.parse(value), null, 2);
-            } catch {
-                return value;
-            }
-        }
-        return JSON.stringify(value, null, 2);
-    };
-
-    const codeBlock =
-        "rounded-md border border-gray-200 bg-gray-50 p-3 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words overflow-x-auto dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200";
-    const label =
-        "text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400";
-    const value = "text-sm text-gray-900 break-words dark:text-gray-100";
-
-    return (
-        <aside className="fixed inset-y-0 right-0 z-50 w-full max-w-2xl overflow-y-auto border-l border-gray-200 bg-white shadow-2xl dark:border-gray-700 dark:bg-gray-900">
-            <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
-                <div className="min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        Log Detail
-                    </h3>
-                    <p className="break-all text-sm text-gray-500 dark:text-gray-400">
-                        {entry.file_path ?? entry.channel ?? "Log entry"}
-                    </p>
-                </div>
-                <button
-                    className="shrink-0 rounded border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
-                    onClick={onClose}
-                >
-                    Close
-                </button>
-            </div>
-
-            <div className="space-y-6 px-6 py-5">
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="space-y-1">
-                        <p className={label}>Timestamp</p>
-                        <p className={value}>{entry.timestamp ?? "—"}</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className={label}>Level</p>
-                        <div>
-                            <SeverityBadge severity={entry.severity} />
-                        </div>
-                    </div>
-                    <div className="space-y-1">
-                        <p className={label}>Channel / File</p>
-                        <p className={value}>
-                            {entry.channel ?? entry.file_path ?? "—"}
-                        </p>
-                    </div>
-                    {entry.exception_class && (
-                        <div className="space-y-1">
-                            <p className={label}>Exception Class</p>
-                            <p className={value}>{entry.exception_class}</p>
-                        </div>
-                    )}
-                </div>
-
-                <div className="space-y-2">
-                    <p className={label}>Message</p>
-                    <p className={value}>{entry.message}</p>
-                </div>
-
-                {(entry.exception_file || entry.exception_line) && (
-                    <div className="space-y-2">
-                        <p className={label}>File / Line</p>
-                        <p className={value}>
-                            {entry.exception_file ?? ""}
-                            {entry.exception_line
-                                ? `:${entry.exception_line}`
-                                : ""}
-                        </p>
-                    </div>
-                )}
-
-                {entry.context && (
-                    <div className="space-y-2">
-                        <p className={label}>Context</p>
-                        <pre className={codeBlock}>
-                            {formatJson(entry.context)}
-                        </pre>
-                    </div>
-                )}
-
-                {entry.stack_trace && (
-                    <div className="space-y-2">
-                        <p className={label}>Stack Trace</p>
-                        <pre className={codeBlock}>{entry.stack_trace}</pre>
-                    </div>
-                )}
-
-                {entry.raw_log_entry && (
-                    <div className="space-y-2">
-                        <p className={label}>Raw Log Entry</p>
-                        <pre className={codeBlock}>
-                            {formatJson(entry.raw_log_entry)}
-                        </pre>
-                    </div>
-                )}
-            </div>
-        </aside>
-    );
-}
-
-function BugSidePeek({
-    bug,
-    onClose,
-}: {
-    bug: SystemBugReport;
-    onClose: () => void;
-}) {
-    return (
-        <aside className="fixed inset-y-0 right-0 z-40 w-full max-w-xl overflow-y-auto border-l border-gray-200 bg-white p-5 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-            <div className="mb-4 flex items-start justify-between gap-3">
-                <div>
-                    <h3 className="text-lg font-semibold">{bug.title}</h3>
-                    <p className="text-sm text-gray-500">
-                        {bug.occurrence_count} occurrence
-                        {bug.occurrence_count === 1 ? "" : "s"}
-                    </p>
-                </div>
-                <button
-                    className="rounded border border-gray-300 px-3 py-1 text-sm dark:border-gray-600"
-                    onClick={onClose}
-                >
-                    Close
-                </button>
-            </div>
-            <dl className="space-y-4">
-                <DetailBlock label="Fingerprint" value={bug.fingerprint} />
-                <DetailBlock label="Status" value={bug.status} />
-                <DetailBlock label="Severity" value={bug.severity} />
-                <DetailBlock label="First Seen" value={bug.first_seen_at} />
-                <DetailBlock label="Last Seen" value={bug.last_seen_at} />
-                <DetailBlock
-                    label="Latest Message"
-                    value={bug.latest_message}
-                />
-                <DetailBlock
-                    label="Latest Stack Trace"
-                    value={bug.latest_stack_trace}
-                    pre
-                />
-                <DetailBlock
-                    label="Latest Raw Log Entry"
-                    value={bug.latest_raw_log_entry}
-                    pre
-                />
-            </dl>
-            <h4 className="mt-5 text-sm font-semibold">Occurrence History</h4>
-            <div className="mt-2 space-y-2">
-                {bug.occurrences.map((occurrence, index) => (
-                    <div
-                        key={`${occurrence.occurred_at ?? "unknown"}-${index}`}
-                        className="rounded border border-gray-200 p-3 text-sm dark:border-gray-700"
-                    >
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span>
-                                {occurrence.occurred_at ?? "Unknown time"}
-                            </span>
-                            {occurrence.level && (
-                                <SeverityBadge severity={occurrence.level} />
-                            )}
-                        </div>
-                        <p className="mt-1 text-gray-700 dark:text-gray-300">
-                            {occurrence.message}
-                        </p>
-                    </div>
-                ))}
-                {bug.occurrences.length === 0 && (
-                    <p className="text-sm text-gray-500">
-                        No occurrences loaded.
-                    </p>
-                )}
-            </div>
-        </aside>
-    );
-}
+const today = new Date();
+const yesterday = new Date(today);
+yesterday.setDate(today.getDate() - 1);
 
 const defaultFilters: LogFilters = {
     severity: "",
-    date_from: "",
-    date_to: "",
+    date_from: yesterday.toISOString().slice(0, 10),
+    date_to: today.toISOString().slice(0, 10),
 };
 
 const emptyPage = (): LogEntriesPage => ({
@@ -312,492 +39,817 @@ const emptyPage = (): LogEntriesPage => ({
     current_page: 1,
     last_page: 1,
     total: 0,
-});
-
-export default function LogsDashboard() {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [files, setFiles] = useState<LogFileInfo[]>([]);
-    const [selectedFile, setSelectedFile] = useState<string>("");
-    const [filters, setFilters] = useState<LogFilters>(defaultFilters);
-    const [page, setPage] = useState(1);
-    const [entries, setEntries] = useState<LogEntriesPage>(emptyPage());
-    const [summary, setSummary] = useState<LogSummary>({
+    next_cursor: null,
+    summary: {
         total: 0,
         by_severity: {},
         chart: [],
-    });
-    const [newEntries, setNewEntries] = useState<LogEntry[]>([]);
-    const [bugs, setBugs] = useState<SystemBugReport[]>([]);
-    const [bugChart, setBugChart] = useState<
-        Array<{ period: string; occurrences: number }>
-    >([]);
-    const [bugRange, setBugRange] = useState(30);
-    const [selectedEntry, setSelectedEntry] = useState<LogEntry | null>(null);
-    const [selectedBug, setSelectedBug] = useState<SystemBugReport | null>(
-        null,
-    );
+    },
+});
 
-    const tableRef = React.useRef<HTMLElement | null>(null);
+export default class LogsDashboard extends React.Component<
+    Record<string, never>,
+    LogsDashboardState
+> {
+    private pollInterval?: number;
 
-    useEffect(() => {
-        fetchLogFiles()
-            .then((f) => {
-                setFiles(f);
-                const first = f.find((fi) => fi.exists);
-                if (first && !selectedFile) setSelectedFile(first.key);
-            })
-            .catch(() => setError("Could not load log file list."))
-            .finally(() => setLoading(false));
-    }, []);
+    private tableRef: React.RefObject<HTMLElement>;
 
-    const loadData = useCallback(
-        async (fileKey: string, f: LogFilters, p: number) => {
-            if (!fileKey) return;
+    public constructor(props: Record<string, never>) {
+        super(props);
 
-            setError("");
+        this.tableRef = React.createRef();
 
-            try {
-                const [entriesData, summaryData, bugData, bugChartData] =
-                    await Promise.all([
-                        fetchLogEntries(fileKey, f, p),
-                        fetchLogSummary(fileKey, f),
-                        fetchSystemBugs(),
-                        fetchBugChart(bugRange),
-                    ]);
+        this.state = {
+            loading: true,
+            error: "",
+            files: [],
+            selectedFile: "",
+            filters: defaultFilters,
+            page: 1,
+            entries: emptyPage(),
+            summary: {
+                total: 0,
+                by_severity: {},
+                chart: [],
+            },
+            newEntries: [],
+            bugs: [],
+            bugChart: [],
+            bugRange: 30,
+            selectedEntry: null,
+            selectedBug: null,
+        };
+    }
 
-                setEntries(entriesData);
-                setSummary(summaryData);
-                setBugs(bugData);
-                setBugChart(bugChartData);
-            } catch {
-                setError("Could not load log entries.");
-            }
-        },
-        [bugRange],
-    );
+    componentDidMount() {
+        void this.loadFiles();
+    }
 
-    useEffect(() => {
-        if (selectedFile) void loadData(selectedFile, filters, page);
-    }, [selectedFile, filters, page, loadData]);
+    componentWillUnmount() {
+        this.clearPollInterval();
+    }
 
-    useEffect(() => {
-        if (!selectedFile) return;
-        void pollLogs(selectedFile, filters)
-            .then((payload) => {
-                setNewEntries(payload.entries);
-                setSummary(payload.summary);
-                setFiles(payload.files);
-                setBugs(payload.bugs);
-                setBugChart(payload.bug_chart);
-            })
-            .catch(() => {});
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedFile]);
+    async loadFiles() {
+        try {
+            const files = await fetchLogFiles();
+            const first = files.find((file: LogFileInfo) => file.exists);
 
-    useEffect(() => {
-        if (!selectedFile) return;
-        const interval = window.setInterval(() => {
-            pollLogs(selectedFile, filters)
+            this.setState(
+                {
+                    files,
+                    selectedFile: first?.key ?? this.state.selectedFile,
+                },
+                () => {
+                    if (this.state.selectedFile !== "") {
+                        void this.loadData();
+                        this.startPolling();
+                    }
+                },
+            );
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        } finally {
+            this.setState({
+                loading: false,
+            });
+        }
+    }
+
+    async loadData() {
+        if (!this.state.selectedFile) {
+            return;
+        }
+
+        this.setState({
+            error: "",
+        });
+
+        try {
+            const entriesData = await fetchLogEntries(
+                this.state.selectedFile,
+                this.state.filters,
+                this.state.page,
+            );
+            const [bugResult, bugChartResult] = await Promise.allSettled([
+                fetchSystemBugs(),
+                fetchBugChart(this.state.bugRange),
+            ]);
+
+            this.setState({
+                entries: entriesData,
+                summary: entriesData.summary,
+                bugs:
+                    bugResult.status === "fulfilled"
+                        ? bugResult.value
+                        : this.state.bugs,
+                bugChart:
+                    bugChartResult.status === "fulfilled"
+                        ? bugChartResult.value
+                        : this.state.bugChart,
+                error:
+                    bugResult.status === "rejected"
+                        ? this.errorMessage(bugResult.reason)
+                        : bugChartResult.status === "rejected"
+                          ? this.errorMessage(bugChartResult.reason)
+                          : "",
+            });
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        }
+    }
+
+    async pollOnce() {
+        if (!this.state.selectedFile) {
+            return;
+        }
+
+        try {
+            const payload = await pollLogs(
+                this.state.selectedFile,
+                this.state.filters,
+            );
+
+            this.setState({
+                newEntries: payload.entries,
+                summary: payload.summary,
+            });
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        }
+    }
+
+    startPolling() {
+        this.clearPollInterval();
+
+        if (!this.state.selectedFile) {
+            return;
+        }
+
+        this.pollInterval = window.setInterval(() => {
+            pollLogs(this.state.selectedFile, this.state.filters)
                 .then((payload) => {
-                    setNewEntries(payload.entries);
-                    setSummary(payload.summary);
-                    setFiles(payload.files);
-                    setBugs(payload.bugs);
-                    setBugChart(payload.bug_chart);
-                    void loadData(selectedFile, filters, page);
+                    this.setState({
+                        newEntries: payload.entries,
+                        summary: payload.summary,
+                    });
                 })
-                .catch(() => setError("Could not poll log entries."));
+                .catch((error) => {
+                    this.setState({
+                        error: this.errorMessage(error),
+                    });
+                });
         }, 60000);
-        return () => window.clearInterval(interval);
-    }, [selectedFile, filters, page, loadData]);
+    }
 
-    const chartPoints = useMemo(
-        () =>
-            summary.chart.map((point) => ({
-                period: point.period,
-                entries: point.count,
-            })),
-        [summary.chart],
-    );
+    clearPollInterval() {
+        if (this.pollInterval !== undefined) {
+            window.clearInterval(this.pollInterval);
+            this.pollInterval = undefined;
+        }
+    }
 
-    const setSeverityFilter = (severity: string) => {
-        setFilters({ ...filters, severity });
-        setPage(1);
-    };
+    errorMessage(error: unknown): string {
+        if (axios.isAxiosError(error)) {
+            const responseMessage = error.response?.data?.message;
 
-    return (
-        <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
-            {loading && (
-                <p role="status" aria-live="polite">
-                    Loading log files...
-                </p>
-            )}
-            {error && (
-                <p
-                    className="rounded border border-red-400 bg-red-50 p-3 text-red-800 dark:bg-red-950 dark:text-red-100"
-                    role="alert"
-                >
-                    {error}
-                </p>
-            )}
+            if (typeof responseMessage === "string" && responseMessage !== "") {
+                return responseMessage;
+            }
 
-            <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
-                <h2 className="mb-3 text-lg font-semibold">Log Files</h2>
-                <div className="flex flex-wrap gap-2">
-                    {files.map((f) => (
-                        <button
-                            key={f.key}
-                            disabled={!f.exists}
-                            onClick={() => {
-                                setSelectedFile(f.key);
-                                setPage(1);
-                            }}
-                            className={[
-                                "rounded border px-3 py-1.5 text-sm transition-colors",
-                                selectedFile === f.key
-                                    ? "border-indigo-500 bg-indigo-50 font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
-                                    : "border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800",
-                                !f.exists
-                                    ? "cursor-not-allowed opacity-40"
-                                    : "",
-                            ].join(" ")}
-                        >
-                            {f.label}
-                            {f.exists && (
-                                <span className="ml-1.5 text-xs text-gray-500 dark:text-gray-400">
-                                    {(f.size_bytes / 1024).toFixed(1)}KB
-                                </span>
-                            )}
-                            {!f.exists && (
-                                <span className="ml-1.5 text-xs">
-                                    (missing)
-                                </span>
-                            )}
-                        </button>
-                    ))}
-                </div>
-            </section>
+            if (error.message !== "") {
+                return error.message;
+            }
+        }
 
-            {selectedFile && (
-                <>
-                    <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <button
-                            className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
-                            onClick={() => setSeverityFilter("")}
-                        >
-                            <span className="text-sm text-gray-500">Total</span>
-                            <span className="mt-1 block text-2xl font-semibold">
-                                {summary.total}
-                            </span>
-                        </button>
-                        {Object.entries(summary.by_severity).map(
-                            ([sev, cnt]) => (
-                                <button
-                                    key={sev}
-                                    className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
-                                    onClick={() => setSeverityFilter(sev)}
-                                >
-                                    <span className="text-sm text-gray-500">
-                                        {sev}
-                                    </span>
-                                    <span className="mt-1 block text-2xl font-semibold">
-                                        {cnt}
-                                    </span>
-                                </button>
-                            ),
-                        )}
-                    </section>
+        return error instanceof Error
+            ? error.message
+            : "The server request failed.";
+    }
 
-                    {newEntries.length > 0 && (
-                        <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100">
-                            {newEntries.length} new log{" "}
-                            {newEntries.length === 1 ? "entry" : "entries"} read
-                            during the latest poll.
-                        </section>
-                    )}
+    chartPoints() {
+        return this.state.summary.chart.map((point) => ({
+            period: point.period,
+            entries: point.count,
+        }));
+    }
 
-                    <section
-                        ref={tableRef}
-                        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5"
+    setSeverityFilter(severity: string) {
+        this.setFilters({
+            ...this.state.filters,
+            severity,
+        });
+    }
+
+    setSelectedFile(selectedFile: string) {
+        this.setState(
+            {
+                selectedFile,
+                page: 1,
+            },
+            () => {
+                void this.loadData();
+                this.startPolling();
+            },
+        );
+    }
+
+    setFilters(filters: LogFilters) {
+        this.setState(
+            {
+                filters,
+                page: 1,
+            },
+            () => {
+                void this.loadData();
+                this.startPolling();
+            },
+        );
+    }
+
+    setPage(page: number) {
+        this.setState(
+            {
+                page,
+            },
+            () => {
+                void this.loadData();
+                this.startPolling();
+            },
+        );
+    }
+
+    async loadOlderEntries() {
+        if (!this.state.selectedFile || !this.state.entries.next_cursor) {
+            return;
+        }
+
+        try {
+            const entries = await fetchLogEntries(
+                this.state.selectedFile,
+                this.state.filters,
+                1,
+                this.state.entries.next_cursor,
+            );
+            this.setState({
+                entries,
+                summary: entries.summary,
+                page: 1,
+            });
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        }
+    }
+
+    setBugRange(bugRange: number) {
+        this.setState(
+            {
+                bugRange,
+            },
+            () => void this.loadData(),
+        );
+    }
+
+    async selectEntry(entry: LogEntry) {
+        this.setState({
+            selectedEntry: entry,
+            selectedBug: null,
+        });
+
+        if (!entry.detail_id || !entry.file_key) {
+            return;
+        }
+
+        try {
+            const detail = await fetchLogEntryDetail(
+                entry.file_key,
+                entry.detail_id,
+            );
+            this.setState({
+                selectedEntry: detail,
+            });
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        }
+    }
+
+    selectBug(bug: SystemBugReport) {
+        this.setState({
+            selectedBug: bug,
+            selectedEntry: null,
+        });
+    }
+
+    closeEntry() {
+        this.setState({
+            selectedEntry: null,
+        });
+    }
+
+    closeBug() {
+        this.setState({
+            selectedBug: null,
+        });
+    }
+
+    render() {
+        const {
+            bugChart,
+            bugRange,
+            bugs,
+            entries,
+            error,
+            files,
+            filters,
+            loading,
+            newEntries,
+            selectedBug,
+            selectedEntry,
+            selectedFile,
+            summary,
+        } = this.state;
+
+        return (
+            <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
+                {loading && (
+                    <p role="status" aria-live="polite">
+                        Loading log files...
+                    </p>
+                )}
+                {error && (
+                    <p
+                        className="rounded border border-red-400 bg-red-50 p-3 text-red-800 dark:bg-red-950 dark:text-red-100"
+                        role="alert"
                     >
-                        <h2 className="mb-3 text-lg font-semibold">
-                            Recent Logs
-                        </h2>
-                        <div className="mb-3 flex flex-wrap gap-2">
-                            {[
-                                { label: "1d", days: 1 },
-                                { label: "7d", days: 7 },
-                                { label: "14d", days: 14 },
-                                { label: "30d", days: 30 },
-                                { label: "6m", days: 180 },
-                                { label: "1y", days: 365 },
-                            ].map(({ label, days }) => {
-                                const from = new Date();
-                                from.setDate(from.getDate() - days);
-                                const fromStr = from.toISOString().slice(0, 10);
-                                const toStr = new Date()
-                                    .toISOString()
-                                    .slice(0, 10);
-                                return (
-                                    <button
-                                        key={label}
-                                        className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
-                                        onClick={() => {
-                                            setFilters({
-                                                ...filters,
-                                                date_from: fromStr,
-                                                date_to: toStr,
-                                            });
-                                            setPage(1);
-                                        }}
-                                    >
-                                        {label}
-                                    </button>
-                                );
-                            })}
-                            <button
-                                className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
-                                onClick={() => {
-                                    setFilters({
-                                        ...filters,
-                                        date_from: "",
-                                        date_to: "",
-                                    });
-                                    setPage(1);
+                        {error}
+                    </p>
+                )}
+
+                <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
+                    <h2 className="mb-3 text-lg font-semibold">Log Files</h2>
+                    <div className="grid gap-3 lg:grid-cols-[minmax(0,20rem)_1fr] lg:items-start">
+                        <label className="text-sm font-medium">
+                            Log file
+                            <select
+                                className="mt-1 w-full rounded border border-gray-300 bg-white p-2 text-base dark:border-gray-600 dark:bg-gray-800"
+                                value={selectedFile}
+                                onChange={(event) => {
+                                    this.setSelectedFile(event.target.value);
                                 }}
                             >
-                                All time
-                            </button>
-                        </div>
-                        <div className="mb-4 grid gap-3 sm:grid-cols-3">
-                            <label className="text-sm font-medium">
-                                Severity
-                                <select
-                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
-                                    value={filters.severity}
-                                    onChange={(e) => {
-                                        setFilters({
-                                            ...filters,
-                                            severity: e.target.value,
-                                        });
-                                        setPage(1);
-                                    }}
-                                >
-                                    <option value="">All severities</option>
-                                    {SEVERITIES.filter(Boolean).map((s) => (
-                                        <option key={s} value={s}>
-                                            {s.charAt(0).toUpperCase() +
-                                                s.slice(1)}
+                                {files
+                                    .filter((file) => file.exists)
+                                    .map((file) => (
+                                        <option key={file.key} value={file.key}>
+                                            {file.label}
                                         </option>
                                     ))}
-                                </select>
-                            </label>
-                            <label className="text-sm font-medium">
-                                Date from
-                                <input
-                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
-                                    type="date"
-                                    value={filters.date_from}
-                                    onChange={(e) => {
-                                        setFilters({
-                                            ...filters,
-                                            date_from: e.target.value,
-                                        });
-                                        setPage(1);
-                                    }}
-                                />
-                            </label>
-                            <label className="text-sm font-medium">
-                                Date to
-                                <input
-                                    className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
-                                    type="date"
-                                    value={filters.date_to}
-                                    onChange={(e) => {
-                                        setFilters({
-                                            ...filters,
-                                            date_to: e.target.value,
-                                        });
-                                        setPage(1);
-                                    }}
-                                />
-                            </label>
-                        </div>
-                        <div className="overflow-x-auto">
-                            <table className="w-full min-w-[840px] text-left text-sm">
-                                <thead>
-                                    <tr className="border-b dark:border-gray-700">
-                                        <th className="p-2 whitespace-nowrap">
-                                            Timestamp
-                                        </th>
-                                        <th className="p-2">Severity</th>
-                                        <th className="p-2">Channel</th>
-                                        <th className="p-2">Message</th>
-                                        <th className="p-2">Exception</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {entries.data.map((entry, idx) => (
-                                        <tr
-                                            key={`${entry.timestamp ?? "raw"}-${idx}`}
-                                            className="cursor-pointer border-t align-top hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                            </select>
+                        </label>
+                        <ul className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                            {files.map((file) => (
+                                <li
+                                    key={file.key}
+                                    className={[
+                                        "rounded border px-3 py-2 text-sm",
+                                        selectedFile === file.key
+                                            ? "border-indigo-500 bg-indigo-50 font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                                            : "border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800",
+                                        !file.exists ? "opacity-60" : "",
+                                    ].join(" ")}
+                                >
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="truncate">
+                                            {file.label}
+                                        </span>
+                                        <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">
+                                            {file.exists
+                                                ? `${(file.size_bytes / 1024).toFixed(1)}KB`
+                                                : "missing"}
+                                        </span>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </section>
+
+                {selectedFile && (
+                    <>
+                        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                            <button
+                                className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                                onClick={() => this.setSeverityFilter("")}
+                            >
+                                <span className="text-sm text-gray-500">
+                                    Total
+                                </span>
+                                <span className="mt-1 block text-2xl font-semibold">
+                                    {summary.total}
+                                </span>
+                            </button>
+                            {Object.entries(summary.by_severity).map(
+                                ([sev, cnt]) => (
+                                    <button
+                                        key={sev}
+                                        className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
+                                        onClick={() =>
+                                            this.setSeverityFilter(sev)
+                                        }
+                                    >
+                                        <span className="text-sm text-gray-500">
+                                            {sev}
+                                        </span>
+                                        <span className="mt-1 block text-2xl font-semibold">
+                                            {cnt}
+                                        </span>
+                                    </button>
+                                ),
+                            )}
+                        </section>
+
+                        {newEntries.length > 0 && (
+                            <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-100">
+                                {newEntries.length} new log{" "}
+                                {newEntries.length === 1 ? "entry" : "entries"}{" "}
+                                read during the latest poll.
+                            </section>
+                        )}
+
+                        <section
+                            ref={this.tableRef}
+                            className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5"
+                        >
+                            <h2 className="mb-3 text-lg font-semibold">
+                                Recent Logs
+                            </h2>
+                            <div className="mb-3 flex flex-wrap gap-2">
+                                {[
+                                    { label: "1d", days: 1 },
+                                    { label: "7d", days: 7 },
+                                    { label: "14d", days: 14 },
+                                    { label: "30d", days: 30 },
+                                    { label: "6m", days: 180 },
+                                    { label: "1y", days: 365 },
+                                ].map(({ label, days }) => {
+                                    const from = new Date();
+                                    from.setDate(from.getDate() - days);
+                                    const fromStr = from
+                                        .toISOString()
+                                        .slice(0, 10);
+                                    const toStr = new Date()
+                                        .toISOString()
+                                        .slice(0, 10);
+                                    return (
+                                        <button
+                                            key={label}
+                                            className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
                                             onClick={() => {
-                                                setSelectedEntry(entry);
-                                                setSelectedBug(null);
+                                                this.setFilters({
+                                                    ...filters,
+                                                    date_from: fromStr,
+                                                    date_to: toStr,
+                                                });
                                             }}
                                         >
-                                            <td className="p-2 text-xs text-gray-500 whitespace-nowrap">
-                                                {entry.timestamp ?? "-"}
-                                            </td>
-                                            <td className="p-2">
-                                                <SeverityBadge
-                                                    severity={entry.severity}
-                                                />
-                                            </td>
-                                            <td className="p-2 text-xs">
-                                                {entry.channel ?? "-"}
-                                            </td>
-                                            <td className="p-2 text-sm">
-                                                {entry.message}
-                                            </td>
-                                            <td className="p-2 text-xs">
-                                                {entry.exception_class ?? "-"}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                            {label}
+                                        </button>
+                                    );
+                                })}
+                                <button
+                                    className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
+                                    onClick={() => {
+                                        this.setFilters({
+                                            ...filters,
+                                            date_from: "",
+                                            date_to: "",
+                                        });
+                                    }}
+                                >
+                                    All time
+                                </button>
+                            </div>
+                            <div className="mb-4 grid gap-3 sm:grid-cols-3">
+                                <label className="text-sm font-medium">
+                                    Severity
+                                    <select
+                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                        value={filters.severity}
+                                        onChange={(e) => {
+                                            this.setFilters({
+                                                ...filters,
+                                                severity: e.target.value,
+                                            });
+                                        }}
+                                    >
+                                        <option value="">All severities</option>
+                                        {SEVERITIES.filter(Boolean).map((s) => (
+                                            <option key={s} value={s}>
+                                                {s.charAt(0).toUpperCase() +
+                                                    s.slice(1)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+                                <label className="text-sm font-medium">
+                                    Date from
+                                    <input
+                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                        type="date"
+                                        value={filters.date_from}
+                                        onChange={(e) => {
+                                            this.setFilters({
+                                                ...filters,
+                                                date_from: e.target.value,
+                                            });
+                                        }}
+                                    />
+                                </label>
+                                <label className="text-sm font-medium">
+                                    Date to
+                                    <input
+                                        className="mt-1 w-full rounded border border-gray-300 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
+                                        type="date"
+                                        value={filters.date_to}
+                                        onChange={(e) => {
+                                            this.setFilters({
+                                                ...filters,
+                                                date_to: e.target.value,
+                                            });
+                                        }}
+                                    />
+                                </label>
+                            </div>
                             {entries.data.length === 0 && (
                                 <p className="p-4 text-center text-gray-600 dark:text-gray-300">
                                     No log entries match the current filters.
                                 </p>
                             )}
-                        </div>
-                        <PaginationControls
-                            currentPage={entries.current_page}
-                            lastPage={entries.last_page}
-                            onPageChange={setPage}
-                        />
-                    </section>
-
-                    <MonitoringStatusChart
-                        title="Log Volume"
-                        description="Parsed log entries by day for the selected channel and filters."
-                        points={chartPoints}
-                        series={[
-                            {
-                                key: "entries",
-                                label: "Entries",
-                                color: "#4f46e5",
-                            },
-                        ]}
-                    />
-
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                        <h2 className="text-lg font-semibold">
-                            System Error Occurrences
-                        </h2>
-                        <div className="flex flex-wrap gap-2">
-                            {[7, 14, 30, 60, 120].map((days) => (
-                                <button
-                                    key={days}
-                                    className={[
-                                        "rounded border px-2 py-1 text-xs",
-                                        bugRange === days
-                                            ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
-                                            : "border-gray-300 dark:border-gray-600",
-                                    ].join(" ")}
-                                    onClick={() => setBugRange(days)}
-                                >
-                                    {days}d
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <MonitoringStatusChart
-                        title="Bug Occurrences"
-                        description="System error occurrences grouped by day."
-                        points={bugChart}
-                        series={[
-                            {
-                                key: "occurrences",
-                                label: "Occurrences",
-                                color: "#dc2626",
-                            },
-                        ]}
-                    />
-                    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
-                        <div className="mb-3">
-                            <h2 className="text-lg font-semibold">
-                                Grouped Bugs
-                            </h2>
-                        </div>
-                        <div className="mt-4 overflow-x-auto">
-                            <table className="w-full min-w-[760px] text-left text-sm">
-                                <thead>
-                                    <tr className="border-b dark:border-gray-700">
-                                        <th className="p-2">Bug</th>
-                                        <th className="p-2">Status</th>
-                                        <th className="p-2">Severity</th>
-                                        <th className="p-2">Occurrences</th>
-                                        <th className="p-2">Last Seen</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {bugs.map((bug) => (
-                                        <tr
-                                            key={bug.id}
-                                            className="cursor-pointer border-t hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-                                            onClick={() => {
-                                                setSelectedBug(bug);
-                                                setSelectedEntry(null);
-                                            }}
-                                        >
-                                            <td className="p-2">{bug.title}</td>
-                                            <td className="p-2">
-                                                {bug.status}
-                                            </td>
-                                            <td className="p-2">
-                                                {bug.severity ? (
-                                                    <SeverityBadge
-                                                        severity={bug.severity}
-                                                    />
-                                                ) : (
-                                                    "-"
-                                                )}
-                                            </td>
-                                            <td className="p-2">
-                                                {bug.occurrence_count}
-                                            </td>
-                                            <td className="p-2">
-                                                {bug.last_seen_at ?? "-"}
-                                            </td>
+                            <div className="grid gap-3 md:hidden">
+                                {entries.data.map((entry, idx) => (
+                                    <button
+                                        key={`${entry.timestamp ?? "raw"}-${idx}`}
+                                        type="button"
+                                        className="rounded border border-gray-200 p-3 text-left text-sm dark:border-gray-700"
+                                        onClick={() => {
+                                            this.selectEntry(entry);
+                                        }}
+                                    >
+                                        <div className="flex flex-wrap items-center justify-between gap-2">
+                                            <span className="text-xs text-gray-500">
+                                                {entry.timestamp ?? "-"}
+                                            </span>
+                                            <SeverityBadge
+                                                severity={entry.severity}
+                                            />
+                                        </div>
+                                        <dl className="mt-2 grid gap-2">
+                                            <div>
+                                                <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                                    Channel
+                                                </dt>
+                                                <dd className="break-words">
+                                                    {entry.channel ?? "-"}
+                                                </dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                                    Message
+                                                </dt>
+                                                <dd className="break-words">
+                                                    {entry.message}
+                                                </dd>
+                                            </div>
+                                            <div>
+                                                <dt className="text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
+                                                    Exception
+                                                </dt>
+                                                <dd className="break-words">
+                                                    {entry.exception_class ??
+                                                        "-"}
+                                                </dd>
+                                            </div>
+                                        </dl>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="hidden overflow-x-auto md:block">
+                                <table className="w-full text-left text-sm">
+                                    <thead>
+                                        <tr className="border-b dark:border-gray-700">
+                                            <th
+                                                scope="col"
+                                                className="p-2 whitespace-nowrap"
+                                            >
+                                                Timestamp
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Severity
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Channel
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Message
+                                            </th>
+                                            <th scope="col" className="p-2">
+                                                Exception
+                                            </th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                            {bugs.length === 0 && (
-                                <p className="p-4 text-center text-gray-600 dark:text-gray-300">
-                                    No system errors have been ingested.
-                                </p>
+                                    </thead>
+                                    <tbody>
+                                        {entries.data.map((entry, idx) => (
+                                            <tr
+                                                key={`${entry.timestamp ?? "raw"}-${idx}`}
+                                                className="cursor-pointer border-t align-top hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                                role="button"
+                                                tabIndex={0}
+                                                onClick={() => {
+                                                    this.selectEntry(entry);
+                                                }}
+                                                onKeyDown={(event) => {
+                                                    if (
+                                                        event.key === "Enter" ||
+                                                        event.key === " "
+                                                    ) {
+                                                        event.preventDefault();
+                                                        this.selectEntry(entry);
+                                                    }
+                                                }}
+                                            >
+                                                <td className="p-2 text-xs text-gray-500 whitespace-nowrap">
+                                                    {entry.timestamp ?? "-"}
+                                                </td>
+                                                <td className="p-2">
+                                                    <SeverityBadge
+                                                        severity={
+                                                            entry.severity
+                                                        }
+                                                    />
+                                                </td>
+                                                <td className="p-2 text-xs">
+                                                    {entry.channel ?? "-"}
+                                                </td>
+                                                <td className="p-2 text-sm">
+                                                    {entry.message}
+                                                </td>
+                                                <td className="p-2 text-xs">
+                                                    {entry.exception_class ??
+                                                        "-"}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <PaginationControls
+                                currentPage={entries.current_page}
+                                lastPage={entries.last_page}
+                                onPageChange={(page: number) =>
+                                    this.setPage(page)
+                                }
+                            />
+                            {entries.next_cursor && (
+                                <button
+                                    className="mt-3 rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600"
+                                    onClick={() => void this.loadOlderEntries()}
+                                >
+                                    Load older entries
+                                </button>
                             )}
+                        </section>
+
+                        <MonitoringStatusChart
+                            title="Log Volume"
+                            description="Parsed log entries by day for the selected channel and filters."
+                            points={this.chartPoints()}
+                            series={[
+                                {
+                                    key: "entries",
+                                    label: "Entries",
+                                    color: "#4f46e5",
+                                },
+                            ]}
+                        />
+
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h2 className="text-lg font-semibold">
+                                System Error Occurrences
+                            </h2>
+                            <div className="flex flex-wrap gap-2">
+                                {[7, 14, 30, 60, 120].map((days) => (
+                                    <button
+                                        key={days}
+                                        className={[
+                                            "rounded border px-2 py-1 text-xs",
+                                            bugRange === days
+                                                ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-200"
+                                                : "border-gray-300 dark:border-gray-600",
+                                        ].join(" ")}
+                                        onClick={() => this.setBugRange(days)}
+                                    >
+                                        {days}d
+                                    </button>
+                                ))}
+                            </div>
                         </div>
-                    </section>
-                </>
-            )}
-            {selectedEntry && (
-                <LogSidePeek
-                    entry={selectedEntry}
-                    onClose={() => setSelectedEntry(null)}
-                />
-            )}
-            {selectedBug && (
-                <BugSidePeek
-                    bug={selectedBug}
-                    onClose={() => setSelectedBug(null)}
-                />
-            )}
-        </div>
-    );
+                        <MonitoringStatusChart
+                            title="Bug Occurrences"
+                            description="System error occurrences grouped by day."
+                            points={bugChart}
+                            series={[
+                                {
+                                    key: "occurrences",
+                                    label: "Occurrences",
+                                    color: "#dc2626",
+                                },
+                            ]}
+                        />
+                        <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900 sm:p-5">
+                            <div className="mb-3">
+                                <h2 className="text-lg font-semibold">
+                                    Grouped Bugs
+                                </h2>
+                            </div>
+                            <div className="mt-4 overflow-x-auto">
+                                <table className="w-full min-w-[760px] text-left text-sm">
+                                    <thead>
+                                        <tr className="border-b dark:border-gray-700">
+                                            <th className="p-2">Bug</th>
+                                            <th className="p-2">Status</th>
+                                            <th className="p-2">Severity</th>
+                                            <th className="p-2">Occurrences</th>
+                                            <th className="p-2">Last Seen</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {bugs.map((bug) => (
+                                            <tr
+                                                key={bug.id}
+                                                className="cursor-pointer border-t hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                                onClick={() => {
+                                                    this.selectBug(bug);
+                                                }}
+                                            >
+                                                <td className="p-2">
+                                                    {bug.title}
+                                                </td>
+                                                <td className="p-2">
+                                                    {bug.status}
+                                                </td>
+                                                <td className="p-2">
+                                                    {bug.severity ? (
+                                                        <SeverityBadge
+                                                            severity={
+                                                                bug.severity
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        "-"
+                                                    )}
+                                                </td>
+                                                <td className="p-2">
+                                                    {bug.occurrence_count}
+                                                </td>
+                                                <td className="p-2">
+                                                    {bug.last_seen_at ?? "-"}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                {bugs.length === 0 && (
+                                    <p className="p-4 text-center text-gray-600 dark:text-gray-300">
+                                        No system errors have been ingested.
+                                    </p>
+                                )}
+                            </div>
+                        </section>
+                    </>
+                )}
+                {selectedEntry && (
+                    <LogSidePeek
+                        entry={selectedEntry}
+                        onClose={() => this.closeEntry()}
+                    />
+                )}
+                {selectedBug && (
+                    <BugSidePeek
+                        bug={selectedBug}
+                        onClose={() => this.closeBug()}
+                    />
+                )}
+            </div>
+        );
+    }
 }

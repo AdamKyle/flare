@@ -8,6 +8,7 @@ use App\Flare\Models\GameUnit;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitInQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueRequest;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
@@ -35,6 +36,7 @@ class CapitalCityUnitManagementRequestHandler
         private readonly UnitService $unitService,
         private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation,
         private readonly UpdateKingdom $updateKingdom,
+        private readonly GameTimerService $gameTimerService,
     ) {}
 
     /**
@@ -89,7 +91,7 @@ class CapitalCityUnitManagementRequestHandler
             CapitalCityUnitRequestMovement::dispatch($queue->id, $character->id)
                 ->onConnection('long_running')
                 ->onQueue('default_long')
-                ->delay(now()->addMinutes($time));
+                ->delay($queue->completed_at);
 
             $createdQueues[] = $queue;
 
@@ -348,7 +350,7 @@ class CapitalCityUnitManagementRequestHandler
      */
     private function prepareQueueData(Character $character, Kingdom $kingdom, array $data, int $time): array
     {
-        $minutes = now()->addMinutes($time);
+        $minutes = $this->gameTimerService->availableAtFromMinutes($time);
 
         return [
             'requested_kingdom' => $kingdom->id,

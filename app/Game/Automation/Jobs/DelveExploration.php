@@ -8,6 +8,7 @@ use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
+use App\Flare\Models\Inventory;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
@@ -21,9 +22,11 @@ use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Exceptions\MissingInventoryException;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -75,6 +78,8 @@ class DelveExploration implements ShouldQueue
 
     private bool $logCreated = false;
 
+    private BroadcastTopsUpdateService $broadcastTopsUpdateService;
+
 
     public function __construct(int $characterId, int $locationId, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
     {
@@ -93,6 +98,7 @@ class DelveExploration implements ShouldQueue
         CharacterCacheData $characterCacheData,
         CharacterRewardService $characterRewardService,
         SkillService $skillService,
+        BroadcastTopsUpdateService $broadcastTopsUpdateService,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -101,99 +107,132 @@ class DelveExploration implements ShouldQueue
 
         $this->monsterFightService = $monsterFightService;
 
+        $this->broadcastTopsUpdateService = $broadcastTopsUpdateService;
+
+        if (is_null($this->character)) {
+            return;
+        }
+
+        if (! Inventory::where('character_id', $this->character->id)->exists()) {
+            $this->character->user()->update(['will_be_deleted' => true]);
+            Log::warning('Delve exploration stopped for a character with missing inventory.', [
+                'job' => self::class,
+                'character_id' => $this->character->id,
+                'user_id' => $this->character->user_id,
+                'automation_id' => $this->automationId,
+                'delve_exploration_id' => $this->delveAutomationId,
+            ]);
+
+            return;
+        }
+
         $automation = CharacterAutomation::where('character_id', $this->character->id)->where('id', $this->automationId)->first();
 
         $delveAutomation = DelveExplorationModel::where('character_id', $this->character->id)->where('id', $this->delveAutomationId)->first();
 
-        if ($this->shouldBail($automation, $delveAutomation)) {
-            $this->endAutomation($automation, $delveAutomation, $characterCacheData);
-
-            Cache::delete('can-character-survive-' . $this->character->id);
-
-            return;
-        }
-
-        $params = [
-            'selected_monster_id' => $delveAutomation->monster_id,
-            'attack_type' => $this->attackType,
-            'pack_size' => $this->packSize,
-        ];
-
-        if ($this->encounter($delveAutomation, $params, $this->timeDelay)) {
-
-            $time = now()->diffInMinutes($automation->completed_at);
-
-            $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
-
-            if ($delay === 0) {
+        try {
+            if ($this->shouldBail($automation, $delveAutomation)) {
                 $this->endAutomation($automation, $delveAutomation, $characterCacheData);
+
+                Cache::delete('can-character-survive-' . $this->character->id);
 
                 return;
             }
 
-            $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
+            $params = [
+                'selected_monster_id' => $delveAutomation->monster_id,
+                'attack_type' => $this->attackType,
+                'pack_size' => $this->packSize,
+            ];
+
+            if ($this->encounter($delveAutomation, $params, $this->timeDelay)) {
+
+                $time = now()->diffInMinutes($automation->completed_at);
+
+                $delay = $time >= $this->timeDelay ? $this->timeDelay : ($time > 1 ? $time : 0);
+
+                if ($delay === 0) {
+                    $this->endAutomation($automation, $delveAutomation, $characterCacheData);
+
+                    return;
+                }
+
+                $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
 
-            $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
+                $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
 
-            if ($newStatIncreaseValue >= self::MAX_INCREASE_PERCENTAGE) {
-                $newStatIncreaseValue = self::MAX_INCREASE_PERCENTAGE;
+                if ($newStatIncreaseValue >= self::MAX_INCREASE_PERCENTAGE) {
+                    $newStatIncreaseValue = self::MAX_INCREASE_PERCENTAGE;
+                }
+
+                if ($delveAutomation->increase_enemy_strength !== self::MAX_INCREASE_PERCENTAGE) {
+                    $this->updateDelveAutomation($delveAutomation, [
+                        'increase_enemy_strength' => $newStatIncreaseValue
+                    ]);
+                }
+
+                $this->updateMonsterForNextFight($delveAutomation);
+
+                $delveAutomation = $delveAutomation->refresh();
+
+                $this->deletePackCache();
+
+                $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
+
+                DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
+
+                return;
             }
 
-            if ($delveAutomation->increase_enemy_strength !== self::MAX_INCREASE_PERCENTAGE) {
-                $this->updateDelveAutomation($delveAutomation, [
-                    'increase_enemy_strength' => $newStatIncreaseValue
+            if ($this->attempts >= self::MAX_ATTEMPTS) {
+                $this->createDelveLog($delveAutomation, DelveOutcome::TIMEOUT, $this->lastFightData);
+
+                $automation->delete();
+
+                $delveAutomation->update([
+                    'completed_at' => now(),
+                    'ended_reason' => DelveOutcome::TIMEOUT->value,
+                    'panel_dismissed_at' => null,
                 ]);
+
+                $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
+
+                $character = $this->character->refresh();
+
+                $this->rewardPlayer($character, $delveAutomation->refresh());
+
+                $this->deletePackCache();
+
+                event(new UpdateCharacterStatus($character));
+
+                event(new AutomationTimeOut($character->user, 0));
+
+                return;
             }
-
-            $this->updateMonsterForNextFight($delveAutomation);
-
-            $delveAutomation = $delveAutomation->refresh();
-
-            $this->deletePackCache();
-
-            $params['selected_monster_id'] = $this->monster?->id ?? $delveAutomation->monster_id;
-
-            DelveExploration::dispatch($this->character->id, $this->location->id, $this->automationId, $this->delveAutomationId, $params, $this->timeDelay)->delay(now()->addMinutes($this->timeDelay))->onConnection('long_running')->onQueue('default_long');
-
-            return;
-        }
-
-        if ($this->attempts >= self::MAX_ATTEMPTS) {
-            $this->createDelveLog($delveAutomation, DelveOutcome::TIMEOUT, $this->lastFightData);
 
             $automation->delete();
 
             $delveAutomation->update([
                 'completed_at' => now(),
-                'ended_reason' => DelveOutcome::TIMEOUT->value,
+                'ended_reason' => 'fight_failed',
                 'panel_dismissed_at' => null,
             ]);
 
-            $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
-
-            $character = $this->character->refresh();
-
-            $this->rewardPlayer($character, $delveAutomation->refresh());
-
-            $this->deletePackCache();
-
-            event(new UpdateCharacterStatus($character));
-
-            event(new AutomationTimeOut($character->user, 0));
+            event(new AutomationTimeOut($this->character->user, 0));
+        } catch (MissingInventoryException $exception) {
+            $this->character->user()->update(['will_be_deleted' => true]);
+            Log::warning('Delve exploration stopped for a character with missing inventory.', [
+                'job' => self::class,
+                'character_id' => $this->character->id,
+                'user_id' => $this->character->user_id,
+                'automation_id' => $this->automationId,
+                'delve_exploration_id' => $this->delveAutomationId,
+                'exception' => $exception,
+            ]);
 
             return;
         }
-
-        $automation->delete();
-
-        $delveAutomation->update([
-            'completed_at' => now(),
-            'ended_reason' => 'fight_failed',
-            'panel_dismissed_at' => null,
-        ]);
-
-        event(new AutomationTimeOut($this->character->user, 0));
     }
 
     private function deletePackCache(): void {
@@ -397,6 +436,8 @@ class DelveExploration implements ShouldQueue
                 'panel_dismissed_at' => null,
             ]);
 
+            event(new DelveStatusUpdated($this->character->user->id));
+
             CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE)->delete();
 
             $this->sendOutEventLogUpdate('You died during the delve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
@@ -549,6 +590,7 @@ class DelveExploration implements ShouldQueue
         $this->logCreated = true;
         event(new DelveMonitoringUpdated($this->character->id));
         event(new DelveStatusUpdated($this->character->user->id));
+        $this->broadcastTopsUpdateService->broadcastDelveCurrentMonth();
     }
 
     /**

@@ -3,8 +3,13 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\GlobalEventCraftingInventory;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
+use App\Flare\Models\GlobalEventGoal;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
+use App\Flare\Models\SetSlot;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\Skills\Services\EnchantItemService;
 use App\Game\Skills\Services\SkillCheckService;
@@ -417,5 +422,175 @@ class EnchantItemServiceTest extends TestCase
 
         $this->assertNull($item);
         $this->assertTrue($character->refresh()->inventory->slots->isEmpty());
+    }
+
+    public function testDeleteSlotDoesNotDeleteItemReferencedBySetSlot()
+    {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
+
+        $enchantedItem = $this->enchantItemService->getItem();
+
+        $inventorySet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+        ]);
+
+        SetSlot::factory()->create([
+            'item_id' => $enchantedItem->id,
+            'inventory_set_id' => $inventorySet->id,
+        ]);
+
+        $this->enchantItemService->deleteSlot($slot);
+
+        $this->assertNotNull(Item::find($enchantedItem->id));
+    }
+
+    public function testUpdateSlotDoesNotDeleteMatchingClonedItemWhenStillReferencedBySetSlot()
+    {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $duplicateItem = $this->createItem([
+            'name' => $this->itemToEnchant->name,
+            'item_suffix_id' => $this->suffix->id,
+        ]);
+
+        $slot = $character->inventory->slots->first();
+
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
+
+        $clonedItem = $this->enchantItemService->getItem();
+
+        $inventorySet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+        ]);
+
+        SetSlot::factory()->create([
+            'item_id' => $clonedItem->id,
+            'inventory_set_id' => $inventorySet->id,
+        ]);
+
+        $this->enchantItemService->updateSlot($slot, false);
+
+        $this->assertEquals($duplicateItem->id, $slot->refresh()->item_id);
+        $this->assertNotNull(Item::find($clonedItem->id));
+    }
+
+    public function testDeleteSlotDoesNotThrowWhenDestroyedEnchantItemIsReferencedBySetSlot()
+    {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(100);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(1);
+            })
+        );
+
+        $enchantItemService = $this->app->make(EnchantItemService::class);
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
+
+        $clonedItem = $enchantItemService->getItem();
+
+        $inventorySet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+        ]);
+
+        SetSlot::factory()->create([
+            'item_id' => $clonedItem->id,
+            'inventory_set_id' => $inventorySet->id,
+        ]);
+
+        $result = $enchantItemService->attachAffix($this->itemToEnchant, $this->createItemAffix([
+            'type' => 'prefix',
+        ]), $skill, false);
+
+        $enchantItemService->deleteSlot($slot);
+
+        $this->assertFalse($result);
+        $this->assertNotNull(Item::find($clonedItem->id));
+    }
+
+    public function testUpdateSlotDeletesOrphanedClonedItemWhenSafeToDelete()
+    {
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $this->createItem([
+            'name' => $this->itemToEnchant->name,
+            'item_suffix_id' => $this->suffix->id,
+        ]);
+
+        $slot = $character->inventory->slots->first();
+
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
+
+        $clonedItemId = $this->enchantItemService->getItem()->id;
+
+        $this->enchantItemService->updateSlot($slot, false);
+
+        $this->assertNull(Item::find($clonedItemId));
+    }
+
+    public function testDeleteSlotAcceptsAGlobalEventCraftingInventorySlotAndSafelyDeletesTheUnreferencedClone()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
+
+        $goal = GlobalEventGoal::factory()->create();
+        $inventory = GlobalEventCraftingInventory::factory()->create(['character_id' => $character->id, 'global_event_goal_id' => $goal->id]);
+        $slot = GlobalEventCraftingInventorySlot::factory()->create(['global_event_crafting_inventory_id' => $inventory->id, 'item_id' => $this->itemToEnchant->id]);
+
+        $this->enchantItemService->deleteSlot($slot);
+
+        $item = $this->enchantItemService->getItem();
+
+        $this->assertNull($item);
+        $this->assertNull(GlobalEventCraftingInventorySlot::find($slot->id));
+    }
+
+    public function testDeleteSlotDoesNotDeleteItemStillReferencedWhenSlotIsAGlobalEventCraftingInventorySlot()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->where('game_skill_id', $this->enchantingSkill->id)->first();
+
+        $this->enchantItemService->attachAffix($this->itemToEnchant, $this->suffix, $skill, true);
+
+        $enchantedItem = $this->enchantItemService->getItem();
+
+        $inventorySet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+        ]);
+
+        SetSlot::factory()->create([
+            'item_id' => $enchantedItem->id,
+            'inventory_set_id' => $inventorySet->id,
+        ]);
+
+        $goal = GlobalEventGoal::factory()->create();
+        $inventory = GlobalEventCraftingInventory::factory()->create(['character_id' => $character->id, 'global_event_goal_id' => $goal->id]);
+        $slot = GlobalEventCraftingInventorySlot::factory()->create(['global_event_crafting_inventory_id' => $inventory->id, 'item_id' => $this->itemToEnchant->id]);
+
+        $this->enchantItemService->deleteSlot($slot);
+
+        $this->assertNull(GlobalEventCraftingInventorySlot::find($slot->id));
+        $this->assertNotNull(Item::find($enchantedItem->id));
     }
 }

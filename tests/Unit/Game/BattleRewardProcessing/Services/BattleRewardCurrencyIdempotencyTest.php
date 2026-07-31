@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
@@ -18,13 +20,13 @@ use Tests\Traits\CreateMonster;
 
 class BattleRewardCurrencyIdempotencyTest extends TestCase
 {
-    use CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testSavedCurrencyPayloadIsReusedOnResume(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -48,7 +50,7 @@ class BattleRewardCurrencyIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -64,32 +66,47 @@ class BattleRewardCurrencyIdempotencyTest extends TestCase
         $this->assertSame(BattleRewardStepStatus::COMPLETED, $request->steps()->where('step_name', BattleRewardStepName::CURRENCY_REWARDS)->firstOrFail()->status);
     }
 
-    public function testCurrencyPayloadSavedBeforeFailedApplyIsReused(): void
+    public function testFailedApplyAfterPlanningRethrowsTheOriginalException(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
         resolve(BattleRewardLedgerService::class)->ensureSteps($request);
         $request->steps()->where('step_name', '!=', BattleRewardStepName::CURRENCY_REWARDS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
-        $firstCharacterRewardService = Mockery::mock(CharacterRewardService::class);
-        $firstCharacterRewardService->shouldReceive('setCharacter')->twice()->andReturnSelf();
-        $firstCharacterRewardService->shouldReceive('planCurrencies')->once()->andReturn(['gold' => 40, 'copper_coins' => 0, 'event' => ['active' => false]]);
-        $firstCharacterRewardService->shouldReceive('applyPlannedCurrencies')->once()->andThrow(new RuntimeException('after plan'));
-        $this->instance(CharacterRewardService::class, $firstCharacterRewardService);
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->once()->andReturnSelf();
+        $characterRewardService->shouldReceive('planCurrencies')->once()->andReturn(['gold' => 40, 'copper_coins' => 0, 'event' => ['active' => false]]);
+        $characterRewardService->shouldReceive('applyPlannedCurrencies')->once()->with(['gold' => 40, 'copper_coins' => 0, 'event' => ['active' => false]])->andThrow(new RuntimeException('after plan'));
+        $this->instance(CharacterRewardService::class, $characterRewardService);
 
-        try {
-            resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
-        } catch (RuntimeException) {
-        }
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('after plan');
 
-        $secondCharacterRewardService = Mockery::mock(CharacterRewardService::class);
-        $secondCharacterRewardService->shouldReceive('setCharacter')->once()->andReturnSelf();
-        $secondCharacterRewardService->shouldReceive('planCurrencies')->never();
-        $secondCharacterRewardService->shouldReceive('applyPlannedCurrencies')->once()->with(['gold' => 40, 'copper_coins' => 0, 'event' => ['active' => false]])->andReturn(['gold' => 40]);
-        $this->instance(CharacterRewardService::class, $secondCharacterRewardService);
+        resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
+    }
+
+    public function testSecondAttemptReusesPreviouslySavedPlanWithoutReplanning(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id, 'gold' => 10]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
+        ]);
+        resolve(BattleRewardLedgerService::class)->ensureSteps($request);
+        $request->steps()->where('step_name', '!=', BattleRewardStepName::CURRENCY_REWARDS)->update(['status' => BattleRewardStepStatus::COMPLETED]);
+        $request->steps()->where('step_name', BattleRewardStepName::CURRENCY_REWARDS)->update([
+            'status' => BattleRewardStepStatus::FAILED,
+            'payload_json' => ['plan' => ['gold' => 40, 'copper_coins' => 0, 'event' => ['active' => false]]],
+        ]);
+        $characterRewardService = Mockery::mock(CharacterRewardService::class);
+        $characterRewardService->shouldReceive('setCharacter')->once()->andReturnSelf();
+        $characterRewardService->shouldReceive('planCurrencies')->never();
+        $characterRewardService->shouldReceive('applyPlannedCurrencies')->once()->with(['gold' => 40, 'copper_coins' => 0, 'event' => ['active' => false]])->andReturn(['gold' => 40]);
+        $this->instance(CharacterRewardService::class, $characterRewardService);
 
         resolve(BattleRewardService::class)->processLedgerAwareRewards($request);
 

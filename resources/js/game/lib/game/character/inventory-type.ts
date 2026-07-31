@@ -9,4 +9,6 @@ export default interface InventoryType {
     inventory_bag_count: number;
     inventory_count: number;
     inventory_max: number;
+    crafted_items_set_count: number;
+    crafted_items_set_max: number;
 }

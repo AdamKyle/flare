@@ -16,6 +16,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/monitoring/exploration', ['as' => 'admin.monitoring.exploration', 'uses' => 'MonitoringController@exploration']);
     Route::get('/admin/monitoring/faction-loyalty', ['as' => 'admin.monitoring.faction-loyalty', 'uses' => 'MonitoringController@factionLoyalty']);
     Route::get('/admin/monitoring/delve', ['as' => 'admin.monitoring.delve', 'uses' => 'MonitoringController@delve']);
+    Route::get('/admin/monitoring/batch-crafting', ['as' => 'admin.monitoring.batch-crafting', 'uses' => 'MonitoringController@batchCrafting']);
     Route::get('/admin/monitoring/logs', ['as' => 'admin.monitoring.logs', 'uses' => 'MonitoringController@logs']);
 
     Route::get('/admin/chat-logs', ['as' => 'admin.chat-logs', 'uses' => 'AdminController@chatLogs']);
@@ -50,6 +51,17 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/location/{location}', ['as' => 'locations.location', 'uses' => 'LocationsController@show']);
     Route::get('/admin/locations/{location}/edit', ['as' => 'location.edit', 'uses' => 'LocationsController@edit']);
     Route::post('/admin/locations/store', ['as' => 'locations.store', 'uses' => 'LocationsController@store']);
+
+    Route::get('/admin/location-templates', ['as' => 'admin.location-templates.list', 'uses' => 'LocationTemplatesController@index']);
+    Route::get('/admin/location-templates/create', ['as' => 'admin.location-templates.create', 'uses' => 'LocationTemplatesController@create']);
+    Route::get('/admin/location-templates/export-data', ['as' => 'admin.location-templates.export-data', 'uses' => 'LocationTemplatesController@exportLocationTemplates']);
+    Route::get('/admin/location-templates/import-data', ['as' => 'admin.location-templates.import-data', 'uses' => 'LocationTemplatesController@importLocationTemplates']);
+    Route::get('/admin/location-templates/{locationTemplate}/edit', ['as' => 'admin.location-templates.edit', 'uses' => 'LocationTemplatesController@edit']);
+    Route::get('/admin/location-templates/{locationTemplate}', ['as' => 'admin.location-templates.show', 'uses' => 'LocationTemplatesController@show']);
+    Route::post('/admin/location-templates/store', ['as' => 'admin.location-templates.store', 'uses' => 'LocationTemplatesController@store']);
+    Route::post('/admin/location-templates/{locationTemplate}/delete', ['as' => 'admin.location-templates.delete', 'uses' => 'LocationTemplatesController@delete']);
+    Route::post('/admin/location-templates/export', ['as' => 'admin.location-templates.export', 'uses' => 'LocationTemplatesController@export']);
+    Route::post('/admin/location-templates/import', ['as' => 'admin.location-templates.import', 'uses' => 'LocationTemplatesController@importData']);
 
     Route::get('/admin/location-gems', ['as' => 'admin.location-gems.list', 'uses' => 'LocationGemsController@index']);
     Route::get('/admin/location-gems/create', ['as' => 'admin.location-gems.create', 'uses' => 'LocationGemsController@create']);

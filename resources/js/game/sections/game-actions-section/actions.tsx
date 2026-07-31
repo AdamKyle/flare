@@ -19,6 +19,7 @@ import RaidSection from "./components/raid-section";
 import MonsterActions from "./components/small-actions/monster-actions";
 import Shop from "./components/specialty-shops/shop";
 import DelveStatusPanel from "./components/delve-status-panel";
+import BatchCraftingStatusPanel from "./components/batch-crafting-status-panel";
 import ActionsProps from "./types/actions-props";
 import ActionsState from "./types/actions-state";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
@@ -40,6 +41,11 @@ export default class Actions extends React.Component<
             attack_time_out: 0,
             crafting_time_out: 0,
             celestial_time_out: 0,
+            batch_crafting_time_out:
+                this.props.character.batch_crafting_time_out,
+            batch_crafting_visible:
+                this.props.character.is_batch_crafting_visible,
+            batch_crafting_hidden: false,
             crafting_type: null,
             loading: true,
             show_exploration: false,
@@ -62,6 +68,14 @@ export default class Actions extends React.Component<
         this.setUpState();
 
         this.props.update_show_map_mobile(true);
+        window.addEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.addEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
 
         // @ts-ignore
         this.traverseUpdate.listen(
@@ -75,6 +89,13 @@ export default class Actions extends React.Component<
                     craftingType === "labyrinth-oracle"
                 ) {
                     craftingType = null;
+                }
+
+                if (craftingType === "batch-crafting") {
+                    this.setState({ crafting_type: null }, () => {
+                        this.setState({ crafting_type: "batch-crafting" });
+                    });
+                    return;
                 }
 
                 this.setState({
@@ -92,6 +113,27 @@ export default class Actions extends React.Component<
                 ...this.state,
                 ...this.props.action_data,
                 ...{ loading: false },
+            });
+        }
+
+        if (
+            prevProps.character.batch_crafting_time_out !==
+            this.props.character.batch_crafting_time_out
+        ) {
+            this.setState({
+                batch_crafting_time_out:
+                    this.props.character.batch_crafting_time_out,
+            });
+        }
+
+        if (
+            prevProps.character.is_batch_crafting_visible !==
+            this.props.character.is_batch_crafting_visible
+        ) {
+            this.setState({
+                batch_crafting_visible:
+                    this.props.character.is_batch_crafting_visible,
+                batch_crafting_hidden: false,
             });
         }
 
@@ -147,11 +189,33 @@ export default class Actions extends React.Component<
     }
 
     componentWillUnmount(): void {
+        window.removeEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.removeEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
         this.props.update_parent_state({
             monsters: this.state.monsters,
             raid_monsters: this.state.raid_monsters,
         });
     }
+
+    showBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: true,
+            batch_crafting_hidden: false,
+        });
+    };
+
+    hideBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: false,
+            batch_crafting_hidden: true,
+        });
+    };
 
     setUpState(): void {
         if (this.props.action_data === null) {
@@ -268,6 +332,18 @@ export default class Actions extends React.Component<
 
     isDelveRunning(): boolean {
         return this.props.character.is_delve_running;
+    }
+
+    isBatchCraftingRunning(): boolean {
+        return this.props.character.is_batch_crafting_running;
+    }
+
+    isBatchCraftingVisible(): boolean {
+        return (
+            (this.props.character.is_batch_crafting_visible &&
+                !this.state.batch_crafting_hidden) ||
+            this.state.batch_crafting_visible
+        );
     }
 
     isAnyAutomationRunning(): boolean {
@@ -563,20 +639,38 @@ export default class Actions extends React.Component<
     renderActionContent() {
         const celestialFight = this.renderCelestialFight();
         const actionSlot = this.renderActionSlot();
-        const automationPanel = !this.state.show_exploration ? (
-            <div className="grid gap-4">
+        const automationPanels = [
+            !this.state.show_exploration &&
+            (this.props.exploration_output?.type === "active" ||
+                this.props.exploration_output?.type === "warning" ||
+                this.props.exploration_output?.type === "ended") ? (
                 <ExplorationOutputSection
+                    key="exploration-output"
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                {this.isDelveRunning() ? (
-                    <DelveStatusPanel
-                        character_id={this.props.character.id}
-                        user_id={this.props.character.user_id}
-                    />
-                ) : null}
-            </div>
-        ) : null;
+            ) : null,
+            !this.state.show_exploration &&
+            this.props.character.is_delve_visible ? (
+                <DelveStatusPanel
+                    key="delve-status"
+                    character_id={this.props.character.id}
+                    user_id={this.props.character.user_id}
+                />
+            ) : null,
+            this.isBatchCraftingVisible() &&
+            this.state.crafting_type !== "batch-crafting" ? (
+                <BatchCraftingStatusPanel
+                    key="batch-crafting-status"
+                    character_id={this.props.character.id}
+                    user_id={this.props.character.user_id}
+                />
+            ) : null,
+        ].filter(Boolean);
+        const automationPanel =
+            automationPanels.length > 0 ? (
+                <div className="grid gap-4">{automationPanels}</div>
+            ) : null;
         let fightContent = null;
 
         if (this.state.show_exploration) {

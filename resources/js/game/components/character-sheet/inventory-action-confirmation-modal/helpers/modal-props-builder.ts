@@ -35,6 +35,18 @@ export default class ModalPropsBuilder {
                 return "Equip Selected";
             case InventoryActionConfirmationType.DESTROY_ALL_ALCHEMY_ITEMS:
                 return "Destroy All Alchemy Items";
+            case InventoryActionConfirmationType.SELL_SELECTED_FROM_SET:
+                return "Sell Selected";
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
+                return "Disenchant Selected";
+            case InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET:
+                return "Destroy Selected Items";
+            case InventoryActionConfirmationType.DESTROY_ALL_FROM_SET:
+                return "Destroy All";
+            case InventoryActionConfirmationType.SELL_ALL_FROM_SET:
+                return "Sell All";
+            case InventoryActionConfirmationType.DISENCHANT_ALL_FROM_SET:
+                return "Disenchant All";
             default:
                 return "ERROR";
         }
@@ -69,6 +81,32 @@ export default class ModalPropsBuilder {
                     "character/" +
                     characterId +
                     "/inventory/destroy-all-alchemy-items"
+                );
+            case InventoryActionConfirmationType.SELL_SELECTED_FROM_SET:
+                return (
+                    "character/" + characterId + "/inventory-set/sell-selected"
+                );
+            case InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET:
+                return (
+                    "character/" +
+                    characterId +
+                    "/inventory-set/disenchant-selected"
+                );
+            case InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET:
+                return (
+                    "character/" +
+                    characterId +
+                    "/inventory-set/destroy-selected"
+                );
+            case InventoryActionConfirmationType.DESTROY_ALL_FROM_SET:
+                return (
+                    "character/" + characterId + "/inventory-set/destroy-all"
+                );
+            case InventoryActionConfirmationType.SELL_ALL_FROM_SET:
+                return "character/" + characterId + "/inventory-set/sell-all";
+            case InventoryActionConfirmationType.DISENCHANT_ALL_FROM_SET:
+                return (
+                    "character/" + characterId + "/inventory-set/disenchant-all"
                 );
             default:
                 return "";

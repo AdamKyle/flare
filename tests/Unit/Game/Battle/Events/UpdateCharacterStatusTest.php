@@ -3,16 +3,19 @@
 namespace Tests\Unit\Game\Battle\Events;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacterAutomation;
 
 class UpdateCharacterStatusTest extends TestCase
 {
+    use CreateBatchCrafting;
     use CreateCharacterAutomation;
     use RefreshDatabase;
 
@@ -208,5 +211,97 @@ class UpdateCharacterStatusTest extends TestCase
         $this->assertFalse($event->characterStatuses['can_attack']);
         $this->assertFalse($this->character->refresh()->can_attack);
         $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function testPayloadIncludesBatchCraftingVisibleTrueForActiveUndismissedBatch(): void
+    {
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function testPayloadIncludesBatchCraftingVisibleTrueForCompletedUndismissedBatch(): void
+    {
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function testPayloadIncludesBatchCraftingVisibleFalseAfterDismissed(): void
+    {
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function testPayloadIncludesDelveVisibleTrueForActiveDelve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->addSeconds(600),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function testPayloadIncludesDelveVisibleTrueForCompletedUndismissedDelve(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function testPayloadIncludesDelveVisibleFalseAfterDismissed(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function testPayloadKeepsDelveRunningFalseForCompletedDelveRecord(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_delve_running']);
     }
 }

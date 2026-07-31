@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Kingdoms;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\GameBuilding;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,7 +13,7 @@ use Tests\TestCase;
 
 class CapitalCityGoldBarWithdrawValidationTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function test_negative_amount_to_withdraw_is_rejected(): void
     {
@@ -48,7 +50,7 @@ class CapitalCityGoldBarWithdrawValidationTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter(['gold' => 0]);
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
         $otherKingdom = $characterFactory->kingdomManagement()->assignKingdom(['gold_bars' => 2])->getKingdom();
-        GameBuilding::factory()->create(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
+        $this->createGameBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
         $character = $characterFactory->getCharacter();
 
         $response = $this->actingAs($character->user)->call('POST', '/api/kingdom/capital-city/withdraw-gold-bars/'.$character->id.'/'.$capitalCity->id, [

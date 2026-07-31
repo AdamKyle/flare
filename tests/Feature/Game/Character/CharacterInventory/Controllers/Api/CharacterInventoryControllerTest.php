@@ -2,6 +2,9 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\ItemSkill;
+use App\Flare\Models\SetSlot;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -66,6 +69,45 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertGreaterThan(0, $jsonData['equipped'][0]['healing']);
     }
 
+    public function testGetCharacterInventoryApiRequestReturnsExpectedShapeWithFullCraftedItemsSet()
+    {
+        $item = $this->createItem();
+
+        $character = $this->character->getCharacter();
+
+        $inventorySet = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => 1,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+        ]);
+
+        SetSlot::factory()->create([
+            'inventory_set_id' => $inventorySet->id,
+            'item_id' => $item->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory');
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertIsArray($jsonData['inventory']);
+        $this->assertIsArray($jsonData['usable_items']);
+        $this->assertIsArray($jsonData['usable_sets']);
+        $this->assertIsArray($jsonData['savable_sets']);
+        $this->assertIsArray($jsonData['equipped']);
+        $this->assertIsArray($jsonData['quest_items']);
+        $this->assertIsArray($jsonData['sets']);
+        $this->assertTrue($jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['is_batch_crafting_set']);
+        $this->assertEquals(1, $jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['current_slots']);
+        $this->assertEquals(0, $jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['remaining_slots']);
+        $this->assertEquals(1, $jsonData['sets'][InventorySet::BATCH_CRAFTING_SET_NAME]['max_slots']);
+    }
+
     public function testFailToGetApiItemDetails()
     {
         $character = $this->character->inventoryManagement()->giveItem($this->createItem())->getCharacter();
@@ -92,6 +134,49 @@ class CharacterInventoryControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals($item->name, $jsonData['name']);
+    }
+
+    public function testGetItemDetailsIncludesRootItemSkillWithChildren(): void
+    {
+        $rootSkill = ItemSkill::create(['name' => 'Root Artifact Skill', 'description' => 'Root', 'max_level' => 10, 'total_kills_needed' => 10]);
+        $childSkill = ItemSkill::create(['name' => 'Child Artifact Skill', 'description' => 'Child', 'max_level' => 10, 'total_kills_needed' => 10, 'parent_id' => $rootSkill->id, 'parent_level_needed' => 1]);
+        $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertSame($rootSkill->id, $jsonData['item_skills'][0]['id']);
+        $this->assertSame($childSkill->id, $jsonData['item_skills'][0]['children'][0]['id']);
+    }
+
+    public function testGetItemDetailsIncludesItemSkillProgressionRelation(): void
+    {
+        $rootSkill = ItemSkill::create(['name' => 'Progression Artifact Skill', 'description' => 'Root', 'max_level' => 10, 'total_kills_needed' => 10]);
+        $item = $this->createItem(['type' => 'artifact', 'item_skill_id' => $rootSkill->id]);
+        $progression = $item->itemSkillProgressions()->create(['item_skill_id' => $rootSkill->id, 'current_level' => 1, 'current_kill' => 0, 'is_training' => false]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertSame($progression->id, $jsonData['item_skill_progressions'][0]['id']);
+        $this->assertSame($rootSkill->id, $jsonData['item_skill_progressions'][0]['item_skill']['id']);
+    }
+
+    public function testGetNonArtifactItemDetailsReturnsEmptySkillArrays(): void
+    {
+        $item = $this->createItem(['type' => 'weapon', 'item_skill_id' => null]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/item/'.$item->id);
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertSame([], $jsonData['item_skills']);
+        $this->assertSame([], $jsonData['item_skill_progressions']);
     }
 
     public function testDestroyItem()
@@ -570,5 +655,161 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertEquals(3, $otherSlot->refresh()->amount);
         $this->assertEquals(1, $character->inventory->slots()->where('item_id', $normalItem->id)->count());
         $this->assertEquals(4, $gemSlot->refresh()->amount);
+    }
+
+    public function testSellAllFromSetSellsEligibleCraftedItemsSetSlots(): void
+    {
+        $weapon = $this->createItem(['type' => 'weapon', 'cost' => 100]);
+        $trinket = $this->createItem(['type' => 'trinket']);
+
+        $character = $this->character->getCharacter();
+
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $set->slots()->create(['item_id' => $weapon->id]);
+        $trinketSlot = $set->slots()->create(['item_id' => $trinket->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/sell-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(1, $set->refresh()->slots()->count());
+        $this->assertTrue($set->slots()->where('id', $trinketSlot->id)->exists());
+    }
+
+    public function testSellAllFromSetRejectsNormalSet(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($item, 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/sell-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Cannot do that.', $jsonData['message']);
+        $this->assertEquals(1, $set->refresh()->slots()->count());
+    }
+
+    public function testDestroyAllFromSetDestroysCraftedItemsSetSlots(): void
+    {
+        $item = $this->createItem(['type' => 'weapon']);
+
+        $character = $this->character->getCharacter();
+
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $set->slots()->create(['item_id' => $item->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/destroy-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(0, $set->refresh()->slots()->count());
+    }
+
+    public function testDisenchantAllFromSetReturns200ForCraftedItemsSet(): void
+    {
+        $prefix = $this->createItemAffix(['name' => 'Controller Disenchant All Prefix', 'type' => 'prefix']);
+        $item = $this->createItem(['type' => 'weapon', 'item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->getCharacter();
+
+        $set = $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $enchantedSlot = $set->slots()->create(['item_id' => $item->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/disenchant-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertFalse($set->slots()->where('id', $enchantedSlot->id)->exists());
+    }
+
+    public function testDisenchantAllFromSetReturns422ForNormalSet(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(1, true)
+            ->putItemInSet($item, 0)
+            ->getCharacter();
+
+        $set = $character->inventorySets->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/disenchant-all', [
+                'set_id' => $set->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Cannot do that.', $jsonData['message']);
+        $this->assertEquals(1, $set->refresh()->slots()->count());
+    }
+
+    public function testDisenchantAllFromSetReturns422ForAnotherCharactersSet(): void
+    {
+        $prefix = $this->createItemAffix(['name' => 'Controller Other Character Prefix', 'type' => 'prefix']);
+        $item = $this->createItem(['item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $otherSet = $otherCharacter->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+        $otherSlot = $otherSet->slots()->create(['item_id' => $item->id]);
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/character/'.$character->id.'/inventory-set/disenchant-all', [
+                'set_id' => $otherSet->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Cannot do that.', $jsonData['message']);
+        $this->assertTrue($otherSet->slots()->where('id', $otherSlot->id)->exists());
     }
 }

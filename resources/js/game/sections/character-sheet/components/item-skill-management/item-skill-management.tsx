@@ -68,6 +68,7 @@ export default class ItemSkillManagement extends React.Component<
                         this.props.skill_data,
                         this.props.skill_progression_data,
                     )}
+                    read_only={this.props.read_only}
                 />
             );
         }
@@ -88,7 +89,11 @@ export default class ItemSkillManagement extends React.Component<
                 </p>
                 <div className="border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3"></div>
                 <DangerButton
-                    button_label={"Close Skill Tree"}
+                    button_label={
+                        this.props.read_only
+                            ? "Back to Item Details"
+                            : "Close Skill Tree"
+                    }
                     on_click={() => this.props.close_skill_tree()}
                     additional_css="mb-4"
                 />

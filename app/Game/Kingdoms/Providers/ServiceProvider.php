@@ -3,6 +3,7 @@
 namespace App\Game\Kingdoms\Providers;
 
 use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
@@ -66,6 +67,7 @@ use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
 use App\Game\Kingdoms\Validators\MoveUnitsValidator;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Services\LocationService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -79,7 +81,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(ResourceTransferService::class, function ($app) {
             return new ResourceTransferService(
-                $app->make(DistanceCalculation::class)
+                $app->make(DistanceCalculation::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -122,7 +125,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(DistanceCalculation::class),
                 $app->make(CapitalCityRequestResourcesHandler::class),
                 $app->make(CapitalCityBuildingRequestHandler::class),
-                $app->make(KingdomBuildingResourceValidation::class)
+                $app->make(KingdomBuildingResourceValidation::class),
             );
         });
 
@@ -130,7 +133,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CapitalCityBuildingManagementRequestHandler(
                 $app->make(KingdomBuildingService::class),
                 $app->make(UnitMovementService::class),
-                $app->make(BuildingUpgradeRequestValidator::class)
+                $app->make(BuildingUpgradeRequestValidator::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -147,6 +151,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UnitService::class),
                 $app->make(KingdomUnitResourceValidation::class),
                 $app->make(UpdateKingdom::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -163,7 +168,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CapitalCityRequestResourcesHandler::class),
                 $app->make(DistanceCalculation::class),
                 $app->make(UnitService::class),
-                $app->make(KingdomUnitResourceValidation::class)
+                $app->make(KingdomUnitResourceValidation::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -174,6 +180,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(KingdomBuildingResourceValidation::class),
                 $app->make(PurchasePeopleService::class),
                 $app->make(UpdateKingdom::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -195,6 +202,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ResourceTransferService::class),
                 $app->make(KingdomMovementTimeCalculationService::class),
                 $app->make(CapitalCityKingdomLogHandler::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -207,7 +215,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(SteelSmeltingService::class, function ($app) {
             return new SteelSmeltingService(
-                $app->make(UpdateKingdom::class)
+                $app->make(UpdateKingdom::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -219,7 +228,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(KingdomBuildingService::class, function ($app) {
-            return new KingdomBuildingService($app->make(UpdateKingdomHandler::class));
+            return new KingdomBuildingService(
+                $app->make(UpdateKingdomHandler::class),
+                $app->make(GameTimerService::class),
+            );
         });
 
         $this->app->bind(KingdomSettleService::class, function ($app) {
@@ -233,7 +245,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UnitMovementService(
                 $app->make(DistanceCalculation::class),
                 $app->make(MoveUnitsValidator::class),
-                $app->make(UpdateKingdom::class)
+                $app->make(UpdateKingdom::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -248,7 +261,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(UnitService::class, function ($app) {
             return new UnitService(
                 $app->make(UpdateKingdomHandler::class),
-                $app->make(KingdomUnitResourceValidation::class)
+                $app->make(KingdomUnitResourceValidation::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -259,7 +273,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(UnitRecallService::class, function ($app) {
-            return new UnitRecallService;
+            return new UnitRecallService($app->make(GameTimerService::class));
         });
 
         $this->app->bind(TooMuchPopulationHandler::class, function () {
@@ -318,6 +332,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new AbandonKingdomService(
                 $app->make(UpdateKingdom::class),
                 $app->make(GiveKingdomsToNpcHandler::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -326,7 +341,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(KingdomTransformer::class),
                 $app->make(KingdomTableTransformer::class),
                 $app->make(KingdomAttackLogsTransformer::class),
-                $app->make(Manager::class)
+                $app->make(Manager::class),
+                $app->make(BroadcastTopsUpdateService::class)
             );
         });
 
@@ -334,7 +350,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomAttackService(
                 $app->make(UnitMovementService::class),
                 $app->make(MoveUnitsValidator::class),
-                $app->make(UpdateKingdom::class)
+                $app->make(UpdateKingdom::class),
+                $app->make(GameTimerService::class),
             );
         });
 
@@ -364,7 +381,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ReturnSurvivingUnitHandler::class, function ($app) {
-            return new ReturnSurvivingUnitHandler($app->make(UnitMovementService::class));
+            return new ReturnSurvivingUnitHandler(
+                $app->make(UnitMovementService::class),
+                $app->make(GameTimerService::class),
+            );
         });
 
         $this->app->bind(SettlerHandler::class, function () {
@@ -383,7 +403,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ExpandResourceBuildingService::class, function ($app) {
-            return new ExpandResourceBuildingService($app->make(UpdateKingdom::class));
+            return new ExpandResourceBuildingService(
+                $app->make(UpdateKingdom::class),
+                $app->make(GameTimerService::class),
+            );
         });
 
         $this->app->bind(KingdomQueueService::class, function ($app) {

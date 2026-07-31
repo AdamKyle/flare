@@ -40,6 +40,10 @@ class  InventorySetService
      */
     public function assignItemToSet(InventorySet $inventorySet, InventorySlot $slot): void
     {
+        if ($inventorySet->isBatchCraftingSet()) {
+            return;
+        }
+
         $inventorySet->slots()->create([
             'inventory_set_id' => $inventorySet->id,
             'item_id' => $slot->item_id,
@@ -58,9 +62,13 @@ class  InventorySetService
     /**
      * Put an item into the characters inventory set.
      */
-    public function putItemIntoSet(InventorySet $set, Item $item): void
+    public function putItemIntoSet(InventorySet $set, Item $item): ?SetSlot
     {
-        $set->slots()->create([
+        if ($set->isBatchCraftingSet()) {
+            return null;
+        }
+
+        $setSlot = $set->slots()->create([
             'inventory_set_id' => $set->id,
             'item_id' => $item->id,
         ]);
@@ -71,6 +79,8 @@ class  InventorySetService
         $set->update([
             'can_be_equipped' => $this->isSetEquippable($set),
         ]);
+
+        return $setSlot;
     }
 
     /**
@@ -84,6 +94,10 @@ class  InventorySetService
         if (is_null($slot) || is_null($inventorySet)) {
 
             return $this->errorResult('Either the slot or the inventory set does not exist.');
+        }
+
+        if ($inventorySet->isBatchCraftingSet()) {
+            return $this->errorResult('You cannot manually move items into the Batch Crafting set.');
         }
 
         $itemName = $slot->item->affix_name;
@@ -225,6 +239,11 @@ class  InventorySetService
         }
 
         $originalInventorySetCount = $inventorySet->slots->count();
+
+        if ($originalInventorySetCount > max(0, $character->inventory_max - $character->getInventoryCount())) {
+            return $this->errorResult('Your inventory does not have enough room to empty this set.');
+        }
+
         $itemsRemoved = 0;
 
         // Only grab the amount of items your inventory can hold.
@@ -455,6 +474,10 @@ class  InventorySetService
      */
     public function equipSet(Character $character, InventorySet $inventorySet): array
     {
+        if ($inventorySet->isBatchCraftingSet()) {
+            return $this->errorResult('Batch Crafting set cannot be equipped.');
+        }
+
         if (! $inventorySet->can_be_equipped) {
             return $this->errorResult('Set cannot be equipped. It violates the set rules.');
         }
@@ -587,6 +610,10 @@ class  InventorySetService
             return $this->errorResult('Set does not exist.');
         }
 
+        if ($inventorySet->isBatchCraftingSet()) {
+            return $this->errorResult('Batch Crafting set cannot be renamed.');
+        }
+
         if ($character->inventorySets->where('name', $setName)->isNotEmpty()) {
             return $this->errorResult('You already have a set with this name. Pick something else.');
         }
@@ -619,6 +646,14 @@ class  InventorySetService
         });
 
         $inventorySet = $character->inventorySets()->find($setId);
+
+        if (is_null($inventorySet)) {
+            return $this->errorResult('Set does not exist.');
+        }
+
+        if ($inventorySet->isBatchCraftingSet()) {
+            return $this->errorResult('Cannot save equipped items to the Batch Crafting set.');
+        }
 
         if ($inventorySet->slots->isNotEmpty()) {
             return $this->errorResult('Set must be empty.');

@@ -4,9 +4,14 @@ import CraftingSkillsProps from "../../../../../lib/game/character-sheet/types/s
 import SkillInformation from "../../modals/skills/skill-information";
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 
+interface CraftingSkillsState {
+    show_skill_details: boolean;
+    skill: SkillType | null;
+}
+
 export default class CraftingSkills extends React.Component<
     CraftingSkillsProps,
-    any
+    CraftingSkillsState
 > {
     constructor(props: CraftingSkillsProps) {
         super(props);
@@ -17,7 +22,7 @@ export default class CraftingSkills extends React.Component<
         };
     }
 
-    manageSkillDetails(row?: any) {
+    manageSkillDetails(row?: SkillType) {
         this.setState({
             show_skill_details: !this.state.show_skill_details,
             skill: typeof row !== "undefined" ? row : null,
@@ -108,7 +113,7 @@ export default class CraftingSkills extends React.Component<
 
     renderCraftingSkills(): JSX.Element {
         const skills = this.props.crafting_skills.map(
-            (trainable_skill: any, index: number) => {
+            (trainable_skill: SkillType, index: number) => {
                 return (
                     <div key={trainable_skill.id}>
                         <div className="p-4">
@@ -163,11 +168,13 @@ export default class CraftingSkills extends React.Component<
     render() {
         return (
             <Fragment>
-                <div className="mb-4">
-                    <InfoAlert>
-                        This section will not update in real time.
-                    </InfoAlert>
-                </div>
+                {!this.props.read_only ? (
+                    <div className="mb-4">
+                        <InfoAlert>
+                            This section will not update in real time.
+                        </InfoAlert>
+                    </div>
+                ) : null}
 
                 <div className={"max-w-full"}>
                     {this.renderCraftingSkills()}
@@ -179,6 +186,11 @@ export default class CraftingSkills extends React.Component<
                         skill={this.state.skill}
                         manage_modal={this.manageSkillDetails.bind(this)}
                         is_open={this.state.show_skill_details}
+                        preloaded_skill_details={
+                            this.props.read_only
+                                ? this.state.skill.details
+                                : undefined
+                        }
                     />
                 ) : null}
             </Fragment>

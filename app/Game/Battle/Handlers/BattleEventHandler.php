@@ -8,6 +8,7 @@ use App\Flare\Models\Monster;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
@@ -23,6 +24,7 @@ class BattleEventHandler
     public function __construct(
         private BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
         private WeeklyBattleService $weeklyBattleService,
+        private BatchCraftingService $batchCraftingService,
     ) {}
 
     /**
@@ -30,9 +32,17 @@ class BattleEventHandler
      */
     public function processDeadCharacter(Character $character, ?Monster $monster = null): void
     {
-        $character->update(['is_dead' => true]);
+        $updatedRows = Character::where('id', $character->id)
+            ->where('is_dead', false)
+            ->update(['is_dead' => true]);
+
+        if ($updatedRows === 0) {
+            return;
+        }
 
         $character = $character->refresh();
+
+        $this->batchCraftingService->completeForDeath($character);
 
         if (! is_null($monster)) {
 
@@ -59,6 +69,13 @@ class BattleEventHandler
      */
     public function processMonsterDeath(int $characterId, int $monsterId, array $context = []): void
     {
+        $character = Character::find($characterId);
+        $monster = Monster::find($monsterId);
+
+        if (! is_null($character) && ! is_null($monster)) {
+            $this->weeklyBattleService->claimMonsterDeath($character, $monster);
+        }
+
         $sourceType = isset($context['exploration_log_id'])
             ? BattleRewardRequestSourceType::EXPLORATION
             : BattleRewardRequestSourceType::BATTLE;

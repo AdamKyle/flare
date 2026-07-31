@@ -3,12 +3,9 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Event;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
-use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -19,7 +16,7 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
-use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -45,6 +42,8 @@ class EnchantingService
 
     private HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal;
 
+    private GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
+
     private bool $sentToEasyMessage = false;
 
     /**
@@ -60,12 +59,14 @@ class EnchantingService
         CharacterInventoryService $characterInventoryService,
         EnchantItemService $enchantItemService,
         RandomEnchantmentService $randomEnchantmentService,
+        GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
     ) {
 
         $this->characterStatBuilder = $characterStatBuilder;
         $this->characterInventoryService = $characterInventoryService;
         $this->enchantItemService = $enchantItemService;
         $this->randomEnchantmentService = $randomEnchantmentService;
+        $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService;
     }
 
     /**
@@ -185,6 +186,96 @@ class EnchantingService
         $this->enchantItemService->updateSlot($slot, $params['enchant_for_event']);
     }
 
+    /**
+     * Enchant an item directly for Batch Crafting, with no InventorySlot involved.
+     *
+     * Applies the given affixes to a clone of the item after validating the full
+     * affix list and gold cost. Returns the final item on success, or a destroyed
+     * result if the roll fails.
+     *
+     * $suppressSuccessServerMessage skips only the "Applied enchantment: X to: Y"
+     * success message, used when the batch processor will emit a linked equivalent
+     * once the item is committed to the Crafted Items Set. Failure messages are
+     * never suppressed.
+     */
+    public function enchantItemForBatch(Character $character, Item $item, array $affixIds, int $cost, bool $suppressSuccessServerMessage = false): array
+    {
+        $enchantingSkill = $this->getEnchantingSkill($character);
+        $characterInt = $character->getInformation()->statMod('int');
+        $affixes = [];
+
+        foreach (array_values(array_filter($affixIds, fn ($affixId) => ! is_null($affixId))) as $affixId) {
+            $affix = ItemAffix::find($affixId);
+
+            if (is_null($affix)) {
+                return ['success' => false, 'item' => null, 'reason' => 'invalid_affix'];
+            }
+
+            if (! in_array($affix->type, ['prefix', 'suffix'], true)) {
+                return ['success' => false, 'item' => null, 'reason' => 'invalid_affix_type'];
+            }
+
+            if ($enchantingSkill->level < $affix->skill_level_required) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
+
+                return ['success' => false, 'item' => null, 'reason' => 'skill_too_low'];
+            }
+
+            if ($characterInt < $affix->int_required) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::INT_TO_LOW_ENCHANTING);
+
+                return ['success' => false, 'item' => null, 'reason' => 'int_too_low'];
+            }
+
+            $affixes[] = $affix;
+        }
+
+        if (empty($affixes)) {
+            return ['success' => false, 'item' => null, 'reason' => 'no_affixes'];
+        }
+
+        if ($character->gold < $cost) {
+            return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold'];
+        }
+
+        $character->update([
+            'gold' => $character->gold - $cost,
+        ]);
+
+        $character = $character->refresh();
+
+        foreach ($affixes as $affix) {
+
+            $tooEasy = $enchantingSkill->level > $affix->skill_level_trivial;
+
+            if ($tooEasy) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
+            }
+
+            if (! $this->enchantItemService->attachAffix($item, $affix, $enchantingSkill, $tooEasy)) {
+                ServerMessageHandler::handleMessage(
+                    $character->user,
+                    CraftingMessageTypes::ENCHANTMENT_FAILED,
+                    'You failed to apply ' . $affix->name . ' to: ' . $item->refresh()->affix_name . '. The item shatters before you. You lost the investment.'
+                );
+
+                $this->enchantItemService->discardPendingItem();
+
+                return ['success' => false, 'item' => null, 'reason' => 'destroyed'];
+            }
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::ENCHANTED, 'Applied enchantment: ' . $affix->name . ' to: ' . $item->refresh()->affix_name);
+            }
+
+            if (! $tooEasy) {
+                event(new UpdateSkillEvent($enchantingSkill));
+            }
+        }
+
+        return ['success' => true, 'item' => $this->enchantItemService->finalizeBatchItem(), 'reason' => null];
+    }
+
     public function timeForEnchanting(Item $item)
     {
 
@@ -206,7 +297,15 @@ class EnchantingService
         $foundInInventory = InventorySlot::where('id', $slotId)->where('inventory_id', $inventory->id)->where('equipped', false)->first();
 
         if (is_null($foundInInventory)) {
-            $inventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
+            $globalEventGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
+
+            if (is_null($globalEventGoal)) {
+                return null;
+            }
+
+            $inventory = GlobalEventCraftingInventory::where('character_id', $character->id)
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->first();
 
             if (is_null($inventory)) {
                 return null;
@@ -228,8 +327,7 @@ class EnchantingService
     protected function getAvailableAffixes(CharacterStatBuilder $builder, Skill $enchantingSkill, bool $showMerchantMessage = true): Collection
     {
 
-        $affixes = ItemAffix::select('name', 'cost', 'id', 'type', 'int_required')
-            ->where('skill_level_required', '<=', $enchantingSkill->level)
+        $affixes = ItemAffix::where('skill_level_required', '<=', $enchantingSkill->level)
             ->where('randomly_generated', false)
             ->orderBy('skill_level_required', 'asc')
             ->get();
@@ -329,35 +427,29 @@ class EnchantingService
 
         $this->enchantItemService->deleteSlot($slot);
 
-        event(new UpdateCharacterInventoryCountEvent($character));
+        if ($slot instanceof InventorySlot) {
+            event(new UpdateCharacterInventoryCountEvent($character));
+        }
     }
 
     private function fetchEventItemsForEnchanting(Character $character): array
     {
-        $event = Event::where('current_event_goal_step', GlobalEventSteps::ENCHANT)->first();
+        $globalEventGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
         $itemsForEvent = [];
 
-        if (! is_null($event)) {
+        if (! is_null($globalEventGoal)) {
 
-            $gameMap = GameMap::where('only_during_event_type', $event->type)->first();
+            $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)
+                ->where('global_event_goal_id', $globalEventGoal->id)
+                ->first();
 
-            if ($character->map->game_map_id === $gameMap->id) {
-
-                $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
-
-                if (! is_null($eventInventory)) {
-
-                    $globalEventGoal = GlobalEventGoal::where('event_type', $event->type)->first();
-
-                    if (! is_null($globalEventGoal)) {
-                        $itemsForEvent = $eventInventory->craftingSlots->map(function ($slot) {
-                            return [
-                                'slot_id' => $slot->id,
-                                'item_name' => $slot->item->name,
-                            ];
-                        })->toArray();
-                    }
-                }
+            if (! is_null($eventInventory)) {
+                $itemsForEvent = $eventInventory->craftingSlots->map(function ($slot) {
+                    return [
+                        'slot_id' => $slot->id,
+                        'item_name' => $slot->item->name,
+                    ];
+                })->toArray();
             }
         }
 

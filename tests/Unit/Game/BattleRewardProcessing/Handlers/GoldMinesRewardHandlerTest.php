@@ -95,7 +95,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'invalid_type_location',
         ]);
 
@@ -758,7 +758,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'not_gold_mines',
         ]);
 
@@ -793,7 +793,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'not_gold_mines',
         ]);
 
@@ -943,7 +943,7 @@ class GoldMinesRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
             'name' => 'gold_mines_' . uniqid('', true),
         ]);
     }

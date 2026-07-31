@@ -508,6 +508,48 @@ class BattleRewardProcessingQueueManager
         );
     }
 
+    public function markCorruptedInventory(CharacterBattleRewardRequest $request): void
+    {
+        $request->update([
+            'status' => BattleRewardRequestStatus::FAILED,
+            'failed_reason' => 'missing_inventory',
+            'completed_at' => now(),
+        ]);
+
+        $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_processing')->warning('Reward request stopped because the character inventory is missing.', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+        ]);
+    }
+
+    public function markNotificationRetryable(
+        CharacterBattleRewardRequest $request,
+        \App\Flare\Models\CharacterBattleRewardRequestStep $step,
+        Throwable $throwable,
+    ): void {
+        $step->update([
+            'status' => \App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus::RESUMABLE,
+            'failed_reason' => $throwable::class.': '.$throwable->getMessage(),
+            'heartbeat_at' => now(),
+        ]);
+        $request->update([
+            'status' => BattleRewardRequestStatus::RESUMABLE,
+            'failed_reason' => $throwable::class.': '.$throwable->getMessage(),
+            'completed_at' => null,
+        ]);
+        $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_ledger')->warning('notification.retry_scheduled', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+            'step_name' => $step->step_name->value,
+            'exception_class' => $throwable::class,
+            'exception_message' => $throwable->getMessage(),
+        ]);
+    }
+
     public function updateHeartbeat(int $characterId): void
     {
         CharacterBattleRewardQueueState::where('character_id', $characterId)->update([

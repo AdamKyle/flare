@@ -52,6 +52,11 @@ Before changing code, inspect the existing implementation, nearby files, related
 * Keep imports explicit.
 * Do not use leading backslash fully qualified class names in code or docblocks.
 * Remove unused imports when editing a file unless project tooling intentionally leaves them.
+* Keep methods small and focused; avoid deeply nested conditionals by returning early instead of nesting another branch.
+* Add a blank line between a setup/assignment block and the control-flow statement that follows it (`if`, `foreach`, `try`, `return`, etc.). Do not put an assignment line immediately followed by control flow with no blank line between them.
+* Use a single space before the opening brace/parenthesis of `if`, `foreach`, `try`, and other control-flow keywords, matching existing formatting in the file.
+* Prefer `public` and `private` method/property visibility.
+* Do not add `protected` methods or properties unless there is a narrow, documented reason (for example, a random-number-generator extension point the project already relies on for test seams). Note the reason in a short comment or PR description when it is used.
 
 ## Comments And Docblocks
 
@@ -87,6 +92,8 @@ Common module folders include:
 * `Console`
 
 Do not invent a new module layout when the target module already has one.
+
+Controllers, requests, services, values, events, tests, factories, imports, and commands for a feature live in the module they belong to (see `app/Game/Skills` for a reference layout). Do not split a module's own controllers/services/tests across unrelated top-level folders.
 
 ## Controllers
 
@@ -244,6 +251,26 @@ If model setup is needed in tests, the PHPUnit skill owns the test trait and tes
 * Preserve existing exception behavior unless the requested change requires otherwise.
 * Return Laravel JSON responses consistently from API controllers.
 * Keep validation messages and rules in Form Requests when applicable.
+* Backend logs and player-facing error messages must be specific about what happened, not generic strings like `Failed`.
+* Any unexpected/unhandled exception in a background or long-running process must be logged with full context (identifying ids, current state/progress, exception class, message, and stack trace) and must feed the existing monitored bug-report system so it is surfaced immediately, not only through later manual log review.
+* When a server exception is found, fix the root cause; keep exception logging and monitored bug-report creation as a safety net, not as a substitute for the fix.
+* Do not leave raw SQL/database exception details as a player-facing message. Admin logs and bug reports get the raw exception; the player gets plain, direct language describing what happened.
+
+## Diagnosing UI Bugs
+
+* When a browser bug or screenshot points to a specific UI element, inspect the actual component that renders that element, not a similarly named component.
+* For dropdown/menu bugs specifically, first determine whether the element is React Select, a HeadlessUI `Menu`/`Listbox`, a native `<select>`, or bespoke custom code, before making a fix. Fixing the wrong dropdown implementation leaves the reported bug unfixed.
+* Do not say a behavior is "already correct" or "mostly implemented" until you have traced both the screenshot/report path and the actual component/code path and confirmed they match. State fully implemented or unresolved with the exact reason — never "mostly."
+* Any shared/reusable component fix must preserve all existing callers' behavior unless the task explicitly scopes a breaking change for one caller.
+
+## Reusing Existing Components, Services, And Helpers
+
+* If the user says an existing component/service/helper/modal exists, search for it and use it.
+* If it cannot be found, stop and report the exact missing component/path. Do not create a new substitute component, a simplified stand-in, or a one-off replacement.
+* Do not claim "no existing component supports this" unless the report lists the exact files searched and why each existing component cannot be safely adapted.
+* The existing component may be adapted only if all existing usages continue working unchanged.
+* Any shared component change must preserve all existing callers.
+* If a component needs a new mode/prop to support a new use case, add the smallest safe prop and prove existing behavior is unchanged for every current caller.
 
 ## Refactoring Rules
 
@@ -255,6 +282,42 @@ If model setup is needed in tests, the PHPUnit skill owns the test trait and tes
 * Do not mass-format unrelated code.
 * Do not change unrelated whitespace.
 * Do not introduce new packages unless explicitly requested.
+
+## Long-Running Process And Player-Facing Payload Conventions
+
+* When adding player-facing panels/statuses, the backend payload must include the exact fields the frontend needs to render them (e.g. max level alongside current level, the specific relevant subset of data rather than everything). Do not force the frontend to infer or recompute backend state from partial data.
+* Long-running process hard stops (batch jobs, automations, and similar) must use specific, named enum reasons for why the process stopped, not generic strings like `"failed"` used for every case.
+* Player-facing hard stop reasons must be explicit and actionable: state what happened and what the player can do about it, not just that something stopped.
+* Chart/graph data payloads must not mix currencies or other distinct units into one generic series. Carry exact, separately named fields for each real currency/unit (for example separate spent/gained fields per currency) rather than one netted or generic pair.
+* Action outcome charts must count one action row as one outcome; do not double-count or aggregate multiple action rows into a single chart point.
+* Do not expose internal work-unit counts as player-facing item progress when the player requested a count of final items. Track work units internally if needed, but the main player-facing progress must reflect completed/requested final items.
+* Keep-highest/keep-best disposition behavior must be documented in code (via clear method/variable naming or a short comment where non-obvious) and must match what the UI copy tells the player will happen.
+* When adding a new enum value (for example a new end/stop reason), update all formatters, status message mappings, and tests affected by that value so the new value is handled everywhere the enum is switched over, not just in the one path that motivated the change.
+* Start-gate validation for long-running actions (batch jobs, automations, and similar) must come from backend preview/start validation, not frontend heuristics.
+* Frontend must not invent authoritative cost, capacity, currency, INT, or set-validity rules; it may only render what the backend preview/status payload provides.
+* Manual start blockers must be returned as structured backend data (code, message, blocking, optional links) and enforced again on start, not just shown in preview.
+* Runtime must still hard-stop with a specific reason if player state (gold, gold dust, shards, INT, set/bag space, target-set validity) changes after preview/start.
+* INT blockers for Craft and Enchant must never fall back to a lower-INT enchant. Resolve the exact intended affix first, then check INT against that resolved affix.
+* If the intended enchant requires too much INT, stop before calling the enchant service; do not attempt the enchant and then fail normally.
+* Do not let normal server messages spam when a hard blocker (such as INT too low) is already known before attempting the action.
+* Currency blockers must name the real currency used by the code for that feature (Gold, Gold Dust, Shards); do not say Gold for a feature that spends Gold Dust or Shards. Do not say Gold for Alchemy unless the code actually uses Gold for that path.
+* Public guide/help links pointing at another page must inspect that target page/component and use its existing filter query params. If the filter path cannot be found, stop and report the exact missing path/param instead of inventing a new one.
+* Craft Set requires an empty normal unequipped set.
+* Craft and Enchant Set may use an empty normal unequipped set or a valid full normal unequipped 23-item set.
+* Equipped sets are never valid target sets for Craft Set or Craft and Enchant Set.
+* Unique, Mythic, and Cosmic items are never touched (never enchanted, overwritten, or destroyed) by batch enchanting.
+
+## Frontend Conventions (TSX)
+
+These conventions apply to frontend TSX/React changes in this project's game client (`resources/js/game/**`), used until a dedicated frontend-conventions skill exists.
+
+* Reuse existing components, colors, layouts, and modal components. Do not build a new one-off modal when an existing modal already covers the same need.
+* Every `dl` must have direct `dt`/`dd` children — do not wrap them in extra `div`s, and do not break a two-column layout by spanning only one side of a label/value pair.
+* Long action histories/logs must be collapsible, with the collapsed summary stating how many entries exist.
+* Skill bars must show both current and max level whenever max level is available in the payload.
+* Chart labels must name the actual currency or unit involved (e.g. "Gold Dust Spent"), never a generic "Currency" label.
+* Links that open in a new tab must use `target="_blank"` and `rel="noopener noreferrer"`.
+* Panels must use shared status/tone styling components instead of hardcoding one-off status colors per panel.
 
 ## Output Rules
 

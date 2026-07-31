@@ -18,6 +18,8 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -27,6 +29,7 @@ use League\Fractal\Resource\Item as FractalItem;
 
 class CharacterInventoryController extends Controller
 {
+    use ChecksAutomationRestrictions;
     private CharacterInventoryService $characterInventoryService;
 
     private InventorySetService $inventorySetService;
@@ -55,15 +58,18 @@ class CharacterInventoryController extends Controller
         return response()->json($inventory->getInventoryForApi());
     }
 
-    public function itemDetails(Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse
+    public function itemDetails(Request $request, Character $character, Item $item, Manager $manager, ItemTransformer $itemTransformer): JsonResponse
     {
+        $setSlotId = $request->query('slot_id');
 
-        $slot = $this->characterInventoryService->getSlotForItemDetails($character, $item);
+        $slot = is_null($setSlotId)
+            ? $this->characterInventoryService->getSlotForItemDetails($character, $item)
+            : $this->characterInventoryService->getSetSlotForItemDetails($character, $item, (int) $setSlotId);
 
         if (is_null($slot)) {
             return response()->json([
                 'message' => 'You cannot do that.',
-            ]);
+            ], 422);
         }
 
         $item = new FractalItem($slot->item, $itemTransformer);
@@ -74,6 +80,11 @@ class CharacterInventoryController extends Controller
 
     public function destroy(Request $request, Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
 
         $result = $this->characterInventoryService->setCharacter($character)->deleteItem($request->slot_id);
 
@@ -85,6 +96,12 @@ class CharacterInventoryController extends Controller
 
     public function destroyAll(Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->characterInventoryService->setCharacter($character)->destroyAllItemsInInventory();
 
         $status = $result['status'];
@@ -95,6 +112,12 @@ class CharacterInventoryController extends Controller
 
     public function disenchantAll(Character $character): JsonResponse
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         $result = $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
 
         $status = $result['status'];

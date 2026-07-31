@@ -202,4 +202,36 @@ class AccountDeletionJobTest extends TestCase
 
         AccountDeletionJob::dispatch($character->user);
     }
+
+    public function test_already_deleted_user_is_an_idempotent_no_op(): void
+    {
+        $user = $this->characterFactory->getCharacter()->user;
+        $user->character->delete();
+        $user->delete();
+
+        (new AccountDeletionJob($user))->handle(resolve(CharacterDeletion::class));
+
+        $this->assertNull(User::find($user->id));
+    }
+
+    public function test_user_without_character_is_deleted_idempotently(): void
+    {
+        $user = $this->characterFactory->getCharacter()->user;
+        $user->character->delete();
+
+        (new AccountDeletionJob($user))->handle(resolve(CharacterDeletion::class));
+
+        $this->assertNull(User::find($user->id));
+    }
+
+    public function test_email_failure_does_not_reverse_database_deletion(): void
+    {
+        $user = $this->characterFactory->getCharacter()->user;
+        Mail::shouldReceive('to')->once()->with($user->email)->andThrow(new Exception('mail unavailable'));
+
+        (new AccountDeletionJob($user, true))->handle(resolve(CharacterDeletion::class));
+
+        $this->assertNull(User::find($user->id));
+        $this->assertNull(Character::where('user_id', $user->id)->first());
+    }
 }

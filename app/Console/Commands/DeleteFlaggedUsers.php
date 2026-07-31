@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Jobs\AccountDeletionJob;
+use App\Flare\Models\InactiveUserDeletionStatistic;
 use App\Flare\Models\User;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -42,12 +43,18 @@ class DeleteFlaggedUsers extends Command
     public function handle()
     {
         $users = User::where('will_be_deleted', true);
+        $userCount = $users->count();
 
-        if ($users->count() === 0) {
+        if ($userCount === 0) {
             return;
         }
 
-        $progressBar = new ProgressBar(new ConsoleOutput, $users->count());
+        InactiveUserDeletionStatistic::create([
+            'deleted_count' => $userCount,
+            'tracked_at' => now(),
+        ]);
+
+        $progressBar = new ProgressBar(new ConsoleOutput, $userCount);
 
         $users->chunkById(100, function ($users) use ($progressBar) {
             foreach ($users as $user) {

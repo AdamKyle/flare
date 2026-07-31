@@ -10,8 +10,8 @@ export default class DestroySelectedInformation extends React.Component<
     }
 
     renderSelectedItemNames() {
-        return this.props.item_names.map((name) => {
-            return <li>{name}</li>;
+        return this.props.item_names.map((name, index) => {
+            return <li key={`${name}-${index}`}>{name}</li>;
         });
     }
 

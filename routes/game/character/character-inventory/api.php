@@ -42,6 +42,12 @@ Route::group(['middleware' => ['is.character.dead']], function () {
     Route::post('/character/{character}/inventory/disenchant-selected', ['uses' => 'Api\CharacterInventoryMultiController@disenchantSelected']);
     Route::post('/character/{character}/inventory/move-selected', ['uses' => 'Api\CharacterInventoryMultiController@moveSelected']);
     Route::post('/character/{character}/inventory/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelected']);
+    Route::post('/character/{character}/inventory-set/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelectedFromSet']);
+    Route::post('/character/{character}/inventory-set/disenchant-selected', ['uses' => 'Api\CharacterInventoryMultiController@disenchantSelectedFromSet']);
+    Route::post('/character/{character}/inventory-set/destroy-selected', ['uses' => 'Api\CharacterInventoryMultiController@destroySelectedFromSet']);
+    Route::post('/character/{character}/inventory-set/destroy-all', ['uses' => 'Api\CharacterInventoryMultiController@destroyAllFromSet']);
+    Route::post('/character/{character}/inventory-set/sell-all', ['uses' => 'Api\CharacterInventoryMultiController@sellAllFromSet']);
+    Route::post('/character/{character}/inventory-set/disenchant-all', ['uses' => 'Api\CharacterInventoryMultiController@disenchantAllFromSet']);
 });
 
 });

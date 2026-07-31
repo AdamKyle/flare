@@ -1,20 +1,44 @@
 import React from "react";
 
-export default class SellInformation extends React.Component<{}, {}> {
-    constructor(props: any) {
+interface SellInformationProps {
+    from_set?: boolean;
+}
+
+export default class SellInformation extends React.Component<
+    SellInformationProps,
+    {}
+> {
+    constructor(props: SellInformationProps) {
         super(props);
+    }
+
+    renderDescription() {
+        if (this.props.from_set) {
+            return (
+                <p>
+                    Are you sure? This action sells every sellable item in your
+                    Crafted Items Set. Alchemy items, Gems, Quest items,
+                    Artifacts and Trinkets are not sold and will remain in the
+                    set. This action cannot be undone for items that are sold.
+                </p>
+            );
+        }
+
+        return (
+            <p>
+                Are you sure? You are about to sell all items in your inventory
+                (this does not effect Alchemy, Quest items, Sets, Gems or
+                Equipped items). This action cannot be undone. Also, trinkets
+                cannot be sold to the shop. They can be listed to the market or
+                destroyed.
+            </p>
+        );
     }
 
     render() {
         return (
             <>
-                <p>
-                    Are you sure? You are about to sell all items in your
-                    inventory (this does not effect Alchemy, Quest items, Sets,
-                    Gems or Equipped items). This action cannot be undone. Also,
-                    trinkets cannot be sold to the shop. They can be listed to
-                    the market or destroyed.
-                </p>
+                {this.renderDescription()}
                 <p className="mt-2">
                     <strong>Note</strong>: The amount of gold you will get back
                     for items that are enchanted or crafted over the price of

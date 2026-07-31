@@ -21,6 +21,7 @@
     height: 16px;
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-sizing: border-box;
+    pointer-events: auto;
 }
 
 .coordinates {
@@ -31,4 +32,19 @@
     border-radius: 3px;
     pointer-events: none; /* Prevent the tooltip from interfering with mouse events */
     z-index: 999; /* Ensure the tooltip appears above other elements */
+}
+
+.admin-map-overlay .location-x-pin,
+.admin-map-overlay .map-x-pin,
+.admin-map-overlay .port-x-pin {
+    width: 16px;
+    height: 16px;
+    background-color: transparent;
+}
+
+.admin-map-overlay .location-x-pin:after,
+.admin-map-overlay .map-x-pin:after,
+.admin-map-overlay .port-x-pin:after {
+    top: 0;
+    left: 0;
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Jobs;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
@@ -14,10 +16,12 @@ use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
+use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
@@ -34,25 +38,25 @@ use Tests\TestCase;
 
 class ProcessCharacterBattleRewardQueueTest extends TestCase
 {
-    use MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testProcessorDrainsFirstPriorityBeforeSecondAndMarksQueueInactive(): void
     {
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $second = CharacterBattleRewardRequest::factory()->create([
+        $second = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::SECOND,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 22, 'context' => []],
         ]);
-        $first = CharacterBattleRewardRequest::factory()->create([
+        $first = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::FIRST,
             'source_type' => BattleRewardRequestSourceType::QUEST,
@@ -86,16 +90,16 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $failed = CharacterBattleRewardRequest::factory()->create([
+        $failed = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
         ]);
-        $completed = CharacterBattleRewardRequest::factory()->create([
+        $completed = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => 2, 'context' => []],
         ]);
@@ -155,14 +159,14 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
             }
         };
         Queue::swap($queueFake);
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
 
         for ($i = 1; $i <= 51; $i++) {
-            CharacterBattleRewardRequest::factory()->create([
+            $this->createCharacterBattleRewardRequest([
                 'character_id' => $character->id,
                 'priority' => BattleRewardRequestPriority::SECOND,
                 'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -197,7 +201,7 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
@@ -205,7 +209,7 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         $lastRequest = null;
 
         for ($requestNumber = 1; $requestNumber <= 51; $requestNumber++) {
-            $lastRequest = CharacterBattleRewardRequest::factory()->create([
+            $lastRequest = $this->createCharacterBattleRewardRequest([
                 'character_id' => $character->id,
                 'priority' => BattleRewardRequestPriority::SECOND,
                 'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -255,12 +259,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::EXPLORATION,
             'handler_payload' => ['monster_id' => 55, 'context' => []],
@@ -290,12 +294,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::AUTOMATION,
             'handler_payload' => ['monster_id' => 77, 'context' => []],
@@ -325,12 +329,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
         ]);
@@ -341,7 +345,7 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         $battleRewardService->shouldReceive('setContext')->with([])->once()->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->with(true)->once()->andReturnUsing(
             function () use ($character): void {
-                CharacterBattleRewardRequest::factory()->create([
+                $this->createCharacterBattleRewardRequest([
                     'character_id' => $character->id,
                     'handler_payload' => ['monster_id' => 2, 'context' => []],
                 ]);
@@ -372,12 +376,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
@@ -408,19 +412,19 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now()->subMinutes(10),
         ]);
-        $orphanedRequest = CharacterBattleRewardRequest::factory()->create([
+        $orphanedRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
             'started_at' => now()->subMinutes(10),
         ]);
-        $pendingRequest = CharacterBattleRewardRequest::factory()->create([
+        $pendingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PENDING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -456,12 +460,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
@@ -491,12 +495,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
@@ -526,12 +530,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::EXPLORATION,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
@@ -561,12 +565,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::AUTOMATION,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
@@ -597,17 +601,17 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 2, 'context' => []],
@@ -637,19 +641,19 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now()->subMinutes(10),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
             'started_at' => now()->subMinutes(10),
         ]);
-        $pendingRequest = CharacterBattleRewardRequest::factory()->create([
+        $pendingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PENDING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -674,12 +678,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
@@ -708,24 +712,110 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
     }
 
+    public function testCurrencyNotificationFailureKeepsCompletedRewardMutationStepsAndSchedulesRetry(): void
+    {
+        Event::fakeExcept([UpdateCharacterCurrenciesEvent::class]);
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardQueueState([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+        ]);
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processRewards')->once();
+        Event::listen(UpdateCharacterCurrenciesEvent::class, function (): void {
+            throw new RuntimeException('currency notification failed');
+        });
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $request->refresh()->status);
+        $this->assertSame(
+            BattleRewardStepStatus::RESUMABLE,
+            $request->steps()->where('step_name', BattleRewardStepName::FINAL_PLAYER_UPDATES)->firstOrFail()->status,
+        );
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class);
+    }
+
+    public function testWeeklyInventoryCapacityFailureLeavesRewardStepResumableWithoutHotLoop(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardQueueState([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+        ]);
+        $step = $this->createCharacterBattleRewardRequestStep([
+            'character_battle_reward_request_id' => $request->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::WEEKLY_REWARDS,
+            'status' => BattleRewardStepStatus::FAILED,
+        ]);
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processRewards')->once()->andThrow(
+            new WeeklyRewardInventoryFullException('Weekly reward delivery requires four available inventory slots.'),
+        );
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $request->refresh()->status);
+        $this->assertSame(BattleRewardStepStatus::RESUMABLE, $step->refresh()->status);
+        Queue::assertNotPushed(ProcessCharacterBattleRewardQueue::class);
+    }
+
     public function testProcessorExitsWithoutFailingFreshProcessingRowAtProcessorStart(): void
     {
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
             'started_at' => now(),
         ]);
-        $pendingRequest = CharacterBattleRewardRequest::factory()->create([
+        $pendingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PENDING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -756,19 +846,19 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
             'started_at' => now(),
         ]);
-        $pendingRequest = CharacterBattleRewardRequest::factory()->create([
+        $pendingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PENDING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -797,19 +887,19 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -843,19 +933,19 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => 1, 'context' => []],
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -875,12 +965,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",
@@ -920,12 +1010,12 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::FACTION_LOYALTY,
             'source_id' => "faction_loyalty:{$character->id}:1:1",

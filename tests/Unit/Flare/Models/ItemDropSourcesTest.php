@@ -110,11 +110,11 @@ class ItemDropSourcesTest extends TestCase
             'is_celestial_entity' => false,
             'is_raid_monster' => false,
             'is_raid_boss' => false,
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $location = $this->createLocation([
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'Alchemy Church',
             'x' => 100,
             'y' => 200,
@@ -135,11 +135,11 @@ class ItemDropSourcesTest extends TestCase
             'is_celestial_entity' => false,
             'is_raid_monster' => false,
             'is_raid_boss' => false,
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
         ]);
 
         $location = $this->createLocation([
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'Alchemy Church',
             'x' => 100,
             'y' => 200,

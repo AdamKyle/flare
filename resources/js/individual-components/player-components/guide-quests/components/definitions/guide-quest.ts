@@ -43,6 +43,19 @@ export default interface GuideQuest {
     required_mercenary_level: number | null;
     required_secondary_mercenary_level: number | null;
     required_class_specials_equipped: number | null;
+    required_event_goal_participation: number | null;
+    required_event_goal_crafting_participation: number | null;
+    required_event_goal_enchanting_participation: number | null;
+    required_batch_crafting_type: string | null;
+    required_batch_crafting_hours: number | null;
+    required_batch_crafted_items:
+        | {
+              source: string;
+              item_id: number;
+              amount: number;
+              must_be_enchanted: boolean;
+          }[]
+        | null;
     desktop_instructions: string;
     mobile_instructions: string;
     skill_name: string | null;
@@ -56,4 +69,17 @@ export default interface GuideQuest {
     skill_type_name: string | null;
     mercenary_name: string | null;
     secondary_mercenary_name: string | null;
+    required_batch_crafting_type_name: string | null;
+    required_batch_crafted_item_names:
+        | {
+              requirement_index: number;
+              source: string;
+              item_id: number;
+              name: string;
+              type: string;
+              type_name: string;
+              amount: number;
+              must_be_enchanted: boolean;
+          }[]
+        | null;
 }

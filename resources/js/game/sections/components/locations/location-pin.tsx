@@ -18,6 +18,10 @@ export default class LocationPin extends React.Component<LocationPinProps, {}> {
                 key={this.props.location.id}
                 data-location-id={this.props.location.id}
                 className={this.props.pin_class}
+                aria-label={
+                    this.props.aria_label ??
+                    `Open ${this.props.location.name} location details`
+                }
                 style={{
                     top: this.props.location.y,
                     left: this.props.location.x,

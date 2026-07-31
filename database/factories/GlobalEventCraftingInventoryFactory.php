@@ -22,7 +22,7 @@ class GlobalEventCraftingInventoryFactory extends Factory
     public function definition()
     {
         return [
-            'global_event_id' => null,
+            'global_event_goal_id' => null,
             'character_id' => null,
         ];
     }

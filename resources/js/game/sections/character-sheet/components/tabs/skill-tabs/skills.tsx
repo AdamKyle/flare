@@ -13,7 +13,15 @@ import WarningAlert from "../../../../../components/ui/alerts/simple-alerts/warn
 import InfoAlert from "../../../../../components/ui/alerts/simple-alerts/info-alert";
 import clsx from "clsx";
 
-export default class Skills extends React.Component<SkillsProps, any> {
+interface SkillsState {
+    show_skill_details: boolean;
+    show_train_skill: boolean;
+    skill: SkillType | null;
+    stopping: boolean;
+    success_message: string | null;
+}
+
+export default class Skills extends React.Component<SkillsProps, SkillsState> {
     constructor(props: SkillsProps) {
         super(props);
 
@@ -26,14 +34,14 @@ export default class Skills extends React.Component<SkillsProps, any> {
         };
     }
 
-    manageTrainSkill(row: any) {
+    manageTrainSkill(row?: SkillType) {
         this.setState({
             show_train_skill: !this.state.show_train_skill,
             skill: row || null,
         });
     }
 
-    stopTraining(row: any) {
+    stopTraining(row: SkillType) {
         this.setState(
             {
                 stopping: true,
@@ -67,7 +75,7 @@ export default class Skills extends React.Component<SkillsProps, any> {
         );
     }
 
-    manageSkillDetails(row?: any) {
+    manageSkillDetails(row?: SkillType) {
         this.setState({
             show_skill_details: !this.state.show_skill_details,
             skill: row || null,
@@ -87,8 +95,8 @@ export default class Skills extends React.Component<SkillsProps, any> {
         );
     }
 
-    buildColumns() {
-        return [
+    buildColumns(read_only: boolean = false) {
+        const columns = [
             {
                 name: "Name",
                 selector: (row: { name: string }) => row.name,
@@ -158,57 +166,64 @@ export default class Skills extends React.Component<SkillsProps, any> {
                     row.is_training ? "Yes" : "No",
                 sortable: true,
             },
-            {
-                name: "Actions",
-                selector: (row: any) => "",
-                sortable: false,
-                cell: (row: SkillType) => (
-                    <span
-                        key={
-                            row.id +
-                            "-" +
-                            (Math.random() + 1).toString(36).substring(7)
-                        }
-                    >
-                        {row.is_training ? (
-                            <DangerButton
-                                button_label={
-                                    this.state.stopping ? (
-                                        <span>
-                                            Stopping{" "}
-                                            <i className="fas fa-spinner fa-pulse"></i>
-                                        </span>
-                                    ) : (
-                                        "Stop training"
-                                    )
-                                }
-                                on_click={() => this.stopTraining(row)}
-                                disabled={
-                                    this.props.is_dead ||
-                                    this.state.stopping ||
-                                    this.props.is_automation_running
-                                }
-                            />
-                        ) : (
-                            <PrimaryButton
-                                button_label={"Train"}
-                                on_click={() => this.manageTrainSkill(row)}
-                                disabled={
-                                    this.props.is_dead ||
-                                    this.isAnySkillTraining() ||
-                                    this.props.is_automation_running
-                                }
-                            />
-                        )}
-                    </span>
-                ),
-            },
         ];
+
+        if (read_only) {
+            return columns;
+        }
+
+        columns.push({
+            name: "Actions",
+            selector: (row: SkillType) => row.id,
+            sortable: false,
+            cell: (row: SkillType) => (
+                <span
+                    key={
+                        row.id +
+                        "-" +
+                        (Math.random() + 1).toString(36).substring(7)
+                    }
+                >
+                    {row.is_training ? (
+                        <DangerButton
+                            button_label={
+                                this.state.stopping ? (
+                                    <span>
+                                        Stopping{" "}
+                                        <i className="fas fa-spinner fa-pulse"></i>
+                                    </span>
+                                ) : (
+                                    "Stop training"
+                                )
+                            }
+                            on_click={() => this.stopTraining(row)}
+                            disabled={
+                                this.props.is_dead ||
+                                this.state.stopping ||
+                                this.props.is_automation_running
+                            }
+                        />
+                    ) : (
+                        <PrimaryButton
+                            button_label={"Train"}
+                            on_click={() => this.manageTrainSkill(row)}
+                            disabled={
+                                this.props.is_dead ||
+                                this.isAnySkillTraining() ||
+                                this.props.is_automation_running
+                            }
+                        />
+                    )}
+                </span>
+            ),
+        });
+
+        return columns;
     }
 
     renderMobileTrainableSkills(): JSX.Element {
         const skills = this.props.trainable_skills.map(
-            (trainable_skill: any, index: number) => {
+            (trainable_skill: SkillType, index: number) => {
                 return (
                     <div key={trainable_skill.id}>
                         <div className="p-4">
@@ -315,7 +330,135 @@ export default class Skills extends React.Component<SkillsProps, any> {
         return <div className="space-y-4">{skills}</div>;
     }
 
+    renderMobileSkillsReadOnly(skills: SkillType[]): JSX.Element {
+        const rows = skills.map((skill: SkillType, index: number) => {
+            return (
+                <div key={skill.id}>
+                    <div className="p-4">
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold w-24">Name:</span>
+                            <span>
+                                <button
+                                    className={clsx("underline", {
+                                        "text-orange-600 dark:text-orange-300":
+                                            skill.is_class_skill,
+                                    })}
+                                    onClick={() =>
+                                        this.manageSkillDetails(skill)
+                                    }
+                                >
+                                    <i
+                                        className={clsx({
+                                            "ra ra-player-pyromaniac":
+                                                skill.is_class_skill,
+                                        })}
+                                    ></i>{" "}
+                                    {skill.name}
+                                </button>
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center mb-2">
+                            <span className="font-semibold w-24">Level:</span>
+                            <span>
+                                {skill.level}/{skill.max_level}
+                            </span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <span className="font-semibold w-24">XP:</span>
+                            <span>
+                                {formatNumber(skill.xp)}/
+                                {formatNumber(skill.xp_max)}
+                            </span>
+                        </div>
+                    </div>
+                    {index < skills.length - 1 && (
+                        <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3"></div>
+                    )}
+                </div>
+            );
+        });
+
+        return <div className="space-y-4">{rows}</div>;
+    }
+
+    renderReadOnly(): JSX.Element {
+        const nonClassSkills = this.props.trainable_skills.filter(
+            (skill: SkillType) => !skill.is_class_skill,
+        );
+        const classSkills = this.props.trainable_skills.filter(
+            (skill: SkillType) => skill.is_class_skill,
+        );
+
+        return (
+            <Fragment>
+                <div className={"max-w-full"}>
+                    <div>
+                        <div className={"hidden md:block"}>
+                            <Table
+                                columns={this.buildColumns(true)}
+                                data={nonClassSkills}
+                                dark_table={this.props.dark_table}
+                            />
+                        </div>
+                        <div className={"block md:hidden"}>
+                            {this.renderMobileSkillsReadOnly(nonClassSkills)}
+                        </div>
+                    </div>
+                </div>
+
+                {classSkills.length > 0 ? (
+                    <div className="mt-6">
+                        <h3 className="text-lg font-semibold">Class Skills</h3>
+                        <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">
+                            Class skills are learned by switching into and using
+                            different classes. These bonuses apply while you are
+                            using the related class and help define how that
+                            class behaves and scales.{" "}
+                            <a
+                                href="/information/class-skills"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="my-2"
+                            >
+                                Learn more{" "}
+                                <i className="fas fa-external-link-alt"></i>
+                            </a>
+                        </p>
+                        <div className="mt-4">
+                            <div className={"hidden md:block"}>
+                                <Table
+                                    columns={this.buildColumns(true)}
+                                    data={classSkills}
+                                    dark_table={this.props.dark_table}
+                                />
+                            </div>
+                            <div className={"block md:hidden"}>
+                                {this.renderMobileSkillsReadOnly(classSkills)}
+                            </div>
+                        </div>
+                    </div>
+                ) : null}
+
+                {this.state.show_skill_details && this.state.skill !== null ? (
+                    <SkillInformation
+                        is_trainable={true}
+                        skill={this.state.skill}
+                        manage_modal={this.manageSkillDetails.bind(this)}
+                        is_open={this.state.show_skill_details}
+                        preloaded_skill_details={this.state.skill.details}
+                    />
+                ) : null}
+            </Fragment>
+        );
+    }
+
     render() {
+        if (this.props.read_only) {
+            return this.renderReadOnly();
+        }
+
         return (
             <Fragment>
                 {this.props.is_automation_running ? (
@@ -354,6 +497,7 @@ export default class Skills extends React.Component<SkillsProps, any> {
                         skill={this.state.skill}
                         manage_modal={this.manageSkillDetails.bind(this)}
                         is_open={this.state.show_skill_details}
+                        preloaded_skill_details={undefined}
                     />
                 ) : null}
 

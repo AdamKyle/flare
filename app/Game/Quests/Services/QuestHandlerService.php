@@ -81,6 +81,12 @@ class QuestHandlerService
             return true;
         }
 
+        if ($character->times_reincarnated < $quest->reincarnated_times) {
+            $this->bailMessage = 'You must reincarnate more times before completing this quest.';
+
+            return true;
+        }
+
         if ($this->questRequiresItem($quest)) {
             $foundItem = $this->fetchRequiredItem($quest, $character);
 

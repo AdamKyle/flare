@@ -29,8 +29,9 @@ class FactionLoyaltyAutomationService
     /**
      * @param CharacterCacheData $characterCacheData
      */
-    public function __construct( private readonly CharacterCacheData $characterCacheData) {
-    }
+    public function __construct(
+        private readonly CharacterCacheData $characterCacheData,
+    ) {}
 
     /**
      * Begin the automation.

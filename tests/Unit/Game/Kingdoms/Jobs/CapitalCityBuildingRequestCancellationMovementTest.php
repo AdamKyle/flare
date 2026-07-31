@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
@@ -17,7 +19,7 @@ use Tests\TestCase;
 
 class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function testDelayedRedispatchPassesAllConstructorArgumentsAndUsesLongRunningQueue(): void
     {
@@ -192,7 +194,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
             'travel_time_completed_at' => now(),
         ]);
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -260,7 +262,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
             'travel_time_completed_at' => now(),
         ]);
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,

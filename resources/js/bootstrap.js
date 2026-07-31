@@ -36,7 +36,6 @@ axios.interceptors.request.use(function (config) {
     return Promise.reject(error);
 });
 
-
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

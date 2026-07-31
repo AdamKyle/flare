@@ -16110,180 +16110,6 @@ namespace Illuminate\Support\Facades {
             }
     }
 
-namespace Clockwork\Support\Laravel {
-            /**
-     */        class Facade {
-                    /**
-         * @static
-         */        public static function addDataSource($dataSource)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->addDataSource($dataSource);
-        }
-                    /**
-         * @static
-         */        public static function resolveRequest()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->resolveRequest();
-        }
-                    /**
-         * @static
-         */        public static function resolveAsCommand($name, $exitCode = null, $arguments = [], $options = [], $argumentsDefaults = [], $optionsDefaults = [], $output = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->resolveAsCommand($name, $exitCode, $arguments, $options, $argumentsDefaults, $optionsDefaults, $output);
-        }
-                    /**
-         * @static
-         */        public static function resolveAsQueueJob($name, $description = null, $status = 'processed', $payload = [], $queue = null, $connection = null, $options = [])
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->resolveAsQueueJob($name, $description, $status, $payload, $queue, $connection, $options);
-        }
-                    /**
-         * @static
-         */        public static function resolveAsTest($name, $status = 'passed', $statusMessage = null, $asserts = [])
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->resolveAsTest($name, $status, $statusMessage, $asserts);
-        }
-                    /**
-         * @static
-         */        public static function extendRequest($request = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->extendRequest($request);
-        }
-                    /**
-         * @static
-         */        public static function storeRequest()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->storeRequest();
-        }
-                    /**
-         * @static
-         */        public static function reset()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->reset();
-        }
-                    /**
-         * @static
-         */        public static function request($request = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->request($request);
-        }
-                    /**
-         * @static
-         */        public static function log($level = null, $message = null, $context = [])
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->log($level, $message, $context);
-        }
-                    /**
-         * @static
-         */        public static function timeline()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->timeline();
-        }
-                    /**
-         * @static
-         */        public static function event($description, $data = [])
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->event($description, $data);
-        }
-                    /**
-         * @static
-         */        public static function shouldCollect($shouldCollect = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->shouldCollect($shouldCollect);
-        }
-                    /**
-         * @static
-         */        public static function shouldRecord($shouldRecord = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->shouldRecord($shouldRecord);
-        }
-                    /**
-         * @static
-         */        public static function dataSources($dataSources = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->dataSources($dataSources);
-        }
-                    /**
-         * @static
-         */        public static function storage($storage = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->storage($storage);
-        }
-                    /**
-         * @static
-         */        public static function authenticator($authenticator = null)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->authenticator($authenticator);
-        }
-                    /**
-         * @static
-         */        public static function getDataSources()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->getDataSources();
-        }
-                    /**
-         * @static
-         */        public static function getRequest()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->getRequest();
-        }
-                    /**
-         * @static
-         */        public static function setRequest($request)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->setRequest($request);
-        }
-                    /**
-         * @static
-         */        public static function getStorage()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->getStorage();
-        }
-                    /**
-         * @static
-         */        public static function setStorage($storage)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->setStorage($storage);
-        }
-                    /**
-         * @static
-         */        public static function getAuthenticator()
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->getAuthenticator();
-        }
-                    /**
-         * @static
-         */        public static function setAuthenticator($authenticator)
-        {
-                        /** @var \Clockwork\Clockwork $instance */
-                        return $instance->setAuthenticator($authenticator);
-        }
-            }
-    }
-
 namespace Livewire {
             /**
      * @see \Livewire\LivewireManager
@@ -21393,7 +21219,6 @@ namespace  {
             class View extends \Illuminate\Support\Facades\View {}
             class GameVersion extends \App\Flare\Values\GameVersionHelper {}
             class GuideQuests extends \App\Flare\Values\Wrappers\HasGuideQuestsCompletedOrEnabled {}
-            class Clockwork extends \Clockwork\Support\Laravel\Facade {}
             class Horizon extends \Laravel\Horizon\Horizon {}
             class Livewire extends \Livewire\Livewire {}
             class Excel extends \Maatwebsite\Excel\Facades\Excel {}
@@ -21401,6 +21226,101 @@ namespace  {
     }
 
 
+namespace Facades\App\Game\Kingdoms\Validation {
+    /**
+     * @mixin \App\Game\Kingdoms\Validation\ResourceValidation     */
+    class ResourceValidation extends \App\Game\Kingdoms\Validation\ResourceValidation {}
+}
+namespace Facades\Livewire\Features\SupportFileUploads {
+    /**
+     * @mixin \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl     */
+    class GenerateSignedUploadUrl extends \Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\SellItemCalculator     */
+    class SellItemCalculator extends \App\Flare\Calculators\SellItemCalculator {}
+}
+namespace Facades\App\Flare\Transformers\DataSets {
+    /**
+     * @mixin \App\Flare\Transformers\DataSets\CharacterAttackData     */
+    class CharacterAttackData extends \App\Flare\Transformers\DataSets\CharacterAttackData {}
+}
+namespace Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders {
+    /**
+     * @mixin \App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute     */
+    class ItemSkillAttribute extends \App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute {}
+}
+namespace Facades\App\Flare\Values {
+    /**
+     * @mixin \App\Flare\Values\UserOnlineValue     */
+    class UserOnlineValue extends \App\Flare\Values\UserOnlineValue {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\GoldRushCheckCalculator     */
+    class GoldRushCheckCalculator extends \App\Flare\Calculators\GoldRushCheckCalculator {}
+}
+namespace Facades\App\Admin\Formatters {
+    /**
+     * @mixin \App\Admin\Formatters\MessagesFormatter     */
+    class MessagesFormatter extends \App\Admin\Formatters\MessagesFormatter {}
+}
+namespace Facades\App\Flare\Items\Presenters {
+    /**
+     * @mixin \App\Flare\Items\Presenters\QuestItemEffectsPresenter     */
+    class QuestItemEffectsPresenter extends \App\Flare\Items\Presenters\QuestItemEffectsPresenter {}
+}
+namespace Facades\App\Flare\Cache {
+    /**
+     * @mixin \App\Flare\Cache\CoordinatesCache     */
+    class CoordinatesCache extends \App\Flare\Cache\CoordinatesCache {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\XPCalculator     */
+    class XPCalculator extends \App\Flare\Calculators\XPCalculator {}
+}
+namespace Facades\App\Game\Skills\Handlers {
+    /**
+     * @mixin \App\Game\Skills\Handlers\UpdateItemSkill     */
+    class UpdateItemSkill extends \App\Game\Skills\Handlers\UpdateItemSkill {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\SkillXPCalculator     */
+    class SkillXPCalculator extends \App\Flare\Calculators\SkillXPCalculator {}
+}
+namespace Facades\App\Game\Core\Handlers {
+    /**
+     * @mixin \App\Game\Core\Handlers\DuplicateItemHandler     */
+    class DuplicateItemHandler extends \App\Game\Core\Handlers\DuplicateItemHandler {}
+}
+namespace Facades\App\Game\Core\Handlers {
+    /**
+     * @mixin \App\Game\Core\Handlers\AnnouncementHandler     */
+    class AnnouncementHandler extends \App\Game\Core\Handlers\AnnouncementHandler {}
+}
+namespace Facades\App\Game\Messages\Handlers {
+    /**
+     * @mixin \App\Game\Messages\Handlers\ServerMessageHandler     */
+    class ServerMessageHandler extends \App\Game\Messages\Handlers\ServerMessageHandler {}
+}
+namespace Facades\App\Flare\Calculators {
+    /**
+     * @mixin \App\Flare\Calculators\DropCheckCalculator     */
+    class DropCheckCalculator extends \App\Flare\Calculators\DropCheckCalculator {}
+}
+namespace Facades\App\Game\Core\Handlers {
+    /**
+     * @mixin \App\Game\Core\Handlers\HandleGoldBarsAsACurrency     */
+    class HandleGoldBarsAsACurrency extends \App\Game\Core\Handlers\HandleGoldBarsAsACurrency {}
+}
+namespace Facades\App\Flare\RandomNumber {
+    /**
+     * @mixin \App\Flare\RandomNumber\RandomNumberGenerator     */
+    class RandomNumberGenerator extends \App\Flare\RandomNumber\RandomNumberGenerator {}
+}
 
 
 

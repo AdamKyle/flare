@@ -4,6 +4,7 @@ import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import DangerAlert from "../../../ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../../ui/alerts/simple-alerts/warning-alert";
 
 export default class ResistanceInfoSection extends React.Component<
     AdditionalInfoProps,
@@ -12,14 +13,23 @@ export default class ResistanceInfoSection extends React.Component<
     constructor(props: AdditionalInfoProps) {
         super(props);
 
+        const preloadedResistanceInfo = props.preloaded_resistance_info;
+
         this.state = {
-            is_loading: true,
+            is_loading: typeof preloadedResistanceInfo === "undefined",
             error_message: "",
-            resistance_info: [],
+            resistance_info:
+                typeof preloadedResistanceInfo === "undefined"
+                    ? []
+                    : preloadedResistanceInfo,
         };
     }
 
     componentDidMount(): void {
+        if (typeof this.props.preloaded_resistance_info !== "undefined") {
+            return;
+        }
+
         this.setState(
             {
                 error_message: "",
@@ -74,6 +84,15 @@ export default class ResistanceInfoSection extends React.Component<
 
         if (this.state.is_loading) {
             return <LoadingProgressBar />;
+        }
+
+        if (this.state.resistance_info === null) {
+            return (
+                <WarningAlert>
+                    Resistance information is unavailable because this character
+                    has no inventory.
+                </WarningAlert>
+            );
         }
 
         return (

@@ -85,6 +85,18 @@ export interface CharacterType {
 
     is_delve_running: boolean;
 
+    is_delve_visible: boolean;
+
+    is_batch_crafting_running: boolean;
+
+    is_batch_crafting_visible: boolean;
+
+    batch_crafting_time_out: number;
+
+    is_batch_crafting_experience_mode: boolean;
+
+    is_batch_crafting_retry_mode: boolean;
+
     is_at_delve_location: boolean;
 
     can_set_delve_pack: boolean;

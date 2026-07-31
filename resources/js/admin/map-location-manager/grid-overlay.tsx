@@ -52,17 +52,19 @@ export default class GridOverlay extends Component<
 
             // Loop through the x coordinates to fill in columns within each row
             for (let xIndex = 0; xIndex < xCoords.length; xIndex++) {
-                const xPos = xCoords[xIndex] - 8;
+                const xPos = xCoords[xIndex];
                 const isHovered =
                     hoveredGridCell.x === xPos && hoveredGridCell.y === yPos;
 
                 gridCells.push(
                     <button
+                        type="button"
                         key={`${xPos}-${yPos}`} // Unique key for each grid cell
                         className={`grid-cell ${isHovered ? "hovered" : ""}`} // Tailwind CSS class for grid cell
+                        aria-label={`Select map coordinate ${xPos}, ${yPos}`}
                         style={{
-                            left: `${xPos}px`,
-                            top: `${yPos}px`,
+                            left: `${xPos - 8}px`,
+                            top: `${yPos - 8}px`,
                             width: "16px",
                             height: "16px",
                             position: "absolute", // Make sure grid cells are positioned absolutely
@@ -87,12 +89,14 @@ export default class GridOverlay extends Component<
         return this.props.npcs.map((npc: NpcDetails) => {
             return (
                 <button
+                    type="button"
                     key={npc.id}
                     data-npc-id={npc.id}
                     className={"map-x-pin"}
+                    aria-label={`NPC ${npc.real_name} at ${npc.x_position}, ${npc.y_position}`}
                     style={{
-                        top: npc.y_position,
-                        left: npc.x_position,
+                        top: npc.y_position - 8,
+                        left: npc.x_position - 8,
                     }}
                     onMouseEnter={() => {
                         this.mouseHandlers.handleLocationMouseEnter(
@@ -108,17 +112,20 @@ export default class GridOverlay extends Component<
 
     renderLocationPins(): ReactNode {
         return this.props.locations.map((location: LocationDetails) => {
+            const pinClass = location.is_port ? "port-x-pin" : "location-x-pin";
+
             if (location.is_port) {
                 return (
                     <LocationPin
                         key={location.id}
                         location={{
                             id: location.id,
-                            x: location.x,
-                            y: location.y,
+                            x: location.x - 8,
+                            y: location.y - 8,
                         }}
                         openLocationDetails={() => {}}
-                        pin_class={"port-x-pin"}
+                        pin_class={pinClass}
+                        aria_label={`Port location ${location.name} at ${location.x}, ${location.y}`}
                         onMouseEnter={() =>
                             this.mouseHandlers.handleLocationMouseEnter(
                                 location.x,
@@ -135,9 +142,14 @@ export default class GridOverlay extends Component<
             return (
                 <LocationPin
                     key={location.id}
-                    location={{ id: location.id, x: location.x, y: location.y }}
+                    location={{
+                        id: location.id,
+                        x: location.x - 8,
+                        y: location.y - 8,
+                    }}
                     openLocationDetails={() => {}}
-                    pin_class={"location-x-pin"}
+                    pin_class={pinClass}
+                    aria_label={`Location ${location.name} at ${location.x}, ${location.y}`}
                     onMouseEnter={() =>
                         this.mouseHandlers.handleLocationMouseEnter(
                             location.x,
@@ -173,7 +185,7 @@ export default class GridOverlay extends Component<
 
         return (
             <div
-                className="image-container game-map"
+                className="image-container game-map admin-map-overlay"
                 onMouseMove={this.mouseHandlers.handleMouseMove}
                 onMouseLeave={this.mouseHandlers.handleMouseLeave}
                 style={{
@@ -197,18 +209,20 @@ export default class GridOverlay extends Component<
                     {Math.floor(coordinates.y)})
                 </div>
                 {snapped && (
-                    <div
+                    <button
+                        type="button"
+                        aria-label={`Move location or NPC to ${coordinates.x}, ${coordinates.y}`}
                         style={{
                             position: "absolute",
                             width: "16px",
                             height: "16px",
                             backgroundColor: "rgba(255, 0, 0, 0.5)",
                             left: coordinates.x - 8,
-                            top: coordinates.y,
+                            top: coordinates.y - 8,
                             cursor: "pointer",
                         }}
                         onClick={this.manageModal.bind(this)}
-                    ></div>
+                    ></button>
                 )}
                 {this.state.showModal ? (
                     <MoveLocationDialogue

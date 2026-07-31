@@ -6,4 +6,5 @@ export default interface ItemDetailsState {
     holy_stacks: any | null;
     view_stacks: boolean;
     view_sockets: boolean;
+    view_item_skill_tree: boolean;
 }

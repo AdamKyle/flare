@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Kingdoms\Requests;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
@@ -16,7 +18,7 @@ use Tests\TestCase;
 
 class BuildingUpgradeRequestsRequestTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function testRequestDoesNotHaveBusinessValidation(): void
     {
@@ -105,7 +107,7 @@ class BuildingUpgradeRequestsRequestTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'building_id' => $building->id,

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Automation\Controllers\Api;
 
+use Tests\Traits\CreateLocation;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
@@ -18,7 +20,7 @@ use Tests\TestCase;
 
 class ExplorationControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateLocation, RefreshDatabase;
 
     private Character $character;
 
@@ -144,11 +146,11 @@ class ExplorationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        Location::factory()->create([
+        $this->createLocation([
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
             'game_map_id' => $this->character->map->game_map_id,
-            'type' => LocationType::UNDERWATER_CAVES,
+            'type' => LocationType::UNDERWATER_CAVES->value,
         ]);
 
         $response = $this->actingAs($this->character->user)

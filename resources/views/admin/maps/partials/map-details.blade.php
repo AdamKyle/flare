@@ -21,6 +21,30 @@
                     class="shadow rounded max-w-full h-auto align-middle border-none img-fluid" />
             </div>
             <div>
+                @if ($map->isGeneratedGemMap())
+                    <h3 class="my-4">Generated Gem Map</h3>
+                    <dl>
+                        <dt>Generated Map</dt>
+                        <dd>Yes</dd>
+                        <dt>Generated Type</dt>
+                        <dd>{{ $map->generated_map_type === 'map_gem' ? 'Map Gem' : 'Location Gem' }}</dd>
+                        <dt>Gem Profile</dt>
+                        <dd>{{ $map->generatedMapGemParamter?->name ?? $map->generatedLocationGemParamter?->name }}</dd>
+                        <dt>Parent Map</dt>
+                        <dd>{{ $map->generatedParentMap?->name }}</dd>
+                        @if (!is_null($map->generatedLocationGemParamter))
+                            <dt>Parent Location</dt>
+                            <dd>{{ $map->generatedLocationGemParamter->location?->name }}</dd>
+                        @endif
+                        <dt>Can Traverse</dt>
+                        <dd>{{ $map->can_traverse ? 'Yes' : 'No' }}</dd>
+                        <dt>Monster Source</dt>
+                        <dd>Parent Map</dd>
+                        <dt>Walking Rules</dt>
+                        <dd>Parent Map</dd>
+                    </dl>
+                    <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-2'></div>
+                @endif
                 <h3 class="my-4">Map Bonuses</h3>
                 <dl>
                     <dt>XP Bonus</dt>

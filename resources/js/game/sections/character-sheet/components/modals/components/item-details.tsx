@@ -10,6 +10,7 @@ import ItemDetailsState from "./types/item-details-state";
 import { ItemDefinition } from "./deffinitions/item-definition";
 import AffixDefinition from "./deffinitions/affix-definition";
 import { AppliedStack } from "./deffinitions/holy-definition";
+import ItemSkillManagement from "../../item-skill-management/item-skill-management";
 
 type ItemDetailsElements = React.JSX.Element | null;
 
@@ -26,6 +27,7 @@ export default class ItemDetails extends React.Component<
             holy_stacks: null,
             view_stacks: false,
             view_sockets: false,
+            view_item_skill_tree: false,
         };
     }
 
@@ -50,6 +52,12 @@ export default class ItemDetails extends React.Component<
     viewSockets() {
         this.setState({
             view_sockets: !this.state.view_sockets,
+        });
+    }
+
+    viewItemSkillTree() {
+        this.setState({
+            view_item_skill_tree: !this.state.view_item_skill_tree,
         });
     }
 
@@ -241,6 +249,22 @@ export default class ItemDetails extends React.Component<
     }
 
     render() {
+        if (this.state.view_item_skill_tree) {
+            return (
+                <div className="max-h-[400px] md:max-h-[600px] overflow-y-auto">
+                    <ItemSkillManagement
+                        skill_data={this.props.item.item_skills ?? []}
+                        skill_progression_data={
+                            this.props.item.item_skill_progressions ?? []
+                        }
+                        close_skill_tree={this.viewItemSkillTree.bind(this)}
+                        character_id={this.props.character_id}
+                        read_only
+                    />
+                </div>
+            );
+        }
+
         const statModifiers: ItemDetailsElements[] | [] = this.getStatModifiers(
             this.props.item,
         );
@@ -601,6 +625,15 @@ export default class ItemDetails extends React.Component<
                     </div>
                 ) : null}
 
+                {(this.props.item.item_skills?.length ?? 0) > 0 &&
+                (this.props.item.item_skill_progressions?.length ?? 0) > 0 ? (
+                    <OrangeButton
+                        button_label={"View Ancestral Skill Tree"}
+                        on_click={this.viewItemSkillTree.bind(this)}
+                        additional_css={"my-4"}
+                    />
+                ) : null}
+
                 {this.state.view_affix && this.state.affix !== null ? (
                     <ItemAffixDetails
                         is_open={this.state.view_affix}
@@ -623,6 +656,9 @@ export default class ItemDetails extends React.Component<
                         character_id={this.props.character_id}
                         item_id={this.props.item.id}
                         manage_modal={this.viewSockets.bind(this)}
+                        preloaded_attached_gems={
+                            this.props.preloaded_attached_gems
+                        }
                     />
                 ) : null}
             </div>

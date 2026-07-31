@@ -42,6 +42,7 @@ class InitiateWeeklyCurrencyDropEventTest extends TestCase
         Event::fake();
 
         $event = $this->createScheduledEvent([
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
         ]);
 

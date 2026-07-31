@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleUnauthenticatedAxiosRequest } from "../../../game/lib/ajax/unauthenticated-response-handler";
 import {
     CharacterDetailResponse,
     CharacterRow,
@@ -15,20 +16,30 @@ import {
 const baseUrl = "/api/admin/character-reward-queue";
 
 export async function fetchRewardQueueSummary(): Promise<Summary> {
-    return (await axios.get<Summary>(`${baseUrl}/summary`)).data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<Summary>(`${baseUrl}/summary`),
+        )
+    ).data;
 }
 
 export async function fetchRewardQueueCharts(): Promise<ChartsResponse> {
-    return (await axios.get<ChartsResponse>(`${baseUrl}/charts`)).data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ChartsResponse>(`${baseUrl}/charts`),
+        )
+    ).data;
 }
 
 export async function fetchRewardQueueCharacters(
     page: number,
 ): Promise<Paginated<CharacterRow>> {
     return (
-        await axios.get<Paginated<CharacterRow>>(`${baseUrl}/characters`, {
-            params: { page },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<Paginated<CharacterRow>>(`${baseUrl}/characters`, {
+                params: { page },
+            }),
+        )
     ).data;
 }
 
@@ -37,9 +48,11 @@ export async function fetchRewardQueueRequests(
     page: number,
 ): Promise<Paginated<RewardRequest>> {
     return (
-        await axios.get<Paginated<RewardRequest>>(`${baseUrl}/requests`, {
-            params: { ...filters, page },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<Paginated<RewardRequest>>(`${baseUrl}/requests`, {
+                params: { ...filters, page },
+            }),
+        )
     ).data;
 }
 
@@ -49,9 +62,11 @@ export async function fetchCharacterRewardQueue(
     page: number,
 ): Promise<CharacterDetailResponse> {
     return (
-        await axios.get<CharacterDetailResponse>(
-            `${baseUrl}/characters/${characterId}`,
-            { params: { ...filters, page } },
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<CharacterDetailResponse>(
+                `${baseUrl}/characters/${characterId}`,
+                { params: { ...filters, page } },
+            ),
         )
     ).data;
 }
@@ -60,16 +75,26 @@ export async function fetchRewardQueueStatusVolume(
     days: string,
 ): Promise<ChartPoint[]> {
     return (
-        await axios.get<ChartPoint[]>(`${baseUrl}/status-breakdown`, {
-            params: { days },
-        })
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<ChartPoint[]>(`${baseUrl}/status-breakdown`, {
+                params: { days },
+            }),
+        )
     ).data;
 }
 
 export async function fetchStaleRewardQueues(): Promise<StaleQueue[]> {
-    return (await axios.get<StaleQueue[]>(`${baseUrl}/stale`)).data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.get<StaleQueue[]>(`${baseUrl}/stale`),
+        )
+    ).data;
 }
 
 export async function repairStaleRewardQueues(): Promise<RepairSummary> {
-    return (await axios.post<RepairSummary>(`${baseUrl}/stale/repair`)).data;
+    return (
+        await handleUnauthenticatedAxiosRequest(
+            axios.post<RepairSummary>(`${baseUrl}/stale/repair`),
+        )
+    ).data;
 }

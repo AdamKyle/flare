@@ -4,6 +4,7 @@ namespace App\Game\Maps\Listeners;
 
 use App\Flare\Models\Character;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\ShowTimeOutEvent;
 use App\Game\Maps\Jobs\MoveTimeOutJob;
@@ -12,8 +13,10 @@ class MoveTimeOutListener
 {
     private CharacterStatBuilder $characterStatBuilder;
 
-    public function __construct(CharacterStatBuilder $characterStatBuilder)
-    {
+    public function __construct(
+        CharacterStatBuilder $characterStatBuilder,
+        private readonly GameTimerService $gameTimerService,
+    ) {
         $this->characterStatBuilder = $characterStatBuilder;
     }
 
@@ -51,9 +54,9 @@ class MoveTimeOutListener
         $time = (int) round($event->timeOut - ($event->timeOut * $this->characterStatBuilder->buildTimeOutModifier('move_time_out')));
 
         if ($time < 1) {
-            $timeOut = now()->addMinute();
+            $timeOut = $this->gameTimerService->availableAtFromMinutes(1);
         } else {
-            $timeOut = now()->addMinutes($time);
+            $timeOut = $this->gameTimerService->availableAtFromMinutes($time);
         }
 
         $character->update([
@@ -65,7 +68,7 @@ class MoveTimeOutListener
 
         MoveTimeOutJob::dispatch($character->id)->delay($timeOut);
 
-        return $time * 60;
+        return (int) now()->diffInSeconds($timeOut);
     }
 
     /**

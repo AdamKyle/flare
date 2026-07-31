@@ -130,7 +130,7 @@ class TheOldChurchRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'not_the_old_church',
         ]);
 
@@ -808,7 +808,7 @@ class TheOldChurchRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
-            'type' => LocationType::THE_OLD_CHURCH,
+            'type' => LocationType::THE_OLD_CHURCH->value,
             'name' => 'the_old_church_' . uniqid('', true),
         ]);
     }

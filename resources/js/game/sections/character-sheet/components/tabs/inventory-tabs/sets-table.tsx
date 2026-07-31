@@ -18,11 +18,18 @@ import clsx from "clsx";
 import UsableItemsDetails from "../../../../../lib/game/character-sheet/types/inventory/usable-items-details";
 import InventoryUseDetails from "../../modals/inventory-item-details";
 import DangerAlert from "../../../../../components/ui/alerts/simple-alerts/danger-alert";
+import PrimaryButton from "../../../../../components/ui/buttons/primary-button";
+import { InventoryActionConfirmationType } from "../../../../../components/character-sheet/inventory-action-confirmation-modal/helpers/enums/inventory-action-confirmation-type";
+import BaseInventoryActionConfirmationModal from "../../../../../components/character-sheet/inventory-action-confirmation-modal/modals/base-inventory-action-confirmation-modal";
+import ModalPropsBuilder from "../../../../../components/character-sheet/inventory-action-confirmation-modal/helpers/modal-props-builder";
+import { serviceContainer } from "../../../../../lib/containers/core-container";
 
 export default class SetsTable
     extends React.Component<SetsInventoryTabProps, SetsTableState>
     implements ActionsInterface
 {
+    private modalPropsBuilder: ModalPropsBuilder;
+
     constructor(props: SetsInventoryTabProps) {
         super(props);
 
@@ -40,7 +47,12 @@ export default class SetsTable
             loading_label: null,
             show_loading_label: false,
             error_message: null,
+            selected_slots: [],
+            show_action_confirmation_modal: false,
+            action_confirmation_type: null,
         };
+
+        this.modalPropsBuilder = serviceContainer().fetch(ModalPropsBuilder);
     }
 
     componentDidMount() {
@@ -74,6 +86,7 @@ export default class SetsTable
             equippable: boolean;
             items: InventoryDetails[] | [];
             equipped: boolean;
+            is_batch_crafting_set?: boolean;
         };
     }) {
         const setKeys = Object.keys(sets);
@@ -355,16 +368,148 @@ export default class SetsTable
             data: data,
             selected_set: set,
             selected_set_index: index !== -1 ? index : 0,
+            selected_slots: [],
         });
+    }
+
+    manageSelectedItems(e: React.ChangeEvent<HTMLInputElement>): void {
+        const isChecked = e.target.checked;
+        const slotId = parseInt(e.target.dataset.slotId as string, 10) || 0;
+
+        if (slotId <= 0) {
+            return;
+        }
+
+        const { selected_slots } = this.state;
+        let updatedSlots: number[];
+
+        if (selected_slots.length > 0) {
+            const duplicateId = selected_slots.indexOf(slotId);
+
+            if (isChecked && duplicateId !== -1) {
+                return;
+            }
+
+            updatedSlots = isChecked
+                ? [...selected_slots, slotId]
+                : selected_slots.filter((id) => id !== slotId);
+        } else {
+            updatedSlots = [slotId];
+        }
+
+        this.setState({
+            selected_slots: updatedSlots,
+        });
+    }
+
+    selectAllSlots() {
+        this.setState({
+            selected_slots: this.state.data.map((slot) => slot.slot_id),
+        });
+    }
+
+    resetSelectedSlots() {
+        this.setState({
+            selected_slots: [],
+        });
+    }
+
+    isSelectedSetBatchCraftingSet(): boolean {
+        if (this.state.selected_set === null) {
+            return false;
+        }
+
+        return (
+            this.props.sets[this.state.selected_set]?.is_batch_crafting_set ??
+            false
+        );
+    }
+
+    manageConfirmationModal(type?: InventoryActionConfirmationType) {
+        let actionConfirmationType = null;
+
+        if (!this.state.show_action_confirmation_modal && type) {
+            actionConfirmationType = type;
+        }
+
+        this.setState({
+            show_action_confirmation_modal:
+                !this.state.show_action_confirmation_modal,
+            action_confirmation_type: actionConfirmationType,
+        });
+    }
+
+    buildSelectedItemsDropDown() {
+        if (this.isSelectedSetBatchCraftingSet()) {
+            return [
+                {
+                    name: "Sell Selected",
+                    icon_class: "far fa-money-bill-alt",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.SELL_SELECTED_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Disenchant Selected",
+                    icon_class: "ra ra-fire",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Destroy Selected",
+                    icon_class: "fas fa-trash",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DESTROY_SELECTED_FROM_SET,
+                        ),
+                },
+            ];
+        }
+
+        return [
+            {
+                name: "Sell Selected",
+                icon_class: "far fa-money-bill-alt",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.SELL_SELECTED_FROM_SET,
+                    ),
+            },
+            {
+                name: "Disenchant Selected",
+                icon_class: "ra ra-fire",
+                on_click: () =>
+                    this.manageConfirmationModal(
+                        InventoryActionConfirmationType.DISENCHANT_SELECTED_FROM_SET,
+                    ),
+            },
+        ];
+    }
+
+    getSelectedSlotItemNames(): string[] {
+        return this.state.data
+            .filter((slot) => this.state.selected_slots.includes(slot.slot_id))
+            .map((slot) => slot.item_name);
     }
 
     buildMenuItems() {
         return this.state.drop_down_labels.map((label: string) => {
+            const isBatchCraftingSet =
+                this.props.sets[label]?.is_batch_crafting_set ?? false;
+
             return {
                 name: label,
-                icon_class: clsx("ra ra-crossed-swords", {
-                    "text-yellow-600": this.cannotEquipSet(label),
-                }),
+                icon_class: isBatchCraftingSet
+                    ? "ra ra-anvil"
+                    : clsx("ra ra-crossed-swords", {
+                          "text-yellow-600": this.cannotEquipSet(label),
+                      }),
+                extra_class: isBatchCraftingSet
+                    ? "border border-yellow-sea-700 bg-yellow-sea-500 text-yellow-sea-950 dark:border-yellow-sea-300 dark:bg-yellow-sea-800 dark:text-yellow-sea-50 font-medium"
+                    : undefined,
                 on_click: () => this.switchTable(label),
             };
         });
@@ -377,6 +522,44 @@ export default class SetsTable
     }
 
     buildActionsDropDown() {
+        const selectedSet =
+            this.state.selected_set !== null
+                ? this.props.sets[this.state.selected_set]
+                : null;
+
+        if (selectedSet?.is_batch_crafting_set) {
+            if (selectedSet.items.length === 0) {
+                return [];
+            }
+
+            return [
+                {
+                    name: "Sell All",
+                    icon_class: "far fa-money-bill-alt",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.SELL_ALL_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Disenchant All",
+                    icon_class: "ra ra-fire",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DISENCHANT_ALL_FROM_SET,
+                        ),
+                },
+                {
+                    name: "Destroy All",
+                    icon_class: "fas fa-trash",
+                    on_click: () =>
+                        this.manageConfirmationModal(
+                            InventoryActionConfirmationType.DESTROY_ALL_FROM_SET,
+                        ),
+                },
+            ];
+        }
+
         const actions = [];
 
         actions.push({
@@ -385,18 +568,21 @@ export default class SetsTable
             on_click: () => this.manageRenameSet(),
         });
 
-        if (this.state.selected_set !== null) {
+        if (this.state.selected_set !== null && selectedSet !== null) {
             if (
                 this.state.selected_set !== this.props.set_name_equipped &&
-                this.props.sets[this.state.selected_set].items.length > 0
+                selectedSet.items.length > 0
             ) {
-                actions.push({
-                    name: "Empty set",
-                    icon_class: "fas fa-eraser",
-                    on_click: () => this.emptySet(),
-                });
+                if (selectedSet.can_empty) {
+                    actions.push({
+                        name: "Empty set",
+                        icon_class: "fas fa-eraser",
+                        on_click: () => this.emptySet(),
+                    });
+                }
 
                 if (
+                    !selectedSet.is_batch_crafting_set &&
                     !this.cannotEquipSet() &&
                     !this.props.is_automation_running
                 ) {
@@ -510,6 +696,17 @@ export default class SetsTable
                         rules. You can still treat this set like a stash tab.
                     </WarningAlert>
                 ) : null}
+                {this.state.selected_set !== null &&
+                !this.props.sets[this.state.selected_set].can_empty &&
+                this.props.sets[this.state.selected_set]
+                    .empty_disabled_reason ? (
+                    <WarningAlert additional_css={"mb-4"}>
+                        {
+                            this.props.sets[this.state.selected_set]
+                                .empty_disabled_reason
+                        }
+                    </WarningAlert>
+                ) : null}
                 {this.buildSetTitle() !== null ? (
                     <div>
                         <h4 className="text-orange-500 dark:text-orange-400">
@@ -534,6 +731,45 @@ export default class SetsTable
                             disabled={this.props.is_dead || this.state.loading}
                         />
                     </div>
+                    {this.isSelectedSetBatchCraftingSet() &&
+                    this.state.data.length > 0 ? (
+                        <div className="w-full md:w-auto mt-[-10px] md:mt-0">
+                            {this.state.selected_slots.length > 0 ? (
+                                <DangerButton
+                                    button_label={"Deselect all items"}
+                                    on_click={this.resetSelectedSlots.bind(
+                                        this,
+                                    )}
+                                    additional_css="w-full md:w-auto"
+                                    disabled={
+                                        this.props.is_dead || this.state.loading
+                                    }
+                                />
+                            ) : (
+                                <PrimaryButton
+                                    button_label={"Select all items"}
+                                    on_click={this.selectAllSlots.bind(this)}
+                                    additional_css="w-full md:w-auto"
+                                    disabled={
+                                        this.props.is_dead || this.state.loading
+                                    }
+                                />
+                            )}
+                        </div>
+                    ) : null}
+                    {this.isSelectedSetBatchCraftingSet() &&
+                    this.state.selected_slots.length > 0 ? (
+                        <div className="w-full md:w-auto mt-[-10px] md:mt-0">
+                            <DropDown
+                                menu_items={this.buildSelectedItemsDropDown()}
+                                button_title="Selected Items (Actions)"
+                                disabled={
+                                    this.props.is_dead || this.state.loading
+                                }
+                                greenButton={true}
+                            />
+                        </div>
+                    ) : null}
                     <div className="w-full md:w-auto md:absolute md:right-[10px]">
                         <input
                             type="text"
@@ -581,10 +817,49 @@ export default class SetsTable
                             this,
                             this.viewItem.bind(this),
                             this.props.manage_skills,
+                            undefined,
+                            this.isSelectedSetBatchCraftingSet()
+                                ? this.manageSelectedItems.bind(this)
+                                : undefined,
+                            this.state.selected_slots,
                         )}
                         dark_table={this.props.dark_tables}
                     />
                 </div>
+
+                {this.state.show_action_confirmation_modal &&
+                this.state.action_confirmation_type !== null &&
+                this.state.selected_set !== null ? (
+                    <BaseInventoryActionConfirmationModal
+                        type={this.state.action_confirmation_type}
+                        is_open={this.state.show_action_confirmation_modal}
+                        manage_modal={this.manageConfirmationModal.bind(this)}
+                        title={this.modalPropsBuilder
+                            .setActionType(this.state.action_confirmation_type)
+                            .fetchModalName()}
+                        update_inventory={this.props.update_inventory}
+                        set_success_message={(message: string) =>
+                            this.setState({ success_message: message })
+                        }
+                        selected_item_names={this.getSelectedSlotItemNames()}
+                        reset_selected_items={this.resetSelectedSlots.bind(
+                            this,
+                        )}
+                        data={{
+                            url: this.modalPropsBuilder
+                                .setActionType(
+                                    this.state.action_confirmation_type,
+                                )
+                                .fetchActionUrl(this.props.character_id),
+                            params: {
+                                set_id: this.props.sets[this.state.selected_set]
+                                    .set_id,
+                                slot_ids: this.state.selected_slots,
+                            },
+                        }}
+                        usable_sets={this.props.savable_sets}
+                    />
+                ) : null}
             </Fragment>
         );
     }

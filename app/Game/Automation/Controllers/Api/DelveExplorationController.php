@@ -12,6 +12,7 @@ use App\Game\Automation\Requests\DelveExplorationRequest;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\DelveExplorationAutomationService;
 use App\Game\Automation\Services\DelveStatusService;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -42,7 +43,7 @@ class DelveExplorationController extends Controller
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
-            ->where('type', LocationType::CAVE_OF_MEMORIES)
+            ->where('type', LocationType::CAVE_OF_MEMORIES->value)
             ->first();
 
         if ( is_null($location)) {
@@ -77,6 +78,8 @@ class DelveExplorationController extends Controller
     public function dismiss(Character $character): JsonResponse
     {
         $this->delveStatusService->dismissForCharacter($character);
+
+        event(new UpdateCharacterStatus($character->refresh()));
 
         return response()->json($this->delveStatusService->statusForCharacter($character));
     }

@@ -19,6 +19,8 @@ export type LogEntry = {
     raw_log_entry: string | null;
     file_path: string | null;
     raw_parseable: boolean;
+    detail_id?: string;
+    file_key?: string;
 };
 
 export type LogSummary = {
@@ -32,6 +34,8 @@ export type LogEntriesPage = {
     current_page: number;
     last_page: number;
     total: number;
+    next_cursor: string | null;
+    summary: LogSummary;
 };
 
 export type LogFilters = {
@@ -72,9 +76,6 @@ export type SystemBugReport = {
 export type LogsPollResponse = {
     entries: LogEntry[];
     summary: LogSummary;
-    files: LogFileInfo[];
-    bugs: SystemBugReport[];
-    bug_chart: Array<{ period: string; occurrences: number }>;
 };
 
 export const SEVERITIES = [

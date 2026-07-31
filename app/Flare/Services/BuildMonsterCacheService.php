@@ -40,17 +40,18 @@ class BuildMonsterCacheService
         $this->monster = $this->monster->setIsMonsterSpecial(true);
 
         foreach (GameMap::all() as $gameMap) {
+            $monsterSourceMap = $gameMap->monsterSourceGameMap();
             $monsters = new Collection(
                 Monster::where('is_celestial_entity', false)
                     ->where('is_raid_monster', false)
                     ->where('is_raid_boss', false)
                     ->whereNull('only_for_location_type')
-                    ->where('game_map_id', $gameMap->id)
+                    ->where('game_map_id', $monsterSourceMap->id)
                     ->get(),
                 $this->monster
             );
 
-            if (! is_null($gameMap->only_during_event_type)) {
+            if (! is_null($monsterSourceMap->only_during_event_type)) {
                 $monstersCache[$gameMap->name] = $this->createMonstersForEventMaps($monsters);
 
                 continue;
@@ -76,18 +77,19 @@ class BuildMonsterCacheService
         Cache::delete('raid-monsters');
 
         foreach (GameMap::all() as $gameMap) {
+            $monsterSourceMap = $gameMap->monsterSourceGameMap();
 
             $raidCritters = Monster::where('is_celestial_entity', false)
                 ->where('is_raid_monster', true)
                 ->where('is_raid_boss', false)
-                ->where('game_map_id', $gameMap->id)
+                ->where('game_map_id', $monsterSourceMap->id)
                 ->whereNull('only_for_location_type')
                 ->get();
 
             $raidBosses = Monster::where('is_celestial_entity', false)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', true)
-                ->where('game_map_id', $gameMap->id)
+                ->where('game_map_id', $monsterSourceMap->id)
                 ->whereNull('only_for_location_type')
                 ->get();
 
@@ -150,9 +152,10 @@ class BuildMonsterCacheService
         $this->monster = $this->monster->setIsMonsterSpecial(true);
 
         foreach (GameMap::all() as $gameMap) {
+            $monsterSourceMap = $gameMap->monsterSourceGameMap();
             $monsters = new Collection(
                 Monster::where('is_celestial_entity', true)
-                    ->where('game_map_id', $gameMap->id)
+                    ->where('game_map_id', $monsterSourceMap->id)
                     ->whereNull('only_for_location_type')
                     ->get(),
                 $this->monster

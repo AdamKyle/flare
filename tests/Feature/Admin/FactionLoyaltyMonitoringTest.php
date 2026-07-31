@@ -2,6 +2,10 @@
 
 namespace Tests\Feature\Admin;
 
+use Tests\Traits\CreateFactionLoyaltyAutomation;
+
+use Tests\Traits\CreateCharacterAutomation;
+
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Values\AutomationType;
@@ -13,7 +17,7 @@ use Tests\Traits\CreateUser;
 
 class FactionLoyaltyMonitoringTest extends TestCase
 {
-    use CreateRole, CreateUser, RefreshDatabase;
+    use CreateCharacterAutomation, CreateFactionLoyaltyAutomation, CreateRole, CreateUser, RefreshDatabase;
 
     public function testNonAdminCannotAccessFactionLoyaltyMonitoringPage(): void
     {
@@ -56,13 +60,13 @@ class FactionLoyaltyMonitoringTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
         ]);
 
-        FactionLoyaltyAutomation::factory()->create([
+        $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $automation->id,
             'character_id' => $character->id,
             'faction_loyalty_npc_id' => 0,
@@ -79,13 +83,13 @@ class FactionLoyaltyMonitoringTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
         ]);
 
-        FactionLoyaltyAutomation::factory()->create([
+        $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $automation->id,
             'character_id' => $character->id,
             'faction_loyalty_npc_id' => 0,
@@ -102,13 +106,13 @@ class FactionLoyaltyMonitoringTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
         ]);
 
-        FactionLoyaltyAutomation::factory()->create([
+        $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $automation->id,
             'character_id' => $character->id,
             'faction_loyalty_npc_id' => 0,
@@ -156,13 +160,13 @@ class FactionLoyaltyMonitoringTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
         ]);
 
-        FactionLoyaltyAutomation::factory()->create([
+        $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $automation->id,
             'character_id' => $character->id,
             'faction_loyalty_npc_id' => 0,

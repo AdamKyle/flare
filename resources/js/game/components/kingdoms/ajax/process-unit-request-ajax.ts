@@ -4,6 +4,7 @@ import axios from "axios";
 import { flushSync } from "react-dom";
 import UnitRecruitment from "../capital-city/partials/unit-management/unit-recruitment";
 import { runCapitalCityRequestBatches } from "./run-capital-city-request-batches";
+import { handleUnauthenticatedAxiosRequest } from "../../../lib/ajax/unauthenticated-response-handler";
 
 @injectable()
 export default class ProcessUnitRequestAjax {
@@ -53,22 +54,16 @@ export default class ProcessUnitRequestAjax {
         kingdomId: number,
         batch: any[],
     ): Promise<void> {
-        return axios
-            .post(
+        return handleUnauthenticatedAxiosRequest(
+            axios.post(
                 "/api/kingdom/capital-city/recruit-unit-requests/" +
                     characterId +
                     "/" +
                     kingdomId,
                 { request_data: batch },
                 { headers: { "Content-Type": "application/json" } },
-            )
-            .then(() => undefined)
-            .catch((error: AxiosError) => {
-                if (error.response?.status === 401) {
-                    window.location.reload();
-                }
-                throw error;
-            });
+            ),
+        ).then(() => undefined);
     }
 
     private applyAcceptedRequestState(

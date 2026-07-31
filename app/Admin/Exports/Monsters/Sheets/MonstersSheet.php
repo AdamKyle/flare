@@ -54,10 +54,10 @@ class MonstersSheet implements FromView, ShouldAutoSize, WithTitle
                     ->where('is_raid_boss', false)
                     ->whereNotNull('only_for_location_type')
                     ->whereIn('only_for_location_type', [
-                        LocationType::LORDS_STRONG_HOLD,
-                        LocationType::BROKEN_ANVIL,
-                        LocationType::ALCHEMY_CHURCH,
-                        LocationType::TWSITED_MAIDENS_DUNGEONS,
+                        LocationType::LORDS_STRONG_HOLD->value,
+                        LocationType::BROKEN_ANVIL->value,
+                        LocationType::ALCHEMY_CHURCH->value,
+                        LocationType::TWISTED_MAIDENS_DUNGEONS->value,
                     ])
                     ->get();
                 break;

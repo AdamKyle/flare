@@ -11,6 +11,8 @@ export default interface CharacterInventoryTabsState {
 
     inventory: Inventory | null;
 
+    inventory_error: string | null;
+
     disable_tabs: boolean;
 
     item_skill_data: {

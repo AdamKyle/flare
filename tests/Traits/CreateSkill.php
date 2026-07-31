@@ -10,4 +10,9 @@ trait CreateSkill
     {
         return Skill::factory()->create($options);
     }
+
+    public function makeSkill(array $options = []): Skill
+    {
+        return Skill::factory()->make($options);
+    }
 }

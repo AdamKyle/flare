@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\SmeltingProgress;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Jobs\SmeltSteel;
 use Carbon\Carbon;
@@ -14,8 +15,10 @@ class SteelSmeltingService
 
     private UpdateKingdom $updateKingdom;
 
-    public function __construct(UpdateKingdom $updateKingdom)
-    {
+    public function __construct(
+        UpdateKingdom $updateKingdom,
+        private readonly GameTimerService $gameTimerService,
+    ) {
         $this->updateKingdom = $updateKingdom;
     }
 
@@ -105,15 +108,17 @@ class SteelSmeltingService
 
         $kingdom = $kingdom->refresh();
 
+        $completedAt = $this->gameTimerService->availableAtFromMinutes($time);
+
         $smeltingJob = SmeltingProgress::create([
             'character_id' => $kingdom->character_id,
             'kingdom_id' => $kingdom->id,
             'started_at' => now(),
-            'completed_at' => now()->addMinutes($time),
+            'completed_at' => $completedAt,
             'amount_to_smelt' => $originalAmount,
         ]);
 
-        SmeltSteel::dispatch($smeltingJob->id)->delay(now()->addMinutes($time))->onConnection('long_running')->onQueue('default_long');
+        SmeltSteel::dispatch($smeltingJob->id)->delay($completedAt)->onConnection('long_running')->onQueue('default_long');
 
         $this->updateKingdom->updateKingdom($kingdom);
     }

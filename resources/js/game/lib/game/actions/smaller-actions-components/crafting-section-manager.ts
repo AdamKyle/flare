@@ -40,6 +40,13 @@ export default class CraftingSectionManager {
                 value: "craft",
             },
             {
+                label: "Batch Craft",
+                value: "batch-crafting",
+                disabled:
+                    this.component.props.character
+                        .is_faction_loyalty_automation_running,
+            },
+            {
                 label: "Enchant",
                 value: "enchant",
             },
@@ -150,6 +157,14 @@ export default class CraftingSectionManager {
                 name: "Craft",
                 icon_class: "ra ra-hammer",
                 on_click: () => handler("craft"),
+            },
+            {
+                name: "Batch Craft",
+                icon_class: "ra ra-anvil",
+                on_click: () => handler("batch-crafting"),
+                disabled:
+                    this.component.props.character
+                        .is_faction_loyalty_automation_running,
             },
             {
                 name: "Enchant",

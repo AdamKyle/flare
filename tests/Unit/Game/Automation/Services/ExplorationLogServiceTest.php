@@ -11,6 +11,7 @@ use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Tops\Events\ExplorationTopsUpdated;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -464,6 +465,24 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals('warning', $output['type']);
         $this->assertEquals($log->id, $output['output']['exploration_log_id']);
         $this->assertEquals(1, ExplorationLog::where('id', $log->id)->where('character_id', $this->character->id)->count());
+    }
+
+    public function testFinalizeBroadcastsExplorationTopsUpdated(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->service->recordFightTotals($log, [
+            'fights' => 3,
+            'kills' => 2,
+            'xp_gained' => 250,
+            'skill_xp_gained' => 75,
+        ], false);
+
+        $this->service->finalize($log, 'natural_end');
+
+        Event::assertDispatched(ExplorationTopsUpdated::class);
     }
 
     public function testDismissHidesCompletedExplorationPanelWithoutDeletingLog(): void

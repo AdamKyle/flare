@@ -12,4 +12,6 @@ export default interface ItemTableProps {
         filter: string | null;
         search_text: string | null;
     }) => void;
+    initial_filter?: string | null;
+    initial_search_text?: string | null;
 }

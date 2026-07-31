@@ -10,6 +10,7 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
@@ -56,6 +57,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInventoryService::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
             );
+        });
+
+        $this->app->bind(BatchCraftingSetService::class, function () {
+            return new BatchCraftingSetService;
         });
 
         $this->app->bind(EquipItemService::class, function ($app) {

@@ -45,4 +45,8 @@ export default interface MapProps {
     set_map_data: (mapData: Partial<MapState>) => void;
 
     can_move: boolean;
+
+    batch_crafting_time_out?: number;
+
+    batch_crafting_experience_mode?: boolean;
 }

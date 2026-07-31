@@ -7,8 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
-use App\Flare\Models\Event;
-use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Services\CharacterRewardService;
@@ -19,6 +17,7 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
@@ -35,6 +34,7 @@ use App\Flare\Models\ExplorationLog;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Log;
@@ -94,6 +94,8 @@ class BattleRewardService
         private readonly BattleRewardLedgerService $battleRewardLedgerService,
         private readonly BattleRewardMessageContext $battleRewardMessageContext,
         private readonly RandomAffixGenerator $randomAffixGenerator,
+        private readonly BroadcastTopsUpdateService $broadcastTopsUpdateService,
+        private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
     ) {}
 
     /**
@@ -418,11 +420,10 @@ class BattleRewardService
     {
         $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
         $payload = $step->payload_json ?? [];
+        $characterRewardService = $this->characterRewardService->setCharacter($this->character);
 
         if (! isset($payload['plan'])) {
-            $payload['plan'] = $this->characterRewardService
-                ->setCharacter($this->character)
-                ->planCurrencies($this->monster, $totalKills);
+            $payload['plan'] = $characterRewardService->planCurrencies($this->monster, $totalKills);
 
             $payload['planned_at'] = now()->toIso8601String();
             $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
@@ -430,10 +431,8 @@ class BattleRewardService
 
         $goldBeforeReward = $this->character->gold;
 
-        DB::transaction(function () use ($step, $payload, $goldBeforeReward): void {
-            $this->earnedCurrencies = $this->characterRewardService
-                ->setCharacter($this->character)
-                ->applyPlannedCurrencies($payload['plan']);
+        DB::transaction(function () use ($step, $payload, $goldBeforeReward, $characterRewardService): void {
+            $this->earnedCurrencies = $characterRewardService->applyPlannedCurrencies($payload['plan']);
 
             $character = $this->character->refresh();
             $goldGained = $character->gold - $goldBeforeReward;
@@ -918,6 +917,8 @@ class BattleRewardService
             new FactionLoyaltyUpdate($this->character->user, $this->factionLoyaltyService->getLoyaltyInfoForPlane($this->character)),
             ['character_id' => $this->character->id]
         );
+
+        $this->broadcastTopsUpdateService->broadcastFactionLoyaltyCurrentMonth();
     }
 
     /**
@@ -985,9 +986,15 @@ class BattleRewardService
 
         if ($totalKills > 1) {
             for ($i = 0; $i < $totalKills; $i++) {
-                $this->addDropRewardTotals(
-                    $this->dropCheckService->process($this->character, $this->monster, $lootingChance)
-                );
+                $dropTotals = $this->weeklyBattleService->isWeeklyMonster($this->monster)
+                    ? $this->dropCheckService->process(
+                        $this->character,
+                        $this->monster,
+                        $lootingChance,
+                        true,
+                    )
+                    : $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
+                $this->addDropRewardTotals($dropTotals);
 
                 $this->character = $this->character->refresh();
             }
@@ -995,9 +1002,15 @@ class BattleRewardService
             return;
         }
 
-        $this->addDropRewardTotals(
-            $this->dropCheckService->process($this->character, $this->monster, $lootingChance)
-        );
+        $dropTotals = $this->weeklyBattleService->isWeeklyMonster($this->monster)
+            ? $this->dropCheckService->process(
+                $this->character,
+                $this->monster,
+                $lootingChance,
+                true,
+            )
+            : $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
+        $this->addDropRewardTotals($dropTotals);
     }
 
     private function addDropRewardTotals(array $dropRewardTotals): void
@@ -1053,24 +1066,17 @@ class BattleRewardService
      * @throws Exception
      */
     private function handleGlobalEventParticipation(): void {
-        $gameMap = $this->character->map->gameMap;
-        $eventType = $gameMap->only_during_event_type;
-
-        if (is_null($eventType)) {
-            return;
-        }
-
-        $event = Event::where('type', $eventType)->first();
+        $event = $this->globalEventGoalEligibilityService->eventForCharacterMap($this->character);
 
         if (is_null($event)) {
             return;
         }
 
-        if ($eventType === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
+        if ($event->type === EventType::DELUSIONAL_MEMORIES_EVENT && $event->current_event_goal_step !== GlobalEventSteps::BATTLE) {
             return;
         }
 
-        $globalEventGoal = GlobalEventGoal::where('event_type', $eventType)->first();
+        $globalEventGoal = $event->globalEventGoals()->latest('id')->first();
 
         if (is_null($globalEventGoal)) {
             return;

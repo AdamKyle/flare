@@ -23,55 +23,55 @@
                             <dt>Required Player Level</dt>
                             <dd>{{ $guideQuest->required_level }}</dd>
                         @endif
-                          @if (!is_null($guideQuest->required_reincarnation_amount))
+                        @if (!is_null($guideQuest->required_reincarnation_amount))
                             <dt>Required Player Reincarnation Amount</dt>
                             <dd>{{ $guideQuest->required_reincarnation_amount }}</dd>
-                          @endif
+                        @endif
                         @if (!is_null($guideQuest->required_event_goal_participation))
-                            <dt>Participate in the Event Goal and Kill # of Creatures:</dt>
-                            <dd>{{$guideQuest->required_event_goal_participation}}</dd>
+                            <dt>Event Goal Creature Kills</dt>
+                            <dd>{{ $guideQuest->required_event_goal_participation }}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_event_goal_crafting_participation))
+                            <dt>Event Goal Crafts</dt>
+                            <dd>{{ $guideQuest->required_event_goal_crafting_participation }}</dd>
+                        @endif
+                        @if (!is_null($guideQuest->required_event_goal_enchanting_participation))
+                            <dt>Event Goal Enchants</dt>
+                            <dd>{{ $guideQuest->required_event_goal_enchanting_participation }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_game_map_id))
-                            <dt>Required Access To Map</dt>
+                            <dt>Required Map Access</dt>
                             <dd>{{ $guideQuest->game_map_name }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->skill_name))
+                        @if (!is_null($guideQuest->skill_name) && !is_null($guideQuest->required_skill_level))
                             <dt>Required Skill</dt>
-                            <dd>{{ $guideQuest->skill_name }}</dd>
-                            <dt>Required Skill Level</dt>
-                            <dd>{{ $guideQuest->required_skill_level }}</dd>
+                            <dd>{{ $guideQuest->skill_name }} to level {{ $guideQuest->required_skill_level }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->secondary_skill_name))
+                        @if (!is_null($guideQuest->secondary_skill_name) && !is_null($guideQuest->required_secondary_skill_level))
                             <dt>Required Secondary Skill</dt>
-                            <dd>{{ $guideQuest->secondary_skill_name }}</dd>
-                            <dt>Required Secondary Skill Level</dt>
-                            <dd>{{ $guideQuest->required_secondary_skill_level }}</dd>
+                            <dd>{{ $guideQuest->secondary_skill_name }} to level {{ $guideQuest->required_secondary_skill_level }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->skill_type_name))
-                            <dt>Requireed Skill Type</dt>
-                            <dd>{{ $guideQuest->skill_type_name }}</dd>
-                            <dt>Required Skill Type Level</dt>
-                            <dd>{{ $guideQuest->required_skill_type_level }}</dd>
+                        @if (!is_null($guideQuest->skill_type_name) && !is_null($guideQuest->required_skill_type_level))
+                            <dt>Required Skill Type</dt>
+                            <dd>{{ $guideQuest->skill_type_name }} to level {{ $guideQuest->required_skill_type_level }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->faction_name))
+                        @if (!is_null($guideQuest->faction_name) && !is_null($guideQuest->required_faction_level))
                             <dt>Required Faction</dt>
-                            <dd>{{ $guideQuest->faction_name }}</dd>
-                            <dt>Required Faction Level</dt>
-                            <dd>{{ $guideQuest->required_faction_level }}</dd>
+                            <dd>{{ $guideQuest->faction_name }} to level {{ $guideQuest->required_faction_level }}</dd>
                         @endif
                         @if (!is_null($guideQuest->be_on_game_map))
-                            <dt>Physically be on Map:</dt>
-                            <dd>{{$guideQuest->required_to_be_on_game_map_name}}</dd>
+                            <dt>Physically Be On Map</dt>
+                            <dd>{{ $guideQuest->required_to_be_on_game_map_name }}</dd>
                         @endif
                         @if (!is_null($guideQuest->quest_name))
                             <dt>Required Quest</dt>
                             <dd>{{ $guideQuest->quest_name }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->required_quest_item_id))
+                        @if (!is_null($guideQuest->quest_item_name))
                             <dt>Required Quest Item</dt>
                             <dd>{{ $guideQuest->quest_item_name }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->secondary_quest_item_id))
+                        @if (!is_null($guideQuest->secondary_quest_item_name))
                             <dt>Secondary Required Quest Item</dt>
                             <dd>{{ $guideQuest->secondary_quest_item_name }}</dd>
                         @endif
@@ -80,22 +80,20 @@
                             <dd>{{ $guideQuest->required_kingdoms }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_kingdom_level))
-                            <dt>Required Kingdom Building Level (combined)</dt>
+                            <dt>Required Kingdom Building Level Combined</dt>
                             <dd>{{ $guideQuest->required_kingdom_level }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_kingdom_building_id))
-                            <dt>Required Kingdom Building: {{ $guideQuest->kingdom_building_name }} to level</dt>
-                            <dd>{{ $guideQuest->required_kingdom_building_level }}</dd>
+                            <dt>Required Kingdom Building</dt>
+                            <dd>{{ $guideQuest->kingdom_building_name }} to level {{ $guideQuest->required_kingdom_building_level }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_kingdom_units))
-                            <dt>Required Kingdom Units (combined)</dt>
+                            <dt>Required Kingdom Units Combined</dt>
                             <dd>{{ $guideQuest->required_kingdom_units }}</dd>
                         @endif
-                        @if (!is_null($guideQuest->required_passive_skill))
-                            <dt>Required Passive Name</dt>
-                            <dd>{{ $guideQuest->passive_name }}</dd>
-                            <dt>Required Passive Level</dt>
-                            <dd>{{ $guideQuest->required_passive_level }}</dd>
+                        @if (!is_null($guideQuest->passive_name) && !is_null($guideQuest->required_passive_level))
+                            <dt>Required Passive Skill</dt>
+                            <dd>{{ $guideQuest->passive_name }} to level {{ $guideQuest->required_passive_level }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_class_specials_equipped))
                             <dt>Required Class Specials Equipped</dt>
@@ -110,7 +108,7 @@
                             <dd>{{ number_format($guideQuest->required_stats) }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_str))
-                            <dt>Required Strengh</dt>
+                            <dt>Required Strength</dt>
                             <dd>{{ number_format($guideQuest->required_str) }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_dex))
@@ -118,7 +116,7 @@
                             <dd>{{ number_format($guideQuest->required_dex) }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_dur))
-                            <dt>Required Dexterity</dt>
+                            <dt>Required Durability</dt>
                             <dd>{{ number_format($guideQuest->required_dur) }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_agi))
@@ -139,11 +137,11 @@
                         @endif
                         @if (!is_null($guideQuest->required_specialty_type))
                             <dt>Required Set Item Type</dt>
-                            <dd>{{$guideQuest->required_specialty_type}}</dd>
+                            <dd>{{ $guideQuest->required_specialty_type }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_holy_stacks))
                             <dt>Required Holy Stacks</dt>
-                            <dd>{{$guideQuest->required_holy_stacks}}</dd>
+                            <dd>{{ $guideQuest->required_holy_stacks }}</dd>
                         @endif
                         @if (!is_null($guideQuest->required_gold))
                             <dt>Required Gold</dt>
@@ -169,14 +167,32 @@
                             <dt>Required Fame Level</dt>
                             <dd>{{ number_format($guideQuest->required_fame_level) }}</dd>
                         @endif
-                          @if (!is_null($guideQuest->required_delve_survival_time))
+                        @if (!is_null($guideQuest->required_delve_survival_time))
                             <dt>Required Delve Survival Hour(s)</dt>
                             <dd>{{ number_format($guideQuest->required_delve_survival_time) }}</dd>
-                          @endif
-                          @if (!is_null($guideQuest->required_delve_pack_size))
+                        @endif
+                        @if (!is_null($guideQuest->required_delve_pack_size))
                             <dt>Required Delve Pack Size</dt>
                             <dd>{{ number_format($guideQuest->required_delve_pack_size) }}</dd>
-                          @endif
+                        @endif
+                        @if (!is_null($guideQuest->required_batch_crafting_type) && !is_null($guideQuest->required_batch_crafting_hours))
+                            <dt>Required Batch Crafting</dt>
+                            <dd>Run {{ $guideQuest->required_batch_crafting_type_name }} for at least {{ $guideQuest->required_batch_crafting_hours }} {{ $guideQuest->required_batch_crafting_hours === 1 ? 'hour' : 'hours' }}.</dd>
+                        @endif
+                        @if (!empty($guideQuest->required_batch_crafted_item_names))
+                            @foreach ($guideQuest->required_batch_crafted_item_names as $requiredBatchCraftedItem)
+                                <dt>Required Item</dt>
+                                @if (($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag')
+                                    <dd>Have {{ $requiredBatchCraftedItem['amount'] }}x {{ $requiredBatchCraftedItem['name'] }} of type {{ $requiredBatchCraftedItem['type_name'] }} in your alchemy bag.</dd>
+                                @elseif ($requiredBatchCraftedItem['must_be_enchanted'])
+                                    <dd>Have {{ $requiredBatchCraftedItem['amount'] }}x {{ $requiredBatchCraftedItem['name'] }} of type {{ $requiredBatchCraftedItem['type_name'] }} in your inventory with both a prefix and a suffix. The exact enchantments do not matter.</dd>
+                                @else
+                                    <dd>Have {{ $requiredBatchCraftedItem['amount'] }}x {{ $requiredBatchCraftedItem['name'] }} of type {{ $requiredBatchCraftedItem['type_name'] }} in your inventory.</dd>
+                                @endif
+                            @endforeach
+                            <dt>Item Consumption</dt>
+                            <dd>These items are consumed when the guide quest is handed in.</dd>
+                        @endif
                     </dl>
                     <h3 class="text-sky-600 dark:text-sky-500">XP Reward</h3>
                     <div class='border-b-2 border-b-gray-300 dark:border-b-gray-600 my-3'></div>

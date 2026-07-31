@@ -49,7 +49,11 @@ class LocationTransformer extends TransformerAbstract
             return null;
         }
 
-        $locationType = new LocationType($location->type);
+        $locationType = LocationType::tryFrom($location->type);
+
+        if (is_null($locationType)) {
+            return null;
+        }
 
         if ($locationType->isPurgatorySmithHouse()) {
             return 'Purgatory Smiths House';

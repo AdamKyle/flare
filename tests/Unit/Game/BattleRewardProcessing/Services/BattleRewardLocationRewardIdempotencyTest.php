@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
@@ -22,13 +24,13 @@ use Tests\Traits\CreateMonster;
 
 class BattleRewardLocationRewardIdempotencyTest extends TestCase
 {
-    use CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testCompletedLocationRewardStepCannotApplyTwice(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -49,7 +51,7 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -86,7 +88,7 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -156,7 +158,7 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
             'show_gold_dust_per_kill' => true,
             'show_shards_per_kill' => true,
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
         DB::table('sessions')->insert([[
             'id' => 'location-message-test',
             'user_id' => $character->user_id,
@@ -189,8 +191,8 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        $message = CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -207,8 +209,8 @@ class BattleRewardLocationRewardIdempotencyTest extends TestCase
     {
         Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $request = CharacterBattleRewardRequest::factory()->create(['character_id' => $character->id]);
-        CharacterBattleRewardRequestMessage::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest(['character_id' => $character->id]);
+        $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,

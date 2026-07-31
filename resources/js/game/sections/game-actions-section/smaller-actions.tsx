@@ -20,6 +20,7 @@ import Ajax from "../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import WarningAlert from "../../components/ui/alerts/simple-alerts/warning-alert";
 import DelveStatusPanel from "./components/delve-status-panel";
+import BatchCraftingStatusPanel from "./components/batch-crafting-status-panel";
 
 export default class SmallerActions extends React.Component<
     SmallActionsProps,
@@ -57,6 +58,11 @@ export default class SmallerActions extends React.Component<
             movement_time_left: 0,
             automation_time_out: 0,
             celestial_time_out: 0,
+            batch_crafting_time_out:
+                this.props.character.batch_crafting_time_out,
+            batch_crafting_visible:
+                this.props.character.is_batch_crafting_visible,
+            batch_crafting_hidden: false,
         };
 
         this.smallActionsManager = new SmallActionsManager(this);
@@ -89,6 +95,14 @@ export default class SmallerActions extends React.Component<
 
     componentDidMount() {
         this.smallActionsManager.initialFetch();
+        window.addEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.addEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
 
         // @ts-ignore
         this.attackTimeOut.listen(
@@ -165,6 +179,27 @@ export default class SmallerActions extends React.Component<
             );
         }
 
+        if (
+            prevProps.character.batch_crafting_time_out !==
+            this.props.character.batch_crafting_time_out
+        ) {
+            this.setState({
+                batch_crafting_time_out:
+                    this.props.character.batch_crafting_time_out,
+            });
+        }
+
+        if (
+            prevProps.character.is_batch_crafting_visible !==
+            this.props.character.is_batch_crafting_visible
+        ) {
+            this.setState({
+                batch_crafting_visible:
+                    this.props.character.is_batch_crafting_visible,
+                batch_crafting_hidden: false,
+            });
+        }
+
         if (this.props.action_data === null) {
             return;
         }
@@ -183,11 +218,33 @@ export default class SmallerActions extends React.Component<
     }
 
     componentWillUnmount(): void {
+        window.removeEventListener(
+            "batch-crafting-started",
+            this.showBatchCraftingPanel,
+        );
+        window.removeEventListener(
+            "batch-crafting-hidden",
+            this.hideBatchCraftingPanel,
+        );
         this.props.update_parent_state({
             monsters: this.state.monsters,
             raid_monsters: this.state.raid_monsters,
         });
     }
+
+    showBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: true,
+            batch_crafting_hidden: false,
+        });
+    };
+
+    hideBatchCraftingPanel = (): void => {
+        this.setState({
+            batch_crafting_visible: false,
+            batch_crafting_hidden: true,
+        });
+    };
 
     showAction(data: any) {
         this.smallActionsManager.setSelectedAction(data);
@@ -258,6 +315,18 @@ export default class SmallerActions extends React.Component<
 
     isDelveRunning(): boolean {
         return this.props.character.is_delve_running;
+    }
+
+    isBatchCraftingRunning(): boolean {
+        return this.props.character.is_batch_crafting_running;
+    }
+
+    isBatchCraftingVisible(): boolean {
+        return (
+            (this.props.character.is_batch_crafting_visible &&
+                !this.state.batch_crafting_hidden) ||
+            this.state.batch_crafting_visible
+        );
     }
 
     isAnyAutomationRunning(): boolean {
@@ -519,26 +588,39 @@ export default class SmallerActions extends React.Component<
     }
 
     renderAutomationPanels() {
-        if (this.state.selected_action === "explore") {
-            return null;
-        }
-
-        return (
-            <Fragment>
+        const panels = [
+            this.state.selected_action !== "explore" &&
+            this.props.exploration_output?.type === "active" ? (
                 <ExplorationOutputSection
+                    key="exploration-output"
                     character_id={this.props.character.id}
                     exploration_output={this.props.exploration_output}
                 />
-                {this.isDelveRunning() ? (
-                    <div className="mt-3">
-                        <DelveStatusPanel
-                            character_id={this.props.character.id}
-                            user_id={this.props.character.user_id}
-                        />
-                    </div>
-                ) : null}
-            </Fragment>
-        );
+            ) : null,
+            this.state.selected_action !== "explore" &&
+            this.isDelveRunning() ? (
+                <div className="mt-3" key="delve-status">
+                    <DelveStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+                </div>
+            ) : null,
+            this.isBatchCraftingVisible() ? (
+                <div className="mt-3" key="batch-crafting-status">
+                    <BatchCraftingStatusPanel
+                        character_id={this.props.character.id}
+                        user_id={this.props.character.user_id}
+                    />
+                </div>
+            ) : null,
+        ].filter(Boolean);
+
+        if (panels.length === 0) {
+            return null;
+        }
+
+        return <Fragment>{panels}</Fragment>;
     }
 
     render() {
@@ -609,6 +691,13 @@ export default class SmallerActions extends React.Component<
                                 automation_time_out_label={this.automationTimerLabel()}
                                 celestial_time_out={
                                     this.state.celestial_time_out
+                                }
+                                batch_crafting_time_out={
+                                    this.state.batch_crafting_time_out
+                                }
+                                batch_crafting_experience_mode={
+                                    this.props.character
+                                        .is_batch_crafting_experience_mode
                                 }
                             />
                         </div>

@@ -144,6 +144,14 @@ export default class ActionsManager {
                 on_click: () => handler("craft"),
             },
             {
+                name: "Batch Craft",
+                icon_class: "ra ra-anvil",
+                on_click: () => handler("batch-crafting"),
+                disabled:
+                    this.component.props.character
+                        .is_faction_loyalty_automation_running,
+            },
+            {
                 name: "Enchant",
                 icon_class: "ra ra-burning-embers",
                 on_click: () => handler("enchant"),

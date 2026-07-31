@@ -19,8 +19,8 @@ export default class CharactersOnlineList extends React.Component<
         super(props);
 
         this.state = {
-            characters_online_data: [],
-            loading: true,
+            characters_online_data: props.initialCharactersOnline ?? [],
+            loading: props.initialLoading ?? true,
             filter_type: 0,
             error_message: "",
         };
@@ -30,7 +30,55 @@ export default class CharactersOnlineList extends React.Component<
     }
 
     componentDidMount() {
-        this.userLoginAjax.fetchCharactersOnlineData(this, 0);
+        if (!this.props.initialCharactersOnline) {
+            this.userLoginAjax.fetchCharactersOnlineData(this, 0);
+        }
+
+        this.subscribeToUpdates();
+    }
+
+    componentWillUnmount() {
+        const echo = (window as any).Echo;
+
+        if (echo) {
+            echo.leave("whos-playing-statistics");
+        }
+    }
+
+    componentDidUpdate(previousProps: CharactersOnlineListProps) {
+        if (
+            previousProps.initialCharactersOnline !==
+                this.props.initialCharactersOnline &&
+            this.state.filter_type === 0
+        ) {
+            this.setState({
+                characters_online_data:
+                    this.props.initialCharactersOnline ?? [],
+                loading: this.props.initialLoading ?? false,
+            });
+        }
+    }
+
+    subscribeToUpdates() {
+        const echo = (window as any).Echo;
+
+        if (!echo) {
+            return;
+        }
+
+        echo.channel("whos-playing-statistics").listen(
+            ".whos.playing.statistics.updated",
+            (payload: { snapshot: { characters_online: any[] } }) => {
+                if (payload.snapshot && this.state.filter_type === 0) {
+                    this.setState({
+                        characters_online_data:
+                            payload.snapshot.characters_online,
+                        loading: false,
+                        error_message: "",
+                    });
+                }
+            },
+        );
     }
 
     fetchCharactersOnline(filter: AllowedFilters) {
@@ -47,7 +95,7 @@ export default class CharactersOnlineList extends React.Component<
         }
 
         if (characterOnline.duration >= 3600) {
-            return (characterOnline.duration / 3600).toFixed(0) + " Seconds";
+            return (characterOnline.duration / 3600).toFixed(0) + " Hours";
         }
 
         if (characterOnline.duration >= 60) {
@@ -55,6 +103,14 @@ export default class CharactersOnlineList extends React.Component<
         }
 
         return "unknown";
+    }
+
+    renderDate(value: string | null): string {
+        if (!value) {
+            return "Unknown";
+        }
+
+        return new Date(value).toLocaleString();
     }
 
     renderCurrentlyExploringLink(): JSX.Element {
@@ -107,8 +163,7 @@ export default class CharactersOnlineList extends React.Component<
                 />
                 {this.state.filter_type > 0 ? (
                     <InfoAlert>
-                        You are now looking at the past, these are people who
-                        have been online and for how long during that period.
+                        Showing character login totals for the selected period.
                     </InfoAlert>
                 ) : null}
                 {this.state.error_message ? (
@@ -119,26 +174,58 @@ export default class CharactersOnlineList extends React.Component<
                 {this.state.characters_online_data.length > 0 ? (
                     this.state.characters_online_data.map(
                         (characterOnline: any, index: number) => (
-                            <div key={index}>
-                                <div className="flex items-center space-x-2">
-                                    {this.state.filter_type > 0 ? (
-                                        <i className="text-gray-500 fas fa-circle"></i>
-                                    ) : (
-                                        <i className="text-green-500 fas fa-circle"></i>
-                                    )}
-
-                                    <span className="font-bold">
-                                        {characterOnline.name}{" "}
-                                        {characterOnline.currently_exploring
-                                            ? this.renderCurrentlyExploringLink()
-                                            : ""}
-                                    </span>
-                                    <span>
-                                        Logged in for{" "}
-                                        {this.getTimeLoggedInFor(
-                                            characterOnline,
-                                        )}
-                                    </span>
+                            <div
+                                key={`${characterOnline.name}-${index}`}
+                                className="rounded-sm border border-gray-200 p-3 dark:border-gray-700"
+                            >
+                                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            {this.state.filter_type > 0 ? (
+                                                <i className="text-gray-500 fas fa-circle"></i>
+                                            ) : (
+                                                <i className="text-green-500 fas fa-circle"></i>
+                                            )}
+                                            <span className="break-words font-bold text-gray-900 dark:text-gray-100">
+                                                {characterOnline.name}
+                                            </span>
+                                        </div>
+                                        <div className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                                            Level {characterOnline.level} on{" "}
+                                            {characterOnline.map ??
+                                                "Unknown map"}
+                                        </div>
+                                        {characterOnline.currently_exploring ? (
+                                            <div className="mt-1 text-sm">
+                                                {this.renderCurrentlyExploringLink()}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                    <div className="text-sm text-gray-700 dark:text-gray-300 sm:text-right">
+                                        <div>
+                                            {this.state.filter_type > 0
+                                                ? "Duration in period"
+                                                : "Online for"}
+                                            :{" "}
+                                            <strong>
+                                                {this.getTimeLoggedInFor(
+                                                    characterOnline,
+                                                )}
+                                            </strong>
+                                        </div>
+                                        <div>
+                                            Last activity:{" "}
+                                            {this.renderDate(
+                                                characterOnline.last_activity,
+                                            )}
+                                        </div>
+                                        <div>
+                                            Last heartbeat:{" "}
+                                            {this.renderDate(
+                                                characterOnline.last_heart_beat,
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {index <
@@ -151,10 +238,11 @@ export default class CharactersOnlineList extends React.Component<
                     )
                 ) : (
                     <p className="p-4 text-center text-red-700 dark:text-red-400">
-                        No Characters online.
+                        {this.state.filter_type === 0
+                            ? "No characters are currently online."
+                            : "No character login records were found for this period."}
                     </p>
                 )}
-                {}
             </div>
         );
     }

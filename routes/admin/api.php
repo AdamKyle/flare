@@ -19,6 +19,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/site-statistics/character-total-gold', ['uses' => 'Api\SiteAccessStatisticsController@getTotalGoldIncludingKingdomsForCharacters']);
     Route::get('/admin/site-statistics/login-duration', ['uses' => 'Api\SiteAccessStatisticsController@getLoginDurationDetails']);
     Route::get('/admin/site-statistics/characters-online', ['uses' => 'Api\SiteAccessStatisticsController@getUsersCurrentlyOnline']);
+    Route::get('/admin/statistics/dashboard-data', ['uses' => 'StatisticsController@dashboardData']);
 
     Route::get('/admin/info-section/page', ['uses' => 'Api\InformationController@getPage']);
     Route::post('/admin/info-section/store-page', ['uses' => 'Api\InformationController@storePage']);
@@ -51,9 +52,14 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/monitoring/delve/summary', ['uses' => 'Api\MonitoringController@delveSummary']);
     Route::get('/admin/monitoring/delve/chart', ['uses' => 'Api\MonitoringController@delveChart']);
 
+    Route::get('/admin/monitoring/batch-crafting/active', ['uses' => 'Api\MonitoringController@batchCraftingActive']);
+    Route::get('/admin/monitoring/batch-crafting/runs', ['uses' => 'Api\MonitoringController@batchCraftingRuns']);
+    Route::get('/admin/monitoring/batch-crafting/summary', ['uses' => 'Api\MonitoringController@batchCraftingSummary']);
+    Route::get('/admin/monitoring/batch-crafting/chart', ['uses' => 'Api\MonitoringController@batchCraftingChart']);
+
     Route::get('/admin/monitoring/logs/files', ['uses' => 'Api\AdminLogsDashboardController@files']);
     Route::get('/admin/monitoring/logs/entries', ['uses' => 'Api\AdminLogsDashboardController@entries']);
-    Route::get('/admin/monitoring/logs/summary', ['uses' => 'Api\AdminLogsDashboardController@summary']);
+    Route::get('/admin/monitoring/logs/entry-detail', ['uses' => 'Api\AdminLogsDashboardController@entryDetail']);
     Route::get('/admin/monitoring/logs/poll', ['uses' => 'Api\AdminLogsDashboardController@poll']);
     Route::get('/admin/monitoring/logs/bugs', ['uses' => 'Api\AdminLogsDashboardController@bugs']);
     Route::get('/admin/monitoring/logs/bug-chart', ['uses' => 'Api\AdminLogsDashboardController@bugChart']);

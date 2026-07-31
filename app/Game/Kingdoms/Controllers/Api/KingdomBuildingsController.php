@@ -13,6 +13,7 @@ use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Http\Controllers\Controller;
 use Facades\App\Game\Kingdoms\Validation\ResourceValidation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class KingdomBuildingsController extends Controller
 {
@@ -38,37 +39,60 @@ class KingdomBuildingsController extends Controller
             return $restriction;
         }
 
+        if ((int) $building->kingdom->character_id !== (int) $character->id) {
+            return $this->rejectUpgrade($character, $building, 'ownership_mismatch', 'You do not own this kingdom building.');
+        }
+
+        if ($building->is_locked) {
+            return $this->rejectUpgrade(
+                $character,
+                $building,
+                'prerequisite_locked',
+                'This building is locked because its prerequisite has not been unlocked.',
+            );
+        }
+
         if ($this->kingdomBuildingService->hasActiveBuildingUpgrade($building)) {
-            return response()->json([
-                'message' => 'Building is already in the process of upgrading.',
-            ], 422);
+            return $this->rejectUpgrade($character, $building, 'active_queue', 'Building is already in the process of upgrading.');
         }
 
         $fromLevel = $request->has('from_level') ? (int) $request->from_level : null;
         $toLevel = (int) $request->to_level;
 
         if ($this->kingdomBuildingService->isBuildingDamaged($building)) {
-            return response()->json([
-                'message' => 'Building must be repaired before it can be upgraded.',
-            ], 422);
+            return $this->rejectUpgrade($character, $building, 'invalid_state', 'Building must be repaired before it can be upgraded.');
         }
 
         if ($this->kingdomBuildingService->cannotUpgradePastMaxLevel($building, $toLevel)) {
-            return response()->json([
-                'message' => 'Building is already max level.',
-            ], 422);
+            return $this->rejectUpgrade($character, $building, 'maximum_level', 'Building is already max level.');
         }
 
-        if ($this->kingdomBuildingService->hasInvalidUpgradeLevels($building, $fromLevel, $toLevel)) {
-            return response()->json([
-                'message' => 'Invalid building upgrade request.',
-            ], 422);
+        if (! is_null($fromLevel) && $fromLevel !== $building->level) {
+            return $this->rejectUpgrade(
+                $character,
+                $building,
+                'stale_level',
+                'The building level changed. Refresh the kingdom and try again.',
+            );
+        }
+
+        if ($toLevel !== $building->level + 1) {
+            return $this->rejectUpgrade($character, $building, 'invalid_state', 'Invalid building upgrade request.');
         }
 
         if (ResourceValidation::shouldRedirectKingdomBuilding($building, $building->kingdom)) {
-            return response()->json([
-                'message' => "You don't have the resources.",
-            ], 422);
+            $missing = ResourceValidation::getMissingBuildingCosts($building, $building->kingdom);
+            $details = collect($missing)
+                ->map(fn (int|float $amount, string $resource): string => ucfirst($resource).': '.number_format($amount))
+                ->implode(', ');
+
+            return $this->rejectUpgrade(
+                $character,
+                $building,
+                array_key_exists('steel', $missing) ? 'missing_steel' : 'missing_resources',
+                'Missing resources for this upgrade: '.$details.'.',
+                ['missing_resources' => $missing],
+            );
         }
 
         $this->kingdomBuildingService->updateKingdomResourcesForKingdomBuildingUpgrade($building);
@@ -161,5 +185,28 @@ class KingdomBuildingsController extends Controller
         }
 
         return response()->json(['message' => $restriction['message']], 422);
+    }
+
+    private function rejectUpgrade(
+        Character $character,
+        KingdomBuilding $building,
+        string $reason,
+        string $message,
+        array $context = [],
+    ): JsonResponse {
+        Log::channel('capital_city_building_upgrades')->warning('Kingdom building upgrade rejected.', array_merge([
+            'reason' => $reason,
+            'message' => $message,
+            'character_id' => $character->id,
+            'kingdom_id' => $building->kingdom_id,
+            'building_id' => $building->id,
+            'building_name' => $building->name,
+            'building_level' => $building->level,
+        ], $context));
+
+        return response()->json([
+            'message' => $message,
+            'reason' => $reason,
+        ], 422);
     }
 }

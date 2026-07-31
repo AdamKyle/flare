@@ -9,6 +9,12 @@ export default interface SetsInventoryTabProps extends CoreInventoryTabProps {
             items: InventoryDetails[] | [];
             equipped: boolean;
             set_id: number;
+            is_batch_crafting_set: boolean;
+            max_slots: number | null;
+            current_slots: number;
+            remaining_slots: number | null;
+            can_empty: boolean;
+            empty_disabled_reason: string | null;
         };
     };
 

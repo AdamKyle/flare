@@ -2,6 +2,10 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
+use Tests\Traits\CreateKingdom;
+
+use Tests\Traits\CreateGameUnit;
+
 use App\Flare\Models\GameUnit;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
@@ -15,14 +19,14 @@ use Tests\TestCase;
 
 class UnitMovementServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameUnit, CreateKingdom, RefreshDatabase;
 
     public function testRemoveUnitsFromKingdomReturnsOnlyRowsActuallyRemoved(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $kingdomUnit = KingdomUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $kingdomUnit = $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => 5,
@@ -63,8 +67,8 @@ class UnitMovementServiceTest extends TestCase
             $query->where('type', SkillTypeValue::EFFECTS_KINGDOM->value);
         })->update(['skill_type' => SkillTypeValue::EFFECTS_KINGDOM->value]);
         $character = $character->refresh();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $kingdomUnit = KingdomUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $kingdomUnit = $this->createKingdomUnit([
             'kingdom_id' => $sourceKingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => 5,

@@ -36,5 +36,7 @@ class BroadcastServiceProvider extends ServiceProvider
         require base_path('routes/game/events/channels.php');
         require base_path('routes/game/shop/channels.php');
         require base_path('routes/game/factions/faction-loyalty/channels.php');
+        require base_path('routes/game/tops/channels.php');
+        require base_path('routes/game/batch-crafting/channels.php');
     }
 }

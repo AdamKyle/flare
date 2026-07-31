@@ -45,11 +45,12 @@ class BattleRewardMessageOutboxService
     public function emitUnemittedMessages(CharacterBattleRewardRequest $request): int
     {
         $emittedCount = 0;
+        $firstFailure = null;
 
         CharacterBattleRewardRequestMessage::query()
             ->where('character_battle_reward_request_id', $request->id)
             ->orderBy('id')
-            ->chunkById(50, function ($messages) use (&$emittedCount): void {
+            ->chunkById(50, function ($messages) use (&$emittedCount, &$firstFailure): void {
                 foreach ($messages as $message) {
                     if (! is_null($message->emitted_at)) {
                         $this->log('message.skipped_emitted', $message);
@@ -75,10 +76,14 @@ class BattleRewardMessageOutboxService
 
                         $dispatched = true;
                     } catch (Throwable $throwable) {
+                        $firstFailure ??= $throwable;
                         Log::channel('reward_ledger')->warning('message.emit_failed', [
                             'character_id' => $message->character_id,
                             'request_id' => $message->character_battle_reward_request_id,
+                            'message_record_id' => $message->id,
+                            'message' => $message->message,
                             'step_name' => $message->step_name?->value,
+                            'event_class' => ServerMessageEvent::class,
                             'exception_class' => $throwable::class,
                             'exception_message' => $throwable->getMessage(),
                         ]);
@@ -93,6 +98,10 @@ class BattleRewardMessageOutboxService
                     $this->log('message.emitted', $message->refresh());
                 }
             });
+
+        if ($firstFailure instanceof Throwable) {
+            throw $firstFailure;
+        }
 
         return $emittedCount;
     }

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
+use Tests\Traits\CreateCharacterBattleReward;
+
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
@@ -22,13 +24,13 @@ use Tests\Traits\CreateMonster;
 
 class BattleRewardXpCheckpointResumeTest extends TestCase
 {
-    use CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function testXpPayloadIsSavedBeforeApplyAndCheckpointed(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -55,7 +57,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -84,7 +86,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
@@ -109,7 +111,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -140,11 +142,11 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         \Illuminate\Support\Facades\Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
-        $message = \App\Flare\Models\CharacterBattleRewardRequestMessage::factory()->create([
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -164,12 +166,12 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
         \Illuminate\Support\Facades\Event::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
         $emittedAt = now()->subSeconds(10);
-        $message = \App\Flare\Models\CharacterBattleRewardRequestMessage::factory()->create([
+        $message = $this->createCharacterBattleRewardRequestMessage([
             'character_battle_reward_request_id' => $request->id,
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -200,7 +202,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'payload' => 'payload',
             'last_activity' => now()->timestamp,
         ]]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
@@ -232,7 +234,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'payload' => 'payload',
             'last_activity' => now()->timestamp,
         ]]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
@@ -259,7 +261,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'payload' => 'payload',
             'last_activity' => now()->timestamp,
         ]]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
@@ -297,7 +299,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'payload' => 'payload',
             'last_activity' => now()->timestamp,
         ]]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::EXPLORATION,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => [
@@ -334,7 +336,7 @@ class BattleRewardXpCheckpointResumeTest extends TestCase
             'xp' => 10,
             'max_level' => 9999,
         ]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],

@@ -275,6 +275,96 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertTrue($result->hasEndedAutomation());
     }
 
+    public function testMaximumBountyCompletesAcrossTwoRunsWithoutDuplicateRewards(): void
+    {
+        Event::fake();
+        $bountyMonster = $this->factionLoyaltyFactory->getBountyMonstersForNpc($this->factionLoyaltyNpc)[0];
+        $fightData = [
+            'health' => [
+                'current_character_health' => 10,
+                'current_monster_health' => 0,
+            ],
+        ];
+        $this->monsterFightService
+            ->shouldReceive('setupMonster')
+            ->twice()
+            ->with(Mockery::type(Character::class), [
+                'selected_monster_id' => $bountyMonster->id,
+                'attack_type' => AttackTypeValue::ATTACK,
+            ], true)
+            ->andReturn($fightData);
+        $this->monsterFightService
+            ->shouldReceive('setupMonster')
+            ->times(48)
+            ->with(Mockery::type(Character::class), [
+                'selected_monster_id' => $bountyMonster->id,
+                'attack_type' => AttackTypeValue::ATTACK,
+            ], true, false, true)
+            ->andReturn($fightData);
+        $this->characterRewardService
+            ->shouldReceive('setCharacter')
+            ->times(50)
+            ->andReturnSelf();
+        $this->characterRewardService
+            ->shouldReceive('fetchXpForMonster')
+            ->times(50)
+            ->with(Mockery::on(fn (Monster $monster): bool => $monster->id === $bountyMonster->id))
+            ->andReturn(10);
+        $this->skillService
+            ->shouldReceive('setSkillInTraining')
+            ->times(50)
+            ->andReturnSelf();
+        $this->skillService
+            ->shouldReceive('getXpForSkillIntraining')
+            ->times(50)
+            ->with(Mockery::type(Character::class), $bountyMonster->xp)
+            ->andReturn(5);
+        $this->battleEventHandler
+            ->shouldReceive('processMonsterDeath')
+            ->twice()
+            ->with($this->character->id, $bountyMonster->id, [
+                'total_creatures' => 25,
+                'total_xp' => 250,
+                'total_faction_points' => 0,
+                'total_skill_xp' => 125,
+                'skip_faction_loyalty_update_event' => true,
+            ]);
+
+        $first = $this->handler
+            ->setUp(
+                $this->character,
+                $this->factionLoyaltyAutomation,
+                $this->factionLoyaltyNpc,
+                [
+                    'monster_id' => $bountyMonster->id,
+                    'required_amount' => 50,
+                    'current_amount' => 0,
+                ],
+                AttackTypeValue::ATTACK,
+                $this->fightLogger,
+            )
+            ->handle();
+        $second = $this->handler
+            ->setUp(
+                $this->character,
+                $this->factionLoyaltyAutomation->refresh(),
+                $this->factionLoyaltyNpc,
+                [
+                    'monster_id' => $bountyMonster->id,
+                    'required_amount' => 50,
+                    'current_amount' => 25,
+                ],
+                AttackTypeValue::ATTACK,
+                $this->fightLogger,
+            )
+            ->handle();
+
+        $this->assertSame(AutomatedFightResultType::BOUNTY_BATCH_YIELDED, $first->getResultType());
+        $this->assertSame(25, $first->getBountyKills());
+        $this->assertSame(AutomatedFightResultType::BOUNTY_COMPLETED, $second->getResultType());
+        $this->assertSame(25, $second->getBountyKills());
+    }
+
     public function testHandleReturnsBountyStalledRetryWhenAttackLimitIsReached(): void
     {
         Event::fake();
@@ -315,6 +405,143 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertEquals(AutomatedFightResultType::BOUNTY_STALLED_RETRY, $result->getResultType());
         $this->assertEquals(1, $result->getStalledAttempt());
         $this->assertFalse($result->hasEndedAutomation());
+    }
+
+    public function testTimeBudgetReachedInsideAttackLoopYieldsWithoutKillOrReward(): void
+    {
+        $bountyMonster = $this->factionLoyaltyFactory->getBountyMonstersForNpc($this->factionLoyaltyNpc)[0];
+        $fightData = [
+            'health' => [
+                'current_character_health' => 10,
+                'current_monster_health' => 5,
+            ],
+        ];
+        $clockCalls = 0;
+        $handler = new AutomatedBountyFightHandler(
+            $this->monsterFightService,
+            $this->battleEventHandler,
+            $this->characterRewardService,
+            $this->skillService,
+            new AutomatedFightResult,
+            function () use (&$clockCalls): float {
+                $clockCalls++;
+
+                return $clockCalls <= 3 ? 0.0 : 91.0;
+            },
+        );
+        $this->monsterFightService
+            ->shouldReceive('setupMonster')
+            ->once()
+            ->andReturn([
+                'health' => [
+                    'current_character_health' => 10,
+                    'current_monster_health' => 10,
+                ],
+            ]);
+        $this->monsterFightService
+            ->shouldReceive('fightMonster')
+            ->once()
+            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->andReturn($fightData);
+        $this->battleEventHandler
+            ->shouldNotReceive('processMonsterDeath');
+        $this->characterRewardService
+            ->shouldNotReceive('setCharacter');
+        $this->skillService
+            ->shouldNotReceive('setSkillInTraining');
+
+        $result = $handler
+            ->setUp(
+                $this->character,
+                $this->factionLoyaltyAutomation,
+                $this->factionLoyaltyNpc,
+                [
+                    'monster_id' => $bountyMonster->id,
+                    'required_amount' => 1,
+                    'current_amount' => 0,
+                ],
+                AttackTypeValue::ATTACK,
+                $this->fightLogger,
+            )
+            ->handle();
+
+        $this->assertSame(AutomatedFightResultType::BOUNTY_FIGHT_YIELDED, $result->getResultType());
+        $this->assertSame(0, $result->getBountyKills());
+        $this->assertFalse($result->hasEndedAutomation());
+    }
+
+    public function testYieldedBountyFightResumesDamagedMonsterAndRewardsOneDefeat(): void
+    {
+        Event::fake();
+
+        $bountyMonster = $this->factionLoyaltyFactory->getBountyMonstersForNpc($this->factionLoyaltyNpc)[0];
+        $this->factionLoyaltyAutomation->update([
+            'last_fight_outcome' => AutomatedFightResultType::BOUNTY_FIGHT_YIELDED->value,
+            'last_fight_monster_id' => $bountyMonster->id,
+            'last_fight_was_bounty_target' => true,
+            'last_fight_was_training' => false,
+            'last_fight_stalled_attempt' => 0,
+        ]);
+        $this->monsterFightService
+            ->shouldNotReceive('setupMonster');
+        $this->monsterFightService
+            ->shouldReceive('fightMonster')
+            ->once()
+            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->andReturn([
+                'health' => [
+                    'current_character_health' => 10,
+                    'current_monster_health' => 0,
+                ],
+            ]);
+        $this->characterRewardService
+            ->shouldReceive('setCharacter')
+            ->once()
+            ->with(Mockery::type(Character::class))
+            ->andReturnSelf();
+        $this->characterRewardService
+            ->shouldReceive('fetchXpForMonster')
+            ->once()
+            ->with(Mockery::on(fn (Monster $monster): bool => $monster->id === $bountyMonster->id))
+            ->andReturn(10);
+        $this->skillService
+            ->shouldReceive('setSkillInTraining')
+            ->once()
+            ->with(Mockery::type(Character::class))
+            ->andReturnSelf();
+        $this->skillService
+            ->shouldReceive('getXpForSkillIntraining')
+            ->once()
+            ->with(Mockery::type(Character::class), $bountyMonster->xp)
+            ->andReturn(5);
+        $this->battleEventHandler
+            ->shouldReceive('processMonsterDeath')
+            ->once()
+            ->with($this->character->id, $bountyMonster->id, [
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_faction_points' => 0,
+                'total_skill_xp' => 5,
+                'skip_faction_loyalty_update_event' => true,
+            ]);
+
+        $result = $this->handler
+            ->setUp(
+                $this->character,
+                $this->factionLoyaltyAutomation->refresh(),
+                $this->factionLoyaltyNpc,
+                [
+                    'monster_id' => $bountyMonster->id,
+                    'required_amount' => 1,
+                    'current_amount' => 0,
+                ],
+                AttackTypeValue::ATTACK,
+                $this->fightLogger,
+            )
+            ->handle();
+
+        $this->assertSame(AutomatedFightResultType::BOUNTY_COMPLETED, $result->getResultType());
+        $this->assertSame(1, $result->getBountyKills());
     }
 
     public function testHandleRetriesCachedBountyFightWithoutSettingUpMonsterWhenBountyStalled(): void
@@ -649,7 +876,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertFalse($result->hasEndedAutomation());
     }
 
-    public function testHandleCompletesTrainingBatchWhenFiftyTrainingMonstersDie(): void
+    public function testHandleYieldsRecoveryTrainingAfterBoundedKillCount(): void
     {
         Event::fake();
 
@@ -671,11 +898,24 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ]);
         $this->monsterFightService
             ->shouldReceive('setupMonster')
-            ->times(50)
+            ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $trainingMonster->id,
                 'attack_type' => AttackTypeValue::ATTACK,
             ], true)
+            ->andReturn([
+                'health' => [
+                    'current_character_health' => 10,
+                    'current_monster_health' => 0,
+                ],
+            ]);
+        $this->monsterFightService
+            ->shouldReceive('setupMonster')
+            ->times(24)
+            ->with(Mockery::type(Character::class), [
+                'selected_monster_id' => $trainingMonster->id,
+                'attack_type' => AttackTypeValue::ATTACK,
+            ], true, false, true)
             ->andReturn([
                 'health' => [
                     'current_character_health' => 10,
@@ -690,21 +930,21 @@ class AutomatedBountyFightHandlerTest extends TestCase
 
         $this->characterRewardService
             ->shouldReceive('setCharacter')
-            ->times(50)
+            ->times(25)
             ->andReturnSelf();
         $this->characterRewardService
             ->shouldReceive('fetchXpForMonster')
-            ->times(50)
+            ->times(25)
             ->with(Mockery::on(fn (Monster $monster): bool => $monster->id === $trainingMonster->id))
             ->andReturn(10);
 
         $this->skillService
             ->shouldReceive('setSkillInTraining')
-            ->times(50)
+            ->times(25)
             ->andReturnSelf();
         $this->skillService
             ->shouldReceive('getXpForSkillIntraining')
-            ->times(50)
+            ->times(25)
             ->with(Mockery::type(Character::class), $trainingMonster->xp)
             ->andReturn(5);
 
@@ -712,10 +952,10 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->shouldReceive('processMonsterDeath')
             ->once()
             ->with($this->character->id, $trainingMonster->id, [
-                'total_creatures' => 50,
-                'total_xp' => 500,
+                'total_creatures' => 25,
+                'total_xp' => 250,
                 'total_faction_points' => 0,
-                'total_skill_xp' => 250,
+                'total_skill_xp' => 125,
                 'skip_faction_loyalty_update_event' => true,
             ]);
 
@@ -734,9 +974,96 @@ class AutomatedBountyFightHandlerTest extends TestCase
             )
             ->handle();
 
-        $this->assertEquals(AutomatedFightResultType::TRAINING_BATCH_COMPLETED, $result->getResultType());
-        $this->assertEquals(50, $result->getTrainingKills());
-        $this->assertTrue($result->hasTrainedForFailedBounty());
+        $this->assertEquals(AutomatedFightResultType::TRAINING_BATCH_YIELDED, $result->getResultType());
+        $this->assertEquals(25, $result->getTrainingKills());
+        $this->assertFalse($result->hasEndedAutomation());
+    }
+
+    public function testYieldedRecoveryTrainingFightResumesWithoutFreshMonsterSetup(): void
+    {
+        Event::fake();
+
+        $bountyMonster = $this->factionLoyaltyFactory->getBountyMonstersForNpc($this->factionLoyaltyNpc)[0];
+        $trainingMonster = $this->factionLoyaltyFactory->getTrainingMonstersForMap($bountyMonster->gameMap)[0];
+        $clockCalls = 0;
+        $handler = new AutomatedBountyFightHandler(
+            $this->monsterFightService,
+            $this->battleEventHandler,
+            $this->characterRewardService,
+            $this->skillService,
+            new AutomatedFightResult,
+            function () use (&$clockCalls): float {
+                $clockCalls++;
+
+                return $clockCalls <= 2 ? 0.0 : 91.0;
+            },
+        );
+        $this->factionLoyaltyAutomation->update([
+            'failed_bounty_monster_id' => $bountyMonster->id,
+            'last_fight_outcome' => AutomatedFightResultType::TRAINING_FIGHT_YIELDED->value,
+            'last_fight_monster_id' => $trainingMonster->id,
+            'last_fight_was_bounty_target' => false,
+            'last_fight_was_training' => true,
+            'last_fight_stalled_attempt' => 0,
+        ]);
+        $this->monsterFightService
+            ->shouldNotReceive('setupMonster');
+        $this->monsterFightService
+            ->shouldReceive('fightMonster')
+            ->once()
+            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->andReturn([
+                'health' => [
+                    'current_character_health' => 10,
+                    'current_monster_health' => 0,
+                ],
+            ]);
+        $this->characterRewardService
+            ->shouldReceive('setCharacter')
+            ->once()
+            ->andReturnSelf();
+        $this->characterRewardService
+            ->shouldReceive('fetchXpForMonster')
+            ->once()
+            ->with(Mockery::on(fn (Monster $monster): bool => $monster->id === $trainingMonster->id))
+            ->andReturn(10);
+        $this->skillService
+            ->shouldReceive('setSkillInTraining')
+            ->once()
+            ->andReturnSelf();
+        $this->skillService
+            ->shouldReceive('getXpForSkillIntraining')
+            ->once()
+            ->with(Mockery::type(Character::class), $trainingMonster->xp)
+            ->andReturn(5);
+        $this->battleEventHandler
+            ->shouldReceive('processMonsterDeath')
+            ->once()
+            ->with($this->character->id, $trainingMonster->id, [
+                'total_creatures' => 1,
+                'total_xp' => 10,
+                'total_faction_points' => 0,
+                'total_skill_xp' => 5,
+                'skip_faction_loyalty_update_event' => true,
+            ]);
+
+        $result = $handler
+            ->setUp(
+                $this->character,
+                $this->factionLoyaltyAutomation->refresh(),
+                $this->factionLoyaltyNpc,
+                [
+                    'monster_id' => $bountyMonster->id,
+                    'required_amount' => 1,
+                    'current_amount' => 0,
+                ],
+                AttackTypeValue::ATTACK,
+                $this->fightLogger,
+            )
+            ->handle();
+
+        $this->assertSame(AutomatedFightResultType::TRAINING_BATCH_YIELDED, $result->getResultType());
+        $this->assertSame(1, $result->getTrainingKills());
     }
 
     public function testHandleEndsAutomationWhenBountyKillsCharacterAfterCompletedTraining(): void

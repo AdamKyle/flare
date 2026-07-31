@@ -24,6 +24,18 @@ export default class Table extends React.Component<DataTableProps, any> {
                     paginationRowsPerPageOptions={
                         this.props.pagination_rows_per_page_options
                     }
+                    expandableRows={this.props.expandable_rows}
+                    expandOnRowClicked={this.props.expand_on_row_clicked}
+                    expandableRowsHideExpander={
+                        this.props.expandable_rows_hide_expander
+                    }
+                    expandableRowExpanded={this.props.expandable_row_expanded}
+                    expandableRowsComponent={
+                        this.props.expandable_rows_component
+                    }
+                    onRowExpandToggled={this.props.on_row_expand_toggled}
+                    onRowClicked={this.props.on_row_clicked}
+                    onChangePage={this.props.on_change_page}
                     responsive
                 />
             </div>

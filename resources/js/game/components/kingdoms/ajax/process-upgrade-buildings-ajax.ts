@@ -4,6 +4,7 @@ import axios from "axios";
 import { flushSync } from "react-dom";
 import BuildingsToUpgradeSection from "../capital-city/buildings-to-upgrade-section";
 import { runCapitalCityRequestBatches } from "./run-capital-city-request-batches";
+import { handleUnauthenticatedAxiosRequest } from "../../../lib/ajax/unauthenticated-response-handler";
 
 @injectable()
 export default class ProcessUpgradeBuildingsAjax {
@@ -64,22 +65,16 @@ export default class ProcessUpgradeBuildingsAjax {
         requestType: string,
         batch: any[],
     ): Promise<void> {
-        return axios
-            .post(
+        return handleUnauthenticatedAxiosRequest(
+            axios.post(
                 "/api/kingdom/capital-city/upgrade-building-requests/" +
                     characterId +
                     "/" +
                     kingdomId,
                 { request_data: batch, request_type: requestType },
                 { headers: { "Content-Type": "application/json" } },
-            )
-            .then(() => undefined)
-            .catch((error: AxiosError) => {
-                if (error.response?.status === 401) {
-                    window.location.reload();
-                }
-                throw error;
-            });
+            ),
+        ).then(() => undefined);
     }
 
     private applyAcceptedRequestState(

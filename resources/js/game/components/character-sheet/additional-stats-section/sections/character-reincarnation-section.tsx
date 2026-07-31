@@ -12,15 +12,22 @@ export default class CharacterReincarnationSection extends React.Component<
     constructor(props: AdditionalInfoProps) {
         super(props);
 
+        const preloadedReincarnationDetails =
+            props.preloaded_reincarnation_details;
+
         this.state = {
-            is_loading: true,
-            reincarnation_details: [],
+            is_loading: typeof preloadedReincarnationDetails === "undefined",
+            reincarnation_details: preloadedReincarnationDetails ?? [],
             error_message: "",
         };
     }
 
     componentDidMount(): void {
         if (this.props.character === null) {
+            return;
+        }
+
+        if (typeof this.props.preloaded_reincarnation_details !== "undefined") {
             return;
         }
 

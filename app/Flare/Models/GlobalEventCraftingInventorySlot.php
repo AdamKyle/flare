@@ -26,8 +26,8 @@ class GlobalEventCraftingInventorySlot extends Model
      * @var array
      */
     protected $casts = [
-        'global_event_id' => 'integer',
-        'character_id' => 'integer',
+        'global_event_crafting_inventory_id' => 'integer',
+        'item_id' => 'integer',
     ];
 
     public function item()

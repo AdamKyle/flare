@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Admin\Services;
 
+use Tests\Traits\CreateSuggestionAndBugs;
+
 use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\MonitoredSystemErrorOccurrence;
 use App\Flare\Models\MonitoredSystemErrorReport;
@@ -12,7 +14,7 @@ use Tests\TestCase;
 
 class MonitoredBugReportServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateSuggestionAndBugs, RefreshDatabase;
 
     public function testCreatesNewBugReportWhenNoneExistsForFingerprint(): void
     {
@@ -273,7 +275,7 @@ class MonitoredBugReportServiceTest extends TestCase
 
     public function testUserSubmittedBugFactoryStillCreatesFeedbackBug(): void
     {
-        SuggestionAndBugs::factory()->create(['type' => FeedbackType::BUG]);
+        $this->createSuggestionAndBug(['type' => FeedbackType::BUG]);
 
         $this->assertSame(1, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
         $this->assertSame(0, MonitoredSystemErrorReport::count());

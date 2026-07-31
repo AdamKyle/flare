@@ -186,6 +186,12 @@
                                 <x-core.forms.input :model="$guideQuest" label="Required Event Goal Kills:"
                                    modelKey="required_event_goal_participation"
                                    name="required_event_goal_participation" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Event Goal Crafts:"
+                                   modelKey="required_event_goal_crafting_participation"
+                                   name="required_event_goal_crafting_participation" />
+                                <x-core.forms.input :model="$guideQuest" label="Required Event Goal Enchants:"
+                                   modelKey="required_event_goal_enchanting_participation"
+                                   name="required_event_goal_enchanting_participation" />
 
                                 <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
                                 </div>
@@ -196,6 +202,75 @@
                                                     modelKey="required_delve_survival_time" name="required_delve_survival_time" />
                                 <x-core.forms.input :model="$guideQuest" label="Required Delve Pack Size:"
                                                     modelKey="required_delve_pack_size" name="required_delve_pack_size" />
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+
+                                <h3 class="mb-3">Batch Crafting Experience Requirement</h3>
+                                <x-core.forms.key-value-select :model="$guideQuest" label="Required Batch Crafting Type:"
+                                                               modelKey="required_batch_crafting_type" name="required_batch_crafting_type"
+                                                               :options="$batchCraftingTypes"
+                                                               helpText="Counts when the player runs the selected batch crafting type in experience mode for at least this many hours. It remains valid if the batch finishes, times out, or is cancelled after the required time is met." />
+                                <x-core.forms.input :model="$guideQuest" label="Required Batch Crafting Hour(s):"
+                                                    modelKey="required_batch_crafting_hours" name="required_batch_crafting_hours"
+                                                    helpText="Counts when the player runs the selected batch crafting type in experience mode for at least this many hours. It remains valid if the batch finishes, times out, or is cancelled after the required time is met." />
+
+                                @php
+                                    $requiredBatchCraftedItems = old('required_batch_crafted_items', !is_null($guideQuest) ? ($guideQuest->required_batch_crafted_items ?? []) : []);
+                                @endphp
+
+                                <div class='border-b-2 block md:hidden border-b-gray-300 dark:border-b-gray-600 my-6'>
+                                </div>
+
+                                <h3 class="mb-3">Required Crafted or Alchemy Items</h3>
+                                <p class="mb-3 text-sm text-gray-600 dark:text-gray-400">Requires the player to have this many matching items. Crafted equipment is checked in normal inventory. Alchemy items are checked in the player’s alchemy bag. Crafted equipment marked as enchanted must have both a prefix and a suffix. One enchant is not enough. Alchemy items cannot be enchanted. These items are consumed when the guide quest is handed in.</p>
+
+                                @for ($batchCraftedItemIndex = 0; $batchCraftedItemIndex < 2; $batchCraftedItemIndex++)
+                                    @php
+                                        $batchCraftedItemRow = $requiredBatchCraftedItems[$batchCraftedItemIndex] ?? [];
+                                    @endphp
+
+                                    <div class="mb-4 grid grid-cols-1 gap-3 md:grid-cols-4">
+                                        <div>
+                                            <label class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100" for="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_source">Source</label>
+                                            <select class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                                                    id="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_source"
+                                                    name="required_batch_crafted_items[{{ $batchCraftedItemIndex }}][source]">
+                                                <option value="inventory" @selected(($batchCraftedItemRow['source'] ?? 'inventory') === 'inventory')>Crafted Equipment</option>
+                                                <option value="alchemy_bag" @selected(($batchCraftedItemRow['source'] ?? 'inventory') === 'alchemy_bag')>Alchemy Bag</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100" for="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_item_id">Item</label>
+                                            <select class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                                                    id="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_item_id"
+                                                    name="required_batch_crafted_items[{{ $batchCraftedItemIndex }}][item_id]">
+                                                <option value="">Please select</option>
+                                                @foreach ($batchCraftedItemOptions as $itemId => $itemLabel)
+                                                    <option value="{{ $itemId }}" @selected((string) ($batchCraftedItemRow['item_id'] ?? '') === (string) $itemId)>{{ $itemLabel }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100" for="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_amount">Amount</label>
+                                            <input class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm placeholder:text-gray-500 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
+                                                   id="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_amount"
+                                                   name="required_batch_crafted_items[{{ $batchCraftedItemIndex }}][amount]"
+                                                   type="number"
+                                                   min="1"
+                                                   value="{{ $batchCraftedItemRow['amount'] ?? '' }}">
+                                        </div>
+                                        <div>
+                                            <label class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100" for="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_must_be_enchanted">Must Be Enchanted</label>
+                                            <select class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                                                    id="required_batch_crafted_items_{{ $batchCraftedItemIndex }}_must_be_enchanted"
+                                                    name="required_batch_crafted_items[{{ $batchCraftedItemIndex }}][must_be_enchanted]">
+                                                <option value="0" @selected(!filter_var($batchCraftedItemRow['must_be_enchanted'] ?? false, FILTER_VALIDATE_BOOLEAN))>No</option>
+                                                <option value="1" @selected(filter_var($batchCraftedItemRow['must_be_enchanted'] ?? false, FILTER_VALIDATE_BOOLEAN))>Yes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                @endfor
                             </div>
                         </div>
                     </x-core.form-wizard.content>

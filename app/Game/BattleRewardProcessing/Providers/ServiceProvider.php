@@ -25,9 +25,13 @@ use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -65,6 +69,14 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(GlobalEventParticipation::class, function ($app) {
             return new GlobalEventParticipation(
                 $app->make(RandomAffixGenerator::class),
+            );
+        });
+
+        $this->app->bind(BattleGlobalEventParticipationHandler::class, function ($app) {
+            return new BattleGlobalEventParticipationHandler(
+                $app->make(RandomAffixGenerator::class),
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalProgressionService::class),
             );
         });
 
@@ -118,6 +130,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(BattleRewardLedgerService::class),
                 $app->make(BattleRewardMessageContext::class),
                 $app->make(RandomAffixGenerator::class),
+                $app->make(BroadcastTopsUpdateService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
             );
         });
 

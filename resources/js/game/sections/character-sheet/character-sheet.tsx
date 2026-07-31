@@ -216,9 +216,7 @@ export default class CharacterSheet extends React.Component<
                 <div className="flex flex-col lg:flex-row w-full gap-2">
                     {this.showSection() || this.state.show_top_section ? (
                         <Fragment>
-                            <BasicCard
-                                additionalClasses={"overflow-y-auto lg:w-1/2"}
-                            >
+                            <BasicCard additionalClasses={"lg:w-1/2"}>
                                 {this.showCloseButton() ? (
                                     <div className="text-right cursor-pointer text-red-500 relative top-[10px]">
                                         <button
@@ -247,11 +245,7 @@ export default class CharacterSheet extends React.Component<
                                     }
                                 />
                             </BasicCard>
-                            <BasicCard
-                                additionalClasses={
-                                    "overflow-y-auto lg:w-1/2 md:max-h-[325px]"
-                                }
-                            >
+                            <BasicCard additionalClasses={"lg:w-1/2"}>
                                 <div className="grid lg:grid-cols-2 gap-2">
                                     <div>
                                         <dl>

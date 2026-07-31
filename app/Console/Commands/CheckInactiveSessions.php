@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\UserLoginDuration;
+use App\Game\Core\Events\WhosPlayingStatisticsUpdated;
 use Carbon\Carbon;
-use DB;
 use Illuminate\Console\Command;
 
 class CheckInactiveSessions extends Command
@@ -26,20 +26,43 @@ class CheckInactiveSessions extends Command
     /**
      * Execute the console command.
      */
-    public function handle() {
-
+    public function handle(): void
+    {
         $threshold = Carbon::now()->subMinutes(30); // example threshold, adjust as needed
+        $updatedSessions = 0;
+        $now = now();
 
         UserLoginDuration::whereNull('logged_out_at')
-            ->where('last_heart_beat', '<', $threshold) // Correct column name
+            ->whereNull('duration_in_seconds')
             ->get()
-            ->each(function ($login) {
-                $loggedInAt = Carbon::parse($login->logged_in_at);
-                $lastHeartbeat = Carbon::parse($login->last_heart_beat); // Correct column name
+            ->each(function (UserLoginDuration $login) use (&$updatedSessions, $now, $threshold): void {
+                $loggedOutAt = collect([
+                    $login->last_heart_beat,
+                    $login->last_activity,
+                ])->filter()->sortByDesc(fn ($activity) => $activity->getTimestamp())->first() ?? $login->logged_in_at;
 
-                $login->logged_out_at = Carbon::now();
-                $login->duration_in_seconds = $lastHeartbeat->diffInSeconds($loggedInAt);
-                $login->save();
+                if ($loggedOutAt->lt($login->logged_in_at)) {
+                    $loggedOutAt = $login->logged_in_at;
+                }
+
+                if ($loggedOutAt->gt($now)) {
+                    $loggedOutAt = $now;
+                }
+
+                if ($loggedOutAt->gte($threshold)) {
+                    return;
+                }
+
+                $login->update([
+                    'logged_out_at' => $loggedOutAt,
+                    'duration_in_seconds' => $login->logged_in_at->diffInSeconds($loggedOutAt),
+                ]);
+
+                $updatedSessions++;
             });
+
+        if ($updatedSessions > 0) {
+            broadcast(new WhosPlayingStatisticsUpdated());
+        }
     }
 }

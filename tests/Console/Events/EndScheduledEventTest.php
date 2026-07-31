@@ -75,6 +75,7 @@ class EndScheduledEventTest extends TestCase
             'start_date' => now()->addMinutes(5),
             'raid_id' => $raid,
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(
@@ -117,6 +118,7 @@ class EndScheduledEventTest extends TestCase
             'start_date' => now()->addMinutes(5),
             'raid_id' => $raid,
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -154,6 +156,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -181,6 +184,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WEEKLY_CELESTIALS,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -208,6 +212,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -236,6 +241,7 @@ class EndScheduledEventTest extends TestCase
             'start_date' => now()->addMinutes(5),
             'end_date' => now()->subMinutes(10),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -283,6 +289,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -351,6 +358,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -465,6 +473,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -548,6 +557,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([
@@ -621,6 +631,7 @@ class EndScheduledEventTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => now()->addMinutes(5),
             'currently_running' => true,
+            'status' => \App\Game\Events\Values\ScheduledEventStatus::RUNNING,
         ]);
 
         $event = $this->createEvent([

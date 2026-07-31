@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
+use Tests\Traits\CreateGameBuilding;
+
 use App\Flare\Models\BuildingInQueue;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
@@ -14,7 +16,7 @@ use Tests\TestCase;
 
 class UpgradeBuildingTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function testCompletionCannotPushBuildingAboveMax(): void
     {
@@ -32,7 +34,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -69,7 +71,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -110,7 +112,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -148,7 +150,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -192,7 +194,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -235,7 +237,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -279,7 +281,7 @@ class UpgradeBuildingTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
-        $queue = BuildingInQueue::factory()->create([
+        $queue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,

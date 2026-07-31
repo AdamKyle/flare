@@ -26,6 +26,7 @@ use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\DB;
 
 class CraftingService
 {
@@ -195,6 +196,103 @@ class CraftingService
     public function getLastCraftedInventorySlotId(): ?int
     {
         return $this->lastCraftedInventorySlotId;
+    }
+
+    /**
+     * Craft an item directly for Batch Crafting, with no InventorySlot involved.
+     *
+     * Uses the same skill requirement, gold affordability, and success/failure roll
+     * rules as craft(), charging gold and assigning crafting XP exactly like craft()
+     * does on a successful roll. Never picks up the item into inventory.
+     *
+     * @throws Exception
+     */
+    public function craftForBatch(
+        Character $character,
+        Item $item,
+        string $craftingType,
+        bool $suppressSuccessServerMessage = false,
+        ?callable $destinationCreator = null,
+    ): array
+    {
+        return DB::transaction(function () use ($character, $item, $craftingType, $suppressSuccessServerMessage, $destinationCreator): array {
+            $skill = $this->fetchCraftingSkill($character, $craftingType);
+
+            $cost = $this->getItemCost($character, $item);
+
+            if ($cost > $character->gold) {
+                ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD);
+
+                return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold', 'destination' => null];
+            }
+
+            $result = $this->attemptToCraftItemForBatch($character, $skill, $item, $suppressSuccessServerMessage);
+
+            if (! $result['success'] || is_null($destinationCreator)) {
+                return $result + ['destination' => null];
+            }
+
+            $destination = $destinationCreator($result['item']);
+
+            if (! is_array($destination)) {
+                throw new \RuntimeException('The retained Batch Crafting destination could not accept the crafted item.');
+            }
+
+            return $result + ['destination' => $destination];
+        });
+    }
+
+    /**
+     * Attempt to craft an item for Batch Crafting without picking it up into inventory.
+     * Mirrors attemptToCraftItem()'s manual Server Messages so batch crafting reads
+     * the same as manual crafting in the player's chat/Server Message feed.
+     *
+     * $suppressSuccessServerMessage skips only the "You crafted a: X!" success message,
+     * used when the batch processor will emit a linked equivalent once the item is
+     * committed to the Crafted Items Set. Failure messages are never suppressed.
+     *
+     * @throws Exception
+     */
+    private function attemptToCraftItemForBatch(Character $character, Skill $skill, Item $item, bool $suppressSuccessServerMessage = false): array
+    {
+        if ($skill->level < $item->skill_level_required) {
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
+
+            return ['success' => false, 'item' => null, 'reason' => 'skill_too_low'];
+        }
+
+        if ($skill->level > $item->skill_level_trivial) {
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
+
+            $this->updateCharacterGold($character, $item);
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+            }
+
+            return ['success' => true, 'item' => $item, 'reason' => null];
+        }
+
+        $characterRoll = $this->skillCheckService->characterRoll($skill);
+        $dcCheck = $this->skillCheckService->getDCCheck($skill, 0);
+
+        if ($dcCheck < $characterRoll) {
+            $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+            $this->updateCharacterGold($character, $item);
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+            }
+
+            return ['success' => true, 'item' => $item, 'reason' => null];
+        }
+
+        ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::FAILED_TO_CRAFT);
+
+        $this->updateCharacterGold($character, $item);
+
+        return ['success' => false, 'item' => null, 'reason' => 'failed_roll'];
     }
 
     /**

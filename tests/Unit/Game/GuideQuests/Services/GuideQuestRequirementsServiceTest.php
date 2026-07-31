@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
+use App\Admin\Services\GuideQuestService as AdminGuideQuestService;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
@@ -13,7 +14,9 @@ use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
+use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,30 +24,25 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateDelveAutomation;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateGuideQuest;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
+use Tests\Traits\CreateScheduledEvent;
 
 class GuideQuestRequirementsServiceTest extends TestCase
 {
-    use CreateGuideQuest,
-        CreateItem,
-        CreateGameSkill,
-        CreateQuest,
-        CreateNpc,
-        CreateGameMap,
-        CreateFactionLoyalty,
-        CreateGameClassSpecial,
-        CreateEvent,
-        CreateGlobalEventGoal,
-        RefreshDatabase;
+    use CreateBatchCrafting, CreateDelveAutomation, CreateEvent, CreateFactionLoyalty, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateGuideQuest, CreateInventorySets, CreateItem, CreateItemAffix, CreateNpc, CreateQuest, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -141,14 +139,14 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'monster_id' => 0,
             'started_at' => now()->subHour(),
             'completed_at' => now(),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
@@ -167,14 +165,14 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'monster_id' => 0,
             'started_at' => now()->subHour(),
             'completed_at' => now(),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
@@ -210,21 +208,21 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'monster_id' => 0,
             'started_at' => now()->subHour(),
             'completed_at' => now(),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
             'created_at' => now()->subMinutes(10),
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 10,
@@ -912,13 +910,16 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::WINTER_EVENT,
+            'scheduled_event_id' => $schedule->id,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
             'max_kills' => 1000,
             'event_type' => EventType::WINTER_EVENT,
+            'event_id' => $event->id,
             'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
             'unique_type' => RandomAffixDetails::LEGENDARY,
         ]);
@@ -937,7 +938,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
         ]);
 
         $guideQuest = $this->createGuideQuest([
-            'required_event_goal_participation' => 10
+            'required_event_goal_participation' => 10,
+            'only_during_event' => EventType::WINTER_EVENT,
         ]);
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventKillAmount($character, $guideQuest)->getFinishedRequirements();;
@@ -959,6 +961,148 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventKillAmount($character, $guideQuest)->getFinishedRequirements();;
 
         $this->assertNotContains('required_event_goal_participation', $finishedRequirements);
+    }
+
+    public function testPlayerHasGlobalEventCraftAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'crafts' => 100,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_event_goal_crafting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventCraftAmountWhenNoCraftRowExists()
+    {
+        $character = $this->character->getCharacter();
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_crafting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventCraftAmountWhenCraftsAreBelowRequirement()
+    {
+        $character = $this->character->getCharacter();
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_crafts' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventCrafts([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'crafts' => 5,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_crafting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventCraftAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_crafting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerHasGlobalEventEnchantAmount()
+    {
+        $character = $this->character->getCharacter();
+
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+        ]);
+
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_enchants' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventEnchants([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'enchants' => 100,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+            'only_during_event' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_event_goal_enchanting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventEnchantAmountWhenNoEnchantRowExists()
+    {
+        $character = $this->character->getCharacter();
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_enchanting_participation', $finishedRequirements);
+    }
+
+    public function testPlayerDoesNotHaveGlobalEventEnchantAmountWhenEnchantsAreBelowRequirement()
+    {
+        $character = $this->character->getCharacter();
+        $eventGoal = $this->createGlobalEventGoal([
+            'max_enchants' => 1000,
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'unique_type' => RandomAffixDetails::LEGENDARY,
+        ]);
+
+        $this->createGlobalEventEnchants([
+            'global_event_goal_id' => $eventGoal->id,
+            'character_id' => $character->id,
+            'enchants' => 5,
+        ]);
+
+        $guideQuest = $this->createGuideQuest([
+            'required_event_goal_enchanting_participation' => 10,
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredGlobalEventEnchantAmount($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_event_goal_enchanting_participation', $finishedRequirements);
     }
 
     public function testRequiredSkillCheckReturnsFalseWhenCharacterDoesNotHaveSkill(): void
@@ -1005,5 +1149,670 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $finishedRequirements = $this->guideQuestRequirementsService->requiredKingdomPassiveLevel($character, $guideQuest)->getFinishedRequirements();
 
         $this->assertNotContains('required_passive_level', $finishedRequirements);
+    }
+
+    public function testRunningCraftExperienceBatchAtRequiredHoursPasses(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'craft',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'craft',
+            'started_at' => now()->subHours(2),
+            'completed_at' => null,
+            'cancelled_at' => null,
+            'progress' => [
+                'craft_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testCompletedCraftAndEnchantExperienceBatchAtRequiredHoursPasses(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'craft_and_enchant',
+            'required_batch_crafting_hours' => 3,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'craft_and_enchant',
+            'started_at' => now()->subHours(4),
+            'completed_at' => now()->subHour(),
+            'cancelled_at' => null,
+            'progress' => [
+                'craft_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testCancelledAlchemyExperienceBatchAtRequiredHoursPasses(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'alchemy',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'alchemy',
+            'started_at' => now()->subHours(3),
+            'completed_at' => now()->subHour(),
+            'cancelled_at' => now()->subHour(),
+            'progress' => [
+                'alchemy_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testCancelledMatchingBatchBeforeRequiredHoursFails(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'alchemy',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'alchemy',
+            'started_at' => now()->subMinutes(90),
+            'completed_at' => now(),
+            'cancelled_at' => now(),
+            'progress' => [
+                'alchemy_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testMatchingTypeWithNonExperienceModeFails(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'craft',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'craft',
+            'started_at' => now()->subHours(3),
+            'completed_at' => null,
+            'cancelled_at' => null,
+            'progress' => [
+                'craft_mode' => 'gold',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testWrongBatchTypeFails(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'trinketry',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'alchemy',
+            'started_at' => now()->subHours(3),
+            'completed_at' => null,
+            'cancelled_at' => null,
+            'progress' => [
+                'alchemy_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testHolyOilsDoesNotSatisfyTheRequirement(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'alchemy',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'holy_oils',
+            'started_at' => now()->subHours(3),
+            'completed_at' => null,
+            'cancelled_at' => null,
+            'progress' => [
+                'alchemy_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testTrinketryExperienceBatchAtRequiredHoursPasses(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafting_type' => 'trinketry',
+            'required_batch_crafting_hours' => 2,
+        ]);
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => 'trinketry',
+            'started_at' => now()->subHours(3),
+            'completed_at' => null,
+            'cancelled_at' => null,
+            'progress' => [
+                'trinketry_mode' => 'experience',
+            ],
+        ]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftingExperienceHours($character, $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafting_hours', $finishedRequirements);
+    }
+
+    public function testPlainDaggerInventoryRequirementPassesWithEnoughUnenchantedMatchingItems(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 2, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testPlainDaggerInventoryRequirementFailsWithInsufficientAmount(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 2, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testPlainDaggerInventoryRequirementDoesNotCountEnchantedDaggers(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedDagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'parent_id' => $dagger->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedDagger->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testEnchantedHelmetInventoryRequirementPassesWhenEnoughMatchingEnchantedHelmetsExist(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 2, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedHelmet->id]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedHelmet->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testEnchantedHelmetInventoryRequirementFailsWhenMatchingItemsHaveOnlyPrefix(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $prefixedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $prefixedHelmet->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testEnchantedHelmetInventoryRequirementFailsWhenMatchingItemsHaveOnlySuffix(): void
+    {
+        $character = $this->character->getCharacter();
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $suffixedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => null, 'item_suffix_id' => $suffix->id]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $suffixedHelmet->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testEnchantedHelmetInventoryRequirementDoesNotCareWhichPrefixOrSuffixIsApplied(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix', 'name' => 'Sharp']);
+        $suffix = $this->createItemAffix(['type' => 'suffix', 'name' => 'Protection']);
+        $otherPrefix = $this->createItemAffix(['type' => 'prefix', 'name' => 'Guarding']);
+        $otherSuffix = $this->createItemAffix(['type' => 'suffix', 'name' => 'Power']);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $firstEnchantedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $secondEnchantedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $firstEnchantedHelmet->id, 'item_prefix_id' => $otherPrefix->id, 'item_suffix_id' => $otherSuffix->id]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 2, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $firstEnchantedHelmet->id]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $secondEnchantedHelmet->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testEnchantedHelmetInventoryRequirementDoesNotCountUnenchantedHelmets(): void
+    {
+        $character = $this->character->getCharacter();
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $helmet->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testPlainDaggerInventoryRequirementFailsWhenMatchingItemsAreEnchantedWithBothPrefixAndSuffix(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedDagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'parent_id' => $dagger->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedDagger->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testPlayerFacingRequirementDataIncludesItemNameTypeAmountAndEnchantedState(): void
+    {
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $helmet->id, 'amount' => 10, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $displayRows = $guideQuest->required_batch_crafted_item_names;
+
+        $this->assertSame('Iron Helmet', $displayRows[0]['name']);
+        $this->assertSame('helmet', $displayRows[0]['type']);
+        $this->assertSame('Helmet', $displayRows[0]['type_name']);
+        $this->assertSame(10, $displayRows[0]['amount']);
+        $this->assertTrue($displayRows[0]['must_be_enchanted']);
+    }
+
+    public function testConfiguredInventoryRowsReturnIndependentCompletionStatusesAndFactualAmounts(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $mace = $this->createItem(['name' => 'Diamond Mace', 'type' => 'mace', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $chest = $this->createItem(['name' => "Paladin's Oath Chest", 'type' => 'body', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedMace = $this->createItem(['name' => 'Diamond Mace', 'type' => 'mace', 'parent_id' => $mace->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $enchantedChest = $this->createItem(['name' => "Paladin's Oath Chest", 'type' => 'body', 'parent_id' => $chest->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+
+        for ($slotIndex = 0; $slotIndex < 24; $slotIndex++) {
+            $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedMace->id]);
+        }
+
+        for ($slotIndex = 0; $slotIndex < 14; $slotIndex++) {
+            $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedChest->id]);
+        }
+
+        $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
+            ['source' => 'inventory', 'item_id' => $mace->id, 'amount' => 20, 'must_be_enchanted' => true],
+            ['source' => 'inventory', 'item_id' => $chest->id, 'amount' => 15, 'must_be_enchanted' => true],
+        ]);
+
+        $this->assertCount(2, $requirements);
+        $this->assertSame(0, $requirements[0]['requirement_index']);
+        $this->assertSame(24, $requirements[0]['current_amount']);
+        $this->assertTrue($requirements[0]['is_complete']);
+        $this->assertSame(1, $requirements[1]['requirement_index']);
+        $this->assertSame(14, $requirements[1]['current_amount']);
+        $this->assertFalse($requirements[1]['is_complete']);
+    }
+
+    public function testMissingConfiguredItemKeepsAnIncompleteStatusBesideACompletedValidStatus(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
+            ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ['source' => 'inventory', 'item_id' => 999999, 'amount' => 1, 'must_be_enchanted' => true],
+        ]);
+
+        $this->assertTrue($requirements[0]['is_complete']);
+        $this->assertSame(999999, $requirements[1]['item_id']);
+        $this->assertSame(0, $requirements[1]['current_amount']);
+        $this->assertFalse($requirements[1]['is_complete']);
+    }
+
+    public function testMixedInventoryAndAlchemyRowsReturnIndependentStatuses(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 3]);
+
+        $requirements = $this->guideQuestRequirementsService->batchCraftedItemRequirements($character->refresh(), [
+            ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 5, 'must_be_enchanted' => true],
+        ]);
+
+        $this->assertSame(1, $requirements[0]['current_amount']);
+        $this->assertTrue($requirements[0]['is_complete']);
+        $this->assertSame(3, $requirements[1]['current_amount']);
+        $this->assertFalse($requirements[1]['must_be_enchanted']);
+        $this->assertFalse($requirements[1]['is_complete']);
+    }
+
+    public function testMultipleConfiguredItemRowsPassOnlyWhenAllRowsAreSatisfied(): void
+    {
+        $character = $this->character->getCharacter();
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $enchantedHelmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'parent_id' => $helmet->id, 'item_prefix_id' => $prefix->id, 'item_suffix_id' => $suffix->id]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $enchantedHelmet->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testMultipleConfiguredItemRowsFailWhenOneRowIsMissing(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $helmet = $this->createItem(['name' => 'Iron Helmet', 'type' => 'helmet', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => true],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testNormalInventoryIsCheckedNotCraftedItemsSet(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $inventorySet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => 'batch_crafting']);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $this->createInventorySetSlot(['inventory_set_id' => $inventorySet->id, 'item_id' => $dagger->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testAlchemyBagRequirementPassesWhenTheBagHasEnoughAmount(): void
+    {
+        $character = $this->character->getCharacter();
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 5, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 5]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testAlchemyBagRequirementFailsWhenTheBagHasInsufficientAmount(): void
+    {
+        $character = $this->character->getCharacter();
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 5, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 4]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testAlchemyBagRequirementDoesNotCountNormalInventory(): void
+    {
+        $character = $this->character->getCharacter();
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $potion->id]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testInventoryRequirementDoesNotCountAlchemyBag(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $dagger->id, 'amount' => 1]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testMixedInventoryPlusAlchemyRequirementsPassWhenBothRowsAreSatisfied(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 3, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 3]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testMixedInventoryPlusAlchemyRequirementsFailWhenTheAlchemyRowIsShort(): void
+    {
+        $character = $this->character->getCharacter();
+        $dagger = $this->createItem(['name' => 'Iron Dagger', 'type' => 'dagger', 'can_craft' => true, 'item_prefix_id' => null, 'item_suffix_id' => null]);
+        $potion = $this->createItem(['name' => 'Lesser Stat Potion', 'type' => 'alchemy', 'alchemy_type' => AlchemyItemType::INCREASE_STATS->value]);
+        $guideQuest = $this->createGuideQuest([
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['source' => 'alchemy_bag', 'item_id' => $potion->id, 'amount' => 3, 'must_be_enchanted' => false],
+            ],
+        ]);
+
+        $character->inventory->slots()->create(['inventory_id' => $character->inventory->id, 'item_id' => $dagger->id]);
+        $character->alchemyBag->slots()->create(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $potion->id, 'amount' => 2]);
+
+        $finishedRequirements = $this->guideQuestRequirementsService->requiredBatchCraftedItems($character->refresh(), $guideQuest)->getFinishedRequirements();
+
+        $this->assertNotContains('required_batch_crafted_items', $finishedRequirements);
+    }
+
+    public function testOnlyTwoConfiguredRowsAreHonoredAfterCleaning(): void
+    {
+        $dagger = $this->createItem(['name' => 'Clean Iron Dagger', 'type' => 'dagger', 'can_craft' => true]);
+        $helmet = $this->createItem(['name' => 'Clean Iron Helmet', 'type' => 'helmet', 'can_craft' => true]);
+        $ring = $this->createItem(['name' => 'Clean Copper Ring', 'type' => 'ring', 'can_craft' => true]);
+        $guideQuestService = new AdminGuideQuestService();
+
+        $params = $guideQuestService->cleanRequest([
+            'required_batch_crafting_type' => null,
+            'required_batch_crafting_hours' => null,
+            'required_batch_crafted_items' => [
+                ['source' => 'inventory', 'item_id' => $dagger->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['source' => 'inventory', 'item_id' => $helmet->id, 'amount' => 1, 'must_be_enchanted' => false],
+                ['source' => 'inventory', 'item_id' => $ring->id, 'amount' => 1, 'must_be_enchanted' => false],
+            ],
+            'required_skill_level' => null,
+            'required_skill' => null,
+            'required_passive_level' => null,
+            'required_passive_skill' => null,
+            'required_faction_level' => null,
+            'required_faction_id' => null,
+        ]);
+
+        $this->assertCount(2, $params['required_batch_crafted_items']);
+        $this->assertSame($dagger->id, $params['required_batch_crafted_items'][0]['item_id']);
+        $this->assertSame($helmet->id, $params['required_batch_crafted_items'][1]['item_id']);
     }
 }

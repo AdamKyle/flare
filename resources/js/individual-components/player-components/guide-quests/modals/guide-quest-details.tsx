@@ -2,6 +2,7 @@ import React from "react";
 import InfoAlert from "../../../../game/components/ui/alerts/simple-alerts/info-alert";
 import SuccessAlert from "../../../../game/components/ui/alerts/simple-alerts/success-alert";
 import DangerAlert from "../../../../game/components/ui/alerts/simple-alerts/danger-alert";
+import WarningAlert from "../../../../game/components/ui/alerts/simple-alerts/warning-alert";
 import TabLayout from "../components/tab-labout";
 import clsx from "clsx";
 import {
@@ -13,14 +14,20 @@ import RequiredListItem from "../components/required-list-item";
 import { questRewardKeys } from "../lib/guide-quests-rewards";
 import RewardListItem from "../components/reward-list-item";
 import GuideQuest from "../components/definitions/guide-quest";
+import {
+    CompletedGuideQuestRequirements,
+    RequiredBatchCraftedItemRequirement,
+} from "./types/guide-quest-state";
 
 interface GuideQuestDetailsProps {
     guide_quest: GuideQuest;
-    completed_requirements: string[] | [];
+    completed_requirements: CompletedGuideQuestRequirements[];
     close_message: () => void;
     success_message: string | null;
     error_message: string | null;
     view_port: number;
+    read_only?: boolean;
+    viewer_has_access?: boolean;
 }
 
 export default class GuideQuestDetails extends React.Component<GuideQuestDetailsProps> {
@@ -35,12 +42,29 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
 
         return Object.keys(this.props.guide_quest).filter((key: string) => {
             if (this.props.guide_quest !== null) {
+                const value = this.props.guide_quest[key];
+
+                if (value === null) {
+                    return false;
+                }
+
+                if (Array.isArray(value) && value.length === 0) {
+                    return false;
+                }
+
+                if (
+                    key === "required_batch_crafting_hours" ||
+                    key === "required_batch_crafted_item_names"
+                ) {
+                    return false;
+                }
+
                 return (
-                    (key.startsWith("required_") ||
-                        key.startsWith("secondary_")) &&
-                    this.props.guide_quest[key] !== null
+                    key.startsWith("required_") || key.startsWith("secondary_")
                 );
             }
+
+            return false;
         });
     }
 
@@ -52,28 +76,69 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                 return [];
             }
 
+            const matchingCompletedRequirements =
+                this.props.completed_requirements.find(
+                    (completedRequirements: CompletedGuideQuestRequirements) =>
+                        completedRequirements.quest_id ===
+                        this.props.guide_quest.id,
+                );
+
+            let completedRequirements: string[] = [];
+            let batchCraftedItemRequirements: RequiredBatchCraftedItemRequirement[] =
+                [];
+
+            if (matchingCompletedRequirements !== undefined) {
+                completedRequirements =
+                    matchingCompletedRequirements.completed_requirements;
+                batchCraftedItemRequirements =
+                    matchingCompletedRequirements.required_batch_crafted_item_requirements;
+            }
+
+            if (key === "required_batch_crafted_items") {
+                (
+                    this.props.guide_quest.required_batch_crafted_item_names ??
+                    []
+                ).forEach((item) => {
+                    const itemRequirement = batchCraftedItemRequirements.find(
+                        (requirement) =>
+                            requirement.requirement_index ===
+                                item.requirement_index &&
+                            requirement.item_id === item.item_id,
+                    );
+                    const itemLabel =
+                        item.source === "alchemy_bag"
+                            ? `Have ${item.amount}x ${item.name} of type ${item.type_name} in your alchemy bag. Current: ${itemRequirement?.current_amount ?? 0} / ${item.amount}.`
+                            : `Have ${item.amount}x ${item.name} of type ${item.type_name} in your inventory ${item.must_be_enchanted ? "with both a prefix and a suffix" : "with no prefix or suffix"}. Current: ${itemRequirement?.current_amount ?? 0} / ${item.amount}.`;
+
+                    requirementsList.push(
+                        <RequiredListItem
+                            key={`${key}-${item.requirement_index}-${item.item_id}`}
+                            label={"Required Item"}
+                            isFinished={itemRequirement?.is_complete ?? false}
+                            requirement={itemLabel}
+                        />,
+                    );
+                });
+
+                requirementsList.push(
+                    <RequiredListItem
+                        key={`${key}-consumption`}
+                        label={"Item Consumption"}
+                        isFinished={false}
+                        requirement={
+                            "These items are consumed when the guide quest is handed in."
+                        }
+                    />,
+                );
+
+                return [];
+            }
+
             let label = guideQuestLabelBuilder(key, this.props.guide_quest);
 
             if (label !== null) {
                 const requiredKey = getRequirementKey(key);
                 const value = this.props.guide_quest[requiredKey];
-
-                const matchingCompletedRequirements: any =
-                    this.props.completed_requirements.filter(
-                        (completedRequirements: any) => {
-                            return (
-                                completedRequirements.quest_id ===
-                                this.props.guide_quest.id
-                            );
-                        },
-                    );
-
-                let completedRequirements: string[] = [];
-
-                if (matchingCompletedRequirements.length > 0) {
-                    completedRequirements =
-                        matchingCompletedRequirements[0].completed_requirements;
-                }
 
                 const isFinished =
                     completedRequirements.includes(key) ||
@@ -126,6 +191,11 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
     render() {
         return (
             <>
+                {this.props.read_only && !this.props.viewer_has_access ? (
+                    <WarningAlert additional_css={"my-4"}>
+                        You have not completed this guide quest yet.
+                    </WarningAlert>
+                ) : null}
                 <InfoAlert
                     additional_css={clsx("my-4", {
                         hidden:
@@ -193,18 +263,23 @@ export default class GuideQuestDetails extends React.Component<GuideQuestDetails
                     is_small={this.props.view_port < 1600}
                 />
 
-                <p className={"mt-4 mb-4"}>
-                    The Hand in button will become available when you meet the
-                    requirements. Unless exploration is running.
-                </p>
+                {!this.props.read_only ? (
+                    <>
+                        <p className={"mt-4 mb-4"}>
+                            The Hand in button will become available when you
+                            meet the requirements. Unless exploration is
+                            running.
+                        </p>
 
-                <p className={"mt-4 mb-4"}>
-                    You can click the top right button in the header called
-                    Guide Quests to re-open this modal. You can also see
-                    previous Guide Quests by opening the top left menu,
-                    selecting Quest Log and then selecting Completed Guide
-                    Quests.
-                </p>
+                        <p className={"mt-4 mb-4"}>
+                            You can click the top right button in the header
+                            called Guide Quests to re-open this modal. You can
+                            also see previous Guide Quests by opening the top
+                            left menu, selecting Quest Log and then selecting
+                            Completed Guide Quests.
+                        </p>
+                    </>
+                ) : null}
             </>
         );
     }

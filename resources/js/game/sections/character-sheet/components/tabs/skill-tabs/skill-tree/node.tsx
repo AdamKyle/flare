@@ -1,11 +1,14 @@
 import React from "react";
 import clsx from "clsx";
+import KingdomPassiveRow from "../../../../../../lib/game/character-sheet/types/skills/kingdom-passive-row";
 
-export default class Node extends React.Component<any, any> {
-    constructor(props: any) {
-        super(props);
-    }
+interface NodeProps {
+    passive: KingdomPassiveRow;
+    show_passive_modal: (passive: KingdomPassiveRow) => void;
+    read_only?: boolean;
+}
 
+export default class Node extends React.Component<NodeProps> {
     isMaxLevel() {
         return (
             this.props.passive.current_level === this.props.passive.max_level
@@ -16,6 +19,7 @@ export default class Node extends React.Component<any, any> {
         return (
             <div>
                 <button
+                    type="button"
                     onClick={() =>
                         this.props.show_passive_modal(this.props.passive)
                     }

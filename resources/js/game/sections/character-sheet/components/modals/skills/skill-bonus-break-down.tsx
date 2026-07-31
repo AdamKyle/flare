@@ -1,14 +1,18 @@
 import React from "react";
 import HelpDialogue from "../../../../../components/ui/dialogue/help-dialogue";
 import ItemNameColorationText from "../../../../../components/items/item-name/item-name-coloration-text";
+import { SkillBonusItem } from "../../../../../lib/game/character-sheet/types/skills/skill-details";
 
-export default class SkillBonusBreakDown extends React.Component<any, any> {
-    constructor(props: any) {
-        super(props);
-    }
+interface SkillBonusBreakDownProps {
+    manage_modal: (bonusType: null) => void;
+    title: string;
+    bonus_type: "skill" | "xp" | null;
+    items: SkillBonusItem[];
+}
 
+export default class SkillBonusBreakDown extends React.Component<SkillBonusBreakDownProps> {
     renderSections(): JSX.Element[] | [] {
-        return this.props.items.map((item: any, index: number) => {
+        return this.props.items.map((item: SkillBonusItem, index: number) => {
             return (
                 <div>
                     <div className="p-4">

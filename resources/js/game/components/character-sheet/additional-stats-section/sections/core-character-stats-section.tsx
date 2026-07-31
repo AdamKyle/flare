@@ -5,6 +5,7 @@ import Ajax from "../../../../lib/ajax/ajax";
 import { AxiosError, AxiosResponse } from "axios";
 import LoadingProgressBar from "../../../ui/progress-bars/loading-progress-bar";
 import DropDown from "../../../ui/drop-down/drop-down";
+import WarningAlert from "../../../ui/alerts/simple-alerts/warning-alert";
 import StatDetails from "./partials/core-stats/stat-details";
 import HolyDetails from "./partials/core-stats/holy-details";
 import AmbushAndCounterDetails from "./partials/core-stats/ambush-and-counter-details";
@@ -17,9 +18,14 @@ export default class CoreCharacterStatsSection extends React.Component<
     constructor(props: AdditionalInfoProps) {
         super(props);
 
+        const preloadedStatDetails = props.preloaded_stat_details;
+
         this.state = {
-            is_loading: true,
-            stat_details: [],
+            is_loading: typeof preloadedStatDetails === "undefined",
+            stat_details:
+                typeof preloadedStatDetails === "undefined"
+                    ? []
+                    : preloadedStatDetails,
             error_message: "",
             stat_type_to_show: "",
         };
@@ -27,6 +33,10 @@ export default class CoreCharacterStatsSection extends React.Component<
 
     componentDidMount() {
         if (this.props.character === null) {
+            return;
+        }
+
+        if (typeof this.props.preloaded_stat_details !== "undefined") {
             return;
         }
 
@@ -93,6 +103,7 @@ export default class CoreCharacterStatsSection extends React.Component<
                     <StatDetails
                         stat_details={this.state.stat_details}
                         character={this.props.character}
+                        read_only={this.props.read_only}
                     />
                 );
             case "holy":
@@ -112,6 +123,7 @@ export default class CoreCharacterStatsSection extends React.Component<
                     <StatDetails
                         stat_details={this.state.stat_details}
                         character={this.props.character}
+                        read_only={this.props.read_only}
                     />
                 );
         }
@@ -124,6 +136,15 @@ export default class CoreCharacterStatsSection extends React.Component<
 
         if (this.state.is_loading) {
             return <LoadingProgressBar />;
+        }
+
+        if (this.state.stat_details === null) {
+            return (
+                <WarningAlert>
+                    Character stat details are unavailable because this
+                    character has no inventory.
+                </WarningAlert>
+            );
         }
 
         return (

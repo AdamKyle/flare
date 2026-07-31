@@ -7,6 +7,7 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueRequest;
@@ -30,6 +31,7 @@ class CapitalCityBuildingManagementRequestHandler
         private readonly KingdomBuildingService $kingdomBuildingService,
         private readonly UnitMovementService $unitMovementService,
         private readonly BuildingUpgradeRequestValidator $buildingUpgradeRequestValidator,
+        private readonly GameTimerService $gameTimerService,
     ) {}
 
     public function createRequestQueue(Character $character, Kingdom $kingdom, array $requests, string $type): array
@@ -67,7 +69,7 @@ class CapitalCityBuildingManagementRequestHandler
                 return;
             }
 
-            $travelTimeNeeded = $currentTime->clone()->addMinutes($timeNeeded);
+            $travelTimeNeeded = $this->gameTimerService->availableAtFromMinutes($timeNeeded);
 
             $capitalCityBuildingQueue = CapitalCityBuildingQueue::create([
                 'kingdom_id' => $kingdomId,
@@ -80,20 +82,14 @@ class CapitalCityBuildingManagementRequestHandler
                 'completed_at' => $travelTimeNeeded,
             ]);
 
-            $dispatchTime = $travelTimeNeeded;
-
-            if ($timeNeeded >= 15) {
-                $dispatchTime = $currentTime->clone()->addMinutes(15);
-            }
-
             Log::channel('capital_city_building_upgrades')->info('Dispatching Queue Movement', [
                 '$capitalCityBuildingQueue' => $capitalCityBuildingQueue,
                 '$character' => $character->id,
                 '$kingdom' => $kingdom->id,
-                '$dispatchTime' => $dispatchTime,
+                '$dispatchTime' => $travelTimeNeeded,
             ]);
 
-            $this->dispatchQueueMovement($capitalCityBuildingQueue, $dispatchTime);
+            $this->dispatchQueueMovement($capitalCityBuildingQueue, $travelTimeNeeded);
 
             $createdQueues[] = $capitalCityBuildingQueue;
 

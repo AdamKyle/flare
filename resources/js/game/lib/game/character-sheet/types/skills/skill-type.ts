@@ -1,4 +1,5 @@
 import DataTableBaseData from "../../../../ui/types/tables/data-table-base-data";
+import SkillDetails from "./skill-details";
 
 export default interface SkillType extends DataTableBaseData {
     id: number;
@@ -17,7 +18,7 @@ export default interface SkillType extends DataTableBaseData {
 
     name: string;
 
-    skill_bonus: number;
+    skill_bonus?: number;
 
     skill_type: string;
 
@@ -25,7 +26,9 @@ export default interface SkillType extends DataTableBaseData {
 
     xp_max: number;
 
-    xp_towards: number | null;
+    xp_towards?: number | null;
 
     is_class_skill: boolean;
+
+    details?: SkillDetails;
 }

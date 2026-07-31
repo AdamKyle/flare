@@ -18,8 +18,10 @@ export default class DropDown extends React.Component<DropDownProps, any> {
 
     renderMenuItems() {
         return this.props.menu_items.map((menuItem) => {
+            const disabled = this.props.disabled || menuItem.disabled === true;
+
             return (
-                <Menu.Item key={menuItem.name} disabled={this.props.disabled}>
+                <Menu.Item key={menuItem.name} disabled={disabled}>
                     {({ active }) => (
                         <button
                             className={clsx(
@@ -54,9 +56,24 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                                         "icon_class",
                                     ),
                                 },
+                                {
+                                    "cursor-not-allowed opacity-50": disabled,
+                                },
+                                !active &&
+                                    this.props.selected_name !==
+                                        menuItem.name &&
+                                    this.props.secondary_selected !==
+                                        menuItem.name
+                                    ? menuItem.extra_class
+                                    : undefined,
                             )}
-                            onClick={() => menuItem.on_click(menuItem.name)}
-                            disabled={this.props.disabled}
+                            onClick={() => {
+                                if (!disabled) {
+                                    menuItem.on_click(menuItem.name);
+                                }
+                            }}
+                            disabled={disabled}
+                            aria-disabled={disabled}
                         >
                             {typeof menuItem.icon_class !== "undefined" ? (
                                 <i
@@ -137,12 +154,19 @@ export default class DropDown extends React.Component<DropDownProps, any> {
                         leaveTo="transform opacity-0 scale-95"
                     >
                         <Menu.Items
+                            anchor={
+                                this.props.use_relative
+                                    ? undefined
+                                    : { to: "bottom start", gap: 8, padding: 8 }
+                            }
+                            portal={!this.props.use_relative}
                             className={clsx(
-                                "left-0 z-50 w-full md:w-max min-w-full md:min-w-[220px] mt-2 origin-top-left dark:bg-gray-700 " +
+                                "z-50 w-[var(--button-width)] md:w-max md:min-w-[220px] origin-top-left dark:bg-gray-700 " +
                                     "bg-white divide-y dark:divide-gray-600 divide-gray-300 rounded-md shadow-lg ring-1 " +
                                     "ring-black ring-opacity-5 focus:outline-none max-h-64 overflow-y-auto",
                                 {
-                                    absolute: !this.props.use_relative,
+                                    "absolute left-0 mt-2":
+                                        !this.props.use_relative,
                                     relative: this.props.use_relative,
                                 },
                             )}

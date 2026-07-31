@@ -16,6 +16,7 @@ use App\Game\Maps\Values\MapTileValue;
 use App\Game\Quests\Handlers\NpcQuestsHandler;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Services\QuestHandlerService;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Cache;
@@ -31,10 +32,151 @@ use Tests\Traits\CreateQuest;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateItem;
 
 class QuestHandlerServiceTest extends TestCase
 {
-    use CreateEvent, CreateLocation, CreateMonster, CreateMonsterCache, CreateNpc, CreateQuest, CreateRaid, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateEvent, CreateFactionLoyalty, CreateItem, CreateLocation, CreateMonster, CreateMonsterCache, CreateNpc, CreateQuest, CreateRaid, MockeryPHPUnitIntegration, RefreshDatabase;
+
+    public function testQuestWithCopperRequirementBailsWithoutMutatingInsufficientCopper(): void
+    {
+        $npc = $this->createNpc();
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'gold_cost' => 0,
+            'gold_dust_cost' => 0,
+            'shard_cost' => 0,
+            'copper_coin_cost' => 100000,
+            'reincarnated_times' => 0,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['copper_coins' => 99999]);
+
+        $shouldBail = resolve(QuestHandlerService::class)->shouldBailOnQuest($character->refresh(), $quest);
+
+        $this->assertTrue($shouldBail);
+        $this->assertSame(99999, $character->refresh()->copper_coins);
+    }
+
+    public function testQuestWithReincarnationRequirementBailsWhenCharacterHasOnlyFourteen(): void
+    {
+        $npc = $this->createNpc();
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'gold_cost' => 0,
+            'gold_dust_cost' => 0,
+            'shard_cost' => 0,
+            'copper_coin_cost' => 100000,
+            'reincarnated_times' => 15,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update([
+            'copper_coins' => 100000,
+            'times_reincarnated' => 14,
+        ]);
+
+        $shouldBail = resolve(QuestHandlerService::class)->shouldBailOnQuest($character->refresh(), $quest);
+
+        $this->assertTrue($shouldBail);
+        $this->assertSame(100000, $character->refresh()->copper_coins);
+    }
+
+    public function testQuestWithCopperAndReincarnationRequirementsConsumesExactlyOneHundredThousandCopper(): void
+    {
+        Event::fake();
+        $npc = $this->createNpc();
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'gold_cost' => 0,
+            'gold_dust_cost' => 0,
+            'shard_cost' => 0,
+            'copper_coin_cost' => 100000,
+            'reincarnated_times' => 15,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update([
+            'copper_coins' => 150000,
+            'times_reincarnated' => 15,
+        ]);
+
+        resolve(NpcQuestsHandler::class)->consumeQuestRequirements($character->refresh(), $quest);
+
+        $this->assertSame(50000, $character->refresh()->copper_coins);
+    }
+
+    public function testMixedRequirementsConsumeNothingWhenSecondaryCurrencyValidationFails(): void
+    {
+        Event::fake();
+        $primary = $this->createItem(['type' => 'quest']);
+        $secondary = $this->createItem(['type' => 'quest']);
+        $npc = $this->createNpc();
+        $quest = $this->createQuest([
+            'npc_id' => $npc->id,
+            'item_id' => $primary->id,
+            'secondary_required_item' => $secondary->id,
+            'gold_cost' => 50,
+            'gold_dust_cost' => 25,
+            'shard_cost' => 0,
+            'copper_coin_cost' => 100,
+        ]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($primary)
+            ->giveItem($secondary)
+            ->getCharacter();
+        $character->update(['gold' => 100, 'gold_dust' => 24, 'copper_coins' => 100]);
+
+        try {
+            resolve(NpcQuestsHandler::class)->consumeQuestRequirements($character->refresh(), $quest);
+            $this->fail('Expected mixed requirement validation to fail.');
+        } catch (Exception $exception) {
+            $this->assertSame('The required quest currencies are missing.', $exception->getMessage());
+        }
+
+        $character->refresh();
+        $this->assertSame(100, $character->gold);
+        $this->assertSame(24, $character->gold_dust);
+        $this->assertSame(100, $character->copper_coins);
+        $this->assertTrue($character->inventory->slots()->where('item_id', $primary->id)->exists());
+        $this->assertTrue($character->inventory->slots()->where('item_id', $secondary->id)->exists());
+    }
+
+    public function testFailedNpcMovementDoesNotConsumeQuestRequirements(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $requiredItem = $this->createItem(['type' => 'quest']);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($requiredItem)
+            ->getCharacter();
+        $npc = $this->createNpc([
+            'game_map_id' => $character->map->game_map_id,
+            'x_position' => 64,
+            'y_position' => 96,
+        ]);
+        $this->createMonsterCache();
+        $mapTileValue = Mockery::mock(MapTileValue::class);
+        $mapTileValue->shouldReceive('setUp')->once()->andReturnSelf();
+        $mapTileValue->shouldReceive('canWalk')->once()->with(64, 96)->andReturnFalse();
+        $service = new QuestHandlerService(
+            resolve(NpcQuestsHandler::class),
+            resolve(CanTravelToMap::class),
+            $mapTileValue,
+            resolve(BuildQuestCacheService::class),
+            resolve(\App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager::class),
+        );
+
+        $result = $service->moveCharacter($character, $npc);
+
+        $this->assertIsArray($result);
+        $this->assertSame(422, $result['status']);
+        $this->assertTrue($character->refresh()->inventory->slots()->where('item_id', $requiredItem->id)->exists());
+    }
 
     public function testHandInQuestResponseIncludesCompletedQuestInCompletedQuestsList(): void
     {
@@ -211,12 +353,12 @@ class QuestHandlerServiceTest extends TestCase
 
         $faction = $character->factions()->first();
 
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $faction->id,
         ]);
 
-        FactionLoyaltyNpc::factory()->create([
+        $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $assistingNpc->id,
             'current_level' => 5,
@@ -257,12 +399,12 @@ class QuestHandlerServiceTest extends TestCase
 
         $faction = $character->factions()->first();
 
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $faction->id,
         ]);
 
-        FactionLoyaltyNpc::factory()->create([
+        $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $questNpc->id,
             'current_level' => 5,
@@ -303,12 +445,12 @@ class QuestHandlerServiceTest extends TestCase
 
         $faction = $character->factions()->first();
 
-        $factionLoyalty = FactionLoyalty::factory()->create([
+        $factionLoyalty = $this->createFactionLoyalty([
             'character_id' => $character->id,
             'faction_id' => $faction->id,
         ]);
 
-        FactionLoyaltyNpc::factory()->create([
+        $this->createFactionLoyaltyNpc([
             'faction_loyalty_id' => $factionLoyalty->id,
             'npc_id' => $assistingNpc->id,
             'current_level' => 3,

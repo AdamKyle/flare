@@ -7,20 +7,23 @@ use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateScheduledEvent;
 
 class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
 {
-    use CreateEvent, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateItemAffix, CreateScheduledEvent, RefreshDatabase;
 
     private ?HandleUpdatingEnchantingGlobalEventGoal $handleUpdateEnchantingGlobalEventGoal;
 
@@ -58,9 +61,9 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventEnchants);
+        $this->assertEmpty($character->globalEventEnchants);
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertEmpty($character->globalEventParticipation);
 
         $this->assertEmpty(GlobalEventCraftingInventory::all());
 
@@ -84,22 +87,25 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNull($character->globalEventEnchants);
+        $this->assertEmpty($character->globalEventEnchants);
 
-        $this->assertNull($character->globalEventParticipation);
+        $this->assertEmpty($character->globalEventParticipation);
 
         $this->assertNotEmpty($character->inventory->slots);
     }
 
     public function testParticipateInGlobalEnchantingEvent()
     {
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
         ]);
 
-        $this->createGlobalEventGoal([
+        $goal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -108,9 +114,11 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
             'should_be_mythic' => true,
         ]);
 
+        $map = $this->createGameMap(['only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);
+
         $item = $this->createItem(['type' => WeaponTypes::WEAPON, 'item_prefix_id' => $this->createItemAffix(['type' => 'prefix'])->id]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $character = $this->character->givePlayerLocation(16, 16, $map)->inventoryManagement()->giveItem($item)->getCharacter();
 
         $slot = $character->inventory->slots->first();
 
@@ -118,26 +126,29 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventEnchants);
-        $this->assertNotNull($character->globalEventParticipation);
+        $this->assertNotEmpty($character->globalEventEnchants);
+        $this->assertNotEmpty($character->globalEventParticipation);
 
-        $this->assertEquals(1, $character->globalEventEnchants->enchants);
-        $this->assertEquals(1, $character->globalEventParticipation->current_enchants);
+        $this->assertEquals(1, $character->globalEventEnchants()->where('global_event_goal_id', $goal->id)->first()->enchants);
+        $this->assertEquals(1, $character->globalEventParticipation()->where('global_event_goal_id', $goal->id)->first()->current_enchants);
 
-        $this->assertempty($character->inventory->slots);
+        $this->assertEmpty($character->inventory->slots);
     }
 
     public function testParticipateInGlobalEnchantingEventWhenWeShouldBeRewarded()
     {
         $this->createItem(['name' => 'Delusional silver', 'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER]);
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
         ]);
 
         $eventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -146,9 +157,11 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
             'should_be_mythic' => true,
         ]);
 
+        $map = $this->createGameMap(['only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);
+
         $item = $this->createItem(['name' => 'Item To Enchant', 'type' => WeaponTypes::WEAPON, 'item_prefix_id' => $this->createItemAffix(['type' => 'prefix'])->id]);
 
-        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $character = $this->character->givePlayerLocation(16, 16, $map)->inventoryManagement()->giveItem($item)->getCharacter();
 
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $eventGoal->id,
@@ -170,11 +183,11 @@ class HandleUpdatingEnchantingGlobalEventGoalTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventEnchants);
-        $this->assertNotNull($character->globalEventParticipation);
+        $this->assertNotEmpty($character->globalEventEnchants);
+        $this->assertNotEmpty($character->globalEventParticipation);
 
-        $this->assertEquals(100, $character->globalEventEnchants->enchants);
-        $this->assertEquals(100, $character->globalEventParticipation->current_enchants);
+        $this->assertEquals(100, $character->globalEventEnchants()->where('global_event_goal_id', $eventGoal->id)->first()->enchants);
+        $this->assertEquals(100, $character->globalEventParticipation()->where('global_event_goal_id', $eventGoal->id)->first()->current_enchants);
 
         $foundMythic = $character->inventory->slots->filter(function ($slot) {
             return $slot->item->is_mythic;
