@@ -128,7 +128,7 @@ jobs:
             --testdox-text test-results/testdox.txt \
             --coverage-clover test-results/coverage-clover.xml \
             --coverage-cobertura test-results/coverage-cobertura.xml \
-            --coverage-text test-results/coverage.txt \
+            --coverage-text=test-results/coverage.txt \
             --coverage-html test-coverage \
             2>&1 | tee test-results/phpunit.log
           phpunit_exit_code=${PIPESTATUS[0]}
