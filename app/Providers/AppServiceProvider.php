@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Console\AfterDeployment\AddBatchCraftingSetToPlayers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
-use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\BackfillSpecialLocationTypes;
@@ -50,7 +49,6 @@ class AppServiceProvider extends ServiceProvider
             AddHolyStacksToItems::class,
             BackfillCompletedPanelDismissals::class,
             BackfillSpecialLocationTypes::class,
-            AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
             CleanDuplicateQuestInventorySlots::class,

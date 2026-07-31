@@ -5,6 +5,8 @@ on: [push]
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
+    env:
+      TIME_ZONE: America/Edmonton
 
     services:
       mysql-service:
@@ -108,6 +110,7 @@ jobs:
           /usr/bin/time -v php artisan migrate 2>&1 | tee test-results/migrate.log
 
       - name: Execute tests (Unit and Feature tests) via PHPUnit
+        id: phpunit
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -232,7 +235,7 @@ jobs:
             storage/logs/*.log
 
       - name: Report PHPUnit result
-        if: always()
+        if: ${{ always() && steps.phpunit.outcome != 'skipped' }}
         shell: bash
         run: |
           if [[ ! -f test-results/phpunit-exit-code.txt ]]; then
