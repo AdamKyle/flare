@@ -50,6 +50,63 @@ jobs:
       - name: Install dependencies (Laravel Vite)
         run: yarn build
 
+      - name: Prepare diagnostics directories
+        run: mkdir -p test-results test-coverage
+
+      - name: Capture environment diagnostics
+        shell: bash
+        continue-on-error: true
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 33306
+          DB_USER: root
+          MYSQL_PWD: password
+        run: |
+          set +e
+          {
+            echo "UTC timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            echo "Commit SHA: $GITHUB_SHA"
+            echo "Runner OS:"
+            uname -a
+            test -f /etc/os-release && cat /etc/os-release
+            echo "CPU count: $(getconf _NPROCESSORS_ONLN)"
+            echo "Memory:"
+            free -h
+            echo "Disk usage:"
+            df -h
+            echo "PHP version:"
+            php --version
+            echo "Loaded PHP configuration:"
+            php --ini
+            echo "Loaded PHP extensions:"
+            php -m
+            echo "Composer version:"
+            composer --version
+            echo "Locked direct dependencies:"
+            composer show --locked --direct
+            echo "MySQL client version:"
+            mysql --version
+            echo "MySQL server version:"
+            mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --batch --skip-column-names --execute='SELECT VERSION();'
+            echo "Coverage drivers:"
+            php -m | grep -Ei '^(xdebug|pcov)$' || echo "Neither Xdebug nor PCOV is loaded."
+          } > test-results/environment.txt 2>&1
+          exit 0
+
+      - name: Run database migration
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_DATABASE: flare_test
+          DB_PORT: 33306
+          DB_USER: root
+          DB_PASSWORD: password
+          TIME_ZONE: America/Edmonton
+        shell: bash
+        run: |
+          set -o pipefail
+          /usr/bin/time -v php artisan migrate 2>&1 | tee test-results/migrate.log
+
       - name: Execute tests (Unit and Feature tests) via PHPUnit
         env:
           DB_CONNECTION: mysql
@@ -59,13 +116,140 @@ jobs:
           DB_USER: root
           DB_PASSWORD: password
           TIME_ZONE: America/Edmonton
+        shell: bash
         run: |
-          php artisan migrate
-          mkdir test-coverage
-          vendor/bin/phpunit --coverage-html=./test-coverage
+          set +e
+          set -o pipefail
+          /usr/bin/time -v vendor/bin/phpunit \
+            --log-junit test-results/junit.xml \
+            --testdox-text test-results/testdox.txt \
+            --coverage-clover test-results/coverage-clover.xml \
+            --coverage-cobertura test-results/coverage-cobertura.xml \
+            --coverage-text test-results/coverage.txt \
+            --coverage-html test-coverage \
+            2>&1 | tee test-results/phpunit.log
+          phpunit_exit_code=${PIPESTATUS[0]}
+          echo "$phpunit_exit_code" > test-results/phpunit-exit-code.txt
+          exit 0
 
-      - name: Upload HTML coverage report
+      - name: Report slow tests and overall timing
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p test-results test-coverage
+          python3 - <<'PY'
+          import pathlib
+          import xml.etree.ElementTree as ET
+
+          results = pathlib.Path('test-results')
+          junit = results / 'junit.xml'
+          report = results / 'slow-tests.txt'
+          rows = []
+
+          if junit.exists():
+              try:
+                  root = ET.parse(junit).getroot()
+                  for case in root.iter('testcase'):
+                      rows.append((
+                          float(case.get('time', '0') or 0),
+                          case.get('class', 'unknown class'),
+                          case.get('name', 'unknown method'),
+                      ))
+              except (ET.ParseError, ValueError) as error:
+                  report.write_text(f'Unable to parse JUnit XML: {error}\n')
+          else:
+              report.write_text('JUnit XML was not generated.\n')
+
+          if rows:
+              rows.sort(reverse=True)
+              report.write_text(
+                  'Slowest tests (descending duration)\n'
+                  + '\n'.join(
+                      f'{duration:.6f}s\t{class_name}\t{method_name}'
+                      for duration, class_name, method_name in rows[:200]
+                  )
+                  + '\n'
+              )
+          elif junit.exists() and not report.exists():
+              report.write_text('JUnit XML contained no test cases.\n')
+          PY
+          {
+            echo "## Test timing diagnostics"
+            echo
+            echo "### Migration timing"
+            grep -E 'Elapsed \(wall clock\) time|Maximum resident set size|Percent of CPU' test-results/migrate.log || true
+            echo
+            echo "### PHPUnit timing"
+            grep -E 'Elapsed \(wall clock\) time|Maximum resident set size|Percent of CPU' test-results/phpunit.log || true
+            echo
+            echo "### PHPUnit exit code"
+            if [[ -f test-results/phpunit-exit-code.txt ]]; then
+              head -n 1 test-results/phpunit-exit-code.txt || true
+            else
+              echo "PHPUnit did not produce an exit code."
+            fi
+            echo
+            echo "### Slowest available tests"
+            head -n 21 test-results/slow-tests.txt || true
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Capture post-test diagnostics
+        if: always()
+        continue-on-error: true
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 33306
+          DB_USER: root
+          MYSQL_PWD: password
+        shell: bash
+        run: |
+          set +e
+          mkdir -p test-results test-coverage
+          {
+            echo "Laravel logs:"
+            find storage/logs -maxdepth 1 -type f -name '*.log' -print -exec tail -n 200 {} \;
+            echo "MySQL version and status:"
+            mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --execute='SELECT VERSION(); SHOW GLOBAL STATUS WHERE Variable_name IN ("Threads_connected", "Threads_running", "Slow_queries", "Questions", "Uptime");'
+            echo "Post-test disk usage:"
+            df -h
+            echo "Post-test memory:"
+            free -h
+            echo "Diagnostic directory sizes:"
+            du -sh test-results test-coverage
+          } > test-results/post-test-diagnostics.txt 2>&1
+          exit 0
+
+      - name: Upload test diagnostics and coverage
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: test-coverage
+          name: laravel-test-diagnostics-${{ github.run_id }}-${{ github.sha }}
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            test-results/**
+            test-coverage/**
+            storage/logs/*.log
+
+      - name: Report PHPUnit result
+        if: always()
+        shell: bash
+        run: |
+          if [[ ! -f test-results/phpunit-exit-code.txt ]]; then
+            echo "PHPUnit did not produce an exit code."
+            exit 1
+          fi
+
+          phpunit_exit_code=$(head -n 1 test-results/phpunit-exit-code.txt)
+
+          if [[ ! "$phpunit_exit_code" =~ ^[0-9]+$ ]]; then
+            echo "PHPUnit produced an invalid exit code: $phpunit_exit_code"
+            exit 1
+          fi
+
+          if (( phpunit_exit_code != 0 )); then
+            echo "PHPUnit failed with exit code $phpunit_exit_code."
+            exit "$phpunit_exit_code"
+          fi
+
+          echo "PHPUnit passed."

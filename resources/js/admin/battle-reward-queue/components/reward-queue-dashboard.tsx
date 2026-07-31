@@ -1,4 +1,3 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import CharacterQueueTable from './character-queue-table';
@@ -7,9 +6,6 @@ import StaleQueueAlert from './stale-queue-alert';
 import StaleQueueView from './stale-queue-view';
 import StatusVolumeChart from './status-volume-chart';
 import SummaryCards from './summary-cards';
-import { useRewardQueueApi } from '../ajax/reward-queue-api';
-import useRewardQueueLiveRefresh from '../hooks/use-reward-queue-live-refresh';
-import useStaleRewardQueues from '../hooks/use-stale-reward-queues';
 import {
   CharacterRow,
   ChartPoint,
@@ -17,7 +13,11 @@ import {
   RequestFiltersType,
   RewardRequest,
   Summary,
-} from '../types/reward-queue';
+} from '../api/definitions/reward-queue-definition';
+import { useRewardQueueApi } from '../api/hooks/use-reward-queue-api';
+import useRewardQueueLiveRefresh from '../hooks/use-reward-queue-live-refresh';
+import useStaleRewardQueues from '../hooks/use-stale-reward-queues';
+import rewardQueuePaginationAdapter from '../utils/reward-queue-pagination-adapter';
 
 const emptySummary: Summary = {
   queued: 0,
@@ -27,22 +27,6 @@ const emptySummary: Summary = {
   completed: 0,
   failed: 0,
 };
-
-const emptyPaginatedResponse = <T,>(): PaginatedApiResponseDefinition<T[]> =>
-  ({
-    data: [],
-    meta: {
-      can_load_more: false,
-      pagination: {
-        count: 0,
-        [`current${'_'}page`]: 1,
-        links: { next: '', prev: '' },
-        per_page: 10,
-        total: 0,
-        total_pages: 1,
-      },
-    },
-  }) as PaginatedApiResponseDefinition<T[]>;
 
 export default function RewardQueueDashboard() {
   const {
@@ -60,12 +44,22 @@ export default function RewardQueueDashboard() {
     last_7_days: [],
     previous_7_days: [],
   });
-  const [characters, setCharacters] = useState<
-    PaginatedApiResponseDefinition<CharacterRow[]>
-  >(emptyPaginatedResponse());
-  const [requests, setRequests] = useState<
-    PaginatedApiResponseDefinition<RewardRequest[]>
-  >(emptyPaginatedResponse());
+  const [characters, setCharacters] = useState(
+    rewardQueuePaginationAdapter<CharacterRow>({
+      data: [],
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    })
+  );
+  const [requests, setRequests] = useState(
+    rewardQueuePaginationAdapter<RewardRequest>({
+      data: [],
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    })
+  );
   const [selectedCharacter, setSelectedCharacter] =
     useState<CharacterRow | null>(null);
   const [detailCharts, setDetailCharts] = useState<

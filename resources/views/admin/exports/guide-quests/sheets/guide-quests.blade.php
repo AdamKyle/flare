@@ -47,17 +47,31 @@
             <th>shards_reward</th>
             <th>gold_reward</th>
             <th>xp_reward</th>
-            <th>parent_id<th>
-            <th>unlock_at_level<th>
-            <th>only_during_event<th>
+            <th>parent_id</th>
+            <th>unlock_at_level</th>
+            <th>only_during_event</th>
             <th>be_on_game_map</th>
             <th>required_event_goal_participation</th>
+            <th>required_event_goal_crafting_participation</th>
+            <th>required_event_goal_enchanting_participation</th>
             <th>required_holy_stacks</th>
             <th>required_attached_gems</th>
             <th>required_specialty_type</th>
             <th>required_fame_level</th>
             <th>required_delve_survival_time</th>
             <th>required_delve_pack_size</th>
+            <th>required_batch_crafting_type</th>
+            <th>required_batch_crafting_hours</th>
+            <th>required_item_1_source</th>
+            <th>required_item_1_name</th>
+            <th>required_item_1_type</th>
+            <th>required_item_1_amount</th>
+            <th>required_item_1_must_be_enchanted</th>
+            <th>required_item_2_source</th>
+            <th>required_item_2_name</th>
+            <th>required_item_2_type</th>
+            <th>required_item_2_amount</th>
+            <th>required_item_2_must_be_enchanted</th>
         </tr>
     </thead>
     <tbody>
@@ -67,8 +81,8 @@
                 <td>{{ $guideQuest->name }}</td>
                 <td>{{ nl2br($guideQuest->intro_text) }}</td>
                 <td>{{ nl2br($guideQuest->instructions) }}</td>
-                <td>{{ nl2br($guideQuest->desktop_instructions) }}
-                <td>{{ nl2br($guideQuest->mobile_instructions) }}
+                <td>{{ nl2br($guideQuest->desktop_instructions) }}</td>
+                <td>{{ nl2br($guideQuest->mobile_instructions) }}</td>
                 <td>{{ $guideQuest->required_level }}</td>
                 <td>{{ $guideQuest->required_reincarnation_amount }}</td>
                 <td>{{ !is_null($guideQuest->required_skill) ? $guideQuest->skill_name : '' }}</td>
@@ -111,17 +125,34 @@
                 <td>{{ $guideQuest->shards_reward }}</td>
                 <td>{{ $guideQuest->gold_reward }}</td>
                 <td>{{ $guideQuest->xp_reward }}</td>
-                <td>{{ !is_null($guideQuest->parent_id) ? $guideQuest->parent_quest_name : ''}}<td>
-                <td>{{ $guideQuest->unlock_at_level}}<td>
-                <td>{{ $guideQuest->only_during_event}}<td>
+                <td>{{ !is_null($guideQuest->parent_id) ? $guideQuest->parent_quest_name : ''}}</td>
+                <td>{{ $guideQuest->unlock_at_level}}</td>
+                <td>{{ $guideQuest->only_during_event}}</td>
                 <td>{{ !is_null($guideQuest->be_on_game_map) ? $guideQuest->required_to_be_on_game_map_name : ''}}</td>
                 <td>{{ $guideQuest->required_event_goal_participation }}</td>
+                <td>{{ $guideQuest->required_event_goal_crafting_participation }}</td>
+                <td>{{ $guideQuest->required_event_goal_enchanting_participation }}</td>
                 <td>{{ $guideQuest->required_holy_stacks }}</td>
                 <td>{{ $guideQuest->required_attached_gems }}</td>
                 <td>{{ $guideQuest->required_specialty_type }}</td>
                 <td>{{ $guideQuest->required_fame_level }}</td>
                 <td>{{ $guideQuest->required_delve_survival_time }}</td>
                 <td>{{ $guideQuest->required_delve_pack_size }}</td>
+                <td>{{ $guideQuest->required_batch_crafting_type }}</td>
+                <td>{{ $guideQuest->required_batch_crafting_hours }}</td>
+                @php
+                    $requiredBatchCraftedItems = $guideQuest->required_batch_crafted_item_names;
+                @endphp
+                @for ($requiredBatchCraftedItemIndex = 0; $requiredBatchCraftedItemIndex < 2; $requiredBatchCraftedItemIndex++)
+                    @php
+                        $requiredBatchCraftedItem = $requiredBatchCraftedItems[$requiredBatchCraftedItemIndex] ?? null;
+                    @endphp
+                    <td>{{ $requiredBatchCraftedItem['source'] ?? '' }}</td>
+                    <td>{{ $requiredBatchCraftedItem['name'] ?? '' }}</td>
+                    <td>{{ $requiredBatchCraftedItem['type_name'] ?? '' }}</td>
+                    <td>{{ $requiredBatchCraftedItem['amount'] ?? '' }}</td>
+                    <td>{{ !is_null($requiredBatchCraftedItem) ? ($requiredBatchCraftedItem['must_be_enchanted'] ? '1' : '0') : '' }}</td>
+                @endfor
             </tr>
         @endforeach
     </tbody>

@@ -4,7 +4,11 @@ namespace App\Game\Core\Services;
 
 use App\Flare\Items\Builders\BuildMythicItem;
 use App\Flare\Models\Character;
+use App\Flare\Models\Item;
+use App\Flare\Models\Location;
+use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
+use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;
 use Exception;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
@@ -14,6 +18,18 @@ class DropCheckService
     private BattleDrop $battleDrop;
 
     private Monster $monster;
+
+    private ?Location $locationWithEffect = null;
+
+    private ?Location $manualQuestItemLocation = null;
+
+    private ?string $cachedLocationWithEffectKey = null;
+
+    private ?Location $cachedLocationWithEffect = null;
+
+    private ?string $cachedManualQuestItemLocationKey = null;
+
+    private ?Location $cachedManualQuestItemLocation = null;
 
     private BuildMythicItem $buildMythicItem;
 
@@ -32,7 +48,7 @@ class DropCheckService
      *
      * @throws Exception
      */
-    public function process(Character $character, Monster $monster, ?float $lootingChance = null): array
+    public function process(Character $character, Monster $monster, ?float $lootingChance = null, bool $questItemsOnly = false): array
     {
         $this->gameMapBonus = 0.0;
 
@@ -46,15 +62,35 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
+        $this->findLocationWithEffect($characterMap);
+        $this->findManualQuestItemLocation($characterMap);
+
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
-            ->setSpecialLocation(null)
+            ->setSpecialLocation($this->locationWithEffect)
+            ->setManualQuestItemLocation($this->manualQuestItemLocation)
             ->setGameMapBonus($this->gameMapBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
 
-        $this->handleDropChance($character);
+        $this->handleDropChance($character, $questItemsOnly);
 
-        $this->handleMythicDrop($character, true);
+        if (! $questItemsOnly && $monster->celestial_type === 1) {
+            $this->handleMythicDrop($character, true);
+        }
+
+        if (is_null($this->locationWithEffect)) {
+            return $this->battleDrop->rewardTotals();
+        }
+
+        if (is_null($this->locationWithEffect->type)) {
+            return $this->battleDrop->rewardTotals();
+        }
+
+        $locationType = LocationType::from($this->locationWithEffect->type);
+
+        if (! $questItemsOnly && $locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
+            $this->handleMythicDrop($character);
+        }
 
         return $this->battleDrop->rewardTotals();
     }
@@ -73,60 +109,47 @@ class DropCheckService
         }
 
         $this->findLocationWithEffect($characterMap);
+        $this->findManualQuestItemLocation($characterMap);
 
         $this->battleDrop = $this->battleDrop->setMonster($this->monster)
             ->setSpecialLocation($this->locationWithEffect)
+            ->setManualQuestItemLocation($this->manualQuestItemLocation)
             ->setGameMapBonus($this->gameMapBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
 
         $plannedDrops = [];
+        $plannedQuestItemIds = [];
 
         for ($killIndex = 0; $killIndex < $killCount; $killIndex++) {
             $normalDrop = $this->battleDrop->handleDrop($character, $this->canHaveDrop($character), true);
 
             if (! is_null($normalDrop)) {
-                $plannedDrops[] = [
-                    'item_id' => $normalDrop->id,
-                    'is_mythic' => false,
-                    'source' => 'monster_drop',
-                ];
+                $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $normalDrop, 'monster_drop');
             }
 
             $monsterQuestDrop = $this->battleDrop->handleMonsterQuestDrop($character, true);
 
             if (! is_null($monsterQuestDrop)) {
-                $plannedDrops[] = [
-                    'item_id' => $monsterQuestDrop->id,
-                    'is_mythic' => false,
-                    'source' => 'monster_quest_drop',
-                ];
+                $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $monsterQuestDrop, 'monster_quest_drop');
             }
 
             $delveQuestDrop = $this->battleDrop->planDelveLocationQuestItem($character);
 
             if (! is_null($delveQuestDrop)) {
-                $plannedDrops[] = [
-                    'item_id' => $delveQuestDrop->id,
-                    'is_mythic' => false,
-                    'source' => 'delve_location_quest_drop',
-                ];
+                $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $delveQuestDrop, 'delve_location_quest_drop');
             }
 
-            if (! is_null($this->locationWithEffect)) {
+            if (! is_null($this->manualQuestItemLocation)) {
                 $specialLocationQuestDrop = $this->battleDrop->planSpecialLocationQuestItem($character);
 
                 if (! is_null($specialLocationQuestDrop)) {
-                    $plannedDrops[] = [
-                        'item_id' => $specialLocationQuestDrop->id,
-                        'is_mythic' => false,
-                        'source' => 'special_location_quest_drop',
-                    ];
+                    $this->appendPlannedDrop($plannedDrops, $plannedQuestItemIds, $specialLocationQuestDrop, 'special_location_quest_drop');
                 }
             }
         }
 
-        if ($monster->celestial_type === CelestialType::KING_CELESTIAL && $this->canHaveMythic(true)) {
+        if ($monster->celestial_type === 1 && $this->canHaveMythic(true)) {
             $plannedDrops[] = [
                 'item_id' => $this->buildMythicItem->fetchMythicItem($character)->id,
                 'is_mythic' => true,
@@ -135,7 +158,7 @@ class DropCheckService
         }
 
         if (! is_null($this->locationWithEffect) && ! is_null($this->locationWithEffect->type)) {
-            $locationType = new LocationType($this->locationWithEffect->type);
+            $locationType = LocationType::from($this->locationWithEffect->type);
 
             if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty() && $this->canHaveMythic()) {
                 $plannedDrops[] = [
@@ -172,6 +195,26 @@ class DropCheckService
     }
 
     /**
+     * Append a planned drop, skipping quest items already planned in this batch.
+     */
+    private function appendPlannedDrop(array &$plannedDrops, array &$plannedQuestItemIds, Item $item, string $source): void
+    {
+        if ($item->type === 'quest') {
+            if (in_array($item->id, $plannedQuestItemIds, true)) {
+                return;
+            }
+
+            $plannedQuestItemIds[] = $item->id;
+        }
+
+        $plannedDrops[] = [
+            'item_id' => $item->id,
+            'is_mythic' => false,
+            'source' => $source,
+        ];
+    }
+
+    /**
      * See if the player can have a mythic drop.
      *
      *
@@ -194,15 +237,73 @@ class DropCheckService
      *
      * @throws Exception
      */
-    private function handleDropChance(Character $character): void
+    private function handleDropChance(Character $character, bool $questItemsOnly = false): void
     {
-        $canGetDrop = $this->canHaveDrop($character);
-
-        $this->battleDrop->handleDrop($character, $canGetDrop);
+        if (! $questItemsOnly) {
+            $canGetDrop = $this->canHaveDrop($character);
+            $this->battleDrop->handleDrop($character, $canGetDrop);
+        }
 
         $this->battleDrop->handleMonsterQuestDrop($character);
 
         $this->battleDrop->handleDelveLocationQuestItems($character);
+
+        if (! is_null($this->manualQuestItemLocation)) {
+            $this->battleDrop->handleSpecialLocationQuestItem($character);
+        }
+    }
+
+    /**
+     * Are we at a location with an effect (special location)?
+     */
+    private function findLocationWithEffect(Map $map): void
+    {
+        $cacheKey = $this->makeLocationWithEffectCacheKey($map);
+
+        if ($this->cachedLocationWithEffectKey === $cacheKey) {
+            $this->locationWithEffect = $this->cachedLocationWithEffect;
+
+            return;
+        }
+
+        $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->first();
+
+        $this->cachedLocationWithEffectKey = $cacheKey;
+        $this->cachedLocationWithEffect = $this->locationWithEffect;
+    }
+
+    private function findManualQuestItemLocation(Map $map): void
+    {
+        $cacheKey = $this->makeLocationWithEffectCacheKey($map);
+
+        if ($this->cachedManualQuestItemLocationKey === $cacheKey) {
+            $this->manualQuestItemLocation = $this->cachedManualQuestItemLocation;
+
+            return;
+        }
+
+        $this->manualQuestItemLocation = Location::whereNotNull('type')
+            ->whereIn('type', LocationType::manualQuestDropValues())
+            ->where('x', $map->character_position_x)
+            ->where('y', $map->character_position_y)
+            ->where('game_map_id', $map->game_map_id)
+            ->dropsQuestItems()
+            ->first();
+
+        $this->cachedManualQuestItemLocationKey = $cacheKey;
+        $this->cachedManualQuestItemLocation = $this->manualQuestItemLocation;
+    }
+
+    /**
+     * Build a cache key for determining if we need to re-query the location effect.
+     */
+    private function makeLocationWithEffectCacheKey(Map $map): string
+    {
+        return $map->game_map_id.':'.$map->character_position_x.':'.$map->character_position_y;
     }
 
     /**

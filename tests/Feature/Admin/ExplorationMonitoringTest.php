@@ -2,18 +2,18 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\ExplorationLog;
 use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateExplorationLog;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class ExplorationMonitoringTest extends TestCase
 {
-    use CreateRole, CreateUser, RefreshDatabase;
+    use CreateCharacterAutomation, CreateExplorationLog, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_non_admin_cannot_access_exploration_monitoring_page(): void
     {
@@ -57,7 +57,7 @@ class ExplorationMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -74,7 +74,7 @@ class ExplorationMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->subMinute(),
@@ -91,7 +91,7 @@ class ExplorationMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -108,7 +108,7 @@ class ExplorationMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        ExplorationLog::factory()->create(['character_id' => $character->id]);
+        $this->createExplorationLog(['character_id' => $character->id]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/exploration/logs');
 

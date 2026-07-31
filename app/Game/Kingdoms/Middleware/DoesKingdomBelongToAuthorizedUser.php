@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DoesKingdomBelongToAuthorizedUser
 {
@@ -53,9 +54,30 @@ class DoesKingdomBelongToAuthorizedUser
 
             // Do something with the message:
             if (! is_null($message)) {
+                if (! is_null($request->route('building'))) {
+                    $building = $request->route('building');
+                    $message = 'You do not own this kingdom building.';
+                    Log::channel('capital_city_building_upgrades')->warning('Kingdom building upgrade rejected.', [
+                        'reason' => 'ownership_mismatch',
+                        'message' => $message,
+                        'character_id' => $character?->id,
+                        'kingdom_id' => $kingdom->id,
+                        'building_id' => $building->id,
+                        'building_name' => $building->name,
+                        'building_level' => $building->level,
+                    ]);
+                }
+
                 if ($request->wantsJson()) {
+                    if (is_null($request->route('building'))) {
+                        return response()->json([
+                            'error' => $message,
+                        ], 422);
+                    }
+
                     return response()->json([
-                        'error' => $message,
+                        'message' => $message,
+                        'reason' => 'ownership_mismatch',
                     ], 422);
                 } else {
                     return redirect()->route('game')->with('error', $message);

@@ -40,7 +40,7 @@ class GivePlayerDelveLocationQuestItems extends Command
             return;
         }
 
-        $locationIds = Location::where('type', LocationType::CAVE_OF_MEMORIES)->pluck('id')->toArray();
+        $locationIds = Location::where('type', LocationType::CAVE_OF_MEMORIES->value)->pluck('id')->toArray();
 
         $questItems = Item::whereIn('drop_location_id', $locationIds)->where('type', 'quest')->get();
 

@@ -1,29 +1,26 @@
 import React from 'react';
 
 import RewardQueueCard from './reward-queue-card';
-import { StaleQueue } from '../types/reward-queue';
+import { StaleQueueViewProps } from '../types/component-props';
 
 export default function StaleQueueView({
   staleQueues,
   repairing,
   onBack,
   onRepair,
-}: {
-  staleQueues: StaleQueue[];
-  repairing: boolean;
-  onBack: () => void;
-  onRepair: () => void;
-}) {
+}: StaleQueueViewProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
         <button
+          type="button"
           className="rounded border border-gray-300 px-4 py-2 dark:border-gray-600"
           onClick={onBack}
         >
           Back to dashboard
         </button>
         <button
+          type="button"
           className="rounded bg-amber-700 px-4 py-2 text-white disabled:opacity-50"
           disabled={repairing || staleQueues.length === 0}
           onClick={onRepair}

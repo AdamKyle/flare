@@ -16,6 +16,7 @@ use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
+use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
@@ -57,6 +58,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SetHandsValidation::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
             );
+        });
+
+        $this->app->bind(BatchCraftingSetService::class, function () {
+            return new BatchCraftingSetService;
         });
 
         $this->app->bind(EquipItemService::class, function ($app) {

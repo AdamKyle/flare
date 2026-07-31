@@ -4,6 +4,7 @@ namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateNPCKingdoms;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Jobs\KingdomSettlementLockout;
@@ -22,8 +23,11 @@ class AbandonKingdomService
 
     private Character $character;
 
-    public function __construct(UpdateKingdom $updateKingdom, GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler)
-    {
+    public function __construct(
+        UpdateKingdom $updateKingdom,
+        GiveKingdomsToNpcHandler $giveKingdomsToNpcHandler,
+        private readonly GameTimerService $gameTimerService,
+    ) {
         $this->updateKingdom = $updateKingdom;
         $this->giveKingdomsToNpcHandler = $giveKingdomsToNpcHandler;
     }
@@ -112,9 +116,9 @@ class AbandonKingdomService
     private function setTimeOut(): void
     {
         if (! is_null($this->character->can_settle_again_at)) {
-            $time = $this->character->can_settle_again_at->addMinutes(15);
+            $time = $this->gameTimerService->availableAt($this->character->can_settle_again_at->addMinutes(15));
         } else {
-            $time = now()->addMinutes(15);
+            $time = $this->gameTimerService->availableAtFromMinutes(15);
         }
 
         $this->character->update([

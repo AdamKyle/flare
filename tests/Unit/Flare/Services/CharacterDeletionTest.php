@@ -40,19 +40,11 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
+use Tests\Traits\CreateSmeltingProgress;
 
 class CharacterDeletionTest extends TestCase
 {
-    use CreateCelestials,
-        CreateDelveAutomation,
-        CreateExplorationLog,
-        CreateExplorationWarning,
-        CreateGlobalEventGoal,
-        CreateItem,
-        CreateMonster,
-        CreateNpc,
-        CreateQuest,
-        RefreshDatabase;
+    use CreateCelestials, CreateDelveAutomation, CreateExplorationLog, CreateExplorationWarning, CreateGlobalEventGoal, CreateItem, CreateMonster, CreateNpc, CreateQuest, CreateSmeltingProgress, RefreshDatabase;
 
     private ?CharacterFactory $characterFactory;
 
@@ -101,9 +93,9 @@ class CharacterDeletionTest extends TestCase
     {
         $character = $this->characterFactory->getCharacter();
 
-        ExplorationLog::factory()->create(['character_id' => $character->id]);
-        ExplorationWarning::factory()->create(['character_id' => $character->id]);
-        SmeltingProgress::factory()->create(['character_id' => $character->id]);
+        $this->createExplorationLog(['character_id' => $character->id]);
+        $this->createExplorationWarning(['character_id' => $character->id]);
+        $this->createSmeltingProgress(['character_id' => $character->id]);
 
         $monster = $this->createMonster(['is_celestial_entity' => true]);
         $celestialFight = $this->createCelestialFight([

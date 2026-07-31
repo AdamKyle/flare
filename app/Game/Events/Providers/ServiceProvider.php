@@ -17,11 +17,13 @@ use App\Game\Events\Services\EventParticipantNotifierService;
 use App\Game\Events\Services\FactionLoyaltyPledgeCleanupService;
 use App\Game\Events\Services\FeedbackEventEnderService;
 use App\Game\Events\Services\GlobalEventGoalCleanupService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventStepRotatorService;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Services\MoveCharacterAfterEventService;
 use App\Game\Events\Services\RaidEventEnderService;
 use App\Game\Events\Services\RegularEventGoalResetService;
+use App\Game\Events\Services\ScheduledEventDispatchService;
 use App\Game\Events\Services\ScheduleEventFinalizerService;
 use App\Game\Events\Services\WeeklyCelestialEventEnderService;
 use App\Game\Events\Services\WeeklyCurrencyEventEnderService;
@@ -47,8 +49,8 @@ class ServiceProvider extends ApplicationServiceProvider
             RestartGlobalEventGoal::class,
         ]);
 
-        $this->app->bind(EventGoalsService::class, function () {
-            return new EventGoalsService;
+        $this->app->bind(EventGoalsService::class, function ($app) {
+            return new EventGoalsService($app->make(GlobalEventGoalEligibilityService::class));
         });
 
         $this->app->bind(KingdomEventService::class, function () {
@@ -165,6 +167,10 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(RegularEventGoalResetService::class, function ($app) {
             return new RegularEventGoalResetService;
+        });
+
+        $this->app->bind(ScheduledEventDispatchService::class, function () {
+            return new ScheduledEventDispatchService;
         });
     }
 

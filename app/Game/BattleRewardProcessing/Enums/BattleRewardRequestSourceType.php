@@ -10,5 +10,6 @@ enum BattleRewardRequestSourceType: string
     case BATTLE = 'battle';
     case EXPLORATION = 'exploration';
     case AUTOMATION = 'automation';
+    case FACTION_LOYALTY = 'faction_loyalty';
     case FUTURE = 'future';
 }

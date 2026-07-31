@@ -1,4 +1,6 @@
 export default interface LogEntryDefinition {
+  detail_id: string;
+  file_key: string;
   timestamp: string | null;
   channel: string | null;
   severity: string;
@@ -7,8 +9,4 @@ export default interface LogEntryDefinition {
   exception_class: string | null;
   exception_file: string | null;
   exception_line: number | null;
-  stack_trace: string | null;
-  raw_log_entry: string | null;
-  file_path: string | null;
-  raw_parseable: boolean;
 }

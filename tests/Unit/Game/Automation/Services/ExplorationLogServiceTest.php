@@ -11,10 +11,13 @@ use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Tops\Events\ExplorationTopsUpdated;
 use Carbon\Carbon;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
+use PDOException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
@@ -464,6 +467,24 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertEquals(1, ExplorationLog::where('id', $log->id)->where('character_id', $this->character->id)->count());
     }
 
+    public function test_finalize_broadcasts_exploration_tops_updated(): void
+    {
+        Event::fake();
+
+        $log = $this->service->start($this->character, $this->automation);
+
+        $this->service->recordFightTotals($log, [
+            'fights' => 3,
+            'kills' => 2,
+            'xp_gained' => 250,
+            'skill_xp_gained' => 75,
+        ], false);
+
+        $this->service->finalize($log, 'natural_end');
+
+        Event::assertDispatched(ExplorationTopsUpdated::class);
+    }
+
     public function test_dismiss_hides_completed_exploration_panel_without_deleting_log(): void
     {
         Event::fake();
@@ -740,6 +761,34 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertNotNull($log->ended_at);
         $this->assertEquals('missing_automation', $log->stopped_reason);
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_resolve_output_finalizes_missing_automation_log_when_warning_creation_hits_lock_wait_timeout(): void
+    {
+        Log::shouldReceive('error')->once();
+        Log::shouldReceive('warning')->zeroOrMoreTimes();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => 999999,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'started_at' => now(),
+        ]);
+
+        ExplorationWarning::creating(function (): void {
+            throw new QueryException('mysql', 'insert into exploration_warnings', [], new PDOException('Lock wait timeout exceeded', 1205));
+        });
+
+        $output = $this->service->outputForCharacter($this->character);
+
+        $log->refresh();
+
+        $this->assertEquals('ended', $output['type']);
+        $this->assertEquals('missing_automation', $log->stopped_reason);
+        $this->assertNotNull($log->ended_at);
+        $this->assertSame(0, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
 
     public function test_resolve_output_does_not_repair_when_automation_exists(): void

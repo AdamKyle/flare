@@ -255,6 +255,7 @@ class ExplorationTest extends TestCase
     public function test_begin_exploration_accepts_cleared_selections_and_uses_default_values(): void
     {
         Event::fake();
+        Queue::fake();
 
         $successfulFightData = [
             'health' => [
@@ -294,6 +295,10 @@ class ExplorationTest extends TestCase
         $this->assertEquals(AttackTypeValue::ATTACK, $automation->attack_type);
         $this->assertNull($automation->move_down_monster_list_every);
         $this->assertTrue($automation->completed_at->greaterThan(now()));
+
+        Queue::assertPushedOn('exploration', Exploration::class, function ($job) {
+            return $job->connection === 'long_running';
+        });
     }
 
     public function test_handle_caps_gold_when_automation_reward_would_exceed_max_gold(): void
@@ -1954,6 +1959,109 @@ class ExplorationTest extends TestCase
         $this->assertNotNull($log->ended_at);
         $this->assertEquals('character_died', $log->stopped_reason);
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_handle_does_not_recursively_attack_when_character_dies_while_monster_survives(): void
+    {
+        Event::fake();
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn([
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 100,
+            ],
+            'monster' => [
+                'id' => $this->monster->id,
+            ],
+        ]);
+        $monsterFightService->shouldReceive('fightMonster')
+            ->once()
+            ->andReturn([
+                'health' => [
+                    'current_character_health' => 0,
+                    'current_monster_health' => 50,
+                ],
+                'monster' => [
+                    'id' => $this->monster->id,
+                ],
+            ]);
+
+        $characterCacheData = Mockery::mock(CharacterCacheData::class);
+        $characterCacheData->shouldReceive('deleteCharacterSheet')
+            ->once()
+            ->with(Mockery::type(Character::class));
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->refresh()->currentAutomations()->first();
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(CharacterCacheData::class, $characterCacheData);
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $this->assertNull(CharacterAutomation::find($automation->id));
+        Event::assertDispatched(UpdateCharacterStatus::class);
+        Event::assertDispatched(AutomationTimeOut::class);
+    }
+
+    public function test_handle_cancels_exploration_with_character_died_reason_when_monster_survives_character_death(): void
+    {
+        Event::fake();
+
+        $this->character = $this->characterFactory->automationManagement()->assignExplorationAutomation([
+            'monster_id' => $this->monster->id,
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+        ])->getCharacter();
+
+        $automation = $this->character->refresh()->currentAutomations()->first();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'character_automation_id' => $automation->id,
+            'monster_id' => $this->monster->id,
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+
+        $monsterFightService = Mockery::mock(MonsterFightService::class);
+        $monsterFightService->shouldReceive('setupMonster')->andReturn([
+            'health' => [
+                'current_character_health' => 100,
+                'current_monster_health' => 100,
+            ],
+            'monster' => ['id' => $this->monster->id],
+        ]);
+        $monsterFightService->shouldReceive('fightMonster')
+            ->once()
+            ->andReturn([
+                'health' => [
+                    'current_character_health' => 0,
+                    'current_monster_health' => 50,
+                ],
+                'monster' => ['id' => $this->monster->id],
+            ]);
+
+        $characterCacheData = Mockery::mock(CharacterCacheData::class);
+        $characterCacheData->shouldReceive('deleteCharacterSheet')->with(Mockery::type(Character::class));
+
+        $this->instance(MonsterFightService::class, $monsterFightService);
+        $this->instance(CharacterCacheData::class, $characterCacheData);
+
+        Exploration::dispatchSync($this->character, $automation->id, AttackTypeValue::ATTACK, 1);
+
+        $log->refresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertEquals('character_died', $log->stopped_reason);
     }
 
     public function test_timeout_finalizes_exploration_log_and_creates_warning(): void

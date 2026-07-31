@@ -46,7 +46,9 @@ class FactionHandler
             return;
         }
 
-        DB::transaction(function () use ($character, $map, $totalFactionPointsToReward): void {
+        $totalPointsApplied = 0;
+
+        DB::transaction(function () use ($character, $map, $totalFactionPointsToReward, &$totalPointsApplied): void {
             $faction = Faction::where('character_id', $character->id)
                 ->where('game_map_id', $map->id)
                 ->lockForUpdate()
@@ -87,6 +89,8 @@ class FactionHandler
                     'current_points' => $newPoints,
                 ]);
 
+                $totalPointsApplied += $pointsToApply;
+
                 $remainingPoints -= $pointsToApply;
 
                 $faction = $faction->refresh();
@@ -106,6 +110,25 @@ class FactionHandler
                 return;
             }
         });
+
+        if ($totalPointsApplied <= 0) {
+            return;
+        }
+
+        $finalFaction = Faction::where('character_id', $character->id)
+            ->where('game_map_id', $map->id)
+            ->first();
+
+        if (is_null($finalFaction)) {
+            return;
+        }
+
+        $this->battleMessageHandler->handleFactionPointGain(
+            $character->user,
+            $totalPointsApplied,
+            $finalFaction->current_points,
+            $finalFaction->points_needed
+        );
     }
 
     public function getFactionPointsPerKill(Character $character): int

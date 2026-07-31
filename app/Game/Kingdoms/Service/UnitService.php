@@ -9,6 +9,7 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\Skill;
 use App\Flare\Models\UnitInQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
@@ -27,7 +28,8 @@ class UnitService
 
     public function __construct(
         private readonly UpdateKingdomHandler $updateKingdomHandler,
-        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation
+        private readonly KingdomUnitResourceValidation $kingdomUnitResourceValidation,
+        private readonly GameTimerService $gameTimerService,
     ) {}
 
     public function handlePayment(GameUnit $gameUnit, Kingdom $kingdom, int $amount): array
@@ -53,7 +55,7 @@ class UnitService
         $character = $kingdom->character;
         $totalTime = $this->getTotalTimeForUnitRecruitment($character, $gameUnit, $amount);
 
-        $timeTillFinished = now()->addSeconds($totalTime);
+        $timeTillFinished = $this->gameTimerService->availableAtFromSeconds($totalTime);
 
         $queue = UnitInQueue::create([
             'character_id' => $character->id,
@@ -67,11 +69,7 @@ class UnitService
 
         event(new UpdateKingdomQueues($kingdom));
 
-        if ($totalTime > 900) {
-            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id, $capitalCityQueueId)->delay(now()->addMinutes(15));
-        } else {
-            RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id, $capitalCityQueueId)->delay($timeTillFinished);
-        }
+        RecruitUnits::dispatch($gameUnit, $kingdom, $amount, $queue->id, $capitalCityQueueId)->delay($timeTillFinished);
     }
 
     /**

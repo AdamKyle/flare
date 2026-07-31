@@ -3,10 +3,6 @@
 namespace Tests\Feature\Game\Kingdoms\Requests;
 
 use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -14,10 +10,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameBuildingUnit;
+use Tests\Traits\CreateGameUnit;
 
 class CapitalCityUnitRequestTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameBuildingUnit, CreateGameUnit, RefreshDatabase;
 
     public function test_capital_city_recruit_rejects_manually_queued_unit(): void
     {
@@ -46,8 +45,8 @@ class CapitalCityUnitRequestTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        UnitInQueue::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $unit->id,
@@ -100,7 +99,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $targetKingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
@@ -159,9 +158,9 @@ class CapitalCityUnitRequestTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $gameBuilding = GameBuilding::factory()->create();
-        GameBuildingUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $gameBuilding = $this->createGameBuilding();
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $unit->id,
             'required_level' => 1,
@@ -210,14 +209,14 @@ class CapitalCityUnitRequestTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $gameBuilding = GameBuilding::factory()->create();
-        GameBuildingUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $gameBuilding = $this->createGameBuilding();
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $unit->id,
             'required_level' => 1,
         ]);
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $unit->id,

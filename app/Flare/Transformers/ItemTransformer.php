@@ -21,6 +21,17 @@ class ItemTransformer extends TransformerAbstract
      */
     public function transform(Item $item): array
     {
+        $itemSkills = [];
+        $itemSkillProgressions = [];
+
+        if (! is_null($item->item_skill_id)) {
+            $item->loadMissing([
+                'itemSkill.children',
+                'itemSkillProgressions.itemSkill',
+            ]);
+            $itemSkills = is_null($item->itemSkill) ? [] : [$item->itemSkill];
+            $itemSkillProgressions = $item->itemSkillProgressions;
+        }
 
         return [
             'id' => $item->id,
@@ -97,6 +108,8 @@ class ItemTransformer extends TransformerAbstract
             'sockets' => $item->sockets,
             'socket_amount' => $item->socket_count,
             'item_atonements' => $this->getElementAtonement($item),
+            'item_skills' => $itemSkills,
+            'item_skill_progressions' => $itemSkillProgressions,
         ];
     }
 

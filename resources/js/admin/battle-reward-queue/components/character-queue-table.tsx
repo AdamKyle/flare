@@ -1,19 +1,14 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React from 'react';
 
 import RewardQueueCard from './reward-queue-card';
 import AdminPaginationControls from '../../shared/components/admin-pagination-controls';
-import { CharacterRow } from '../types/reward-queue';
+import { CharacterQueueTableProps } from '../types/component-props';
 
 export default function CharacterQueueTable({
   characters,
   onSelect,
   onPageChange,
-}: {
-  characters: PaginatedApiResponseDefinition<CharacterRow[]>;
-  onSelect: (character: CharacterRow) => void;
-  onPageChange: (page: number) => void;
-}) {
+}: CharacterQueueTableProps) {
   return (
     <RewardQueueCard
       title="Character queues"
@@ -52,6 +47,7 @@ export default function CharacterQueueTable({
                 <td>{row.last_request_at}</td>
                 <td>
                   <button
+                    type="button"
                     className="rounded bg-blue-600 px-3 py-2 text-white hover:bg-blue-700"
                     onClick={() => onSelect(row)}
                   >

@@ -6,6 +6,9 @@ use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Traits\IsItemUnique;
 use App\Flare\Transformers\MarketItemsTransformer;
+use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder;
@@ -22,7 +25,7 @@ use League\Fractal\Resource\Collection;
 
 class MarketController extends Controller
 {
-    use IsItemUnique, UpdateMarketBoard;
+    use ChecksAutomationRestrictions, IsItemUnique, UpdateMarketBoard;
 
     public function __construct(
         private readonly Manager $manager,
@@ -49,6 +52,12 @@ class MarketController extends Controller
 
     public function sellItem(ListPriceRequest $request, Character $character)
     {
+        $restriction = $this->automationRestrictionJsonResponse($character, AutomationRestrictionService::INVENTORY_MANAGEMENT);
+
+        if (! is_null($restriction)) {
+            return $restriction;
+        }
+
         if ($request->list_for < 1) {
             return response()->json(['message' => 'Listing price must be at least 1 Gold.'], 422);
         }
@@ -67,6 +76,10 @@ class MarketController extends Controller
 
         $listPrice = $request->list_for;
 
+        if ($listPrice > MaxCurrenciesValue::MAX_GOLD) {
+            $listPrice = MaxCurrenciesValue::MAX_GOLD;
+        }
+
         MarketBoard::create([
             'character_id' => auth()->user()->character->id,
             'item_id' => $slot->item->id,
@@ -79,8 +92,14 @@ class MarketController extends Controller
 
         $this->sendUpdate($this->transformer, $this->manager);
 
+        $inventory = $this->characterInventoryService->setCharacter($character->refresh());
+
         return response()->json([
             'message' => 'Listed: '.$itemName.' For: '.number_format($listPrice).' Gold.',
+            'inventory' => [
+                'inventory' => $inventory->getInventoryForType('inventory'),
+                'usable_items' => $inventory->getInventoryForType('usable_items'),
+            ],
         ]);
     }
 

@@ -9,10 +9,13 @@ use App\Flare\Models\WeeklyMonsterFight;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
+use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Facades\App\Flare\Calculators\DropCheckCalculator;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class LocationSpecialtyHandler
 {
@@ -27,6 +30,12 @@ class LocationSpecialtyHandler
 
     public function handleMonsterFromSpecialLocation(Character $character, WeeklyMonsterFight $weeklyMonsterFight, bool $mainItemIsCosmic = true): void
     {
+        $availableSlots = max(0, $character->inventory_max - $character->inventory->slots()->count());
+
+        if ($availableSlots < 4) {
+            throw new WeeklyRewardInventoryFullException('Weekly reward delivery requires four available inventory slots.');
+        }
+
         $lootingDropChance = $character->skills->where('baseSkill.name', '=', 'Looting')->first()->skill_bonus;
 
         $lootingDropChance = min($lootingDropChance, 0.15);
@@ -52,16 +61,18 @@ class LocationSpecialtyHandler
     {
         $character = $this->handOverAward($character, $isCosmic);
 
-        event(new GlobalMessageEvent($character->name.' Has slaughtered a beast beyond comprehension and been rewarded with an interesting gift!'));
+        $this->dispatchAfterReward(
+            new GlobalMessageEvent($character->name.' Has slaughtered a beast beyond comprehension and been rewarded with an interesting gift!'),
+            $character,
+            'global',
+        );
     }
 
     private function handOverAward(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Character
     {
 
         if ($character->isInventoryFull()) {
-            event(new ServerMessageEvent($character->user, 'Your inventory is full, you could not get this reward. Child you need to make some room.'));
-
-            return $character;
+            throw new WeeklyRewardInventoryFullException('Weekly reward delivery inventory became full.');
         }
 
         $item = $this->giveCharacterRandomItem($character, $isCosmic, $secondaryIsLegendary);
@@ -76,14 +87,29 @@ class LocationSpecialtyHandler
         $slot = $character->inventory->slots->where('item_id', '=', $item->id)->first();
 
         if ($secondaryIsLegendary) {
-            event(new ServerMessageEvent($character->user, 'You have received a Legendary item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
+            $message = 'You have received a Legendary item! How exciting! Rewarded with: '.$slot->item->affix_name;
         } elseif ($isCosmic) {
-            event(new ServerMessageEvent($character->user, 'You have received a Cosmic item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
+            $message = 'You have received a Cosmic item! How exciting! Rewarded with: '.$slot->item->affix_name;
         } else {
-            event(new ServerMessageEvent($character->user, 'You have received a Mythical item! How exciting! Rewarded with: '.$slot->item->affix_name, $slot->id));
+            $message = 'You have received a Mythical item! How exciting! Rewarded with: '.$slot->item->affix_name;
         }
 
+        $this->dispatchAfterReward(new ServerMessageEvent($character->user, $message, $slot->id), $character, 'player');
+
         return $character->refresh();
+    }
+
+    private function dispatchAfterReward(object $event, Character $character, string $broadcastType): void
+    {
+        try {
+            event($event);
+        } catch (Throwable $throwable) {
+            Log::channel('reward_processing')->error('Weekly reward broadcast failed after item delivery.', [
+                'character_id' => $character->id,
+                'broadcast_type' => $broadcastType,
+                'exception' => $throwable,
+            ]);
+        }
     }
 
     private function giveCharacterRandomItem(Character $character, bool $isCosmic = true, bool $secondaryIsLegendary = false): Item

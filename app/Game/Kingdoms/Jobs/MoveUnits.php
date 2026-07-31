@@ -6,13 +6,13 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\AttackKingdomWithUnitsHandler;
 use App\Game\Kingdoms\Service\KingdomMovementTimeCalculationService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -29,6 +29,7 @@ class MoveUnits implements ShouldQueue
         AttackKingdomWithUnitsHandler $attackKingdomWithUnitsHandler,
         UpdateKingdom $updateKingdom,
         KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService,
+        GameTimerService $gameTimerService,
     ): void {
         $unitMovement = UnitMovementQueue::find($this->movementId);
 
@@ -74,7 +75,7 @@ class MoveUnits implements ShouldQueue
         }
 
         if ($unitMovement->resources_requested) {
-            $this->handleWhenResourceRequested($unitMovement, $updateKingdom, $kingdomMovementTimeCalculationService);
+            $this->handleWhenResourceRequested($unitMovement, $updateKingdom, $kingdomMovementTimeCalculationService, $gameTimerService);
         }
     }
 
@@ -212,9 +213,7 @@ class MoveUnits implements ShouldQueue
             event(new UpdateKingdomQueues($toKingdom));
             event(new UpdateKingdomQueues($fromKingdom));
 
-            $minutes = (new Carbon($attributes['completed_at']))->diffInMinutes($attributes['started_at']);
-
-            MoveUnits::dispatch($unitMovementQueue->id)->delay($minutes);
+            MoveUnits::dispatch($unitMovementQueue->id)->delay($unitMovementQueue->completed_at);
 
             event(new ServerMessageEvent($user, 'Your units are returning. The kingdom you sent them to does not belong to you anymore.'));
 
@@ -230,13 +229,17 @@ class MoveUnits implements ShouldQueue
         return false;
     }
 
-    private function handleWhenResourceRequested(UnitMovementQueue $unitMovementQueue, UpdateKingdom $updateKingdom, KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService): void
-    {
+    private function handleWhenResourceRequested(
+        UnitMovementQueue $unitMovementQueue,
+        UpdateKingdom $updateKingdom,
+        KingdomMovementTimeCalculationService $kingdomMovementTimeCalculationService,
+        GameTimerService $gameTimerService,
+    ): void {
 
         $character = $unitMovementQueue->character;
 
         $timeTillArrival = $kingdomMovementTimeCalculationService->getTimeToKingdom($character, $unitMovementQueue->from_kingdom, $unitMovementQueue->to_kingdom);
-        $timeToComplete = now()->addMinutes($timeTillArrival);
+        $timeToComplete = $gameTimerService->availableAtFromMinutes($timeTillArrival);
 
         $attributes = $unitMovementQueue->getAttributes();
         $attributes['from_kingdom_id'] = $unitMovementQueue->to_kingdom_id;

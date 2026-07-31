@@ -3,10 +3,6 @@
 namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\KingdomUnit;
-use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
@@ -24,10 +20,13 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuildingUnit;
+use Tests\Traits\CreateGameUnit;
+use Tests\Traits\CreateKingdom;
 
 class CapitalCityUnitRequestTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuildingUnit, CreateGameUnit, CreateKingdom, RefreshDatabase;
 
     public function test_over_maximum_completion_is_rejected_without_spending_resources(): void
     {
@@ -41,8 +40,8 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create();
-        KingdomUnit::factory()->create([
+        $unit = $this->createGameUnit();
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT,
@@ -84,7 +83,7 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
@@ -130,8 +129,8 @@ class CapitalCityUnitRequestTest extends TestCase
         ]);
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Settlers']);
-        KingdomUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Settlers']);
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 5,
@@ -194,8 +193,8 @@ class CapitalCityUnitRequestTest extends TestCase
         ])->assignBuilding()->getKingdom();
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        GameBuildingUnit::factory()->create([
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
+        $this->createGameBuildingUnit([
             'game_building_id' => $building->game_building_id,
             'game_unit_id' => $unit->id,
             'required_level' => 1,
@@ -241,15 +240,15 @@ class CapitalCityUnitRequestTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
+        $archers = $this->createGameUnit(['name' => 'Archer']);
         $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $spearmen->id,
             'required_level' => 1,
         ]);
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $archers->id,
             'required_level' => 1,
@@ -295,7 +294,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
@@ -327,7 +326,7 @@ class CapitalCityUnitRequestTest extends TestCase
         $kingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $unit = $this->createGameUnit(['name' => 'Spearmen']);
         $kingdomManagement->assignCapitalCityUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
@@ -381,15 +380,15 @@ class CapitalCityUnitRequestTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
+        $archers = $this->createGameUnit(['name' => 'Archer']);
         $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $spearmen->id,
             'required_level' => 1,
         ]);
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $archers->id,
             'required_level' => 1,
@@ -442,15 +441,15 @@ class CapitalCityUnitRequestTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
+        $archers = $this->createGameUnit(['name' => 'Archer']);
         $gameBuildingId = $firstTargetKingdom->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $spearmen->id,
             'required_level' => 1,
         ]);
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $archers->id,
             'required_level' => 1,
@@ -500,14 +499,14 @@ class CapitalCityUnitRequestTest extends TestCase
         ])->assignBuilding();
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
         $gameBuildingId = $targetKingdom->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $spearmen->id,
             'required_level' => 1,
         ]);
-        KingdomUnit::factory()->create([
+        $this->createKingdomUnit([
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $spearmen->id,
             'amount' => 500,
@@ -563,20 +562,20 @@ class CapitalCityUnitRequestTest extends TestCase
         ])->assignBuilding();
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
+        $archers = $this->createGameUnit(['name' => 'Archer']);
         $gameBuildingId = $targetKingdom->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $spearmen->id,
             'required_level' => 1,
         ]);
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $archers->id,
             'required_level' => 1,
         ]);
-        KingdomUnit::factory()->create([
+        $this->createKingdomUnit([
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $spearmen->id,
             'amount' => 500,
@@ -633,21 +632,21 @@ class CapitalCityUnitRequestTest extends TestCase
         ])->assignBuilding();
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $archers = GameUnit::factory()->create(['name' => 'Archer']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
+        $archers = $this->createGameUnit(['name' => 'Archer']);
         $gameBuildingId = $targetKingdom->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $spearmen->id,
             'required_level' => 1,
         ]);
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $archers->id,
             'required_level' => 1,
         ]);
 
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $spearmen->id,

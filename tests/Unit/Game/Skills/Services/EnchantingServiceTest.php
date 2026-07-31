@@ -3,13 +3,16 @@
 namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -32,18 +35,23 @@ use Tests\Traits\CreateGlobalCraftingInventorySlot;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateScheduledEvent;
 
 class EnchantingServiceTest extends TestCase
 {
     use CreateClass,
         CreateEvent,
         CreateGameMap,
+        CreateGameMap,
         CreateGameSkill,
         CreateGlobalCraftingInventory,
+        CreateGlobalCraftingInventory,
+        CreateGlobalCraftingInventorySlot,
         CreateGlobalCraftingInventorySlot,
         CreateGlobalEventGoal,
         CreateItem,
         CreateItemAffix,
+        CreateScheduledEvent,
         RefreshDatabase;
 
     private ?CharacterFactory $character;
@@ -125,13 +133,17 @@ class EnchantingServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
         ]);
 
         $globalEventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -143,13 +155,13 @@ class EnchantingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $inventory = $this->createGlobalCraftingInventory([
-            'global_event_id' => $globalEventGoal->id,
+            'global_event_goal_id' => $globalEventGoal->id,
             'character_id' => $character->id,
         ]);
 
         $this->createGlobalCraftingInventorySlot([
             'global_event_crafting_inventory_id' => $inventory->id,
-            'item_id' => $this->createItem(),
+            'item_id' => $this->createItem()->id,
         ]);
 
         $gameMap = $this->createGameMap([
@@ -458,13 +470,17 @@ class EnchantingServiceTest extends TestCase
 
         $enchantingService = $this->app->make(EnchantingService::class);
 
-        $this->createEvent([
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
             'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
             'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
         ]);
 
         $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -473,7 +489,13 @@ class EnchantingServiceTest extends TestCase
             'should_be_mythic' => true,
         ]);
 
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
         $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
 
         $character->update(['gold' => 1000]);
 
@@ -537,6 +559,67 @@ class EnchantingServiceTest extends TestCase
         });
     }
 
+    public function test_failed_enchant_on_global_event_crafting_inventory_slot_does_not_dispatch_inventory_count_event_or_throw_type_error()
+    {
+        Event::fake();
+
+        $this->instance(
+            EnchantItemService::class,
+            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+            })
+        );
+
+        $character = $this->character->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $goal = $this->createGlobalEventGoal();
+        $inventory = $this->createGlobalCraftingInventory(['character_id' => $character->id, 'global_event_goal_id' => $goal->id]);
+        $slot = $this->createGlobalCraftingInventorySlot(['global_event_crafting_inventory_id' => $inventory->id, 'item_id' => $this->itemToEnchant->id]);
+
+        $enchantingService = resolve(EnchantingService::class);
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
+        ], $slot, 1000);
+
+        Event::assertNotDispatched(UpdateCharacterInventoryCountEvent::class);
+        $this->assertNull(GlobalEventCraftingInventorySlot::find($slot->id));
+    }
+
+    public function test_failed_enchant_on_normal_inventory_slot_still_dispatches_inventory_count_event()
+    {
+        Event::fake();
+
+        $this->instance(
+            EnchantItemService::class,
+            Mockery::mock(EnchantItemService::class, function (MockInterface $mock) {
+                $mock->makePartial()->shouldReceive('attachAffix')->once()->andReturn(false);
+            })
+        );
+
+        $character = $this->character->inventoryManagement()->giveItem($this->itemToEnchant)->getCharacter();
+
+        $character->update(['gold' => 1000]);
+
+        $character = $character->refresh();
+
+        $slot = $character->inventory->slots->first();
+
+        $enchantingService = resolve(EnchantingService::class);
+
+        $enchantingService->enchant($character, [
+            'affix_ids' => [$this->prefix->id],
+            'enchant_for_event' => false,
+        ], $slot, 1000);
+
+        Event::assertDispatched(UpdateCharacterInventoryCountEvent::class);
+    }
+
     public function test_get_time_addition_for_enchanting_should_be_triple()
     {
         $item = $this->createItem([
@@ -593,8 +676,17 @@ class EnchantingServiceTest extends TestCase
     public function test_get_item_for_global_event()
     {
 
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+            'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
+        ]);
+
         $globalEventGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
@@ -603,20 +695,103 @@ class EnchantingServiceTest extends TestCase
             'should_be_mythic' => true,
         ]);
 
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
         $character = $this->character->getCharacter();
 
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character = $character->refresh();
+
         $inventory = $this->createGlobalCraftingInventory([
-            'global_event_id' => $globalEventGoal->id,
+            'global_event_goal_id' => $globalEventGoal->id,
             'character_id' => $character->id,
         ]);
 
+        $this->assertNotNull($inventory->id);
+
         $slot = $this->createGlobalCraftingInventorySlot([
             'global_event_crafting_inventory_id' => $inventory->id,
-            'item_id' => $this->createItem(),
+            'item_id' => $this->createItem()->id,
         ]);
 
         $foundSlot = $this->enchantingService->getSlotFromInventory($character, $slot->id);
 
         $this->assertEquals($foundSlot->id, $slot->id);
+    }
+
+    public function test_enchant_item_for_batch_validates_all_affixes_before_charging_gold(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$this->prefix->id, 999999], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('invalid_affix', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
+
+    public function test_enchant_item_for_batch_does_not_charge_gold_when_affix_validation_fails(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+        $wrongTypeAffix = $this->createItemAffix([
+            'type' => 'invalid',
+            'int_required' => 1,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 2,
+            'cost' => 1000,
+        ]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$wrongTypeAffix->id], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('invalid_affix_type', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
+
+    public function test_enchant_item_for_batch_rejects_affix_above_character_int(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000, 'int' => 1]);
+        $affix = $this->createItemAffix([
+            'type' => 'prefix',
+            'int_required' => 10000,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 2,
+            'cost' => 1000,
+        ]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$affix->id], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('int_too_low', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
+    }
+
+    public function test_enchant_item_for_batch_rejects_affix_above_enchanting_skill(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+        $affix = $this->createItemAffix([
+            'type' => 'prefix',
+            'int_required' => 1,
+            'skill_level_required' => 10000,
+            'skill_level_trivial' => 10001,
+            'cost' => 1000,
+        ]);
+        $goldBefore = (int) $character->gold;
+
+        $result = $this->enchantingService->enchantItemForBatch($character, $this->itemToEnchant, [$affix->id], 1000);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('skill_too_low', $result['reason']);
+        $this->assertSame($goldBefore, (int) $character->refresh()->gold);
     }
 }

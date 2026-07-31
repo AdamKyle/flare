@@ -2,13 +2,13 @@
 
 namespace Tests\Unit\Game\Kingdoms\Services;
 
-use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueRequest;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingUpgrades;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Values\BuildingCosts;
@@ -22,10 +22,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
 
 class CapitalCityBuildingManagementTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -100,6 +101,7 @@ class CapitalCityBuildingManagementTest extends TestCase
     public function test_it_consumes_discounted_resource_costs_for_one_capital_city_building_upgrade_when_the_building_management_passive_is_partially_trained(): void
     {
         Event::fake();
+        Queue::fake();
 
         $character = $this->character->getCharacter();
 
@@ -181,11 +183,15 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(7704, $targetKingdom->current_wood);
         $this->assertSame(8278, $targetKingdom->current_iron);
         $this->assertSame(9720, $targetKingdom->current_population);
+        Queue::assertPushed(CapitalCityBuildingRequest::class, function (CapitalCityBuildingRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 
     public function test_it_consumes_discounted_resource_costs_for_multiple_capital_city_building_upgrades_when_the_building_management_passive_is_partially_trained(): void
     {
         Event::fake();
+        Queue::fake();
 
         $character = $this->character->getCharacter();
 
@@ -297,6 +303,9 @@ class CapitalCityBuildingManagementTest extends TestCase
         $this->assertSame(5408, $targetKingdom->current_wood);
         $this->assertSame(6556, $targetKingdom->current_iron);
         $this->assertSame(9440, $targetKingdom->current_population);
+        Queue::assertPushed(CapitalCityBuildingRequest::class, function (CapitalCityBuildingRequest $job) {
+            return $job->connection === 'long_running' && $job->queue === 'default_long';
+        });
     }
 
     public function test_capital_city_building_resource_rejection_updates_building_request_data_and_top_level_status(): void
@@ -895,7 +904,7 @@ class CapitalCityBuildingManagementTest extends TestCase
             ->getKingdom();
         $building = $targetKingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'building_id' => $building->id,

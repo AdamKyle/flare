@@ -1,36 +1,21 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import ActiveExplorersTable from './active-explorers-table';
 import ExplorationLogsTable from './exploration-logs-table';
 import MonitoringCard from './monitoring-card';
 import MonitoringStatusChart from '../../monitoring/components/monitoring-status-chart';
-import { useExplorationApi } from '../ajax/exploration-api';
-import useExplorationLiveRefresh from '../hooks/use-exploration-live-refresh';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../monitoring/values/admin-monitoring-chart-colors';
 import {
   ActiveExplorer,
   ExplorationChartPoint,
   ExplorationFilters,
   ExplorationLogRow,
   ExplorationSummary,
-} from '../types/exploration-monitoring';
+} from '../api/definitions/exploration-monitoring-definition';
+import { useExplorationApi } from '../api/hooks/use-exploration-api';
+import useExplorationLiveRefresh from '../hooks/use-exploration-live-refresh';
+import explorationPaginationAdapter from '../utils/exploration-pagination-adapter';
 import { DAY_OPTIONS } from '../values/filter-options';
-
-const emptyPaginatedResponse = <T,>(): PaginatedApiResponseDefinition<T[]> =>
-  ({
-    data: [],
-    meta: {
-      can_load_more: false,
-      pagination: {
-        count: 0,
-        [`current${'_'}page`]: 1,
-        links: { next: '', prev: '' },
-        per_page: 10,
-        total: 0,
-        total_pages: 1,
-      },
-    },
-  }) as PaginatedApiResponseDefinition<T[]>;
 
 const emptySummary: ExplorationSummary = {
   total_runs: 0,
@@ -60,9 +45,14 @@ export default function ExplorationDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeExplorers, setActiveExplorers] = useState<ActiveExplorer[]>([]);
-  const [logs, setLogs] = useState<
-    PaginatedApiResponseDefinition<ExplorationLogRow[]>
-  >(emptyPaginatedResponse());
+  const [logs, setLogs] = useState(
+    explorationPaginationAdapter<ExplorationLogRow>({
+      data: [],
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    })
+  );
   const [summary, setSummary] = useState<ExplorationSummary>(emptySummary);
   const [chart, setChart] = useState<ExplorationChartPoint[]>([]);
   const [filters, setFilters] = useState<ExplorationFilters>(defaultFilters);
@@ -150,18 +140,21 @@ export default function ExplorationDashboard() {
             label: 'Skill XP',
             value: summary.total_skill_xp_gained.toLocaleString(),
           },
-        ].map(({ label, value }) => (
-          <button
-            key={label}
-            type="button"
-            className="text-left"
-            onClick={() => {
-              if (label === 'Stopped by Player') {
-                applyTableFilter({ stopped_by_player: true });
+        ].map(({ label, value }) => {
+          const isFilterCard = label === 'Stopped by Player';
+
+          return (
+            <MonitoringCard
+              key={label}
+              onClick={
+                isFilterCard
+                  ? () => applyTableFilter({ stopped_by_player: true })
+                  : undefined
               }
-            }}
-          >
-            <MonitoringCard>
+              ariaLabel={
+                isFilterCard ? 'Filter runs stopped by player' : undefined
+              }
+            >
               <div className="text-sm text-gray-600 dark:text-gray-300">
                 {label}
               </div>
@@ -169,8 +162,8 @@ export default function ExplorationDashboard() {
                 {value}
               </div>
             </MonitoringCard>
-          </button>
-        ))}
+          );
+        })}
       </div>
 
       <div>
@@ -194,24 +187,36 @@ export default function ExplorationDashboard() {
           description="Run, kill, XP, skill XP, active, and completed totals from exploration logs."
           points={chart}
           series={[
-            { key: 'runs', label: 'Runs', color: '#22c55e' },
-            { key: 'kills', label: 'Kills', color: '#16a34a' },
-            { key: 'xp', label: 'XP', color: '#3b82f6' },
+            {
+              key: 'runs',
+              label: 'Runs',
+              color: ADMIN_MONITORING_CHART_COLORS.emerald,
+            },
+            {
+              key: 'kills',
+              label: 'Kills',
+              color: ADMIN_MONITORING_CHART_COLORS.emeraldStrong,
+            },
+            {
+              key: 'xp',
+              label: 'XP',
+              color: ADMIN_MONITORING_CHART_COLORS.danube,
+            },
             {
               key: 'skill_xp',
               label: 'Skill XP',
-              color: '#a855f7',
+              color: ADMIN_MONITORING_CHART_COLORS.cosmic,
             },
             {
               key: 'active',
               label: 'Active',
-              color: '#f59e0b',
+              color: ADMIN_MONITORING_CHART_COLORS.mangoTango,
               dash: '2,2',
             },
             {
               key: 'completed',
               label: 'Completed',
-              color: '#14b8a6',
+              color: ADMIN_MONITORING_CHART_COLORS.glacier,
             },
           ]}
         />

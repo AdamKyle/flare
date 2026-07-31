@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomUnit;
 use App\Flare\Models\UnitMovementQueue;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\MoveUnits;
@@ -31,7 +32,8 @@ class UnitMovementService
     public function __construct(
         DistanceCalculation $distanceCalculation,
         MoveUnitsValidator $moveUnitsValidator,
-        UpdateKingdom $updateKingdom
+        UpdateKingdom $updateKingdom,
+        private readonly GameTimerService $gameTimerService,
     ) {
         $this->distanceCalculation = $distanceCalculation;
         $this->moveUnitsValidator = $moveUnitsValidator;
@@ -130,7 +132,7 @@ class UnitMovementService
         $toKingdom = $unitMovementQueue->from_kingdom_id;
         $fromKingdom = $unitMovementQueue->to_kingdom_id;
 
-        $timeLeft = now()->addSeconds($elapsedTime);
+        $timeLeft = $this->gameTimerService->availableAtFromSeconds($elapsedTime);
 
         $queue = UnitMovementQueue::create([
             'character_id' => $character->id,
@@ -256,7 +258,7 @@ class UnitMovementService
 
         $time = $this->determineTimeRequired($character, $kingdom, $fromKingdomId);
 
-        $minutes = now()->addMinutes($time);
+        $minutes = $this->gameTimerService->availableAtFromMinutes($time);
 
         $unitMovementQueue = UnitMovementQueue::create([
             'character_id' => $character->id,

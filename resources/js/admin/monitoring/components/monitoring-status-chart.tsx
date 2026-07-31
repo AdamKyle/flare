@@ -1,16 +1,8 @@
 import React, { useMemo, useState } from 'react';
 
-export type MonitoringChartPoint = {
-  period: string;
-  [key: string]: string | number;
-};
-
-type Series = {
-  key: string;
-  label: string;
-  color: string;
-  dash?: string;
-};
+import MonitoringStatusChartProps, {
+  MonitoringChartPoint,
+} from '../types/monitoring-status-chart-props';
 
 const CHART_H = 200;
 const CHART_W = 600;
@@ -63,22 +55,19 @@ function shortLabel(period: string): string {
 }
 
 function valueFor(point: MonitoringChartPoint, key: string): number {
-  const value = point[key];
+  const value: unknown = Reflect.get(point, key);
 
   return typeof value === 'number' ? value : 0;
 }
 
-export default function MonitoringStatusChart({
+export default function MonitoringStatusChart<
+  ChartPoint extends MonitoringChartPoint,
+>({
   title,
   description,
   points,
   series,
-}: {
-  title: string;
-  description: string;
-  points: MonitoringChartPoint[];
-  series: Series[];
-}) {
+}: MonitoringStatusChartProps<ChartPoint>) {
   const [page, setPage] = useState(1);
   const periods = points.map((point) => point.period);
   const maxValue = points.reduce((maximum, point) => {
@@ -112,8 +101,7 @@ export default function MonitoringStatusChart({
         <>
           <svg
             viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-            className="mt-3 w-full"
-            style={{ minHeight: 140 }}
+            className="mt-3 min-h-35 w-full"
             role="img"
             aria-hidden="true"
           >
@@ -224,6 +212,7 @@ export default function MonitoringStatusChart({
               </span>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
                   disabled={page <= 1}
                   onClick={() => setPage((current) => current - 1)}
@@ -231,6 +220,7 @@ export default function MonitoringStatusChart({
                   Previous
                 </button>
                 <button
+                  type="button"
                   className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
                   disabled={page >= totalPages}
                   onClick={() => setPage((current) => current + 1)}

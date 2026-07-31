@@ -2,10 +2,12 @@
 
 namespace App\Exceptions;
 
+use App\Game\Character\Exceptions\MissingInventoryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 /**
@@ -52,6 +54,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
+        if ($exception instanceof MissingInventoryException) {
+            Auth::logout();
+
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Your previous character no longer exists. Please create a new character.',
+                ], 410);
+            }
+
+            return redirect()->to('/login')->with('error', 'Your previous character no longer exists. Please create a new character.');
+        }
 
         if ($exception instanceof TokenMismatchException) {
             return redirect()->to('/')->with('error', 'You were logged out due to inactivity. Please login again.');

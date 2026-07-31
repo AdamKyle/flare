@@ -1,7 +1,10 @@
 import { useCallback, useState } from 'react';
 
-import { useRewardQueueApi } from '../ajax/reward-queue-api';
-import { RepairSummary, StaleQueue } from '../types/reward-queue';
+import {
+  RepairSummary,
+  StaleQueue,
+} from '../api/definitions/reward-queue-definition';
+import { useRewardQueueApi } from '../api/hooks/use-reward-queue-api';
 
 export default function useStaleRewardQueues() {
   const { fetchStaleRewardQueues, repairStaleRewardQueues } =

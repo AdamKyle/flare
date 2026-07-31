@@ -5,13 +5,14 @@ namespace App\Flare\Services;
 use App\Flare\Events\UpdateScheduledEvents;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event;
-use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\ScheduledEventConfiguration;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
+use App\Game\Raids\Services\RaidMapConflictService;
 use App\Game\Raids\Values\RaidType;
 use Carbon\Carbon;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
@@ -21,6 +22,10 @@ class EventSchedulerService
     use ResponseBuilder;
 
     const GENERATE_EVENT_AMOUNT = 5;
+
+    public function __construct(
+        private readonly RaidMapConflictService $raidMapConflictService,
+    ) {}
 
     public function fetchEvents(): array
     {
@@ -55,13 +60,24 @@ class EventSchedulerService
         return $this->successResult();
     }
 
-    public function createRaidEventsForScheduledEventWith(ScheduledEvent $scheduledEvent): void
+    /**
+     * Create (or reuse) the raid-event children described by the parent
+     * schedule's raids_for_event payload, linking each to the parent via
+     * parent_scheduled_event_id. Idempotent: an existing child for the same
+     * parent/raid/start (such as one already created by the development
+     * command) is reused rather than duplicated.
+     *
+     * @return ScheduledEvent[]
+     */
+    public function createRaidEventsForScheduledEventWith(ScheduledEvent $scheduledEvent): array
     {
         $raidsForEvent = $scheduledEvent->raids_for_event;
 
         if (is_null($raidsForEvent)) {
-            return;
+            return [];
         }
+
+        $children = [];
 
         foreach ($raidsForEvent as $raidForEvent) {
             $childStartDate = new Carbon($raidForEvent['start_date']);
@@ -71,10 +87,22 @@ class EventSchedulerService
                 continue;
             }
 
+            $existingChild = ScheduledEvent::query()
+                ->where('parent_scheduled_event_id', $scheduledEvent->id)
+                ->where('raid_id', $raidForEvent['selected_raid'])
+                ->where('start_date', $childStartDate)
+                ->first();
+
+            if (! is_null($existingChild)) {
+                $children[] = $existingChild;
+
+                continue;
+            }
+
             $raid = Raid::find($raidForEvent['selected_raid']);
 
-            $gameMapIds = $this->getGameMapIdsForRaid($raid);
-            $raidIdsOnSameMaps = $this->getRaidIdsOnSameMaps($gameMapIds);
+            $gameMapIds = $this->raidMapConflictService->mapIdsForRaid($raid);
+            $raidIdsOnSameMaps = $this->raidMapConflictService->raidIdsOnMaps($gameMapIds);
 
             $hasOverlap = ! empty($raidIdsOnSameMaps) && ScheduledEvent::query()
                 ->whereIn('raid_id', $raidIdsOnSameMaps)
@@ -87,14 +115,18 @@ class EventSchedulerService
                 continue;
             }
 
-            ScheduledEvent::create([
+            $children[] = ScheduledEvent::create([
                 'event_type' => EventType::RAID_EVENT,
                 'raid_id' => $raidForEvent['selected_raid'],
+                'parent_scheduled_event_id' => $scheduledEvent->id,
                 'start_date' => $childStartDate,
                 'end_date' => $childEndDate,
                 'description' => $raid->scheduled_event_description,
+                'status' => ScheduledEventStatus::SCHEDULED,
             ]);
         }
+
+        return $children;
     }
 
     public function updateEvent(array $params, ScheduledEvent $scheduledEvent): array
@@ -111,7 +143,7 @@ class EventSchedulerService
         $scheduledEvent = $scheduledEvent->refresh();
 
         if ($scheduledEvent->currently_running) {
-            $event = Event::where('type', $params['selected_event_type'])->first();
+            $event = Event::where('scheduled_event_id', $scheduledEvent->id)->first();
 
             if (! is_null($event)) {
                 $event->update([
@@ -212,8 +244,8 @@ class EventSchedulerService
             ->orderBy('start_date')
             ->get();
 
-        $gameMapIds = $this->getGameMapIdsForRaid($raid);
-        $raidIdsOnSameMaps = $this->getRaidIdsOnSameMaps($gameMapIds);
+        $gameMapIds = $this->raidMapConflictService->mapIdsForRaid($raid);
+        $raidIdsOnSameMaps = $this->raidMapConflictService->raidIdsOnMaps($gameMapIds);
 
         if ($raidEvents->isEmpty()) {
             $hasSameMapRaidInWindow = ! empty($raidIdsOnSameMaps) && ScheduledEvent::query()
@@ -341,44 +373,6 @@ class EventSchedulerService
             return 'Once per week players can participate in Faction Loyalty Event where they get 2 points i their faction loyalty tasks be they bounty or crafting.
             When a player levels up the fame with an NPC of the faction they are pledged to, the new levels requirements will be halved.';
         }
-    }
-
-    private function getGameMapIdsForRaid(Raid $raid): array
-    {
-        $locationIds = array_filter(
-            array_merge([$raid->raid_boss_location_id], $raid->corrupted_location_ids ?? [])
-        );
-
-        if (empty($locationIds)) {
-            return [];
-        }
-
-        return Location::whereIn('id', $locationIds)
-            ->pluck('game_map_id')
-            ->unique()
-            ->values()
-            ->all();
-    }
-
-    private function getRaidIdsOnSameMaps(array $gameMapIds): array
-    {
-        if (empty($gameMapIds)) {
-            return [];
-        }
-
-        $locationIdsOnMaps = Location::whereIn('game_map_id', $gameMapIds)->pluck('id')->all();
-
-        if (empty($locationIdsOnMaps)) {
-            return [];
-        }
-
-        $query = Raid::whereIn('raid_boss_location_id', $locationIdsOnMaps);
-
-        foreach ($locationIdsOnMaps as $locationId) {
-            $query->orWhereJsonContains('corrupted_location_ids', $locationId);
-        }
-
-        return $query->pluck('id')->all();
     }
 
     private function createEvents(array $eventData, int $amount, string $type): Carbon

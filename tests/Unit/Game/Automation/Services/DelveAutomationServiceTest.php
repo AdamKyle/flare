@@ -26,10 +26,11 @@ use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateDelveAutomation;
+use Tests\Traits\CreateLocation;
 
 class DelveAutomationServiceTest extends TestCase
 {
-    use CreateCharacterAutomation;
+    use CreateCharacterAutomation, CreateLocation;
     use CreateDelveAutomation;
     use RefreshDatabase;
 
@@ -60,7 +61,7 @@ class DelveAutomationServiceTest extends TestCase
             ->buildMonster()
             ->updateMonster([
                 'game_map_id' => $this->character->map->game_map_id,
-                'only_for_location_type' => LocationType::CAVE_OF_MEMORIES,
+                'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
                 'is_celestial_entity' => false,
                 'is_raid_monster' => false,
                 'is_raid_boss' => false,
@@ -68,9 +69,9 @@ class DelveAutomationServiceTest extends TestCase
             ])
             ->getMonster();
 
-        $this->location = Location::factory()->create([
+        $this->location = $this->createLocation([
             'game_map_id' => $this->character->map->game_map_id,
-            'type' => LocationType::CAVE_OF_MEMORIES,
+            'type' => LocationType::CAVE_OF_MEMORIES->value,
             'minutes_between_delve_fights' => 7,
         ]);
 
@@ -135,6 +136,11 @@ class DelveAutomationServiceTest extends TestCase
     {
         Queue::fake();
         Event::fake();
+        config([
+            'game_timers.development_cap.enabled' => true,
+            'game_timers.development_cap.environments' => ['testing'],
+            'game_timers.development_cap.max_seconds' => 60,
+        ]);
 
         $now = Carbon::parse('2026-01-01 12:00:00');
 

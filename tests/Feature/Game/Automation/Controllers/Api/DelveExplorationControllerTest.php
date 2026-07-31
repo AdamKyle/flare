@@ -8,25 +8,28 @@ use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Npc;
-use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
+use App\Game\Battle\Events\UpdateCharacterStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateDelveAutomation;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateNpc;
+use Tests\Traits\CreateQuest;
 
 class DelveExplorationControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateDelveAutomation, CreateItem, CreateLocation, CreateNpc, CreateQuest, RefreshDatabase;
 
     private Character $character;
 
@@ -43,11 +46,11 @@ class DelveExplorationControllerTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $this->location = Location::factory()->create([
+        $this->location = $this->createLocation([
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
             'game_map_id' => $this->character->map->game_map_id,
-            'type' => LocationType::CAVE_OF_MEMORIES,
+            'type' => LocationType::CAVE_OF_MEMORIES->value,
             'minutes_between_delve_fights' => 5,
         ]);
 
@@ -55,7 +58,7 @@ class DelveExplorationControllerTest extends TestCase
             ->buildMonster()
             ->updateMonster([
                 'game_map_id' => $this->character->map->game_map_id,
-                'only_for_location_type' => LocationType::CAVE_OF_MEMORIES,
+                'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
                 'is_celestial_entity' => false,
                 'is_raid_monster' => false,
                 'is_raid_boss' => false,
@@ -185,7 +188,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_returns_completed_delve_until_dismissed(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now()->subHour(),
@@ -194,7 +197,7 @@ class DelveExplorationControllerTest extends TestCase
             'panel_dismissed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'outcome' => 'survived',
@@ -213,7 +216,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_dismiss_hides_completed_delve_without_deleting_logs(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now()->subHour(),
@@ -222,7 +225,7 @@ class DelveExplorationControllerTest extends TestCase
             'panel_dismissed_at' => null,
         ]);
 
-        $log = DelveLog::factory()->create([
+        $log = $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'outcome' => 'died',
@@ -242,7 +245,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_new_delve_run_shows_after_previous_completed_panel_was_dismissed(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now()->subHours(2),
@@ -251,7 +254,7 @@ class DelveExplorationControllerTest extends TestCase
             'panel_dismissed_at' => now()->subMinutes(30),
         ]);
 
-        $active = DelveExploration::factory()->create([
+        $active = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -270,7 +273,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_returns_active_data_when_delve_is_running(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'completed_at' => null,
@@ -289,7 +292,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_reward_checkpoints_reach_first_checkpoint_by_default(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -309,7 +312,7 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 2]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -329,7 +332,7 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 1]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now()->subHours(2),
@@ -348,7 +351,7 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => null]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -368,14 +371,14 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 1]);
 
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'drop_location_id' => $this->location->id,
             'item_suffix_id' => null,
             'item_prefix_id' => null,
         ]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -395,7 +398,7 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 1]);
 
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'drop_location_id' => $this->location->id,
             'item_suffix_id' => null,
@@ -409,7 +412,7 @@ class DelveExplorationControllerTest extends TestCase
             'item_id' => $item->id,
         ]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -430,22 +433,22 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 1]);
 
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'drop_location_id' => $this->location->id,
             'item_suffix_id' => null,
             'item_prefix_id' => null,
         ]);
 
-        $npc = Npc::factory()->create();
-        $quest = Quest::factory()->create(['item_id' => $item->id, 'npc_id' => $npc->id]);
+        $npc = $this->createNpc();
+        $quest = $this->createQuest(['item_id' => $item->id, 'npc_id' => $npc->id]);
 
         QuestsCompleted::create([
             'character_id' => $this->character->id,
             'quest_id' => $quest->id,
         ]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -465,15 +468,15 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 1]);
 
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'drop_location_id' => $this->location->id,
             'item_suffix_id' => null,
             'item_prefix_id' => null,
         ]);
 
-        $npc = Npc::factory()->create();
-        $quest = Quest::factory()->create([
+        $npc = $this->createNpc();
+        $quest = $this->createQuest([
             'npc_id' => $npc->id,
             'item_id' => null,
             'secondary_required_item' => $item->id,
@@ -484,7 +487,7 @@ class DelveExplorationControllerTest extends TestCase
             'quest_id' => $quest->id,
         ]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -504,14 +507,14 @@ class DelveExplorationControllerTest extends TestCase
     {
         $this->location->update(['hours_to_drop' => 1]);
 
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'drop_location_id' => $this->location->id,
             'item_suffix_id' => null,
             'item_prefix_id' => null,
         ]);
 
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -529,7 +532,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_returns_available_enemy_stats_from_active_monster(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -546,7 +549,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_quest_item_detail_returns_item_data_for_quest_item(): void
     {
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'item_suffix_id' => null,
             'item_prefix_id' => null,
@@ -562,7 +565,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_quest_item_detail_returns_item_name_in_response(): void
     {
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'name' => 'Test Quest Item',
             'item_suffix_id' => null,
@@ -578,7 +581,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_quest_item_detail_returns422_for_non_quest_item(): void
     {
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'weapon',
             'item_suffix_id' => null,
             'item_prefix_id' => null,
@@ -600,7 +603,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_quest_item_detail_requires_authentication(): void
     {
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'item_suffix_id' => null,
             'item_prefix_id' => null,
@@ -613,7 +616,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_quest_item_detail_does_not_require_ownership(): void
     {
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'item_suffix_id' => null,
             'item_prefix_id' => null,
@@ -627,7 +630,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_quest_item_detail_response_does_not_contain_admin_only_fields(): void
     {
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'type' => 'quest',
             'item_suffix_id' => null,
             'item_prefix_id' => null,
@@ -644,7 +647,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_source_is_active_delve_fallback_when_no_log_exists(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -660,7 +663,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_name_from_active_delve_fallback(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -676,14 +679,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_source_is_latest_log_when_log_has_fight_data(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'fight_data' => [
@@ -700,14 +703,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_name_from_latest_log_fight_data(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'fight_data' => [
@@ -724,14 +727,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_pack_size_from_log(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 5,
@@ -749,14 +752,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_message_for_pack_greater_than_one(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'pack_size' => 10,
@@ -774,14 +777,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_enemy_strength_boost_from_log(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'increased_enemy_strength' => 0.5,
@@ -799,7 +802,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_stats_available_from_active_monster_model_when_no_log(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -816,14 +819,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_stats_available_when_log_has_monster_in_fight_data(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'fight_data' => [
@@ -840,7 +843,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_base_stats_from_active_monster_model(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -859,7 +862,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_message_for_active_delve_fallback(): void
     {
-        DelveExploration::factory()->create([
+        $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
@@ -878,14 +881,14 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_status_current_foe_stat_values_from_fight_data(): void
     {
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now(),
             'completed_at' => null,
         ]);
 
-        DelveLog::factory()->create([
+        $this->createDelveAutomationLog([
             'character_id' => $this->character->id,
             'delve_exploration_id' => $delve->id,
             'fight_data' => [
@@ -914,7 +917,7 @@ class DelveExplorationControllerTest extends TestCase
 
     public function test_dismiss_soft_dismisses_all_completed_delves_at_once(): void
     {
-        $olderDelve = DelveExploration::factory()->create([
+        $olderDelve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now()->subHours(3),
@@ -923,7 +926,7 @@ class DelveExplorationControllerTest extends TestCase
             'panel_dismissed_at' => null,
         ]);
 
-        $newerDelve = DelveExploration::factory()->create([
+        $newerDelve = $this->createDelveAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'started_at' => now()->subHour(),
@@ -942,5 +945,33 @@ class DelveExplorationControllerTest extends TestCase
         $this->assertFalse($response->json('completed'));
         $this->assertNotNull($olderDelve->refresh()->panel_dismissed_at);
         $this->assertNotNull($newerDelve->refresh()->panel_dismissed_at);
+    }
+
+    public function test_dismiss_dispatches_update_character_status_built_from_the_same_character(): void
+    {
+        Event::fake();
+
+        $delve = $this->createDelveAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => 'player_stopped',
+            'panel_dismissed_at' => null,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/delve/'.$this->character->id.'/dismiss', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertNotNull($delve->refresh()->panel_dismissed_at);
+        Event::assertDispatchedTimes(UpdateCharacterStatus::class, 1);
+        Event::assertDispatched(UpdateCharacterStatus::class, function (UpdateCharacterStatus $event): bool {
+            return $event->broadcastOn()->name === 'private-update-character-status-'.$this->character->user_id;
+        });
+        $this->assertFalse($response->json('active'));
+        $this->assertFalse($response->json('completed'));
     }
 }

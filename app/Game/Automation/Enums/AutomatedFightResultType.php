@@ -5,7 +5,11 @@ namespace App\Game\Automation\Enums;
 enum AutomatedFightResultType: string
 {
     case BOUNTY_COMPLETED = 'bounty_completed';
+    case BOUNTY_BATCH_YIELDED = 'bounty_batch_yielded';
+    case BOUNTY_FIGHT_YIELDED = 'bounty_fight_yielded';
     case TRAINING_BATCH_COMPLETED = 'training_batch_completed';
+    case TRAINING_BATCH_YIELDED = 'training_batch_yielded';
+    case TRAINING_FIGHT_YIELDED = 'training_fight_yielded';
     case BOUNTY_STALLED_RETRY = 'bounty_stalled_retry';
     case TRAINING_STALLED_RETRY = 'training_stalled_retry';
     case BOUNTY_STALLED_MAX_ATTEMPTS_REACHED = 'bounty_stalled_max_attempts_reached';

@@ -6,6 +6,7 @@ use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
 use App\Game\Events\Jobs\InitiateWeeklyFactionLoyaltyEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -42,6 +43,7 @@ class InitiateWeeklyFactionLoyaltyEventTest extends TestCase
         Event::fake();
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
         ]);
 

@@ -25,6 +25,8 @@ class InventorySetFactory extends Factory
             'character_id' => null,
             'is_equipped' => false,
             'can_be_equipped' => true,
+            'special_type' => null,
+            'max_slots' => null,
         ];
     }
 }

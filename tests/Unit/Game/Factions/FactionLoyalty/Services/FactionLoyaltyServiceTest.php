@@ -4,8 +4,6 @@ namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\FactionLoyaltyAutomation;
-use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
@@ -20,6 +18,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateFactionLoyaltyAutomation;
 use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
@@ -27,7 +26,7 @@ use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyServiceTest extends TestCase
 {
-    use CreateEvent, CreateFactionLoyalty, CreateFactionLoyaltyAutomationWarning, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
+    use CreateEvent, CreateFactionLoyalty, CreateFactionLoyaltyAutomation, CreateFactionLoyaltyAutomationWarning, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -128,13 +127,13 @@ class FactionLoyaltyServiceTest extends TestCase
             'completed_at' => now()->addHour(),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
-        $automation = FactionLoyaltyAutomation::factory()->create([
+        $automation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,
             'character_id' => $this->character->id,
             'faction_loyalty_npc_id' => $factionNpc->id,
         ]);
 
-        $automationLog = FactionLoyaltyAutomationLog::factory()->create([
+        $automationLog = $this->createFactionLoyaltyAutomationLog([
             'faction_loyalty_automation_id' => $automation->id,
             'fight_logs' => [
                 [
@@ -215,12 +214,12 @@ class FactionLoyaltyServiceTest extends TestCase
             'completed_at' => now()->addHour(),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
-        $automation = FactionLoyaltyAutomation::factory()->create([
+        $automation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,
             'character_id' => $this->character->id,
             'faction_loyalty_npc_id' => $factionNpc->id,
         ]);
-        $automationLog = FactionLoyaltyAutomationLog::factory()->create([
+        $automationLog = $this->createFactionLoyaltyAutomationLog([
             'faction_loyalty_automation_id' => $automation->id,
             'fight_logs' => [
                 [

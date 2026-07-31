@@ -95,7 +95,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => LocationType::ALCHEMY_CHURCH,
+            'type' => LocationType::ALCHEMY_CHURCH->value,
             'name' => 'invalid_type_location',
         ]);
 
@@ -134,7 +134,8 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => 12,
             'y' => 12,
-            'type' => LocationType::PURGATORY_DUNGEONS,
+            'type' => LocationType::PURGATORY_DUNGEONS->value,
+            'enemy_strength_type' => 1,
             'name' => 'not_smith_house',
         ]);
 
@@ -1073,7 +1074,7 @@ class PurgatorySmithHouseRewardHandlerTest extends TestCase
             'game_map_id' => $character->map->game_map_id,
             'x' => $map->character_position_x,
             'y' => $map->character_position_y,
-            'type' => LocationType::PURGATORY_SMITH_HOUSE,
+            'type' => LocationType::PURGATORY_SMITH_HOUSE->value,
             'name' => 'smith_house_'.uniqid('', true),
         ]);
     }

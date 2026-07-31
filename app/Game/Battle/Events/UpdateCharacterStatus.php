@@ -2,7 +2,9 @@
 
 namespace App\Game\Battle\Events;
 
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Models\Event;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
@@ -12,9 +14,14 @@ use App\Flare\Models\User;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
+use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
+use App\Game\BatchCrafting\Values\BatchCraftingType;
+use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Skills\Values\SkillTypeValue;
+use Carbon\Carbon;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -33,9 +40,11 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     /**
      * Create a new event instance.
      */
-    public function __construct(Character $character)
+    public function __construct(Character $character, ?AttackTimerService $attackTimerService = null)
     {
-        $character = $character->refresh();
+        $attackTimerService ??= new AttackTimerService(new AutomationRestrictionService());
+        $character = $attackTimerService->normalizeExpiredAttackTimer($character);
+        $activeBatchCrafting = $this->activeBatchCrafting($character);
 
         $this->characterStatuses = [
             'can_attack' => $character->can_attack,
@@ -57,6 +66,12 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
                 ->where('type', AutomationType::DELVE)
                 ->where('completed_at', '>', now())
                 ->exists(),
+            'is_delve_visible' => $this->isDelveVisible($character),
+            'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
+            'is_batch_crafting_visible' => $this->visibleBatchCrafting($character),
+            'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
+            'is_batch_crafting_experience_mode' => $this->isBatchCraftingExperienceMode($activeBatchCrafting),
+            'is_batch_crafting_retry_mode' => $this->isBatchCraftingRetryMode($activeBatchCrafting),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->is_silenced,
@@ -111,6 +126,114 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         ];
     }
 
+    private function activeBatchCrafting(Character $character): ?BatchCrafting
+    {
+        $activeId = BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->max('id');
+
+        if (is_null($activeId)) {
+            return null;
+        }
+
+        return BatchCrafting::select(['id', 'character_id', 'batch_type', 'progress', 'started_at', 'ends_at'])
+            ->find($activeId);
+    }
+
+    private function visibleBatchCrafting(Character $character): bool
+    {
+        $hasActiveBatchCrafting = BatchCrafting::where('character_id', $character->id)
+            ->whereNull('completed_at')
+            ->whereNull('cancelled_at')
+            ->exists();
+
+        if ($hasActiveBatchCrafting) {
+            return true;
+        }
+
+        return BatchCrafting::where('character_id', $character->id)
+            ->whereNull('panel_dismissed_at')
+            ->where(function ($query) {
+                $query->whereNotNull('completed_at')
+                    ->orWhereNotNull('cancelled_at');
+            })
+            ->exists();
+    }
+
+    private function isDelveVisible(Character $character): bool
+    {
+        $isDelveActive = $character->currentAutomations()
+            ->where('character_id', $character->id)
+            ->where('type', AutomationType::DELVE)
+            ->where('completed_at', '>', now())
+            ->exists();
+
+        if ($isDelveActive) {
+            return true;
+        }
+
+        return DelveExploration::where('character_id', $character->id)
+            ->whereNotNull('completed_at')
+            ->whereNull('panel_dismissed_at')
+            ->exists();
+    }
+
+    private function batchCraftingTimeOutSeconds(?BatchCrafting $batchCrafting): int
+    {
+        if (is_null($batchCrafting)) {
+            return 0;
+        }
+
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+        $progress = $batchCrafting->progress ?? [];
+
+        if ($type->usesEightHourTimer($progress)) {
+            return max(0, now()->diffInSeconds($batchCrafting->ends_at, false));
+        }
+
+        if (($progress['continuation_state'] ?? null) === 'processing') {
+            return 0;
+        }
+
+        $nextAttemptAt = $progress['next_attempt_at'] ?? null;
+
+        if (! is_string($nextAttemptAt) || $nextAttemptAt === '') {
+            return 0;
+        }
+
+        try {
+            $pendingUntil = Carbon::parse($nextAttemptAt);
+        } catch (\Throwable) {
+            return 0;
+        }
+
+        return max(0, now()->diffInSeconds($pendingUntil, false));
+    }
+
+    private function isBatchCraftingExperienceMode(?BatchCrafting $batchCrafting): bool
+    {
+        if (is_null($batchCrafting)) {
+            return false;
+        }
+
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+
+        return $type->isExperienceMode($batchCrafting->progress ?? []);
+    }
+
+    private function isBatchCraftingRetryMode(?BatchCrafting $batchCrafting): bool
+    {
+        if (is_null($batchCrafting)) {
+            return false;
+        }
+
+        $progress = $batchCrafting->progress ?? [];
+        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? BatchCraftingService::RECURRING_DELAY_SECONDS);
+
+        return $tickDelay < BatchCraftingService::RECURRING_DELAY_SECONDS;
+    }
+
     private function isAlchemyLocked(Character $character): bool
     {
 
@@ -138,7 +261,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         }
 
         $location = Location::where('game_map_id', $characterMap->game_map_id)->where('x', $characterMap->character_position_x)->where('y', $characterMap->character_position_y)
-            ->where('type', LocationType::CAVE_OF_MEMORIES)->first();
+            ->where('type', LocationType::CAVE_OF_MEMORIES->value)->first();
 
         $characterHasItem = $character->inventory->slots->filter(function ($slot) use ($questItemForDelve) {
             return $slot->item_id === $questItemForDelve->id;

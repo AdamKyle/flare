@@ -5,6 +5,7 @@ namespace App\Game\BattleRewardProcessing\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\CharacterBattleRewardRequest;
+use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
@@ -14,6 +15,7 @@ use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use Carbon\Carbon;
 use Illuminate\Contracts\Cache\Lock;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -34,6 +36,8 @@ class BattleRewardProcessingQueueManager
      * recover the stuck state that follows a Horizon restart before TTL expires.
      */
     private const PROCESSOR_LOCK_SECONDS = 1800;
+
+    private const ENQUEUE_CREATE_ATTEMPTS = 3;
 
     public const ORPHANED_PROCESSING_FAILED_REASON = 'Orphaned processing request recovered after stale heartbeat and no live processor lock.';
 
@@ -65,14 +69,52 @@ class BattleRewardProcessingQueueManager
             'source_id' => $sourceId,
         ]);
 
-        $request = CharacterBattleRewardRequest::create([
-            'character_id' => $characterId,
-            'priority' => $priority,
-            'source_type' => $sourceType,
-            'source_id' => is_null($sourceId) ? null : (string) $sourceId,
-            'handler_payload' => $handlerPayload,
-            'status' => BattleRewardRequestStatus::PENDING,
-        ]);
+        $request = null;
+        $firstLockException = null;
+
+        for ($attempt = 1; $attempt <= self::ENQUEUE_CREATE_ATTEMPTS; $attempt++) {
+            try {
+                $request = CharacterBattleRewardRequest::create([
+                    'character_id' => $characterId,
+                    'priority' => $priority,
+                    'source_type' => $sourceType,
+                    'source_id' => is_null($sourceId) ? null : (string) $sourceId,
+                    'handler_payload' => $handlerPayload,
+                    'status' => BattleRewardRequestStatus::PENDING,
+                ]);
+
+                break;
+            } catch (QueryException $exception) {
+                $exceptionCode = (int) $exception->getCode();
+                $previousCode = (int) ($exception->getPrevious()?->getCode() ?? 0);
+                $isRetryable = in_array($exceptionCode, [1205, 1213], true)
+                    || in_array($previousCode, [1205, 1213], true)
+                    || str_contains($exception->getMessage(), '1205')
+                    || str_contains($exception->getMessage(), '1213')
+                    || str_contains($exception->getMessage(), 'Lock wait timeout exceeded')
+                    || str_contains($exception->getMessage(), 'Deadlock found');
+
+                if (! $isRetryable) {
+                    throw $exception;
+                }
+
+                $firstLockException ??= $exception;
+
+                Log::channel('reward_processing')->warning('Reward request creation retry after database lock error.', [
+                    'character_id' => $characterId,
+                    'source_type' => $sourceType->value,
+                    'source_id' => $sourceId,
+                    'attempt' => $attempt,
+                    'exception_code' => $exceptionCode !== 0 ? $exceptionCode : $previousCode,
+                ]);
+
+                if ($attempt === self::ENQUEUE_CREATE_ATTEMPTS) {
+                    throw $firstLockException;
+                }
+
+                usleep(50_000);
+            }
+        }
 
         Log::channel('reward_processing')->debug('Enqueue created request.', [
             'character_id' => $characterId,
@@ -465,6 +507,48 @@ class BattleRewardProcessingQueueManager
         $this->safelyDispatchBroadcastEvent(
             new BattleRewardQueueUpdated($request->character_id, 'failed'),
         );
+    }
+
+    public function markCorruptedInventory(CharacterBattleRewardRequest $request): void
+    {
+        $request->update([
+            'status' => BattleRewardRequestStatus::FAILED,
+            'failed_reason' => 'missing_inventory',
+            'completed_at' => now(),
+        ]);
+
+        $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_processing')->warning('Reward request stopped because the character inventory is missing.', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+        ]);
+    }
+
+    public function markNotificationRetryable(
+        CharacterBattleRewardRequest $request,
+        CharacterBattleRewardRequestStep $step,
+        Throwable $throwable,
+    ): void {
+        $step->update([
+            'status' => BattleRewardStepStatus::RESUMABLE,
+            'failed_reason' => $throwable::class.': '.$throwable->getMessage(),
+            'heartbeat_at' => now(),
+        ]);
+        $request->update([
+            'status' => BattleRewardRequestStatus::RESUMABLE,
+            'failed_reason' => $throwable::class.': '.$throwable->getMessage(),
+            'completed_at' => null,
+        ]);
+        $this->updateHeartbeat($request->character_id);
+
+        Log::channel('reward_ledger')->warning('notification.retry_scheduled', [
+            'character_id' => $request->character_id,
+            'request_id' => $request->id,
+            'step_name' => $step->step_name->value,
+            'exception_class' => $throwable::class,
+            'exception_message' => $throwable->getMessage(),
+        ]);
     }
 
     public function updateHeartbeat(int $characterId): void

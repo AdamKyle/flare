@@ -4,19 +4,23 @@ import { SidePeekComponentRegistrationEnum } from '../../../game/components/side
 import { SidePeek } from '../../../game/components/side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import MonitoringStatusChart from '../../monitoring/components/monitoring-status-chart';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../monitoring/values/admin-monitoring-chart-colors';
 import AdminPaginationControls from '../../shared/components/admin-pagination-controls';
-import { useLogsApi } from '../ajax/logs-api';
 import LogsPollResponseDefinition from '../api/definitions/logs-poll-response-definition';
+import { useLogsApi } from '../api/hooks/use-logs-api';
 import useLogPolling from '../hooks/use-log-polling';
 import {
   LogEntriesPage,
   LogEntry,
+  LogEntryDetail,
   LogFileInfo,
   LogFilters,
   LogSummary,
   SEVERITIES,
   SystemBugReport,
 } from '../types/logs-dashboard';
+import SeverityBadgeProps from '../types/severity-badge-props';
+import logEntriesPaginationAdapter from '../utils/log-entries-pagination-adapter';
 
 const SEVERITY_COLORS: Record<string, string> = {
   emergency: 'bg-red-700 text-white',
@@ -31,7 +35,7 @@ const SEVERITY_COLORS: Record<string, string> = {
   unknown: 'bg-gray-200 text-gray-700',
 };
 
-function SeverityBadge({ severity }: { severity: string }) {
+function SeverityBadge({ severity }: SeverityBadgeProps) {
   const cls =
     SEVERITY_COLORS[severity.toLowerCase()] ?? SEVERITY_COLORS.unknown;
   return (
@@ -49,28 +53,21 @@ const defaultFilters: LogFilters = {
   date_to: '',
 };
 
-const emptyPaginatedResponse = (): LogEntriesPage =>
-  ({
-    data: [],
-    meta: {
-      can_load_more: false,
-      pagination: {
-        count: 0,
-        [`current${'_'}page`]: 1,
-        links: { next: '', prev: '' },
-        per_page: 10,
-        total: 0,
-        total_pages: 1,
-      },
-    },
-  }) as LogEntriesPage;
+const emptyPaginatedResponse = (): LogEntriesPage => ({
+  data: [],
+  current_page: 1,
+  last_page: 1,
+  total: 0,
+  next_cursor: null,
+  summary: { total: 0, by_severity: {}, chart: [] },
+});
 
 export default function LogsDashboard() {
   const sidePeekEmitter = useSidePeekEmitter();
   const {
     fetchLogFiles,
     fetchLogEntries,
-    fetchLogSummary,
+    fetchLogEntryDetail,
     pollLogs,
     fetchSystemBugs,
     fetchBugChart,
@@ -96,6 +93,8 @@ export default function LogsDashboard() {
     Array<{ period: string; occurrences: number }>
   >([]);
   const [bugRange, setBugRange] = useState(30);
+  const [loadingDetailId, setLoadingDetailId] = useState<string | null>(null);
+  const [detailError, setDetailError] = useState('');
   const tableRef = React.useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -118,23 +117,21 @@ export default function LogsDashboard() {
       setError('');
 
       try {
-        const [entriesData, summaryData, bugData, bugChartData] =
-          await Promise.all([
-            fetchLogEntries(fileKey, f, p),
-            fetchLogSummary(fileKey, f),
-            fetchSystemBugs(),
-            fetchBugChart(bugRange),
-          ]);
+        const [entriesData, bugData, bugChartData] = await Promise.all([
+          fetchLogEntries(fileKey, f, p),
+          fetchSystemBugs(),
+          fetchBugChart(bugRange),
+        ]);
 
         setEntries(entriesData);
-        setSummary(summaryData);
+        setSummary(entriesData.summary);
         setBugs(bugData);
         setBugChart(bugChartData);
       } catch {
         setError('Could not load log entries.');
       }
     },
-    [bugRange, fetchBugChart, fetchLogEntries, fetchLogSummary, fetchSystemBugs]
+    [bugRange, fetchBugChart, fetchLogEntries, fetchSystemBugs]
   );
 
   useEffect(() => {
@@ -145,9 +142,6 @@ export default function LogsDashboard() {
     (payload: LogsPollResponseDefinition) => {
       setNewEntries(payload.entries);
       setSummary(payload.summary);
-      setFiles(payload.files);
-      setBugs(payload.bugs);
-      setBugChart(payload.bug_chart);
       void loadData(selectedFile, filters, page);
     },
     [filters, loadData, page, selectedFile]
@@ -180,18 +174,27 @@ export default function LogsDashboard() {
   };
 
   const openLogEntrySidePeek = useCallback(
-    (entry: LogEntry) => {
-      sidePeekEmitter.emit(
-        SidePeek.SIDE_PEEK,
-        SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY,
-        {
-          title: 'Log Detail',
-          is_open: true,
-          entry,
-        }
-      );
+    async (entry: LogEntry) => {
+      setDetailError('');
+      setLoadingDetailId(entry.detail_id);
+
+      try {
+        const detail: LogEntryDetail = await fetchLogEntryDetail(
+          entry.file_key,
+          entry.detail_id
+        );
+        sidePeekEmitter.emit(
+          SidePeek.SIDE_PEEK,
+          SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY,
+          { title: 'Log Detail', is_open: true, entry: detail }
+        );
+      } catch {
+        setDetailError('Could not load the selected log detail.');
+      } finally {
+        setLoadingDetailId(null);
+      }
     },
-    [sidePeekEmitter]
+    [fetchLogEntryDetail, sidePeekEmitter]
   );
 
   const openBugReportSidePeek = useCallback(
@@ -230,6 +233,7 @@ export default function LogsDashboard() {
         <div className="flex flex-wrap gap-2">
           {files.map((f) => (
             <button
+              type="button"
               key={f.key}
               disabled={!f.exists}
               onClick={() => {
@@ -260,6 +264,7 @@ export default function LogsDashboard() {
         <>
           <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <button
+              type="button"
               className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
               onClick={() => setSeverityFilter('')}
             >
@@ -270,6 +275,7 @@ export default function LogsDashboard() {
             </button>
             {Object.entries(summary.by_severity).map(([sev, cnt]) => (
               <button
+                type="button"
                 key={sev}
                 className="rounded-lg border border-gray-200 bg-white p-4 text-left shadow-sm dark:border-gray-700 dark:bg-gray-900"
                 onClick={() => setSeverityFilter(sev)}
@@ -293,6 +299,14 @@ export default function LogsDashboard() {
             className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5 dark:border-gray-700 dark:bg-gray-900"
           >
             <h2 className="mb-3 text-lg font-semibold">Recent Logs</h2>
+            {detailError && (
+              <p
+                className="mb-3 text-sm text-rose-700 dark:text-rose-300"
+                role="alert"
+              >
+                {detailError}
+              </p>
+            )}
             <div className="mb-3 flex flex-wrap gap-2">
               {[
                 { label: '1d', days: 1 },
@@ -308,6 +322,7 @@ export default function LogsDashboard() {
                 const toStr = new Date().toISOString().slice(0, 10);
                 return (
                   <button
+                    type="button"
                     key={label}
                     className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
                     onClick={() => {
@@ -324,6 +339,7 @@ export default function LogsDashboard() {
                 );
               })}
               <button
+                type="button"
                 className="rounded border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
                 onClick={() => {
                   setFilters({
@@ -394,19 +410,28 @@ export default function LogsDashboard() {
               <table className="w-full min-w-[840px] text-left text-sm">
                 <thead>
                   <tr className="border-b dark:border-gray-700">
-                    <th className="p-2 whitespace-nowrap">Timestamp</th>
-                    <th className="p-2">Severity</th>
-                    <th className="p-2">Channel</th>
-                    <th className="p-2">Message</th>
-                    <th className="p-2">Exception</th>
+                    <th scope="col" className="p-2 whitespace-nowrap">
+                      Timestamp
+                    </th>
+                    <th scope="col" className="p-2">
+                      Severity
+                    </th>
+                    <th scope="col" className="p-2">
+                      Channel
+                    </th>
+                    <th scope="col" className="p-2">
+                      Message
+                    </th>
+                    <th scope="col" className="p-2">
+                      Exception
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {entries.data.map((entry, idx) => (
                     <tr
                       key={`${entry.timestamp ?? 'raw'}-${idx}`}
-                      className="cursor-pointer border-t align-top hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-                      onClick={() => openLogEntrySidePeek(entry)}
+                      className="border-t align-top dark:border-gray-700"
                     >
                       <td className="p-2 text-xs whitespace-nowrap text-gray-500">
                         {entry.timestamp ?? '-'}
@@ -415,7 +440,20 @@ export default function LogsDashboard() {
                         <SeverityBadge severity={entry.severity} />
                       </td>
                       <td className="p-2 text-xs">{entry.channel ?? '-'}</td>
-                      <td className="p-2 text-sm">{entry.message}</td>
+                      <td className="p-2 text-sm">
+                        <button
+                          type="button"
+                          className="text-left underline decoration-dotted underline-offset-2 disabled:cursor-wait disabled:opacity-60"
+                          disabled={loadingDetailId === entry.detail_id}
+                          aria-label={`View log detail: ${entry.message}`}
+                          onClick={() => void openLogEntrySidePeek(entry)}
+                        >
+                          {loadingDetailId === entry.detail_id
+                            ? 'Loading detail… '
+                            : ''}
+                          {entry.message}
+                        </button>
+                      </td>
                       <td className="p-2 text-xs">
                         {entry.exception_class ?? '-'}
                       </td>
@@ -430,7 +468,7 @@ export default function LogsDashboard() {
               )}
             </div>
             <AdminPaginationControls
-              response={entries}
+              response={logEntriesPaginationAdapter(entries)}
               label="log entries"
               on_page_change={setPage}
             />
@@ -444,7 +482,7 @@ export default function LogsDashboard() {
               {
                 key: 'entries',
                 label: 'Entries',
-                color: '#4f46e5',
+                color: ADMIN_MONITORING_CHART_COLORS.indigoStrong,
               },
             ]}
           />
@@ -454,6 +492,7 @@ export default function LogsDashboard() {
             <div className="flex flex-wrap gap-2">
               {[7, 14, 30, 60, 120].map((days) => (
                 <button
+                  type="button"
                   key={days}
                   className={[
                     'rounded border px-2 py-1 text-xs',
@@ -476,7 +515,7 @@ export default function LogsDashboard() {
               {
                 key: 'occurrences',
                 label: 'Occurrences',
-                color: '#dc2626',
+                color: ADMIN_MONITORING_CHART_COLORS.roseStrong,
               },
             ]}
           />
@@ -488,21 +527,36 @@ export default function LogsDashboard() {
               <table className="w-full min-w-[760px] text-left text-sm">
                 <thead>
                   <tr className="border-b dark:border-gray-700">
-                    <th className="p-2">Bug</th>
-                    <th className="p-2">Status</th>
-                    <th className="p-2">Severity</th>
-                    <th className="p-2">Occurrences</th>
-                    <th className="p-2">Last Seen</th>
+                    <th scope="col" className="p-2">
+                      Bug
+                    </th>
+                    <th scope="col" className="p-2">
+                      Status
+                    </th>
+                    <th scope="col" className="p-2">
+                      Severity
+                    </th>
+                    <th scope="col" className="p-2">
+                      Occurrences
+                    </th>
+                    <th scope="col" className="p-2">
+                      Last Seen
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {bugs.map((bug) => (
-                    <tr
-                      key={bug.id}
-                      className="cursor-pointer border-t hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-                      onClick={() => openBugReportSidePeek(bug)}
-                    >
-                      <td className="p-2">{bug.title}</td>
+                    <tr key={bug.id} className="border-t dark:border-gray-700">
+                      <td className="p-2">
+                        <button
+                          type="button"
+                          className="text-left underline decoration-dotted underline-offset-2"
+                          onClick={() => openBugReportSidePeek(bug)}
+                          aria-label={`View bug report: ${bug.title}`}
+                        >
+                          {bug.title}
+                        </button>
+                      </td>
                       <td className="p-2">{bug.status}</td>
                       <td className="p-2">
                         {bug.severity ? (

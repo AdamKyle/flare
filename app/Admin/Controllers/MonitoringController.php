@@ -26,4 +26,9 @@ class MonitoringController extends Controller
     {
         return view('admin.monitoring.logs');
     }
+
+    public function batchCrafting(): View
+    {
+        return view('admin.monitoring.batch-crafting');
+    }
 }

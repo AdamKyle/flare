@@ -35,3 +35,11 @@ Broadcast::channel('admin-monitoring-faction-loyalty', function ($user) {
 Broadcast::channel('admin-monitoring-delve', function ($user) {
     return $user->hasRole('Admin');
 });
+
+Broadcast::channel('admin-monitoring-batch-crafting', function ($user) {
+    return $user->hasRole('Admin');
+});
+
+Broadcast::channel('admin-statistics-dashboard', function ($user) {
+    return $user->hasRole('Admin');
+});

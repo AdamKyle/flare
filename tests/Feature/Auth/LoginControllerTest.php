@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;
@@ -59,7 +60,7 @@ class LoginControllerTest extends TestCase
         $this->seeIsAuthenticatedAs($character->user);
     }
 
-    public function test_user_marked_for_deletion_can_login_and_deletion_flag_is_cleared(): void
+    public function test_user_without_character_does_not_have_deletion_flag_cleared_on_login(): void
     {
         $user = $this->createUser([
             'email' => 'login-test@example.com',
@@ -73,7 +74,31 @@ class LoginControllerTest extends TestCase
 
         $response->assertRedirectedTo('/');
         $this->seeIsAuthenticatedAs($user);
-        $this->assertFalse($user->refresh()->will_be_deleted);
+        $this->assertTrue($user->refresh()->will_be_deleted);
+    }
+
+    public function test_user_with_character_without_inventory_is_logged_out_and_retains_deletion_flag(): void
+    {
+        Queue::fake();
+        $character = (new CharacterFactory)
+            ->setAttributesOnUserForCreation([
+                'email' => 'missing-inventory-login-test@example.com',
+                'will_be_deleted' => false,
+            ])
+            ->createBaseCharacter()
+            ->getCharacter();
+        $character->inventory()->delete();
+
+        $response = $this->call('POST', route('login'), [
+            'email' => 'missing-inventory-login-test@example.com',
+            'password' => 'ReallyLongPassword',
+        ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHas('error', 'Your previous character no longer exists. Please create a new character.');
+        $this->dontSeeIsAuthenticated();
+        $this->assertTrue($character->user->refresh()->will_be_deleted);
+        Queue::assertNothingPushed();
     }
 
     public function test_existing_user_cannot_login_with_wrong_password(): void

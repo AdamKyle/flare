@@ -5,19 +5,20 @@ namespace App\Admin\Controllers\Api;
 use App\Admin\Services\AdminLogsDashboardService;
 use App\Admin\Transformers\AdminBugChartTransformer;
 use App\Admin\Transformers\AdminBugReportTransformer;
+use App\Admin\Transformers\AdminLogEntryTransformer;
 use App\Admin\Transformers\AdminLogFileTransformer;
 use App\Admin\Transformers\AdminLogPollTransformer;
-use App\Admin\Transformers\AdminLogSummaryTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
 
 class AdminLogsDashboardController extends Controller
 {
     public function __construct(
         private readonly AdminLogsDashboardService $adminLogsDashboardService,
         private readonly AdminLogFileTransformer $adminLogFileTransformer,
-        private readonly AdminLogSummaryTransformer $adminLogSummaryTransformer,
+        private readonly AdminLogEntryTransformer $adminLogEntryTransformer,
         private readonly AdminLogPollTransformer $adminLogPollTransformer,
         private readonly AdminBugReportTransformer $adminBugReportTransformer,
         private readonly AdminBugChartTransformer $adminBugChartTransformer,
@@ -36,27 +37,35 @@ class AdminLogsDashboardController extends Controller
         $fileKey = $request->string('file', 'laravel')->toString();
         $page = max(1, $request->integer('page', 1));
         $severity = $request->string('severity', '')->toString();
-        $dateFrom = $request->string('date_from', '')->toString();
-        $dateTo = $request->string('date_to', '')->toString();
-        $perPage = min($request->integer('per_page', 10), 100);
+        $dateFrom = $request->string('date_from', now()->subDay()->toDateString())->toString();
+        $dateTo = $request->string('date_to', now()->toDateString())->toString();
+        $cursor = $request->string('cursor', '')->toString();
 
-        return response()->json(
-            $this->adminLogsDashboardService->entries($fileKey, $page, $severity, $dateFrom, $dateTo, $perPage),
-        );
+        try {
+            return response()->json(
+                $this->adminLogsDashboardService->entries($fileKey, $page, $severity, $dateFrom, $dateTo, $cursor),
+            );
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return response()->json([
+                'message' => $throwable->getMessage(),
+            ], 500);
+        }
     }
 
-    public function summary(Request $request): JsonResponse
+    public function entryDetail(Request $request): JsonResponse
     {
-        $fileKey = $request->string('file', 'laravel')->toString();
-        $severity = $request->string('severity', '')->toString();
-        $dateFrom = $request->string('date_from', '')->toString();
-        $dateTo = $request->string('date_to', '')->toString();
-
-        return response()->json(
-            $this->adminLogSummaryTransformer->transform(
-                $this->adminLogsDashboardService->summary($fileKey, $severity, $dateFrom, $dateTo),
-            ),
+        $detail = $this->adminLogsDashboardService->entryDetail(
+            $request->string('file')->toString(),
+            $request->string('detail_id')->toString(),
         );
+
+        if (is_null($detail)) {
+            return response()->json(['message' => 'The requested log detail is no longer available.'], 404);
+        }
+
+        return response()->json($this->adminLogEntryTransformer->transform($detail));
     }
 
     public function poll(Request $request): JsonResponse

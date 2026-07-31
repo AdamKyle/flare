@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\ItemSkill;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
@@ -579,5 +580,57 @@ class CharacterInventoryServiceTest extends TestCase
         $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
 
         $this->assertEquals(2, $gemSlot->refresh()->amount);
+    }
+
+    public function test_batch_crafting_set_appears_last_in_set_payload(): void
+    {
+        $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
+        $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $sets = $this->characterInventoryService->setCharacter($character->refresh())->getCharacterInventorySets();
+
+        $this->assertSame(InventorySet::BATCH_CRAFTING_SET_NAME, array_key_last($sets));
+        $this->assertTrue($sets[InventorySet::BATCH_CRAFTING_SET_NAME]['is_batch_crafting_set']);
+    }
+
+    public function test_batch_crafting_set_is_excluded_from_usable_sets(): void
+    {
+        $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
+        $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $sets = $this->characterInventoryService->setCharacter($character->refresh())->getUsableSets();
+
+        $this->assertCount(1, $sets);
+        $this->assertNotSame(InventorySet::BATCH_CRAFTING_SET_NAME, $sets[0]['name']);
+    }
+
+    public function test_batch_crafting_set_excluded_from_savable_sets(): void
+    {
+        $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
+        $character->inventorySets()->create([
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'is_equipped' => false,
+            'can_be_equipped' => false,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+        ]);
+
+        $savableSets = $this->characterInventoryService->setCharacter($character->refresh())->getInventoryForType('savable_sets');
+
+        $batchCraftingSetIncluded = collect($savableSets)->contains(fn ($set) => ($set['name'] ?? null) === InventorySet::BATCH_CRAFTING_SET_NAME);
+
+        $this->assertFalse($batchCraftingSetIncluded);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controllers\Api;
 
+use App\Admin\Services\BatchCraftingMonitoringService;
 use App\Admin\Services\DelveMonitoringService;
 use App\Admin\Services\ExplorationMonitoringService;
 use App\Admin\Services\FactionLoyaltyMonitoringService;
@@ -41,6 +42,7 @@ class MonitoringController extends Controller
         private readonly DelveActiveCharacterTransformer $delveActiveCharacterTransformer,
         private readonly DelveSummaryTransformer $delveSummaryTransformer,
         private readonly DelveChartTransformer $delveChartTransformer,
+        private readonly BatchCraftingMonitoringService $batchCraftingMonitoringService,
     ) {}
 
     public function explorationActive(): JsonResponse
@@ -139,5 +141,25 @@ class MonitoringController extends Controller
     private function transformRows(array $rows, callable $transformer): array
     {
         return array_map($transformer, $rows);
+    }
+
+    public function batchCraftingActive(): JsonResponse
+    {
+        return response()->json($this->batchCraftingMonitoringService->activeCharacters());
+    }
+
+    public function batchCraftingRuns(Request $request): JsonResponse
+    {
+        return response()->json($this->batchCraftingMonitoringService->recentRuns($request));
+    }
+
+    public function batchCraftingSummary(Request $request): JsonResponse
+    {
+        return response()->json($this->batchCraftingMonitoringService->summary($request));
+    }
+
+    public function batchCraftingChart(Request $request): JsonResponse
+    {
+        return response()->json($this->batchCraftingMonitoringService->chart($request));
     }
 }

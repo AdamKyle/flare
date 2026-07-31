@@ -5,6 +5,7 @@ namespace App\Game\Kingdoms\Handlers\CapitalCityHandlers;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Handlers\Traits\CanAffordPopulationCost;
 use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
@@ -13,7 +14,6 @@ use App\Game\Kingdoms\Service\PurchasePeopleService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
@@ -29,6 +29,7 @@ class CapitalCityBuildingRequestHandler
         private readonly KingdomBuildingResourceValidation $kingdomBuildingResourceValidation,
         private readonly PurchasePeopleService $purchasePeopleService,
         private readonly UpdateKingdom $updateKingdom,
+        private readonly GameTimerService $gameTimerService,
     ) {}
 
     /**
@@ -88,9 +89,7 @@ class CapitalCityBuildingRequestHandler
             }
         }
 
-        if (config('app.env') !== 'production') {
-            $timeTillFinished = 1;
-        }
+        $completedAt = $this->gameTimerService->availableAtFromMinutes($timeTillFinished);
 
         $messages = $capitalCityBuildingQueue->messages ?? [];
 
@@ -98,13 +97,13 @@ class CapitalCityBuildingRequestHandler
             'building_request_data' => $buildingsToUpgradeOrRepair,
             'messages' => array_merge($messages, $this->messages),
             'started_at' => $timeToStart,
-            'completed_at' => $timeToStart->clone()->addMinutes($timeTillFinished),
+            'completed_at' => $completedAt,
             'status' => $upgrading ? CapitalCityQueueStatus::BUILDING : CapitalCityQueueStatus::REPAIRING,
         ]);
 
         $capitalCityBuildingQueue = $capitalCityBuildingQueue->refresh();
 
-        $this->dispatchOrLogBuildingRequest($capitalCityBuildingQueue, $buildingsToUpgradeOrRepair, $timeToStart, $timeTillFinished);
+        $this->dispatchOrLogBuildingRequest($capitalCityBuildingQueue, $buildingsToUpgradeOrRepair);
     }
 
     /**
@@ -173,8 +172,6 @@ class CapitalCityBuildingRequestHandler
     private function dispatchOrLogBuildingRequest(
         CapitalCityBuildingQueue $capitalCityBuildingQueue,
         array $buildingsToUpgradeOrRepair,
-        Carbon $timeToStart,
-        int $timeTillFinished
     ): void {
         $filteredRequestData = collect($buildingsToUpgradeOrRepair)->filter(fn ($item) => in_array($item['secondary_status'], [
             CapitalCityQueueStatus::BUILDING,
@@ -183,12 +180,8 @@ class CapitalCityBuildingRequestHandler
 
         if (! empty($filteredRequestData)) {
 
-            if (config('app.env') !== 'production') {
-                $timeTillFinished = 1;
-            }
-
             CapitalCityBuildingRequest::dispatch($capitalCityBuildingQueue->id)->onConnection('long_running')->onQueue('default_long')->delay(
-                ($timeTillFinished >= 15 ? $timeToStart->clone()->addMinutes(15) : $timeToStart->clone()->addMinutes($timeTillFinished))
+                $capitalCityBuildingQueue->completed_at
             );
 
             $this->updateKingdom->updateKingdom($capitalCityBuildingQueue->kingdom);

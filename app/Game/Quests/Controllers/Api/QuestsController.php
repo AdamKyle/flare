@@ -84,11 +84,12 @@ class QuestsController extends Controller
         }
 
         $characterIsAtLocation = $character->map()
-            ->where('x_position', $quest->npc->x_position)
-            ->where('y_position', $quest->npc->y_position)
-            ->where('game_map_id', $quest->npc->game_map_id);
+            ->where('character_position_x', $quest->npc->x_position)
+            ->where('character_position_y', $quest->npc->y_position)
+            ->where('game_map_id', $quest->npc->game_map_id)
+            ->exists();
 
-        if (! is_null($characterIsAtLocation)) {
+        if (! $characterIsAtLocation) {
             $response = $this->questHandler->moveCharacter($character, $quest->npc);
 
             if ($response instanceof Character) {

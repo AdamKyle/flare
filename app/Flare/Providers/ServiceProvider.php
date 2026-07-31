@@ -73,6 +73,7 @@ use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\BaseSkillValue;
 use App\Flare\Values\BaseStatValue;
 use App\Flare\View\Components\ItemDisplayColor;
+use App\Game\Battle\Services\AttackTimerService;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -91,6 +92,7 @@ use App\Game\Kingdoms\Transformers\UnitTransformer;
 use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Transformers\QuestTransformer;
+use App\Game\Raids\Services\RaidMapConflictService;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -140,7 +142,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterSheetBaseInfoTransformer::class, function ($app) {
             return new CharacterSheetBaseInfoTransformer(
-                $app->make(CharacterStatBuilder::class)
+                $app->make(CharacterStatBuilder::class),
+                $app->make(AttackTimerService::class),
             );
         });
 
@@ -461,8 +464,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ClassRanksWeaponMasteriesBuilder;
         });
 
-        $this->app->bind(EventSchedulerService::class, function () {
-            return new EventSchedulerService;
+        $this->app->bind(EventSchedulerService::class, function ($app) {
+            return new EventSchedulerService($app->make(RaidMapConflictService::class));
         });
 
         $this->app->bind(BuildQuestCacheService::class, function ($app) {

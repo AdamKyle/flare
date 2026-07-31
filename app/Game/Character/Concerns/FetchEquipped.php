@@ -7,6 +7,7 @@ use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
+use App\Game\Character\Exceptions\MissingInventoryException;
 use Illuminate\Database\Eloquent\Collection;
 
 trait FetchEquipped
@@ -27,7 +28,7 @@ trait FetchEquipped
                 ]);
             }
 
-            return null;
+            throw new MissingInventoryException('The character inventory is missing.');
         }
 
         $slots = $this->fetchEquippedInventorySlots($inventory);

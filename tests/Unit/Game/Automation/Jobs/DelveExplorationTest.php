@@ -5,7 +5,6 @@ namespace Tests\Unit\Game\Automation\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration as DelveExplorationModel;
-use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
@@ -15,11 +14,16 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Enums\DelveOutcome;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Jobs\DelveExploration;
+use App\Game\Automation\Services\DelveStatusService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Events\DelveTopsUpdated;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -31,10 +35,14 @@ use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateDelveAutomation;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
 
 class DelveExplorationTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacterAutomation, CreateDelveAutomation, CreateItem, CreateLocation, RefreshDatabase;
 
     private Character $character;
 
@@ -54,11 +62,11 @@ class DelveExplorationTest extends TestCase
             ->createSessionForCharacter()
             ->getCharacter();
 
-        $this->location = Location::factory()->create([
+        $this->location = $this->createLocation([
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
             'game_map_id' => $this->character->map->game_map_id,
-            'type' => LocationType::CAVE_OF_MEMORIES,
+            'type' => LocationType::CAVE_OF_MEMORIES->value,
             'minutes_between_delve_fights' => 5,
         ]);
 
@@ -74,8 +82,7 @@ class DelveExplorationTest extends TestCase
             ])
             ->getMonster();
 
-        Item::factory()->create([
-            'name' => 'Delve Reward Sword',
+        $this->createItem([
             'type' => 'weapon',
             'skill_level_required' => 1,
             'item_prefix_id' => null,
@@ -102,6 +109,83 @@ class DelveExplorationTest extends TestCase
         $this->runJob(999999, 999999);
 
         $this->assertEquals(0, $this->character->currentAutomations()->count());
+    }
+
+    public function test_missing_inventory_stops_delve_without_continuation_rewards_or_completion_events(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $delve = $this->createDelveAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now(),
+            'completed_at' => null,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'increase_enemy_strength' => 0,
+        ]);
+        $automationState = $automation->refresh()->toArray();
+        $delveState = $delve->refresh()->toArray();
+        $characterRewardsAndCurrencies = $this->character->only([
+            'xp',
+            'gold',
+            'gold_dust',
+            'shards',
+            'copper_coins',
+        ]);
+        $this->character->inventory()->delete();
+        $job = new DelveExploration(
+            $this->character->id,
+            $this->location->id,
+            $automation->id,
+            $delve->id,
+            [
+                'attack_type' => AttackTypeValue::ATTACK,
+                'pack_size' => 1,
+            ],
+            5,
+        );
+
+        $job->handle(
+            resolve(MonsterFightService::class),
+            resolve(BattleEventHandler::class),
+            resolve(CharacterCacheData::class),
+            resolve(CharacterRewardService::class),
+            resolve(SkillService::class),
+            resolve(BroadcastTopsUpdateService::class),
+        );
+
+        $this->assertNull($this->character->refresh()->inventory);
+        $this->assertTrue($this->character->user->refresh()->will_be_deleted);
+        $this->assertSame($automationState, $automation->refresh()->toArray());
+        $this->assertSame($delveState, $delve->refresh()->toArray());
+        $this->assertSame(
+            $characterRewardsAndCurrencies,
+            $this->character->refresh()->only([
+                'xp',
+                'gold',
+                'gold_dust',
+                'shards',
+                'copper_coins',
+            ]),
+        );
+        $this->assertSame(0, DB::table('delve_logs')->where('delve_exploration_id', $delve->id)->count());
+        Queue::assertNothingPushed();
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+        Event::assertNotDispatched(AutomationTimeOut::class);
+        Event::assertNotDispatched(DelveStatusUpdated::class);
+        Event::assertNotDispatched(DelveTopsUpdated::class);
+        Event::assertNotDispatched(ServerMessageEvent::class);
+        Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertNotDispatched(UpdateCharacterStatus::class);
     }
 
     public function test_handle_deletes_automation_when_delve_does_not_exist(): void
@@ -359,6 +443,7 @@ class DelveExplorationTest extends TestCase
         $this->runJob($automation->id, $delve->id);
 
         $this->assertDelveLogExists($delve, DelveOutcome::SURVIVED, 1);
+        Event::assertDispatched(DelveTopsUpdated::class);
     }
 
     public function test_handle_increases_enemy_strength_after_survived_encounter(): void
@@ -541,6 +626,65 @@ class DelveExplorationTest extends TestCase
         $this->runJob($automation->id, $delve->id);
 
         $this->assertNotNull($delve->refresh()->completed_at);
+    }
+
+    public function test_handle_keeps_panel_undismissed_when_character_dies_after_fight(): void
+    {
+        Event::fake();
+
+        $this->bindFightDeathFight();
+
+        $automation = $this->createAutomation();
+        $delve = $this->createDelve();
+
+        $this->runJob($automation->id, $delve->id);
+
+        $this->assertNull($delve->refresh()->panel_dismissed_at);
+    }
+
+    public function test_handle_dispatches_delve_status_update_when_character_dies_after_fight(): void
+    {
+        Event::fake();
+
+        $this->bindFightDeathFight();
+
+        $automation = $this->createAutomation();
+        $delve = $this->createDelve();
+
+        $this->runJob($automation->id, $delve->id);
+
+        Event::assertDispatched(DelveStatusUpdated::class);
+    }
+
+    public function test_completed_non_dismissed_delve_status_remains_available(): void
+    {
+        $delve = $this->createDelve([
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => DelveOutcome::DIED->value,
+            'panel_dismissed_at' => null,
+        ]);
+
+        $status = resolve(DelveStatusService::class)->statusForCharacter($this->character->refresh());
+
+        $this->assertFalse($status['active']);
+        $this->assertTrue($status['completed']);
+        $this->assertSame($delve->id, $status['id']);
+    }
+
+    public function test_dismissed_completed_delve_status_no_longer_returns_visible_status(): void
+    {
+        $this->createDelve([
+            'started_at' => now()->subHour(),
+            'completed_at' => now(),
+            'ended_reason' => DelveOutcome::DIED->value,
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $status = resolve(DelveStatusService::class)->statusForCharacter($this->character->refresh());
+
+        $this->assertFalse($status['active']);
+        $this->assertFalse($status['completed']);
     }
 
     public function test_handle_creates_timeout_log_when_fight_exceeds_maximum_attempts(): void
@@ -878,11 +1022,24 @@ class DelveExplorationTest extends TestCase
             ],
             $timeDelay
         );
+        $this->handleJob($job);
+    }
+
+    private function handleJob(DelveExploration $job): void
+    {
+        $job->handle(
+            resolve(MonsterFightService::class),
+            resolve(BattleEventHandler::class),
+            resolve(CharacterCacheData::class),
+            resolve(CharacterRewardService::class),
+            resolve(SkillService::class),
+            resolve(BroadcastTopsUpdateService::class),
+        );
     }
 
     private function createAutomation(array $attributes = []): CharacterAutomation
     {
-        return CharacterAutomation::factory()->create([
+        return $this->createCharacterAutomation([
             ...[
                 'character_id' => $this->character->id,
                 'monster_id' => $this->monster->id,
@@ -897,7 +1054,7 @@ class DelveExplorationTest extends TestCase
 
     private function createDelve(array $attributes = []): DelveExplorationModel
     {
-        return DelveExplorationModel::factory()->create([
+        return $this->createDelveAutomation([
             ...[
                 'character_id' => $this->character->id,
                 'monster_id' => $this->monster->id,

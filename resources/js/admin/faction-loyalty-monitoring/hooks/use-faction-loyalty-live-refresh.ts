@@ -2,10 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { ChannelType } from '../../../websocket-handler/enums/channel-type';
 import { useWebsocket } from '../../../websocket-handler/hooks/use-websocket';
-
-interface FactionLoyaltyMonitoringUpdatedPayload {
-  character_id: number;
-}
+import { FactionLoyaltyWebsocketEvents } from '../enums/faction-loyalty-websocket-events';
+import FactionLoyaltyMonitoringUpdatedPayload from '../types/faction-loyalty-monitoring-updated-payload';
 
 export default function useFactionLoyaltyLiveRefresh(refresh: () => void) {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -21,10 +19,10 @@ export default function useFactionLoyaltyLiveRefresh(refresh: () => void) {
   );
 
   useWebsocket<FactionLoyaltyMonitoringUpdatedPayload>({
-    url: 'admin-monitoring-faction-loyalty',
+    url: FactionLoyaltyWebsocketEvents.CHANNEL,
     params: {},
     type: ChannelType.PRIVATE,
-    channelName: '.faction.loyalty.monitoring.updated',
+    channelName: FactionLoyaltyWebsocketEvents.UPDATED,
     onEvent: handleEvent,
   });
 

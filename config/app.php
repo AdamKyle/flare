@@ -254,6 +254,7 @@ return [
          */
         ServiceProvider::class,
         EventsProvider::class,
+        App\Flare\GemWorldGeneration\Providers\ServiceProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
 
@@ -295,6 +296,7 @@ return [
          */
         App\Game\Events\Providers\ServiceProvider::class,
         App\Game\Automation\Providers\ServiceProvider::class,
+        App\Game\BatchCrafting\Providers\ServiceProvider::class,
         App\Game\Character\Providers\ServiceProvider::class,
         App\Game\Character\Builders\AttackBuilders\Providers\ServiceProvider::class,
         App\Game\Character\Builders\InformationBuilders\Providers\ServiceProvider::class,
@@ -324,6 +326,7 @@ return [
         App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
         App\Game\Raids\Providers\ServiceProvider::class,
         App\Game\Factions\FactionLoyalty\Providers\ServiceProvider::class,
+        App\Game\Tops\Providers\ServiceProvider::class,
 
         // App Main Router Provider
         //

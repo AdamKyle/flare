@@ -1,14 +1,9 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React from 'react';
 
 import RequestFilters from './request-filters';
 import RewardQueueCard from './reward-queue-card';
 import AdminPaginationControls from '../../shared/components/admin-pagination-controls';
-import {
-  CharacterRow,
-  RequestFiltersType,
-  RewardRequest,
-} from '../types/reward-queue';
+import { RequestHistoryProps } from '../types/component-props';
 
 export default function RequestHistory({
   selectedCharacter,
@@ -17,14 +12,7 @@ export default function RequestHistory({
   onFiltersChange,
   onClearCharacter,
   onPageChange,
-}: {
-  selectedCharacter: CharacterRow | null;
-  requests: PaginatedApiResponseDefinition<RewardRequest[]>;
-  filters: RequestFiltersType;
-  onFiltersChange: (filters: RequestFiltersType) => void;
-  onClearCharacter: () => void;
-  onPageChange: (page: number) => void;
-}) {
+}: RequestHistoryProps) {
   return (
     <RewardQueueCard
       title={
@@ -36,6 +24,7 @@ export default function RequestHistory({
     >
       {selectedCharacter && (
         <button
+          type="button"
           className="mb-4 rounded border border-gray-300 px-3 py-2 dark:border-gray-600"
           onClick={onClearCharacter}
         >

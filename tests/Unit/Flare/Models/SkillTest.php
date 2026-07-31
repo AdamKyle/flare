@@ -10,10 +10,11 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateSkill;
 
 class SkillTest extends TestCase
 {
-    use CreateGameSkill;
+    use CreateGameSkill, CreateSkill;
     use CreateItem;
     use RefreshDatabase;
 
@@ -37,7 +38,7 @@ class SkillTest extends TestCase
 
     public function test_new_factory_can_create_skill_instance(): void
     {
-        $skill = Skill::factory()->make();
+        $skill = $this->makeSkill();
 
         $this->assertInstanceOf(Skill::class, $skill);
     }

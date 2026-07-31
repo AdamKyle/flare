@@ -6,11 +6,11 @@ use App\Flare\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateBaseCharacterInformation implements ShouldBroadcastNow
+class UpdateBaseCharacterInformation implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -41,5 +41,10 @@ class UpdateBaseCharacterInformation implements ShouldBroadcastNow
     public function broadcastOn()
     {
         return new PrivateChannel('update-character-base-stats-'.$this->user->id);
+    }
+
+    public function broadcastQueue(): string
+    {
+        return 'character_broadcasts';
     }
 }

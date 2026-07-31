@@ -1,16 +1,13 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+
+import { RewardQueueCardProps } from '../types/component-props';
 
 export default function RewardQueueCard({
   title,
   description,
   children,
   className = '',
-}: {
-  title?: string;
-  description?: string;
-  children: ReactNode;
-  className?: string;
-}) {
+}: RewardQueueCardProps) {
   return (
     <section
       className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5 dark:border-gray-700 dark:bg-gray-900 ${className}`}

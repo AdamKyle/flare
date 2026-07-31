@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Flare\Services;
 
-use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Services\CharacterXPService;
 use App\Flare\Values\ItemEffectsValue;
@@ -14,12 +13,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 
 class CharacterXPServiceTest extends TestCase
 {
-    use CreateItem, CreateMonster, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateItem, CreateMonster, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -753,7 +753,7 @@ class CharacterXPServiceTest extends TestCase
     {
         Event::fake();
         $character = $this->character->getCharacter();
-        $state = CharacterBattleRewardQueueState::factory()->create([
+        $state = $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now()->subMinutes(10),

@@ -2,9 +2,6 @@
 
 namespace Tests\Feature\Game\Battle\Controllers\Api;
 
-use App\Flare\Models\Location;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Controllers\Api\RaidBattleController;
@@ -14,33 +11,36 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateRaid;
 
 class RaidBattleControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateLocation, CreateMonster, CreateRaid, RefreshDatabase;
 
     public function test_exhausted_participation_for_another_raid_does_not_block_current_raid_attack(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16)->getCharacter();
-        $monster = Monster::factory()->create([
+        $monster = $this->createMonster([
             'game_map_id' => $character->map->game_map_id,
             'is_raid_boss' => true,
         ]);
-        $oldLocation = Location::factory()->create([
+        $oldLocation = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 32,
         ]);
-        $oldRaid = Raid::factory()->create([
+        $oldRaid = $this->createRaid([
             'raid_boss_id' => $monster->id,
             'raid_boss_location_id' => $oldLocation->id,
         ]);
-        $currentLocation = Location::factory()->create([
+        $currentLocation = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 16,
             'y' => 16,
         ]);
-        $currentRaid = Raid::factory()->create([
+        $currentRaid = $this->createRaid([
             'raid_boss_id' => $monster->id,
             'raid_boss_location_id' => $currentLocation->id,
         ]);

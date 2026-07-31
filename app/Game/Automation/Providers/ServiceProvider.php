@@ -47,13 +47,13 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(ExplorationCreatureCountCalculator::class),
                 $app->make(ExplorationLogService::class),
-                $app->make(ExplorationWarningService::class)
+                $app->make(ExplorationWarningService::class),
             );
         });
 
         $this->app->bind(DelveExplorationAutomationService::class, function ($app) {
             return new DelveExplorationAutomationService(
-                $app->make(CharacterCacheData::class)
+                $app->make(CharacterCacheData::class),
             );
         });
 
@@ -63,7 +63,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(FactionLoyaltyAutomationService::class, function ($app) {
             return new FactionLoyaltyAutomationService(
-                $app->make(CharacterCacheData::class)
+                $app->make(CharacterCacheData::class),
             );
         });
 

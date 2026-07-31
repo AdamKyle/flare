@@ -8,7 +8,7 @@ class AdminLogEntryTransformer extends BaseTransformer
 {
     public function transform(array $entry): array
     {
-        return [
+        $transformed = [
             'timestamp' => $entry['timestamp'] ?? null,
             'channel' => $entry['channel'] ?? null,
             'severity' => $entry['severity'] ?? 'unknown',
@@ -22,5 +22,15 @@ class AdminLogEntryTransformer extends BaseTransformer
             'file_path' => $entry['file_path'] ?? null,
             'raw_parseable' => (bool) ($entry['raw_parseable'] ?? false),
         ];
+
+        if (array_key_exists('detail_id', $entry)) {
+            $transformed['detail_id'] = $entry['detail_id'];
+        }
+
+        if (array_key_exists('file_key', $entry)) {
+            $transformed['file_key'] = $entry['file_key'];
+        }
+
+        return $transformed;
     }
 }

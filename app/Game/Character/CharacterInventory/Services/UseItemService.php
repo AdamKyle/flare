@@ -446,7 +446,7 @@ class UseItemService
             ->first();
     }
 
-    private function isAlchemyBoonItem(Item $item): bool
+    public function isAlchemyBoonItem(Item $item): bool
     {
         return $item->type === 'alchemy'
             && $item->usable

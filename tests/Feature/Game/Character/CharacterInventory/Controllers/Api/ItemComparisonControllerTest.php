@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Models\InventorySet;
+use App\Flare\Models\SetSlot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -225,5 +227,133 @@ class ItemComparisonControllerTest extends TestCase
 
         $this->assertNotEmpty($jsonData['comparison_data']['itemToEquip']['item']);
         $this->assertEquals('gem', $jsonData['comparison_data']['itemToEquip']['type']);
+    }
+
+    public function test_get_chat_comparison_data_for_item_in_crafted_items_set(): void
+    {
+        $character = $this->character->getCharacter();
+        $item = $this->createItem(['type' => 'weapon']);
+        $set = InventorySet::factory()->create([
+            'character_id' => $character->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+        ]);
+        $setSlot = SetSlot::factory()->create([
+            'inventory_set_id' => $set->id,
+            'item_id' => $item->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
+                'id' => $setSlot->id,
+                'source' => 'crafted_items_set',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($setSlot->id, $jsonData['comparison_data']['slotId']);
+    }
+
+    public function test_fail_to_compare_item_from_chat_for_crafted_items_set_owned_by_another_character(): void
+    {
+        $character = $this->character->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $item = $this->createItem(['type' => 'weapon']);
+        $set = InventorySet::factory()->create([
+            'character_id' => $otherCharacter->id,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+        ]);
+        $setSlot = SetSlot::factory()->create([
+            'inventory_set_id' => $set->id,
+            'item_id' => $item->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
+                'id' => $setSlot->id,
+                'source' => 'crafted_items_set',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('Item does not exist  ...', $jsonData['message']);
+    }
+
+    public function test_fail_to_compare_item_from_chat_for_missing_crafted_items_set_slot(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
+                'id' => 999999,
+                'source' => 'crafted_items_set',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('Item does not exist  ...', $jsonData['message']);
+    }
+
+    public function test_get_chat_comparison_data_for_item_in_alchemy_bag(): void
+    {
+        $character = $this->character->getCharacter();
+        $item = $this->createItem(['type' => 'alchemy']);
+        $alchemyBagSlot = $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
+                'id' => $alchemyBagSlot->id,
+                'source' => 'alchemy_bag',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($alchemyBagSlot->id, $jsonData['comparison_data']['slotId']);
+    }
+
+    public function test_fail_to_compare_item_from_chat_for_missing_alchemy_bag_slot(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
+                'id' => 999999,
+                'source' => 'alchemy_bag',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('Item does not exist  ...', $jsonData['message']);
+    }
+
+    public function test_fail_to_compare_item_from_chat_for_alchemy_bag_slot_owned_by_another_character(): void
+    {
+        $character = $this->character->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $item = $this->createItem(['type' => 'alchemy']);
+        $alchemyBagSlot = $otherCharacter->alchemyBag->slots()->create([
+            'character_id' => $otherCharacter->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/comparison-from-chat', [
+                'id' => $alchemyBagSlot->id,
+                'source' => 'alchemy_bag',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(404, $response->getStatusCode());
+        $this->assertEquals('Item does not exist  ...', $jsonData['message']);
     }
 }

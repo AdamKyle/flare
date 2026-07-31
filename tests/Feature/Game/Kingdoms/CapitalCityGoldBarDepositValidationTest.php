@@ -2,17 +2,17 @@
 
 namespace Tests\Feature\Game\Kingdoms;
 
-use App\Flare\Models\GameBuilding;
 use App\Game\Kingdoms\Service\CapitalCityGoldBarManagementService;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
 
 class CapitalCityGoldBarDepositValidationTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function test_negative_deposit_amount_is_rejected(): void
     {
@@ -45,7 +45,7 @@ class CapitalCityGoldBarDepositValidationTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter(['gold' => 4000000000]);
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
         $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
-        GameBuilding::factory()->create(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
+        $this->createGameBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
         $character = $characterFactory->getCharacter();
 
         $result = resolve(CapitalCityGoldBarManagementService::class)->depositGoldBars($character, $capitalCity, -1);
@@ -61,7 +61,7 @@ class CapitalCityGoldBarDepositValidationTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->updateCharacter(['gold' => 4000000000]);
         $capitalCity = $characterFactory->kingdomManagement()->assignKingdom(['is_capital' => true])->getKingdom();
         $receivingKingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
-        GameBuilding::factory()->create(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
+        $this->createGameBuilding(['name' => BuildingCosts::GOBLIN_COIN_BANK]);
         $character = $characterFactory->getCharacter();
 
         $result = resolve(CapitalCityGoldBarManagementService::class)->depositGoldBars($character, $capitalCity, 1);

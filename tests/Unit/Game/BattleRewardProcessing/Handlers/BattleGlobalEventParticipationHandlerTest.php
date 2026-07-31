@@ -53,8 +53,10 @@ class BattleGlobalEventParticipationHandlerTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertNotNull($character->globalEventParticipation);
-        $this->assertEquals(1, $character->globalEventParticipation->current_kills);
+        $participation = $character->globalEventParticipation()->where('global_event_goal_id', $globalEventGoal->id)->first();
+
+        $this->assertNotNull($participation);
+        $this->assertEquals(1, $participation->current_kills);
 
         $killsRow = $character->globalEventKills()
             ->where('global_event_goal_id', $globalEventGoal->id)
@@ -93,7 +95,7 @@ class BattleGlobalEventParticipationHandlerTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEquals(8, $character->globalEventParticipation->current_kills);
+        $this->assertEquals(8, $character->globalEventParticipation()->where('global_event_goal_id', $globalEventGoal->id)->first()->current_kills);
 
         $killsRow = $character->globalEventKills()
             ->where('global_event_goal_id', $globalEventGoal->id)
@@ -131,7 +133,7 @@ class BattleGlobalEventParticipationHandlerTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertEquals(10, $character->globalEventParticipation->current_kills);
+        $this->assertEquals(10, $character->globalEventParticipation()->where('global_event_goal_id', $globalEventGoal->id)->first()->current_kills);
 
         $killsRow = $character->globalEventKills()
             ->where('global_event_goal_id', $globalEventGoal->id)

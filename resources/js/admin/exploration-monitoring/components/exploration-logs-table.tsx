@@ -1,24 +1,15 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React from 'react';
 
 import MonitoringCard from './monitoring-card';
 import AdminPaginationControls from '../../shared/components/admin-pagination-controls';
-import {
-  ExplorationFilters,
-  ExplorationLogRow,
-} from '../types/exploration-monitoring';
+import { ExplorationLogsTableProps } from '../types/component-props';
 
 export default function ExplorationLogsTable({
   logs,
   filters,
   onFiltersChange,
   onPageChange,
-}: {
-  logs: PaginatedApiResponseDefinition<ExplorationLogRow[]>;
-  filters: ExplorationFilters;
-  onFiltersChange: (filters: ExplorationFilters) => void;
-  onPageChange: (page: number) => void;
-}) {
+}: ExplorationLogsTableProps) {
   return (
     <MonitoringCard
       title="Recent Exploration Runs"

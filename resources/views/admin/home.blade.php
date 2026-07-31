@@ -110,7 +110,40 @@
                     </div>
                 </div>
             </x-core.cards.card>
-            <div class="sm:col-span-2 xl:col-span-3">
+            <div class="grid gap-3 sm:col-span-2 lg:grid-cols-2 xl:col-span-3">
+                <x-core.cards.card>
+                    <i class="fas fa-hammer text-indigo-500"></i>
+                    <div class="mt-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-3xl font-bold text-black dark:text-white">
+                                    {{ $batchCraftingSummary['active'] }}
+                                </h4>
+                                <a href="{{ route('admin.monitoring.batch-crafting') }}" class="text-sm font-medium text-meta-7">
+                                    Batch Crafting Monitoring
+                                </a>
+                            </div>
+                            <span class="text-xs text-gray-500">
+                                {{ $batchCraftingSummary['total_runs'] }} runs
+                            </span>
+                        </div>
+                        <div class="mt-3 flex h-10 items-end gap-1 overflow-hidden" aria-label="Batch crafting runs in the selected period">
+                            @forelse ($batchCraftingChart as $point)
+                                @php
+                                    $volume = $point['runs'] + $point['crafted'] + $point['failed'];
+                                @endphp
+                                <span
+                                    class="min-w-[2px] flex-1 rounded-t bg-indigo-500"
+                                    style="height: {{ max(4, min(40, $volume * 4)) }}px"
+                                    title="{{ $point['period'] }}: {{ $volume }}"
+                                ></span>
+                            @empty
+                                <span class="text-xs text-gray-500">No batch crafting runs in this period.</span>
+                            @endforelse
+                        </div>
+                    </div>
+                </x-core.cards.card>
+
                 <x-core.cards.card>
                     <i class="fas fa-file-alt text-gray-500 dark:text-gray-400"></i>
                     <div class="mt-4 flex items-center justify-between">

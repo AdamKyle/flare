@@ -3,19 +3,12 @@
 namespace Tests\Unit\Game\Kingdoms\Services;
 
 use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Models\KingdomUnit;
-use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueRequest;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitRecruitments;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityProcessUnitRequestHandler;
-use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityRequestResourcesHandler;
 use App\Game\Kingdoms\Jobs\CapitalCityResourceRequest;
 use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
@@ -31,10 +24,15 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameBuildingUnit;
+use Tests\Traits\CreateGameUnit;
+use Tests\Traits\CreateKingdom;
+use Tests\Traits\CreateKingdomBuilding;
 
 class CapitalCityUnitManagementTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameBuildingUnit, CreateGameUnit, CreateKingdom, CreateKingdomBuilding, RefreshDatabase;
 
     public function test_capital_city_unit_resource_rejection_updates_unit_request_data_and_top_level_status(): void
     {
@@ -290,14 +288,14 @@ class CapitalCityUnitManagementTest extends TestCase
         ]);
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Settlers']);
-        $gameBuilding = GameBuilding::factory()->create(['name' => 'Church']);
-        GameBuildingUnit::factory()->create([
+        $gameUnit = $this->createGameUnit(['name' => 'Settlers']);
+        $gameBuilding = $this->createGameBuilding(['name' => 'Church']);
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,
         ]);
-        KingdomBuilding::factory()->create([
+        $this->createKingdomBuilding([
             'kingdom_id' => $kingdom->id,
             'game_building_id' => $gameBuilding->id,
             'level' => 1,
@@ -351,19 +349,19 @@ class CapitalCityUnitManagementTest extends TestCase
         ]);
         $kingdom = $kingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Settlers']);
-        $gameBuilding = GameBuilding::factory()->create(['name' => 'Church']);
-        GameBuildingUnit::factory()->create([
+        $gameUnit = $this->createGameUnit(['name' => 'Settlers']);
+        $gameBuilding = $this->createGameBuilding(['name' => 'Church']);
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,
         ]);
-        KingdomBuilding::factory()->create([
+        $this->createKingdomBuilding([
             'kingdom_id' => $kingdom->id,
             'game_building_id' => $gameBuilding->id,
             'level' => 1,
         ]);
-        KingdomUnit::factory()->create([
+        $this->createKingdomUnit([
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount' => KingdomMaxValue::MAX_UNIT - 5,
@@ -425,15 +423,15 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $gameUnit = $this->createGameUnit(['name' => 'Spearmen']);
         $gameBuildingId = $targetKingdomOne->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,
         ]);
-        $gameBuilding = GameBuilding::factory()->create(['name' => 'Barracks']);
-        GameBuildingUnit::factory()->create(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
+        $gameBuilding = $this->createGameBuilding(['name' => 'Barracks']);
+        $this->createGameBuildingUnit(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
         $characterFactory->createPassiveForCharacter(
             PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION,
             ['capital_city_unit_request_travel_time_reduction' => 0.0]
@@ -465,9 +463,9 @@ class CapitalCityUnitManagementTest extends TestCase
         ]);
         $targetKingdom = $targetKingdomManagement->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $gameBuilding = GameBuilding::factory()->create(['name' => 'Barracks']);
-        GameBuildingUnit::factory()->create(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
+        $gameUnit = $this->createGameUnit(['name' => 'Spearmen']);
+        $gameBuilding = $this->createGameBuilding(['name' => 'Barracks']);
+        $this->createGameBuildingUnit(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
         $characterFactory->createPassiveForCharacter(
             PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION,
             ['capital_city_unit_request_travel_time_reduction' => 0.0]
@@ -510,14 +508,14 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $gameBuilding = GameBuilding::factory()->create(['name' => 'Barracks']);
-        GameBuildingUnit::factory()->create(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
+        $gameUnit = $this->createGameUnit(['name' => 'Spearmen']);
+        $gameBuilding = $this->createGameBuilding(['name' => 'Barracks']);
+        $this->createGameBuildingUnit(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
         $characterFactory->createPassiveForCharacter(
             PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION,
             ['capital_city_unit_request_travel_time_reduction' => 0.0]
         );
-        UnitInQueue::factory()->create([
+        $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $gameUnit->id,
@@ -548,8 +546,8 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        KingdomUnit::factory()->create([
+        $gameUnit = $this->createGameUnit(['name' => 'Spearmen']);
+        $this->createKingdomUnit([
             'kingdom_id' => $targetKingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount' => KingdomMaxValue::MAX_UNIT,
@@ -586,9 +584,9 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $gameBuilding = GameBuilding::factory()->create(['name' => 'Barracks']);
-        GameBuildingUnit::factory()->create(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
+        $gameUnit = $this->createGameUnit(['name' => 'Spearmen']);
+        $gameBuilding = $this->createGameBuilding(['name' => 'Barracks']);
+        $this->createGameBuildingUnit(['game_building_id' => $gameBuilding->id, 'game_unit_id' => $gameUnit->id, 'required_level' => 1]);
         $characterFactory->createPassiveForCharacter(
             PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION,
             ['capital_city_unit_request_travel_time_reduction' => 0.0]
@@ -623,9 +621,9 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create(['name' => 'Spearmen']);
+        $gameUnit = $this->createGameUnit(['name' => 'Spearmen']);
         $gameBuildingId = $targetKingdomOne->buildings()->first()->game_building_id;
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuildingId,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,
@@ -663,12 +661,12 @@ class CapitalCityUnitManagementTest extends TestCase
             'y_position' => 16,
         ])->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnitOne = GameUnit::factory()->create(['name' => 'Spearmen']);
-        $gameBuildingOne = GameBuilding::factory()->create(['name' => 'Barracks']);
-        GameBuildingUnit::factory()->create(['game_building_id' => $gameBuildingOne->id, 'game_unit_id' => $gameUnitOne->id, 'required_level' => 1]);
-        $gameUnitTwo = GameUnit::factory()->create(['name' => 'Archer']);
-        $gameBuildingTwo = GameBuilding::factory()->create(['name' => 'Archery Range']);
-        GameBuildingUnit::factory()->create(['game_building_id' => $gameBuildingTwo->id, 'game_unit_id' => $gameUnitTwo->id, 'required_level' => 1]);
+        $gameUnitOne = $this->createGameUnit(['name' => 'Spearmen']);
+        $gameBuildingOne = $this->createGameBuilding(['name' => 'Barracks']);
+        $this->createGameBuildingUnit(['game_building_id' => $gameBuildingOne->id, 'game_unit_id' => $gameUnitOne->id, 'required_level' => 1]);
+        $gameUnitTwo = $this->createGameUnit(['name' => 'Archer']);
+        $gameBuildingTwo = $this->createGameBuilding(['name' => 'Archery Range']);
+        $this->createGameBuildingUnit(['game_building_id' => $gameBuildingTwo->id, 'game_unit_id' => $gameUnitTwo->id, 'required_level' => 1]);
         $characterFactory->createPassiveForCharacter(
             PassiveSkillTypeValue::CAPITAL_CITY_REQUEST_UNIT_TRAVEL_TIME_REDUCTION,
             ['capital_city_unit_request_travel_time_reduction' => 0.0]

@@ -2,14 +2,8 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Jobs;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Item;
 use App\Flare\Models\ItemSkill;
-use App\Flare\Models\Location;
-use App\Flare\Models\Monster;
-use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
-use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -20,28 +14,34 @@ use Illuminate\Support\Facades\Event;
 use ReflectionMethod;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateRaid;
+use Tests\Traits\CreateRaidBossParticipation;
 
 class RaidBossRewardHandlerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateRaid, CreateRaidBossParticipation, RefreshDatabase;
 
     public function test_only_killed_raid_boss_participations_are_zeroed(): void
     {
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $firstMonster = Monster::factory()->create();
-        $secondMonster = Monster::factory()->create();
-        $otherRaidMonster = Monster::factory()->create();
-        $location = Location::factory()->create();
-        $otherLocation = Location::factory()->create();
-        $artifact = Item::factory()->create();
-        $raid = Raid::factory()->create([
+        $firstMonster = $this->createMonster();
+        $secondMonster = $this->createMonster();
+        $otherRaidMonster = $this->createMonster();
+        $location = $this->createLocation();
+        $otherLocation = $this->createLocation();
+        $artifact = $this->createItem();
+        $raid = $this->createRaid([
             'raid_boss_id' => $firstMonster->id,
             'raid_boss_location_id' => $location->id,
             'artifact_item_id' => $artifact->id,
         ]);
-        $otherRaid = Raid::factory()->create([
+        $otherRaid = $this->createRaid([
             'raid_boss_id' => $otherRaidMonster->id,
             'raid_boss_location_id' => $otherLocation->id,
             'artifact_item_id' => $artifact->id,
@@ -58,19 +58,19 @@ class RaidBossRewardHandlerTest extends TestCase
             'raid_id' => $otherRaid->id,
             'raid_boss_id' => $otherRaidMonster->id,
         ]);
-        $killedBossParticipation = RaidBossParticipation::factory()->create([
+        $killedBossParticipation = $this->createRaidBossParticipation([
             'character_id' => $character->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $firstRaidBoss->id,
             'attacks_left' => 3,
         ]);
-        $siblingBossParticipation = RaidBossParticipation::factory()->create([
+        $siblingBossParticipation = $this->createRaidBossParticipation([
             'character_id' => $character->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $secondRaidBoss->id,
             'attacks_left' => 4,
         ]);
-        $otherRaidParticipation = RaidBossParticipation::factory()->create([
+        $otherRaidParticipation = $this->createRaidBossParticipation([
             'character_id' => $character->id,
             'raid_id' => $otherRaid->id,
             'raid_boss_id' => $otherRaidBoss->id,
@@ -90,10 +90,10 @@ class RaidBossRewardHandlerTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $firstMonster = Monster::factory()->create();
-        $location = Location::factory()->create();
-        $artifact = Item::factory()->create();
-        $raid = Raid::factory()->create([
+        $firstMonster = $this->createMonster();
+        $location = $this->createLocation();
+        $artifact = $this->createItem();
+        $raid = $this->createRaid([
             'raid_boss_id' => $firstMonster->id,
             'raid_boss_location_id' => $location->id,
             'artifact_item_id' => $artifact->id,
@@ -102,7 +102,7 @@ class RaidBossRewardHandlerTest extends TestCase
             'raid_id' => $raid->id,
             'raid_boss_id' => $firstMonster->id,
         ]);
-        RaidBossParticipation::factory()->create([
+        $this->createRaidBossParticipation([
             'character_id' => $character->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $firstRaidBoss->id,
@@ -124,12 +124,12 @@ class RaidBossRewardHandlerTest extends TestCase
 
         $charA = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $charB = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $firstMonster = Monster::factory()->create();
-        $secondMonster = Monster::factory()->create();
-        $gameMap = GameMap::factory()->create();
-        $location = Location::factory()->create(['game_map_id' => $gameMap->id]);
-        Item::factory()->create(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER]);
-        $raid = Raid::factory()->create([
+        $firstMonster = $this->createMonster();
+        $secondMonster = $this->createMonster();
+        $gameMap = $this->createGameMap();
+        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
+        $this->createItem(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER]);
+        $raid = $this->createRaid([
             'raid_boss_id' => $firstMonster->id,
             'raid_boss_location_id' => $location->id,
             'item_specialty_reward_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER,
@@ -142,13 +142,13 @@ class RaidBossRewardHandlerTest extends TestCase
             'raid_id' => $raid->id,
             'raid_boss_id' => $secondMonster->id,
         ]);
-        RaidBossParticipation::factory()->create([
+        $this->createRaidBossParticipation([
             'character_id' => $charA->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $secondRaidBoss->id,
             'damage_dealt' => 100,
         ]);
-        RaidBossParticipation::factory()->create([
+        $this->createRaidBossParticipation([
             'character_id' => $charB->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $firstRaidBoss->id,
@@ -178,7 +178,7 @@ class RaidBossRewardHandlerTest extends TestCase
         $charA = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $charB = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        $location = Location::factory()->create();
+        $location = $this->createLocation();
 
         $itemSkill = ItemSkill::create([
             'name' => 'Test Skill',
@@ -186,21 +186,21 @@ class RaidBossRewardHandlerTest extends TestCase
             'max_level' => 1,
             'total_kills_needed' => 0,
         ]);
-        $artifactItem = Item::factory()->create(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
+        $artifactItem = $this->createItem(['type' => 'artifact', 'item_skill_id' => $itemSkill->id]);
 
-        $bossAMonster = Monster::factory()->create();
-        $bossBMonster = Monster::factory()->create();
+        $bossAMonster = $this->createMonster();
+        $bossBMonster = $this->createMonster();
 
-        Item::factory()->create(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER]);
+        $this->createItem(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER]);
 
-        $dummyRaid = Raid::factory()->create([
+        $dummyRaid = $this->createRaid([
             'raid_boss_id' => $bossAMonster->id,
             'raid_boss_location_id' => $location->id,
         ]);
         RaidBoss::create(['raid_id' => $dummyRaid->id, 'raid_boss_id' => $bossAMonster->id]);
         RaidBoss::create(['raid_id' => $dummyRaid->id, 'raid_boss_id' => $bossBMonster->id]);
 
-        $raid = Raid::factory()->create([
+        $raid = $this->createRaid([
             'raid_boss_id' => $bossAMonster->id,
             'raid_boss_location_id' => $location->id,
             'artifact_item_id' => $artifactItem->id,
@@ -210,7 +210,7 @@ class RaidBossRewardHandlerTest extends TestCase
         $bossARaidBoss = RaidBoss::create(['raid_id' => $raid->id, 'raid_boss_id' => $bossAMonster->id]);
         $bossBRaidBoss = RaidBoss::create(['raid_id' => $raid->id, 'raid_boss_id' => $bossBMonster->id]);
 
-        $bossAParticipation = RaidBossParticipation::factory()->create([
+        $bossAParticipation = $this->createRaidBossParticipation([
             'character_id' => $charA->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $bossARaidBoss->id,
@@ -218,7 +218,7 @@ class RaidBossRewardHandlerTest extends TestCase
             'attacks_left' => 3,
         ]);
 
-        $bossBParticipation = RaidBossParticipation::factory()->create([
+        $bossBParticipation = $this->createRaidBossParticipation([
             'character_id' => $charB->id,
             'raid_id' => $raid->id,
             'raid_boss_id' => $bossBRaidBoss->id,

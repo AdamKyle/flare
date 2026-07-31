@@ -47,7 +47,10 @@ trait QuestDetails
 
     protected function questHasCurrenciesRequirement(Quest $quest): bool
     {
-        return $quest->gold_dust_cost > 0 || $quest->gold_cost > 0 || $quest->shard_cost > 0;
+        return $quest->gold_dust_cost > 0
+            || $quest->gold_cost > 0
+            || $quest->shard_cost > 0
+            || $quest->copper_coin_cost > 0;
     }
 
     protected function questHasFactionRequirement(Quest $quest): bool

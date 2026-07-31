@@ -17,6 +17,9 @@ use App\Flare\Models\Quest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
+use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
+use App\Game\Character\CharacterInventory\Values\ArmourType;
+use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Http\Controllers\Controller;
@@ -24,6 +27,13 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class GuideQuestsController extends Controller
 {
+    private const BATCH_CRAFTING_TYPES = [
+        'craft' => 'Craft For Experience',
+        'craft_and_enchant' => 'Craft and Enchant For Experience',
+        'alchemy' => 'Alchemy For Experience',
+        'trinketry' => 'Trinketry For Experience',
+    ];
+
     private GuideQuestService $guideQuestService;
 
     public function __construct(GuideQuestService $guideQuestService)
@@ -86,6 +96,8 @@ class GuideQuestsController extends Controller
             'guideQuests' => GuideQuest::pluck('name', 'id')->toArray(),
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
             'itemSpecialtyTypes' => ItemSpecialtyType::getValuesForSelect(),
+            'batchCraftingTypes' => self::BATCH_CRAFTING_TYPES,
+            'batchCraftedItemOptions' => $this->batchCraftedItemOptions(),
         ]);
     }
 
@@ -120,6 +132,8 @@ class GuideQuestsController extends Controller
             'guideQuests' => GuideQuest::pluck('name', 'id')->toArray(),
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
             'itemSpecialtyTypes' => ItemSpecialtyType::getValuesForSelect(),
+            'batchCraftingTypes' => self::BATCH_CRAFTING_TYPES,
+            'batchCraftedItemOptions' => $this->batchCraftedItemOptions(),
         ]);
     }
 
@@ -130,5 +144,81 @@ class GuideQuestsController extends Controller
         QuestsCompleted::where('guide_quest_id', $guideQuest->id)->delete();
 
         return response()->redirectToRoute('admin.guide-quests')->with('success', 'Deleted guide quest.');
+    }
+
+    private function batchCraftedItemOptions(): array
+    {
+        $validTypes = array_merge(
+            ItemType::validWeapons(),
+            ArmourType::allTypes(),
+            [
+                ItemType::RING->value,
+                ItemType::SPELL_DAMAGE->value,
+                ItemType::SPELL_HEALING->value,
+            ],
+        );
+
+        $craftedItems = Item::where('can_craft', true)
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
+            ->whereIn('type', $validTypes)
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (Item $item) => [$item->id => $this->batchCraftedItemOptionLabel($item)]);
+
+        $alchemyItems = Item::where('type', 'alchemy')
+            ->orderBy('alchemy_type')
+            ->orderBy('name')
+            ->get()
+            ->mapWithKeys(fn (Item $item) => [$item->id => $this->batchCraftedItemOptionLabel($item)]);
+
+        return $craftedItems->union($alchemyItems)->toArray();
+    }
+
+    private function batchCraftedItemOptionLabel(Item $item): string
+    {
+        if ($item->type === 'alchemy') {
+            return 'Alchemy > '.$this->alchemyItemTypeName($item->alchemy_type).' > '.$item->name;
+        }
+
+        if (in_array($item->type, ItemType::validWeapons(), true)) {
+            return 'Crafted > Weapon > '.$this->batchCraftedItemTypeName($item->type).' > '.$item->name;
+        }
+
+        if (in_array($item->type, ArmourType::allTypes(), true)) {
+            return 'Crafted > Armour > '.$this->batchCraftedItemTypeName($item->type).' > '.$item->name;
+        }
+
+        if ($item->type === ItemType::RING->value) {
+            return 'Crafted > Ring > Ring > '.$item->name;
+        }
+
+        return 'Crafted > Spell > '.$this->batchCraftedItemTypeName($item->type).' > '.$item->name;
+    }
+
+    private function batchCraftedItemTypeName(string $type): string
+    {
+        return match ($type) {
+            ItemType::DAGGER->value => 'Daggers',
+            ItemType::SPELL_DAMAGE->value => 'Spell Damage',
+            ItemType::SPELL_HEALING->value => 'Spell Healing',
+            default => ItemType::getProperNameForType($type),
+        };
+    }
+
+    private function alchemyItemTypeName(?string $alchemyType): string
+    {
+        return match ($alchemyType) {
+            AlchemyItemType::INCREASE_STATS->value => 'Increases Stats',
+            AlchemyItemType::INCREASE_SKILL_TYPE->value => 'Increases Training Skills',
+            AlchemyItemType::INCREASE_DAMAGE->value => 'Increases Damage',
+            AlchemyItemType::INCREASE_ARMOUR->value => 'Increases Armour',
+            AlchemyItemType::INCREASE_HEALING->value => 'Increases Healing',
+            AlchemyItemType::INCREASE_ALCHEMY_SKILL->value => 'Increases Alchemy Skill',
+            AlchemyItemType::DAMAGES_KINGDOMS->value => 'Damages Kingdoms',
+            AlchemyItemType::HOLY_OILS->value => 'Holy Oils',
+            default => ItemType::getProperNameForType($alchemyType ?? 'alchemy'),
+        };
     }
 }

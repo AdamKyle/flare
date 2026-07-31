@@ -1,22 +1,42 @@
 import React, { useMemo, useState } from 'react';
 
 import RewardQueueCard from './reward-queue-card';
-import { ChartPoint } from '../types/reward-queue';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../monitoring/values/admin-monitoring-chart-colors';
+import { ChartPoint } from '../api/definitions/reward-queue-definition';
+import {
+  ChartPointsProps,
+  StatusVolumeChartProps,
+} from '../types/status-volume-chart-props';
 
 const SERIES = [
-  { key: 'completed', label: 'Completed', color: '#22c55e', dash: '' },
-  { key: 'failed', label: 'Failed', color: '#ef4444', dash: '6,3' },
-  { key: 'pending', label: 'Pending', color: '#f59e0b', dash: '2,2' },
+  {
+    key: 'completed',
+    label: 'Completed',
+    color: ADMIN_MONITORING_CHART_COLORS.emerald,
+    dash: '',
+  },
+  {
+    key: 'failed',
+    label: 'Failed',
+    color: ADMIN_MONITORING_CHART_COLORS.rose,
+    dash: '6,3',
+  },
+  {
+    key: 'pending',
+    label: 'Pending',
+    color: ADMIN_MONITORING_CHART_COLORS.mangoTango,
+    dash: '2,2',
+  },
   {
     key: 'processing',
     label: 'Processing',
-    color: '#3b82f6',
+    color: ADMIN_MONITORING_CHART_COLORS.danube,
     dash: '8,2,2,2',
   },
   {
     key: 'resumable',
     label: 'Resumable',
-    color: '#8b5cf6',
+    color: ADMIN_MONITORING_CHART_COLORS.cosmic,
     dash: '4,4',
   },
 ] as const;
@@ -69,7 +89,7 @@ function shortLabel(period: string): string {
   return period;
 }
 
-function InlineSvgChart({ points }: { points: ChartPoint[] }) {
+function InlineSvgChart({ points }: ChartPointsProps) {
   const periods = points.map((p) => p.period);
   const maxValue = points.reduce(
     (acc, p) =>
@@ -95,8 +115,7 @@ function InlineSvgChart({ points }: { points: ChartPoint[] }) {
   return (
     <svg
       viewBox={`0 0 ${CHART_W} ${CHART_H}`}
-      className="w-full"
-      style={{ minHeight: 140 }}
+      className="min-h-35 w-full"
       role="img"
       aria-hidden="true"
     >
@@ -201,7 +220,7 @@ function ChartLegend() {
   );
 }
 
-function ChartDataTable({ points }: { points: ChartPoint[] }) {
+function ChartDataTable({ points }: ChartPointsProps) {
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(points.length / TABLE_PAGE));
   const slice = points.slice((page - 1) * TABLE_PAGE, page * TABLE_PAGE);
@@ -256,6 +275,7 @@ function ChartDataTable({ points }: { points: ChartPoint[] }) {
           </span>
           <div className="flex gap-2">
             <button
+              type="button"
               className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
@@ -263,6 +283,7 @@ function ChartDataTable({ points }: { points: ChartPoint[] }) {
               Previous
             </button>
             <button
+              type="button"
               className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
               disabled={page >= totalPages}
               onClick={() => setPage((p) => p + 1)}
@@ -280,11 +301,7 @@ export default function StatusVolumeChart({
   title,
   description,
   points,
-}: {
-  title: string;
-  description: string;
-  points: ChartPoint[];
-}) {
+}: StatusVolumeChartProps) {
   const total = points.reduce(
     (acc, p) => acc + p.completed + p.failed + p.pending + p.processing,
     0

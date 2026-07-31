@@ -6,30 +6,34 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Game\Character\CharacterInventory\Exceptions\BatchCraftingDestinationFullException;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
-use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Support\Facades\DB;
 
 class TrinketCraftingService
 {
-    use UpdateCharacterCurrency;
-
     private CraftingService $craftingService;
 
     private SkillCheckService $skillCheckService;
 
     private ItemListCostTransformerService $itemListCostTransformerService;
 
+    private SkillService $skillService;
+
     public function __construct(
         CraftingService $craftingService,
         SkillCheckService $skillCheckService,
-        ItemListCostTransformerService $itemListCostTransformerService
+        ItemListCostTransformerService $itemListCostTransformerService,
+        SkillService $skillService,
     ) {
         $this->craftingService = $craftingService;
         $this->skillCheckService = $skillCheckService;
         $this->itemListCostTransformerService = $itemListCostTransformerService;
+        $this->skillService = $skillService;
     }
 
     /**
@@ -44,7 +48,7 @@ class TrinketCraftingService
         $items = Item::where('type', 'trinket')
             ->where('skill_level_required', '<=', $trinkentrySkill->level)
             ->orderBy('skill_level_required', 'asc')
-            ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost')
+            ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost', 'skill_level_required')
             ->get();
 
         return $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage)->toArray();
@@ -90,14 +94,14 @@ class TrinketCraftingService
         if ($trinkentrySkill->level > $item->skill_level_trivial) {
             ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
-            $this->updateTrinketCost($character, $item);
+            $this->deductCraftingCost($character, $item);
 
             $this->craftingService->pickUpItem($character, $item, $trinkentrySkill, true);
 
             return $this->fetchItemsToCraft($character);
         }
 
-        $this->updateTrinketCost($character, $item);
+        $this->deductCraftingCost($character, $item);
 
         if (! $this->canCraft($trinkentrySkill)) {
             event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
@@ -108,6 +112,81 @@ class TrinketCraftingService
         $this->craftingService->pickUpItem($character, $item, $trinkentrySkill);
 
         return $this->fetchItemsToCraft($character->refresh(), false);
+    }
+
+    /**
+     * Craft a trinket directly for Batch Crafting, with no InventorySlot involved.
+     *
+     * Preserves the same affordability, skill requirement, success/failure roll, and
+     * currency spending rules as craft(), but never picks the item up into inventory.
+     *
+     * @throws Exception
+     */
+    public function craftForBatch(
+        Character $character,
+        Item $item,
+        bool $suppressSuccessServerMessage = false,
+        ?callable $destinationCreator = null,
+    ): array {
+        return DB::transaction(function () use ($character, $item, $suppressSuccessServerMessage, $destinationCreator): array {
+            $trinkentrySkill = $this->fetchCharacterSkill($character);
+
+            if (! $this->canAfford($character, $item)) {
+                return [
+                    'success' => false,
+                    'item' => null,
+                    'reason' => 'not_enough_currency',
+                    'destination' => null,
+                    'cost' => $this->craftingCost($character->refresh(), $item),
+                ];
+            }
+
+            if ($trinkentrySkill->level < $item->skill_level_required) {
+                ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
+
+                return ['success' => false, 'item' => null, 'reason' => 'skill_too_low', 'destination' => null];
+            }
+
+            if ($trinkentrySkill->level > $item->skill_level_trivial) {
+                ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
+
+                $this->deductCraftingCost($character, $item);
+
+                if (! $suppressSuccessServerMessage) {
+                    ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+                }
+
+                $destination = is_null($destinationCreator) ? null : $destinationCreator($item);
+
+                if (! is_null($destinationCreator) && ! is_array($destination)) {
+                    throw new BatchCraftingDestinationFullException('The retained Batch Crafting destination could not accept the crafted trinket.');
+                }
+
+                return ['success' => true, 'item' => $item, 'reason' => null, 'destination' => $destination];
+            }
+
+            $this->deductCraftingCost($character, $item);
+
+            if (! $this->canCraft($trinkentrySkill)) {
+                event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
+
+                return ['success' => false, 'item' => null, 'reason' => 'failed_roll', 'destination' => null];
+            }
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+            }
+
+            $destination = is_null($destinationCreator) ? null : $destinationCreator($item);
+
+            if (! is_null($destinationCreator) && ! is_array($destination)) {
+                throw new BatchCraftingDestinationFullException('The retained Batch Crafting destination could not accept the crafted trinket.');
+            }
+
+            $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $trinkentrySkill);
+
+            return ['success' => true, 'item' => $item, 'reason' => null, 'destination' => $destination];
+        });
     }
 
     /**
@@ -125,26 +204,50 @@ class TrinketCraftingService
      *
      * @throws Exception
      */
-    protected function canAfford(Character $character, Item $item): bool
+    public function craftingCost(Character $character, Item $item): array
     {
-
-        $copperCoinCost = $item->copper_coin_cost;
-        $goldDustCostCost = $item->gold_dust_cost;
+        $copperCoinCost = (int) $item->copper_coin_cost;
+        $goldDustCost = (int) $item->gold_dust_cost;
 
         if ($character->classType()->isMerchant()) {
             $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
-            $goldDustCostCost = floor($goldDustCostCost - $goldDustCostCost * 0.10);
+            $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
         }
 
-        if ($character->gold_dust < $goldDustCostCost) {
-            return false;
-        }
+        return [
+            'item_id' => $item->id,
+            'item_name' => $item->name,
+            'gold_dust' => [
+                'required' => (int) $goldDustCost,
+                'available' => (int) $character->gold_dust,
+                'missing' => max(0, (int) $goldDustCost - (int) $character->gold_dust),
+            ],
+            'copper_coins' => [
+                'required' => (int) $copperCoinCost,
+                'available' => (int) $character->copper_coins,
+                'missing' => max(0, (int) $copperCoinCost - (int) $character->copper_coins),
+            ],
+        ];
+    }
 
-        if ($character->copper_coins < $copperCoinCost) {
-            return false;
-        }
+    protected function canAfford(Character $character, Item $item): bool
+    {
+        $cost = $this->craftingCost($character, $item);
 
-        return true;
+        return $cost['gold_dust']['missing'] === 0
+            && $cost['copper_coins']['missing'] === 0;
+    }
+
+    private function deductCraftingCost(Character $character, Item $item): void
+    {
+        $cost = $this->craftingCost($character, $item);
+
+        $character->update([
+            'gold_dust' => $character->gold_dust - $cost['gold_dust']['required'],
+            'copper_coins' => $character->copper_coins - $cost['copper_coins']['required'],
+        ]);
+
+        event(new UpdateCharacterCurrenciesEvent($character->refresh()));
     }
 
     /**

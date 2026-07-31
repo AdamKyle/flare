@@ -11,6 +11,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
 use App\Game\Maps\Services\LocationService;
@@ -61,7 +62,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
                 $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class)
+                $app->make(CharacterSheetBaseInfoTransformer::class),
+                $app->make(GameTimerService::class),
             );
         });
 

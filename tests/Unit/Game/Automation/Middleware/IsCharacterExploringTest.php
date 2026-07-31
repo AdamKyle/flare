@@ -12,9 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 
 class IsCharacterExploringTest extends TestCase
 {
+    use CreateCharacterAutomation {
+        createCharacterAutomation as createCharacterAutomationRecord;
+    }
     use RefreshDatabase;
 
     private Character $character;
@@ -138,7 +142,7 @@ class IsCharacterExploringTest extends TestCase
 
     private function createCharacterAutomation(): CharacterAutomation
     {
-        return CharacterAutomation::factory()->create([
+        return $this->createCharacterAutomationRecord([
             'character_id' => $this->character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),

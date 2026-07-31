@@ -9,10 +9,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Monster;
 use App\Flare\Values\RandomAffixDetails;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\Skills\Services\SkillService;
 use Closure;
-use Exception;
 use Exception;
 
 class CharacterRewardService

@@ -5,43 +5,27 @@ namespace App\Game\Automation\Jobs;
 use App\Admin\Events\ExplorationMonitoringUpdated;
 use App\Admin\Services\MonitoredBugReportService;
 use App\Flare\Models\Character;
-use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
-use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
 use App\Flare\Services\CharacterRewardService;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
-use App\Game\Automation\Events\AutomationTimeOut;
-use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
-use App\Game\Automation\Services\ExplorationLogService;
-use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Events\UpdateCharacterStatus;
-use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
-use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Character\Exceptions\MissingInventoryException;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
-use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -281,6 +265,17 @@ class Exploration implements ShouldQueue
 
             $this->cancelAutomation($automation, $message, $reason);
         } catch (Throwable $throwable) {
+            if ($throwable instanceof MissingInventoryException) {
+                $this->character->user()->update(['will_be_deleted' => true]);
+                Log::warning('Exploration stopped for a character with missing inventory.', [
+                    'character_id' => $this->character->id,
+                    'automation_id' => $this->automationId,
+                    'exception' => $throwable,
+                ]);
+
+                return;
+            }
+
             $this->handleFailure($throwable, 'unexpected_exception');
         }
     }
@@ -611,6 +606,10 @@ class Exploration implements ShouldQueue
     {
 
         if (! $this->hasRequiredHealthData($data)) {
+            return false;
+        }
+
+        if ($data['health']['current_character_health'] <= 0) {
             return false;
         }
 

@@ -35,7 +35,9 @@ class HolyItemService
         event(new CraftedItemTimeOutEvent($character));
 
         $inventory = Inventory::where('character_id', $character->id)->first();
-        $itemSlot = InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
+        $itemSlot = isset($params['inventory_slot_id'])
+            ? InventorySlot::where('inventory_id', $inventory->id)->where('id', $params['inventory_slot_id'])->first()
+            : InventorySlot::where('inventory_id', $inventory->id)->where('item_id', $params['item_id'])->first();
         $alchemySlotQuery = AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag?->id)
             ->where('character_id', $character->id)
             ->with('item');
@@ -94,7 +96,7 @@ class HolyItemService
         return $this->fetchSmithingItems($character);
     }
 
-    protected function getCost(Item $item, Item $alchemyItem): int
+    public function getCost(Item $item, Item $alchemyItem): int
     {
         $baseCost = $item->holy_stacks * 100;
         $totalCost = $baseCost * $alchemyItem->holy_level;

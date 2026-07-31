@@ -77,4 +77,20 @@ class CharacterAttackTypesCacheBuilderTest extends TestCase
             Cache::get('character-attack-data-'.$character->id)
         );
     }
+
+    public function test_missing_inventory_flags_user_and_cleanly_stops_queued_cache_work(): void
+    {
+        Event::fake();
+        $character = $this->character->getCharacter();
+        $character->inventory()->delete();
+        $character->unsetRelation('inventory');
+        $character = $character->refresh();
+        Cache::forget('character-attack-data-'.$character->id);
+
+        CharacterAttackTypesCacheBuilder::dispatch($character, true);
+
+        $this->assertTrue((bool) $character->user->refresh()->will_be_deleted);
+        $this->assertNull(Cache::get('character-attack-data-'.$character->id));
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+    }
 }

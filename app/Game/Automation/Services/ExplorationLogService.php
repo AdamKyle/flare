@@ -9,6 +9,8 @@ use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Events\ExplorationOutputUpdated;
 use App\Game\Automation\Events\ExplorationWarningState;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 
 class ExplorationLogService
@@ -129,6 +131,7 @@ class ExplorationLogService
         ]);
 
         $this->broadcastOutputForCharacter($log->character);
+        BroadcastTopsUpdateService::make()->broadcastExplorationCurrentMonth();
     }
 
     public function latestForCharacter(Character $character): ?ExplorationLog
@@ -180,6 +183,7 @@ class ExplorationLogService
 
         try {
             (new self)->broadcastOutputForCharacter($character);
+            BroadcastTopsUpdateService::make()->broadcastExplorationCurrentMonth();
         } catch (\Throwable $throwable) {
             Log::warning('ExplorationLogService::applyRewardContext failed to broadcast exploration output.', [
                 'character_id' => $character->id,
@@ -277,13 +281,34 @@ class ExplorationLogService
                     'stopped_reason' => 'missing_automation',
                 ]);
 
-                ExplorationWarning::create([
-                    'character_id' => $character->id,
-                    'user_id' => $character->user_id,
-                    'exploration_log_id' => $activeLog->id,
-                    'type' => 'missing_automation',
-                    'message' => 'Exploration ended because the automation was missing. Please report this as a bug.',
-                ]);
+                try {
+                    ExplorationWarning::create([
+                        'character_id' => $character->id,
+                        'user_id' => $character->user_id,
+                        'exploration_log_id' => $activeLog->id,
+                        'type' => 'missing_automation',
+                        'message' => 'Exploration ended because the automation was missing. Please report this as a bug.',
+                    ]);
+                } catch (QueryException $exception) {
+                    $exceptionCode = (int) $exception->getCode();
+                    $previousCode = (int) ($exception->getPrevious()?->getCode() ?? 0);
+                    $isRetryable = in_array($exceptionCode, [1205, 1213], true)
+                        || in_array($previousCode, [1205, 1213], true)
+                        || str_contains($exception->getMessage(), '1205')
+                        || str_contains($exception->getMessage(), '1213')
+                        || str_contains($exception->getMessage(), 'Lock wait timeout exceeded')
+                        || str_contains($exception->getMessage(), 'Deadlock found');
+
+                    if (! $isRetryable) {
+                        throw $exception;
+                    }
+
+                    Log::warning('Exploration log repair skipped warning creation after database lock error.', [
+                        'character_id' => $character->id,
+                        'exploration_log_id' => $activeLog->id,
+                        'exception_code' => $exceptionCode !== 0 ? $exceptionCode : $previousCode,
+                    ]);
+                }
             } else {
                 return ['type' => 'active', 'output' => $this->formatLogOutput($activeLog)];
             }

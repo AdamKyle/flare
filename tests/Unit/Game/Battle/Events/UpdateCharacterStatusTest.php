@@ -3,16 +3,19 @@
 namespace Tests\Unit\Game\Battle\Events;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\DelveExploration;
 use App\Flare\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacterAutomation;
 
 class UpdateCharacterStatusTest extends TestCase
 {
+    use CreateBatchCrafting;
     use CreateCharacterAutomation;
     use RefreshDatabase;
 
@@ -145,6 +148,159 @@ class UpdateCharacterStatusTest extends TestCase
         ]);
 
         $event = new UpdateCharacterStatus($this->character);
+
+        $this->assertFalse($event->characterStatuses['is_delve_running']);
+    }
+
+    public function test_payload_normalizes_expired_attack_timer(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['can_attack']);
+        $this->assertNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function test_payload_keeps_future_attack_timer_disabled(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->addSeconds(30),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['can_attack']);
+        $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function test_payload_does_not_normalize_expired_attack_timer_for_dead_character(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+            'is_dead' => true,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['can_attack']);
+        $this->assertFalse($this->character->refresh()->can_attack);
+        $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function test_payload_does_not_normalize_expired_attack_timer_when_automation_blocks_manual_fighting(): void
+    {
+        $this->character->update([
+            'can_attack' => false,
+            'can_attack_again_at' => now()->subSecond(),
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::EXPLORING,
+            'completed_at' => now()->addSeconds(300),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['can_attack']);
+        $this->assertFalse($this->character->refresh()->can_attack);
+        $this->assertNotNull($this->character->refresh()->can_attack_again_at);
+    }
+
+    public function test_payload_includes_batch_crafting_visible_true_for_active_undismissed_batch(): void
+    {
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function test_payload_includes_batch_crafting_visible_true_for_completed_undismissed_batch(): void
+    {
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function test_payload_includes_batch_crafting_visible_false_after_dismissed(): void
+    {
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_batch_crafting_visible']);
+    }
+
+    public function test_payload_includes_delve_visible_true_for_active_delve(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE,
+            'completed_at' => now()->addSeconds(600),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function test_payload_includes_delve_visible_true_for_completed_undismissed_delve(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertTrue($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function test_payload_includes_delve_visible_false_after_dismissed(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => now(),
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
+
+        $this->assertFalse($event->characterStatuses['is_delve_visible']);
+    }
+
+    public function test_payload_keeps_delve_running_false_for_completed_delve_record(): void
+    {
+        DelveExploration::factory()->create([
+            'character_id' => $this->character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $event = new UpdateCharacterStatus($this->character->refresh());
 
         $this->assertFalse($event->characterStatuses['is_delve_running']);
     }

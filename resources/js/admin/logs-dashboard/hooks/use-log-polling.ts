@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
-import LogFiltersDefinition from '../api/definitions/log-filters-definition';
-import LogsPollResponseDefinition from '../api/definitions/logs-poll-response-definition';
+import UseLogPollingParams from './definitions/use-log-polling-params';
 import { LOG_POLLING_INTERVAL_MS } from '../values/log-polling';
 
 export default function useLogPolling({
@@ -10,16 +9,7 @@ export default function useLogPolling({
   poll_logs,
   on_poll,
   on_error,
-}: {
-  selected_file: string;
-  filters: LogFiltersDefinition;
-  poll_logs: (
-    fileKey: string,
-    filters: LogFiltersDefinition
-  ) => Promise<LogsPollResponseDefinition>;
-  on_poll: (payload: LogsPollResponseDefinition) => void;
-  on_error: () => void;
-}) {
+}: UseLogPollingParams) {
   useEffect(() => {
     if (!selected_file) {
       return;

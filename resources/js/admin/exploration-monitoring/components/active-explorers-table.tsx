@@ -1,13 +1,11 @@
 import React from 'react';
 
 import MonitoringCard from './monitoring-card';
-import { ActiveExplorer } from '../types/exploration-monitoring';
+import { ActiveExplorersTableProps } from '../types/component-props';
 
 export default function ActiveExplorersTable({
   explorers,
-}: {
-  explorers: ActiveExplorer[];
-}) {
+}: ActiveExplorersTableProps) {
   return (
     <MonitoringCard
       title="Currently Exploring"

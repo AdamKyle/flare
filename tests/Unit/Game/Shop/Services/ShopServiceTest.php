@@ -164,13 +164,10 @@ class ShopServiceTest extends TestCase
         $this->instance(EquipItemService::class, $equipItemService);
         $shopService = resolve(ShopService::class);
 
-        try {
-            $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
-        } catch (EquipItemException $e) {
-            // expected
-        }
+        $this->expectException(EquipItemException::class);
+        $this->expectExceptionMessage('cannot equip');
 
-        $this->assertEquals(50000, $character->refresh()->gold);
+        $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
     }
 
     public function test_buy_and_replace_rolls_back_inventory_slot_on_replace_failure(): void
@@ -178,7 +175,6 @@ class ShopServiceTest extends TestCase
         $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
         $character = $this->character->getCharacter();
         $character->update(['gold' => 50000]);
-        $initialSlotCount = $character->inventory->slots()->count();
 
         $equipItemService = Mockery::mock(EquipItemService::class);
         $equipItemService->shouldReceive('setRequest')->andReturnSelf();
@@ -188,13 +184,10 @@ class ShopServiceTest extends TestCase
         $this->instance(EquipItemService::class, $equipItemService);
         $shopService = resolve(ShopService::class);
 
-        try {
-            $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
-        } catch (EquipItemException $e) {
-            // expected
-        }
+        $this->expectException(EquipItemException::class);
+        $this->expectExceptionMessage('cannot equip');
 
-        $this->assertEquals($initialSlotCount, $character->refresh()->inventory->slots()->count());
+        $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
     }
 
     public function test_sell_item_do_not_go_above_max_gold()

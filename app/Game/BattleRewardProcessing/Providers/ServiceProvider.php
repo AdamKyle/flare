@@ -15,15 +15,21 @@ use App\Game\BattleRewardProcessing\Handlers\TheOldChurchRewardHandler;
 use App\Game\BattleRewardProcessing\Services\BattleLocationRewardService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
+use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Skills\Services\SkillService;
+use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -45,11 +51,30 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
+        $this->app->bind(FactionLoyaltyRewardRequestService::class, function ($app) {
+            return new FactionLoyaltyRewardRequestService(
+                $app->make(BattleRewardProcessingQueueManager::class),
+            );
+        });
+
         $this->app->bind(FactionLoyaltyBountyHandler::class, function ($app) {
             return new FactionLoyaltyBountyHandler(
-                $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
-                $app->make(BattleMessageHandler::class),
+                $app->make(FactionLoyaltyRewardRequestService::class),
+            );
+        });
+
+        $this->app->bind(GlobalEventParticipation::class, function ($app) {
+            return new GlobalEventParticipation(
+                $app->make(RandomAffixGenerator::class),
+            );
+        });
+
+        $this->app->bind(BattleGlobalEventParticipationHandler::class, function ($app) {
+            return new BattleGlobalEventParticipationHandler(
+                $app->make(RandomAffixGenerator::class),
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalProgressionService::class),
             );
         });
 
@@ -102,6 +127,9 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillService::class),
                 $app->make(BattleRewardLedgerService::class),
                 $app->make(BattleRewardMessageContext::class),
+                $app->make(RandomAffixGenerator::class),
+                $app->make(BroadcastTopsUpdateService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
             );
         });
 

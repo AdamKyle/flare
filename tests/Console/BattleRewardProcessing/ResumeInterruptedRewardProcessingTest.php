@@ -4,7 +4,6 @@ namespace Tests\Console\BattleRewardProcessing;
 
 use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\CharacterBattleRewardRequest;
-use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
@@ -15,10 +14,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBattleReward;
 
 class ResumeInterruptedRewardProcessingTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacterBattleReward, RefreshDatabase;
 
     public function test_command_exits_zero_when_no_stale_queues(): void
     {
@@ -36,7 +36,7 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now()->subMinutes(10),
@@ -53,12 +53,12 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now()->subMinutes(10),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PENDING,
         ]);
@@ -74,17 +74,17 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -103,17 +103,17 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -135,17 +135,17 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         $other = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
         foreach ([$target, $other] as $character) {
-            CharacterBattleRewardQueueState::factory()->create([
+            $this->createCharacterBattleRewardQueueState([
                 'character_id' => $character->id,
                 'is_processing' => true,
                 'heartbeat_at' => now(),
             ]);
-            $request = CharacterBattleRewardRequest::factory()->create([
+            $request = $this->createCharacterBattleRewardRequest([
                 'character_id' => $character->id,
                 'status' => BattleRewardRequestStatus::PROCESSING,
                 'started_at' => now(),
             ]);
-            CharacterBattleRewardRequestStep::factory()->create([
+            $this->createCharacterBattleRewardRequestStep([
                 'character_battle_reward_request_id' => $request->id,
                 'character_id' => $character->id,
                 'step_name' => BattleRewardStepName::XP,
@@ -168,17 +168,17 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -197,12 +197,12 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -222,16 +222,16 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => false,
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,
@@ -255,17 +255,17 @@ class ResumeInterruptedRewardProcessingTest extends TestCase
         Event::fake();
         Queue::fake();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now(),
         ]);
-        $processingRequest = CharacterBattleRewardRequest::factory()->create([
+        $processingRequest = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
             'started_at' => now(),
         ]);
-        CharacterBattleRewardRequestStep::factory()->create([
+        $this->createCharacterBattleRewardRequestStep([
             'character_battle_reward_request_id' => $processingRequest->id,
             'character_id' => $character->id,
             'step_name' => BattleRewardStepName::XP,

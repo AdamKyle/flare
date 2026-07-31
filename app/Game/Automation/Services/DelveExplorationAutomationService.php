@@ -26,7 +26,7 @@ class DelveExplorationAutomationService
     private int $timeDelay = 5;
 
     public function __construct(
-        private readonly CharacterCacheData $characterCacheData
+        private readonly CharacterCacheData $characterCacheData,
     ) {}
 
     public function beginAutomation(Character $character, Location $location, array $params)
@@ -36,7 +36,7 @@ class DelveExplorationAutomationService
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
             ->where('game_map_id', $character->map->game_map_id)
-            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_MEMORIES])
+            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_MEMORIES->value])
             ->whereNull('raid_special_attack_type')
             ->inRandomOrder()
             ->first()

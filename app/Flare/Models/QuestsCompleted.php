@@ -2,6 +2,7 @@
 
 namespace App\Flare\Models;
 
+use App\Admin\Events\AdminStatisticsDashboardUpdated;
 use Database\Factories\QuestsCompletedFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,5 +42,12 @@ class QuestsCompleted extends Model
     protected static function newFactory()
     {
         return QuestsCompletedFactory::new();
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function () {
+            broadcast(new AdminStatisticsDashboardUpdated());
+        });
     }
 }

@@ -1,15 +1,12 @@
 import React from 'react';
 
-import { RequestFiltersType } from '../types/reward-queue';
+import { RequestFiltersProps } from '../types/component-props';
 import { rewardQueueFilterOptions } from '../values/reward-queue-filter-options';
 
 export default function RequestFilters({
   filters,
   onChange,
-}: {
-  filters: RequestFiltersType;
-  onChange: (filters: RequestFiltersType) => void;
-}) {
+}: RequestFiltersProps) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {Object.entries(filters).map(([name, value]) => {

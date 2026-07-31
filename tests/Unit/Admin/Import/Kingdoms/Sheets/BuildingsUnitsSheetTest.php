@@ -3,29 +3,30 @@
 namespace Tests\Unit\Admin\Import\Kingdoms\Sheets;
 
 use App\Admin\Import\Kingdoms\Sheets\BuildingsUnitsSheet;
-use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameBuildingUnit;
+use Tests\Traits\CreateGameUnit;
 
 class BuildingsUnitsSheetTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameBuildingUnit, CreateGameUnit, RefreshDatabase;
 
     public function test_collection_preserves_omitted_relationships_and_upserts_present_rows(): void
     {
-        $church = GameBuilding::factory()->create(['name' => 'Church']);
-        $farm = GameBuilding::factory()->create(['name' => 'Farm']);
-        $settler = GameUnit::factory()->create(['name' => 'Settler']);
-        $spearmen = GameUnit::factory()->create(['name' => 'Spearmen']);
-        GameBuildingUnit::factory()->create([
+        $church = $this->createGameBuilding(['name' => 'Church']);
+        $farm = $this->createGameBuilding(['name' => 'Farm']);
+        $settler = $this->createGameUnit(['name' => 'Settler']);
+        $spearmen = $this->createGameUnit(['name' => 'Spearmen']);
+        $this->createGameBuildingUnit([
             'game_building_id' => $farm->id,
             'game_unit_id' => $spearmen->id,
             'required_level' => 10,
         ]);
-        GameBuildingUnit::factory()->create([
+        $this->createGameBuildingUnit([
             'game_building_id' => $church->id,
             'game_unit_id' => $settler->id,
             'required_level' => 1,

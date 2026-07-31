@@ -1,45 +1,46 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import MonitoringStatusChart from '../../monitoring/components/monitoring-status-chart';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../monitoring/values/admin-monitoring-chart-colors';
 import AdminPaginationControls from '../../shared/components/admin-pagination-controls';
-import { useFactionLoyaltyApi } from '../ajax/faction-loyalty-api';
-import useFactionLoyaltyLiveRefresh from '../hooks/use-faction-loyalty-live-refresh';
 import {
   ActiveFactionLoyaltyRunner,
   FactionLoyaltyChartPoint,
   FactionLoyaltyFilters,
-  FactionLoyaltyLog,
   FactionLoyaltyRunRow,
   FactionLoyaltySummary,
-} from '../types/faction-loyalty-monitoring';
+} from '../api/definitions/faction-loyalty-monitoring-definition';
+import { useFactionLoyaltyApi } from '../api/hooks/use-faction-loyalty-api';
+import useFactionLoyaltyLiveRefresh from '../hooks/use-faction-loyalty-live-refresh';
+import {
+  LogDetailsProps,
+  MonitorCardProps,
+} from '../types/dashboard-component-props';
+import factionLoyaltyPaginationAdapter from '../utils/faction-loyalty-pagination-adapter';
 import { DAY_OPTIONS } from '../values/filter-options';
 
-const emptyPaginatedResponse = <T,>(): PaginatedApiResponseDefinition<T[]> =>
-  ({
-    data: [],
-    meta: {
-      can_load_more: false,
-      pagination: {
-        count: 0,
-        [`current${'_'}page`]: 1,
-        links: { next: '', prev: '' },
-        per_page: 10,
-        total: 0,
-        total_pages: 1,
-      },
-    },
-  }) as PaginatedApiResponseDefinition<T[]>;
+function MonitorCard({ children, onClick, ariaLabel }: MonitorCardProps) {
+  const classes =
+    'rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5 ' +
+    'dark:border-gray-700 dark:bg-gray-900';
 
-function MonitorCard({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5 dark:border-gray-700 dark:bg-gray-900">
-      {children}
-    </section>
-  );
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={`${classes} cursor-pointer text-left transition-colors hover:border-blue-400 focus:ring-2 focus:ring-blue-400 focus:outline-none dark:hover:border-blue-500`}
+        onClick={onClick}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  return <section className={classes}>{children}</section>;
 }
 
-function LogDetails({ log }: { log: FactionLoyaltyLog | null | undefined }) {
+function LogDetails({ log }: LogDetailsProps) {
   const [open, setOpen] = useState(false);
 
   const fightLogs = log?.fight_logs ?? [];
@@ -51,8 +52,9 @@ function LogDetails({ log }: { log: FactionLoyaltyLog | null | undefined }) {
   }
 
   return (
-    <span>
+    <div>
       <button
+        type="button"
         className="text-xs text-blue-500 underline"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
@@ -85,7 +87,7 @@ function LogDetails({ log }: { log: FactionLoyaltyLog | null | undefined }) {
           )}
         </div>
       )}
-    </span>
+    </div>
   );
 }
 
@@ -108,9 +110,14 @@ export default function FactionLoyaltyDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [active, setActive] = useState<ActiveFactionLoyaltyRunner[]>([]);
-  const [runs, setRuns] = useState<
-    PaginatedApiResponseDefinition<FactionLoyaltyRunRow[]>
-  >(emptyPaginatedResponse());
+  const [runs, setRuns] = useState(
+    factionLoyaltyPaginationAdapter<FactionLoyaltyRunRow>({
+      data: [],
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    })
+  );
   const [summary, setSummary] = useState<FactionLoyaltySummary>({
     total_runs: 0,
     active: 0,
@@ -184,15 +191,21 @@ export default function FactionLoyaltyDashboard() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-3">
+        <MonitorCard>
+          <div className="text-sm text-gray-600 dark:text-gray-300">
+            Total Runs
+          </div>
+          <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+            {summary.total_runs}
+          </div>
+        </MonitorCard>
         {[
-          { label: 'Total Runs', value: summary.total_runs },
           { label: 'Active', value: summary.active },
           { label: 'Completed', value: summary.completed },
         ].map(({ label, value }) => (
-          <button
+          <MonitorCard
             key={label}
-            type="button"
-            className="text-left"
+            ariaLabel={`Filter runs by ${label}`}
             onClick={() => {
               if (label === 'Active') {
                 applyTableFilter({ status: 'active' });
@@ -201,15 +214,13 @@ export default function FactionLoyaltyDashboard() {
               }
             }}
           >
-            <MonitorCard>
-              <div className="text-sm text-gray-600 dark:text-gray-300">
-                {label}
-              </div>
-              <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                {value}
-              </div>
-            </MonitorCard>
-          </button>
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              {label}
+            </div>
+            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+              {value}
+            </div>
+          </MonitorCard>
         ))}
       </div>
 
@@ -234,12 +245,20 @@ export default function FactionLoyaltyDashboard() {
           description="Run, active, and completed totals from faction loyalty automation data."
           points={chart}
           series={[
-            { key: 'runs', label: 'Runs', color: '#a855f7' },
-            { key: 'active', label: 'Active', color: '#3b82f6' },
+            {
+              key: 'runs',
+              label: 'Runs',
+              color: ADMIN_MONITORING_CHART_COLORS.cosmic,
+            },
+            {
+              key: 'active',
+              label: 'Active',
+              color: ADMIN_MONITORING_CHART_COLORS.danube,
+            },
             {
               key: 'completed',
               label: 'Completed',
-              color: '#22c55e',
+              color: ADMIN_MONITORING_CHART_COLORS.emerald,
             },
           ]}
         />
@@ -398,9 +417,7 @@ export default function FactionLoyaltyDashboard() {
                 {runs.data.map((run) => (
                   <tr className="border-t dark:border-gray-700" key={run.id}>
                     <td className="p-2">{run.character?.name ?? '—'}</td>
-                    <td className="p-2">
-                      {run.factionLoyaltyNpc?.npc?.name ?? '—'}
-                    </td>
+                    <td className="p-2">{run.npc_name ?? '—'}</td>
                     <td className="p-2">{run.last_automation_action ?? '—'}</td>
                     <td className="p-2">{run.started_at ?? '—'}</td>
                     <td className="p-2">{run.completed_at ?? 'Active'}</td>

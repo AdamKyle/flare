@@ -2,19 +2,18 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\DelveExploration;
-use App\Flare\Models\DelveLog;
 use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateDelveAutomation;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class DelveMonitoringTest extends TestCase
 {
-    use CreateRole, CreateUser, RefreshDatabase;
+    use CreateCharacterAutomation, CreateDelveAutomation, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_non_admin_cannot_access_delve_monitoring_page(): void
     {
@@ -58,7 +57,7 @@ class DelveMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -75,7 +74,7 @@ class DelveMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->subMinute(),
@@ -92,7 +91,7 @@ class DelveMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -109,7 +108,7 @@ class DelveMonitoringTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        DelveExploration::factory()->create(['character_id' => $character->id]);
+        $this->createDelveAutomation(['character_id' => $character->id]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/delve/runs');
 
@@ -153,9 +152,9 @@ class DelveMonitoringTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $delve = DelveExploration::factory()->create(['character_id' => $character->id]);
-        DelveLog::factory()->create(['character_id' => $character->id, 'delve_exploration_id' => $delve->id, 'outcome' => 'survived']);
-        DelveLog::factory()->create(['character_id' => $character->id, 'delve_exploration_id' => $delve->id, 'outcome' => 'died']);
+        $delve = $this->createDelveAutomation(['character_id' => $character->id]);
+        $this->createDelveAutomationLog(['character_id' => $character->id, 'delve_exploration_id' => $delve->id, 'outcome' => 'survived']);
+        $this->createDelveAutomationLog(['character_id' => $character->id, 'delve_exploration_id' => $delve->id, 'outcome' => 'died']);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/delve/summary');
 
@@ -171,16 +170,16 @@ class DelveMonitoringTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
         ]);
-        $delve = DelveExploration::factory()->create([
+        $delve = $this->createDelveAutomation([
             'character_id' => $character->id,
             'completed_at' => null,
         ]);
-        DelveLog::factory()->create(['character_id' => $character->id, 'delve_exploration_id' => $delve->id, 'outcome' => 'survived']);
+        $this->createDelveAutomationLog(['character_id' => $character->id, 'delve_exploration_id' => $delve->id, 'outcome' => 'survived']);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monitoring/delve/active');
 

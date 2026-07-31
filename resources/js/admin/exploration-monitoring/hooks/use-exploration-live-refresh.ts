@@ -2,10 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { ChannelType } from '../../../websocket-handler/enums/channel-type';
 import { useWebsocket } from '../../../websocket-handler/hooks/use-websocket';
-
-interface ExplorationMonitoringUpdatedPayload {
-  character_id: number;
-}
+import { ExplorationWebsocketEvents } from '../enums/exploration-websocket-events';
+import ExplorationMonitoringUpdatedPayload from '../types/exploration-monitoring-updated-payload';
 
 export default function useExplorationLiveRefresh(refresh: () => void) {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -21,10 +19,10 @@ export default function useExplorationLiveRefresh(refresh: () => void) {
   );
 
   useWebsocket<ExplorationMonitoringUpdatedPayload>({
-    url: 'admin-monitoring-exploration',
+    url: ExplorationWebsocketEvents.CHANNEL,
     params: {},
     type: ChannelType.PRIVATE,
-    channelName: '.exploration.monitoring.updated',
+    channelName: ExplorationWebsocketEvents.UPDATED,
     onEvent: handleEvent,
   });
 

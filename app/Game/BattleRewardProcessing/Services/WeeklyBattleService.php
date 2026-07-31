@@ -8,16 +8,17 @@ use App\Flare\Models\WeeklyMonsterFight;
 use App\Flare\Values\LocationType;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class WeeklyBattleService
 {
     private LocationSpecialtyHandler $locationSpecialtyHandler;
 
     private array $validLocationTypes = [
-        LocationType::ALCHEMY_CHURCH,
-        LocationType::LORDS_STRONG_HOLD,
-        LocationType::BROKEN_ANVIL,
-        LocationType::TWSITED_MAIDENS_DUNGEONS,
+        LocationType::ALCHEMY_CHURCH->value,
+        LocationType::LORDS_STRONG_HOLD->value,
+        LocationType::BROKEN_ANVIL->value,
+        LocationType::TWISTED_MAIDENS_DUNGEONS->value,
     ];
 
     public function __construct(LocationSpecialtyHandler $locationSpecialtyHandler)
@@ -62,25 +63,38 @@ class WeeklyBattleService
             return $character;
         }
 
-        $weeklyMonsterFight = $character->weeklyBattleFights()->where('monster_id', $monster->id)->first();
+        $this->claimMonsterDeath($character, $monster);
 
-        if (is_null($weeklyMonsterFight)) {
-            $weeklyMonsterFight = $character->weeklyBattleFights()->create([
-                'character_id' => $character->id,
-                'monster_id' => $monster->id,
-                'monster_was_killed' => true,
-            ]);
+        return DB::transaction(function () use ($character, $monster): Character {
+            $weeklyMonsterFight = WeeklyMonsterFight::where('character_id', $character->id)
+                ->where('monster_id', $monster->id)
+                ->lockForUpdate()
+                ->first();
 
-            return $this->handleReward($character, $monster, $weeklyMonsterFight);
+            if (is_null($weeklyMonsterFight) || ! is_null($weeklyMonsterFight->reward_processed_at)) {
+                return $character;
+            }
+
+            $character = $this->handleReward($character, $monster, $weeklyMonsterFight);
+            $weeklyMonsterFight->update(['reward_processed_at' => now()]);
+
+            return $character;
+        });
+    }
+
+    public function claimMonsterDeath(Character $character, Monster $monster): void
+    {
+        if (! in_array($monster->only_for_location_type, $this->validLocationTypes)) {
+            return;
         }
 
-        $weeklyMonsterFight->update([
+        WeeklyMonsterFight::upsert([[
+            'character_id' => $character->id,
+            'monster_id' => $monster->id,
             'monster_was_killed' => true,
-        ]);
-
-        $weeklyMonsterFight = $weeklyMonsterFight->refresh();
-
-        return $this->handleReward($character, $monster, $weeklyMonsterFight);
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]], ['character_id', 'monster_id'], ['monster_was_killed', 'updated_at']);
     }
 
     /**
@@ -97,6 +111,11 @@ class WeeklyBattleService
         return ! $weeklyMonsterFight->monster_was_killed;
     }
 
+    public function isWeeklyMonster(Monster $monster): bool
+    {
+        return in_array($monster->only_for_location_type, $this->validLocationTypes, true);
+    }
+
     /**
      * Handle rewarding the player.
      *
@@ -105,7 +124,7 @@ class WeeklyBattleService
     private function handleReward(Character $character, Monster $monster, WeeklyMonsterFight $weeklyMonsterFight): Character
     {
 
-        $locationType = new LocationType($monster->only_for_location_type);
+        $locationType = LocationType::from($monster->only_for_location_type);
 
         if ($locationType->isAlchemyChurch() || $locationType->isCaveOfMemories()) {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);

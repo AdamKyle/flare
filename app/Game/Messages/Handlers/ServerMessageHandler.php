@@ -57,6 +57,14 @@ class ServerMessageHandler
         $this->dispatchOrOutbox($user, $message, $id);
     }
 
+    /**
+     * Send a basic message with a clickable item link.
+     */
+    public function sendBasicMessageWithLink(User $user, string $message, int $id, ?string $source, ?string $linkText): void
+    {
+        $this->dispatchOrOutbox($user, $message, $id, $source, null, $linkText);
+    }
+
     private function dispatchOrOutbox(
         User $user,
         string $message,
@@ -86,11 +94,22 @@ class ServerMessageHandler
             $linkText,
         );
 
-        $this->safelyDispatchBroadcastEvent(
-            new ServerMessageEvent($user, $message, $id, $source, $itemId, $linkText),
-            ['user_id' => $user->id],
+        $event = new ServerMessageEvent($user, $message, $id, $source, $itemId, $linkText);
+        $dispatched = $this->safelyDispatchBroadcastEvent(
+            $event,
+            [
+                'user_id' => $user->id,
+                'character_id' => $this->battleRewardMessageContext->characterId(),
+                'reward_request_id' => $this->battleRewardMessageContext->requestId(),
+                'reward_step' => $this->battleRewardMessageContext->stepName()?->value,
+                'message_record_id' => $storedMessage->id,
+                'message' => $message,
+                'event_class' => $event::class,
+            ],
         );
 
-        $this->battleRewardMessageOutboxService->markEmitted($storedMessage);
+        if ($dispatched) {
+            $this->battleRewardMessageOutboxService->markEmitted($storedMessage);
+        }
     }
 }

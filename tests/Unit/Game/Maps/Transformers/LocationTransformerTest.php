@@ -2,24 +2,24 @@
 
 namespace Tests\Unit\Game\Maps\Transformers;
 
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Item;
-use App\Flare\Models\Location;
 use App\Game\Maps\Transformers\LocationTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
 
 class LocationTransformerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameMap, CreateItem, CreateLocation, RefreshDatabase;
 
     public function test_transform_includes_quest_reward_item(): void
     {
-        $gameMap = GameMap::factory()->create();
-        $questRewardItem = Item::factory()->create([
+        $gameMap = $this->createGameMap();
+        $questRewardItem = $this->createItem([
             'name' => 'Quest Reward',
         ]);
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $gameMap->id,
             'quest_reward_item_id' => $questRewardItem->id,
         ])->load(['map', 'questRewardItem']);
@@ -34,8 +34,8 @@ class LocationTransformerTest extends TestCase
 
     public function test_transform_includes_null_quest_reward_item(): void
     {
-        $gameMap = GameMap::factory()->create();
-        $location = Location::factory()->create([
+        $gameMap = $this->createGameMap();
+        $location = $this->createLocation([
             'game_map_id' => $gameMap->id,
             'quest_reward_item_id' => null,
         ])->load(['map', 'questRewardItem']);
@@ -47,10 +47,10 @@ class LocationTransformerTest extends TestCase
 
     public function test_transform_includes_game_map_name(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => 'Test Map',
         ]);
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $gameMap->id,
         ])->load('map');
 

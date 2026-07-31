@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Flare\Models\CharacterBattleRewardQueueState;
-use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
@@ -12,12 +10,13 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class BattleRewardQueueControllerTest extends TestCase
 {
-    use CreateRole, CreateUser, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_admin_can_view_reward_queue_page_and_home_card(): void
     {
@@ -45,7 +44,7 @@ class BattleRewardQueueControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::FIRST,
             'source_type' => BattleRewardRequestSourceType::QUEST,
@@ -105,13 +104,13 @@ class BattleRewardQueueControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::FIRST,
             'source_type' => BattleRewardRequestSourceType::QUEST,
             'status' => BattleRewardRequestStatus::FAILED,
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::SECOND,
             'source_type' => BattleRewardRequestSourceType::BATTLE,
@@ -152,13 +151,13 @@ class BattleRewardQueueControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'started_at' => now()->subMinutes(15),
             'heartbeat_at' => now()->subMinutes(10),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PROCESSING,
         ]);
@@ -191,12 +190,12 @@ class BattleRewardQueueControllerTest extends TestCase
         Queue::fake();
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        CharacterBattleRewardQueueState::factory()->create([
+        $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
             'is_processing' => true,
             'heartbeat_at' => now()->subMinutes(10),
         ]);
-        CharacterBattleRewardRequest::factory()->create([
+        $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'status' => BattleRewardRequestStatus::PENDING,
         ]);

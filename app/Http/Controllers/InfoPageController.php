@@ -184,7 +184,7 @@ class InfoPageController extends Controller
         }
 
         if (! is_null($location->type)) {
-            $locationType = (new LocationType($location->type));
+            $locationType = LocationType::tryFrom($location->type);
         }
 
         return view('information.locations.location', array_merge([

@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Maps\Services;
 
-use App\Flare\Models\Location;
 use App\Flare\Values\LocationType;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
@@ -12,13 +11,14 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
 class LocationServiceTest extends TestCase
 {
-    use CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
+    use CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
     public function test_raid_monsters_not_overwritten_by_special_location_monsters(): void
     {
@@ -26,15 +26,15 @@ class LocationServiceTest extends TestCase
 
         $gameMap = $character->map->gameMap;
 
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'x' => 16,
             'y' => 16,
             'game_map_id' => $gameMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
 
         Cache::put('special-location-monsters', [
-            'location-type-'.LocationType::GOLD_MINES => [['id' => 1, 'name' => 'Gold Mine Monster']],
+            'location-type-'.LocationType::GOLD_MINES->value => [['id' => 1, 'name' => 'Gold Mine Monster']],
         ]);
 
         $raidBoss = $this->createMonster(['game_map_id' => $gameMap->id]);
@@ -64,15 +64,15 @@ class LocationServiceTest extends TestCase
 
         $gameMap = $character->map->gameMap;
 
-        Location::factory()->create([
+        $this->createLocation([
             'x' => 16,
             'y' => 16,
             'game_map_id' => $gameMap->id,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
         ]);
 
         Cache::put('special-location-monsters', [
-            'location-type-'.LocationType::GOLD_MINES => [['id' => 1, 'name' => 'Gold Mine Monster']],
+            'location-type-'.LocationType::GOLD_MINES->value => [['id' => 1, 'name' => 'Gold Mine Monster']],
         ]);
 
         Event::fake();

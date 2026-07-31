@@ -23,6 +23,7 @@ class EventFactory extends Factory
     {
         return [
             'type' => null,
+            'scheduled_event_id' => null,
             'started_at' => now(),
             'ends_at' => now()->subMinutes(5),
             'raid_id' => null,

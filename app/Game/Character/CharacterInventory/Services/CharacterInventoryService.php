@@ -143,6 +143,26 @@ class CharacterInventoryService
         }
     }
 
+    /**
+     * Resolves an exact SetSlot for item details, instead of the item_id-based
+     * lookup in getSlotForItemDetails() below, which picks the first slot it finds
+     * matching that item_id. When duplicate, non-enchanted items share the same
+     * catalog Item row across multiple SetSlots (e.g. several identical Batch
+     * Crafting outputs kept in the Crafted Items Set), that ambiguous lookup can
+     * resolve to the wrong physical slot. Callers that already know the specific
+     * SetSlot id (such as Batch Crafting action history) should use this instead.
+     */
+    public function getSetSlotForItemDetails(Character $character, Item $item, int $setSlotId): ?SetSlot
+    {
+        return SetSlot::where('id', $setSlotId)
+            ->where('item_id', $item->id)
+            ->whereHas('inventorySet', fn ($query) => $query->where('character_id', $character->id))
+            ->first();
+    }
+
+    /**
+     * Gets the slot that holds the item, for its details.
+     */
     public function getSlotForItemDetails(Character $character, int|Item $slotIdOrItem): InventorySlot|SetSlot|null
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
@@ -203,25 +223,32 @@ class CharacterInventoryService
     public function getCharacterInventorySets(int $perPage = 10, int $page = 1): array
     {
         $sets = [];
+        $inventorySets = $this->character->inventorySets()
+            ->with('slots.item')
+            ->orderByRaw('case when special_type = ? then 1 else 0 end', [InventorySet::BATCH_CRAFTING_SPECIAL_TYPE])
+            ->orderBy('id')
+            ->get();
 
-        foreach ($this->character->inventorySets as $index => $inventorySet) {
-            if (is_null($inventorySet->name)) {
-                $sets[] = [
-                    'name' => 'Set '.$index + 1,
-                    'equippable' => $inventorySet->can_be_equipped,
-                    'set_id' => $inventorySet->id,
-                    'equipped' => $inventorySet->is_equipped,
-                    'is_equippable' => $this->inventorySetService->isSetEquippable($inventorySet),
-                ];
-            } else {
-                $sets[] = [
-                    'name' => $inventorySet->name,
-                    'equippable' => $inventorySet->can_be_equipped,
-                    'set_id' => $inventorySet->id,
-                    'equipped' => $inventorySet->is_equipped,
-                    'is_equippable' => $this->inventorySetService->isSetEquippable($inventorySet),
-                ];
-            }
+        foreach ($inventorySets as $index => $inventorySet) {
+            $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
+            $slotCount = $inventorySet->currentSlotCount();
+            $remainingInventorySpace = max(0, $this->character->inventory_max - $this->character->getInventoryCount());
+            $payload = [
+                'name' => $inventorySet->name ?? 'Set '.($index + 1),
+                'items' => array_reverse($this->manager->createData($slots)->toArray()),
+                'equippable' => $inventorySet->can_be_equipped,
+                'set_id' => $inventorySet->id,
+                'equipped' => $inventorySet->is_equipped,
+                'is_equippable' => $this->inventorySetService->isSetEquippable($inventorySet),
+                'is_batch_crafting_set' => $inventorySet->isBatchCraftingSet(),
+                'max_slots' => $inventorySet->max_slots,
+                'current_slots' => $slotCount,
+                'remaining_slots' => $inventorySet->remainingSlots(),
+                'can_empty' => $slotCount <= $remainingInventorySpace,
+                'empty_disabled_reason' => $slotCount > $remainingInventorySpace ? 'Your inventory does not have enough room to empty this set.' : null,
+            ];
+
+            $sets[] = $payload;
         }
 
         $setCollection = collect($sets);
@@ -341,8 +368,20 @@ class CharacterInventoryService
      */
     public function getUsableSets(): array
     {
-        $selectableSets = InventorySet::where('is_equipped', false)->where('character_id', $this->character->id)->get();
-        $setIds = InventorySet::where('character_id', $this->character->id)->pluck('id')->toArray();
+        $selectableSets = InventorySet::where('is_equipped', false)
+            ->where('character_id', $this->character->id)
+            ->where(function ($query) {
+                $query->whereNull('special_type')
+                    ->orWhere('special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE);
+            })
+            ->get();
+        $setIds = InventorySet::where('character_id', $this->character->id)
+            ->where(function ($query) {
+                $query->whereNull('special_type')
+                    ->orWhere('special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE);
+            })
+            ->pluck('id')
+            ->toArray();
 
         $indexes = [];
 

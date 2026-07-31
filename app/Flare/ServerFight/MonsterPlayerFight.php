@@ -3,7 +3,6 @@
 namespace App\Flare\ServerFight;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Flare\ServerFight\Fight\Ambush;
@@ -372,11 +371,10 @@ class MonsterPlayerFight
             resolve(BuildMonsterCacheService::class)->buildCache();
         }
 
-        $mapName = $map->gameMap->name;
+        $gameMap = $map->gameMap;
+        $mapName = $gameMap->name;
 
         $monsters = Cache::get('monsters')[$mapName]['data'];
-
-        $gameMap = GameMap::where('name', $mapName)->first();
 
         if (is_null($gameMap)) {
             return null;

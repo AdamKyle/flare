@@ -2,10 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { ChannelType } from '../../../websocket-handler/enums/channel-type';
 import { useWebsocket } from '../../../websocket-handler/hooks/use-websocket';
-
-interface DelveMonitoringUpdatedPayload {
-  character_id: number;
-}
+import { DelveWebsocketEvents } from '../enums/delve-websocket-events';
+import DelveMonitoringUpdatedPayload from '../types/delve-monitoring-updated-payload';
 
 export default function useDelveMonitoringLiveRefresh(refresh: () => void) {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -21,10 +19,10 @@ export default function useDelveMonitoringLiveRefresh(refresh: () => void) {
   );
 
   useWebsocket<DelveMonitoringUpdatedPayload>({
-    url: 'admin-monitoring-delve',
+    url: DelveWebsocketEvents.CHANNEL,
     params: {},
     type: ChannelType.PRIVATE,
-    channelName: '.delve.monitoring.updated',
+    channelName: DelveWebsocketEvents.UPDATED,
     onEvent: handleEvent,
   });
 

@@ -95,7 +95,7 @@ class BaseMovementService
      */
     protected function traversePlayer(Location $location, Character $character): bool
     {
-        if ($location->type === LocationType::TWISTED_GATE) {
+        if ($location->type === LocationType::TWISTED_GATE->value) {
             $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
 
             if (is_null($gameMap)) {
@@ -191,6 +191,21 @@ class BaseMovementService
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
         if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::ENTER_LOCATION, $location)) {
+
+            return false;
+        }
+
+        if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
+
+            if (! is_null($location->type)) {
+                $locationType = LocationType::tryFrom($location->type);
+
+                if (! is_null($locationType) && ($locationType->isGoldMines() || $locationType->isPurgatoryDungeons())) {
+                    return true;
+                }
+            }
+
+            event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
 
             return false;
         }

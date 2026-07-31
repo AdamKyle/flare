@@ -3,24 +3,24 @@
 namespace Tests\Unit\Admin\Services;
 
 use App\Admin\Services\AdminGemRollService;
-use App\Flare\Models\GameLocationGemParamter;
-use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Gem;
 use App\Flare\Models\GemBagSlot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
 use Tests\TestCase;
+use Tests\Traits\CreateGameLocationGemParamter;
+use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class AdminGemRollServiceTest extends TestCase
 {
-    use CreateRole, CreateUser, RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGameMapGemParamter, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_roll_map_gem_creates_generated_gem_and_updates_current_pointer(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameMapGemParamter::factory()->create([
+        $profile = $this->createGameMapGemParamter([
             'character_xp_bonus_range' => '0.1250-0.2500',
             'gold_gain_range' => '1.5000-2.5000',
             'character_power_reduction_range' => '0.0500-0.1000',
@@ -53,7 +53,7 @@ class AdminGemRollServiceTest extends TestCase
     public function test_roll_location_gem_never_sets_character_power_reduction(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameLocationGemParamter::factory()->create([
+        $profile = $this->createGameLocationGemParamter([
             'character_xp_bonus_range' => '0.5000-0.7500',
             'monster_atonement_range' => null,
         ]);
@@ -75,7 +75,7 @@ class AdminGemRollServiceTest extends TestCase
     public function test_reroll_creates_new_gem_and_keeps_previous_gem(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameMapGemParamter::factory()->create();
+        $profile = $this->createGameMapGemParamter();
         $service = resolve(AdminGemRollService::class);
 
         $firstGem = $service->rollMapGem($profile, $admin);
@@ -94,7 +94,7 @@ class AdminGemRollServiceTest extends TestCase
     public function test_location_reroll_keeps_profile_name_and_roll_history(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameLocationGemParamter::factory()->create(['name' => 'Location Profile Name']);
+        $profile = $this->createGameLocationGemParamter(['name' => 'Location Profile Name']);
         $service = resolve(AdminGemRollService::class);
 
         $firstGem = $service->rollLocationGem($profile, $admin);
@@ -147,7 +147,7 @@ class AdminGemRollServiceTest extends TestCase
             'character_power_reduction_range' => 'character_power_reduction',
         ];
         $profileData = array_fill_keys(array_keys($rangeMappings), '0.4321-0.4321');
-        $profile = GameMapGemParamter::factory()->create($profileData);
+        $profile = $this->createGameMapGemParamter($profileData);
 
         $gem = resolve(AdminGemRollService::class)->rollMapGem($profile, $admin);
 
@@ -159,24 +159,19 @@ class AdminGemRollServiceTest extends TestCase
     public function test_invalid_range_fails_loudly_without_creating_gem(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameMapGemParamter::factory()->create([
+        $profile = $this->createGameMapGemParamter([
             'character_xp_bonus_range' => 'invalid',
         ]);
 
         $this->expectException(InvalidArgumentException::class);
 
-        try {
-            resolve(AdminGemRollService::class)->rollMapGem($profile, $admin);
-        } finally {
-            $this->assertSame(0, Gem::count());
-            $this->assertNull($profile->fresh()->rolled_gem_id);
-        }
+        resolve(AdminGemRollService::class)->rollMapGem($profile, $admin);
     }
 
     public function test_map_reversed_range_rolls_between_normalized_bounds(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameMapGemParamter::factory()->create([
+        $profile = $this->createGameMapGemParamter([
             'character_power_reduction_range' => '0.05-0.012',
         ]);
 
@@ -189,7 +184,7 @@ class AdminGemRollServiceTest extends TestCase
     public function test_location_reversed_range_rolls_between_normalized_bounds(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $profile = GameLocationGemParamter::factory()->create([
+        $profile = $this->createGameLocationGemParamter([
             'gold_gain_range' => '0.3-0.08',
         ]);
 

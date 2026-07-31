@@ -21,13 +21,10 @@ use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Skills\Services\SkillService;
 use Closure;
 use Exception;
-use Exception;
 use Facades\App\Flare\Calculators\XPCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Manager;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Item;
 use League\Fractal\Resource\Item;
 
 class CharacterXPService

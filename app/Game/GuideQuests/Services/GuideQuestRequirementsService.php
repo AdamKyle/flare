@@ -2,19 +2,33 @@
 
 namespace App\Game\GuideQuests\Services;
 
+use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
+use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GuideQuest;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\Item;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Log;
 
 class GuideQuestRequirementsService
 {
     private array $finishedRequirements = [];
+
+    private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
+
+    public function __construct(?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null)
+    {
+        $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService ?? new GlobalEventGoalEligibilityService();
+    }
 
     /**
      * Get the finished requirements.
@@ -91,18 +105,161 @@ class GuideQuestRequirementsService
                 return $this;
             }
 
-            $lastDelveLog = DelveLog::where('character_id', $character->id)->where('delve_exploration_id', $lastDelveExploration->id)->latest()->first();
+            $latestPackSize = DelveLog::where('character_id', $character->id)
+                ->where('delve_exploration_id', $lastDelveExploration->id)
+                ->orderBy('created_at', 'desc')
+                ->value('pack_size');
 
-            if (is_null($lastDelveLog)) {
+            if (is_null($latestPackSize)) {
                 return $this;
             }
 
-            if ($lastDelveLog->pack_size >= $quest->required_delve_pack_size) {
+            if ($latestPackSize >= $quest->required_delve_pack_size) {
                 $this->finishedRequirements[] = 'required_delve_pack_size';
             }
         }
 
         return $this;
+    }
+
+    public function requiredBatchCraftingExperienceHours(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (is_null($quest->required_batch_crafting_type) || is_null($quest->required_batch_crafting_hours)) {
+            return $this;
+        }
+
+        $batchCraftings = BatchCrafting::where('character_id', $character->id)
+            ->where('batch_type', $quest->required_batch_crafting_type)
+            ->whereNotNull('started_at')
+            ->get();
+
+        foreach ($batchCraftings as $batchCrafting) {
+            $progress = $batchCrafting->progress ?? [];
+
+            if (! $this->batchCraftingWasRunForExperience($quest->required_batch_crafting_type, $progress)) {
+                continue;
+            }
+
+            $endedAt = $batchCrafting->cancelled_at ?? $batchCrafting->completed_at ?? now();
+
+            if ($batchCrafting->started_at->diffInMinutes($endedAt) >= $quest->required_batch_crafting_hours * 60) {
+                $this->finishedRequirements[] = 'required_batch_crafting_hours';
+
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    public function requiredBatchCraftedItems(Character $character, GuideQuest $quest): GuideQuestRequirementsService
+    {
+        if (is_null($quest->required_batch_crafted_items)) {
+            return $this;
+        }
+
+        $requirements = $this->batchCraftedItemRequirements($character, $quest->required_batch_crafted_items);
+
+        if (collect($requirements)->every(fn (array $requirement): bool => $requirement['is_complete'])) {
+            $this->finishedRequirements[] = 'required_batch_crafted_items';
+        }
+
+        return $this;
+    }
+
+    public function hasRequiredBatchCraftedItems(Character $character, array $requiredBatchCraftedItems): bool
+    {
+        $requirements = $this->batchCraftedItemRequirements($character, $requiredBatchCraftedItems);
+
+        return collect($requirements)->every(fn (array $requirement): bool => $requirement['is_complete']);
+    }
+
+    public function batchCraftedItemRequirements(Character $character, array $requiredBatchCraftedItems): array
+    {
+        return collect($requiredBatchCraftedItems)->map(function (array $requiredBatchCraftedItem, int $requirementIndex) use ($character): array {
+            $source = $requiredBatchCraftedItem['source'] ?? 'inventory';
+            $itemId = (int) ($requiredBatchCraftedItem['item_id'] ?? 0);
+            $requiredAmount = (int) ($requiredBatchCraftedItem['amount'] ?? 0);
+            $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+            $mustBeEnchanted = $source === 'alchemy_bag'
+                ? false
+                : (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false);
+            $currentAmount = 0;
+
+            if (! is_null($item) && $source === 'alchemy_bag' && $item->type === 'alchemy') {
+                $currentAmount = (int) AlchemyBagSlot::where('character_id', $character->id)
+                    ->where('item_id', $item->id)
+                    ->sum('amount');
+            }
+
+            if (! is_null($item) && $source === 'inventory' && $item->type !== 'alchemy') {
+                $currentAmount = $this->matchingBatchCraftedItemSlotsQuery($character, $item, $mustBeEnchanted)->count();
+            }
+
+            return [
+                'requirement_index' => $requirementIndex,
+                'source' => $source,
+                'item_id' => $itemId,
+                'required_amount' => $requiredAmount,
+                'current_amount' => $currentAmount,
+                'must_be_enchanted' => $mustBeEnchanted,
+                'is_complete' => ! is_null($item) && $currentAmount >= $requiredAmount,
+            ];
+        })->values()->all();
+    }
+
+    public function hasRequiredAlchemyBagItemAmount(Character $character, array $requiredBatchCraftedItem): bool
+    {
+        $requirements = $this->batchCraftedItemRequirements($character, [$requiredBatchCraftedItem]);
+
+        return $requirements[0]['is_complete'];
+    }
+
+    public function matchingBatchCraftedItemSlotIds(Character $character, array $requiredBatchCraftedItem): array
+    {
+        $item = Item::find($requiredBatchCraftedItem['item_id'] ?? null);
+
+        if (is_null($item) || ($requiredBatchCraftedItem['source'] ?? 'inventory') === 'alchemy_bag') {
+            return [];
+        }
+
+        return $this->matchingBatchCraftedItemSlotsQuery(
+            $character,
+            $item,
+            (bool) ($requiredBatchCraftedItem['must_be_enchanted'] ?? false),
+        )
+            ->orderBy('id')
+            ->limit((int) ($requiredBatchCraftedItem['amount'] ?? 0))
+            ->pluck('id')
+            ->all();
+    }
+
+    private function matchingBatchCraftedItemSlotsQuery(Character $character, Item $item, bool $mustBeEnchanted): Builder
+    {
+        return InventorySlot::where('inventory_id', $character->inventory->id)
+            ->where(function ($query) {
+                $query->where('equipped', false)
+                    ->orWhereNull('equipped');
+            })
+            ->whereHas('item', function ($query) use ($item, $mustBeEnchanted) {
+                if (! $mustBeEnchanted) {
+                    $query->where('id', $item->id)
+                        ->whereNull('item_prefix_id')
+                        ->whereNull('item_suffix_id');
+
+                    return;
+                }
+
+                $query->whereNotNull('item_prefix_id')
+                    ->whereNotNull('item_suffix_id')
+                    ->where(function ($matchingItemQuery) use ($item) {
+                        $matchingItemQuery->where('parent_id', $item->id)
+                            ->orWhere(function ($nameAndTypeQuery) use ($item) {
+                                $nameAndTypeQuery->where('name', $item->name)
+                                    ->where('type', $item->type);
+                            });
+                    });
+            });
     }
 
     /**
@@ -525,15 +682,81 @@ class GuideQuestRequirementsService
     public function requiredGlobalEventKillAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService
     {
 
-        if (is_null($character->globalEventKills)) {
+        $goal = $this->eventOwnedGoalForGuideQuest($guideQuest);
+
+        if (is_null($goal)) {
             return $this;
         }
 
-        if ($character->globalEventKills->kills >= $guideQuest->required_event_goal_participation) {
+        $kills = $character->globalEventKills()->where('global_event_goal_id', $goal->id)->first()?->kills ?? 0;
+
+        if ($kills >= $guideQuest->required_event_goal_participation) {
             $this->finishedRequirements[] = 'required_event_goal_participation';
         }
 
         return $this;
+    }
+
+    public function requiredGlobalEventCraftAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService
+    {
+        if (is_null($guideQuest->required_event_goal_crafting_participation)) {
+            return $this;
+        }
+
+        $goal = $this->eventOwnedGoalForGuideQuest($guideQuest);
+
+        if (is_null($goal)) {
+            return $this;
+        }
+
+        $crafts = $character->globalEventCrafts()->where('global_event_goal_id', $goal->id)->first()?->crafts ?? 0;
+
+        if ($crafts >= $guideQuest->required_event_goal_crafting_participation) {
+            $this->finishedRequirements[] = 'required_event_goal_crafting_participation';
+        }
+
+        return $this;
+    }
+
+    public function requiredGlobalEventEnchantAmount(Character $character, GuideQuest $guideQuest): GuideQuestRequirementsService
+    {
+        if (is_null($guideQuest->required_event_goal_enchanting_participation)) {
+            return $this;
+        }
+
+        $goal = $this->eventOwnedGoalForGuideQuest($guideQuest);
+
+        if (is_null($goal)) {
+            return $this;
+        }
+
+        $enchants = $character->globalEventEnchants()->where('global_event_goal_id', $goal->id)->first()?->enchants ?? 0;
+
+        if ($enchants >= $guideQuest->required_event_goal_enchanting_participation) {
+            $this->finishedRequirements[] = 'required_event_goal_enchanting_participation';
+        }
+
+        return $this;
+    }
+
+    /**
+     * Resolves the event-owned goal for the guide quest's event type. Only one
+     * runtime event of a given seasonal type can be active at a time, so this
+     * lookup is never ambiguous between concurrent Winter/Delusional events.
+     */
+    private function eventOwnedGoalForGuideQuest(GuideQuest $guideQuest): ?GlobalEventGoal
+    {
+        if (is_null($guideQuest->only_during_event)) {
+            return null;
+        }
+
+        $event = $this->globalEventGoalEligibilityService->activeEventForType($guideQuest->only_during_event);
+
+        if (is_null($event)) {
+            return null;
+        }
+
+        return $event->globalEventGoals()->latest('id')->first();
     }
 
     /**
@@ -565,6 +788,16 @@ class GuideQuestRequirementsService
         if (! is_null($classSkill)) {
             $this->finishedRequirements[] = 'required_skill_type_level';
         }
+    }
+
+    protected function batchCraftingWasRunForExperience(string $batchCraftingType, array $progress): bool
+    {
+        return match ($batchCraftingType) {
+            'craft', 'craft_and_enchant' => ($progress['craft_mode'] ?? null) === 'experience',
+            'alchemy' => ($progress['alchemy_mode'] ?? null) === 'experience',
+            'trinketry' => ($progress['trinketry_mode'] ?? null) === 'experience',
+            default => false,
+        };
     }
 
     /**

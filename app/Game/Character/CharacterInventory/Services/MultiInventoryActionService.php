@@ -3,14 +3,17 @@
 namespace App\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\MarketBoard;
+use App\Flare\Models\SetSlot;
 use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
+use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantManyService;
 use Exception;
@@ -110,8 +113,7 @@ class MultiInventoryActionService
     public function sellManyItems(Character $character, array $params): array
     {
 
-        $slots = $character->inventory->slots()
-            ->whereIn('id', $slotIds)
+        $slotsQuery = $character->inventory->slots()
             ->whereHas('item', function ($query) {
                 return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact', 'trinket']);
             })
@@ -127,11 +129,10 @@ class MultiInventoryActionService
 
         $slots = $slotsQuery->get();
 
-        $totalSoldFor = 0;
-
-        foreach ($slots as $slot) {
-            $totalSoldFor += $this->sellItem($character, $slot);
-        }
+        $totalSoldFor = $slots->sum(fn (InventorySlot $slot) => SellItemCalculator::fetchSalePriceWithAffixes($slot->item));
+        $slotCount = $slots->count();
+        $character->increment('gold', $totalSoldFor);
+        $character->inventory->slots()->whereIn('id', $slots->pluck('id')->all())->delete();
 
         $character = $character->refresh();
 
@@ -144,6 +145,116 @@ class MultiInventoryActionService
         ]);
     }
 
+    public function sellManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $slots = $set->slots()
+            ->whereIn('id', $setSlotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact', 'trinket']);
+            })
+            ->with('item')
+            ->get();
+
+        $totalSoldFor = $slots->sum(fn (SetSlot $slot) => SellItemCalculator::fetchSalePriceWithAffixes($slot->item));
+        $slotCount = $slots->count();
+        $character->increment('gold', $totalSoldFor);
+        $set->slots()->whereIn('id', $slots->pluck('id')->all())->delete();
+
+        $character = $character->refresh();
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+        ServerMessageHandler::sendBasicMessage($character->user, 'Sold '.$slotCount.' set items for: '.number_format($totalSoldFor).' Gold (Minus 5% tax).');
+
+        return $this->successResult([
+            'message' => 'Sold selected set items for: '.number_format($totalSoldFor).' Gold (Minus 5% tax).',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+        ]);
+    }
+
+    public function sellAllCraftedItemsSetSlots(Character $character, InventorySet $set): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        if (! $set->isBatchCraftingSet()) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $setSlotIds = $set->slots()->pluck('id')->all();
+
+        $result = $this->sellManySetSlots($character, $set, $setSlotIds);
+
+        if ($result['status'] !== 200) {
+            return $result;
+        }
+
+        $result['message'] = str_replace('Sold selected set items', 'Sold all set items', $result['message']);
+
+        return $result;
+    }
+
+    public function disenchantManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $filteredSlots = $set->slots()
+            ->whereIn('id', $setSlotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'trinket', 'artifact']);
+            })
+            ->with('item')
+            ->get()
+            ->filter(function (SetSlot $slot) {
+                return ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id);
+            });
+
+        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
+        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
+
+        $set->slots()->whereIn('id', $filteredSlotIds)->delete();
+
+        $character = $character->refresh();
+
+        DisenchantMany::dispatch($character, $itemIdsToDisenchant);
+
+        return $this->successResult([
+            'message' => 'Set items are queued for disenchanting. Check Server Messages
+            (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
+            selected Server Messages from the Orange Chat Dropdown.',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+        ]);
+    }
+
+    public function disenchantAllCraftedItemsSetSlots(Character $character, InventorySet $set): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        if (! $set->isBatchCraftingSet()) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $setSlotIds = $set->slots()->pluck('id')->all();
+
+        $result = $this->disenchantManySetSlots($character, $set, $setSlotIds);
+
+        if ($result['status'] !== 200) {
+            return $result;
+        }
+
+        $result['message'] = str_replace('Set items are queued', 'All eligible set items are queued', $result['message']);
+
+        return $result;
+    }
+
     /**
      * Disenchant many items via the DisenchantManyService.
      *
@@ -152,27 +263,89 @@ class MultiInventoryActionService
      */
     public function disenchantManyItems(Character $character, array $params): array
     {
-        $filteredSlots = $character->inventory->slots
-            ->whereIn('id', $slotIds)
-            ->whereNotIn('item.type', ['alchemy', 'gem', 'quest', 'trinket', 'artifact'])
-            ->where('equipped', false)
-            ->filter(function ($slot) {
-                return ! is_null($slot->item->item_prefix_id) || ! is_null($slot->item->item_suffix_id);
-            });
+        return $this->disenchantManyService->disenchantMany(
+            $this->manager,
+            $this->characterInventoryCountTransformer,
+            $character,
+            $params,
+        );
+    }
 
-        $itemIdsToDisenchant = $filteredSlots->pluck('item_id')->toArray();
-        $filteredSlotIds = $filteredSlots->pluck('id')->toArray();
+    /**
+     * Destroy items by include/exclude rules (artifacts excluded).
+     *
+     * @param  array{ids?:array<int|string>,exclude?:array<int|string>}  $params
+     * @return array{status:int,message:string}
+     */
+    public function destroyManySetSlots(Character $character, InventorySet $set, array $setSlotIds): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
 
-        $character->inventory->slots()->whereIn('id', $filteredSlotIds)->delete();
+        $set->slots()
+            ->whereIn('id', $setSlotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact']);
+            })
+            ->delete();
 
         $character = $character->refresh();
 
-        DisenchantMany::dispatch($character, $itemIdsToDisenchant);
+        event(new UpdateCharacterInventoryCountEvent($character));
 
         return $this->successResult([
-            'message' => 'Items are queued for disenchanting. Check Server Messages
-            (Scroll down for desktop, click Serve Messages tab). If on mobile scroll down,
-            selected Server Messages from the Orange Chat Dropdown.',
+            'message' => 'Destroyed all selected set items (with exception of artifacts. You must manually delete these powerful items).',
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
+        ]);
+    }
+
+    public function destroyAllCraftedItemsSetSlots(Character $character, InventorySet $set): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        if (! $set->isBatchCraftingSet()) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $setSlotIds = $set->slots()->pluck('id')->all();
+
+        return $this->destroyManySetSlots($character, $set, $setSlotIds);
+    }
+
+    public function listManySetSlots(Character $character, InventorySet $set, array $setSlotIds, int $listPrice): array
+    {
+        if ($set->character_id !== $character->id) {
+            return $this->errorResult('Cannot do that.');
+        }
+
+        $slots = $set->slots()
+            ->whereIn('id', $setSlotIds)
+            ->whereHas('item', function ($query) {
+                return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact', 'trinket']);
+            })
+            ->with('item')
+            ->get();
+
+        foreach ($slots as $slot) {
+            MarketBoard::create([
+                'character_id' => $character->id,
+                'item_id' => $slot->item_id,
+                'listed_price' => $listPrice,
+            ]);
+        }
+
+        $slotCount = $slots->count();
+        $set->slots()->whereIn('id', $slots->pluck('id')->all())->delete();
+
+        $character = $character->refresh();
+
+        event(new UpdateCharacterInventoryCountEvent($character));
+
+        return $this->successResult([
+            'message' => 'Listed '.$slotCount.' set items for: '.number_format($listPrice).' Gold each.',
             'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
     }
@@ -185,9 +358,7 @@ class MultiInventoryActionService
      */
     public function destroyManyItems(Character $character, array $params): array
     {
-
-        $character->inventory->slots()
-            ->whereIn('id', $slotIds)
+        $slotsQuery = $character->inventory->slots()
             ->whereHas('item', function ($query) {
                 return $query->whereNotIn('type', ['alchemy', 'gem', 'quest', 'artifact']);
             })
@@ -224,26 +395,5 @@ class MultiInventoryActionService
         $this->equipItemService->setRequest($equipParams)
             ->setCharacter($character)
             ->replaceItem();
-    }
-
-    /**
-     * Sell a single inventory slot and emit messages/events.
-     *
-     * @throws Exception
-     */
-    private function sellItem(Character $character, InventorySlot $slot): int
-    {
-        $item = $slot->item;
-
-        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-        event(new SellItemEvent($slot, $character));
-
-        ServerMessageHandler::sendBasicMessage(
-            $character->user,
-            'Sold item: '.$item->affix_name.' for: '.number_format($totalSoldFor).' (Minus 5% tax) Gold! (Selling to a shop can never go above 2 billion gold for an individual item)'
-        );
-
-        return $totalSoldFor;
     }
 }

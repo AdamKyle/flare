@@ -4,6 +4,7 @@ namespace App\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
+use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use Carbon\CarbonInterface;
@@ -17,7 +18,11 @@ class BattleRewardLedgerService
     {
         $createdCount = 0;
 
-        foreach (BattleRewardStepName::ordered() as $stepName) {
+        $stepsOrder = $request->source_type === BattleRewardRequestSourceType::FACTION_LOYALTY
+            ? BattleRewardStepName::orderedForFactionLoyalty()
+            : BattleRewardStepName::ordered();
+
+        foreach ($stepsOrder as $stepName) {
             $step = CharacterBattleRewardRequestStep::query()->firstOrCreate(
                 [
                     'character_battle_reward_request_id' => $request->id,
@@ -44,9 +49,13 @@ class BattleRewardLedgerService
 
     public function stepsForRequest(CharacterBattleRewardRequest $request): Collection
     {
+        $stepsOrder = $request->source_type === BattleRewardRequestSourceType::FACTION_LOYALTY
+            ? BattleRewardStepName::orderedForFactionLoyalty()
+            : BattleRewardStepName::ordered();
+
         $steps = $request->steps()->get()->keyBy(fn (CharacterBattleRewardRequestStep $step): string => $step->step_name->value);
 
-        return collect(BattleRewardStepName::ordered())
+        return collect($stepsOrder)
             ->map(fn (BattleRewardStepName $stepName): ?CharacterBattleRewardRequestStep => $steps->get($stepName->value))
             ->filter()
             ->values();

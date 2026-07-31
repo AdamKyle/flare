@@ -8,6 +8,7 @@ use App\Flare\Values\MapNameValue;
 use Database\Factories\GameMapFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GameMap extends Model
@@ -33,6 +34,10 @@ class GameMap extends Model
         'required_location_id',
         'only_during_event_type',
         'can_traverse',
+        'generated_map_type',
+        'generated_parent_game_map_id',
+        'game_map_gem_paramter_id',
+        'game_location_gem_paramter_id',
     ];
 
     protected $casts = [
@@ -45,6 +50,9 @@ class GameMap extends Model
         'character_attack_reduction' => 'float',
         'only_during_event_type' => 'integer',
         'can_traverse' => 'boolean',
+        'generated_parent_game_map_id' => 'integer',
+        'game_map_gem_paramter_id' => 'integer',
+        'game_location_gem_paramter_id' => 'integer',
     ];
 
     protected $appends = [
@@ -66,9 +74,43 @@ class GameMap extends Model
         return $this->hasOne(GameMapGemParamter::class);
     }
 
+    public function generatedParentMap(): BelongsTo
+    {
+        return $this->belongsTo(GameMap::class, 'generated_parent_game_map_id');
+    }
+
+    public function generatedMapGemParamter(): BelongsTo
+    {
+        return $this->belongsTo(GameMapGemParamter::class, 'game_map_gem_paramter_id');
+    }
+
+    public function generatedLocationGemParamter(): BelongsTo
+    {
+        return $this->belongsTo(GameLocationGemParamter::class, 'game_location_gem_paramter_id');
+    }
+
     public function mapType(): MapNameValue
     {
-        return new MapNameValue($this->name);
+        return new MapNameValue($this->effectiveGameMap()->name);
+    }
+
+    public function isGeneratedGemMap(): bool
+    {
+        return ! is_null($this->generated_map_type);
+    }
+
+    public function effectiveGameMap(): GameMap
+    {
+        if (! is_null($this->generated_parent_game_map_id)) {
+            return $this->generatedParentMap ?? $this;
+        }
+
+        return $this;
+    }
+
+    public function monsterSourceGameMap(): GameMap
+    {
+        return $this->effectiveGameMap();
     }
 
     public function mapHasBonuses()
@@ -86,10 +128,9 @@ class GameMap extends Model
 
     public function getMapRequiredItemAttribute()
     {
-
         $questItemDataBuilder = resolve(QuestItemBuilder::class);
 
-        switch ($this->name) {
+        switch ($this->effectiveGameMap()->name) {
             case 'Labyrinth':
                 return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::LABYRINTH)->first());
             case 'Dungeons':

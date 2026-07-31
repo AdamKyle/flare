@@ -9,6 +9,7 @@ use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
@@ -30,6 +31,7 @@ class TeleportService extends BaseMovementService
         TraverseService $traverseService,
         private readonly Manager $manager,
         private readonly CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
+        private readonly GameTimerService $gameTimerService,
     ) {
         parent::__construct(
             $mapTileValue,
@@ -124,7 +126,7 @@ class TeleportService extends BaseMovementService
         $character->update([
             'can_move' => $timeout === 0 ? true : false,
             'gold' => $character->gold - $cost,
-            'can_move_again_at' => $timeout === 0 ? null : now()->addMinutes($timeout),
+            'can_move_again_at' => $timeout === 0 ? null : $this->gameTimerService->availableAtFromMinutes($timeout),
         ]);
 
         $character = $character->refresh();

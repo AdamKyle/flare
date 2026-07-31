@@ -5,9 +5,6 @@ namespace Tests\Feature\Game\Automation;
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\CharacterInCelestialFight;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\MapNameValue;
@@ -28,9 +25,13 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCelestials;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateNpc;
 
 /**
@@ -49,7 +50,7 @@ use Tests\Traits\CreateNpc;
  */
 class AutomationRestrictionEnforcementTest extends TestCase
 {
-    use CreateFactionLoyalty, CreateGameSkill, CreateItem, CreateNpc, RefreshDatabase;
+    use CreateCelestials, CreateCharacterAutomation, CreateFactionLoyalty, CreateGameMap, CreateGameSkill, CreateItem, CreateLocation, CreateNpc, RefreshDatabase;
 
     public function test_manual_fighting_is_blocked_while_exploration_is_running(): void
     {
@@ -61,7 +62,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -88,7 +89,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -115,7 +116,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -144,7 +145,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
                 'is_celestial_entity' => true,
             ])
             ->getMonster();
-        $celestialFight = CelestialFight::factory()->create([
+        $celestialFight = $this->createCelestialFight([
             'monster_id' => $monster->id,
             'character_id' => $character->id,
             'conjured_at' => now(),
@@ -157,14 +158,14 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'max_health' => 100,
             'type' => CelestialConjureType::PUBLIC,
         ]);
-        $characterInCelestialFight = CharacterInCelestialFight::factory()->create([
+        $characterInCelestialFight = $this->createCharacterInCelestialFight([
             'celestial_fight_id' => $celestialFight->id,
             'character_id' => $character->id,
             'character_max_health' => 100,
             'character_current_health' => 100,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -190,7 +191,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
                 'is_celestial_entity' => true,
             ])
             ->getMonster();
-        $celestialFight = CelestialFight::factory()->create([
+        $celestialFight = $this->createCelestialFight([
             'monster_id' => $monster->id,
             'character_id' => $character->id,
             'conjured_at' => now(),
@@ -203,14 +204,14 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'max_health' => 100,
             'type' => CelestialConjureType::PUBLIC,
         ]);
-        $characterInCelestialFight = CharacterInCelestialFight::factory()->create([
+        $characterInCelestialFight = $this->createCharacterInCelestialFight([
             'celestial_fight_id' => $celestialFight->id,
             'character_id' => $character->id,
             'character_max_health' => 100,
             'character_current_health' => 100,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -236,7 +237,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
                 'is_celestial_entity' => true,
             ])
             ->getMonster();
-        $celestialFight = CelestialFight::factory()->create([
+        $celestialFight = $this->createCelestialFight([
             'monster_id' => $monster->id,
             'character_id' => $character->id,
             'conjured_at' => now(),
@@ -249,14 +250,14 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'max_health' => 100,
             'type' => CelestialConjureType::PUBLIC,
         ]);
-        $characterInCelestialFight = CharacterInCelestialFight::factory()->create([
+        $characterInCelestialFight = $this->createCharacterInCelestialFight([
             'celestial_fight_id' => $celestialFight->id,
             'character_id' => $character->id,
             'character_max_health' => 100,
             'character_current_health' => 100,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -276,7 +277,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -294,7 +295,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -310,7 +311,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
     {
         Event::fake();
 
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -318,7 +319,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $gameMap)->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -338,13 +339,13 @@ class AutomationRestrictionEnforcementTest extends TestCase
     public function test_enter_location_is_blocked_while_delve_is_running(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = Location::factory()->create([
+        $location = $this->createLocation([
             'game_map_id' => $character->map->game_map_id,
             'x' => 32,
             'y' => 16,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -367,7 +368,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -386,7 +387,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -404,14 +405,14 @@ class AutomationRestrictionEnforcementTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::HELL,
             'path' => 'hell.png',
             'default' => false,
             'can_traverse' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -430,7 +431,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -448,7 +449,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -473,7 +474,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -503,7 +504,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -536,7 +537,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -576,7 +577,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'skill_level_trivial' => 25,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -621,7 +622,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'skill_level_trivial' => 25,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -666,7 +667,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'skill_level_trivial' => 25,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -711,7 +712,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'skill_level_trivial' => 25,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -754,7 +755,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             'skill_level_trivial' => 25,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -788,7 +789,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -823,7 +824,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -849,7 +850,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -867,7 +868,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -885,7 +886,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),
@@ -912,7 +913,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'started_at' => now(),
@@ -945,7 +946,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'started_at' => now(),
@@ -978,7 +979,7 @@ class AutomationRestrictionEnforcementTest extends TestCase
             ])
             ->getMonster();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'started_at' => now(),

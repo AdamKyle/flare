@@ -77,6 +77,8 @@ class AccountDeletionControllerTest extends TestCase
         ]));
 
         Queue::assertPushed(AccountDeletionJob::class);
+        $this->assertTrue($user->refresh()->will_be_deleted);
+        $this->dontSeeIsAuthenticated();
     }
 
     public function test_guest_cannot_delete_account(): void

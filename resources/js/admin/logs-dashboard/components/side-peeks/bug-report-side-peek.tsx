@@ -1,16 +1,9 @@
 import React from 'react';
 
 import BugReportSidePeekProps from './types/bug-report-side-peek-props';
+import DetailBlockProps from './types/detail-block-props';
 
-const DetailBlock = ({
-  label,
-  value,
-  pre = false,
-}: {
-  label: string;
-  value: React.ReactNode;
-  pre?: boolean;
-}) => {
+const DetailBlock = ({ label, value, pre = false }: DetailBlockProps) => {
   if (value === null || value === undefined || value === '') {
     return null;
   }

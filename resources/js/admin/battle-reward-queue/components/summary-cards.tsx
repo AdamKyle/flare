@@ -1,7 +1,7 @@
 import React from 'react';
 
 import RewardQueueCard from './reward-queue-card';
-import { Summary } from '../types/reward-queue';
+import SummaryCardsProps from '../types/summary-cards-props';
 
 const FILTERABLE_STATUSES = new Set([
   'pending',
@@ -11,13 +11,7 @@ const FILTERABLE_STATUSES = new Set([
   'failed',
 ]);
 
-export default function SummaryCards({
-  summary,
-  onFilter,
-}: {
-  summary: Summary;
-  onFilter?: (status: string) => void;
-}) {
+export default function SummaryCards({ summary, onFilter }: SummaryCardsProps) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
       {Object.entries(summary).map(([label, value]) => {

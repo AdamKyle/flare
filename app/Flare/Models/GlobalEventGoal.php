@@ -7,6 +7,7 @@ use App\Game\Events\Values\EventType;
 use Database\Factories\GlobalEventGoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GlobalEventGoal extends Model
@@ -19,6 +20,7 @@ class GlobalEventGoal extends Model
      * @var array
      */
     protected $fillable = [
+        'event_id',
         'max_kills',
         'max_crafts',
         'max_enchants',
@@ -37,6 +39,7 @@ class GlobalEventGoal extends Model
      * @var array
      */
     protected $casts = [
+        'event_id' => 'integer',
         'max_kills' => 'integer',
         'max_crafts' => 'integer',
         'max_enchants' => 'integer',
@@ -72,6 +75,11 @@ class GlobalEventGoal extends Model
     public function globalEventEnchants(): HasMany
     {
         return $this->hasMany(GlobalEventEnchant::class, 'global_event_goal_id', 'id');
+    }
+
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class, 'event_id', 'id');
     }
 
     public function eventType(): EventType

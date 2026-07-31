@@ -2,12 +2,8 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\BuildingInQueue;
 use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
-use App\Flare\Models\GameBuilding;
-use App\Flare\Models\GameBuildingUnit;
-use App\Flare\Models\GameUnit;
 use App\Flare\Values\AutomationType;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
@@ -24,10 +20,13 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameBuildingUnit;
+use Tests\Traits\CreateGameUnit;
 
 class CapitalCityManagementControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameBuildingUnit, CreateGameUnit, RefreshDatabase;
 
     public function test_direct_api_cannot_queue_max_level_building(): void
     {
@@ -133,7 +132,7 @@ class CapitalCityManagementControllerTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $targetKingdom->id,
             'building_id' => $building->id,
@@ -550,9 +549,9 @@ class CapitalCityManagementControllerTest extends TestCase
             ])
             ->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create();
-        $gameBuilding = GameBuilding::factory()->create();
-        GameBuildingUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $gameBuilding = $this->createGameBuilding();
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,
@@ -614,9 +613,9 @@ class CapitalCityManagementControllerTest extends TestCase
             ])
             ->getKingdom();
         $character = $characterFactory->getCharacter();
-        $gameUnit = GameUnit::factory()->create();
-        $gameBuilding = GameBuilding::factory()->create();
-        GameBuildingUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $gameBuilding = $this->createGameBuilding();
+        $this->createGameBuildingUnit([
             'game_building_id' => $gameBuilding->id,
             'game_unit_id' => $gameUnit->id,
             'required_level' => 1,

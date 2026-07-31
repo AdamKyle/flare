@@ -2,11 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import { ChannelType } from '../../../websocket-handler/enums/channel-type';
 import { useWebsocket } from '../../../websocket-handler/hooks/use-websocket';
-
-interface BattleRewardQueueUpdatedPayload {
-  character_id: number;
-  change: string;
-}
+import { RewardQueueWebsocketEvents } from '../enums/reward-queue-websocket-events';
+import BattleRewardQueueUpdatedPayload from '../types/battle-reward-queue-updated-payload';
 
 export default function useRewardQueueLiveRefresh(refresh: () => void) {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
@@ -22,10 +19,10 @@ export default function useRewardQueueLiveRefresh(refresh: () => void) {
   );
 
   useWebsocket<BattleRewardQueueUpdatedPayload>({
-    url: 'admin-character-reward-queue',
+    url: RewardQueueWebsocketEvents.CHANNEL,
     params: {},
     type: ChannelType.PRIVATE,
-    channelName: '.battle.reward.queue.updated',
+    channelName: RewardQueueWebsocketEvents.UPDATED,
     onEvent: handleEvent,
   });
 

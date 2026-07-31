@@ -9,10 +9,13 @@ use App\Flare\Models\KingdomLog;
 use App\Flare\Values\NpcTypes;
 use App\Game\Kingdoms\Service\KingdomQueueService;
 use App\Game\Kingdoms\Service\KingdomUpdateService;
+use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
+use App\Game\Tops\Events\KingdomTopsUpdated;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameBuilding;
@@ -52,6 +55,19 @@ class KingdomUpdateServiceTest extends TestCase
         $this->kingdomUpdateService->setKingdom($kingdom)->updateKingdom();
 
         $this->assertNotNull($this->kingdomUpdateService->getKingdom());
+    }
+
+    public function test_update_kingdom_broadcasts_kingdom_tops_updated(): void
+    {
+        $kingdom = $this->createKingdomForCharacter($this->character);
+
+        $this->bailIfMissingKeyElements($kingdom);
+
+        Event::fake();
+
+        resolve(UpdateKingdom::class)->updateKingdom($kingdom);
+
+        Event::assertDispatched(KingdomTopsUpdated::class);
     }
 
     public function test_hands_kingdom_to_npc()

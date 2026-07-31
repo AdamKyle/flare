@@ -3,8 +3,6 @@
 namespace Tests\Feature\Game\Maps;
 
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\Location;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\LocationType;
@@ -17,13 +15,16 @@ use Mockery;
 use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateLocation;
 
 /**
  * This is a feature / integration test around walking movement while automation is running.
  */
 class WalkingServiceAutomationRestrictionTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacterAutomation, CreateGameMap, CreateLocation, RefreshDatabase;
 
     protected function tearDown(): void
     {
@@ -36,7 +37,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_exploration_started_in_gold_mine_blocks_directional_movement(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -47,15 +48,15 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
             'x' => 16,
             'y' => 16,
-            'type' => LocationType::GOLD_MINES,
-
+            'type' => LocationType::GOLD_MINES->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -79,7 +80,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_exploration_started_in_purgatory_dungeon_blocks_directional_movement(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -90,15 +91,15 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Purgatory Dungeon',
             'game_map_id' => $gameMap->id,
             'x' => 16,
             'y' => 16,
-            'type' => LocationType::PURGATORY_DUNGEONS,
-
+            'type' => LocationType::PURGATORY_DUNGEONS->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -122,7 +123,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_exploration_started_in_purgatory_smith_house_blocks_directional_movement(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -133,15 +134,15 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Purgatory Smith House',
             'game_map_id' => $gameMap->id,
             'x' => 16,
             'y' => 16,
-            'type' => LocationType::PURGATORY_SMITH_HOUSE,
-
+            'type' => LocationType::PURGATORY_SMITH_HOUSE->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -174,7 +175,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         );
         Cache::put('celestial-spawn-rate', 0);
         Cache::put('monsters', [MapNameValue::SURFACE => []]);
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -185,7 +186,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -196,7 +197,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Regular',
             'game_map_id' => $gameMap->id,
             'x' => 32,
@@ -227,7 +228,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         );
         Cache::put('celestial-spawn-rate', 0);
         Cache::put('monsters', [MapNameValue::SURFACE => []]);
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -238,7 +239,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -249,7 +250,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Port',
             'game_map_id' => $gameMap->id,
             'x' => 32,
@@ -271,7 +272,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_exploration_started_in_regular_context_blocks_entry_into_gold_mine(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -282,7 +283,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -293,13 +294,13 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::GOLD_MINES,
-
+            'type' => LocationType::GOLD_MINES->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $walkingService = resolve(WalkingService::class);
@@ -314,7 +315,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_exploration_started_in_regular_context_blocks_entry_into_purgatory_dungeon(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -325,7 +326,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -336,13 +337,13 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Purgatory Dungeon',
             'game_map_id' => $gameMap->id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::PURGATORY_DUNGEONS,
-
+            'type' => LocationType::PURGATORY_DUNGEONS->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $walkingService = resolve(WalkingService::class);
@@ -357,7 +358,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_exploration_started_in_regular_context_blocks_entry_into_purgatory_smith_house(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -368,7 +369,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -379,13 +380,13 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Purgatory Smith House',
             'game_map_id' => $gameMap->id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::PURGATORY_SMITH_HOUSE,
-
+            'type' => LocationType::PURGATORY_SMITH_HOUSE->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $walkingService = resolve(WalkingService::class);
@@ -400,7 +401,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_blocked_special_location_entry_does_not_delete_current_exploration_automation(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -410,7 +411,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->createBaseCharacter()
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -422,13 +423,13 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'started_in_special_location' => false,
         ]);
 
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::GOLD_MINES,
-
+            'type' => LocationType::GOLD_MINES->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
         $walkingService = resolve(WalkingService::class);
         $walkingService->setCoordinatesToTravelTo(32, 16);
@@ -441,7 +442,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
 
     public function test_blocked_special_location_entry_does_not_delete_unrelated_automation(): void
     {
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -456,7 +457,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -467,7 +468,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        $unrelatedAutomation = CharacterAutomation::factory()->create([
+        $unrelatedAutomation = $this->createCharacterAutomation([
             'character_id' => $unrelatedCharacter->id,
             'monster_id' => null,
             'type' => AutomationType::FACTION_LOYALTY,
@@ -478,13 +479,13 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $gameMap->id,
             'x' => 32,
             'y' => 16,
-            'type' => LocationType::GOLD_MINES,
-
+            'type' => LocationType::GOLD_MINES->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
         $walkingService = resolve(WalkingService::class);
         $walkingService->setCoordinatesToTravelTo(32, 16);
@@ -506,7 +507,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
         );
         Cache::put('celestial-spawn-rate', 0);
         Cache::put('monsters', [MapNameValue::SURFACE => []]);
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => MapNameValue::SURFACE,
             'path' => 'surface.png',
             'default' => false,
@@ -516,7 +517,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             ->createBaseCharacter()
             ->givePlayerLocation(16, 16, $gameMap)
             ->getCharacter();
-        $automation = CharacterAutomation::factory()->create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => null,
             'type' => AutomationType::EXPLORING,
@@ -527,7 +528,7 @@ class WalkingServiceAutomationRestrictionTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
             'started_in_special_location' => false,
         ]);
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Regular',
             'game_map_id' => $gameMap->id,
             'x' => 32,

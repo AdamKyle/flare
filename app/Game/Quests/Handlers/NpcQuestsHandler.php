@@ -36,62 +36,52 @@ class NpcQuestsHandler
 
     public function consumeQuestRequirements(Character $character, Quest $quest): void
     {
-        $giveRewards = false;
+        $requiredItem = null;
+        $secondaryRequiredItem = null;
 
         if ($this->questRequiresItem($quest)) {
-            $foundItem = $this->fetchRequiredItem($quest, $character);
+            $requiredItem = $this->fetchRequiredItem($quest, $character);
 
-            if (! is_null($foundItem)) {
-                $foundItem->delete();
-
-                $giveRewards = true;
+            if (is_null($requiredItem)) {
+                throw new Exception('The required quest item is missing.');
             }
         }
 
         if ($this->questRequiresSecondaryItem($quest)) {
-            $secondaryItem = $this->fetchSecondaryRequiredItem($quest, $character);
+            $secondaryRequiredItem = $this->fetchSecondaryRequiredItem($quest, $character);
 
-            if (! is_null($secondaryItem)) {
-                $secondaryItem->delete();
-
-                $giveRewards = true;
+            if (is_null($secondaryRequiredItem)) {
+                throw new Exception('The secondary required quest item is missing.');
             }
+        }
+
+        if ($this->questHasCurrenciesRequirement($quest) && ! $this->canPay($character, $quest)) {
+            throw new Exception('The required quest currencies are missing.');
+        }
+
+        if ($this->questRequiresPlaneAccess($quest) && ! $this->hasPlaneAccess($quest, $character)) {
+            throw new Exception('The required plane access is missing.');
+        }
+
+        if ($this->questHasFactionRequirement($quest) && ! $this->hasMetFactionRequirement($character, $quest)) {
+            throw new Exception('The required faction level is missing.');
+        }
+
+        if ($this->questHasFactionLoyaltyRequirement($quest) && ! $this->hasMetFactionLoyaltyRequirements($quest, $character)) {
+            throw new Exception('The required faction loyalty is missing.');
+        }
+
+        if (! is_null($requiredItem)) {
+            $requiredItem->delete();
+        }
+
+        if (! is_null($secondaryRequiredItem)) {
+            $secondaryRequiredItem->delete();
         }
 
         if ($this->questHasCurrenciesRequirement($quest)) {
-            if ($this->canPay($character, $quest)) {
-                $this->payCurrencies($character, $quest);
-
-                $giveRewards = true;
-            }
+            $this->payCurrencies($character, $quest);
         }
-
-        if ($this->questRequiresPlaneAccess($quest)) {
-            if ($this->hasPlaneAccess($quest, $character)) {
-
-                $giveRewards = true;
-            }
-        }
-
-        if ($this->questHasFactionRequirement($quest)) {
-            if ($this->hasMetFactionRequirement($character, $quest)) {
-
-                $giveRewards = true;
-            }
-        }
-
-        if ($this->questHasFactionLoyaltyRequirement($quest)) {
-            if ($this->hasMetFactionLoyaltyRequirements($quest, $character)) {
-
-                $giveRewards = true;
-            }
-        }
-
-        if ($giveRewards) {
-            return;
-        }
-
-        throw new Exception($quest->npc->real_name.' thinks The Creator forgot to tell them how to handle this quest!');
     }
 
     public function payCurrencies(Character $character, Quest $quest)

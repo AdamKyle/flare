@@ -111,9 +111,25 @@
 
     <div class="menu-detail" data-menu="tops">
         <div class="menu-detail-wrapper">
-            <a href="{{ route('game.tops') }}">
+            <a href="{{ route('game.tops') }}" class="{{ request()->routeIs('game.tops') ? 'active' : '' }}">
                 <span class="fas fa-list"></span>
-                Characters
+                Character Progression
+            </a>
+            <a href="{{ route('game.tops.exploration') }}" class="{{ request()->routeIs('game.tops.exploration') ? 'active' : '' }}">
+                <span class="fas fa-compass"></span>
+                Exploration
+            </a>
+            <a href="{{ route('game.tops.delve') }}" class="{{ request()->routeIs('game.tops.delve') ? 'active' : '' }}">
+                <span class="fas fa-mountain"></span>
+                Delve
+            </a>
+            <a href="{{ route('game.tops.faction-loyalty') }}" class="{{ request()->routeIs('game.tops.faction-loyalty') ? 'active' : '' }}">
+                <span class="fas fa-handshake"></span>
+                Faction Loyalty
+            </a>
+            <a href="{{ route('game.tops.kingdoms') }}" class="{{ request()->routeIs('game.tops.kingdoms') ? 'active' : '' }}">
+                <span class="fas fa-chess-rook"></span>
+                Kingdoms
             </a>
         </div>
     </div>

@@ -5,6 +5,7 @@ namespace Tests;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\HtmlString;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
@@ -26,11 +27,78 @@ abstract class TestCase extends BaseTestCase
 
         parent::setUp();
 
+        Facade::clearResolvedInstance(Vite::class);
+
         $this->app->instance(Vite::class, new class extends Vite
         {
             public function __invoke($entrypoints, $buildDirectory = null): HtmlString
             {
                 return new HtmlString('');
+            }
+
+            public function __call($method, $parameters)
+            {
+                return '';
+            }
+
+            public function __toString()
+            {
+                return '';
+            }
+
+            public function useIntegrityKey($key)
+            {
+                return $this;
+            }
+
+            public function useBuildDirectory($path)
+            {
+                return $this;
+            }
+
+            public function useHotFile($path)
+            {
+                return $this;
+            }
+
+            public function withEntryPoints($entryPoints)
+            {
+                return $this;
+            }
+
+            public function useScriptTagAttributes($attributes)
+            {
+                return $this;
+            }
+
+            public function useStyleTagAttributes($attributes)
+            {
+                return $this;
+            }
+
+            public function usePreloadTagAttributes($attributes)
+            {
+                return $this;
+            }
+
+            public function preloadedAssets()
+            {
+                return [];
+            }
+
+            public function reactRefresh()
+            {
+                return '';
+            }
+
+            public function content($asset, $buildDirectory = null)
+            {
+                return '';
+            }
+
+            public function asset($asset, $buildDirectory = null)
+            {
+                return '';
             }
         });
 

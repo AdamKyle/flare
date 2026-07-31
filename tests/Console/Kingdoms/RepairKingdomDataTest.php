@@ -11,10 +11,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
+use Tests\Traits\CreateGameUnit;
 
 class RepairKingdomDataTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, CreateGameUnit, RefreshDatabase;
 
     public function test_dry_run_reports_invalid_kingdom_data_without_mutating_it(): void
     {
@@ -34,7 +36,7 @@ class RepairKingdomDataTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -43,7 +45,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -89,7 +91,7 @@ class RepairKingdomDataTest extends TestCase
         $building = $kingdom->buildings()->first();
         $gameUnit = $kingdom->units()->first()->gameUnit;
 
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -98,7 +100,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -107,7 +109,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $overMaxUnitQueue = UnitInQueue::factory()->create([
+        $overMaxUnitQueue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
@@ -115,7 +117,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $invalidUnitQueue = UnitInQueue::factory()->create([
+        $invalidUnitQueue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
@@ -149,7 +151,7 @@ class RepairKingdomDataTest extends TestCase
         $character = $kingdomManagement->getCharacter();
         $kingdom = $kingdomManagement->getKingdom();
         $gameUnit = $kingdom->units()->first()->gameUnit;
-        $firstUnitQueue = UnitInQueue::factory()->create([
+        $firstUnitQueue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
@@ -157,7 +159,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $secondUnitQueue = UnitInQueue::factory()->create([
+        $secondUnitQueue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,
@@ -196,7 +198,7 @@ class RepairKingdomDataTest extends TestCase
         $kingdom = $kingdomManagement->getKingdom();
         $building = $kingdom->buildings()->first();
         $gameUnit = $kingdom->units()->first()->gameUnit;
-        $buildingQueue = BuildingInQueue::factory()->create([
+        $buildingQueue = $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -205,7 +207,7 @@ class RepairKingdomDataTest extends TestCase
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
-        $unitQueue = UnitInQueue::factory()->create([
+        $unitQueue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $gameUnit->id,

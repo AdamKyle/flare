@@ -14,10 +14,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameBuilding;
 
 class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameBuilding, RefreshDatabase;
 
     public function test_delayed_redispatch_passes_all_constructor_arguments_and_uses_long_running_queue(): void
     {
@@ -192,7 +193,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
             'travel_time_completed_at' => now(),
         ]);
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,
@@ -260,7 +261,7 @@ class CapitalCityBuildingRequestCancellationMovementTest extends TestCase
             'capital_city_building_queue_id' => $capitalCityBuildingQueue->id,
             'travel_time_completed_at' => now(),
         ]);
-        BuildingInQueue::factory()->create([
+        $this->createKingdomBuildingQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'building_id' => $building->id,

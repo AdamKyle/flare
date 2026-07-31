@@ -2,8 +2,6 @@
 
 namespace Tests\Feature\Game\Kingdoms;
 
-use App\Flare\Models\GameUnit;
-use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Requests\MoveUnitsRequest;
 use App\Game\Kingdoms\Service\UnitMovementService;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -13,10 +11,12 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Validator;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameUnit;
+use Tests\Traits\CreateKingdom;
 
 class MoveUnitsValidationTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameUnit, CreateKingdom, RefreshDatabase;
 
     public function test_negative_unit_move_amount_is_rejected(): void
     {
@@ -66,8 +66,8 @@ class MoveUnitsValidationTest extends TestCase
         $character->skills()->whereHas('baseSkill', function ($query) {
             $query->where('type', SkillTypeValue::EFFECTS_KINGDOM->value);
         })->update(['skill_type' => SkillTypeValue::EFFECTS_KINGDOM->value]);
-        $gameUnit = GameUnit::factory()->create();
-        $kingdomUnit = KingdomUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $kingdomUnit = $this->createKingdomUnit([
             'kingdom_id' => $sourceKingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount' => 10,
@@ -97,8 +97,8 @@ class MoveUnitsValidationTest extends TestCase
         $character->skills()->whereHas('baseSkill', function ($query) {
             $query->where('type', SkillTypeValue::EFFECTS_KINGDOM->value);
         })->update(['skill_type' => SkillTypeValue::EFFECTS_KINGDOM->value]);
-        $gameUnit = GameUnit::factory()->create();
-        $kingdomUnit = KingdomUnit::factory()->create([
+        $gameUnit = $this->createGameUnit();
+        $kingdomUnit = $this->createKingdomUnit([
             'kingdom_id' => $sourceKingdom->id,
             'game_unit_id' => $gameUnit->id,
             'amount' => 10,

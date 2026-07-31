@@ -10,6 +10,7 @@ use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
+use Illuminate\Database\Eloquent\Collection;
 
 class GoblinShopService
 {
@@ -31,20 +32,20 @@ class GoblinShopService
     /**
      * Buy the item.
      */
-    public function buyItem(Character $character, Item $item): array
+    public function buyItem(Character $character, Item $item, ?Collection $kingdoms = null): array
     {
+        $kingdoms ??= $character->kingdoms()->get();
         HandleGoldBarsAsACurrency::subtractCostFromKingdoms($kingdoms, $item->gold_bars_cost);
 
         if ($item->type === 'alchemy') {
             $this->addToAlchemyBag($character, $item);
 
-            return;
+        } else {
+            $character->inventory->slots()->create([
+                'inventory_id' => $character->inventory->id,
+                'item_id' => $item->id,
+            ]);
         }
-
-        $character->inventory->slots()->create([
-            'inventory_id' => $character->inventory->id,
-            'item_id' => $item->id,
-        ]);
 
         $characterGoldBars = $character->refresh()->kingdoms->sum('gold_bars');
 

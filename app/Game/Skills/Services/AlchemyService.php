@@ -81,7 +81,18 @@ class AlchemyService
         ];
     }
 
-    public function transmute(Character $character, int $itemId): void
+    /**
+     * $isBatch suppresses the manual Crafting Timeout bar event: Batch Crafting
+     * has its own runtime/progress timers and processes many items per run, so
+     * firing the manual per-action timeout here would incorrectly show that bar
+     * during batch processing.
+     *
+     * $bypassBagCapacity is batch-only: it lets a batch disposition that will
+     * immediately destroy/list/use the produced item (never retain it) proceed
+     * even when the Alchemy Bag is full, since the item never actually needs to
+     * occupy a retained bag slot. Manual (non-batch) calls never pass this.
+     */
+    public function transmute(Character $character, int $itemId, bool $isBatch = false, bool $bypassBagCapacity = false): void
     {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
         $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
@@ -101,7 +112,9 @@ class AlchemyService
             $setTime = floor(10 - 10 * 0.15);
         }
 
-        event(new CraftedItemTimeOutEvent($character, null, $setTime));
+        if (! $isBatch) {
+            event(new CraftedItemTimeOutEvent($character, null, $setTime));
+        }
 
         $goldDustCost = $item->gold_dust_cost;
         $shardsCost = $item->shards_cost;
@@ -128,10 +141,10 @@ class AlchemyService
             return;
         }
 
-        $this->attemptTransmute($character, $skill, $item);
+        $this->attemptTransmute($character, $skill, $item, $bypassBagCapacity);
     }
 
-    protected function attemptTransmute(Character $character, Skill $skill, Item $item): void
+    protected function attemptTransmute(Character $character, Skill $skill, Item $item, bool $bypassBagCapacity = false): void
     {
         $this->updateAlchemyCost($character, $item);
 
@@ -139,7 +152,7 @@ class AlchemyService
 
             ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
-            $this->pickUpItem($character, $item, $skill, true);
+            $this->pickUpItem($character, $item, $skill, true, $bypassBagCapacity);
 
             $character = $character->refresh();
 
@@ -153,7 +166,7 @@ class AlchemyService
 
             ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
-            $this->pickUpItem($character, $item, $skill, true);
+            $this->pickUpItem($character, $item, $skill, true, $bypassBagCapacity);
 
             $character = $character->refresh();
 
@@ -167,7 +180,7 @@ class AlchemyService
         $dcCheck = $this->skillCheckService->getDCCheck($skill);
 
         if ($dcCheck < $characterRoll) {
-            $this->pickUpItem($character, $item, $skill);
+            $this->pickUpItem($character, $item, $skill, false, $bypassBagCapacity);
 
             $character = $character->refresh();
 
@@ -185,9 +198,9 @@ class AlchemyService
         event(new UpdateCharacterInventoryCountEvent($character));
     }
 
-    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false)
+    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $bypassBagCapacity = false)
     {
-        if ($this->attemptToPickUpItem($character, $item)) {
+        if ($this->attemptToPickUpItem($character, $item, $bypassBagCapacity)) {
 
             if (! $tooEasy) {
                 event(new UpdateSkillEvent($skill));
@@ -195,9 +208,9 @@ class AlchemyService
         }
     }
 
-    private function attemptToPickUpItem(Character $character, Item $item): bool
+    private function attemptToPickUpItem(Character $character, Item $item, bool $bypassBagCapacity = false): bool
     {
-        if (! $character->canAddToAlchemyBag(1)) {
+        if (! $bypassBagCapacity && ! $character->canAddToAlchemyBag(1)) {
             event(new ServerMessageEvent($character->user, 'Your Alchemy Bag is full. Use or remove alchemy items before crafting more.'));
 
             return false;

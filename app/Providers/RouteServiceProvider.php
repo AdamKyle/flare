@@ -99,6 +99,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapCharacterSheetRoutes();
         $this->mapCharacterInventoryRoutes();
         $this->mapAutomationApiRoutes();
+        $this->mapBatchCraftingApiRoutes();
         $this->mapGameCoreApiRoutes();
         $this->mapGameMarketApiRoutes();
         $this->mapGameMessageApiRoutes();
@@ -115,6 +116,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapReincarnateApiRoutes();
         $this->mapClassRanksApiRoutes();
         $this->mapFactionLoyaltyApiRoutes();
+        $this->mapTopsApiRoutes();
     }
 
     /**
@@ -184,6 +186,14 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Automation\Controllers')
             ->group(base_path('routes/game/automation/api.php'));
+    }
+
+    protected function mapBatchCraftingApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\BatchCrafting\Controllers')
+            ->group(base_path('routes/game/batch-crafting/api.php'));
     }
 
     protected function mapGameKingdomApiRoutes()
@@ -401,5 +411,13 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Factions\FactionLoyalty\Controllers')
             ->group(base_path('routes/game/factions/faction-loyalty/api.php'));
+    }
+
+    protected function mapTopsApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\Tops\Controllers')
+            ->group(base_path('routes/game/tops/api.php'));
     }
 }

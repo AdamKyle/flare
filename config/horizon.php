@@ -274,6 +274,16 @@ return [
                 'timeout' => 900,
                 'nice' => 0,
             ],
+            'supervisor-batch-crafting' => [
+                'connection' => 'long_running',
+                'queue' => ['batch_crafting'],
+                'balance' => 'auto',
+                'maxProcesses' => 2,
+                'memory' => 128,
+                'tries' => 2,
+                'timeout' => 900,
+                'nice' => 0,
+            ],
             'supervisor-exploration' => [
                 'connection' => 'long_running',
                 'queue' => ['exploration'],
@@ -337,6 +347,16 @@ return [
             'supervisor-long-running' => [
                 'connection' => 'long_running',
                 'queue' => ['default_long'],
+                'balance' => 'auto',
+                'maxProcesses' => 2,
+                'memory' => 128,
+                'tries' => 2,
+                'timeout' => 900,
+                'nice' => 0,
+            ],
+            'supervisor-batch-crafting' => [
+                'connection' => 'long_running',
+                'queue' => ['batch_crafting'],
                 'balance' => 'auto',
                 'maxProcesses' => 2,
                 'memory' => 128,

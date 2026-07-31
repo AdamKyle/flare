@@ -5,7 +5,6 @@ namespace Tests\Unit\Flare\Values;
 use App\Flare\Items\Values\ItemType;
 use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

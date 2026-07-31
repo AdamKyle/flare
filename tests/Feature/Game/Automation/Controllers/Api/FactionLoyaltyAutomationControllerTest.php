@@ -5,10 +5,8 @@ namespace Tests\Feature\Game\Automation\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
-use App\Flare\Models\FactionLoyaltyAutomationLog;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Models\GameMap;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,10 +15,13 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateFactionLoyaltyAutomation;
+use Tests\Traits\CreateGameMap;
 
 class FactionLoyaltyAutomationControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateBatchCrafting, CreateFactionLoyaltyAutomation, CreateGameMap, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -188,6 +189,29 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
     }
 
+    public function test_begin_returns422_when_batch_crafting_is_running(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'attack_type' => AttackTypeValue::ATTACK,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You cannot do that while Batch Crafting is running. Cancel it first.', $jsonData['message']);
+        $this->assertNull(FactionLoyaltyAutomation::query()->latest('id')->first());
+    }
+
     public function test_begin_returns422_when_character_is_not_pledged_to_a_faction(): void
     {
         Queue::fake();
@@ -235,7 +259,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        $gameMap = GameMap::factory()->create([
+        $gameMap = $this->createGameMap([
             'name' => 'Other Map',
             'path' => 'other-map',
             'default' => false,
@@ -328,12 +352,12 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
             'completed_at' => now()->addHour(),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
-        $factionLoyaltyAutomation = FactionLoyaltyAutomation::factory()->create([
+        $factionLoyaltyAutomation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,
             'character_id' => $this->character->id,
             'faction_loyalty_npc_id' => $this->factionLoyaltyNpc->id,
         ]);
-        $factionLoyaltyAutomationLog = FactionLoyaltyAutomationLog::factory()->create([
+        $factionLoyaltyAutomationLog = $this->createFactionLoyaltyAutomationLog([
             'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
             'fight_logs' => [
                 [

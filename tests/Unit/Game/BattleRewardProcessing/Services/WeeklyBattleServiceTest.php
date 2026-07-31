@@ -2,262 +2,180 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
-use App\Flare\Values\ItemSpecialtyType;
+use App\Flare\Models\WeeklyMonsterFight;
 use App\Flare\Values\LocationType;
+use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
-use Tests\Traits\CreateWeeklyMonsterFight;
 
 class WeeklyBattleServiceTest extends TestCase
 {
-    use CreateItem, CreateMonster, CreateWeeklyMonsterFight, RefreshDatabase;
+    use CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
-    private ?WeeklyBattleService $weeklyBattleService;
-
-    private ?CharacterFactory $characterFactory;
-
-    protected function setUp(): void
+    public function test_claim_monster_death_creates_weekly_row_immediately(): void
     {
-        parent::setUp();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+        $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
 
-        $this->weeklyBattleService = resolve(WeeklyBattleService::class);
+        $service->claimMonsterDeath($character, $monster);
 
-        $this->characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $fight = WeeklyMonsterFight::where('character_id', $character->id)->where('monster_id', $monster->id)->first();
 
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
-        ]);
-
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::TWISTED_EARTH,
-        ]);
-
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
-        ]);
-
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::FAITHLESS_PLATE,
-        ]);
-
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => null,
-        ]);
+        $this->assertNotNull($fight);
+        $this->assertTrue($fight->monster_was_killed);
     }
 
-    protected function tearDown(): void
+    public function test_claim_monster_death_marks_existing_death_row_killed(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+        $fight = WeeklyMonsterFight::factory()->create(['character_id' => $character->id, 'monster_id' => $monster->id, 'character_deaths' => 2]);
+        $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
 
-        parent::tearDown();
+        $service->claimMonsterDeath($character, $monster);
 
-        $this->weeklyBattleService = null;
-
-        $this->characterFactory = null;
+        $this->assertTrue($fight->refresh()->monster_was_killed);
     }
 
-    public function test_create_record_for_character_death()
+    public function test_claiming_twice_retains_one_row(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+        $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
 
-        $character = $this->characterFactory->getCharacter();
+        $service->claimMonsterDeath($character, $monster);
+        $service->claimMonsterDeath($character, $monster);
 
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
-        ]);
-
-        $this->weeklyBattleService->handleCharacterDeath($character, $monster);
-
-        $weeklyBattleFight = $character->refresh()->weeklyBattleFights->first();
-
-        $this->assertNotNull($weeklyBattleFight);
-
-        $this->assertEquals(1, $weeklyBattleFight->character_deaths);
+        $this->assertSame(1, WeeklyMonsterFight::where('character_id', $character->id)->where('monster_id', $monster->id)->count());
     }
 
-    public function test_does_not_create_record_for_character_death_when_monster_location_type_is_invalid()
+    public function test_can_fight_monster_returns_false_immediately_after_claim(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+        $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
 
-        $character = $this->characterFactory->getCharacter();
+        $service->claimMonsterDeath($character, $monster);
 
-        $monster = $this->createMonster([
-            'only_for_location_type' => null,
-        ]);
-
-        $this->weeklyBattleService->handleCharacterDeath($character, $monster);
-
-        $weeklyBattleFight = $character->refresh()->weeklyBattleFights->first();
-
-        $this->assertNull($weeklyBattleFight);
+        $this->assertFalse($service->canFightMonster($character, $monster));
     }
 
-    public function test_update_record_for_character_death()
+    public function test_invalid_location_claim_does_not_create_row(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => null]);
+        $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
 
-        $character = $this->characterFactory->getCharacter();
+        $service->claimMonsterDeath($character, $monster);
 
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
-        ]);
-
-        $weeklyFight = $this->createWeeklyMonsterFight([
-            'character_id' => $character->id,
-            'monster_id' => $monster->id,
-            'character_deaths' => 10,
-        ]);
-
-        $this->weeklyBattleService->handleCharacterDeath($character, $monster);
-
-        $weeklyBattleFight = $weeklyFight->refresh();
-
-        $this->assertEquals(11, $weeklyBattleFight->character_deaths);
+        $this->assertSame(0, WeeklyMonsterFight::where('character_id', $character->id)->count());
     }
 
-    public function test_does_not_update_record_for_character_death_when_monster_location_type_is_invalid()
+    public function test_handle_monster_death_awards_once(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
+        $handler = Mockery::mock(LocationSpecialtyHandler::class);
+        $handler->shouldReceive('handleMonsterFromSpecialLocation')->once()->with(Mockery::type(get_class($character)), Mockery::type(WeeklyMonsterFight::class), false);
+        $service = new WeeklyBattleService($handler);
 
-        $character = $this->characterFactory->getCharacter();
+        $service->handleMonsterDeath($character, $monster);
+        $service->handleMonsterDeath($character, $monster);
 
-        $monster = $this->createMonster([
-            'only_for_location_type' => null,
-        ]);
-
-        $weeklyFight = $this->createWeeklyMonsterFight([
-            'character_id' => $character->id,
-            'monster_id' => $monster->id,
-            'character_deaths' => 10,
-        ]);
-
-        $this->weeklyBattleService->handleCharacterDeath($character, $monster);
-
-        $weeklyBattleFight = $weeklyFight->refresh();
-
-        $this->assertEquals(10, $weeklyBattleFight->character_deaths);
+        $this->assertSame(1, WeeklyMonsterFight::where('character_id', $character->id)->whereNotNull('reward_processed_at')->count());
     }
 
-    public function test_mark_monster_as_killed()
+    public function test_successful_reward_sets_processed_timestamp(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
+        $handler = Mockery::mock(LocationSpecialtyHandler::class);
+        $handler->shouldReceive('handleMonsterFromSpecialLocation')->once();
 
-        $character = $this->characterFactory->getCharacter();
+        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
 
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
-        ]);
-
-        $weeklyFight = $this->createWeeklyMonsterFight([
-            'character_id' => $character->id,
-            'monster_id' => $monster->id,
-            'character_deaths' => 10,
-        ]);
-
-        $this->weeklyBattleService->handleMonsterDeath($character, $monster);
-
-        $weeklyBattleFight = $weeklyFight->refresh();
-
-        $this->assertTrue($weeklyBattleFight->monster_was_killed);
+        $this->assertNotNull(WeeklyMonsterFight::where('character_id', $character->id)->first()->reward_processed_at);
     }
 
-    public function test_call_location_speciality_handler()
+    public function test_reward_exception_leaves_processed_timestamp_null(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
+        $handler = Mockery::mock(LocationSpecialtyHandler::class);
+        $handler->shouldReceive('handleMonsterFromSpecialLocation')->once()->andThrow(new RuntimeException('reward failed'));
+        $this->expectException(RuntimeException::class);
 
-        $character = $this->characterFactory->getCharacter();
-
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::TWSITED_MAIDENS_DUNGEONS,
-        ]);
-
-        $weeklyFight = $this->createWeeklyMonsterFight([
-            'character_id' => $character->id,
-            'monster_id' => $monster->id,
-            'character_deaths' => 10,
-        ]);
-
-        $this->weeklyBattleService->handleMonsterDeath($character, $monster);
-
-        $weeklyBattleFight = $weeklyFight->refresh();
-
-        $this->assertTrue($weeklyBattleFight->monster_was_killed);
+        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
     }
 
-    public function test_create_record_monster_was_killed()
+    public function test_retry_after_failed_reward_processes_successfully(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
+        WeeklyMonsterFight::factory()->create(['character_id' => $character->id, 'monster_id' => $monster->id, 'monster_was_killed' => true, 'reward_processed_at' => null]);
+        $handler = Mockery::mock(LocationSpecialtyHandler::class);
+        $handler->shouldReceive('handleMonsterFromSpecialLocation')->once();
 
-        DropCheckCalculator::partialMock()->shouldReceive('fetchDifficultItemChance')->andReturn(true);
+        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
 
-        $character = $this->characterFactory->getCharacter();
-
-        $this->createItem([
-            'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
-        ]);
-
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
-        ]);
-
-        $this->weeklyBattleService->handleMonsterDeath($character, $monster);
-
-        $character = $character->refresh();
-
-        $weeklyBattleFight = $character->weeklyBattleFights->first();
-
-        $this->assertNotNull($weeklyBattleFight);
-
-        $this->assertTrue($weeklyBattleFight->monster_was_killed);
-
-        $this->assertNotNull($character->inventory->slots->filter(function ($slot) {
-            return $slot->item->is_cosmic;
-        })->first());
+        $this->assertNotNull(WeeklyMonsterFight::where('character_id', $character->id)->first()->reward_processed_at);
     }
 
-    public function test_do_not_create_record_monster_was_killed_for_invalid_location_type()
+    public function test_inventory_capacity_failure_leaves_claim_available_for_reward_recovery(): void
     {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
+        $handler = Mockery::mock(LocationSpecialtyHandler::class);
+        $handler->shouldReceive('handleMonsterFromSpecialLocation')
+            ->once()
+            ->andReturnUsing(function () use ($character, $monster): void {
+                $fight = WeeklyMonsterFight::where('character_id', $character->id)
+                    ->where('monster_id', $monster->id)
+                    ->firstOrFail();
+                $this->assertTrue($fight->monster_was_killed);
+                $this->assertNull($fight->reward_processed_at);
 
-        $character = $this->characterFactory->getCharacter();
+                throw new RuntimeException('Weekly reward delivery requires four available inventory slots.');
+            });
+        $this->expectException(RuntimeException::class);
 
-        $monster = $this->createMonster([
-            'only_for_location_type' => null,
-        ]);
-
-        $this->weeklyBattleService->handleMonsterDeath($character, $monster);
-
-        $character = $character->refresh();
-
-        $weeklyBattleFight = $character->weeklyBattleFights->first();
-
-        $this->assertNull($weeklyBattleFight);
+        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
     }
 
-    public function test_can_fight_monster()
+    public function test_character_death_creates_count(): void
     {
-        $character = $this->characterFactory->getCharacter();
-        $monster = $this->createMonster();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
 
-        $this->assertTrue($this->weeklyBattleService->canFightMonster($character, $monster));
+        (new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class)))->handleCharacterDeath($character, $monster);
+
+        $this->assertSame(1, WeeklyMonsterFight::where('character_id', $character->id)->first()->character_deaths);
     }
 
-    public function test_cannot_fight_monster()
+    public function test_character_death_increments_existing_count(): void
     {
-        $character = $this->characterFactory->getCharacter();
-        $monster = $this->createMonster([
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH,
-        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+        $fight = WeeklyMonsterFight::factory()->create(['character_id' => $character->id, 'monster_id' => $monster->id, 'character_deaths' => 2]);
 
-        $this->createWeeklyMonsterFight([
-            'character_id' => $character->id,
-            'monster_id' => $monster->id,
-            'character_deaths' => 10,
-            'monster_was_killed' => true,
-        ]);
+        (new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class)))->handleCharacterDeath($character, $monster);
 
-        $this->assertFalse($this->weeklyBattleService->canFightMonster($character, $monster));
+        $this->assertSame(3, $fight->refresh()->character_deaths);
+    }
+
+    public function test_can_fight_unclaimed_monster(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+        $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
+
+        $this->assertTrue($service->canFightMonster($character, $monster));
     }
 }

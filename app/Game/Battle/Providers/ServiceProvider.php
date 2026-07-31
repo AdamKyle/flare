@@ -5,6 +5,7 @@ namespace App\Game\Battle\Providers;
 use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\BattleDrop;
@@ -75,6 +76,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new BattleEventHandler(
                 $app->make(BattleRewardProcessingQueueManager::class),
                 $app->make(WeeklyBattleService::class),
+                $app->make(BatchCraftingService::class),
             );
         });
 

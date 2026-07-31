@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
-use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
@@ -13,17 +12,18 @@ use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateMonster;
 
 class BattleRewardItemDropIdempotencyTest extends TestCase
 {
-    use CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function test_saved_item_drop_payload_is_reused_on_resume(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -46,7 +46,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -66,7 +66,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -90,7 +90,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);
@@ -114,7 +114,7 @@ class BattleRewardItemDropIdempotencyTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
-        $request = CharacterBattleRewardRequest::factory()->create([
+        $request = $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'handler_payload' => ['monster_id' => $monster->id, 'context' => []],
         ]);

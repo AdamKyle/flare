@@ -2,24 +2,30 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDeployment\AddBatchCraftingSetToPlayers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
+use App\Console\AfterDeployment\AllowTraverseForMaps;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
+use App\Console\AfterDeployment\BackfillSpecialLocationTypes;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
+use App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots;
 use App\Console\AfterDeployment\CreateMonsterCache;
 use App\Console\AfterDeployment\MoveAlchemyAndGemsToBags;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\AfterDeployment\RepairStuckExplorationLogs;
 use App\Console\AfterDeployment\ResumeInterruptedRewardProcessing;
+use App\Console\AfterDevelopment\FlagUsersWithMissingCharacterInventories;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
-use App\Console\DevelopmentCommands\CreateEventsForDevelopment;
 use App\Console\DevelopmentCommands\CreateTestCharacters;
 use App\Console\DevelopmentCommands\GivePlayerAncenstorItem;
 use App\Console\DevelopmentCommands\GivePlayerDelveLocationQuestItems;
 use App\Console\DevelopmentCommands\GivePlayerUniqueItem;
 use App\Console\DevelopmentCommands\LevelCharacter;
+use App\Console\DevelopmentCommands\ManageEventsForDevelopment;
+use App\Console\DevelopmentCommands\ManageKingdomResources;
 use App\Console\DevelopmentCommands\MaxOutCharacter;
 use App\Console\DevelopmentCommands\MaxOutCharactersPassiveSkills;
 use App\Console\DevelopmentCommands\ReincarnateCharacter;
@@ -40,15 +46,20 @@ class AppServiceProvider extends ServiceProvider
         // Register development based commands.
         $this->commands([
             // After Deployment Commands
+            AddBatchCraftingSetToPlayers::class,
             AddHolyStacksToItems::class,
             BackfillCompletedPanelDismissals::class,
+            BackfillSpecialLocationTypes::class,
+            AllowTraverseForMaps::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
+            CleanDuplicateQuestInventorySlots::class,
             CreateMonsterCache::class,
             MoveAlchemyAndGemsToBags::class,
             RepairQuestFeatureRewards::class,
             RepairStuckExplorationLogs::class,
             ResumeInterruptedRewardProcessing::class,
+            FlagUsersWithMissingCharacterInventories::class,
 
             // Development Commands:
             CreateCharacter::class,
@@ -63,7 +74,8 @@ class AppServiceProvider extends ServiceProvider
             TestExploration::class,
             CompleteGuideQuestForCharacter::class,
             MaxOutCharactersPassiveSkills::class,
-            CreateEventsForDevelopment::class,
+            ManageEventsForDevelopment::class,
+            ManageKingdomResources::class,
             GivePlayerDelveLocationQuestItems::class,
         ]);
     }

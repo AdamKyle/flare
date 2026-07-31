@@ -11,12 +11,13 @@ use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class GameMapGemParamterControllerTest extends TestCase
 {
-    use CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateRole, CreateUser, RefreshDatabase;
+    use CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateGem, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_admin_can_navigate_from_list_to_create_page(): void
     {
@@ -204,7 +205,7 @@ class GameMapGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameMapGemParamter();
-        Gem::factory()->mapGenerated($profile)->create([
+        $this->createMapGeneratedGem($profile, [
             'name' => 'Historical Map Gem',
             'domain' => Gem::DOMAIN_MAP,
             'game_map_gem_paramters_id' => $profile->id,
@@ -277,7 +278,7 @@ class GameMapGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameMapGemParamter(['name' => 'Map Rolled Profile']);
-        $rolledGem = Gem::factory()->mapGenerated($profile)->create([
+        $rolledGem = $this->createMapGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_MAP,
             'game_map_gem_paramters_id' => $profile->id,
@@ -326,7 +327,7 @@ class GameMapGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameMapGemParamter(['name' => 'Decimal Format Profile']);
-        $rolledGem = Gem::factory()->mapGenerated($profile)->create([
+        $rolledGem = $this->createMapGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_MAP,
             'game_map_gem_paramters_id' => $profile->id,
@@ -351,7 +352,7 @@ class GameMapGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameMapGemParamter(['name' => 'Negative Power Profile']);
-        $rolledGem = Gem::factory()->mapGenerated($profile)->create([
+        $rolledGem = $this->createMapGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_MAP,
             'game_map_gem_paramters_id' => $profile->id,
@@ -377,7 +378,7 @@ class GameMapGemParamterControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $profile = $this->createGameMapGemParamter(['name' => 'No User ID Profile']);
-        $rolledGem = Gem::factory()->mapGenerated($profile)->create([
+        $rolledGem = $this->createMapGeneratedGem($profile, [
             'name' => $profile->name,
             'domain' => Gem::DOMAIN_MAP,
             'game_map_gem_paramters_id' => $profile->id,
@@ -406,7 +407,7 @@ class GameMapGemParamterControllerTest extends TestCase
     public function test_public_map_gem_page_does_not_expose_rolling_controls_or_rolled_values(): void
     {
         $profile = $this->createGameMapGemParamter();
-        $rolledGem = Gem::factory()->mapGenerated($profile)->create([
+        $rolledGem = $this->createMapGeneratedGem($profile, [
             'name' => 'Private Map Roll Value',
             'domain' => Gem::DOMAIN_MAP,
             'game_map_gem_paramters_id' => $profile->id,

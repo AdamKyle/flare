@@ -2,25 +2,25 @@
 
 namespace Tests\Feature\Game\Kingdoms\Controllers\Api;
 
-use App\Flare\Models\GameUnit;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameUnit;
 
 class KingdomUnitsControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameUnit, RefreshDatabase;
 
     public function test_manual_cancel_rejects_capital_city_owned_unit_queue(): void
     {
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $kingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create();
-        $queue = UnitInQueue::factory()->create([
+        $unit = $this->createGameUnit();
+        $queue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
@@ -67,8 +67,8 @@ class KingdomUnitsControllerTest extends TestCase
             'type' => AutomationType::EXPLORING,
         ]);
         $character = $characterFactory->getCharacter();
-        $unit = GameUnit::factory()->create();
-        $queue = UnitInQueue::factory()->create([
+        $unit = $this->createGameUnit();
+        $queue = $this->createUnitQueue([
             'character_id' => $character->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,
@@ -132,8 +132,8 @@ class KingdomUnitsControllerTest extends TestCase
             'current_population' => 1000,
         ])->getKingdom();
         $owner = $ownerFactory->getCharacter();
-        $unit = GameUnit::factory()->create();
-        $queue = UnitInQueue::factory()->create([
+        $unit = $this->createGameUnit();
+        $queue = $this->createUnitQueue([
             'character_id' => $owner->id,
             'kingdom_id' => $kingdom->id,
             'game_unit_id' => $unit->id,

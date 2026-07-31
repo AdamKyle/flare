@@ -15,7 +15,6 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\LocationType;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
-use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 
@@ -61,10 +60,6 @@ class CharacterCurrencyRewardService
         $this->distributeCopperCoins($monster, $killCount);
 
         $this->currencyEventReward($monster, $killCount);
-
-        if ($this->character->isLoggedIn()) {
-            event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
-        }
 
         return $this->earnedCurrencies;
     }
@@ -146,10 +141,6 @@ class CharacterCurrencyRewardService
             $this->applyEventCurrencies($plan['event']);
         }
 
-        if ($this->character->isLoggedIn()) {
-            event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
-        }
-
         return $this->earnedCurrencies;
     }
 
@@ -213,9 +204,6 @@ class CharacterCurrencyRewardService
                 $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $copperCoins, $characterCopperCoins);
             }
 
-            if (! $this->character->is_auto_battling) {
-                event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
-            }
         }
 
         return $this;
@@ -370,9 +358,6 @@ class CharacterCurrencyRewardService
             $this->battleMessageHandler->handleCurrencyGainMessage($this->character->user, CurrenciesMessageTypes::COPPER_COINS, $copperCoins, $characterCopperCoins);
         }
 
-        if (! $this->character->is_auto_battling) {
-            event(new UpdateCharacterCurrenciesEvent($this->character->refresh()));
-        }
     }
 
     /**
@@ -383,7 +368,7 @@ class CharacterCurrencyRewardService
         return Location::where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)
-            ->where('type', LocationType::PURGATORY_DUNGEONS)
+            ->where('type', LocationType::PURGATORY_DUNGEONS->value)
             ->first();
     }
 }

@@ -23,7 +23,8 @@ class MapsController extends Controller
 
     public function show(GameMap $gameMap)
     {
-        $effects = match ($gameMap->name) {
+        $effectiveMap = $gameMap->effectiveGameMap();
+        $effects = match ($effectiveMap->name) {
             'Labyrinth' => ItemEffectsValue::LABYRINTH,
             'Dungeons' => ItemEffectsValue::DUNGEON,
             'Shadow Plane' => ItemEffectsValue::SHADOW_PLANE,
@@ -52,6 +53,7 @@ class MapsController extends Controller
 
         return view('admin.maps.map', [
             'map' => $gameMap,
+            'effectiveMap' => $effectiveMap,
             'itemNeeded' => Item::where('effect', $effects)->first(),
             'walkOnWater' => $walkOnWater,
             'mapUrl' => Storage::disk('maps')->url($gameMap->path),

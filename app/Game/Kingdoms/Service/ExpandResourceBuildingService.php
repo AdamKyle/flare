@@ -6,6 +6,7 @@ use App\Flare\Models\BuildingExpansionQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Jobs\ExpandResourceBuilding;
@@ -18,8 +19,10 @@ class ExpandResourceBuildingService
 
     private UpdateKingdom $updateKingdom;
 
-    public function __construct(UpdateKingdom $updateKingdom)
-    {
+    public function __construct(
+        UpdateKingdom $updateKingdom,
+        private readonly GameTimerService $gameTimerService,
+    ) {
         $this->updateKingdom = $updateKingdom;
     }
 
@@ -93,7 +96,7 @@ class ExpandResourceBuildingService
 
             $this->subtractCostFromKingdom($building);
 
-            $timeNeeded = now()->addMinutes($buildingExpansion->minutes_until_next_expansion);
+            $timeNeeded = $this->gameTimerService->availableAtFromMinutes($buildingExpansion->minutes_until_next_expansion);
 
             $expansionInQueueForBuilding = BuildingExpansionQueue::create([
                 'character_id' => $building->kingdom->character_id,
@@ -121,7 +124,7 @@ class ExpandResourceBuildingService
 
         $this->subtractBaseCostFromKingdom($building->kingdom);
 
-        $timeNeeded = now()->addMinutes(ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED);
+        $timeNeeded = $this->gameTimerService->availableAtFromMinutes(ResourceBuildingExpansionBaseValue::BASE_MINUTES_REQUIRED);
 
         $expansionInQueueForBuilding = BuildingExpansionQueue::create([
             'character_id' => $building->kingdom->character_id,

@@ -2,20 +2,20 @@
 
 namespace Tests\Feature\Game\ClassRanks\Controllers\Api;
 
-use App\Flare\Models\CharacterAutomation;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\BaseSkillValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameSkill;
 
 class ClassRanksControllerTest extends TestCase
 {
-    use CreateClass, CreateGameClassSpecial, CreateGameSkill, RefreshDatabase;
+    use CreateCharacterAutomation, CreateClass, CreateGameClassSpecial, CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -49,7 +49,7 @@ class ClassRanksControllerTest extends TestCase
     public function test_exploration_allows_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -67,7 +67,7 @@ class ClassRanksControllerTest extends TestCase
     public function test_delve_allows_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -85,7 +85,7 @@ class ClassRanksControllerTest extends TestCase
     public function test_faction_loyalty_allows_class_rank_list(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
@@ -123,7 +123,7 @@ class ClassRanksControllerTest extends TestCase
     public function test_exploration_allows_character_class_specials(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -146,7 +146,7 @@ class ClassRanksControllerTest extends TestCase
     public function test_delve_allows_character_class_specials(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -169,7 +169,7 @@ class ClassRanksControllerTest extends TestCase
     public function test_faction_loyalty_allows_character_class_specials(): void
     {
         $character = $this->character->getCharacter();
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
@@ -217,7 +217,7 @@ class ClassRanksControllerTest extends TestCase
         $character = $this->character->getCharacter();
         $initialClassId = $character->game_class_id;
         $gameClass = $this->createClass(['name' => 'Heretic']);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -237,7 +237,7 @@ class ClassRanksControllerTest extends TestCase
         $character = $this->character->getCharacter();
         $initialClassId = $character->game_class_id;
         $gameClass = $this->createClass(['name' => 'Heretic']);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -257,7 +257,7 @@ class ClassRanksControllerTest extends TestCase
         $character = $this->character->getCharacter();
         $initialClassId = $character->game_class_id;
         $gameClass = $this->createClass(['name' => 'Heretic']);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
@@ -278,7 +278,7 @@ class ClassRanksControllerTest extends TestCase
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -299,7 +299,7 @@ class ClassRanksControllerTest extends TestCase
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -320,7 +320,7 @@ class ClassRanksControllerTest extends TestCase
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
@@ -341,7 +341,7 @@ class ClassRanksControllerTest extends TestCase
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->subMinute(),
@@ -362,7 +362,7 @@ class ClassRanksControllerTest extends TestCase
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->subMinute(),
@@ -383,7 +383,7 @@ class ClassRanksControllerTest extends TestCase
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
         ]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->subMinute(),
@@ -407,7 +407,7 @@ class ClassRanksControllerTest extends TestCase
         $character->skills()->create($skillData);
         $gameClass = $this->createClass(['name' => 'Heretic']);
         $this->createGameSkill(['name' => 'Heretic Skill', 'game_class_id' => $gameClass->id]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->subMinute(),
@@ -431,7 +431,7 @@ class ClassRanksControllerTest extends TestCase
         $character->skills()->create($skillData);
         $gameClass = $this->createClass(['name' => 'Heretic']);
         $this->createGameSkill(['name' => 'Heretic Skill', 'game_class_id' => $gameClass->id]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->subMinute(),
@@ -455,7 +455,7 @@ class ClassRanksControllerTest extends TestCase
         $character->skills()->create($skillData);
         $gameClass = $this->createClass(['name' => 'Heretic']);
         $this->createGameSkill(['name' => 'Heretic Skill', 'game_class_id' => $gameClass->id]);
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->subMinute(),
@@ -522,7 +522,7 @@ class ClassRanksControllerTest extends TestCase
             'equipped' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->addHour(),
@@ -557,7 +557,7 @@ class ClassRanksControllerTest extends TestCase
             'equipped' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->addHour(),
@@ -592,7 +592,7 @@ class ClassRanksControllerTest extends TestCase
             'equipped' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->addHour(),
@@ -627,7 +627,7 @@ class ClassRanksControllerTest extends TestCase
             'equipped' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::EXPLORING,
             'completed_at' => now()->subMinute(),
@@ -662,7 +662,7 @@ class ClassRanksControllerTest extends TestCase
             'equipped' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::DELVE,
             'completed_at' => now()->subMinute(),
@@ -697,7 +697,7 @@ class ClassRanksControllerTest extends TestCase
             'equipped' => true,
         ]);
 
-        CharacterAutomation::factory()->create([
+        $this->createCharacterAutomation([
             'character_id' => $character->id,
             'type' => AutomationType::FACTION_LOYALTY,
             'completed_at' => now()->subMinute(),

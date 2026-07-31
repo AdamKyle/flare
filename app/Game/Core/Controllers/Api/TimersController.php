@@ -4,7 +4,9 @@ namespace App\Game\Core\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Game\Automation\Events\AutomationTimeOut;
+use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use App\Game\Core\Events\ShowTimeOutEvent as EventsShowTimeOutEvent;
 use App\Game\Maps\Events\ShowTimeOutEvent;
@@ -13,8 +15,12 @@ use Illuminate\Http\JsonResponse;
 
 class TimersController extends Controller
 {
+    public function __construct(private readonly ?AttackTimerService $attackTimerService = null) {}
+
     public function updateTimersForCharacter(Character $character): JsonResponse
     {
+        $attackTimerService = $this->attackTimerService ?? new AttackTimerService(new AutomationRestrictionService());
+        $character = $attackTimerService->normalizeExpiredAttackTimer($character);
         $now = now();
 
         $characterAutomation = $character->currentAutomations()

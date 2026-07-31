@@ -1,7 +1,6 @@
 <?php
 
 Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], function () {
-
     Route::get('/character/{character}/inventory', ['uses' => 'Api\CharacterInventoryController@inventory']);
     Route::get('/character/{character}/quest-items', ['uses' => 'Api\CharacterInventoryController@questItems']);
     Route::get('/character/{character}/usable-items', ['uses' => 'Api\CharacterInventoryController@usableItems']);
@@ -18,7 +17,6 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
         Route::get('/character/{character}/inventory/item', ['uses' => 'Api\CharacterInventoryController@itemDetails']);
 
         Route::middleware(['is.character.exploring'])->group(function () {
-
             Route::post('/character/{character}/inventory/equip-item', ['uses' => 'Api\CharacterInventoryController@equipItem']);
             Route::post('/character/{character}/inventory/save-equipped-as-set', ['uses' => 'Api\CharacterInventoryController@saveEquippedAsSet']);
             Route::post('/character/{character}/inventory/unequip', ['uses' => 'Api\CharacterInventoryController@unequipItem']);
@@ -29,25 +27,26 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
         Route::post('/character/{character}/inventory/use-many-items', ['uses' => 'Api\CharacterInventoryController@useManyItems']);
         Route::post('/character/{character}/inventory/use-item/{item}', ['uses' => 'Api\CharacterInventoryController@useItem']);
         Route::post('/character/{character}/inventory/use-alchemy-item/{alchemyBagSlot}', ['uses' => 'Api\CharacterInventoryController@useAlchemyItem']);
-
         Route::post('/character/{character}/inventory/destroy-all-alchemy-items', ['uses' => 'Api\CharacterInventoryController@destroyAllAlchemyItems']);
         Route::post('/character/{character}/inventory/destroy-alchemy-item', ['uses' => 'Api\CharacterInventoryController@destroyAlchemyItem']);
-
         Route::post('/character/{character}/inventory/destroy', ['uses' => 'Api\CharacterInventoryController@destroy']);
         Route::post('/character/{character}/inventory-set/remove', ['uses' => 'Api\CharacterInventoryController@removeFromSet']);
         Route::post('/character/{character}/inventory-set/{inventorySet}/remove-all', ['uses' => 'Api\CharacterInventoryController@emptySet']);
-
         Route::post('/character/{character}/inventory/destroy-all', ['uses' => 'Api\CharacterInventoryController@destroyAll']);
         Route::post('/character/{character}/inventory/disenchant-all', ['uses' => 'Api\CharacterInventoryController@disenchantAll']);
         Route::post('/character/{character}/inventory/move-to-set', ['uses' => 'Api\CharacterInventoryController@moveToSet']);
         Route::post('/character/{character}/inventory-set/rename-set', ['uses' => 'Api\CharacterInventoryController@renameSet']);
-
         Route::post('/character/{character}/inventory/equip-selected', ['uses' => 'Api\CharacterInventoryMultiController@equipSelected']);
         Route::post('/character/{character}/inventory/destroy-selected', ['uses' => 'Api\CharacterInventoryMultiController@destroySelected']);
         Route::post('/character/{character}/inventory/disenchant-selected', ['uses' => 'Api\CharacterInventoryMultiController@disenchantSelected']);
         Route::post('/character/{character}/inventory/move-selected', ['uses' => 'Api\CharacterInventoryMultiController@moveSelected']);
         Route::post('/character/{character}/inventory/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelected']);
-
+        Route::post('/character/{character}/inventory-set/sell-selected', ['uses' => 'Api\CharacterInventoryMultiController@sellSelectedFromSet']);
+        Route::post('/character/{character}/inventory-set/disenchant-selected', ['uses' => 'Api\CharacterInventoryMultiController@disenchantSelectedFromSet']);
+        Route::post('/character/{character}/inventory-set/destroy-selected', ['uses' => 'Api\CharacterInventoryMultiController@destroySelectedFromSet']);
+        Route::post('/character/{character}/inventory-set/destroy-all', ['uses' => 'Api\CharacterInventoryMultiController@destroyAllFromSet']);
+        Route::post('/character/{character}/inventory-set/sell-all', ['uses' => 'Api\CharacterInventoryMultiController@sellAllFromSet']);
+        Route::post('/character/{character}/inventory-set/disenchant-all', ['uses' => 'Api\CharacterInventoryMultiController@disenchantAllFromSet']);
         Route::post('/character/{character}/inventory/sell-item', ['uses' => 'Api\CharacterInventoryController@sellItem']);
         Route::post('/character/{character}/inventory/disenchant-item', ['uses' => 'Api\CharacterInventoryController@disenchantItem']);
         Route::post('/character/{character}/inventory/move-item-to-set', ['uses' => 'Api\CharacterInventoryController@moveItemToSet']);

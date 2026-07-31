@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
-use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\AutomationType;
@@ -28,10 +27,11 @@ use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateExplorationLog;
 use Tests\Traits\CreateExplorationWarning;
+use Tests\Traits\CreateLocation;
 
 class ExplorationAutomationServiceTest extends TestCase
 {
-    use CreateCharacterAutomation;
+    use CreateCharacterAutomation, CreateLocation;
     use CreateExplorationLog;
     use CreateExplorationWarning;
     use RefreshDatabase;
@@ -251,6 +251,11 @@ class ExplorationAutomationServiceTest extends TestCase
     {
         Queue::fake();
         Event::fake();
+        config([
+            'game_timers.development_cap.enabled' => true,
+            'game_timers.development_cap.environments' => ['testing'],
+            'game_timers.development_cap.max_seconds' => 60,
+        ]);
 
         $now = Carbon::parse('2026-01-01 12:00:00');
 
@@ -333,12 +338,13 @@ class ExplorationAutomationServiceTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        Location::factory()->create([
+        $this->createLocation([
             'name' => 'Gold Mine',
             'game_map_id' => $this->character->map->game_map_id,
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
-            'type' => LocationType::GOLD_MINES,
+            'type' => LocationType::GOLD_MINES->value,
+            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $this->service->beginAutomation($this->character, [

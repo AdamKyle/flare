@@ -9,6 +9,7 @@ use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateWinterEvent;
 use App\Game\Events\Values\EventType;
+use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -57,6 +58,7 @@ class InitiateWinterEventTest extends TestCase
         Event::fake();
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WINTER_EVENT,
         ]);
 
@@ -80,6 +82,7 @@ class InitiateWinterEventTest extends TestCase
         $now = now();
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => $now,
             'end_date' => $now,
@@ -125,6 +128,7 @@ class InitiateWinterEventTest extends TestCase
         Event::fake();
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => $now,
             'end_date' => $now,
@@ -170,6 +174,7 @@ class InitiateWinterEventTest extends TestCase
         $parentEnd = $now->copy()->addMonths(2);
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => $now,
             'end_date' => $parentEnd,
@@ -186,6 +191,7 @@ class InitiateWinterEventTest extends TestCase
 
         $currentChildRaids = ScheduledEvent::where('raid_id', $raid->id)
             ->where('event_type', EventType::RAID_EVENT)
+            ->where('parent_scheduled_event_id', $event->id)
             ->get();
 
         $this->assertCount(1, $currentChildRaids);
@@ -219,6 +225,7 @@ class InitiateWinterEventTest extends TestCase
         $now = now();
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => $now,
             'end_date' => $now->copy()->addMonths(2),
@@ -269,6 +276,7 @@ class InitiateWinterEventTest extends TestCase
         $now = now();
 
         $event = $this->createScheduledEvent([
+            'status' => ScheduledEventStatus::QUEUED,
             'event_type' => EventType::WINTER_EVENT,
             'start_date' => $now,
             'end_date' => $now->copy()->addMonths(2),

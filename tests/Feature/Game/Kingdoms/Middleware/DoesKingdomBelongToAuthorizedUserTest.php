@@ -49,6 +49,10 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         );
 
         $this->assertSame(422, $response->getStatusCode());
+        $responseData = $response->getData(true);
+        $this->assertSame('Nope. Not allowed to do that.', $responseData['error']);
+        $this->assertArrayNotHasKey('message', $responseData);
+        $this->assertArrayNotHasKey('reason', $responseData);
     }
 
     public function test_matching_kingdom_and_character_ids_do_not_grant_ownership(): void
@@ -68,6 +72,10 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         );
 
         $this->assertSame(422, $response->getStatusCode());
+        $responseData = $response->getData(true);
+        $this->assertSame('Nope. Not allowed to do that.', $responseData['error']);
+        $this->assertArrayNotHasKey('message', $responseData);
+        $this->assertArrayNotHasKey('reason', $responseData);
     }
 
     private function requestWithRouteParameters(array $parameters): Request

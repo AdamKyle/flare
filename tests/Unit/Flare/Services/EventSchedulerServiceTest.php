@@ -611,4 +611,148 @@ class EventSchedulerServiceTest extends TestCase
 
         $this->assertEquals(0, ScheduledEvent::where('raid_id', $raidA->id)->count());
     }
+
+    public function test_generated_seasonal_raid_has_exact_parent_id(): void
+    {
+        $parentStart = now()->addMonth();
+        $parentEnd = $parentStart->copy()->addMonths(2);
+
+        $gameMap = $this->createGameMap(['name' => 'ParentIdMap', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+            'scheduled_event_description' => 'test',
+        ]);
+
+        $parentEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => $parentStart,
+            'end_date' => $parentEnd,
+            'raids_for_event' => [[
+                'selected_raid' => $raid->id,
+                'start_date' => $parentStart->copy()->addDays(4)->format('Y-m-d H:i:s'),
+                'end_date' => $parentStart->copy()->addDays(7)->format('Y-m-d H:i:s'),
+            ]],
+        ]);
+
+        $this->eventSchedulerService->createRaidEventsForScheduledEventWith($parentEvent);
+
+        $child = ScheduledEvent::where('raid_id', $raid->id)->firstOrFail();
+
+        $this->assertEquals($parentEvent->id, $child->parent_scheduled_event_id);
+    }
+
+    public function test_repeated_generation_is_idempotent(): void
+    {
+        $parentStart = now()->addMonth();
+        $parentEnd = $parentStart->copy()->addMonths(2);
+
+        $gameMap = $this->createGameMap(['name' => 'IdempotentMap', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+            'scheduled_event_description' => 'test',
+        ]);
+
+        $parentEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => $parentStart,
+            'end_date' => $parentEnd,
+            'raids_for_event' => [[
+                'selected_raid' => $raid->id,
+                'start_date' => $parentStart->copy()->addDays(4)->format('Y-m-d H:i:s'),
+                'end_date' => $parentStart->copy()->addDays(7)->format('Y-m-d H:i:s'),
+            ]],
+        ]);
+
+        $this->eventSchedulerService->createRaidEventsForScheduledEventWith($parentEvent);
+        $this->eventSchedulerService->createRaidEventsForScheduledEventWith($parentEvent);
+
+        $this->assertEquals(1, ScheduledEvent::where('raid_id', $raid->id)->count());
+    }
+
+    public function test_existing_development_child_is_reused(): void
+    {
+        $parentStart = now()->addMonth();
+        $parentEnd = $parentStart->copy()->addMonths(2);
+
+        $gameMap = $this->createGameMap(['name' => 'DevChildMap', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+            'scheduled_event_description' => 'test',
+        ]);
+
+        $childStart = $parentStart->copy()->addDays(4);
+        $childEnd = $parentStart->copy()->addDays(7);
+
+        $parentEvent = $this->createScheduledEvent([
+            'event_type' => EventType::WINTER_EVENT,
+            'start_date' => $parentStart,
+            'end_date' => $parentEnd,
+            'raids_for_event' => [[
+                'selected_raid' => $raid->id,
+                'start_date' => $childStart->format('Y-m-d H:i:s'),
+                'end_date' => $childEnd->format('Y-m-d H:i:s'),
+            ]],
+        ]);
+
+        $developmentChild = $this->createScheduledEvent([
+            'event_type' => EventType::RAID_EVENT,
+            'raid_id' => $raid->id,
+            'parent_scheduled_event_id' => $parentEvent->id,
+            'start_date' => $childStart,
+            'end_date' => $childEnd,
+        ]);
+
+        $this->eventSchedulerService->createRaidEventsForScheduledEventWith($parentEvent);
+
+        $this->assertEquals(1, ScheduledEvent::where('raid_id', $raid->id)->count());
+        $this->assertEquals($developmentChild->id, ScheduledEvent::where('raid_id', $raid->id)->firstOrFail()->id);
+    }
+
+    public function test_future_independent_raid_remains_parentless(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'IndependentParentlessMap', 'default' => false]);
+        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
+        $monster = $this->createMonster();
+        $item = $this->createItem();
+
+        $raid = $this->createRaid([
+            'raid_boss_id' => $monster->id,
+            'artifact_item_id' => $item->id,
+            'raid_boss_location_id' => $location->id,
+        ]);
+
+        $scheduledRaidEvent = $this->createScheduledEvent([
+            'event_type' => EventType::RAID_EVENT,
+            'raid_id' => $raid->id,
+            'start_date' => now(),
+            'end_date' => now()->addMonth(),
+        ]);
+
+        $this->eventSchedulerService->generateFutureRaid($scheduledRaidEvent);
+
+        $futureRaidSchedule = ScheduledEvent::where('raid_id', $raid->id)
+            ->where('id', '!=', $scheduledRaidEvent->id)
+            ->first();
+
+        $this->assertNotNull($futureRaidSchedule);
+        $this->assertNull($futureRaidSchedule->parent_scheduled_event_id);
+    }
 }

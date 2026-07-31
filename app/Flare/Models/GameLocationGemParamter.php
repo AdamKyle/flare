@@ -6,6 +6,7 @@ use Database\Factories\GameLocationGemParamterFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GameLocationGemParamter extends Model
 {
@@ -67,6 +68,11 @@ class GameLocationGemParamter extends Model
     public function rolledGem(): BelongsTo
     {
         return $this->belongsTo(Gem::class, 'rolled_gem_id');
+    }
+
+    public function generatedMap(): HasOne
+    {
+        return $this->hasOne(GameMap::class, 'game_location_gem_paramter_id');
     }
 
     public function rollableRangeFields(): array

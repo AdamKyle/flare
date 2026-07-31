@@ -8,8 +8,6 @@ use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;

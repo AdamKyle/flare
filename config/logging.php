@@ -79,6 +79,13 @@ return [
             'days' => 14,
         ],
 
+        'batch_crafting' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/batch-crafting.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],

@@ -8,10 +8,13 @@ use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
+use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Events\Services\EventGoalsService;
+use App\Game\Events\Services\GlobalEventGoalEligibilityService;
+use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
@@ -72,14 +75,18 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(HandleUpdatingCraftingGlobalEventGoal::class, function ($app) {
             return new HandleUpdatingCraftingGlobalEventGoal(
                 $app->make(RandomAffixGenerator::class),
-                $app->make(EventGoalsService::class)
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalProgressionService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
             );
         });
 
         $this->app->bind(HandleUpdatingEnchantingGlobalEventGoal::class, function ($app) {
             return new HandleUpdatingEnchantingGlobalEventGoal(
                 $app->make(RandomAffixGenerator::class),
-                $app->make(EventGoalsService::class)
+                $app->make(EventGoalsService::class),
+                $app->make(GlobalEventGoalProgressionService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
             );
         });
 
@@ -123,7 +130,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new TrinketCraftingService(
                 $app->make(CraftingService::class),
                 $app->make(SkillCheckService::class),
-                $app->make(ItemListCostTransformerService::class)
+                $app->make(ItemListCostTransformerService::class),
+                $app->make(SkillService::class),
             );
         });
 
@@ -133,6 +141,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInventoryService::class),
                 $app->make(EnchantItemService::class),
                 $app->make(RandomEnchantmentService::class),
+                $app->make(GlobalEventGoalEligibilityService::class),
             );
         });
 
@@ -144,8 +153,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(UpdateCraftingTasksForFactionLoyalty::class, function ($app) {
             return new UpdateCraftingTasksForFactionLoyalty(
-                $app->make(RandomAffixGenerator::class),
                 $app->make(FactionLoyaltyService::class),
+                $app->make(FactionLoyaltyRewardRequestService::class),
             );
         });
 

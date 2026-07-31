@@ -14,11 +14,14 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
+use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\Character\Exceptions\MissingInventoryException;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\GuideQuests\Services\GuideQuestService;
@@ -113,6 +116,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
         $processed = 0;
         $shouldDispatchAfterUnlock = false;
         $shouldCheckPendingAfterUnlock = false;
+        $capacityRetryPaused = false;
         $heartbeatCallback = fn () => $queueManager->updateHeartbeat($this->characterId);
 
         Log::channel('reward_processing')->debug('Processor loop starts.', [
@@ -147,13 +151,16 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                     'status' => $request->status?->value,
                 ]);
 
+                $notificationRetryScheduled = false;
+
                 try {
                     $payload = $request->handler_payload;
 
                     match ($request->source_type) {
                         BattleRewardRequestSourceType::BATTLE,
                         BattleRewardRequestSourceType::EXPLORATION,
-                        BattleRewardRequestSourceType::AUTOMATION => $this->processBattleRewardRequest(
+                        BattleRewardRequestSourceType::AUTOMATION,
+                        BattleRewardRequestSourceType::FACTION_LOYALTY => $this->processBattleRewardRequest(
                             $battleRewardService,
                             $request,
                             $payload,
@@ -178,6 +185,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         BattleRewardRequestSourceType::BATTLE,
                         BattleRewardRequestSourceType::EXPLORATION,
                         BattleRewardRequestSourceType::AUTOMATION,
+                        BattleRewardRequestSourceType::FACTION_LOYALTY,
                     ], true)) {
                         $this->completeUnsupportedRewardSteps($request, $battleRewardLedgerService);
                     }
@@ -212,6 +220,20 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                         'request_id' => $request->id,
                     ]);
                 } catch (Throwable $exception) {
+                    if ($exception instanceof MissingInventoryException) {
+                        Character::find($this->characterId)?->user()->update(['will_be_deleted' => true]);
+                        $queueManager->markCorruptedInventory($request);
+                        Log::channel('reward_processing')->warning('Battle reward processing stopped for a character with missing inventory.', [
+                            'character_id' => $this->characterId,
+                            'request_id' => $request->id,
+                            'source_type' => $request->source_type?->value ?? 'unknown',
+                            'exception' => $exception,
+                        ]);
+                        $capacityRetryPaused = true;
+
+                        break;
+                    }
+
                     Log::channel('reward_processing')->error('Exception caught during reward processing.', [
                         'character_id' => $this->characterId,
                         'request_id' => $request->id,
@@ -227,30 +249,51 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
                                 BattleRewardStepStatus::RUNNING,
                                 BattleRewardStepStatus::CHECKPOINTED,
                                 BattleRewardStepStatus::RESUMABLE,
+                                BattleRewardStepStatus::FAILED,
                             ])
                             ->orderByDesc('id')
                             ->first();
 
-                        if (! is_null($activeStep)) {
-                            $battleRewardLedgerService->failStep($activeStep, $exception);
-                        }
+                        if ($exception instanceof WeeklyRewardInventoryFullException
+                            && $activeStep?->step_name === BattleRewardStepName::WEEKLY_REWARDS) {
+                            $queueManager->markNotificationRetryable($request, $activeStep, $exception);
+                            $notificationRetryScheduled = true;
+                            $capacityRetryPaused = true;
+                        } elseif (! is_null($activeStep) && in_array($activeStep->step_name, [
+                            BattleRewardStepName::FINAL_PLAYER_UPDATES,
+                            BattleRewardStepName::MESSAGE_OUTBOX,
+                        ], true)) {
+                            $queueManager->markNotificationRetryable($request, $activeStep, $exception);
+                            $notificationRetryScheduled = true;
+                            $shouldDispatchAfterUnlock = true;
+                        } else {
+                            if (! is_null($activeStep)) {
+                                $battleRewardLedgerService->failStep($activeStep, $exception);
+                            }
 
-                        $queueManager->markFailed($request, $exception);
+                            $queueManager->markFailed($request, $exception);
+                        }
                     }
 
-                    (new MonitoredBugReportService)->reportError(
-                        'battle-reward-queue',
-                        $exception->getMessage(),
-                        ['character_id' => $this->characterId, 'source_type' => $request->source_type?->value ?? 'unknown'],
-                        $exception::class,
-                        $this->characterId,
-                    );
+                    if (! $exception instanceof WeeklyRewardInventoryFullException) {
+                        (new MonitoredBugReportService)->reportError(
+                            'battle-reward-queue',
+                            $exception->getMessage(),
+                            ['character_id' => $this->characterId, 'source_type' => $request->source_type?->value ?? 'unknown'],
+                            $exception::class,
+                            $this->characterId,
+                        );
+                    }
                 }
 
                 $processed++;
+
+                if ($notificationRetryScheduled) {
+                    break;
+                }
             }
 
-            if ($queueManager->hasProcessingRequests($this->characterId)) {
+            if ($capacityRetryPaused || $queueManager->hasProcessingRequests($this->characterId)) {
                 return;
             }
 
@@ -471,6 +514,7 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
             new UpdateTopBarEvent($character),
             ['character_id' => $this->characterId]
         );
+        event(new UpdateCharacterCurrenciesEvent($character));
 
         Log::channel('reward_processing')->debug('Base character update attempted.', [
             'character_id' => $this->characterId,

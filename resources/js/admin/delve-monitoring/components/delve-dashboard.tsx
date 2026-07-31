@@ -1,45 +1,46 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React, { useCallback, useEffect, useState } from 'react';
 
 import MonitoringStatusChart from '../../monitoring/components/monitoring-status-chart';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../monitoring/values/admin-monitoring-chart-colors';
 import AdminPaginationControls from '../../shared/components/admin-pagination-controls';
-import { useDelveApi } from '../ajax/delve-api';
-import useDelveMonitoringLiveRefresh from '../hooks/use-delve-live-refresh';
 import {
   ActiveDelveRunner,
   DelveChartPoint,
   DelveFilters,
-  DelveLogEntry,
   DelveRunRow,
   DelveSummary,
-} from '../types/delve-monitoring';
+} from '../api/definitions/delve-monitoring-definition';
+import { useDelveApi } from '../api/hooks/use-delve-api';
+import useDelveMonitoringLiveRefresh from '../hooks/use-delve-live-refresh';
+import {
+  MonitorCardProps,
+  RunLogDetailsProps,
+} from '../types/dashboard-component-props';
+import delvePaginationAdapter from '../utils/delve-pagination-adapter';
 import { DAY_OPTIONS } from '../values/filter-options';
 
-const emptyPaginatedResponse = <T,>(): PaginatedApiResponseDefinition<T[]> =>
-  ({
-    data: [],
-    meta: {
-      can_load_more: false,
-      pagination: {
-        count: 0,
-        [`current${'_'}page`]: 1,
-        links: { next: '', prev: '' },
-        per_page: 10,
-        total: 0,
-        total_pages: 1,
-      },
-    },
-  }) as PaginatedApiResponseDefinition<T[]>;
+function MonitorCard({ children, onClick, ariaLabel }: MonitorCardProps) {
+  const classes =
+    'rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5 ' +
+    'dark:border-gray-700 dark:bg-gray-900';
 
-function MonitorCard({ children }: { children: React.ReactNode }) {
-  return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-5 dark:border-gray-700 dark:bg-gray-900">
-      {children}
-    </section>
-  );
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={`${classes} cursor-pointer text-left transition-colors hover:border-blue-400 focus:ring-2 focus:ring-blue-400 focus:outline-none dark:hover:border-blue-500`}
+        onClick={onClick}
+        aria-label={ariaLabel}
+      >
+        {children}
+      </button>
+    );
+  }
+
+  return <section className={classes}>{children}</section>;
 }
 
-function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
+function RunLogDetails({ logs }: RunLogDetailsProps) {
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
   const totalPages = Math.max(1, Math.ceil(logs.length / 10));
@@ -50,8 +51,9 @@ function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
   }
 
   return (
-    <span>
+    <div>
       <button
+        type="button"
         className="text-xs text-blue-500 underline"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
@@ -89,6 +91,7 @@ function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
               </span>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
                   disabled={page <= 1}
                   onClick={() => setPage((currentPage) => currentPage - 1)}
@@ -96,6 +99,7 @@ function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
                   Previous
                 </button>
                 <button
+                  type="button"
                   className="rounded border border-gray-300 px-2 py-1 disabled:opacity-40 dark:border-gray-600"
                   disabled={page >= totalPages}
                   onClick={() => setPage((currentPage) => currentPage + 1)}
@@ -107,7 +111,7 @@ function RunLogDetails({ logs }: { logs: DelveLogEntry[] }) {
           )}
         </div>
       )}
-    </span>
+    </div>
   );
 }
 
@@ -130,9 +134,14 @@ export default function DelveDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [active, setActive] = useState<ActiveDelveRunner[]>([]);
-  const [runs, setRuns] = useState<
-    PaginatedApiResponseDefinition<DelveRunRow[]>
-  >(emptyPaginatedResponse());
+  const [runs, setRuns] = useState(
+    delvePaginationAdapter<DelveRunRow>({
+      data: [],
+      current_page: 1,
+      last_page: 1,
+      total: 0,
+    })
+  );
   const [summary, setSummary] = useState<DelveSummary>({
     total_runs: 0,
     active: 0,
@@ -209,18 +218,24 @@ export default function DelveDashboard() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-6">
+        <MonitorCard>
+          <div className="text-sm text-gray-600 dark:text-gray-300">
+            Total Runs
+          </div>
+          <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+            {summary.total_runs}
+          </div>
+        </MonitorCard>
         {[
-          { label: 'Total Runs', value: summary.total_runs },
           { label: 'Active', value: summary.active },
           { label: 'Completed', value: summary.completed },
           { label: 'Survived', value: summary.total_survived },
           { label: 'Died', value: summary.total_died },
           { label: 'Timeout', value: summary.total_timeout },
         ].map(({ label, value }) => (
-          <button
+          <MonitorCard
             key={label}
-            type="button"
-            className="text-left"
+            ariaLabel={`Filter runs by ${label}`}
             onClick={() => {
               if (label === 'Active') {
                 applyTableFilter({ status: 'active' });
@@ -235,15 +250,13 @@ export default function DelveDashboard() {
               }
             }}
           >
-            <MonitorCard>
-              <div className="text-sm text-gray-600 dark:text-gray-300">
-                {label}
-              </div>
-              <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
-                {value}
-              </div>
-            </MonitorCard>
-          </button>
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              {label}
+            </div>
+            <div className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">
+              {value}
+            </div>
+          </MonitorCard>
         ))}
       </div>
 
@@ -268,28 +281,36 @@ export default function DelveDashboard() {
           description="Run, status, and outcome totals from retained Delve data."
           points={chart}
           series={[
-            { key: 'runs', label: 'Runs', color: '#f97316' },
-            { key: 'active', label: 'Active', color: '#3b82f6' },
+            {
+              key: 'runs',
+              label: 'Runs',
+              color: ADMIN_MONITORING_CHART_COLORS.mangoTango,
+            },
+            {
+              key: 'active',
+              label: 'Active',
+              color: ADMIN_MONITORING_CHART_COLORS.danube,
+            },
             {
               key: 'completed',
               label: 'Completed',
-              color: '#22c55e',
+              color: ADMIN_MONITORING_CHART_COLORS.emerald,
             },
             {
               key: 'survived',
               label: 'Survived',
-              color: '#16a34a',
+              color: ADMIN_MONITORING_CHART_COLORS.emeraldStrong,
             },
             {
               key: 'died',
               label: 'Died',
-              color: '#ef4444',
+              color: ADMIN_MONITORING_CHART_COLORS.rose,
               dash: '6,3',
             },
             {
               key: 'timeout',
               label: 'Timeout',
-              color: '#f59e0b',
+              color: ADMIN_MONITORING_CHART_COLORS.mangoTango,
               dash: '2,2',
             },
           ]}

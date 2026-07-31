@@ -10,10 +10,11 @@ use App\Game\Core\Values\FeedbackType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateSuggestionAndBugs;
 
 class MonitoredBugReportServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateSuggestionAndBugs, RefreshDatabase;
 
     public function test_creates_new_bug_report_when_none_exists_for_fingerprint(): void
     {
@@ -274,7 +275,7 @@ class MonitoredBugReportServiceTest extends TestCase
 
     public function test_user_submitted_bug_factory_still_creates_feedback_bug(): void
     {
-        SuggestionAndBugs::factory()->create(['type' => FeedbackType::BUG]);
+        $this->createSuggestionAndBug(['type' => FeedbackType::BUG]);
 
         $this->assertSame(1, SuggestionAndBugs::where('type', FeedbackType::BUG)->count());
         $this->assertSame(0, MonitoredSystemErrorReport::count());

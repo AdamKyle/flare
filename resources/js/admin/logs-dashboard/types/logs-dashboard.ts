@@ -1,6 +1,6 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
-
+import LogEntriesResponseDefinition from '../api/definitions/log-entries-response-definition';
 import LogEntryDefinition from '../api/definitions/log-entry-definition';
+import LogEntryDetailDefinition from '../api/definitions/log-entry-detail-definition';
 import LogFileInfoDefinition from '../api/definitions/log-file-info-definition';
 import LogFiltersDefinition from '../api/definitions/log-filters-definition';
 import LogSummaryDefinition from '../api/definitions/log-summary-definition';
@@ -10,9 +10,10 @@ import SystemBugReportDefinition from '../api/definitions/system-bug-report-defi
 
 export type LogFileInfo = LogFileInfoDefinition;
 export type LogEntry = LogEntryDefinition;
+export type LogEntryDetail = LogEntryDetailDefinition;
 export type LogSummary = LogSummaryDefinition;
 
-export type LogEntriesPage = PaginatedApiResponseDefinition<LogEntry[]>;
+export type LogEntriesPage = LogEntriesResponseDefinition;
 
 export type LogFilters = LogFiltersDefinition;
 

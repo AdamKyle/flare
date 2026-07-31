@@ -1,19 +1,13 @@
-import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginated-api-response-definition';
 import React from 'react';
+
+import AdminPaginationControlsProps from '../types/admin-pagination-controls-props';
 
 export default function AdminPaginationControls<T>({
   response,
   label,
   on_page_change,
-}: {
-  response: PaginatedApiResponseDefinition<T[]> | null;
-  label: string;
-  on_page_change: (page: number) => void;
-}) {
-  const currentPageKey = `current${'_'}page` as keyof NonNullable<
-    typeof response
-  >['meta']['pagination'];
-  const currentPage = Number(response?.meta.pagination[currentPageKey] ?? 1);
+}: AdminPaginationControlsProps<T>) {
+  const currentPage = response?.meta.pagination.current_page ?? 1;
   const totalPages = response?.meta.pagination.total_pages ?? 1;
 
   return (

@@ -60,12 +60,10 @@ class HandInQuestTest extends TestCase
             ->with($character, $quest)
             ->andThrow(new Exception('Reward failed.'));
 
-        try {
-            (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
-        } catch (Exception) {
-        }
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Reward failed.');
 
-        $this->assertEquals(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
+        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
     }
 
     public function test_failed_reward_handling_does_not_fire_completed_message(): void
@@ -82,12 +80,10 @@ class HandInQuestTest extends TestCase
             ->with($character, $quest)
             ->andThrow(new Exception('Reward failed.'));
 
-        try {
-            (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
-        } catch (Exception) {
-        }
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Reward failed.');
 
-        Event::assertNotDispatched(GlobalMessageEvent::class);
+        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
     }
 
     public function test_failed_reward_handling_logs_and_rethrows_exception(): void

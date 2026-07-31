@@ -7,6 +7,7 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
+use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\RebuildBuilding;
@@ -23,7 +24,10 @@ class KingdomBuildingService
 
     private float $totalResources;
 
-    public function __construct(private UpdateKingdomHandler $updateKingdomHandler) {}
+    public function __construct(
+        private UpdateKingdomHandler $updateKingdomHandler,
+        private readonly GameTimerService $gameTimerService,
+    ) {}
 
     /**
      * Upgrades the building for a kingdom by dispatching a job with a BuildingInQueue record
@@ -32,7 +36,7 @@ class KingdomBuildingService
      */
     public function upgradeKingdomBuilding(KingdomBuilding $building, Character $character, ?int $capitalCityQueueId = null): void
     {
-        $timeToComplete = now()->addMinutes($this->calculateBuildingTimeReduction($building));
+        $timeToComplete = $this->gameTimerService->availableAtFromMinutes($this->calculateBuildingTimeReduction($building));
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
@@ -123,7 +127,7 @@ class KingdomBuildingService
 
         $minutesToRebuild = $minutesToRebuild - ($minutesToRebuild * $timeReduction);
 
-        $timeToComplete = now()->addMinutes($minutesToRebuild);
+        $timeToComplete = $this->gameTimerService->availableAtFromMinutes($minutesToRebuild);
 
         $queue = BuildingInQueue::create([
             'character_id' => $character->id,
