@@ -111,15 +111,36 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(BatchCraftingEndReason::NO_GOLD_DUST->value, $result->ended_reason);
     }
 
-    public function testStopOnNoShards(): void
+    public function testTrinketryStartIgnoresShardsAndStopsForItsTwoRequiredCurrencies(): void
     {
-        $user = $this->createUser();
-        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'shards' => 0]);
-        $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id, 'batch_type' => BatchCraftingType::TRINKETRY->value]);
+        $trinketry = $this->createGameSkill([
+            'name' => 'Trinketry',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['inventory_max' => 10, 'shards' => 1000000, 'gold_dust' => 0, 'copper_coins' => 0]);
+        $this->createItem([
+            'name' => 'Two Currency Trinket',
+            'type' => 'trinket',
+            'crafting_type' => 'trinketry',
+            'gold_dust_cost' => 10,
+            'copper_coin_cost' => 20,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 400,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
 
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
-        $this->assertSame(BatchCraftingEndReason::NO_SHARDS->value, $result->ended_reason);
+        $this->assertSame(BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES->value, $result->ended_reason);
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(0, $result->skipped_count);
     }
 
     public function testStopOnNoRequiredCurrency(): void
@@ -1005,9 +1026,12 @@ class BatchCraftingServiceTest extends TestCase
                 'craft_enchant_set_requested' => 23,
                 'craft_enchant_set_craft_index' => 23,
                 'craft_enchant_set_enchant_index' => 8,
-                'craft_enchant_set_completed_work_units' => 8,
-                'craft_enchant_set_total_work_units' => 23,
-                'craft_enchant_set_completed_final_count' => 8,
+                'craft_enchant_set_finalize_completed_count' => 0,
+                'craft_enchant_set_completed_work_units' => 31,
+                'craft_enchant_set_total_work_units' => 69,
+                'craft_enchant_set_completed_final_count' => 0,
+                'craft_enchant_set_finalized_keys' => [],
+                'craft_enchant_set_lost_keys' => [],
             ],
         ]);
 
@@ -1015,11 +1039,12 @@ class BatchCraftingServiceTest extends TestCase
 
         $this->assertSame(23, $status['batch']['craft_enchant_set_craft_completed_count']);
         $this->assertSame(8, $status['batch']['craft_enchant_set_enchant_completed_count']);
-        $this->assertSame(8, $status['batch']['craft_enchant_set_completed_work_units']);
-        $this->assertSame(23, $status['batch']['craft_enchant_set_total_work_units']);
-        $this->assertSame(15, $status['batch']['craft_enchant_set_remaining_work_units']);
-        $this->assertSame(34, $status['batch']['craft_enchant_set_overall_percent']);
-        $this->assertSame(8, $status['batch']['craft_enchant_set_completed_final_count']);
+        $this->assertSame(0, $status['batch']['craft_enchant_set_finalize_completed_count']);
+        $this->assertSame(31, $status['batch']['craft_enchant_set_completed_work_units']);
+        $this->assertSame(69, $status['batch']['craft_enchant_set_total_work_units']);
+        $this->assertSame(38, $status['batch']['craft_enchant_set_remaining_work_units']);
+        $this->assertSame(44, $status['batch']['craft_enchant_set_overall_percent']);
+        $this->assertSame(0, $status['batch']['craft_enchant_set_completed_final_count']);
     }
 
     public function testStatusReflectsActiveRetryStateAfterATickWithOneNormalFailure(): void
@@ -2499,6 +2524,71 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(['armour'], $craftOptionValues);
     }
 
+    public function testStatusReturnsTrinketryExperienceSkillProgress(): void
+    {
+        $trinketry = $this->createGameSkill([
+            'name' => 'Trinketry',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 10,
+        ]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($trinketry, 4, false, ['xp' => 70, 'xp_max' => 250])
+            ->getCharacter();
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+
+        $trinketryOption = collect($status['craft_experience_options'])->firstWhere('value', 'trinketry');
+        $this->assertNotNull($trinketryOption);
+        $this->assertSame(BatchCraftingType::TRINKETRY->value, $trinketryOption['batch_type']);
+        $this->assertSame(4, $trinketryOption['current_level']);
+        $this->assertSame(70, $trinketryOption['current_xp']);
+        $this->assertSame(250, $trinketryOption['required_xp']);
+    }
+
+    public function testStatusReturnsAlchemyExperienceSkillProgress(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $alchemySkill = $character->skills->first(function ($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value;
+        });
+        $alchemySkill->baseSkill->update(['max_level' => 10]);
+        $alchemySkill->update(['level' => 4, 'xp' => 70, 'xp_max' => 250]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+
+        $alchemyOption = collect($status['craft_experience_options'])->firstWhere('value', 'alchemy');
+        $this->assertNotNull($alchemyOption);
+        $this->assertSame(BatchCraftingType::ALCHEMY->value, $alchemyOption['batch_type']);
+        $this->assertSame(4, $alchemyOption['current_level']);
+        $this->assertSame(70, $alchemyOption['current_xp']);
+        $this->assertSame(250, $alchemyOption['required_xp']);
+    }
+
+    public function testStatusOmitsMaxedAlchemyAndTrinketryExperienceSkills(): void
+    {
+        $trinketry = $this->createGameSkill([
+            'name' => 'Trinketry',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 5,
+        ]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($trinketry, 5, false, ['xp' => 0, 'xp_max' => 100])
+            ->getCharacter();
+        $alchemySkill = $character->skills->first(function ($skill) {
+            return $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value;
+        });
+        $alchemySkill->baseSkill->update(['max_level' => 5]);
+        $alchemySkill->update(['level' => 5, 'xp' => 0, 'xp_max' => 100]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+
+        $experienceOptionValues = collect($status['craft_experience_options'])->pluck('value');
+        $this->assertFalse($experienceOptionValues->contains('alchemy'));
+        $this->assertFalse($experienceOptionValues->contains('trinketry'));
+    }
+
     public function testCraftForExperienceRejectedWhenAllFourCraftingSkillsMaxed(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
@@ -3287,7 +3377,68 @@ class BatchCraftingServiceTest extends TestCase
         $outcomePoints = $status['batch']['chart_points']['outcomes'] ?? [];
 
         $this->assertNotEmpty($currencyPoints);
-        $this->assertGreaterThan(0, $outcomePoints[0]['success'] ?? 0);
+        $this->assertGreaterThan(0, $outcomePoints[0]['successful'] ?? 0);
+    }
+
+    public function testStatusNormalizesLegacyChartPointsToTheCurrentNumericContract(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $user->id,
+            'progress' => [
+                'chart_points' => [
+                    'currency' => [[
+                        'tick' => '1',
+                        'gold_spent' => '25',
+                        'gold_gained' => null,
+                        'gold_dust_spent' => 'invalid',
+                        'gold_dust_gained' => '4',
+                        'copper_coins_spent' => null,
+                        'shards_spent' => '3',
+                        'listed_value' => '99',
+                    ]],
+                    'outcomes' => [[
+                        'tick' => '1',
+                        'success' => '6',
+                        'failure' => '2',
+                    ]],
+                    'gold_dust' => [[
+                        'tick' => '1',
+                        'gained' => '4',
+                    ]],
+                ],
+            ],
+        ]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+
+        $currencyPoint = $status['batch']['chart_points']['currency'][0];
+        $outcomePoint = $status['batch']['chart_points']['outcomes'][0];
+        $goldDustPoint = $status['batch']['chart_points']['gold_dust'][0];
+
+        $this->assertSame([
+            'tick' => 1,
+            'gold_spent' => 25,
+            'gold_gained' => 0,
+            'gold_dust_spent' => 0,
+            'gold_dust_gained' => 4,
+            'copper_coins_spent' => 0,
+            'shards_spent' => 3,
+            'shards_gained' => 0,
+            'listed_value' => 99,
+        ], $currencyPoint);
+        $this->assertSame([
+            'tick' => 1,
+            'successful' => 6,
+            'failed' => 2,
+            'destroyed' => 0,
+            'skipped' => 0,
+        ], $outcomePoint);
+        $this->assertSame(['tick' => 1, 'gained' => 4], $goldDustPoint);
+        $this->assertArrayNotHasKey('success', $outcomePoint);
+        $this->assertArrayNotHasKey('failure', $outcomePoint);
     }
 
     public function testCancelUpdatesStatusImmediatelyAndBroadcasts(): void
@@ -4099,7 +4250,7 @@ class BatchCraftingServiceTest extends TestCase
         resolve(BatchCraftingService::class)->process($batchCrafting);
         $status = resolve(BatchCraftingService::class)->status($character);
 
-        $this->assertSame(1, $status['batch']['chart_points']['outcomes'][0]['success'] ?? null);
+        $this->assertSame(1, $status['batch']['chart_points']['outcomes'][0]['successful'] ?? null);
     }
 
     public function testChartSuccessCountsDisenchantedActions(): void
@@ -4124,7 +4275,7 @@ class BatchCraftingServiceTest extends TestCase
         resolve(BatchCraftingService::class)->process($batchCrafting);
         $status = resolve(BatchCraftingService::class)->status($character);
 
-        $this->assertSame(1, $status['batch']['chart_points']['outcomes'][0]['success'] ?? null);
+        $this->assertSame(1, $status['batch']['chart_points']['outcomes'][0]['successful'] ?? null);
     }
 
     public function testEnchantSetRequestedRemainingAndProgressUseEligibleTotal(): void
@@ -5788,6 +5939,42 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(3, $preview['effective_craftable_amount']);
     }
 
+    public function testAlchemyAmountPreviewUsesSpecializedAlchemySnapshotDetails(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'inventory_max' => 10]);
+        $item = $this->createItem([
+            'name' => 'Specialized Amount Preview Potion',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'gold_dust_cost' => 1,
+            'shards_cost' => 1,
+            'lasts_for' => 41,
+            'can_stack' => true,
+            'gains_additional_level' => true,
+            'xp_bonus' => 0.37,
+            'increase_stat_by' => 0.19,
+        ]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_item_id' => $item->id, 'alchemy_amount' => 3],
+        ]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+        $snapshot = $status['batch']['alchemy_amount_preview']['selected_item']['full_item_details'];
+
+        $this->assertSame('alchemy', $snapshot['type']);
+        $this->assertSame(41, $snapshot['lasts_for']);
+        $this->assertTrue($snapshot['can_stack']);
+        $this->assertTrue($snapshot['gain_additional_level']);
+        $this->assertSame(0.37, $snapshot['xp_bonus']);
+        $this->assertSame(0.19, $snapshot['stat_increase']);
+    }
+
     public function testHolyOilsSelectedPreviewExposesStacksRemainingCostAndCapped(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
@@ -5844,6 +6031,38 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame(1, $preview['items'][0]['planned_applications']);
         $this->assertFalse($preview['capped']);
         $this->assertNull($preview['unapplied_reason']);
+    }
+
+    public function testHolyOilSetPreviewUsesNumberedNameForUnnamedSet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'inventory_max' => 10]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => 'Battle Gear',
+        ]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+        ]);
+        $selectedSet = $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => null,
+        ]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['holy_oil_mode' => 'set', 'selected_set_id' => $selectedSet->id],
+        ]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+        $setName = $status['batch']['holy_oil_set_preview']['set_name'] ?? null;
+
+        $this->assertSame('Set 2', $setName);
+        $this->assertNotSame('Set', $setName);
     }
 
     public function testCraftAmountAllowsFullRequestWhenCraftedItemsSetHasExactlyEnoughRemainingSpace(): void
@@ -6390,8 +6609,10 @@ class BatchCraftingServiceTest extends TestCase
 
     public function testTrinketryMissingCurrencyPreviewIdentifiesRequiredCurrencyAndAmounts(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $character->update(['shards' => 0, 'inventory_max' => 30]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 4, 'copper_coins' => 7, 'shards' => 1000000, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Preview Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
 
         $preview = resolve(BatchCraftingService::class)->preview($character, [
             'batch_type' => BatchCraftingType::TRINKETRY->value,
@@ -6399,10 +6620,27 @@ class BatchCraftingServiceTest extends TestCase
             'progress' => ['trinketry_mode' => 'experience'],
         ]);
 
-        $this->assertSame('Shards', $preview['cost_breakdown']['currency_label']);
-        $this->assertSame(1, $preview['cost_breakdown']['required_to_start']);
-        $this->assertSame(0, $preview['cost_breakdown']['available_currency_amount']);
-        $this->assertStringContainsString('Shards are awarded by battle rewards and by selling gems.', $preview['cost_breakdown']['message']);
+        $this->assertSame('Gold Dust and Copper Coins', $preview['cost_breakdown']['currency_label']);
+        $this->assertSame(['required' => 10, 'available' => 4, 'missing' => 6], $preview['cost_breakdown']['gold_dust']);
+        $this->assertSame(['required' => 20, 'available' => 7, 'missing' => 13], $preview['cost_breakdown']['copper_coins']);
+        $this->assertFalse($preview['cost_breakdown']['can_afford_start']);
+    }
+
+    public function testTrinketryStartRejectsWithTheQuotedItemAndEveryMissingCurrencyAmount(): void
+    {
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 4, 'copper_coins' => 7, 'shards' => 1000000, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Quoted Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Batch Trinketry cannot start crafting Quoted Trinket. Missing: Gold Dust required 10, available 4, missing 6; Copper Coins required 20, available 7, missing 13.');
+
+        resolve(BatchCraftingService::class)->start($character, [
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
     }
 
     public function testActiveFactionLoyaltyAutomationBlocksBatchCraftingStart(): void
@@ -7193,8 +7431,10 @@ class BatchCraftingServiceTest extends TestCase
 
         $result = (new BatchCraftingService($processor, resolve(CraftingService::class), $logger, resolve(EnchantingService::class), resolve(BatchCraftingSetService::class), resolve(HolyItemService::class)))->processOneOperation($batchCrafting);
 
-        $this->assertSame(3, $result->progress['chart_points']['outcomes'][0]['success'] ?? null);
-        $this->assertSame(3, $result->progress['chart_points']['outcomes'][0]['failure'] ?? null);
+        $this->assertSame(3, $result->progress['chart_points']['outcomes'][0]['successful'] ?? null);
+        $this->assertSame(3, $result->progress['chart_points']['outcomes'][0]['failed'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['destroyed'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['skipped'] ?? null);
     }
 
     public function testCraftAmountChartOutcomeCountsSixSuccessesAndThreeFailures(): void
@@ -7219,8 +7459,10 @@ class BatchCraftingServiceTest extends TestCase
 
         $result = (new BatchCraftingService($processor, resolve(CraftingService::class), $logger, resolve(EnchantingService::class), resolve(BatchCraftingSetService::class), resolve(HolyItemService::class)))->processOneOperation($batchCrafting);
 
-        $this->assertSame(6, $result->progress['chart_points']['outcomes'][0]['success'] ?? null);
-        $this->assertSame(3, $result->progress['chart_points']['outcomes'][0]['failure'] ?? null);
+        $this->assertSame(6, $result->progress['chart_points']['outcomes'][0]['successful'] ?? null);
+        $this->assertSame(3, $result->progress['chart_points']['outcomes'][0]['failed'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['destroyed'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['skipped'] ?? null);
     }
 
     public function testDestroyedEnchantOutcomeCountsAsOneFailureNotOneSuccess(): void
@@ -7243,8 +7485,10 @@ class BatchCraftingServiceTest extends TestCase
 
         $result = (new BatchCraftingService($processor, resolve(CraftingService::class), $logger, resolve(EnchantingService::class), resolve(BatchCraftingSetService::class), resolve(HolyItemService::class)))->processOneOperation($batchCrafting);
 
-        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['success'] ?? null);
-        $this->assertSame(1, $result->progress['chart_points']['outcomes'][0]['failure'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['successful'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['failed'] ?? null);
+        $this->assertSame(1, $result->progress['chart_points']['outcomes'][0]['destroyed'] ?? null);
+        $this->assertSame(0, $result->progress['chart_points']['outcomes'][0]['skipped'] ?? null);
     }
 
     public function testOneTickChartOutcomeDataIsPresentAfterASingleTick(): void
@@ -8014,6 +8258,7 @@ class BatchCraftingServiceTest extends TestCase
         $alchemySkill = $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value);
         $alchemySkill->update(['level' => 1, 'xp' => 100, 'xp_max' => 100]);
         $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'alchemy_bag_limit' => 20]);
+        Item::where('type', 'alchemy')->update(['can_craft' => false]);
         $lowItem = $this->createItem(['name' => 'Keep Best Alchemy Destroy Low Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -8043,6 +8288,13 @@ class BatchCraftingServiceTest extends TestCase
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'copper_coins' => 1000000, 'inventory_max' => 30]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(1000);
+            })
+        );
         $lowTrinket = $this->createItem(['name' => 'Keep Best Trinketry Destroy Low Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         Item::where('type', 'trinket')->where('id', '!=', $lowTrinket->id)->update(['can_craft' => false]);
         $batchCrafting = $this->createBatchCrafting([
@@ -8267,6 +8519,7 @@ class BatchCraftingServiceTest extends TestCase
         $alchemySkill = $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value);
         $alchemySkill->update(['level' => 1, 'xp' => 100, 'xp_max' => 100]);
         $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'alchemy_bag_limit' => 1]);
+        Item::where('type', 'alchemy')->update(['can_craft' => false]);
         $lowItem = $this->createItem(['name' => 'Keep Best Tight Capacity Low Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -8278,7 +8531,7 @@ class BatchCraftingServiceTest extends TestCase
 
         $firstResult = resolve(BatchCraftingService::class)->process($batchCrafting);
         $alchemySkill->refresh()->update(['level' => 2]);
-        $lowItem->update(['can_craft' => false]);
+        Item::where('type', 'alchemy')->update(['can_craft' => false]);
         $highItem = $this->createItem(['name' => 'Keep Best Tight Capacity High Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 2, 'skill_level_trivial' => 400]);
         $firstResult->update(['status' => 'running', 'ended_reason' => null, 'completed_at' => null]);
         $secondResult = resolve(BatchCraftingService::class)->process($firstResult->refresh());
@@ -8508,10 +8761,10 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertArrayHasKey('shards_spent', $point);
     }
 
-    public function testTrinketryChartRecordsShardsSpentAndGoldGainedSeparately(): void
+    public function testTrinketryChartRecordsGoldDustAndCopperSpentAndGoldGainedSeparately(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $character->update(['shards' => 1000, 'inventory_max' => 10]);
+        $character->update(['gold_dust' => 1000, 'copper_coins' => 1000, 'shards' => 1000, 'inventory_max' => 10]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -8521,7 +8774,7 @@ class BatchCraftingServiceTest extends TestCase
         $processor = Mockery::mock(BatchCraftingProcessor::class);
         $processor->shouldReceive('processOneTick')->once()->andReturn([
             'counts' => ['crafted_count' => 1, 'sold_count' => 1],
-            'actions' => [['action' => 'trinketry', 'trinketry_item' => ['item_id' => 1, 'slot_id' => 2], 'gold_gained' => 25]],
+            'actions' => [['action' => 'trinketry', 'trinketry_item' => ['item_id' => 1, 'slot_id' => 2], 'gold_gained' => 25, 'gold_dust_spent' => 10, 'copper_coins_spent' => 20]],
         ]);
         $logger = Mockery::mock(BatchCraftingLogger::class)->shouldIgnoreMissing();
 
@@ -8529,8 +8782,9 @@ class BatchCraftingServiceTest extends TestCase
 
         $point = $result->progress['chart_points']['currency'][0];
         $this->assertSame(25, $point['gold_gained']);
-        $this->assertSame(0, $point['shards_gained']);
-        $this->assertArrayHasKey('shards_spent', $point);
+        $this->assertSame(10, $point['gold_dust_spent']);
+        $this->assertSame(20, $point['copper_coins_spent']);
+        $this->assertSame(0, $point['shards_spent']);
     }
 
     public function testDisenchantChartRecordsGoldSpentAndGoldDustGainedSeparately(): void
@@ -10126,6 +10380,61 @@ class BatchCraftingServiceTest extends TestCase
         $this->assertSame('Inventory', $status['batch']['output_destination_label'] ?? null);
     }
 
+    public function testStatusUsesCustomNameForSelectedInventorySet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => 'Twisted Earth',
+        ]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['enchant_mode' => 'set', 'selected_set_id' => $set->id],
+        ]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+
+        $this->assertSame('Twisted Earth', $status['batch']['selected_set']['name'] ?? null);
+        $this->assertStringNotContainsString('(', $status['batch']['selected_set']['name'] ?? '');
+    }
+
+    public function testStatusUsesNumberedNameForUnnamedSelectedInventorySet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => 'Battle Gear',
+        ]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+        ]);
+        $selectedSet = $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => null,
+        ]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['enchant_mode' => 'set', 'selected_set_id' => $selectedSet->id],
+        ]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+        $name = $status['batch']['selected_set']['name'] ?? null;
+
+        $this->assertSame('Set 2', $name);
+        $this->assertNotSame('Set', $name);
+        $this->assertStringNotContainsString('(', $name ?? '');
+    }
+
     public function testStatusExposesOutputDestinationLabelAsExactSetNameForInventorySetDestination(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
@@ -10141,7 +10450,49 @@ class BatchCraftingServiceTest extends TestCase
 
         $status = resolve(BatchCraftingService::class)->status($character);
 
+        $this->assertSame('My Output Set', $status['batch']['output_set']['name'] ?? null);
         $this->assertSame('My Output Set', $status['batch']['output_destination_label'] ?? null);
+        $this->assertStringNotContainsString('(', $status['batch']['output_set']['name'] ?? '');
+        $this->assertStringNotContainsString('(', $status['batch']['output_destination_label'] ?? '');
+    }
+
+    public function testStatusUsesNumberedNameForUnnamedOutputInventorySet(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => 'Battle Gear',
+        ]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+        ]);
+        $outputSet = $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => null,
+        ]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'output_destination' => 'inventory_set',
+                'output_set_id' => $outputSet->id,
+            ],
+        ]);
+
+        $status = resolve(BatchCraftingService::class)->status($character);
+        $outputSetName = $status['batch']['output_set']['name'] ?? null;
+        $outputDestinationLabel = $status['batch']['output_destination_label'] ?? null;
+
+        $this->assertSame('Set 2', $outputSetName);
+        $this->assertSame('Set 2', $outputDestinationLabel);
+        $this->assertStringNotContainsString('(', $outputSetName ?? '');
+        $this->assertStringNotContainsString('(', $outputDestinationLabel ?? '');
     }
 
     public function testStatusExposesCraftedItemsSetLabelForLegacyBatchWithoutOutputDestination(): void
@@ -10878,8 +11229,10 @@ class BatchCraftingServiceTest extends TestCase
 
     public function testStartStripsOutputDestinationForTrinketryProgress(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $character->update(['shards' => 1000]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 1000, 'copper_coins' => 1000, 'shards' => 1000]);
+        $this->createItem(['name' => 'Strip Destination Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
 
         $batchCrafting = resolve(BatchCraftingService::class)->start($character, [
             'batch_type' => BatchCraftingType::TRINKETRY->value,

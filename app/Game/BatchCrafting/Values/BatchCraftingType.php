@@ -27,7 +27,7 @@ enum BatchCraftingType: string
     {
         return match ($this) {
             self::ALCHEMY, self::HOLY_OILS => 'gold_dust',
-            self::TRINKETRY => 'shards',
+            self::TRINKETRY => 'trinketry_currencies',
             default => 'gold',
         };
     }

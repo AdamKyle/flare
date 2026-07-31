@@ -111,6 +111,11 @@ class WeeklyBattleService
         return ! $weeklyMonsterFight->monster_was_killed;
     }
 
+    public function isWeeklyMonster(Monster $monster): bool
+    {
+        return in_array($monster->only_for_location_type, $this->validLocationTypes, true);
+    }
+
     /**
      * Handle rewarding the player.
      *

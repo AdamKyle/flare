@@ -17,6 +17,7 @@ use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
+use App\Game\Character\CharacterInventory\Exceptions\BatchCraftingDestinationFullException;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
@@ -25,6 +26,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
@@ -50,6 +52,233 @@ use Tests\Traits\CreateScheduledEvent;
 class BatchCraftingProcessorTest extends TestCase
 {
     use CreateAlchemyBagSlot, CreateBatchCrafting, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateScheduledEvent, MockeryPHPUnitIntegration, RefreshDatabase;
+
+    public function testUnexpectedXpEligibleItemLookupExceptionFailsBatchInsteadOfSkipping(): void
+    {
+        $weaponCrafting = $this->createGameSkill([
+            'name' => 'Weapon Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+            'max_level' => 400,
+        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $craftingService = Mockery::mock(CraftingService::class);
+        $craftingService->shouldReceive('fetchCraftableItems')
+            ->once()
+            ->andThrow(new \RuntimeException('craftable item query failed'));
+        $this->instance(CraftingService::class, $craftingService);
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(BatchCraftingEndReason::FAILED->value, $result->ended_reason);
+        $this->assertSame(0, $result->skipped_count);
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(1, \App\Flare\Models\SuggestionAndBugs::query()->count());
+    }
+
+    public function testTrinketryStopsCleanlyForInsufficientGoldDust(): void
+    {
+        Event::fake();
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 9, 'copper_coins' => 100, 'shards' => 1000000, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Dusty Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES->value, $result->ended_reason);
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(0, $result->skipped_count);
+        $this->assertStringContainsString('Gold Dust required 10, available 9, missing 1', $result->progress['trinketry_end_message']);
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+    }
+
+    public function testTrinketryStopsCleanlyForInsufficientCopperCoins(): void
+    {
+        Event::fake();
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 100, 'copper_coins' => 9, 'shards' => 1000000, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Copper Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES->value, $result->ended_reason);
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(0, $result->skipped_count);
+        $this->assertStringContainsString('Copper Coins required 10, available 9, missing 1', $result->progress['trinketry_end_message']);
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+    }
+
+    public function testTrinketryReportsBothMissingCurrenciesAndIgnoresHighShardBalance(): void
+    {
+        Event::fake();
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 1, 'copper_coins' => 2, 'shards' => 999999999, 'inventory_max' => 30]);
+        $this->createItem(['name' => 'Dual Cost Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES->value, $result->ended_reason);
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(0, $result->skipped_count);
+        $this->assertStringContainsString('Gold Dust required 10, available 1, missing 9', $result->progress['trinketry_end_message']);
+        $this->assertStringContainsString('Copper Coins required 20, available 2, missing 18', $result->progress['trinketry_end_message']);
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+    }
+
+    public function testTrinketryDestinationFullRaceEndsCleanlyWithoutFailure(): void
+    {
+        Event::fake();
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 100, 'copper_coins' => 100, 'inventory_max' => 30]);
+        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 10]);
+        $item = $this->createItem(['name' => 'Racing Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $this->instance(TrinketCraftingService::class, Mockery::mock(TrinketCraftingService::class, function ($mock) use ($character, $item) {
+            $mock->shouldReceive('fetchItemsToCraft')->once()->with(Mockery::type(\App\Flare\Models\Character::class), false)->andReturn([$item->toArray()]);
+            $mock->shouldReceive('craftingCost')->once()->with(Mockery::type(\App\Flare\Models\Character::class), Mockery::type(Item::class))->andReturn([
+                'item_id' => $item->id,
+                'item_name' => $item->name,
+                'gold_dust' => ['required' => 10, 'available' => 100, 'missing' => 0],
+                'copper_coins' => ['required' => 20, 'available' => 100, 'missing' => 0],
+            ]);
+            $mock->shouldReceive('craftForBatch')->once()->andThrow(
+                new BatchCraftingDestinationFullException('destination filled after precheck'),
+            );
+        }));
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(
+            BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL->value,
+            $result->ended_reason,
+            json_encode($result->progress),
+        );
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(0, $result->skipped_count);
+    }
+
+    public function testTrinketryAffordabilityRaceEndsCleanlyWithOneDetailedMessage(): void
+    {
+        Event::fake();
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 100, 'copper_coins' => 100, 'shards' => 1000000, 'inventory_max' => 30]);
+        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 10]);
+        $item = $this->createItem(['name' => 'Affordability Race Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $this->instance(TrinketCraftingService::class, Mockery::mock(TrinketCraftingService::class, function ($mock) use ($item) {
+            $mock->shouldReceive('fetchItemsToCraft')->once()->andReturn([$item->toArray()]);
+            $mock->shouldReceive('craftingCost')->once()->andReturn([
+                'item_id' => $item->id,
+                'item_name' => $item->name,
+                'gold_dust' => ['required' => 10, 'available' => 100, 'missing' => 0],
+                'copper_coins' => ['required' => 20, 'available' => 100, 'missing' => 0],
+            ]);
+            $mock->shouldReceive('craftForBatch')->once()->andReturn([
+                'success' => false,
+                'item' => null,
+                'reason' => 'not_enough_currency',
+                'destination' => null,
+                'cost' => [
+                    'item_id' => $item->id,
+                    'item_name' => $item->name,
+                    'gold_dust' => ['required' => 10, 'available' => 4, 'missing' => 6],
+                    'copper_coins' => ['required' => 20, 'available' => 7, 'missing' => 13],
+                ],
+            ]);
+        }));
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES->value, $result->ended_reason);
+        $this->assertSame(0, $result->failed_count);
+        $this->assertSame(0, $result->skipped_count);
+        $this->assertStringContainsString('Affordability Race Trinket', $result->progress['trinketry_end_message']);
+        $this->assertStringContainsString('Gold Dust required 10, available 4, missing 6', $result->progress['trinketry_end_message']);
+        $this->assertStringContainsString('Copper Coins required 20, available 7, missing 13', $result->progress['trinketry_end_message']);
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+    }
+
+    public function testGenuineTrinketryFailedRollRemainsFailureAndCanContinue(): void
+    {
+        Event::fake();
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character->update(['gold_dust' => 100, 'copper_coins' => 100, 'inventory_max' => 30]);
+        $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 10]);
+        $item = $this->createItem(['name' => 'Failed Roll Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $this->instance(TrinketCraftingService::class, Mockery::mock(TrinketCraftingService::class, function ($mock) use ($character, $item) {
+            $mock->shouldReceive('fetchItemsToCraft')->times(6)->with(Mockery::type(\App\Flare\Models\Character::class), false)->andReturn([$item->toArray()]);
+            $mock->shouldReceive('craftingCost')->times(6)->andReturn([
+                'item_id' => $item->id,
+                'item_name' => $item->name,
+                'gold_dust' => ['required' => 10, 'available' => 100, 'missing' => 0],
+                'copper_coins' => ['required' => 20, 'available' => 100, 'missing' => 0],
+            ]);
+            $mock->shouldReceive('craftForBatch')->times(6)->andReturn([
+                'success' => false,
+                'item' => null,
+                'reason' => 'failed_roll',
+                'destination' => null,
+            ]);
+        }));
+        $batch = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['trinketry_mode' => 'experience'],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batch);
+
+        $this->assertSame(6, $result->failed_count, json_encode($result->progress));
+        $this->assertNull($result->ended_reason);
+        $this->assertNull($result->completed_at);
+    }
 
     public function testCraftEnchantSetCraftPhaseCraftsSelectedItemIdInsteadOfHighestCraftableItem(): void
     {
@@ -1120,6 +1349,100 @@ class BatchCraftingProcessorTest extends TestCase
         $craftedCount = collect($result->action_log)->filter(fn (array $entry) => ($entry['action_type'] ?? null) === 'event_fallback_craft' && ($entry['status'] ?? null) === 'crafted')->count();
 
         $this->assertSame(23, $craftedCount);
+    }
+
+    public function testRetainedAlchemyActionExposesLiveAlchemyBagSlotAndSpecializedDetails(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 20]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
+        Item::where('type', 'alchemy')->update(['can_craft' => false]);
+        $item = $this->createItem([
+            'name' => 'Retained Specialized Alchemy Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 400,
+            'gold_dust_cost' => 1,
+            'shards_cost' => 1,
+            'lasts_for' => 17,
+            'can_stack' => true,
+            'gains_additional_level' => true,
+            'xp_bonus' => 0.23,
+            'increase_stat_by' => 0.14,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_amount_count' => 0, 'alchemy_item_id' => $item->id],
+        ]);
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $action = collect($result->action_log)->first(fn (array $entry) => isset($entry['kept_item']));
+        $retainedSlotId = $action['kept_item']['alchemy_slot_id'];
+
+        $this->assertSame(BatchCraftingEndReason::AMOUNT_REACHED->value, $result->ended_reason);
+        $this->assertTrue($action['kept_item']['can_view']);
+        $this->assertSame($retainedSlotId, $action['kept_item']['slot_id']);
+        $this->assertTrue(AlchemyBagSlot::where('character_id', $character->id)->whereKey($retainedSlotId)->exists());
+        $this->assertSame('alchemy', $action['kept_item']['full_item_details']['type']);
+        $this->assertSame(17, $action['kept_item']['full_item_details']['lasts_for']);
+        $this->assertTrue($action['kept_item']['full_item_details']['can_stack']);
+        $this->assertTrue($action['kept_item']['full_item_details']['gain_additional_level']);
+        $this->assertSame(0.23, $action['kept_item']['full_item_details']['xp_bonus']);
+        $this->assertSame(0.14, $action['kept_item']['full_item_details']['stat_increase']);
+    }
+
+    public function testRemovedAlchemyActionKeepsSpecializedSnapshotWithoutLiveSlot(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 20]);
+        $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
+        Item::where('type', 'alchemy')->update(['can_craft' => false]);
+        $item = $this->createItem([
+            'name' => 'Removed Specialized Alchemy Item',
+            'type' => 'alchemy',
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 400,
+            'gold_dust_cost' => 1,
+            'shards_cost' => 1,
+            'lasts_for' => 29,
+            'can_stack' => false,
+            'gains_additional_level' => true,
+            'xp_bonus' => 0.31,
+            'increase_stat_by' => 0.16,
+        ]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_amount_count' => 0, 'alchemy_item_id' => $item->id],
+        ]);
+        $bagCountBefore = $character->getAlchemyBagCount();
+
+        $result = resolve(BatchCraftingService::class)->process($batchCrafting);
+        $action = collect($result->action_log)->first(fn (array $entry) => isset($entry['destroyed_item']));
+        $snapshot = $action['destroyed_item'];
+
+        $this->assertSame(BatchCraftingEndReason::AMOUNT_REACHED->value, $result->ended_reason);
+        $this->assertSame($bagCountBefore, $character->refresh()->getAlchemyBagCount());
+        $this->assertFalse($snapshot['can_view']);
+        $this->assertNull($snapshot['alchemy_slot_id']);
+        $this->assertNull($snapshot['item_id_for_modal']);
+        $this->assertNull($snapshot['slot_id_for_modal']);
+        $this->assertSame('destroyed', $snapshot['status']);
+        $this->assertSame('alchemy', $snapshot['full_item_details']['type']);
+        $this->assertSame(29, $snapshot['full_item_details']['lasts_for']);
+        $this->assertFalse($snapshot['full_item_details']['can_stack']);
+        $this->assertTrue($snapshot['full_item_details']['gain_additional_level']);
+        $this->assertSame(0.31, $snapshot['full_item_details']['xp_bonus']);
+        $this->assertSame(0.16, $snapshot['full_item_details']['stat_increase']);
     }
 
     public function testAlchemyUseNowEmitsAggregateUsedMessageForUsableBoonItem(): void

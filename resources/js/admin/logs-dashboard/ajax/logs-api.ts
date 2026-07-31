@@ -2,9 +2,9 @@ import axios from "axios";
 import { handleUnauthenticatedAxiosRequest } from "../../../game/lib/ajax/unauthenticated-response-handler";
 import {
     LogEntriesPage,
+    LogEntry,
     LogFileInfo,
     LogFilters,
-    LogSummary,
     LogsPollResponse,
     SystemBugReport,
 } from "../types/logs-dashboard";
@@ -19,28 +19,29 @@ export async function fetchLogFiles(): Promise<LogFileInfo[]> {
     ).data;
 }
 
-export async function fetchLogEntries(
+export async function fetchLogEntryDetail(
     fileKey: string,
-    filters: LogFilters,
-    page: number,
-): Promise<LogEntriesPage> {
+    detailId: string,
+): Promise<LogEntry> {
     return (
         await handleUnauthenticatedAxiosRequest(
-            axios.get<LogEntriesPage>(`${base}/entries`, {
-                params: { file: fileKey, ...filters, page },
+            axios.get<LogEntry>(`${base}/entry-detail`, {
+                params: { file: fileKey, detail_id: detailId },
             }),
         )
     ).data;
 }
 
-export async function fetchLogSummary(
+export async function fetchLogEntries(
     fileKey: string,
     filters: LogFilters,
-): Promise<LogSummary> {
+    page: number,
+    cursor?: string | null,
+): Promise<LogEntriesPage> {
     return (
         await handleUnauthenticatedAxiosRequest(
-            axios.get<LogSummary>(`${base}/summary`, {
-                params: { file: fileKey, ...filters },
+            axios.get<LogEntriesPage>(`${base}/entries`, {
+                params: { file: fileKey, ...filters, page, cursor },
             }),
         )
     ).data;

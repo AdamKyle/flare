@@ -59,7 +59,7 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
 
     Route::get('/admin/monitoring/logs/files', ['uses' => 'Api\AdminLogsDashboardController@files']);
     Route::get('/admin/monitoring/logs/entries', ['uses' => 'Api\AdminLogsDashboardController@entries']);
-    Route::get('/admin/monitoring/logs/summary', ['uses' => 'Api\AdminLogsDashboardController@summary']);
+    Route::get('/admin/monitoring/logs/entry-detail', ['uses' => 'Api\AdminLogsDashboardController@entryDetail']);
     Route::get('/admin/monitoring/logs/poll', ['uses' => 'Api\AdminLogsDashboardController@poll']);
     Route::get('/admin/monitoring/logs/bugs', ['uses' => 'Api\AdminLogsDashboardController@bugs']);
     Route::get('/admin/monitoring/logs/bug-chart', ['uses' => 'Api\AdminLogsDashboardController@bugChart']);

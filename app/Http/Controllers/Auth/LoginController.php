@@ -84,6 +84,15 @@ class LoginController extends Controller
 
                 $character = $this->guard()->user()->character;
 
+                if (is_null($character->inventory)) {
+                    $this->guard()->user()->update(['will_be_deleted' => true]);
+                    $this->guard()->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+
+                    return redirect()->to('/login')->with('error', 'Your previous character no longer exists. Please create a new character.');
+                }
+
                 LoginMessage::dispatch($character)->delay(now()->addSeconds(5));
 
                 $guideQuest = $this->guideQuestService->fetchQuestForCharacter($character);

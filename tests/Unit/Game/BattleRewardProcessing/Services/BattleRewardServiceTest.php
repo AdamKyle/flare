@@ -277,7 +277,7 @@ class BattleRewardServiceTest extends TestCase
         $this->assertEquals($monster->xp, $character->xp - $initialXp);
     }
 
-    public function testShouldUpdateCharacterCurrenciesWhenLoggedIn(): void
+    public function testCurrencyMutationDoesNotSynchronouslyBroadcastWhenLoggedIn(): void
     {
         $character = $this->characterFactory->getCharacter();
 
@@ -301,7 +301,7 @@ class BattleRewardServiceTest extends TestCase
 
         $this->battleRewardService->setUp($character->id, $monster->id)->processRewards();
 
-        Event::assertDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
     }
 
     public function testBattleRewardsPassActualGoldGainedIntoGoldRush(): void

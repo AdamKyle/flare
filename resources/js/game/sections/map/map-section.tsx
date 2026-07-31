@@ -24,6 +24,8 @@ import Kingdoms from "../../components/kingdoms/map-pins/kingdoms";
 import Draggable from "react-draggable";
 
 export default class MapSection extends React.Component<MapProps, MapState> {
+    private mapNodeRef = React.createRef<HTMLDivElement>();
+
     private mapTimeOut: any;
 
     private explorationTimeOut: any;
@@ -275,6 +277,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
             <Fragment>
                 <div className="overflow-hidden max-h-[315px] max-w-[514px] sm:border-2 lg:border-0 sm:mr-auto sm:ml-auto lg:max-w-full lg:mr-0 lg:ml-0">
                     <Draggable
+                        nodeRef={this.mapNodeRef}
                         position={this.state.map_position}
                         bounds={{
                             top: -2200,
@@ -288,7 +291,7 @@ export default class MapSection extends React.Component<MapProps, MapState> {
                         scale={1}
                         onDrag={this.handleDrag.bind(this)}
                     >
-                        <div>
+                        <div ref={this.mapNodeRef}>
                             <div
                                 className="handle game-map"
                                 style={getStyle(this)}

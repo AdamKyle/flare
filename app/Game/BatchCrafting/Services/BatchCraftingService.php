@@ -15,6 +15,7 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\SetSlot;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\BatchCrafting\Events\BatchCraftingStatusUpdated;
@@ -60,6 +61,17 @@ class BatchCraftingService
     public const IMMEDIATE_DELAY_SECONDS = 2;
 
     public const INITIAL_FINITE_DELAY_SECONDS = 60;
+
+    public static function eventCraftQueue(): array
+    {
+        return [
+            ['type' => 'weapon', 'crafting_type' => 'weapon'],
+            ['type' => 'armour', 'crafting_type' => 'armour'],
+            ['type' => 'ring', 'crafting_type' => 'ring'],
+            ['type' => ItemType::SPELL_DAMAGE->value, 'crafting_type' => 'spell'],
+            ['type' => ItemType::SPELL_HEALING->value, 'crafting_type' => 'spell'],
+        ];
+    }
 
     private readonly GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
 
@@ -128,7 +140,7 @@ class BatchCraftingService
             ]);
         }
 
-        if ($this->currencyAmount($character, $type->requiredCurrency()) <= 0) {
+        if ($type !== BatchCraftingType::TRINKETRY && $this->currencyAmount($character, $type->requiredCurrency()) <= 0) {
             throw ValidationException::withMessages([
                 'batch_crafting' => $this->missingRequiredCurrencyMessage($character, $type),
             ]);
@@ -368,7 +380,7 @@ class BatchCraftingService
 
             return [
                 'destination' => 'inventory_set',
-                'destination_label' => $outputSet->name ?? 'Set',
+                'destination_label' => $this->inventorySetDisplayName($character, $outputSet),
                 'current' => $outputSet->currentSlotCount(),
                 'max' => $outputSet->max_slots,
                 'remaining' => $outputSet->remainingSlots(),
@@ -429,11 +441,16 @@ class BatchCraftingService
         }
 
         if ($type === BatchCraftingType::TRINKETRY) {
+            $blockers = $this->trinketryStartBlockers($character);
+
             if (! $this->requiresCraftedItemsSetCapacity($type, $progress, $disposition)) {
-                return [];
+                return $blockers;
             }
 
-            return $this->craftedItemsSetCapacityBlockers($character, $this->retainedCraftedItemsSetSlots($type, $progress, $disposition));
+            return array_merge(
+                $blockers,
+                $this->craftedItemsSetCapacityBlockers($character, $this->retainedCraftedItemsSetSlots($type, $progress, $disposition)),
+            );
         }
 
         if ($type === BatchCraftingType::ALCHEMY && ($progress['alchemy_mode'] ?? null) === 'experience') {
@@ -445,6 +462,40 @@ class BatchCraftingService
         }
 
         return [];
+    }
+
+    private function trinketryStartBlockers(Character $character): array
+    {
+        $cost = $this->processor->trinketryCostPreview($character);
+
+        if (is_null($cost)) {
+            return [[
+                'code' => 'trinketry_item_unavailable',
+                'message' => 'No XP-eligible trinket is currently available.',
+                'blocking' => true,
+            ]];
+        }
+
+        $missingCurrencies = [];
+
+        foreach (['gold_dust' => 'Gold Dust', 'copper_coins' => 'Copper Coins'] as $currency => $label) {
+            if ($cost[$currency]['missing'] > 0) {
+                $missingCurrencies[] = $label
+                    .' required '.number_format($cost[$currency]['required'])
+                    .', available '.number_format($cost[$currency]['available'])
+                    .', missing '.number_format($cost[$currency]['missing']);
+            }
+        }
+
+        if (empty($missingCurrencies)) {
+            return [];
+        }
+
+        return [[
+            'code' => 'trinketry_insufficient_currencies',
+            'message' => 'Batch Trinketry cannot start crafting '.$cost['item_name'].'. Missing: '.implode('; ', $missingCurrencies).'.',
+            'blocking' => true,
+        ]];
     }
 
     /**
@@ -1028,6 +1079,44 @@ class BatchCraftingService
 
     private function costBreakdown(Character $character, BatchCraftingType $type, array $progress, array $selectedItemIds, array $selectedOilIds, BatchCraftingDisposition $disposition): array
     {
+        if ($type === BatchCraftingType::TRINKETRY) {
+            $cost = $this->processor->trinketryCostPreview($character);
+
+            if (is_null($cost)) {
+                return [
+                    'currency' => 'trinketry_currencies',
+                    'currency_label' => 'Gold Dust and Copper Coins',
+                    'required_to_start' => 0,
+                    'available_currency_amount' => null,
+                    'can_afford_start' => false,
+                    'total_cost_known' => false,
+                    'total_required' => null,
+                    'effective_amount' => 0,
+                    'destination' => null,
+                    'source_hint' => null,
+                    'message' => 'No XP-eligible trinket is currently available.',
+                ];
+            }
+
+            return [
+                'currency' => 'trinketry_currencies',
+                'currency_label' => 'Gold Dust and Copper Coins',
+                'required_to_start' => null,
+                'available_currency_amount' => null,
+                'can_afford_start' => $cost['gold_dust']['missing'] === 0
+                    && $cost['copper_coins']['missing'] === 0,
+                'total_cost_known' => true,
+                'total_required' => null,
+                'effective_amount' => 1,
+                'destination' => null,
+                'source_hint' => null,
+                'message' => null,
+                'trinket' => ['id' => $cost['item_id'], 'name' => $cost['item_name']],
+                'gold_dust' => $cost['gold_dust'],
+                'copper_coins' => $cost['copper_coins'],
+            ];
+        }
+
         $currency = $type->requiredCurrency();
         $available = $this->currencyAmount($character, $currency);
         $breakdown = [
@@ -1099,10 +1188,6 @@ class BatchCraftingService
         }
 
         if ($type === BatchCraftingType::ALCHEMY) {
-            $breakdown['message'] = $this->missingRequiredCurrencyMessage($character, $type);
-        }
-
-        if ($type === BatchCraftingType::TRINKETRY) {
             $breakdown['message'] = $this->missingRequiredCurrencyMessage($character, $type);
         }
 
@@ -1369,11 +1454,11 @@ class BatchCraftingService
                 'completed_amount' => $this->completedAmount($progress),
                 'remaining_amount' => $this->remainingAmount($progress),
                 'completion_summary' => $this->craftCompletionSummary($type, $progress),
-                'selected_set' => $this->selectedSetSummary($progress),
+                'selected_set' => $this->selectedSetSummary($character, $progress),
                 'output_destination' => $progress['output_destination'] ?? null,
                 'output_destination_label' => $this->outputDestinationLabel($character, $progress),
                 'output_set' => $this->outputSetSummary($character, $progress),
-                'chart_points' => $progress['chart_points'] ?? ['currency' => [], 'outcomes' => [], 'gold_dust' => []],
+                'chart_points' => $this->normalizedChartPoints($progress['chart_points'] ?? []),
                 'current_item_name' => $currentItemSnapshot['name'] ?? null,
                 'current_item_snapshot' => $currentItemSnapshot,
                 'current_crafted_item_snapshot' => $this->latestActionSnapshot($actionLog, 'crafted_item'),
@@ -1392,6 +1477,8 @@ class BatchCraftingService
                 'gold_dust_spent_total' => (int) ($progress['currency_totals']['gold_dust_spent'] ?? 0),
                 'gold_dust_gained_total' => (int) ($progress['currency_totals']['gold_dust_gained'] ?? 0),
                 'gold_dust_left' => (int) $character->gold_dust,
+                'copper_coins_spent_total' => (int) ($progress['currency_totals']['copper_coins_spent'] ?? 0),
+                'copper_coins_left' => (int) $character->copper_coins,
                 'shards_spent_total' => (int) ($progress['currency_totals']['shards_spent'] ?? 0),
                 'shards_gained_total' => (int) ($progress['currency_totals']['shards_gained'] ?? 0),
                 'shards_left' => (int) $character->shards,
@@ -1461,7 +1548,7 @@ class BatchCraftingService
                     : null,
                 'holy_oil_set_preview' => ($progress['holy_oil_mode'] ?? 'selected') === 'set'
                     ? array_merge(
-                        ['set_name' => $this->selectedSetSummary($progress)['name'] ?? 'Set'],
+                        ['set_name' => $this->selectedSetSummary($character, $progress)['name'] ?? 'Inventory Set'],
                         $progress['holy_oil_application_plan'] ?? $this->holyOilsSetPreview($character, $type, $batchCrafting->selected_oils ?? [], $progress) ?? [],
                     )
                     : null,
@@ -1555,7 +1642,7 @@ class BatchCraftingService
         $type = BatchCraftingType::from($batchCrafting->batch_type);
         $currency = $progress['required_currency'] ?? $type->requiredCurrency();
 
-        if ($this->currencyAmount($character, $currency) <= 0) {
+        if ($type !== BatchCraftingType::TRINKETRY && $this->currencyAmount($character, $currency) <= 0) {
             return $this->complete($batchCrafting, $this->currencyEndReason($currency));
         }
 
@@ -1919,9 +2006,12 @@ class BatchCraftingService
             ? min($requested, max(0, (int) $progress['craft_enchant_set_surviving_crafted_count']))
             : min($requested, max(0, (int) ($progress['craft_enchant_set_craft_index'] ?? 0)));
         $enchantCompleted = min($requested, max(0, (int) ($progress['craft_enchant_set_enchant_index'] ?? 0)));
+        $finalizeCompleted = min($requested, max(0, (int) ($progress['craft_enchant_set_finalize_index'] ?? 0)));
         $queueCount = count($progress['craft_enchant_set_queue'] ?? []);
-        $totalWorkUnits = $requested > 0 ? $requested : $queueCount;
-        $completedWorkUnits = min($totalWorkUnits, max(0, (int) ($progress['craft_enchant_set_completed_final_count'] ?? 0)));
+        $derivedTotalWorkUnits = ($requested > 0 ? $requested : $queueCount) * 3;
+        $totalWorkUnits = max(0, (int) ($progress['craft_enchant_set_total_work_units'] ?? $derivedTotalWorkUnits));
+        $derivedCompletedWorkUnits = $craftCompleted + $enchantCompleted + $finalizeCompleted;
+        $completedWorkUnits = min($totalWorkUnits, max(0, (int) ($progress['craft_enchant_set_completed_work_units'] ?? $derivedCompletedWorkUnits)));
         $remainingWorkUnits = max(0, $totalWorkUnits - $completedWorkUnits);
 
         $overallPercent = $totalWorkUnits === 0
@@ -1931,6 +2021,7 @@ class BatchCraftingService
         return [
             'craft_enchant_set_craft_completed_count' => $craftCompleted,
             'craft_enchant_set_enchant_completed_count' => $enchantCompleted,
+            'craft_enchant_set_finalize_completed_count' => $finalizeCompleted,
             'craft_enchant_set_total_work_units' => $totalWorkUnits,
             'craft_enchant_set_completed_work_units' => $completedWorkUnits,
             'craft_enchant_set_remaining_work_units' => $remainingWorkUnits,
@@ -2107,7 +2198,7 @@ class BatchCraftingService
 
         $user = $batchCrafting->user()->first();
 
-        if (! is_null($user)) {
+        if (! is_null($user) && $reason !== BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES) {
             event(new ServerMessageEvent($user, $playerMessage));
         }
 
@@ -2219,6 +2310,7 @@ class BatchCraftingService
     {
         $progress = $batchCrafting->progress ?? [];
         $totals = array_merge([
+            'successful' => 0,
             'crafted' => 0,
             'enchanted' => 0,
             'disenchanted' => 0,
@@ -2227,6 +2319,7 @@ class BatchCraftingService
             'applied' => 0,
             'skipped' => 0,
             'failed' => 0,
+            'destroyed' => 0,
         ], $progress['outcome_totals'] ?? []);
 
         $totals['crafted'] += (int) ($counts['crafted_count'] ?? 0);
@@ -2235,6 +2328,13 @@ class BatchCraftingService
         $totals['applied'] += (int) ($counts['applied_count'] ?? 0);
         $totals['skipped'] += (int) ($counts['skipped_count'] ?? 0);
         $totals['failed'] += (int) ($counts['failed_count'] ?? 0);
+        $totals['destroyed'] += (int) ($counts['destroyed_count'] ?? 0);
+
+        foreach ($actions as $action) {
+            if (! in_array($this->actionStatus($action), ['failed', 'destroyed', 'skipped'], true)) {
+                $totals['successful']++;
+            }
+        }
 
         foreach ($actions as $action) {
             if (isset($action['alchemy_item'])) {
@@ -2277,7 +2377,7 @@ class BatchCraftingService
 
     private function recordChartPoint(BatchCrafting $batchCrafting, string $currency, int $currencyBefore, array $counts, array $actions): void
     {
-        [$successCount, $failureCount] = $this->chartOutcomeCounts($counts, $actions);
+        $outcomeCounts = $this->chartOutcomeCounts($counts, $actions);
 
         $goldGained = collect($actions)->sum(fn (array $action) => (int) ($action['gold_gained'] ?? 0));
         $goldDustGained = collect($actions)->sum(fn (array $action) => (int) ($action['gold_dust_gained'] ?? 0));
@@ -2304,18 +2404,73 @@ class BatchCraftingService
             'tick' => $tick,
             'gold_spent' => $goldSpent,
             'gold_gained' => $goldGained,
-            'gold_dust_spent' => $goldDustSpent,
+            'gold_dust_spent' => $goldDustSpent
+                + collect($actions)->sum(fn (array $action) => (int) ($action['gold_dust_spent'] ?? 0)),
             'gold_dust_gained' => $goldDustGained,
+            'copper_coins_spent' => collect($actions)->sum(fn (array $action) => (int) ($action['copper_coins_spent'] ?? 0)),
             'shards_spent' => $shardsSpent,
             'shards_gained' => 0,
             'listed_value' => $listedValue,
         ];
-        $chartPoints['outcomes'][] = ['tick' => $tick, 'success' => $successCount, 'failure' => $failureCount];
+        $chartPoints['outcomes'][] = [
+            'tick' => $tick,
+            'successful' => $outcomeCounts['successful'],
+            'failed' => $outcomeCounts['failed'],
+            'destroyed' => $outcomeCounts['destroyed'],
+            'skipped' => $outcomeCounts['skipped'],
+        ];
         $chartPoints['gold_dust'][] = ['tick' => $tick, 'gained' => $goldDustGained];
 
         $progress['chart_points'] = $chartPoints;
         $progress['currency_totals'] = $this->accumulatedCurrencyTotals($progress, $currency, $spent, $actions);
         $batchCrafting->update(['progress' => $progress]);
+    }
+
+    private function normalizedChartPoints(mixed $chartPoints): array
+    {
+        if (! is_array($chartPoints)) {
+            $chartPoints = [];
+        }
+
+        $currencyPoints = is_array($chartPoints['currency'] ?? null) ? $chartPoints['currency'] : [];
+        $outcomePoints = is_array($chartPoints['outcomes'] ?? null) ? $chartPoints['outcomes'] : [];
+        $goldDustPoints = is_array($chartPoints['gold_dust'] ?? null) ? $chartPoints['gold_dust'] : [];
+
+        return [
+            'currency' => array_values(array_map(fn (mixed $point): array => [
+                'tick' => $this->chartInteger($point, 'tick'),
+                'gold_spent' => $this->chartInteger($point, 'gold_spent'),
+                'gold_gained' => $this->chartInteger($point, 'gold_gained'),
+                'gold_dust_spent' => $this->chartInteger($point, 'gold_dust_spent'),
+                'gold_dust_gained' => $this->chartInteger($point, 'gold_dust_gained'),
+                'copper_coins_spent' => $this->chartInteger($point, 'copper_coins_spent'),
+                'shards_spent' => $this->chartInteger($point, 'shards_spent'),
+                'shards_gained' => $this->chartInteger($point, 'shards_gained'),
+                'listed_value' => $this->chartInteger($point, 'listed_value'),
+            ], $currencyPoints)),
+            'outcomes' => array_values(array_map(fn (mixed $point): array => [
+                'tick' => $this->chartInteger($point, 'tick'),
+                'successful' => $this->chartInteger($point, 'successful', 'success'),
+                'failed' => $this->chartInteger($point, 'failed', 'failure'),
+                'destroyed' => $this->chartInteger($point, 'destroyed'),
+                'skipped' => $this->chartInteger($point, 'skipped'),
+            ], $outcomePoints)),
+            'gold_dust' => array_values(array_map(fn (mixed $point): array => [
+                'tick' => $this->chartInteger($point, 'tick'),
+                'gained' => $this->chartInteger($point, 'gained'),
+            ], $goldDustPoints)),
+        ];
+    }
+
+    private function chartInteger(mixed $point, string $key, ?string $legacyKey = null): int
+    {
+        if (! is_array($point)) {
+            return 0;
+        }
+
+        $value = $point[$key] ?? ($legacyKey === null ? 0 : ($point[$legacyKey] ?? 0));
+
+        return is_numeric($value) ? (int) $value : 0;
     }
 
     private function accumulatedCurrencyTotals(array $progress, string $currency, int $spent, array $actions): array
@@ -2325,6 +2480,7 @@ class BatchCraftingService
             'gold_gained' => 0,
             'gold_dust_spent' => 0,
             'gold_dust_gained' => 0,
+            'copper_coins_spent' => 0,
             'shards_spent' => 0,
             'shards_gained' => 0,
             'listed_value' => 0,
@@ -2340,6 +2496,8 @@ class BatchCraftingService
 
         $totals['gold_gained'] += collect($actions)->sum(fn (array $action) => (int) ($action['gold_gained'] ?? 0));
         $totals['gold_dust_gained'] += collect($actions)->sum(fn (array $action) => (int) ($action['gold_dust_gained'] ?? 0));
+        $totals['gold_dust_spent'] += collect($actions)->sum(fn (array $action) => (int) ($action['gold_dust_spent'] ?? 0));
+        $totals['copper_coins_spent'] += collect($actions)->sum(fn (array $action) => (int) ($action['copper_coins_spent'] ?? 0));
         $totals['listed_value'] = ((int) ($totals['listed_value'] ?? 0)) + collect($actions)->sum(fn (array $action) => (int) ($action['listed_price'] ?? 0));
 
         return $totals;
@@ -2531,6 +2689,7 @@ class BatchCraftingService
             ['value' => 'enchanting', 'label' => 'Enchanting', 'skill_name' => 'Enchanting', 'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value],
             ['value' => 'disenchanting', 'label' => 'Disenchanting', 'skill_name' => 'Disenchanting', 'batch_type' => null],
             ['value' => 'trinketry', 'label' => 'Trinketry', 'skill_name' => 'Trinketry', 'batch_type' => BatchCraftingType::TRINKETRY->value],
+            ['value' => 'alchemy', 'label' => 'Alchemy', 'skill_name' => 'Alchemy', 'batch_type' => BatchCraftingType::ALCHEMY->value],
             ['value' => 'gem_crafting', 'label' => 'Gem Crafting', 'skill_name' => 'Gem Crafting', 'batch_type' => null],
         ])->map(function (array $option) use ($skills): array {
             $skill = $skills->first(fn ($characterSkill) => $characterSkill->name === $option['skill_name'] || $characterSkill->baseSkill?->name === $option['skill_name']);
@@ -2857,7 +3016,7 @@ class BatchCraftingService
         return ucwords(str_replace('_', ' ', $last['action_type'] ?? $last['action'] ?? 'batch action'));
     }
 
-    private function selectedSetSummary(array $progress): ?array
+    private function selectedSetSummary(Character $character, array $progress): ?array
     {
         $setId = $progress['selected_set_id'] ?? null;
 
@@ -2865,7 +3024,7 @@ class BatchCraftingService
             return null;
         }
 
-        $set = InventorySet::find($setId);
+        $set = InventorySet::where('id', $setId)->where('character_id', $character->id)->first();
 
         if (is_null($set)) {
             return null;
@@ -2873,7 +3032,7 @@ class BatchCraftingService
 
         return [
             'id' => $set->id,
-            'name' => $set->name ?? 'Set',
+            'name' => $this->inventorySetDisplayName($character, $set),
             'current_slots' => $set->currentSlotCount(),
             'max_slots' => $set->max_slots,
             'remaining_slots' => $set->remainingSlots(),
@@ -2899,7 +3058,7 @@ class BatchCraftingService
 
         return [
             'id' => $set->id,
-            'name' => $set->name ?? 'Set',
+            'name' => $this->inventorySetDisplayName($character, $set),
             'current_slots' => $set->currentSlotCount(),
             'max_slots' => $set->max_slots,
             'remaining_slots' => $set->remainingSlots(),
@@ -3059,7 +3218,7 @@ class BatchCraftingService
         }
 
         return array_merge(
-            ['set_name' => $set->name ?? 'Set'],
+            ['set_name' => $this->inventorySetDisplayName($character, $set)],
             $this->holyOilApplicationPlan($character, [], $selectedOilIds, $progress),
         );
     }
@@ -3225,7 +3384,9 @@ class BatchCraftingService
             'is_mythic' => (bool) ($item->is_mythic ?? false),
             'is_cosmic' => (bool) ($item->is_cosmic ?? false),
             'can_view' => false,
-            'full_item_details' => (new ItemTransformer())->transform($item),
+            'full_item_details' => $item->type === 'alchemy'
+                ? (new UsableItemTransformer())->transform($item)
+                : (new ItemTransformer())->transform($item),
         ];
     }
 
@@ -3376,42 +3537,47 @@ class BatchCraftingService
      * Success/failure chart counts, one outcome per action row so a single
      * action cannot be counted as both a success and a failure.
      *
-     * @return array{0: int, 1: int}
+     * @return array{successful: int, failed: int, destroyed: int, skipped: int}
      */
     private function chartOutcomeCounts(array $counts, array $actions): array
     {
         if (empty($actions)) {
-            $hadSuccess = ((int) ($counts['crafted_count'] ?? 0)
+            $successful = ((int) ($counts['crafted_count'] ?? 0)
                 + (int) ($counts['enchanted_count'] ?? 0)
                 + (int) ($counts['sold_count'] ?? 0)
                 + (int) ($counts['listed_count'] ?? 0)
                 + (int) ($counts['kept_count'] ?? 0)
                 + (int) ($counts['disenchanted_count'] ?? 0)
-                + (int) ($counts['applied_count'] ?? 0)) > 0;
-            $hadFailure = ((int) ($counts['failed_count'] ?? 0) + (int) ($counts['destroyed_count'] ?? 0) + (int) ($counts['skipped_count'] ?? 0)) > 0;
+                + (int) ($counts['applied_count'] ?? 0));
 
-            return [$hadSuccess ? 1 : 0, $hadFailure ? 1 : 0];
+            return [
+                'successful' => $successful,
+                'failed' => (int) ($counts['failed_count'] ?? 0),
+                'destroyed' => (int) ($counts['destroyed_count'] ?? 0),
+                'skipped' => (int) ($counts['skipped_count'] ?? 0),
+            ];
         }
 
-        $successCount = 0;
-        $failureCount = 0;
+        $outcomes = [
+            'successful' => 0,
+            'failed' => 0,
+            'destroyed' => 0,
+            'skipped' => 0,
+        ];
 
         foreach ($actions as $action) {
-            if ($this->chartOutcomeIsFailure($action)) {
-                $failureCount++;
-            } else {
-                $successCount++;
+            $status = $action['status'] ?? $this->actionStatus($action);
+
+            if (isset($outcomes[$status])) {
+                $outcomes[$status]++;
+
+                continue;
             }
+
+            $outcomes['successful']++;
         }
 
-        return [$successCount, $failureCount];
-    }
-
-    private function chartOutcomeIsFailure(array $action): bool
-    {
-        $status = $action['status'] ?? $this->actionStatus($action);
-
-        return in_array($status, ['failed', 'skipped', 'destroyed'], true);
+        return $outcomes;
     }
 
     private function countActionStatus(array $actionLog, string $status): int
@@ -3761,6 +3927,8 @@ class BatchCraftingService
     {
         $progress = $batchCrafting->progress ?? [];
         $lastAction = collect($batchCrafting->action_log ?? [])->last();
+        $eventQueue = $progress['event_craft_queue'] ?? self::eventCraftQueue();
+        $eventIndex = max(0, (int) ($progress['event_craft_index'] ?? 0) - 1);
 
         return [
             'batch_crafting_id' => $batchCrafting->id,
@@ -3770,6 +3938,16 @@ class BatchCraftingService
             'mode' => $progress['craft_mode'] ?? $progress['alchemy_mode'] ?? $progress['trinketry_mode'] ?? $progress['enchant_mode'] ?? $progress['holy_oil_mode'] ?? null,
             'progress' => $progress,
             'last_action' => $lastAction,
+            'phase' => $progress['event_enchant_phase']
+                ?? $progress['event_fallback_phase']
+                ?? $progress['craft_enchant_set_phase']
+                ?? null,
+            'target' => $eventQueue[$eventIndex] ?? null,
+            'action' => $lastAction['action_type'] ?? $lastAction['action'] ?? null,
+            'action_index' => $progress['event_craft_index']
+                ?? $progress['craft_experience_index']
+                ?? $progress['craft_set_index']
+                ?? count($batchCrafting->action_log ?? []),
             'selected_item_id' => $progress['specific_item_id'] ?? $progress['alchemy_item_id'] ?? null,
             'selected_affix_ids' => $progress['enchant_affix_ids'] ?? null,
             'event_type' => $progress['event_type'] ?? null,
@@ -3959,10 +4137,27 @@ class BatchCraftingService
         if ($destination === 'inventory_set') {
             $set = InventorySet::where('id', $progress['output_set_id'] ?? 0)->where('character_id', $character->id)->first();
 
-            return $set->name ?? 'Selected Set';
+            return is_null($set) ? 'Inventory Set' : $this->inventorySetDisplayName($character, $set);
         }
 
         return 'Crafted Items Set';
+    }
+
+    private function inventorySetDisplayName(Character $character, InventorySet $inventorySet): string
+    {
+        if (! is_null($inventorySet->name)) {
+            return $inventorySet->name;
+        }
+
+        $position = $character->inventorySets()
+            ->where('id', '<=', $inventorySet->id)
+            ->where(function ($query): void {
+                $query->whereNull('special_type')
+                    ->orWhere('special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE);
+            })
+            ->count();
+
+        return 'Set '.$position;
     }
 
     private function craftSetProgress(Character $character, array $progress): array
@@ -4072,6 +4267,7 @@ class BatchCraftingService
             'craft_enchant_set_completed_work_units' => 0,
             'craft_enchant_set_surviving_crafted_count' => 0,
             'craft_enchant_set_replacement_key' => null,
+            'craft_enchant_set_finalized_keys' => [],
             'craft_enchant_set_lost_item_keys' => [],
             'craft_enchant_set_counted_crafted_keys' => [],
         ];
@@ -4306,13 +4502,7 @@ class BatchCraftingService
             'craft_mode' => 'event',
             'tick_delay_seconds' => self::RECURRING_DELAY_SECONDS,
             'event_actions_per_tick' => self::EVENT_ITEMS_PER_SET_TICK,
-            'event_craft_queue' => [
-                ['type' => 'weapon', 'crafting_type' => 'weapon'],
-                ['type' => 'armour', 'crafting_type' => 'armour'],
-                ['type' => 'ring', 'crafting_type' => 'ring'],
-                ['type' => 'spell_damage', 'crafting_type' => 'spell'],
-                ['type' => 'spell_healing', 'crafting_type' => 'spell'],
-            ],
+            'event_craft_queue' => self::eventCraftQueue(),
             'event_craft_index' => 0,
         ];
     }
@@ -4470,7 +4660,7 @@ class BatchCraftingService
 
         return match ($craftingType) {
             'ring' => 'Ring Crafting',
-            'spell', 'spell_damage', 'spell_healing' => 'Spell Crafting',
+            'spell', 'spell-damage', 'spell-healing', 'spell_damage', 'spell_healing' => 'Spell Crafting',
             default => 'Armour Crafting',
         };
     }

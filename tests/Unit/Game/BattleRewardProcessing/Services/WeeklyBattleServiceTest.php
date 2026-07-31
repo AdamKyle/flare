@@ -128,6 +128,27 @@ class WeeklyBattleServiceTest extends TestCase
         $this->assertNotNull(WeeklyMonsterFight::where('character_id', $character->id)->first()->reward_processed_at);
     }
 
+    public function testInventoryCapacityFailureLeavesClaimAvailableForRewardRecovery(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
+        $handler = Mockery::mock(LocationSpecialtyHandler::class);
+        $handler->shouldReceive('handleMonsterFromSpecialLocation')
+            ->once()
+            ->andReturnUsing(function () use ($character, $monster): void {
+                $fight = WeeklyMonsterFight::where('character_id', $character->id)
+                    ->where('monster_id', $monster->id)
+                    ->firstOrFail();
+                $this->assertTrue($fight->monster_was_killed);
+                $this->assertNull($fight->reward_processed_at);
+
+                throw new RuntimeException('Weekly reward delivery requires four available inventory slots.');
+            });
+        $this->expectException(RuntimeException::class);
+
+        (new WeeklyBattleService($handler))->handleMonsterDeath($character, $monster);
+    }
+
     public function testCharacterDeathCreatesCount(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();

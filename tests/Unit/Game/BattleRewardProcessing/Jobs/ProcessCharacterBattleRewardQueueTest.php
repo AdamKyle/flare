@@ -16,10 +16,12 @@ use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
+use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Quests\Handlers\NpcQuestRewardHandler;
@@ -708,6 +710,92 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
         );
 
         $this->assertSame(BattleRewardRequestStatus::COMPLETED, $request->refresh()->status);
+    }
+
+    public function testCurrencyNotificationFailureKeepsCompletedRewardMutationStepsAndSchedulesRetry(): void
+    {
+        Event::fakeExcept([UpdateCharacterCurrenciesEvent::class]);
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardQueueState([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+        ]);
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processRewards')->once();
+        Event::listen(UpdateCharacterCurrenciesEvent::class, function (): void {
+            throw new RuntimeException('currency notification failed');
+        });
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $request->refresh()->status);
+        $this->assertSame(
+            BattleRewardStepStatus::RESUMABLE,
+            $request->steps()->where('step_name', BattleRewardStepName::FINAL_PLAYER_UPDATES)->firstOrFail()->status,
+        );
+        Queue::assertPushed(ProcessCharacterBattleRewardQueue::class);
+    }
+
+    public function testWeeklyInventoryCapacityFailureLeavesRewardStepResumableWithoutHotLoop(): void
+    {
+        Event::fake();
+        Queue::fake();
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardQueueState([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $request = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+        ]);
+        $step = $this->createCharacterBattleRewardRequestStep([
+            'character_battle_reward_request_id' => $request->id,
+            'character_id' => $character->id,
+            'step_name' => BattleRewardStepName::WEEKLY_REWARDS,
+            'status' => BattleRewardStepStatus::FAILED,
+        ]);
+        $battleRewardService = Mockery::mock(BattleRewardService::class);
+        $battleRewardService->shouldReceive('withHeartbeatCallback')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setUp')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('setContext')->once()->andReturnSelf();
+        $battleRewardService->shouldReceive('processRewards')->once()->andThrow(
+            new WeeklyRewardInventoryFullException('Weekly reward delivery requires four available inventory slots.'),
+        );
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->handle(
+            resolve(BattleRewardProcessingQueueManager::class),
+            $battleRewardService,
+            Mockery::mock(NpcQuestRewardHandler::class),
+            Mockery::mock(GuideQuestService::class),
+            resolve(Manager::class),
+            resolve(CharacterSheetBaseInfoTransformer::class),
+            resolve(ExplorationLogService::class),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $request->refresh()->status);
+        $this->assertSame(BattleRewardStepStatus::RESUMABLE, $step->refresh()->status);
+        Queue::assertNotPushed(ProcessCharacterBattleRewardQueue::class);
     }
 
     public function testProcessorExitsWithoutFailingFreshProcessingRowAtProcessorStart(): void

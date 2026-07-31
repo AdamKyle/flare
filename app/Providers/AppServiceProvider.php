@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Console\AfterDevelopment\FlagUsersWithMissingCharacterInventories;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AddBatchCraftingSetToPlayers;
 use App\Console\AfterDeployment\AllowTraverseForMaps;
@@ -60,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
             RepairQuestFeatureRewards::class,
             RepairStuckExplorationLogs::class,
             ResumeInterruptedRewardProcessing::class,
+            FlagUsersWithMissingCharacterInventories::class,
 
             // Development Commands:
             CreateCharacter::class,

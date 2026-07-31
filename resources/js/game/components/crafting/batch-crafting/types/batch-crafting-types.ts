@@ -289,6 +289,20 @@ export type CostBreakdown = {
     default_suffix_affix_id?: number | null;
     default_suffix_affix_name?: string | null;
     plan_entries?: CraftEnchantSetPlanPreviewEntry[];
+    trinket?: {
+        id: number;
+        name: string;
+    };
+    gold_dust?: {
+        required: number;
+        available: number;
+        missing: number;
+    };
+    copper_coins?: {
+        required: number;
+        available: number;
+        missing: number;
+    };
 };
 
 export type BatchCraftingStartBlockerLink = {

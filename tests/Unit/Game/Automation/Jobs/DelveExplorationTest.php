@@ -117,6 +117,83 @@ class DelveExplorationTest extends TestCase
         $this->assertEquals(0, $this->character->currentAutomations()->count());
     }
 
+    public function testMissingInventoryStopsDelveWithoutContinuationRewardsOrCompletionEvents(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $automation = $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::DELVE,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+            'attack_type' => AttackTypeValue::ATTACK,
+        ]);
+        $delve = $this->createDelveAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'started_at' => now(),
+            'completed_at' => null,
+            'attack_type' => AttackTypeValue::ATTACK,
+            'increase_enemy_strength' => 0,
+        ]);
+        $automationState = $automation->refresh()->toArray();
+        $delveState = $delve->refresh()->toArray();
+        $characterRewardsAndCurrencies = $this->character->only([
+            'xp',
+            'gold',
+            'gold_dust',
+            'shards',
+            'copper_coins',
+        ]);
+        $this->character->inventory()->delete();
+        $job = new DelveExploration(
+            $this->character->id,
+            $this->location->id,
+            $automation->id,
+            $delve->id,
+            [
+                'attack_type' => AttackTypeValue::ATTACK,
+                'pack_size' => 1,
+            ],
+            5,
+        );
+
+        $job->handle(
+            resolve(MonsterFightService::class),
+            resolve(BattleEventHandler::class),
+            resolve(CharacterCacheData::class),
+            resolve(CharacterRewardService::class),
+            resolve(SkillService::class),
+            resolve(BroadcastTopsUpdateService::class),
+        );
+
+        $this->assertNull($this->character->refresh()->inventory);
+        $this->assertTrue($this->character->user->refresh()->will_be_deleted);
+        $this->assertSame($automationState, $automation->refresh()->toArray());
+        $this->assertSame($delveState, $delve->refresh()->toArray());
+        $this->assertSame(
+            $characterRewardsAndCurrencies,
+            $this->character->refresh()->only([
+                'xp',
+                'gold',
+                'gold_dust',
+                'shards',
+                'copper_coins',
+            ]),
+        );
+        $this->assertSame(0, DB::table('delve_logs')->where('delve_exploration_id', $delve->id)->count());
+        Queue::assertNothingPushed();
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+        Event::assertNotDispatched(AutomationTimeOut::class);
+        Event::assertNotDispatched(DelveStatusUpdated::class);
+        Event::assertNotDispatched(DelveTopsUpdated::class);
+        Event::assertNotDispatched(ServerMessageEvent::class);
+        Event::assertNotDispatched(UpdateCharacterCurrenciesEvent::class);
+        Event::assertNotDispatched(UpdateCharacterStatus::class);
+    }
+
     public function testHandleDeletesAutomationWhenDelveDoesNotExist(): void
     {
         Event::fake();

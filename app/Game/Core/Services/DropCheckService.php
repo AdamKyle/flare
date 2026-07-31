@@ -49,7 +49,7 @@ class DropCheckService
      *
      * @throws Exception
      */
-    public function process(Character $character, Monster $monster, ?float $lootingChance = null): array
+    public function process(Character $character, Monster $monster, ?float $lootingChance = null, bool $questItemsOnly = false): array
     {
         $this->gameMapBonus = 0.0;
 
@@ -73,9 +73,9 @@ class DropCheckService
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
 
-        $this->handleDropChance($character);
+        $this->handleDropChance($character, $questItemsOnly);
 
-        if ($monster->celestial_type === CelestialType::KING_CELESTIAL) {
+        if (! $questItemsOnly && $monster->celestial_type === CelestialType::KING_CELESTIAL) {
             $this->handleMythicDrop($character, true);
         }
 
@@ -89,7 +89,7 @@ class DropCheckService
 
         $locationType = LocationType::from($this->locationWithEffect->type);
 
-        if ($locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
+        if (! $questItemsOnly && $locationType->isPurgatoryDungeons() && $character->currentAutomations->isEmpty()) {
             $this->handleMythicDrop($character);
         }
 
@@ -247,11 +247,12 @@ class DropCheckService
      *
      * @throws Exception
      */
-    private function handleDropChance(Character $character): void
+    private function handleDropChance(Character $character, bool $questItemsOnly = false): void
     {
-        $canGetDrop = $this->canHaveDrop($character);
-
-        $this->battleDrop->handleDrop($character, $canGetDrop);
+        if (! $questItemsOnly) {
+            $canGetDrop = $this->canHaveDrop($character);
+            $this->battleDrop->handleDrop($character, $canGetDrop);
+        }
 
         $this->battleDrop->handleMonsterQuestDrop($character);
 

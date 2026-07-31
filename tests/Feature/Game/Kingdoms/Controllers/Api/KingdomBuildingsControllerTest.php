@@ -363,6 +363,102 @@ class KingdomBuildingsControllerTest extends TestCase
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
     }
 
+    public function testManualUpgradeReturnsExactLockedPrerequisiteRejection(): void
+    {
+        Queue::fake();
+        $kingdomManagement = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_steel' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding([], ['is_locked' => true]);
+        $character = $kingdomManagement->getCharacter();
+        $building = $kingdomManagement->getKingdom()->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
+                'to_level' => $building->level + 1,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'This building is locked because its prerequisite has not been unlocked.',
+            'reason' => 'prerequisite_locked',
+        ]);
+        $this->assertSame(0, BuildingInQueue::where('building_id', $building->id)->count());
+    }
+
+    public function testManualUpgradeReturnsExactMissingSteelRejection(): void
+    {
+        Queue::fake();
+        $kingdomManagement = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 2000,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_steel' => 0,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding(['steel_cost' => 10]);
+        $character = $kingdomManagement->getCharacter();
+        $building = $kingdomManagement->getKingdom()->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
+                'to_level' => $building->level + 1,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'Missing resources for this upgrade: Steel: 20.',
+            'reason' => 'missing_steel',
+        ]);
+        $this->assertSame(0, BuildingInQueue::where('building_id', $building->id)->count());
+    }
+
+    public function testManualUpgradeReturnsExactMissingResourceRejection(): void
+    {
+        Queue::fake();
+        $kingdomManagement = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'current_wood' => 0,
+                'current_clay' => 2000,
+                'current_stone' => 2000,
+                'current_iron' => 2000,
+                'current_steel' => 2000,
+                'current_population' => 2000,
+            ])
+            ->assignBuilding();
+        $character = $kingdomManagement->getCharacter();
+        $building = $kingdomManagement->getKingdom()->buildings()->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/kingdoms/'.$character->id.'/upgrade-building/'.$building->id, [
+                'to_level' => $building->level + 1,
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'message' => 'Missing resources for this upgrade: Wood: 20.',
+            'reason' => 'missing_resources',
+        ]);
+        $this->assertSame(0, BuildingInQueue::where('building_id', $building->id)->count());
+    }
+
     public function testRawAuthenticatedJsonRequestRejectsDuplicateManualUpgradeQueue(): void
     {
         Queue::fake();
@@ -703,7 +799,8 @@ class KingdomBuildingsControllerTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJson([
-            'message' => 'Invalid building upgrade request.',
+            'message' => 'The building level changed. Refresh the kingdom and try again.',
+            'reason' => 'stale_level',
         ]);
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)
             ->where('building_id', $building->id)
@@ -748,7 +845,10 @@ class KingdomBuildingsControllerTest extends TestCase
             ], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
         $response->assertStatus(422);
-        $response->assertJson(['error' => 'Nope. Not allowed to do that.']);
+        $response->assertJson([
+            'message' => 'You do not own this kingdom building.',
+            'reason' => 'ownership_mismatch',
+        ]);
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
         $this->assertSame(1, $building->refresh()->level);
         $this->assertSame(2000, $kingdom->refresh()->current_wood);
@@ -789,10 +889,13 @@ class KingdomBuildingsControllerTest extends TestCase
         $response = $this->actingAs($nonOwner->user)
             ->call('POST', '/api/kingdoms/' . $nonOwner->id . '/rebuild-building/' . $building->id,
                 [], [], [], ['HTTP_ACCEPT' => 'application/json']
-            );
+        );
 
         $response->assertStatus(422);
-        $response->assertJson(['error' => 'Nope. Not allowed to do that.']);
+        $response->assertJson([
+            'message' => 'You do not own this kingdom building.',
+            'reason' => 'ownership_mismatch',
+        ]);
         $this->assertSame(0, BuildingInQueue::where('kingdom_id', $kingdom->id)->count());
         $this->assertSame(1, $building->refresh()->current_durability);
         $this->assertSame(2000, $kingdom->refresh()->current_wood);

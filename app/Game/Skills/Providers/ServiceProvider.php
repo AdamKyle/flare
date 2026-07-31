@@ -124,7 +124,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new TrinketCraftingService(
                 $app->make(CraftingService::class),
                 $app->make(SkillCheckService::class),
-                $app->make(ItemListCostTransformerService::class)
+                $app->make(ItemListCostTransformerService::class),
+                $app->make(SkillService::class),
             );
         });
 

@@ -1,10 +1,11 @@
 import React from "react";
+import axios from "axios";
 import MonitoringStatusChart from "../../monitoring/components/monitoring-status-chart";
 import {
     fetchBugChart,
+    fetchLogEntryDetail,
     fetchLogEntries,
     fetchLogFiles,
-    fetchLogSummary,
     fetchSystemBugs,
     pollLogs,
 } from "../ajax/logs-api";
@@ -23,10 +24,14 @@ import LogSidePeek from "./log-side-peek";
 import PaginationControls from "./pagination-controls";
 import SeverityBadge from "./severity-badge";
 
+const today = new Date();
+const yesterday = new Date(today);
+yesterday.setDate(today.getDate() - 1);
+
 const defaultFilters: LogFilters = {
     severity: "",
-    date_from: "",
-    date_to: "",
+    date_from: yesterday.toISOString().slice(0, 10),
+    date_to: today.toISOString().slice(0, 10),
 };
 
 const emptyPage = (): LogEntriesPage => ({
@@ -34,6 +39,12 @@ const emptyPage = (): LogEntriesPage => ({
     current_page: 1,
     last_page: 1,
     total: 0,
+    next_cursor: null,
+    summary: {
+        total: 0,
+        by_severity: {},
+        chart: [],
+    },
 });
 
 export default class LogsDashboard extends React.Component<
@@ -92,14 +103,13 @@ export default class LogsDashboard extends React.Component<
                 () => {
                     if (this.state.selectedFile !== "") {
                         void this.loadData();
-                        void this.pollOnce();
                         this.startPolling();
                     }
                 },
             );
-        } catch {
+        } catch (error) {
             this.setState({
-                error: "Could not load log file list.",
+                error: this.errorMessage(error),
             });
         } finally {
             this.setState({
@@ -118,30 +128,37 @@ export default class LogsDashboard extends React.Component<
         });
 
         try {
-            const [entriesData, summaryData, bugData, bugChartData] =
-                await Promise.all([
-                    fetchLogEntries(
-                        this.state.selectedFile,
-                        this.state.filters,
-                        this.state.page,
-                    ),
-                    fetchLogSummary(
-                        this.state.selectedFile,
-                        this.state.filters,
-                    ),
-                    fetchSystemBugs(),
-                    fetchBugChart(this.state.bugRange),
-                ]);
+            const entriesData = await fetchLogEntries(
+                this.state.selectedFile,
+                this.state.filters,
+                this.state.page,
+            );
+            const [bugResult, bugChartResult] = await Promise.allSettled([
+                fetchSystemBugs(),
+                fetchBugChart(this.state.bugRange),
+            ]);
 
             this.setState({
                 entries: entriesData,
-                summary: summaryData,
-                bugs: bugData,
-                bugChart: bugChartData,
+                summary: entriesData.summary,
+                bugs:
+                    bugResult.status === "fulfilled"
+                        ? bugResult.value
+                        : this.state.bugs,
+                bugChart:
+                    bugChartResult.status === "fulfilled"
+                        ? bugChartResult.value
+                        : this.state.bugChart,
+                error:
+                    bugResult.status === "rejected"
+                        ? this.errorMessage(bugResult.reason)
+                        : bugChartResult.status === "rejected"
+                          ? this.errorMessage(bugChartResult.reason)
+                          : "",
             });
-        } catch {
+        } catch (error) {
             this.setState({
-                error: "Could not load log entries.",
+                error: this.errorMessage(error),
             });
         }
     }
@@ -160,12 +177,11 @@ export default class LogsDashboard extends React.Component<
             this.setState({
                 newEntries: payload.entries,
                 summary: payload.summary,
-                files: payload.files,
-                bugs: payload.bugs,
-                bugChart: payload.bug_chart,
             });
-        } catch {
-            // Preserve the previous polling behavior, which ignored the first poll failure.
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
         }
     }
 
@@ -182,15 +198,11 @@ export default class LogsDashboard extends React.Component<
                     this.setState({
                         newEntries: payload.entries,
                         summary: payload.summary,
-                        files: payload.files,
-                        bugs: payload.bugs,
-                        bugChart: payload.bug_chart,
                     });
-                    void this.loadData();
                 })
-                .catch(() => {
+                .catch((error) => {
                     this.setState({
-                        error: "Could not poll log entries.",
+                        error: this.errorMessage(error),
                     });
                 });
         }, 60000);
@@ -201,6 +213,24 @@ export default class LogsDashboard extends React.Component<
             window.clearInterval(this.pollInterval);
             this.pollInterval = undefined;
         }
+    }
+
+    errorMessage(error: unknown): string {
+        if (axios.isAxiosError(error)) {
+            const responseMessage = error.response?.data?.message;
+
+            if (typeof responseMessage === "string" && responseMessage !== "") {
+                return responseMessage;
+            }
+
+            if (error.message !== "") {
+                return error.message;
+            }
+        }
+
+        return error instanceof Error
+            ? error.message
+            : "The server request failed.";
     }
 
     chartPoints() {
@@ -225,7 +255,6 @@ export default class LogsDashboard extends React.Component<
             },
             () => {
                 void this.loadData();
-                void this.pollOnce();
                 this.startPolling();
             },
         );
@@ -256,6 +285,30 @@ export default class LogsDashboard extends React.Component<
         );
     }
 
+    async loadOlderEntries() {
+        if (!this.state.selectedFile || !this.state.entries.next_cursor) {
+            return;
+        }
+
+        try {
+            const entries = await fetchLogEntries(
+                this.state.selectedFile,
+                this.state.filters,
+                1,
+                this.state.entries.next_cursor,
+            );
+            this.setState({
+                entries,
+                summary: entries.summary,
+                page: 1,
+            });
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        }
+    }
+
     setBugRange(bugRange: number) {
         this.setState(
             {
@@ -265,11 +318,29 @@ export default class LogsDashboard extends React.Component<
         );
     }
 
-    selectEntry(entry: LogEntry) {
+    async selectEntry(entry: LogEntry) {
         this.setState({
             selectedEntry: entry,
             selectedBug: null,
         });
+
+        if (!entry.detail_id || !entry.file_key) {
+            return;
+        }
+
+        try {
+            const detail = await fetchLogEntryDetail(
+                entry.file_key,
+                entry.detail_id,
+            );
+            this.setState({
+                selectedEntry: detail,
+            });
+        } catch (error) {
+            this.setState({
+                error: this.errorMessage(error),
+            });
+        }
     }
 
     selectBug(bug: SystemBugReport) {
@@ -648,6 +719,14 @@ export default class LogsDashboard extends React.Component<
                                     this.setPage(page)
                                 }
                             />
+                            {entries.next_cursor && (
+                                <button
+                                    className="mt-3 rounded border border-gray-300 px-3 py-2 text-sm dark:border-gray-600"
+                                    onClick={() => void this.loadOlderEntries()}
+                                >
+                                    Load older entries
+                                </button>
+                            )}
                         </section>
 
                         <MonitoringStatusChart

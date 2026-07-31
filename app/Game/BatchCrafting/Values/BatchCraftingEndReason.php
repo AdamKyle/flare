@@ -36,4 +36,5 @@ enum BatchCraftingEndReason: string
     case CRAFT_ENCHANT_SET_TARGET_SET_CHANGED = 'craft_enchant_set_target_set_changed';
     case INT_TOO_LOW_FOR_ENCHANTING = 'int_too_low_for_enchanting';
     case ALCHEMY_BAG_FULL = 'alchemy_bag_full';
+    case TRINKETRY_INSUFFICIENT_CURRENCIES = 'trinketry_insufficient_currencies';
 }

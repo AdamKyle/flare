@@ -15,12 +15,18 @@ use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
+use Closure;
+use Illuminate\Support\Facades\Log;
 
 class AutomatedBountyFightHandler
 {
     private const MAX_ATTACK_ATTEMPTS = 100;
 
     private const MAX_TRAINING_KILLS = 50;
+
+    private const MAX_KILLS_PER_RUN = 25;
+
+    private const MAX_RUN_SECONDS = 90;
 
     private const MAX_STALLED_ATTEMPTS = 10;
 
@@ -54,6 +60,16 @@ class AutomatedBountyFightHandler
 
     private ?array $warningNotice = null;
 
+    private float $runStartedAt;
+
+    private int $attackAttempts = 0;
+
+    private int $cacheReuseCount = 0;
+
+    private ?string $yieldReason = null;
+
+    private bool $lastFightYielded = false;
+
     /**
      * Create the automated bounty fight handler.
      *
@@ -69,6 +85,7 @@ class AutomatedBountyFightHandler
         private readonly CharacterRewardService $characterRewardService,
         private readonly SkillService $skillService,
         private readonly AutomatedFightResult $automatedFightResult,
+        private readonly ?Closure $clock = null,
     ) {}
 
     /**
@@ -101,6 +118,11 @@ class AutomatedBountyFightHandler
         $this->lastFightStalled = false;
         $this->stalledAttempt = 0;
         $this->warningNotice = null;
+        $this->runStartedAt = $this->currentTime();
+        $this->attackAttempts = 0;
+        $this->cacheReuseCount = 0;
+        $this->yieldReason = null;
+        $this->lastFightYielded = false;
 
         return $this;
     }
@@ -198,6 +220,10 @@ class AutomatedBountyFightHandler
     private function fightBountyBatch(Monster $bountyMonster, int $remainingKills): AutomatedFightResultType
     {
         while ($this->batchBountyKills < $remainingKills) {
+            if ($this->shouldYieldRun($this->batchBountyKills)) {
+                return AutomatedFightResultType::BOUNTY_BATCH_YIELDED;
+            }
+
             $fightData = $this->fightMonsterUntilResolved(
                 $bountyMonster,
                 $this->shouldRetryStalledFight($bountyMonster, true, false)
@@ -205,6 +231,10 @@ class AutomatedBountyFightHandler
 
             if (empty($fightData)) {
                 return AutomatedFightResultType::NOT_ENOUGH_HEALTH_OR_INVALID_STATE;
+            }
+
+            if ($this->lastFightYielded) {
+                return AutomatedFightResultType::BOUNTY_FIGHT_YIELDED;
             }
 
             if ($this->lastFightStalled) {
@@ -255,14 +285,29 @@ class AutomatedBountyFightHandler
             return $this->finish(AutomatedFightResultType::NO_TRAINING_MONSTER_FOUND, $failedBountyMonster, false, false, true);
         }
 
-        $this->sendOutEventLogUpdate('Recovery training has started. Automation will fight up to 50 training monsters in this job run.', true);
+        $completedTrainingKills = $this->completedRecoveryTrainingKills($failedBountyMonster);
+        $remainingTrainingKills = max(0, self::MAX_TRAINING_KILLS - $completedTrainingKills);
 
-        while ($this->batchTrainingKills < self::MAX_TRAINING_KILLS) {
+        $this->sendOutEventLogUpdate('Recovery training has started. Automation will continue the remaining training kills in this job run.', true);
+
+        while ($this->batchTrainingKills < $remainingTrainingKills) {
+            if ($this->shouldYieldRun($this->batchTrainingKills)) {
+                $this->processBatchRewards($trainingMonster);
+
+                return $this->finish(AutomatedFightResultType::TRAINING_BATCH_YIELDED, $trainingMonster, false, true);
+            }
+
             $fightData = $this->fightMonsterUntilResolved($trainingMonster, $retryCachedFight);
             $retryCachedFight = false;
 
             if (empty($fightData)) {
                 return $this->finish(AutomatedFightResultType::NOT_ENOUGH_HEALTH_OR_INVALID_STATE, $trainingMonster, false, true, true);
+            }
+
+            if ($this->lastFightYielded) {
+                $this->processBatchRewards($trainingMonster);
+
+                return $this->finish(AutomatedFightResultType::TRAINING_FIGHT_YIELDED, $trainingMonster, false, true);
             }
 
             if ($this->lastFightStalled) {
@@ -309,15 +354,27 @@ class AutomatedBountyFightHandler
     private function fightMonsterUntilResolved(Monster $monster, bool $retryCachedFight = false): array
     {
         $this->lastFightStalled = false;
+        $this->lastFightYielded = false;
 
         if ($retryCachedFight) {
             $fightData = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
+            $this->cacheReuseCount++;
         } else {
-            $fightData = $this->monsterFightService->setupMonster($this->character, [
+            $preserveCharacterSheetCache = $this->batchKills > 0;
+            $fightParameters = [
                 'selected_monster_id' => $monster->id,
                 'attack_type' => $this->attackType,
-            ], true);
+            ];
+
+            $fightData = $preserveCharacterSheetCache
+                ? $this->monsterFightService->setupMonster($this->character, $fightParameters, true, false, true)
+                : $this->monsterFightService->setupMonster($this->character, $fightParameters, true);
+
+            if ($preserveCharacterSheetCache) {
+                $this->cacheReuseCount++;
+            }
         }
+        $this->attackAttempts++;
 
         $this->lastFightData = $fightData;
 
@@ -328,9 +385,16 @@ class AutomatedBountyFightHandler
         $attackAttempts = $retryCachedFight ? 1 : 0;
 
         while ($this->shouldAttackAgain($fightData) && $attackAttempts < self::MAX_ATTACK_ATTEMPTS) {
+            if ($this->shouldYieldRun($this->batchKills)) {
+                $this->lastFightYielded = true;
+
+                return $fightData;
+            }
+
             $fightData = $this->monsterFightService->fightMonster($this->character, $this->attackType, false, true);
             $this->lastFightData = $fightData;
             $attackAttempts++;
+            $this->attackAttempts++;
 
             if (empty($fightData) || $this->hasCharacterDied($fightData) || $this->hasMonsterDied($fightData)) {
                 return $fightData;
@@ -431,7 +495,10 @@ class AutomatedBountyFightHandler
     private function shouldRetryTrainingStalledFight(): bool
     {
         return $this->factionLoyaltyAutomation->last_fight_was_training &&
-            $this->factionLoyaltyAutomation->last_fight_outcome === AutomatedFightResultType::TRAINING_STALLED_RETRY->value &&
+            in_array($this->factionLoyaltyAutomation->last_fight_outcome, [
+                AutomatedFightResultType::TRAINING_FIGHT_YIELDED->value,
+                AutomatedFightResultType::TRAINING_STALLED_RETRY->value,
+            ], true) &&
             $this->factionLoyaltyAutomation->last_fight_stalled_attempt < self::MAX_STALLED_ATTEMPTS;
     }
 
@@ -450,6 +517,7 @@ class AutomatedBountyFightHandler
         }
 
         return in_array($this->factionLoyaltyAutomation->last_fight_outcome, [
+            AutomatedFightResultType::BOUNTY_FIGHT_YIELDED->value,
             AutomatedFightResultType::BOUNTY_STALLED_RETRY->value,
             AutomatedFightResultType::TRAINING_STALLED_RETRY->value,
         ], true) && $this->factionLoyaltyAutomation->last_fight_stalled_attempt < self::MAX_STALLED_ATTEMPTS;
@@ -580,6 +648,35 @@ class AutomatedBountyFightHandler
         ]);
     }
 
+    private function shouldYieldRun(int $killsThisPhase): bool
+    {
+        if ($killsThisPhase >= self::MAX_KILLS_PER_RUN) {
+            $this->yieldReason = 'kill_limit';
+
+            return true;
+        }
+
+        if (($this->currentTime() - $this->runStartedAt) >= self::MAX_RUN_SECONDS) {
+            $this->yieldReason = 'elapsed_time_budget';
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function completedRecoveryTrainingKills(Monster $failedBountyMonster): int
+    {
+        $fightLogs = $this->factionLoyaltyAutomation->log?->fight_logs ?? [];
+
+        return collect($fightLogs)
+            ->filter(function (array $fightLog) use ($failedBountyMonster): bool {
+                return ($fightLog['outcome'] ?? null) === AutomatedFightResultType::TRAINING_BATCH_YIELDED->value
+                    && (int) ($fightLog['failed_bounty_monster_id'] ?? 0) === $failedBountyMonster->id;
+            })
+            ->sum(fn (array $fightLog): int => (int) ($fightLog['training_kills'] ?? 0));
+    }
+
     /**
      * Log and return a fight result.
      *
@@ -624,7 +721,35 @@ class AutomatedBountyFightHandler
 
         $this->factionLoyaltyAutomationFightLogger->log($automatedFightResult);
 
+        Log::channel('faction_loyalty')->info('Faction loyalty fight run metrics.', [
+            'character_id' => $this->character->id,
+            'faction_loyalty_automation_id' => $this->factionLoyaltyAutomation->id,
+            'required_kills' => (int) ($this->task['required_amount'] ?? 0),
+            'current_kills' => (int) ($this->task['current_amount'] ?? 0),
+            'remaining_kills' => isset($this->task['required_amount'], $this->task['current_amount'])
+                ? $this->getRemainingBountyKills()
+                : 0,
+            'kills_this_run' => $this->batchKills,
+            'bounty_kills_this_run' => $this->batchBountyKills,
+            'training_kills_this_run' => $this->batchTrainingKills,
+            'attack_attempts_this_run' => $this->attackAttempts,
+            'elapsed_seconds' => round($this->currentTime() - $this->runStartedAt, 3),
+            'cache_reuse_count' => $this->cacheReuseCount,
+            'yield_reason' => $this->yieldReason,
+            'continuation' => in_array($automatedFightResultType, [
+                AutomatedFightResultType::BOUNTY_BATCH_YIELDED,
+                AutomatedFightResultType::BOUNTY_FIGHT_YIELDED,
+                AutomatedFightResultType::TRAINING_BATCH_YIELDED,
+                AutomatedFightResultType::TRAINING_FIGHT_YIELDED,
+            ], true),
+        ]);
+
         return $automatedFightResult;
+    }
+
+    private function currentTime(): float
+    {
+        return is_null($this->clock) ? microtime(true) : ($this->clock)();
     }
 
     /**

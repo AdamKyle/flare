@@ -173,7 +173,10 @@ class BatchCraftingControllerTest extends TestCase
     public function testStartTrinketryBatch(): void
     {
         $user = $this->createUser();
-        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100, 'gold_dust' => 100, 'shards' => 100]);
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100, 'copper_coins' => 100, 'shards' => 100]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $trinketry->id, 'character_id' => $character->id, 'level' => 1, 'xp' => 0, 'xp_max' => 100, 'is_locked' => false]);
+        $this->createItem(['type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::TRINKETRY->value,
@@ -545,7 +548,10 @@ class BatchCraftingControllerTest extends TestCase
     public function testTrinketryAllowsKeepBestDestroyRestDisposition(): void
     {
         $user = $this->createUser();
-        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'shards' => 100]);
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100, 'copper_coins' => 100, 'shards' => 100]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $trinketry->id, 'character_id' => $character->id, 'level' => 1, 'xp' => 0, 'xp_max' => 100, 'is_locked' => false]);
+        $this->createItem(['type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::TRINKETRY->value,
@@ -1326,7 +1332,10 @@ class BatchCraftingControllerTest extends TestCase
     public function testTrinketryUsesCraftedItemsSetCapacityNotNormalInventory(): void
     {
         $user = $this->createUser();
-        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'shards' => 100]);
+        $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold_dust' => 100, 'copper_coins' => 100, 'shards' => 100]);
+        $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character->skills()->create(['game_skill_id' => $trinketry->id, 'character_id' => $character->id, 'level' => 1, 'xp' => 0, 'xp_max' => 100, 'is_locked' => false]);
+        $this->createItem(['type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'trinket']);
         $craftedItemsSet = InventorySet::factory()->create([
             'character_id' => $character->id,
@@ -1343,6 +1352,12 @@ class BatchCraftingControllerTest extends TestCase
         $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
+        $response->assertStatus(422);
+        $response->assertJsonStructure([
+            'errors' => [
+                'batch_crafting',
+            ],
+        ]);
         $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
     }
 

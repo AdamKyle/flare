@@ -986,9 +986,15 @@ class BattleRewardService
 
         if ($totalKills > 1) {
             for ($i = 0; $i < $totalKills; $i++) {
-                $this->addDropRewardTotals(
-                    $this->dropCheckService->process($this->character, $this->monster, $lootingChance)
-                );
+                $dropTotals = $this->weeklyBattleService->isWeeklyMonster($this->monster)
+                    ? $this->dropCheckService->process(
+                        $this->character,
+                        $this->monster,
+                        $lootingChance,
+                        true,
+                    )
+                    : $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
+                $this->addDropRewardTotals($dropTotals);
 
                 $this->character = $this->character->refresh();
             }
@@ -996,9 +1002,15 @@ class BattleRewardService
             return;
         }
 
-        $this->addDropRewardTotals(
-            $this->dropCheckService->process($this->character, $this->monster, $lootingChance)
-        );
+        $dropTotals = $this->weeklyBattleService->isWeeklyMonster($this->monster)
+            ? $this->dropCheckService->process(
+                $this->character,
+                $this->monster,
+                $lootingChance,
+                true,
+            )
+            : $this->dropCheckService->process($this->character, $this->monster, $lootingChance);
+        $this->addDropRewardTotals($dropTotals);
     }
 
     private function addDropRewardTotals(array $dropRewardTotals): void

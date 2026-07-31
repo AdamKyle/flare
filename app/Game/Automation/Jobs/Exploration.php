@@ -20,6 +20,7 @@ use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Exceptions\MissingInventoryException;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
@@ -264,6 +265,17 @@ class Exploration implements ShouldQueue
 
         $this->cancelAutomation($automation, $message, $reason);
         } catch (Throwable $throwable) {
+            if ($throwable instanceof MissingInventoryException) {
+                $this->character->user()->update(['will_be_deleted' => true]);
+                Log::warning('Exploration stopped for a character with missing inventory.', [
+                    'character_id' => $this->character->id,
+                    'automation_id' => $this->automationId,
+                    'exception' => $throwable,
+                ]);
+
+                return;
+            }
+
             $this->handleFailure($throwable, 'unexpected_exception');
         }
     }

@@ -77,6 +77,35 @@ class DropCheckServiceTest extends TestCase
         $this->assertEquals($beforeSlots, $afterSlots);
     }
 
+    public function testQuestItemsOnlySuppressesOrdinaryDropButPreservesConfiguredQuestDrops(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $monster = $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'quest_item_id' => $this->createItem(['type' => 'quest'])->id,
+        ]);
+        $battleDrop = Mockery::mock(BattleDrop::class);
+        $battleDrop->shouldReceive('setMonster')->once()->with($monster)->andReturnSelf();
+        $battleDrop->shouldReceive('setSpecialLocation')->once()->with(null)->andReturnSelf();
+        $battleDrop->shouldReceive('setManualQuestItemLocation')->once()->with(null)->andReturnSelf();
+        $battleDrop->shouldReceive('setGameMapBonus')->once()->with(0.0)->andReturnSelf();
+        $battleDrop->shouldReceive('setLootingChance')->once()->with(0.0)->andReturnSelf();
+        $battleDrop->shouldReceive('resetRewardTotals')->once()->andReturnSelf();
+        $battleDrop->shouldNotReceive('handleDrop');
+        $battleDrop->shouldReceive('handleMonsterQuestDrop')->once()->with($character);
+        $battleDrop->shouldReceive('handleDelveLocationQuestItems')->once()->with($character);
+        $battleDrop->shouldReceive('rewardTotals')->once()->andReturn([
+            'auto_sold_gold' => 0,
+            'planned_count' => 1,
+            'granted_count' => 1,
+        ]);
+
+        $result = (new DropCheckService($battleDrop, Mockery::mock(BuildMythicItem::class)))
+            ->process($character, $monster, 0.0, true);
+
+        $this->assertSame(1, $result['granted_count']);
+    }
+
     public function testProcessSetsGameMapBonusWhenPresent(): void
     {
         DropCheckCalculator::shouldReceive('fetchDropCheckChance')

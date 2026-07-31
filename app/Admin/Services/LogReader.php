@@ -32,6 +32,8 @@ class LogReader
 
     public function fileSize(string $path): int|false
     {
+        clearstatcache(true, $path);
+
         return filesize($path);
     }
 
@@ -55,25 +57,43 @@ class LogReader
             fgets($handle);
         }
 
-        $content = stream_get_contents($handle);
+        $content = stream_get_contents($handle, $maxBytes);
         fclose($handle);
 
         return $content;
     }
 
-    public function readFrom(string $path, int $position): string|false
+    public function readBackward(string $path, int $endPosition, int $maxBytes): array|false
     {
+        $fileSize = $this->fileSize($path);
+
+        if ($fileSize === false) {
+            return false;
+        }
+
+        $endPosition = min(max(0, $endPosition), $fileSize);
+        $startPosition = max(0, $endPosition - $maxBytes);
+        $length = $endPosition - $startPosition;
         $handle = fopen($path, 'rb');
 
         if ($handle === false) {
             return false;
         }
 
-        fseek($handle, $position);
-        $content = stream_get_contents($handle);
+        fseek($handle, $startPosition);
+        $content = $length > 0 ? fread($handle, $length) : '';
         fclose($handle);
 
-        return $content;
+        if ($content === false) {
+            return false;
+        }
+
+        return [
+            'content' => $content,
+            'start' => $startPosition,
+            'end' => $endPosition,
+            'file_size' => $fileSize,
+        ];
     }
 
     private function resolveLogPattern(string $pattern): string

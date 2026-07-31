@@ -6,7 +6,6 @@ use App\Flare\Models\MonitoredLogFileState;
 use App\Flare\Models\MonitoredSystemErrorReport;
 use Carbon\Carbon;
 use RuntimeException;
-use Throwable;
 
 class AdminLogsDashboardService
 {
@@ -64,6 +63,12 @@ class AdminLogsDashboardService
 
     private const ERROR_LEVELS = ['emergency', 'alert', 'critical', 'error', 'fatal'];
 
+    private const REQUEST_BYTE_BUDGET = 2097152;
+
+    private const PAGE_SIZE = 50;
+
+    private const READ_CHUNK_BYTES = 65536;
+
     private const SENSITIVE_PATTERNS = [
         '/("?password"?\s*[=:]\s*)"[^"]*"/i',
         '/("?token"?\s*[=:]\s*)"[^"]*"/i',
@@ -88,61 +93,90 @@ class AdminLogsDashboardService
         }, array_keys(self::LOG_CHANNELS));
     }
 
-    public function entries(string $fileKey, int $page, string $severity, string $dateFrom, string $dateTo): array
+    public function entries(string $fileKey, int $page, string $severity, string $dateFrom, string $dateTo, ?string $cursor = null): array
     {
         if (! isset(self::LOG_CHANNELS[$fileKey])) {
             return ['data' => [], 'current_page' => 1, 'last_page' => 1, 'total' => 0];
         }
 
-        try {
-            $entries = $this->readBoundedEntries($fileKey);
-            $filtered = $this->filter($entries, $severity, $dateFrom, $dateTo);
-        } catch (Throwable $throwable) {
-            $this->monitoredBugReportService->reportError(
-                'admin-logs-dashboard',
-                $throwable->getMessage(),
-                ['file_key' => $fileKey, 'severity' => $severity, 'date_from' => $dateFrom, 'date_to' => $dateTo],
-                get_class($throwable),
-            );
+        $readResult = $this->readCursorEntries($fileKey, $severity, $dateFrom, $dateTo, $cursor);
+        $entries = $readResult['entries'];
+        $filtered = $this->filter($entries, $severity, $dateFrom, $dateTo);
 
-            return ['data' => [], 'current_page' => 1, 'last_page' => 1, 'total' => 0];
-        }
-
-        $perPage = 50;
+        $perPage = self::PAGE_SIZE;
         $total = count($filtered);
         $lastPage = max(1, (int) ceil($total / $perPage));
         $page = max(1, min($page, $lastPage));
-        $slice = array_slice($filtered, ($page - 1) * $perPage, $perPage);
+        $pageEntries = array_slice($filtered, ($page - 1) * $perPage, $perPage);
+        $nextCursor = $readResult['next_cursor'];
+
+        if (count($filtered) > $perPage && ! empty($pageEntries)) {
+            $oldestReturnedEntry = $pageEntries[array_key_last($pageEntries)];
+            $nextCursor = $this->encodeCursor(
+                (int) $oldestReturnedEntry['_cursor_file_index'],
+                (int) $oldestReturnedEntry['_cursor_position'],
+            );
+        }
+
+        $slice = array_map(
+            fn (array $entry): array => $this->compactEntry($entry, $fileKey),
+            $pageEntries,
+        );
 
         return [
             'data' => $slice,
             'current_page' => $page,
             'last_page' => $lastPage,
             'total' => $total,
+            'next_cursor' => $nextCursor,
+            'summary' => $this->summaryFor($filtered),
         ];
     }
 
-    public function summary(string $fileKey, string $severity, string $dateFrom, string $dateTo): array
+    public function entryDetail(string $fileKey, string $detailId): ?array
     {
         if (! isset(self::LOG_CHANNELS[$fileKey])) {
-            return $this->emptySummary();
+            return null;
         }
 
-        try {
-            $entries = $this->readBoundedEntries($fileKey);
-            $filtered = $this->filter($entries, $severity, $dateFrom, $dateTo);
-        } catch (Throwable $throwable) {
-            $this->monitoredBugReportService->reportError(
-                'admin-logs-dashboard',
-                $throwable->getMessage(),
-                ['file_key' => $fileKey, 'severity' => $severity, 'date_from' => $dateFrom, 'date_to' => $dateTo],
-                get_class($throwable),
+        $detailState = $this->decodeOpaqueValue($detailId);
+        $fileName = $detailState['file'] ?? null;
+        $fingerprint = $detailState['fingerprint'] ?? null;
+        $windowEnd = $detailState['window_end'] ?? null;
+
+        if (! is_string($fileName) || ! is_string($fingerprint) || ! is_int($windowEnd)) {
+            return null;
+        }
+
+        foreach ($this->discoverFiles($fileKey) as $path) {
+            if (basename($path) !== $fileName) {
+                continue;
+            }
+
+            $fileSize = $this->reader()->fileSize($path);
+
+            if ($fileSize === false) {
+                return null;
+            }
+
+            $read = $this->reader()->readBackward(
+                $path,
+                min($windowEnd, $fileSize),
+                self::REQUEST_BYTE_BUDGET,
             );
 
-            return $this->emptySummary();
+            if ($read === false) {
+                throw new RuntimeException('Failed to read log detail: '.$fileName);
+            }
+
+            foreach ($this->parseContent($read['content'], $path) as $entry) {
+                if (hash_equals($fingerprint, $this->entryFingerprint($entry))) {
+                    return $entry;
+                }
+            }
         }
 
-        return $this->summaryFor($filtered);
+        return null;
     }
 
     public function poll(string $fileKey, string $severity, string $dateFrom, string $dateTo): array
@@ -151,16 +185,15 @@ class AdminLogsDashboardService
             return [
                 'entries' => [],
                 'summary' => $this->emptySummary(),
-                'files' => $this->listFiles(),
-                'bugs' => $this->bugReports(),
-                'bug_chart' => $this->bugChart(30),
             ];
         }
 
         $newEntries = [];
 
-        foreach ($this->discoverFiles($fileKey) as $path) {
-            $newEntries = array_merge($newEntries, $this->readNewEntries($fileKey, $path));
+        $activePath = $this->activeLogPath($fileKey);
+
+        if (! is_null($activePath)) {
+            $newEntries = $this->readNewEntries($fileKey, $activePath);
         }
 
         usort($newEntries, fn (array $a, array $b): int => strcmp($b['timestamp'] ?? '', $a['timestamp'] ?? ''));
@@ -171,15 +204,11 @@ class AdminLogsDashboardService
             }
         }
 
-        $allEntries = $this->readBoundedEntries($fileKey);
-        $filtered = $this->filter($allEntries, $severity, $dateFrom, $dateTo);
+        $filtered = $this->filter($newEntries, $severity, $dateFrom, $dateTo);
 
         return [
             'entries' => array_slice($this->filter($newEntries, $severity, $dateFrom, $dateTo), 0, 50),
             'summary' => $this->summaryFor($filtered),
-            'files' => $this->listFiles(),
-            'bugs' => $this->bugReports(),
-            'bug_chart' => $this->bugChart(30),
         ];
     }
 
@@ -259,70 +288,330 @@ class AdminLogsDashboardService
         return $this->reader()->discoverFiles(self::LOG_CHANNELS[$fileKey]['patterns']);
     }
 
-    private function readBoundedEntries(string $fileKey, int $maxBytes = 2097152): array
+    private function activeLogPath(string $fileKey): ?string
     {
-        $entries = [];
+        return collect($this->discoverFiles($fileKey))
+            ->sortByDesc(fn (string $path): array => [
+                @filemtime($path) ?: 0,
+                basename($path),
+            ])
+            ->first();
+    }
 
-        foreach ($this->discoverFiles($fileKey) as $path) {
+    private function readCursorEntries(
+        string $fileKey,
+        string $severity,
+        string $dateFrom,
+        string $dateTo,
+        ?string $cursor,
+        int $maxBytes = self::REQUEST_BYTE_BUDGET,
+    ): array {
+        $files = $this->filesForDateRange($fileKey, $dateFrom, $dateTo);
+        $cursorState = $this->decodeCursor($cursor);
+        $fileIndex = min((int) ($cursorState['file_index'] ?? 0), max(0, count($files) - 1));
+        $position = isset($cursorState['position']) ? (int) $cursorState['position'] : null;
+        $remainingBudget = min(self::REQUEST_BYTE_BUDGET, max(1, $maxBytes));
+        $entries = [];
+        $matchingEntryCount = 0;
+
+        while (isset($files[$fileIndex]) && $remainingBudget > 0 && $matchingEntryCount < self::PAGE_SIZE) {
+            $path = $files[$fileIndex];
             $fileSize = $this->reader()->fileSize($path);
 
             if ($fileSize === false || $fileSize === 0) {
+                $fileIndex++;
+                $position = null;
+
                 continue;
             }
 
-            $content = $this->reader()->readTail($path, $maxBytes);
+            $endPosition = is_null($position) ? $fileSize : min($position, $fileSize);
+            $windowEnd = $endPosition;
+            $content = '';
+            $contentStart = $endPosition;
+            $parsedEntries = [];
 
-            if ($content === false || trim($content) === '') {
-                continue;
+            while ($contentStart > 0 && $remainingBudget > 0) {
+                $chunkBytes = min(self::READ_CHUNK_BYTES, $remainingBudget, $contentStart);
+                $read = $this->reader()->readBackward($path, $contentStart, $chunkBytes);
+
+                if ($read === false) {
+                    throw new RuntimeException('Failed to read log file: '.basename($path));
+                }
+
+                $content = $read['content'].$content;
+                $contentStart = $read['start'];
+                $remainingBudget -= $read['end'] - $read['start'];
+                $parseableContent = $content;
+                $parseableStart = $contentStart;
+
+                if ($contentStart > 0 && preg_match('/(?:^|\n)(?=\[\d{4}-\d{2}-\d{2}[T ])/m', $content, $matches, PREG_OFFSET_CAPTURE)) {
+                    $entryOffset = $matches[0][1] + strlen($matches[0][0]);
+                    $parseableContent = substr($content, $entryOffset);
+                    $parseableStart = $contentStart + $entryOffset;
+                }
+
+                $parsedEntries = trim($parseableContent) === ''
+                    ? []
+                    : $this->parseContent($parseableContent, $path);
+                $matchingEntryCount = count($this->filter(
+                    array_merge($entries, $parsedEntries),
+                    $severity,
+                    $dateFrom,
+                    $dateTo,
+                ));
+                $position = $parseableStart;
+
+                if ($matchingEntryCount >= self::PAGE_SIZE) {
+                    break;
+                }
             }
 
-            $entries = array_merge($entries, $this->parseContent($content, $path));
+            foreach ($parsedEntries as $parsedEntry) {
+                $parsedEntry['detail_window_end'] = $windowEnd;
+                $parsedEntry['_cursor_file_index'] = $fileIndex;
+                $parsedEntry['_cursor_position'] = $parseableStart + (int) ($parsedEntry['_byte_start'] ?? 0);
+                $entries[] = $parsedEntry;
+            }
+
+            if ($position === 0) {
+                $fileIndex++;
+                $position = null;
+            }
         }
 
-        usort($entries, fn (array $a, array $b): int => strcmp($b['timestamp'] ?? '', $a['timestamp'] ?? ''));
+        usort($entries, function (array $first, array $second): int {
+            $timestampComparison = strcmp($second['timestamp'] ?? '', $first['timestamp'] ?? '');
 
-        return $entries;
+            if ($timestampComparison !== 0) {
+                return $timestampComparison;
+            }
+
+            $fileComparison = ((int) $first['_cursor_file_index']) <=> ((int) $second['_cursor_file_index']);
+
+            if ($fileComparison !== 0) {
+                return $fileComparison;
+            }
+
+            $positionComparison = ((int) $second['_cursor_position']) <=> ((int) $first['_cursor_position']);
+
+            if ($positionComparison !== 0) {
+                return $positionComparison;
+            }
+
+            return strcmp($this->entryFingerprint($second), $this->entryFingerprint($first));
+        });
+        $hasMore = isset($files[$fileIndex]);
+
+        return [
+            'entries' => $entries,
+            'next_cursor' => $hasMore ? $this->encodeCursor($fileIndex, $position) : null,
+        ];
     }
 
-    private function readChannelEntries(string $fileKey): array
+    private function filesForDateRange(string $fileKey, string $dateFrom, string $dateTo): array
     {
-        $entries = [];
-
-        foreach ($this->discoverFiles($fileKey) as $path) {
-            $content = $this->reader()->readTail($path, PHP_INT_MAX);
-
-            if ($content !== false) {
-                $entries = array_merge($entries, $this->parseContent((string) $content, $path));
+        $files = array_values(array_filter($this->discoverFiles($fileKey), function (string $path) use ($dateFrom, $dateTo): bool {
+            if (! preg_match('/(\d{4}-\d{2}-\d{2})/', basename($path), $matches)) {
+                return true;
             }
+
+            $fileDate = $matches[1];
+
+            return ($dateFrom === '' || $fileDate >= $dateFrom)
+                && ($dateTo === '' || $fileDate <= $dateTo);
+        }));
+
+        usort($files, function (string $first, string $second): int {
+            $modifiedComparison = (@filemtime($second) ?: 0) <=> (@filemtime($first) ?: 0);
+
+            return $modifiedComparison !== 0
+                ? $modifiedComparison
+                : strcmp(basename($second), basename($first));
+        });
+
+        return $files;
+    }
+
+    private function encodeCursor(int $fileIndex, ?int $position): string
+    {
+        return rtrim(strtr(base64_encode(json_encode([
+            'file_index' => $fileIndex,
+            'position' => $position,
+        ], JSON_THROW_ON_ERROR)), '+/', '-_'), '=');
+    }
+
+    private function decodeCursor(?string $cursor): array
+    {
+        if (is_null($cursor) || $cursor === '') {
+            return [];
         }
 
-        usort($entries, fn (array $a, array $b): int => strcmp($b['timestamp'] ?? '', $a['timestamp'] ?? ''));
+        return $this->decodeOpaqueValue($cursor);
+    }
 
-        return $entries;
+    private function decodeOpaqueValue(string $value): array
+    {
+        $padding = strlen($value) % 4;
+        $encoded = strtr($value, '-_', '+/');
+
+        if ($padding > 0) {
+            $encoded .= str_repeat('=', 4 - $padding);
+        }
+
+        $decoded = base64_decode($encoded, true);
+
+        if ($decoded === false) {
+            return [];
+        }
+
+        $state = json_decode($decoded, true);
+
+        return is_array($state) ? $state : [];
+    }
+
+    private function compactEntry(array $entry, string $fileKey): array
+    {
+        $detailId = $this->encodeOpaqueValue([
+            'file' => basename((string) ($entry['file_path'] ?? '')),
+            'fingerprint' => $this->entryFingerprint($entry),
+            'window_end' => (int) ($entry['detail_window_end'] ?? 0),
+        ]);
+
+        unset(
+            $entry['stack_trace'],
+            $entry['raw_log_entry'],
+            $entry['detail_window_end'],
+            $entry['_byte_start'],
+            $entry['_cursor_file_index'],
+            $entry['_cursor_position'],
+        );
+        $entry['detail_id'] = $detailId;
+        $entry['file_key'] = $fileKey;
+
+        return $entry;
+    }
+
+    private function entryFingerprint(array $entry): string
+    {
+        return hash('sha256', implode('|', [
+            (string) ($entry['timestamp'] ?? ''),
+            (string) ($entry['severity'] ?? ''),
+            (string) ($entry['message'] ?? ''),
+            (string) ($entry['raw_log_entry'] ?? ''),
+        ]));
+    }
+
+    private function encodeOpaqueValue(array $value): string
+    {
+        return rtrim(strtr(base64_encode(json_encode($value, JSON_THROW_ON_ERROR)), '+/', '-_'), '=');
     }
 
     private function readNewEntries(string $fileKey, string $path): array
     {
         $fileSize = $this->reader()->fileSize($path);
-        $state = MonitoredLogFileState::firstOrCreate(
-            ['channel_key' => $fileKey, 'file_path' => $path],
-            ['position' => 0, 'file_size' => 0],
-        );
-
         if ($fileSize === false) {
-            throw new RuntimeException('Failed to stat log file: ' . basename($path));
+            throw new RuntimeException('Failed to stat log file: '.basename($path));
         }
 
-        $position = $state->position > $fileSize ? 0 : $state->position;
-        $content = $this->reader()->readFrom($path, $position);
+        $state = MonitoredLogFileState::where('channel_key', $fileKey)
+            ->where('file_path', $path)
+            ->first();
+
+        if (is_null($state)) {
+            MonitoredLogFileState::create([
+                'channel_key' => $fileKey,
+                'file_path' => $path,
+                'position' => $fileSize,
+                'file_size' => $fileSize,
+                'last_scanned_at' => now(),
+            ]);
+
+            return [];
+        }
+
+        $wasTruncated = $state->position > $fileSize;
+        $position = $wasTruncated
+            ? max(0, $fileSize - self::REQUEST_BYTE_BUDGET)
+            : (int) $state->position;
+        $endPosition = min($fileSize, $position + self::REQUEST_BYTE_BUDGET);
+        $read = $this->reader()->readBackward(
+            $path,
+            $endPosition,
+            $endPosition - $position,
+        );
+
+        if ($read === false) {
+            throw new RuntimeException('Failed to read log file: '.basename($path));
+        }
+
+        $content = $read['content'];
+
+        if ($wasTruncated && $position > 0) {
+            $firstEntry = preg_match(
+                '/(?:^|\n)(?=\[\d{4}-\d{2}-\d{2}[T ])/m',
+                $content,
+                $matches,
+                PREG_OFFSET_CAPTURE,
+            ) === 1
+                ? $matches[0][1] + strlen($matches[0][0])
+                : null;
+
+            if (is_null($firstEntry)) {
+                $state->update([
+                    'position' => $endPosition,
+                    'file_size' => $fileSize,
+                    'last_scanned_at' => now(),
+                ]);
+
+                return [];
+            }
+
+            $position += $firstEntry;
+            $content = substr($content, $firstEntry);
+        }
+
+        $consumedBytes = strlen($content);
+
+        if ($endPosition < $fileSize) {
+            $lastEntryOffset = null;
+
+            if (preg_match_all(
+                '/(?:^|\n)(?=\[\d{4}-\d{2}-\d{2}[T ])/m',
+                $content,
+                $matches,
+                PREG_OFFSET_CAPTURE,
+            ) > 0) {
+                $lastMatch = end($matches[0]);
+                $lastEntryOffset = $lastMatch[1] + strlen($lastMatch[0]);
+            }
+
+            if (! is_null($lastEntryOffset)) {
+                $content = substr($content, 0, $lastEntryOffset);
+                $consumedBytes = $lastEntryOffset;
+            } else {
+                $content = '';
+                $consumedBytes = 0;
+            }
+        } elseif ($content !== '' && ! str_ends_with($content, "\n")) {
+            $lastNewline = strrpos($content, "\n");
+
+            if ($lastNewline === false) {
+                $content = '';
+                $consumedBytes = 0;
+            } else {
+                $content = substr($content, 0, $lastNewline + 1);
+                $consumedBytes = $lastNewline + 1;
+            }
+        }
 
         $state->update([
-            'position' => $fileSize,
+            'position' => $position + $consumedBytes,
             'file_size' => $fileSize,
             'last_scanned_at' => now(),
         ]);
 
-        if ($content === false || trim($content) === '') {
+        if (trim($content) === '') {
             return [];
         }
 
@@ -338,22 +627,41 @@ class AdminLogsDashboardService
     {
         $entries = [];
         $current = '';
+        $currentStart = 0;
+        $offset = 0;
+        $contentLength = strlen($content);
 
-        foreach (preg_split('/\R/', $content) as $line) {
+        while ($offset < $contentLength) {
+            $lineStart = $offset;
+            $lineEnd = strpos($content, "\n", $offset);
+            $line = $lineEnd === false
+                ? substr($content, $offset)
+                : substr($content, $offset, $lineEnd - $offset);
+            $line = rtrim($line, "\r");
+
             if (preg_match(self::LOG_START_PATTERN, $line) && $current !== '') {
                 $entry = $this->parseEntry($current, $path);
                 if (! is_null($entry)) {
+                    $entry['_byte_start'] = $currentStart;
                     $entries[] = $entry;
                 }
                 $current = $line;
+                $currentStart = $lineStart;
             } else {
+                if ($current === '') {
+                    $currentStart = $lineStart;
+                }
+
                 $current = $current === '' ? $line : $current . "\n" . $line;
             }
+
+            $offset = $lineEnd === false ? $contentLength : $lineEnd + 1;
         }
 
         if (trim($current) !== '') {
             $entry = $this->parseEntry($current, $path);
             if (! is_null($entry)) {
+                $entry['_byte_start'] = $currentStart;
                 $entries[] = $entry;
             }
         }
@@ -428,11 +736,8 @@ class AdminLogsDashboardService
 
     private function extractMessage(string $body): string
     {
-        $firstLine = strtok($body, "\n");
-
-        if ($firstLine === false) {
-            return '';
-        }
+        $lineEnd = strpos($body, "\n");
+        $firstLine = $lineEnd === false ? $body : substr($body, 0, $lineEnd);
 
         $firstLine = preg_replace('/\s+\{.*\}\s*$/s', '', $firstLine) ?? $firstLine;
 

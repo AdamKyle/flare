@@ -19,11 +19,13 @@ use App\Flare\Models\MarketBoard;
 use App\Flare\Models\SetSlot;
 use App\Flare\Models\Skill;
 use App\Flare\Transformers\ItemTransformer;
+use App\Flare\Transformers\UsableItemTransformer;
 use App\Flare\Values\ItemHolyValue;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
+use App\Game\Character\CharacterInventory\Exceptions\BatchCraftingDestinationFullException;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
@@ -101,6 +103,19 @@ class BatchCraftingProcessor
         ];
     }
 
+    public function trinketryCostPreview(Character $character): ?array
+    {
+        $skill = $character->skills()
+            ->whereHas('baseSkill', fn ($query) => $query->where('name', 'Trinketry'))
+            ->first();
+        $items = $this->trinketCraftingService->fetchItemsToCraft($character, false);
+        $item = $this->xpEligibleItemFromCandidates(collect($items), $skill?->level);
+
+        return is_null($item)
+            ? null
+            : $this->trinketCraftingService->craftingCost($character, $item);
+    }
+
     public function craftEnchantSetPlanKeys(array $queue): array
     {
         $keys = [];
@@ -168,24 +183,22 @@ class BatchCraftingProcessor
     {
         $candidateIds = collect();
 
-        foreach (ItemType::validWeapons() as $weaponType) {
-            try {
+        if (! is_null($this->craftingSkillLevelForType($character, ItemType::validWeapons()[0]))) {
+            foreach (ItemType::validWeapons() as $weaponType) {
                 $candidateIds = $candidateIds->merge(
                     $this->specificCraftableItems($character, $weaponType)
                         ->filter(fn ($item) => $item->type === $weaponType)
                         ->pluck('id')
                 );
-            } catch (\Throwable) {
             }
         }
 
-        try {
+        if (! is_null($this->craftingSkillLevelForType($character, 'armour'))) {
             $candidateIds = $candidateIds->merge(
                 $this->specificCraftableItems($character, 'armour')
                     ->filter(fn ($item) => $item->type === 'shield')
                     ->pluck('id')
             );
-        } catch (\Throwable) {
         }
 
         return Item::whereIn('id', $candidateIds->unique()->values())
@@ -228,13 +241,13 @@ class BatchCraftingProcessor
             ? $type
             : ($type === ArmourType::SHIELD->value ? 'armour' : $craftingType);
 
-        try {
-            $candidateIds = $this->specificCraftableItems($character, $candidateCraftingType)
-                ->filter(fn ($item) => $item->type === $type)
-                ->pluck('id');
-        } catch (\Throwable) {
+        if (is_null($this->craftingSkillLevelForType($character, $candidateCraftingType))) {
             return collect();
         }
+
+        $candidateIds = $this->specificCraftableItems($character, $candidateCraftingType)
+            ->filter(fn ($item) => str_replace('_', '-', $item->type) === $type)
+            ->pluck('id');
 
         if ($candidateIds->isEmpty()) {
             return collect();
@@ -949,7 +962,7 @@ class BatchCraftingProcessor
         return match ($disposition) {
             BatchCraftingDisposition::KEEP => $this->sendAlchemyKeptInBagMessage($character, $slot, [
                 'counts' => ['kept_count' => 1],
-                'details' => ['disposition' => 'keep', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false)],
+                'details' => ['disposition' => 'keep', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)],
             ]),
             BatchCraftingDisposition::KEEP_HIGHEST => $this->applyAlchemyKeepHighest($batchCrafting, $character, $slot),
             BatchCraftingDisposition::SELL => $this->sellAlchemySlot($character, $slot),
@@ -957,13 +970,13 @@ class BatchCraftingProcessor
             BatchCraftingDisposition::LIST => $this->listAlchemySlot($batchCrafting, $character, $slot),
             BatchCraftingDisposition::DISENCHANT => $this->sendAlchemyKeptInBagMessage($character, $slot, [
                 'counts' => ['kept_count' => 1],
-                'details' => ['disposition' => 'keep', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false, $slot->id)],
+                'details' => ['disposition' => 'keep', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)],
             ]),
             BatchCraftingDisposition::KEEP_BEST_SELL_REST => $this->applyAlchemyKeepBestAndRestSlot($batchCrafting, $character, $slot, 'sell'),
             BatchCraftingDisposition::KEEP_BEST_DESTROY_REST => $this->applyAlchemyKeepBestAndRestSlot($batchCrafting, $character, $slot, 'destroy'),
             BatchCraftingDisposition::KEEP_BEST_DISENCHANT_REST => $this->sendAlchemyKeptInBagMessage($character, $slot, [
                 'counts' => ['kept_count' => 1],
-                'details' => ['disposition' => 'keep', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false, $slot->id)],
+                'details' => ['disposition' => 'keep', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)],
             ]),
             BatchCraftingDisposition::USE_NOW => $this->useAlchemySlotNow($character, $slot),
         };
@@ -1039,7 +1052,7 @@ class BatchCraftingProcessor
 
             return $this->sendAlchemyKeptInBagMessage($character, $slot, [
                 'counts' => ['kept_count' => 1],
-                'details' => ['disposition' => 'keep_best_' . $loserAction . '_rest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false)],
+                'details' => ['disposition' => 'keep_best_' . $loserAction . '_rest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)],
             ]);
         }
 
@@ -1054,7 +1067,7 @@ class BatchCraftingProcessor
 
             return $this->sendAlchemyKeptInBagMessage($character, $slot, [
                 'counts' => $this->mergeCounts(['kept_count' => 1], $loserResult['counts']),
-                'details' => array_merge(['disposition' => 'keep_best_' . $loserAction . '_rest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false)], $loserResult['details']),
+                'details' => array_merge(['disposition' => 'keep_best_' . $loserAction . '_rest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)], $loserResult['details']),
             ]);
         }
 
@@ -1075,7 +1088,7 @@ class BatchCraftingProcessor
      */
     private function useAlchemySlotNow(Character $character, AlchemyBagSlot $slot): array
     {
-        $itemDetails = $this->itemDetails($slot->item, $slot->id, false);
+        $itemDetails = $this->itemDetails($slot->item, $slot->id, true, $slot->id);
 
         if (! $this->useItemService->isAlchemyBoonItem($slot->item)) {
             return [
@@ -1177,7 +1190,7 @@ class BatchCraftingProcessor
 
             return [
                 'counts' => ['kept_count' => 1],
-                'details' => ['disposition' => 'keep_highest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false)],
+                'details' => ['disposition' => 'keep_highest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)],
             ];
         }
 
@@ -1188,7 +1201,7 @@ class BatchCraftingProcessor
 
             return [
                 'counts' => ['kept_count' => 1],
-                'details' => ['disposition' => 'keep_highest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false)],
+                'details' => ['disposition' => 'keep_highest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id)],
             ];
         }
 
@@ -1201,7 +1214,7 @@ class BatchCraftingProcessor
 
             return [
                 'counts' => ['kept_count' => 1, 'sold_count' => 1],
-                'details' => ['disposition' => 'keep_highest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, false), 'sold_item' => $sold['details']['sold_item'] ?? null, 'gold_gained' => $sold['details']['gold_gained'] ?? 0],
+                'details' => ['disposition' => 'keep_highest', 'kept_item' => $this->itemDetails($slot->item, $slot->id, true, $slot->id), 'sold_item' => $sold['details']['sold_item'] ?? null, 'gold_gained' => $sold['details']['gold_gained'] ?? 0],
             ];
         }
 
@@ -1807,13 +1820,14 @@ class BatchCraftingProcessor
 
         return $this->processRepeatedActions(BatchCraftingService::ITEMS_PER_RECURRING_TICK, function () use ($batchCrafting, $character, $disposition) {
             return $this->processTrinketrySingle($batchCrafting->refresh(), $character->refresh(), $disposition);
-        });
+        }, true);
     }
 
     private function processTrinketrySingle(BatchCrafting $batchCrafting, Character $character, BatchCraftingDisposition $disposition): array
     {
         $progress = $batchCrafting->progress ?? [];
         $trinketryMode = $progress['trinketry_mode'] ?? 'experience';
+        $skill = null;
 
         if ($trinketryMode === 'experience') {
             $skill = $character->skills()
@@ -1838,15 +1852,42 @@ class BatchCraftingProcessor
             return ['end_reason' => BatchCraftingEndReason::MAXED_OR_NOTHING_LEFT];
         }
 
+        $craftingCost = $this->trinketCraftingService->craftingCost($character, $item);
+
+        if ($craftingCost['gold_dust']['missing'] > 0 || $craftingCost['copper_coins']['missing'] > 0) {
+            $missingCurrencies = [];
+
+            foreach (['gold_dust' => 'Gold Dust', 'copper_coins' => 'Copper Coins'] as $currency => $label) {
+                if ($craftingCost[$currency]['missing'] > 0) {
+                    $missingCurrencies[] = $label
+                        .' required '.number_format($craftingCost[$currency]['required'])
+                        .', available '.number_format($craftingCost[$currency]['available'])
+                        .', missing '.number_format($craftingCost[$currency]['missing']);
+                }
+            }
+
+            $message = 'Batch Trinketry stopped before crafting '.$craftingCost['item_name'].'. Missing: '.implode('; ', $missingCurrencies).'.';
+            $progress['trinketry_end_details'] = $craftingCost;
+            $progress['trinketry_end_message'] = $message;
+            $batchCrafting->update(['progress' => $progress]);
+            $this->serverMessageHandler->sendBasicMessage($character->user, $message);
+
+            return ['end_reason' => BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES];
+        }
+
         $destinationCreator = $this->shouldCommitKeptOutput($disposition)
             ? $this->resolvedDestinationCreator($batchCrafting, $character)
             : null;
-        $craftResult = $this->trinketCraftingService->craftForBatch(
-            $character,
-            $item,
-            $this->shouldCommitKeptOutput($disposition),
-            $destinationCreator,
-        );
+        try {
+            $craftResult = $this->trinketCraftingService->craftForBatch(
+                $character,
+                $item,
+                $this->shouldCommitKeptOutput($disposition),
+                $destinationCreator,
+            );
+        } catch (BatchCraftingDestinationFullException) {
+            return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+        }
 
         if (($craftResult['success'] ?? false) && ! is_null($destinationCreator) && is_null($craftResult['destination'] ?? null)) {
             if (isset($craftResult['item']) && $craftResult['item'] instanceof Item) {
@@ -1858,15 +1899,38 @@ class BatchCraftingProcessor
         $character = $character->refresh();
 
         if (! $craftResult['success'] || is_null($craftResult['item'])) {
+            if (($craftResult['reason'] ?? null) === 'not_enough_currency') {
+                $craftingCost = $craftResult['cost'];
+                $missingCurrencies = [];
+
+                foreach (['gold_dust' => 'Gold Dust', 'copper_coins' => 'Copper Coins'] as $currency => $label) {
+                    if ($craftingCost[$currency]['missing'] > 0) {
+                        $missingCurrencies[] = $label
+                            .' required '.number_format($craftingCost[$currency]['required'])
+                            .', available '.number_format($craftingCost[$currency]['available'])
+                            .', missing '.number_format($craftingCost[$currency]['missing']);
+                    }
+                }
+
+                $message = 'Batch Trinketry stopped before crafting '.$craftingCost['item_name'].'. Missing: '.implode('; ', $missingCurrencies).'.';
+                $progress = $batchCrafting->refresh()->progress ?? [];
+                $progress['trinketry_end_details'] = $craftingCost;
+                $progress['trinketry_end_message'] = $message;
+                $batchCrafting->update(['progress' => $progress]);
+                $this->serverMessageHandler->sendBasicMessage($character->user, $message);
+
+                return ['end_reason' => BatchCraftingEndReason::TRINKETRY_INSUFFICIENT_CURRENCIES];
+            }
+
+            if (($craftResult['reason'] ?? null) === 'destination_failed') {
+                return ['end_reason' => BatchCraftingEndReason::BATCH_CRAFTING_SET_FULL];
+            }
+
             $result = ['counts' => ['failed_count' => 1], 'actions' => [[
                 'action' => 'trinketry',
                 'status' => 'failed',
                 'failure' => 'Trinketry service did not produce an item.',
             ]]];
-
-            if (($craftResult['reason'] ?? null) === 'destination_failed') {
-                $result['end_reason'] = BatchCraftingEndReason::FAILED;
-            }
 
             return $result;
         }
@@ -1883,6 +1947,8 @@ class BatchCraftingProcessor
         $actions = [[
             'action' => 'trinketry',
             'trinketry_item' => $this->itemDetails($craftedItem),
+            'gold_dust_spent' => $craftingCost['gold_dust']['required'],
+            'copper_coins_spent' => $craftingCost['copper_coins']['required'],
         ] + $dispositionResult['details']];
 
         $result = [
@@ -2849,7 +2915,7 @@ class BatchCraftingProcessor
         }
 
         $progress = $batchCrafting->progress ?? [];
-        $queue = $progress['event_craft_queue'] ?? [];
+        $queue = $progress['event_craft_queue'] ?? BatchCraftingService::eventCraftQueue();
         $index = (int) ($progress['event_craft_index'] ?? 0);
 
         if (empty($queue)) {
@@ -3065,13 +3131,7 @@ class BatchCraftingProcessor
     private function processEventFallbackCraftSingle(BatchCrafting $batchCrafting, Character $character): array
     {
         $progress = $batchCrafting->progress ?? [];
-        $queue = $progress['event_craft_queue'] ?? [
-            ['type' => 'weapon', 'crafting_type' => 'weapon'],
-            ['type' => 'armour', 'crafting_type' => 'armour'],
-            ['type' => 'ring', 'crafting_type' => 'ring'],
-            ['type' => 'spell_damage', 'crafting_type' => 'spell'],
-            ['type' => 'spell_healing', 'crafting_type' => 'spell'],
-        ];
+        $queue = $progress['event_craft_queue'] ?? BatchCraftingService::eventCraftQueue();
         $index = (int) ($progress['event_craft_index'] ?? 0);
 
         if ($index >= count($queue)) {
@@ -3421,7 +3481,9 @@ class BatchCraftingProcessor
 
     private function eventCraftableItem(Character $character, array $target): ?Item
     {
-        if ($target['type'] === 'weapon') {
+        $targetType = str_replace('_', '-', $target['type']);
+
+        if ($targetType === 'weapon') {
             foreach (ItemType::validWeapons() as $weaponType) {
                 $item = $this->craftableItemForTarget($character, $weaponType, $weaponType);
 
@@ -3433,7 +3495,7 @@ class BatchCraftingProcessor
             return null;
         }
 
-        if ($target['type'] === 'armour') {
+        if ($targetType === 'armour') {
             foreach (ArmourType::allTypes() as $armourType) {
                 $item = $this->craftableItemForTarget($character, $armourType, 'armour');
 
@@ -3445,46 +3507,52 @@ class BatchCraftingProcessor
             return null;
         }
 
-        return $this->craftableItemForTarget($character, $target['type'], $target['crafting_type']);
+        return $this->craftableItemForTarget($character, $targetType, $target['crafting_type']);
     }
 
     private function craftableItemForTarget(Character $character, string $type, string $craftingType): ?Item
     {
-        try {
-            $craftableItem = $this->specificCraftableItems($character, $craftingType)
-                ->filter(fn ($item) => $item->type === $type)
-                ->sortBy([
-                    ['cost', 'asc'],
-                    ['skill_level_required', 'asc'],
-                    ['id', 'asc'],
-                ])
-                ->first();
-        } catch (\Throwable) {
+        if (is_null($this->craftingSkillLevelForType($character, $craftingType))) {
             return null;
         }
+
+        $craftableItem = $this->specificCraftableItems($character, $craftingType)
+            ->filter(fn ($item) => str_replace('_', '-', $item->type) === $type)
+            ->sortBy([
+                ['cost', 'asc'],
+                ['skill_level_required', 'asc'],
+                ['id', 'asc'],
+            ])
+            ->first();
 
         return is_null($craftableItem) ? null : Item::find($craftableItem->id);
     }
 
     private function xpEligibleCraftableItem(Character $character, string $craftingType, string $type): ?Item
     {
-        try {
-            $candidates = $this->specificCraftableItems($character, $craftingType)
-                ->filter(fn ($craftableItem) => $craftableItem->type === $type);
-        } catch (\Throwable) {
+        $skillLevel = $this->craftingSkillLevelForType($character, $craftingType);
+
+        if (is_null($skillLevel)) {
             return null;
         }
 
-        $skillLevel = $this->craftingSkillLevelForType($character, $craftingType);
+        $candidates = $this->specificCraftableItems($character, $craftingType)
+            ->filter(fn ($craftableItem) => str_replace('_', '-', $craftableItem->type) === $type);
 
         return $this->xpEligibleItemFromCandidates($candidates, $skillLevel);
     }
 
     private function craftingSkillLevelForType(Character $character, string $craftingType): ?int
     {
-        $skillName = in_array($craftingType, ItemType::validWeapons(), true)
+        $normalizedCraftingType = str_replace('_', '-', $craftingType);
+
+        if (in_array($normalizedCraftingType, [ItemType::SPELL_DAMAGE->value, ItemType::SPELL_HEALING->value], true)) {
+            $normalizedCraftingType = 'spell';
+        }
+
+        $skillName = in_array($normalizedCraftingType, ItemType::validWeapons(), true)
             ? 'Weapon Crafting'
-            : ucfirst($craftingType) . ' Crafting';
+            : ucfirst($normalizedCraftingType) . ' Crafting';
 
         $skill = $character->skills()
             ->whereHas('baseSkill', fn ($query) => $query->where('name', $skillName))
@@ -3608,7 +3676,7 @@ class BatchCraftingProcessor
         return BatchCraftingEndReason::EVENT_NO_EVENT_ITEMS_TO_ENCHANT;
     }
 
-    private function processRepeatedActions(int $attempts, callable $callback): array
+    private function processRepeatedActions(int $attempts, callable $callback, bool $continueOnMaxedAfterActions = false): array
     {
         $counts = [];
         $actions = [];
@@ -3621,6 +3689,13 @@ class BatchCraftingProcessor
                 $actions = array_merge($actions, $result['actions'] ?? []);
 
                 if (! empty($actions)) {
+                    if ($continueOnMaxedAfterActions && $result['end_reason'] === BatchCraftingEndReason::MAXED_OR_NOTHING_LEFT) {
+                        return [
+                            'counts' => $counts,
+                            'actions' => $actions,
+                        ];
+                    }
+
                     $endResult = [
                         'end_reason' => $result['end_reason'],
                         'counts' => $counts,
@@ -4752,7 +4827,9 @@ class BatchCraftingProcessor
             'is_cosmic' => (bool) ($item->is_cosmic ?? false),
             'can_view' => $canView && ! is_null($slotId),
             'crafted_at' => now()->toJSON(),
-            'full_item_details' => (new ItemTransformer())->transform($item),
+            'full_item_details' => $item->type === 'alchemy'
+                ? (new UsableItemTransformer())->transform($item)
+                : (new ItemTransformer())->transform($item),
         ];
     }
 
@@ -4770,7 +4847,7 @@ class BatchCraftingProcessor
         return match ($craftingType) {
             'armour', 'helmet', 'body', 'leggings', 'sleeves', 'gloves', 'shield', 'feet' => 'Armour Crafting',
             'ring' => 'Ring Crafting',
-            'spell', 'spell_damage', 'spell_healing' => 'Spell Crafting',
+            'spell', 'spell-damage', 'spell-healing', 'spell_damage', 'spell_healing' => 'Spell Crafting',
             default => 'Weapon Crafting',
         };
     }
@@ -4850,6 +4927,7 @@ class BatchCraftingProcessor
             'can_view' => false,
             'item_id_for_modal' => null,
             'slot_id_for_modal' => null,
+            'alchemy_slot_id' => null,
         ]);
     }
 

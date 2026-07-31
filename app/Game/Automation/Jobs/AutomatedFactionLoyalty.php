@@ -26,6 +26,7 @@ use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\Exceptions\MissingInventoryException;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
 use Carbon\Carbon;
@@ -656,6 +657,17 @@ class AutomatedFactionLoyalty implements ShouldQueue
             return;
         }
 
+        if (in_array($automatedFightResult->getResultType(), [
+            AutomatedFightResultType::BOUNTY_BATCH_YIELDED,
+            AutomatedFightResultType::BOUNTY_FIGHT_YIELDED,
+            AutomatedFightResultType::TRAINING_BATCH_YIELDED,
+            AutomatedFightResultType::TRAINING_FIGHT_YIELDED,
+        ], true)) {
+            $this->recallJob($characterCacheData);
+
+            return;
+        }
+
         if ($automatedFightResult->getResultType() === AutomatedFightResultType::DIED_TO_BOUNTY_STARTED_TRAINING) {
             $this->recallJob($characterCacheData);
 
@@ -931,6 +943,18 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function handleAutomationException(Throwable $throwable, CharacterCacheData $characterCacheData): void
     {
+        if ($throwable instanceof MissingInventoryException) {
+            $this->character?->user()->update(['will_be_deleted' => true]);
+            Log::channel('faction_loyalty')->warning('Faction loyalty automation stopped for a character with missing inventory.', [
+                'character_id' => $this->characterId,
+                'automation_id' => $this->automationId,
+                'faction_loyalty_automation_id' => $this->factionLoyaltyAutomationId,
+                'exception' => $throwable,
+            ]);
+
+            return;
+        }
+
         $context = [
             'character_id' => $this->characterId,
             'character_name' => $this->character?->name,

@@ -388,6 +388,28 @@
                 Labyrinth Oracle
             </a>
             <hr />
+            <h6 class="uppercase">Batch Crafting</h6>
+            <a href="{{ route('info.page', ['pageName' => 'batch-crafting']) }}">
+                <span class="ra ra-hammer"></span>
+                Batch Crafting Intro
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'batch-crafting:-crafting-items']) }}">
+                <span class="ra ra-hammer"></span>
+                Batch: Crafting Items
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'batch-crafting:-craft-and-enchant']) }}">
+                <span class="ra ra-burning-book"></span>
+                Batch: Craft and Enchant
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'batch-crafting:-alchemy-and-holy-oils']) }}">
+                <span class="ra ra-round-bottom-flask"></span>
+                Batch Alchemy & Holy Oils
+            </a>
+            <a href="{{ route('info.page', ['pageName' => 'batch-crafting:-trinkets']) }}">
+                <span class="ra ra-fire-shield"></span>
+                Batch Trinketry
+            </a>
+            <hr />
             <h6>Misc. Lists</h6>
             <a href="{{ route('info.page', ['pageName' => 'monsters']) }}">
                 <span class="ra ra-broken-skull"></span>

@@ -3918,8 +3918,7 @@ export default class BatchCraftingSection extends React.Component<
         const isExperienceMode =
             (["craft", "craft_and_enchant"].includes(batchType) &&
                 resolvedCraftMode === "experience") ||
-            (batchType === "alchemy" && resolvedAlchemyMode === "experience") ||
-            batchType === "trinketry";
+            (batchType === "alchemy" && resolvedAlchemyMode === "experience");
 
         if (isExperienceMode) {
             return null;
@@ -3931,6 +3930,7 @@ export default class BatchCraftingSection extends React.Component<
         const isAlchemyAmount =
             batchType === "alchemy" && resolvedAlchemyMode === "amount";
         const isHolyOils = batchType === "holy_oils";
+        const isTrinketry = batchType === "trinketry";
         const title = isCraftEnchantSet
             ? "Cost To Craft and Enchant"
             : "Cost To Craft";
@@ -3976,7 +3976,8 @@ export default class BatchCraftingSection extends React.Component<
         const redValueClass = "text-red-700 dark:text-red-400 font-semibold";
         const hasCraftCostRow =
             !isAlchemyAmount && !isHolyOils && totalCraftingCost !== null;
-        const hasRows = hasCraftCostRow || isAlchemyAmount || isHolyOils;
+        const hasRows =
+            hasCraftCostRow || isAlchemyAmount || isHolyOils || isTrinketry;
 
         if (!hasRows) {
             return null;
@@ -4055,6 +4056,38 @@ export default class BatchCraftingSection extends React.Component<
                             Available Gold Dust
                         </dt>
                         <dd>{formatNumber(holyOilGoldDustAvailable)}</dd>
+                    </dl>
+                ) : null}
+                {isTrinketry ? (
+                    <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-[max-content_minmax(0,1fr)]">
+                        <dt className="font-semibold sm:whitespace-nowrap">
+                            XP-Eligible Trinket
+                        </dt>
+                        <dd>{preview.trinket?.name ?? "Unavailable"}</dd>
+                        <dt className="font-semibold sm:whitespace-nowrap">
+                            Gold Dust Required
+                        </dt>
+                        <dd
+                            className={
+                                (preview.gold_dust?.missing ?? 0) > 0
+                                    ? redValueClass
+                                    : ""
+                            }
+                        >
+                            {formatNumber(preview.gold_dust?.required ?? 0)}
+                        </dd>
+                        <dt className="font-semibold sm:whitespace-nowrap">
+                            Copper Coins Required
+                        </dt>
+                        <dd
+                            className={
+                                (preview.copper_coins?.missing ?? 0) > 0
+                                    ? redValueClass
+                                    : ""
+                            }
+                        >
+                            {formatNumber(preview.copper_coins?.required ?? 0)}
+                        </dd>
                     </dl>
                 ) : null}
                 {preview.enchant_has_failure_risk ? (
@@ -4608,7 +4641,7 @@ export default class BatchCraftingSection extends React.Component<
                 </p>
                 <div className="border-b-2 border-b-gray-200 dark:border-b-gray-600 my-3 hidden sm:block"></div>
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
-                    <dt className="font-semibold">Selected Set</dt>
+                    <dt className="font-semibold">Set</dt>
                     <dd>{preview.set_name}</dd>
                     <dt className="font-semibold">Items Affected</dt>
                     <dd>{formatNumber(preview.items_affected)}</dd>
@@ -5058,6 +5091,20 @@ export default class BatchCraftingSection extends React.Component<
                                     Alchemy Bag, not your normal inventory.
                                 </p>
                                 {this.renderDestinationCapacity()}
+                                <div className="grid gap-2">
+                                    {craftExperienceOptions.map((option) => (
+                                        <CraftingXp
+                                            key={option.value}
+                                            skill_xp={{
+                                                skill_name: option.skill_name,
+                                                level: option.current_level,
+                                                current_xp: option.current_xp,
+                                                next_level_xp:
+                                                    option.required_xp,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         ) : null}
 
@@ -5593,6 +5640,20 @@ export default class BatchCraftingSection extends React.Component<
                                     Items Set, not your normal inventory.
                                 </InfoAlert>
                                 {this.renderDestinationCapacity()}
+                                <div className="grid gap-2">
+                                    {craftExperienceOptions.map((option) => (
+                                        <CraftingXp
+                                            key={option.value}
+                                            skill_xp={{
+                                                skill_name: option.skill_name,
+                                                level: option.current_level,
+                                                current_xp: option.current_xp,
+                                                next_level_xp:
+                                                    option.required_xp,
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
                         ) : null}
 
