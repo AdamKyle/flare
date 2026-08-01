@@ -2,6 +2,8 @@
 
 namespace App\Game\BatchCrafting\Services;
 
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
@@ -31,8 +33,6 @@ use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\GlobalEventSteps;

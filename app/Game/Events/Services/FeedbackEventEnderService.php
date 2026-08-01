@@ -2,15 +2,12 @@
 
 namespace App\Game\Events\Services;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Models\SubmittedSurvey;
 use App\Flare\Services\CreateSurveySnapshot;
 use App\Game\Events\Services\Concerns\EventEnder;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Survey\Events\ShowSurvey;
 
 class FeedbackEventEnderService implements EventEnder
 {
@@ -31,16 +28,6 @@ class FeedbackEventEnderService implements EventEnder
         ));
 
         $this->createSurveySnapshot->createSnapShop();
-
-        SubmittedSurvey::truncate();
-
-        Character::chunkById(250, function ($characters) {
-            foreach ($characters as $character) {
-                $character->user()->update(['is_showing_survey' => false]);
-                $character = $character->refresh();
-                event(new ShowSurvey($character->user));
-            }
-        });
 
         event(new GlobalMessageEvent(
             'Survey stats have been generated. The Creator has yet to leave a response. You can see these stats by

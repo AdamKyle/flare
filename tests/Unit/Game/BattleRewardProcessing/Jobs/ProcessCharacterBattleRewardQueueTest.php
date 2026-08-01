@@ -641,6 +641,7 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
     {
         Event::fake();
         Queue::fake();
+        config(['queue.connections.battle_reward_processing.driver' => 'redis']);
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
@@ -933,6 +934,7 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
     {
         Event::fake();
         Queue::fake();
+        config(['queue.connections.battle_reward_processing.driver' => 'redis']);
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $this->createCharacterBattleRewardQueueState([
             'character_id' => $character->id,
@@ -959,6 +961,32 @@ class ProcessCharacterBattleRewardQueueTest extends TestCase
 
         $this->assertSame(BattleRewardRequestStatus::RESUMABLE, $processingRequest->refresh()->status);
         Queue::assertPushed(ProcessCharacterBattleRewardQueue::class, 1);
+    }
+
+    public function test_failed_hook_keeps_pending_request_without_dispatching_continuation_for_sync_driver(): void
+    {
+        Event::fake();
+        Queue::fake();
+        config(['queue.connections.battle_reward_processing.driver' => 'sync']);
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardQueueState([
+            'character_id' => $character->id,
+            'is_processing' => true,
+            'heartbeat_at' => now(),
+        ]);
+        $pendingRequest = $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::PENDING,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+            'handler_payload' => ['monster_id' => 1, 'context' => []],
+        ]);
+
+        (new ProcessCharacterBattleRewardQueue($character->id))->failed(
+            new RuntimeException('job failed hard'),
+        );
+
+        $this->assertSame(BattleRewardRequestStatus::PENDING, $pendingRequest->refresh()->status);
+        Queue::assertNothingPushed();
     }
 
     public function test_processor_handles_faction_loyalty_source_type_via_process_ledger_aware_rewards(): void

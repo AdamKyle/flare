@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin\GuideQuests;
 
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
+use App\Flare\Items\Values\AlchemyItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGuideQuest;

@@ -6,7 +6,6 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\User;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
-use App\Http\Middleware\GameAuthentication;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
@@ -36,8 +35,6 @@ class RegistrationControllerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->withoutMiddleware(GameAuthentication::class);
 
         Hash::setRounds(4);
 

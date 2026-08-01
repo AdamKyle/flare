@@ -2,12 +2,12 @@
 
 namespace App\Game\Exploration\Providers;
 
+use App\Game\Automation\Middleware\IsCharacterExploring;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Exploration\Middleware\IsCharacterExploring;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider

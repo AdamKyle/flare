@@ -4,6 +4,8 @@ namespace App\Game\BatchCrafting\Services;
 
 use App\Admin\Events\BatchCraftingMonitoringUpdated;
 use App\Admin\Services\MonitoredBugReportService;
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
@@ -25,8 +27,6 @@ use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;

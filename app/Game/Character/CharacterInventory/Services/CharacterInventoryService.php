@@ -2,6 +2,9 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
+use App\Flare\Items\Transformers\EquippableItemTransformer;
+use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;

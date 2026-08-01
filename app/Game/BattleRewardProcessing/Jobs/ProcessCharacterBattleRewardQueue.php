@@ -485,6 +485,16 @@ class ProcessCharacterBattleRewardQueue implements ShouldQueue
             return;
         }
 
+        if (config('queue.connections.battle_reward_processing.driver') === 'sync') {
+            Log::channel('reward_processing')->warning('Failed hook skipped continuation dispatch to prevent recursive synchronous failure.', [
+                'character_id' => $this->characterId,
+                'connection' => 'battle_reward_processing',
+                'driver' => 'sync',
+            ]);
+
+            return;
+        }
+
         Log::channel('reward_processing')->info('Failed hook dispatching processor for remaining rows.', [
             'character_id' => $this->characterId,
         ]);

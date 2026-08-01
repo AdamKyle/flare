@@ -3,6 +3,8 @@
 namespace Tests\Unit\Game\BatchCrafting\Services;
 
 use App\Admin\Events\BatchCraftingMonitoringUpdated;
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\GlobalEventGoal;
@@ -32,8 +34,6 @@ use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use App\Game\Core\Values\FeedbackType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;

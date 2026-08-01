@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Game\Core\Services;
 
-use App\Flare\Builders\BuildMythicItem;
-use App\Flare\Builders\RandomItemDropBuilder;
+use App\Flare\Items\Builders\BuildMythicItem;
+use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Values\LocationType;
 use App\Game\Battle\Services\BattleDrop;

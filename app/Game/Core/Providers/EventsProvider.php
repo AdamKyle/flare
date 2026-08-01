@@ -17,7 +17,6 @@ use App\Game\Core\Listeners\DropsCheckListener;
 use App\Game\Core\Listeners\UpdateCharacterCurrenciesListener;
 use App\Game\Core\Listeners\UpdateCharacterInventoryCountListener;
 use App\Game\Core\Listeners\UpdateCharacterListener;
-use App\Game\Core\Listeners\UpdateTopBarListener;
 use App\Game\Tops\Listeners\CharacterTopsUpdateListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
@@ -31,7 +30,6 @@ class EventsProvider extends ServiceProvider
         ],
 
         UpdateTopBarEvent::class => [
-            UpdateTopBarListener::class,
             CharacterTopsUpdateListener::class,
         ],
 

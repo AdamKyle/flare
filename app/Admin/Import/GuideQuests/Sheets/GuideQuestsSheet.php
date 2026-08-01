@@ -2,6 +2,9 @@
 
 namespace App\Admin\Import\GuideQuests\Sheets;
 
+use App\Flare\Items\Values\AlchemyItemType;
+use App\Flare\Items\Values\ArmourType;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
@@ -10,9 +13,6 @@ use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Item;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
-use App\Game\Character\CharacterInventory\Values\ArmourType;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 

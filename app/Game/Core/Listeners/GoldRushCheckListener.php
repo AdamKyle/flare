@@ -5,7 +5,7 @@ namespace App\Game\Core\Listeners;
 use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\GoldRushCheckEvent;
-use App\Game\Messages\Types\MessageType;
+use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
 use Facades\App\Flare\Calculators\GoldRushCheckCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -36,13 +36,13 @@ class GoldRushCheckListener
 
             $maxCurrencies = new MaxCurrenciesValue($goldRush, MaxCurrenciesValue::GOLD);
 
-            $type = MessageType::GOLD_RUSH;
+            $type = CurrenciesMessageTypes::GOLD_RUSH;
 
             if ($maxCurrencies->canNotGiveCurrency()) {
                 $event->character->gold = MaxCurrenciesValue::MAX_GOLD;
                 $event->character->save();
 
-                $type = MessageType::GOLD_CAPPED;
+                $type = CurrenciesMessageTypes::GOLD_CAPPED;
             } else {
                 $event->character->gold = $goldRush;
                 $event->character->save();

@@ -2,10 +2,10 @@
 
 namespace App\Game\Character\CharacterSheet\Transformers;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Transformers\BaseTransformer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 
 class CharacterStatDetailsTransformer extends BaseTransformer
 {

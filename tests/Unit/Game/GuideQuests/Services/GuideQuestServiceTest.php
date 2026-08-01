@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\GuideQuests\Services;
 
+use App\Flare\Items\Values\AlchemyItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\InventorySlot;
@@ -15,7 +16,6 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Flare\Values\RandomAffixDetails;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\GuideQuests\Services\GuideQuestService;

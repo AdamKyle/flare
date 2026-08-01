@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\GuideQuests\Services;
 
 use App\Admin\Services\GuideQuestService as AdminGuideQuestService;
+use App\Flare\Items\Values\AlchemyItemType;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
@@ -11,7 +12,6 @@ use App\Flare\Values\ItemEffectsValue;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Flare\Values\MapNameValue;
 use App\Flare\Values\RandomAffixDetails;
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;

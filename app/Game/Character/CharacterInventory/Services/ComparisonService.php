@@ -8,7 +8,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Flare\Transformers\ItemComparisonTransfromer;
 use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
@@ -112,7 +111,7 @@ class ComparisonService
 
     public function buildSetSlotComparisonData(Character $character, SetSlot $slot): array
     {
-        $item = new FractalItem($slot->item, new ItemComparisonTransfromer);
+        $item = new FractalItem($slot, new EquippableItemTransformer);
         $item = (new Manager)->createData($item)->toArray()['data'];
         $item['slot_id'] = $slot->id;
 

@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Values\AttackTypeValue;
 use App\Flare\Values\SpellTypes;
 use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;

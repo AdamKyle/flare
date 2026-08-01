@@ -3,8 +3,8 @@
 namespace Tests\Unit\Admin\Import\GuideQuests\Sheets;
 
 use App\Admin\Import\GuideQuests\Sheets\GuideQuestsSheet;
+use App\Flare\Items\Values\AlchemyItemType;
 use App\Flare\Models\GuideQuest;
-use App\Game\Character\CharacterInventory\Values\AlchemyItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Tests\TestCase;

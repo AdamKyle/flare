@@ -2,10 +2,10 @@
 
 namespace App\Game\Character\CharacterInventory\Validations;
 
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
 use App\Flare\Values\WeaponTypes;
-use App\Game\Character\CharacterInventory\Values\ItemType;
 use Illuminate\Support\Collection;
 
 class SetHandsValidation
