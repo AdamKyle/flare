@@ -38,7 +38,9 @@ class HandInQuestTest extends TestCase
             ->twice()
             ->andReturn($rewardHandler);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
+        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
+
+        HandInQuest::dispatch($character, $quest);
 
         $this->assertEquals(1, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
         Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($character, $quest, $npc): bool {
@@ -63,7 +65,9 @@ class HandInQuestTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Reward failed.');
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
+        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
+
+        HandInQuest::dispatch($character, $quest);
     }
 
     public function test_failed_reward_handling_does_not_fire_completed_message(): void
@@ -83,7 +87,9 @@ class HandInQuestTest extends TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Reward failed.');
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
+        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
+
+        HandInQuest::dispatch($character, $quest);
     }
 
     public function test_failed_reward_handling_logs_and_rethrows_exception(): void
@@ -107,7 +113,9 @@ class HandInQuestTest extends TestCase
 
         $this->expectExceptionObject($exception);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
+        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
+
+        HandInQuest::dispatch($character, $quest);
     }
 
     public function test_quest_completion_log_is_written_before_xp_reward_processing(): void
@@ -138,7 +146,9 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler->shouldReceive('handleNpcQuest')->once();
         $npcQuestsHandler->shouldReceive('questRewardHandler')->twice()->andReturn($rewardHandler);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
+        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
+
+        HandInQuest::dispatch($character, $quest);
     }
 
     public function test_global_quest_completion_event_happens_after_quest_completion_log_exists(): void
@@ -168,6 +178,8 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler->shouldReceive('handleNpcQuest')->once();
         $npcQuestsHandler->shouldReceive('questRewardHandler')->twice()->andReturn($rewardHandler);
 
-        (new HandInQuest($character, $quest))->handle($npcQuestsHandler);
+        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
+
+        HandInQuest::dispatch($character, $quest);
     }
 }

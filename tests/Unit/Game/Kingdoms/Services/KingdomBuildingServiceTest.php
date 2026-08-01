@@ -24,7 +24,7 @@ class KingdomBuildingServiceTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)
-            ->createBaseCharacter([], [], true, false)
+            ->createBaseCharacter(assignPassiveSkills: false)
             ->givePlayerLocation();
 
         $this->character

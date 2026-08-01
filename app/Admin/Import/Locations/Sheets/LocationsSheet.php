@@ -77,6 +77,12 @@ class LocationsSheet implements ToCollection
             $cleanData['type'] = LocationType::SPECIAL->value;
         }
 
+        unset(
+            $cleanData['enemy_strength_type'],
+            $cleanData['enemy_strength_increase'],
+            $cleanData['delve_enemy_strength_increase'],
+        );
+
         return $cleanData;
     }
 }

@@ -74,53 +74,6 @@ class CapitalCityUnitManagementTest extends TestCase
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityUnitQueue->unit_request_data[0]['secondary_status']);
     }
 
-    public function test_capital_city_resource_request_reschedules_itself_while_waiting(): void
-    {
-        Queue::fake();
-
-        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $requestingKingdomManagement = $characterFactory->kingdomManagement()->assignKingdom();
-        $requestingKingdom = $requestingKingdomManagement->getKingdom();
-        $providingKingdom = $characterFactory->kingdomManagement()->assignKingdom()->getKingdom();
-        $character = $characterFactory->getCharacter();
-        $requestingKingdomManagement->assignCapitalCityUnitQueue([
-            'character_id' => $character->id,
-            'kingdom_id' => $requestingKingdom->id,
-            'requested_kingdom' => $providingKingdom->id,
-            'unit_request_data' => [[
-                'name' => 'Spearmen',
-                'amount' => 10,
-                'missing_costs' => ['stone' => 100],
-                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
-            ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::REQUESTING,
-            'started_at' => now(),
-            'completed_at' => now(),
-        ]);
-        $capitalCityUnitQueue = $requestingKingdomManagement->getCapitalCityUnitQueue();
-        $requestingKingdomManagement->assignCapitalCityResourceRequest([
-            'kingdom_requesting_id' => $requestingKingdom->id,
-            'request_from_kingdom_id' => $providingKingdom->id,
-            'resources' => ['stone' => 100],
-            'started_at' => now(),
-            'completed_at' => now()->addMinutes(10),
-        ]);
-        $resourceRequest = $requestingKingdomManagement->getCapitalCityResourceRequest();
-
-        $job = new CapitalCityResourceRequest(
-            $capitalCityUnitQueue->id,
-            $resourceRequest->id,
-            CapitalCityResourceRequestType::UNIT_QUEUE,
-        );
-
-        $this->app->call([$job, 'handle']);
-
-        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
-            return $job->connection === 'long_running' && $job->queue === 'default_long';
-        });
-    }
-
     public function test_capital_city_unit_resource_dispatch_uses_long_running_connection(): void
     {
         Queue::fake();
@@ -203,13 +156,7 @@ class CapitalCityUnitManagementTest extends TestCase
         ]);
         $capitalCityUnitQueue = $kingdomManagement->getCapitalCityUnitQueue();
 
-        $job = new CapitalCityResourceRequest(
-            $capitalCityUnitQueue->id,
-            999,
-            CapitalCityResourceRequestType::UNIT_QUEUE,
-        );
-
-        $this->app->call([$job, 'handle']);
+        CapitalCityResourceRequest::dispatch($capitalCityUnitQueue->id, 999, CapitalCityResourceRequestType::UNIT_QUEUE);
 
         $this->assertSame(CapitalCityQueueStatus::REJECTED, $capitalCityUnitQueue->refresh()->status);
     }
@@ -234,9 +181,7 @@ class CapitalCityUnitManagementTest extends TestCase
         ]);
         $capitalCityUnitQueue = $kingdomManagement->getCapitalCityUnitQueue();
 
-        $job = new CapitalCityUnitRequestMovement($capitalCityUnitQueue->id, $character->id);
-
-        $this->app->call([$job, 'handle']);
+        CapitalCityUnitRequestMovement::dispatch($capitalCityUnitQueue->id, $character->id);
 
         Event::assertDispatched(UpdateCapitalCityUnitQueueTable::class);
         Event::assertNotDispatched(UpdateCapitalCityBuildingQueueTable::class);

@@ -2,23 +2,23 @@
 
 namespace Tests\Unit\Game\Tops;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\User;
 use App\Game\Tops\Services\FactionLoyaltyTopsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateUser;
 
 class FactionLoyaltyTopsServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacter, CreateGameMap, CreateUser, RefreshDatabase;
 
     public function test_faction_loyalty_tops_ranks_by_faction_progression(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        $map = GameMap::factory()->create();
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $map = $this->createGameMap();
         Faction::create(['character_id' => $character->id, 'game_map_id' => $map->id, 'current_level' => 8, 'current_points' => 100, 'points_needed' => 200, 'maxed' => false, 'title' => 'Known']);
 
         $data = $this->app->make(FactionLoyaltyTopsService::class)->leaderboard(['period' => 'current_month']);
@@ -28,9 +28,9 @@ class FactionLoyaltyTopsServiceTest extends TestCase
 
     public function test_faction_loyalty_tops_includes_highest_faction_name(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        $map = GameMap::factory()->create(['name' => 'Highest Faction Name Map']);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $map = $this->createGameMap(['name' => 'Highest Faction Name Map']);
         Faction::create(['character_id' => $character->id, 'game_map_id' => $map->id, 'current_level' => 8, 'current_points' => 100, 'points_needed' => 200, 'maxed' => false, 'title' => 'Known']);
 
         $data = $this->app->make(FactionLoyaltyTopsService::class)->leaderboard(['period' => 'current_month']);
@@ -40,10 +40,10 @@ class FactionLoyaltyTopsServiceTest extends TestCase
 
     public function test_faction_loyalty_tops_includes_total_faction_level_across_maps(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        $mapOne = GameMap::factory()->create();
-        $mapTwo = GameMap::factory()->create();
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $mapOne = $this->createGameMap();
+        $mapTwo = $this->createGameMap();
         Faction::create(['character_id' => $character->id, 'game_map_id' => $mapOne->id, 'current_level' => 5, 'current_points' => 0, 'points_needed' => 200, 'maxed' => false, 'title' => 'Known']);
         Faction::create(['character_id' => $character->id, 'game_map_id' => $mapTwo->id, 'current_level' => 3, 'current_points' => 0, 'points_needed' => 200, 'maxed' => false, 'title' => 'Known']);
 
@@ -54,9 +54,9 @@ class FactionLoyaltyTopsServiceTest extends TestCase
 
     public function test_faction_loyalty_current_month_and_all_time_use_cumulative_rows_and_primary_metrics(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        $map = GameMap::factory()->create();
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $map = $this->createGameMap();
         Faction::create(['character_id' => $character->id, 'game_map_id' => $map->id, 'current_level' => 8, 'current_points' => 100, 'points_needed' => 200, 'maxed' => false, 'title' => 'Known']);
 
         $currentMonth = $this->app->make(FactionLoyaltyTopsService::class)->leaderboard(['period' => 'current_month']);

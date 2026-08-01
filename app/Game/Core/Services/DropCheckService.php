@@ -266,7 +266,7 @@ class DropCheckService
             return;
         }
 
-        $this->locationWithEffect = Location::whereNotNull('enemy_strength_type')
+        $this->locationWithEffect = Location::whereNotNull('type')
             ->where('x', $map->character_position_x)
             ->where('y', $map->character_position_y)
             ->where('game_map_id', $map->game_map_id)

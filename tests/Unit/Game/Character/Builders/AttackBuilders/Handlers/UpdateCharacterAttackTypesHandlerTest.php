@@ -2,9 +2,6 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Handlers;
 
-use App\Flare\Models\Character;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use Cache;
@@ -16,12 +13,11 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
-use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class UpdateCharacterAttackTypesHandlerTest extends TestCase
 {
-    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -43,29 +39,11 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase
         $this->updateCharacterAttackTypesHandler = null;
     }
 
-    private function setUpCharacterForTests(): Character
-    {
-        $item = $this->createItem([
-            'type' => WeaponTypes::STAVE,
-            'base_damage' => 10,
-        ]);
-
-        $spellDamage = $this->createItem([
-            'type' => SpellTypes::DAMAGE,
-            'base_damage' => 10,
-        ]);
-
-        return $this->character->inventoryManagement()
-            ->giveItem($item, true, 'left-hand')
-            ->giveItem($spellDamage, true, 'spell-one')
-            ->getCharacter();
-    }
-
     public function test_update_character_attack_cache()
     {
         Event::fake();
 
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $this->updateCharacterAttackTypesHandler->updateCache($character);
 
@@ -75,7 +53,7 @@ class UpdateCharacterAttackTypesHandlerTest extends TestCase
     public function test_update_character_attack_cache_is_created()
     {
 
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $this->updateCharacterAttackTypesHandler->updateCache($character);
 

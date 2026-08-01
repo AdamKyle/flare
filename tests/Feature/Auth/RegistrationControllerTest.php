@@ -20,6 +20,7 @@ use Tests\Traits\CreateItem;
 use Tests\Traits\CreatePassiveSkill;
 use Tests\Traits\CreateRace;
 use Tests\Traits\CreateUser;
+use Tests\Traits\CreateUsersWithIp;
 
 class RegistrationControllerTest extends TestCase
 {
@@ -30,6 +31,7 @@ class RegistrationControllerTest extends TestCase
         CreatePassiveSkill,
         CreateRace,
         CreateUser,
+        CreateUsersWithIp,
         RefreshDatabase;
 
     protected function setUp(): void
@@ -217,7 +219,7 @@ class RegistrationControllerTest extends TestCase
             'kingdom_color' => '#ffffff',
         ]);
 
-        $this->createUsersWithSameIp(10, '127.0.0.1');
+        $this->createUsersWithIp(10, '127.0.0.1');
 
         $race = $this->createRace([
             'dex_mod' => 2,
@@ -238,12 +240,5 @@ class RegistrationControllerTest extends TestCase
                 'race' => $race->id,
                 'class' => $class->id,
             ])->see('You cannot register anymore characters.');
-    }
-
-    private function createUsersWithSameIp(int $count, string $ip): void
-    {
-        for ($i = 0; $i < $count; $i++) {
-            $this->createUser(['ip_address' => $ip]);
-        }
     }
 }

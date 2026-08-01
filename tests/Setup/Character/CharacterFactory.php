@@ -70,7 +70,7 @@ class CharacterFactory
 
     public function createSessionForCharacter(): CharacterFactory
     {
-        DB::table('sessions')->truncate();
+        DB::table('sessions')->delete();
 
         DB::table('sessions')->insert([[
             'id' => '1',
@@ -133,7 +133,9 @@ class CharacterFactory
             $this->assignPassiveSkills();
         }
 
-        $this->createClassRanks();
+        if ($createClassRanks) {
+            $this->createClassRanks();
+        }
 
         $character = $this->character->refresh();
 
@@ -150,6 +152,25 @@ class CharacterFactory
     public function getCharacterClassId(): int
     {
         return $this->character->game_class_id;
+    }
+
+    public function equipBasicAttackLoadout(): CharacterFactory
+    {
+        $stave = $this->createItem([
+            'type' => 'stave',
+            'base_damage' => 10,
+        ]);
+        $damageSpell = $this->createItem([
+            'type' => 'damage',
+            'base_damage' => 10,
+        ]);
+
+        $this->character = $this->inventoryManagement()
+            ->giveItem($stave, true, 'left-hand')
+            ->giveItem($damageSpell, true, 'spell-one')
+            ->getCharacter();
+
+        return $this;
     }
 
     public function assignPassiveSkills(?GameBuilding $gameBuilding = null): CharacterFactory

@@ -6,22 +6,31 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateUser;
 
 class UnbanRequestControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateUser, RefreshDatabase;
 
     public function test_public_email_lookup_does_not_reveal_account_or_ban_state(): void
     {
-        $user = (new CharacterFactory)->createBaseCharacter()->getCharacter()->user;
-        $tempBannedUser = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason', null, now()->addDay())->getCharacter()->user;
-        $permanentlyBannedUser = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason')->getCharacter()->user;
+        $user = $this->createUser();
+        $tempBannedUser = (new CharacterFactory)->createBaseCharacter(
+            assignBaseSkill: false,
+            assignPassiveSkills: false,
+            createClassRanks: false,
+        )->banCharacter('Reason', null, now()->addDay())->getCharacter()->user;
+        $permanentlyBannedUser = (new CharacterFactory)->createBaseCharacter(
+            assignBaseSkill: false,
+            assignPassiveSkills: false,
+            createClassRanks: false,
+        )->banCharacter('Reason')->getCharacter()->user;
 
         $responses = [
-            $this->lookupUnbanEmail('unknown@example.com'),
-            $this->lookupUnbanEmail($user->email),
-            $this->lookupUnbanEmail($tempBannedUser->email),
-            $this->lookupUnbanEmail($permanentlyBannedUser->email),
+            $this->call('POST', route('un.ban.request.email'), ['email' => 'unknown@example.com']),
+            $this->call('POST', route('un.ban.request.email'), ['email' => $user->email]),
+            $this->call('POST', route('un.ban.request.email'), ['email' => $tempBannedUser->email]),
+            $this->call('POST', route('un.ban.request.email'), ['email' => $permanentlyBannedUser->email]),
         ];
 
         foreach ($responses as $response) {
@@ -34,7 +43,11 @@ class UnbanRequestControllerTest extends TestCase
 
     public function test_submit_rejects_missing_or_invalid_find_user_token(): void
     {
-        $user = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason')->getCharacter()->user;
+        $user = (new CharacterFactory)->createBaseCharacter(
+            assignBaseSkill: false,
+            assignPassiveSkills: false,
+            createClassRanks: false,
+        )->banCharacter('Reason')->getCharacter()->user;
 
         $missingTokenResponse = $this->call('POST', route('un.ban.request.submit'), [
             'unban_message' => 'Please review.',
@@ -53,9 +66,16 @@ class UnbanRequestControllerTest extends TestCase
     {
         Role::create(['name' => 'Admin']);
 
-        $user = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason')->getCharacter()->user;
+        $user = (new CharacterFactory)->createBaseCharacter(
+            assignBaseSkill: false,
+            assignPassiveSkills: false,
+            createClassRanks: false,
+        )->banCharacter('Reason')->getCharacter()->user;
 
-        $token = $this->getContinuationToken($user->email);
+        $lookupResponse = $this->call('POST', route('un.ban.request.email'), ['email' => $user->email]);
+        $lookupResponse->assertRedirect(route('un.ban.request'));
+        $lookupResponse->assertSessionHas('unban_request_token');
+        $token = session('unban_request_token');
         $response = $this->call('POST', route('un.ban.request.submit'), [
             'unban_message' => 'Please review.',
             'token' => $token,
@@ -69,9 +89,16 @@ class UnbanRequestControllerTest extends TestCase
     {
         Role::create(['name' => 'Admin']);
 
-        $user = (new CharacterFactory)->createBaseCharacter()->banCharacter('Reason')->getCharacter()->user;
+        $user = (new CharacterFactory)->createBaseCharacter(
+            assignBaseSkill: false,
+            assignPassiveSkills: false,
+            createClassRanks: false,
+        )->banCharacter('Reason')->getCharacter()->user;
 
-        $token = $this->getContinuationToken($user->email);
+        $lookupResponse = $this->call('POST', route('un.ban.request.email'), ['email' => $user->email]);
+        $lookupResponse->assertRedirect(route('un.ban.request'));
+        $lookupResponse->assertSessionHas('unban_request_token');
+        $token = session('unban_request_token');
         $this->call('POST', route('un.ban.request.submit'), [
             'unban_message' => 'Please review.',
             'token' => $token,
@@ -88,7 +115,10 @@ class UnbanRequestControllerTest extends TestCase
 
     public function test_issued_ineligible_token_does_not_reveal_account_state(): void
     {
-        $token = $this->getContinuationToken('unknown@example.com');
+        $lookupResponse = $this->call('POST', route('un.ban.request.email'), ['email' => 'unknown@example.com']);
+        $lookupResponse->assertRedirect(route('un.ban.request'));
+        $lookupResponse->assertSessionHas('unban_request_token');
+        $token = session('unban_request_token');
 
         $response = $this->call('POST', route('un.ban.request.submit'), [
             'unban_message' => 'Please review.',
@@ -96,42 +126,5 @@ class UnbanRequestControllerTest extends TestCase
         ]);
 
         $response->assertSessionHas('success', 'Request submitted. We will contact you in the next 72 hours.');
-    }
-
-    private function lookupUnbanEmail(string $email)
-    {
-        return $this->call('POST', route('un.ban.request.email'), [
-            'email' => $email,
-        ]);
-    }
-
-    private function getContinuationToken(string $email): string
-    {
-        $lookupResponse = $this->lookupUnbanEmail($email);
-        $lookupResponse->assertRedirect(route('un.ban.request'));
-
-        $landingResponse = $this->call('GET', route('un.ban.request'));
-        $landingResponse->assertOk();
-        $this->assertMatchesRegularExpression(
-            '/href="[^"]*\/un-ban\/request-form\/[^"]+"/',
-            $landingResponse->getContent()
-        );
-
-        preg_match(
-            '/href="([^"]*\/un-ban\/request-form\/[^"]+)"/',
-            $landingResponse->getContent(),
-            $continuationMatches
-        );
-
-        $formResponse = $this->call('GET', html_entity_decode($continuationMatches[1]));
-        $formResponse->assertOk();
-        $formResponse->assertDontSee($email);
-        $formResponse->assertDontSee('Reason you were banned');
-
-        preg_match('/name="token" value="([^"]+)"/', $formResponse->getContent(), $tokenMatches);
-
-        $this->assertNotEmpty($tokenMatches[1] ?? null);
-
-        return $tokenMatches[1];
     }
 }

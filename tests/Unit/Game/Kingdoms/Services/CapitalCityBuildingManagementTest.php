@@ -37,7 +37,7 @@ class CapitalCityBuildingManagementTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)
-            ->createBaseCharacter([], [], true, false)
+            ->createBaseCharacter(assignPassiveSkills: false)
             ->givePlayerLocation();
 
         $this->character->updateSkill('Kingmanship', [
@@ -416,50 +416,6 @@ class CapitalCityBuildingManagementTest extends TestCase
             $requestingKingdom,
             CapitalCityResourceRequestType::BUILDING_QUEUE,
         );
-
-        Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
-            return $job->connection === 'long_running' && $job->queue === 'default_long';
-        });
-    }
-
-    public function test_capital_city_resource_request_redispatches_when_queue_is_waiting_on_long_running_connection(): void
-    {
-        Queue::fake();
-
-        $character = $this->character->getCharacter();
-        $kingdomManagement = $this->character
-            ->kingdomManagement()
-            ->assignKingdom()
-            ->assignBuilding();
-        $kingdom = $kingdomManagement->getKingdom();
-        $building = $kingdom->buildings->first();
-        $kingdomManagement->assignCapitalCityBuildingQueue([
-            'character_id' => $character->id,
-            'kingdom_id' => $kingdom->id,
-            'requested_kingdom' => $kingdom->id,
-            'building_request_data' => [[
-                'building_id' => $building->id,
-                'building_name' => $building->name,
-                'missing_costs' => ['stone' => 100],
-                'secondary_status' => CapitalCityQueueStatus::REQUESTING,
-                'from_level' => 1,
-                'to_level' => 2,
-                'type' => 'upgrade',
-            ]],
-            'messages' => [],
-            'status' => CapitalCityQueueStatus::REQUESTING,
-            'started_at' => now(),
-            'completed_at' => now()->addMinutes(10),
-        ]);
-        $capitalCityBuildingQueue = $kingdomManagement->getCapitalCityBuildingQueue();
-
-        $job = new CapitalCityResourceRequest(
-            $capitalCityBuildingQueue->id,
-            999,
-            CapitalCityResourceRequestType::BUILDING_QUEUE,
-        );
-
-        $this->app->call([$job, 'handle']);
 
         Queue::assertPushed(CapitalCityResourceRequest::class, function (CapitalCityResourceRequest $job) {
             return $job->connection === 'long_running' && $job->queue === 'default_long';

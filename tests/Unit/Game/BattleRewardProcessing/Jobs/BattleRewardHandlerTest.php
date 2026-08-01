@@ -29,9 +29,9 @@ class BattleRewardHandlerTest extends TestCase
         $battleRewardService->shouldReceive('setContext')->once()->with($context)->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
 
-        $job = new BattleRewardHandler($characterId, $monsterId, $context);
+        $this->app->instance(BattleRewardService::class, $battleRewardService);
 
-        $job->handle($battleRewardService);
+        BattleRewardHandler::dispatch($characterId, $monsterId, $context);
     }
 
     public function test_handle_uses_empty_context_when_not_provided(): void
@@ -44,8 +44,8 @@ class BattleRewardHandlerTest extends TestCase
         $battleRewardService->shouldReceive('setContext')->once()->with([])->andReturnSelf();
         $battleRewardService->shouldReceive('processRewards')->once()->with(true);
 
-        $job = new BattleRewardHandler($characterId, $monsterId);
+        $this->app->instance(BattleRewardService::class, $battleRewardService);
 
-        $job->handle($battleRewardService);
+        BattleRewardHandler::dispatch($characterId, $monsterId);
     }
 }

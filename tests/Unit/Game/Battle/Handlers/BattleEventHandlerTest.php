@@ -3,7 +3,6 @@
 namespace Tests\Unit\Game\Battle\Handlers;
 
 use App\Flare\Models\BatchCrafting;
-use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\Battle\Handlers\BattleEventHandler;
@@ -19,16 +18,18 @@ use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateMonster;
 
 class BattleEventHandlerTest extends TestCase
 {
-    use CreateBatchCrafting, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateBatchCrafting, CreateCharacterBattleReward, CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function test_normal_monster_death_claims_weekly_fight_before_enqueue(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $monster = $this->createMonster();
+        $rewardRequest = $this->createCharacterBattleRewardRequest();
         $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
         $weeklyBattleService->shouldReceive('claimMonsterDeath')->once()->ordered()->with(
             Mockery::on(fn ($value): bool => $value->id === $character->id),
@@ -41,7 +42,7 @@ class BattleEventHandlerTest extends TestCase
             BattleRewardRequestSourceType::BATTLE,
             Mockery::on(fn (string $sourceId): bool => str_starts_with($sourceId, 'battle:'.$character->id.':'.$monster->id.':')),
             ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => []],
-        )->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+        )->andReturn($rewardRequest);
 
         (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))->processMonsterDeath($character->id, $monster->id);
     }
@@ -50,6 +51,7 @@ class BattleEventHandlerTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $monster = $this->createMonster();
+        $rewardRequest = $this->createCharacterBattleRewardRequest();
         $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
         $weeklyBattleService->shouldReceive('claimMonsterDeath')->once()->ordered();
         $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
@@ -59,13 +61,14 @@ class BattleEventHandlerTest extends TestCase
             BattleRewardRequestSourceType::EXPLORATION,
             Mockery::on(fn (string $sourceId): bool => str_starts_with($sourceId, 'exploration:'.$character->id.':30:'.$monster->id.':')),
             ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => ['exploration_log_id' => 30]],
-        )->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+        )->andReturn($rewardRequest);
 
         (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))->processMonsterDeath($character->id, $monster->id, ['exploration_log_id' => 30]);
     }
 
     public function test_battle_reward_uses_second_priority_and_preserves_payload(): void
     {
+        $rewardRequest = $this->createCharacterBattleRewardRequest();
         $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
         $queueManager->shouldReceive('enqueue')
             ->once()
@@ -83,7 +86,7 @@ class BattleEventHandlerTest extends TestCase
                     'context' => ['attack_type' => 'attack'],
                 ],
             )
-            ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+            ->andReturn($rewardRequest);
 
         $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
         $weeklyBattleService->shouldNotReceive('claimMonsterDeath');
@@ -94,6 +97,7 @@ class BattleEventHandlerTest extends TestCase
 
     public function test_exploration_reward_uses_second_priority(): void
     {
+        $rewardRequest = $this->createCharacterBattleRewardRequest();
         $queueManager = Mockery::mock(BattleRewardProcessingQueueManager::class);
         $queueManager->shouldReceive('enqueue')
             ->once()
@@ -111,7 +115,7 @@ class BattleEventHandlerTest extends TestCase
                     'context' => ['exploration_log_id' => 30],
                 ],
             )
-            ->andReturn(Mockery::mock(CharacterBattleRewardRequest::class));
+            ->andReturn($rewardRequest);
 
         $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
         $weeklyBattleService->shouldNotReceive('claimMonsterDeath');

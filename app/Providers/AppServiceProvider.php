@@ -6,7 +6,6 @@ use App\Console\AfterDeployment\AddBatchCraftingSetToPlayers;
 use App\Console\AfterDeployment\AddHolyStacksToItems;
 use App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty;
 use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
-use App\Console\AfterDeployment\BackfillSpecialLocationTypes;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
 use App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots;
 use App\Console\AfterDeployment\CreateMonsterCache;
@@ -48,7 +47,6 @@ class AppServiceProvider extends ServiceProvider
             AddBatchCraftingSetToPlayers::class,
             AddHolyStacksToItems::class,
             BackfillCompletedPanelDismissals::class,
-            BackfillSpecialLocationTypes::class,
             AssignNewNpcsToFactionLoyalty::class,
             CleanDanglingCharacterData::class,
             CleanDuplicateQuestInventorySlots::class,

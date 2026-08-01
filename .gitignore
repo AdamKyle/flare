@@ -36,3 +36,5 @@ public/build/
 !.yarn/plugins/**
 !.yarn/patches
 !.yarn/patches/**
+/junit.xml
+/test-results/

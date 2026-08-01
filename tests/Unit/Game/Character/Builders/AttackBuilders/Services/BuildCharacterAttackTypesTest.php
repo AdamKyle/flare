@@ -2,20 +2,16 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Services;
 
-use App\Flare\Models\Character;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameClassSpecial;
-use Tests\Traits\CreateItem;
 
 class BuildCharacterAttackTypesTest extends TestCase
 {
-    use CreateGameClassSpecial, CreateItem, RefreshDatabase;
+    use CreateGameClassSpecial, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -40,27 +36,9 @@ class BuildCharacterAttackTypesTest extends TestCase
         $this->buildCharacterAttackTypes = null;
     }
 
-    private function setUpCharacterForTests(): Character
-    {
-        $item = $this->createItem([
-            'type' => WeaponTypes::STAVE,
-            'base_damage' => 10,
-        ]);
-
-        $spellDamage = $this->createItem([
-            'type' => SpellTypes::DAMAGE,
-            'base_damage' => 10,
-        ]);
-
-        return $this->character->inventoryManagement()
-            ->giveItem($item, true, 'left-hand')
-            ->giveItem($spellDamage, true, 'spell-one')
-            ->getCharacter();
-    }
-
     public function test_build_character_attack_types_data()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         Cache::delete('character-attack-data-'.$character->id);
 
@@ -73,7 +51,7 @@ class BuildCharacterAttackTypesTest extends TestCase
 
     public function test_build_character_attack_types_calculates_damage_stat_amount_fresh_before_building()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,
@@ -110,7 +88,7 @@ class BuildCharacterAttackTypesTest extends TestCase
 
     public function test_attack_cache_rebuild_updates_class_specialty_damage_after_character_stat_changes()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $classSpecial = $this->createGameClassSpecial([
             'game_class_id' => $character->game_class_id,

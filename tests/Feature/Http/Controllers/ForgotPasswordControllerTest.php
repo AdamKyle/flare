@@ -4,7 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mail;
-use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
@@ -28,7 +27,7 @@ class ForgotPasswordControllerTest extends TestCase
 
         Mail::fake();
 
-        $user = $this->createUserWithCharacter()->getUser();
+        $user = $this->createUser();
 
         $this->createAdminRole('Admin');
         $user->assignRole('Admin');
@@ -44,7 +43,7 @@ class ForgotPasswordControllerTest extends TestCase
     public function test_user_goes_through_security_questions()
     {
 
-        $user = $this->createUserWithCharacter()->getUser();
+        $user = $this->createUser();
 
         $this->visit('/login')
             ->click('Forgot Your Password?')
@@ -63,10 +62,5 @@ class ForgotPasswordControllerTest extends TestCase
             ->submitForm('Next Step', [
                 'email' => 'a@t.ca',
             ])->see('This email does not match our records.');
-    }
-
-    protected function createUserWithCharacter()
-    {
-        return (new CharacterFactory)->createBaseCharacter();
     }
 }

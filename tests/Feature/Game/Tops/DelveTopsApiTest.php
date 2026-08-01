@@ -2,21 +2,21 @@
 
 namespace Tests\Feature\Game\Tops;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\DelveExploration;
-use App\Flare\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateDelveExploration;
+use Tests\Traits\CreateUser;
 
 class DelveTopsApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacter, CreateDelveExploration, CreateUser, RefreshDatabase;
 
     public function test_authenticated_users_can_call_delve_tops_api(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id, 'name' => 'Delver']);
-        DelveExploration::factory()->create(['character_id' => $character->id, 'increase_enemy_strength' => 2.5, 'started_at' => now()]);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'name' => 'Delver']);
+        $this->createDelveExploration(['character_id' => $character->id, 'increase_enemy_strength' => 2.5, 'started_at' => now()]);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/delve');
         $data = json_decode($response->getContent(), true);

@@ -2,37 +2,31 @@
 
 namespace Tests\Unit\Game\Raids\Jobs;
 
-use App\Flare\Models\Monster;
-use App\Flare\Services\EventSchedulerService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
-use App\Game\Maps\Services\LocationService;
-use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Messages\Events\GlobalMessageEvent;
-use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Raids\Jobs\InitiateRaid;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
 class InitiateRaidTest extends TestCase
 {
-    use CreateGameMap, CreateLocation, CreateRaid, CreateScheduledEvent, RefreshDatabase;
+    use CreateGameMap, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    public function test_queued_first_invocation_becomes_starting(): void
+    public function test_queued_raid_runs_the_complete_story_before_initialization(): void
     {
-        Queue::fake();
         Event::fake([GlobalMessageEvent::class]);
 
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -43,56 +37,21 @@ class InitiateRaidTest extends TestCase
             'status' => ScheduledEventStatus::QUEUED,
         ]);
 
-        (new InitiateRaid($scheduledEvent->id, ['First sentence.', 'Second sentence.']))->handle(
-            resolve(LocationService::class),
-            resolve(EventSchedulerService::class),
-            resolve(UpdateRaidMonsters::class),
-            resolve(BuildQuestCacheService::class),
-        );
+        InitiateRaid::dispatch($scheduledEvent->id, ['First sentence.', 'Second sentence.']);
 
-        $this->assertEquals(ScheduledEventStatus::STARTING, $scheduledEvent->fresh()->status);
-    }
-
-    public function test_recursive_story_continues_only_while_starting(): void
-    {
-        Queue::fake();
-        Event::fake([GlobalMessageEvent::class]);
-
-        $gameMap = $this->createGameMap();
-        $location = $this->createLocation(['game_map_id' => $gameMap->id]);
-        $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
-            'raid_boss_location_id' => $location->id,
-            'corrupted_location_ids' => [],
-        ]);
-
-        $scheduledEvent = $this->createScheduledEvent([
-            'event_type' => EventType::RAID_EVENT,
-            'raid_id' => $raid->id,
-            'status' => ScheduledEventStatus::STARTING,
-            'currently_running' => true,
-        ]);
-
-        (new InitiateRaid($scheduledEvent->id, ['First sentence.', 'Second sentence.']))->handle(
-            resolve(LocationService::class),
-            resolve(EventSchedulerService::class),
-            resolve(UpdateRaidMonsters::class),
-            resolve(BuildQuestCacheService::class),
-        );
-
-        Queue::assertPushed(InitiateRaid::class, 1);
+        $this->assertEquals(ScheduledEventStatus::RUNNING, $scheduledEvent->fresh()->status);
         Event::assertDispatched(GlobalMessageEvent::class, fn ($event) => $event->message === 'First sentence.');
+        Event::assertDispatched(GlobalMessageEvent::class, fn ($event) => $event->message === 'Second sentence.');
     }
 
     public function test_cancellation_during_story_prevents_further_initialization(): void
     {
-        Queue::fake();
         Event::fake([GlobalMessageEvent::class]);
 
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -104,14 +63,8 @@ class InitiateRaidTest extends TestCase
             'currently_running' => true,
         ]);
 
-        (new InitiateRaid($scheduledEvent->id, ['First sentence.']))->handle(
-            resolve(LocationService::class),
-            resolve(EventSchedulerService::class),
-            resolve(UpdateRaidMonsters::class),
-            resolve(BuildQuestCacheService::class),
-        );
+        InitiateRaid::dispatch($scheduledEvent->id, ['First sentence.']);
 
-        Queue::assertNotPushed(InitiateRaid::class);
         Event::assertNotDispatched(GlobalMessageEvent::class);
         $this->assertEquals(ScheduledEventStatus::CANCELLING, $scheduledEvent->fresh()->status);
     }
@@ -123,7 +76,7 @@ class InitiateRaidTest extends TestCase
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -135,12 +88,7 @@ class InitiateRaidTest extends TestCase
             'currently_running' => true,
         ]);
 
-        (new InitiateRaid($scheduledEvent->id, []))->handle(
-            resolve(LocationService::class),
-            resolve(EventSchedulerService::class),
-            resolve(UpdateRaidMonsters::class),
-            resolve(BuildQuestCacheService::class),
-        );
+        InitiateRaid::dispatch($scheduledEvent->id, []);
 
         $scheduledEvent = $scheduledEvent->fresh();
 
@@ -155,7 +103,7 @@ class InitiateRaidTest extends TestCase
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -175,12 +123,7 @@ class InitiateRaidTest extends TestCase
             'scheduled_event_id' => $scheduledEvent->id,
         ]);
 
-        (new InitiateRaid($scheduledEvent->id, []))->handle(
-            resolve(LocationService::class),
-            resolve(EventSchedulerService::class),
-            resolve(UpdateRaidMonsters::class),
-            resolve(BuildQuestCacheService::class),
-        );
+        InitiateRaid::dispatch($scheduledEvent->id, []);
 
         $this->assertEquals(1, \App\Flare\Models\Event::where('scheduled_event_id', $scheduledEvent->id)->count());
     }

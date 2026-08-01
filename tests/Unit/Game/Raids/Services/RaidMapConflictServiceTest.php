@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Raids\Services;
 
-use App\Flare\Models\Monster;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Raids\Services\RaidMapConflictService;
@@ -10,12 +9,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
 class RaidMapConflictServiceTest extends TestCase
 {
-    use CreateGameMap, CreateLocation, CreateRaid, CreateScheduledEvent, RefreshDatabase;
+    use CreateGameMap, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
     public function test_boss_location_map_is_included(): void
     {
@@ -23,7 +23,7 @@ class RaidMapConflictServiceTest extends TestCase
         $bossLocation = $this->createLocation(['game_map_id' => $gameMap->id]);
 
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
@@ -41,7 +41,7 @@ class RaidMapConflictServiceTest extends TestCase
         $corruptedLocationTwo = $this->createLocation(['game_map_id' => $gameMap->id]);
 
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [$corruptedLocationOne->id, $corruptedLocationTwo->id],
         ]);
@@ -57,7 +57,7 @@ class RaidMapConflictServiceTest extends TestCase
         $bossLocation = $this->createLocation(['game_map_id' => $gameMap->id]);
 
         $activeRaid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
@@ -70,7 +70,7 @@ class RaidMapConflictServiceTest extends TestCase
         ]);
 
         $requestedRaid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
@@ -86,7 +86,7 @@ class RaidMapConflictServiceTest extends TestCase
         $bossLocation = $this->createLocation(['game_map_id' => $gameMap->id]);
 
         $childRaid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
@@ -107,7 +107,7 @@ class RaidMapConflictServiceTest extends TestCase
         ]);
 
         $requestedRaid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
@@ -125,7 +125,7 @@ class RaidMapConflictServiceTest extends TestCase
         $bossLocationTwo = $this->createLocation(['game_map_id' => $gameMapTwo->id]);
 
         $activeRaid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocationOne->id,
             'corrupted_location_ids' => [],
         ]);
@@ -138,7 +138,7 @@ class RaidMapConflictServiceTest extends TestCase
         ]);
 
         $requestedRaid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocationTwo->id,
             'corrupted_location_ids' => [],
         ]);
@@ -154,13 +154,13 @@ class RaidMapConflictServiceTest extends TestCase
         $bossLocation = $this->createLocation(['game_map_id' => $gameMap->id]);
 
         $raidOne = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
 
         $raidTwo = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocation->id,
             'corrupted_location_ids' => [],
         ]);
@@ -178,13 +178,13 @@ class RaidMapConflictServiceTest extends TestCase
         $bossLocationTwo = $this->createLocation(['game_map_id' => $gameMapTwo->id]);
 
         $raidOne = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocationOne->id,
             'corrupted_location_ids' => [],
         ]);
 
         $raidTwo = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $bossLocationTwo->id,
             'corrupted_location_ids' => [],
         ]);

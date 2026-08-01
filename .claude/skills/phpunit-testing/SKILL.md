@@ -1,59 +1,180 @@
 ---
 name: phpunit-testing
-description: Use this skill when writing, reviewing, or refactoring PHPUnit tests in this repository.
+description: Use this skill when writing, reviewing, reducing, or refactoring PHPUnit tests in this repository.
 ---
 
 # PHPUnit Testing
 
 ## Scope
 
-Use this skill for PHPUnit tests only.
+Use this skill for PHPUnit tests and test infrastructure only.
 
-Do not use this skill for production PHP/Laravel app code. Those rules belong in the `back-end-conventions` skill.
+Production backend rules belong to the `back-end-conventions` skill.
 
-Before writing or changing a test, inspect the existing test class, nearby tests in the same module, relevant factories, models, value objects, enums, and the production code under test.
+Before changing a retained test:
+
+- Read the test class.
+- Read nearby tests in the same domain.
+- Read the public production path under test.
+- Read applicable traits and setup factories.
+- Identify the exact behavior owned by that test.
+
+Do not assume behavior from a test name.
 
 ## Test Structure
 
-* One behavior per test method.
-* Inline all setup directly inside each test method body.
-* Do not add private, protected, or public helper methods to a test class.
-* Do not extract shared setup into a method and call it from multiple tests.
-* Do not use PHPUnit data providers.
-* Do not use loops inside a test to cover multiple independent behaviors or inputs.
-* If two scenarios are independent behaviors, write two separate test methods, not one test with a loop or a data provider.
-* A test method name should describe the single behavior being verified.
+- One behavior per test method.
+- Use a descriptive test name.
+- Multiple assertions are allowed only when they verify the same behavior, mutation, response, event, or object state.
+- Do not combine independent behavior to lower the test count.
+- Do not use PHPUnit data providers.
+- Do not use loops to cover multiple independent inputs or behaviors.
+- Do not test private or protected methods.
+- Do not use reflection.
+- Exercise behavior through public APIs.
 
-## What Not To Test
+## Shared Setup
 
-* Do not call private or protected methods directly from a test.
-* Do not use reflection to bypass visibility, invoke private/protected methods, or read private/protected properties.
-* Test behavior through the class's public API only.
+Scenario-specific setup belongs in the test method and must use traits or domain setup factories.
+
+`setUp()` may contain a small shared baseline only when every test in the class requires that exact baseline.
+
+`setUp()` is not a mechanism for reusing one database record across tests. It runs before every test.
+
+Do not place complicated fixture graphs, scenario-specific state, loops, or branching in `setUp()`.
+
+Do not add private, protected, or public test helper methods.
+
+Existing helper methods in retained test files must be removed or moved into the appropriate fixture abstraction.
+
+## Fixtures
+
+Test classes must not call Laravel model factories directly.
+
+Use:
+
+- Existing `Tests\Traits\Create*` traits for single models.
+- Existing domain setup factories.
+- Existing domain management classes.
+- A narrowly scoped new trait or setup factory when one is missing.
+
+Use `CharacterFactory` for normal playable characters and character-related graphs.
+
+Do not manually recreate character inventory, skills, passive skills, automation, kingdoms, bags, class ranks, or attack data when the character setup APIs already own that behavior.
+
+## Database
+
+Keep `RefreshDatabase` for database-backed tests.
+
+Do not truncate tables under `tests/**`.
+
+Do not manually clear every model.
+
+Do not manually clean database records after a test.
+
+Rely on Laravel’s transactional rollback.
+
+Use transactional `delete()` only when a test specifically requires a table empty before continuing inside that test.
+
+## Jobs
+
+Queue-job execution must use the real application dispatch path:
+
+`JobName::dispatch($arguments);`
+
+The following are all forms of prohibited manual queue-job execution:
+
+- `$job->handle(...)`
+- `app()->call([$job, 'handle'])`
+- `$this->app->call([$job, 'handle'])`
+- `Container::call([$job, 'handle'])`
+- Invoking `handle()` through a closure
+- Invoking `handle()` through reflection
+- `dispatchSync(...)` when the application path uses ordinary `dispatch(...)`
+
+Binding dependencies into Laravel’s container does not make a manual `handle()` call acceptable.
+
+When a queue job requires mocked collaborators:
+
+1. Create the mock.
+2. Bind it into Laravel’s application container.
+3. Call `JobName::dispatch(...)`.
+4. Allow the configured synchronous testing queue to execute it.
+
+Middleware, listeners, coordinators, and ordinary handlers may still have their public `handle()` API called directly.
+
+The prohibition applies to classes implementing `ShouldQueue`.
+
+Do not retain tests whose only purpose is to prove that a job reconstructs or recursively redispatches itself.
+
+When a test manually executes a job only so it can stop before another copy is dispatched:
+
+- Prefer a complete observable state assertion through normal dispatch.
+- Remove queue-reinitialization metadata coverage when it provides no independent business confidence.
+- Do not introduce a complicated fake dispatcher solely to preserve such a test.
 
 ## Mocking
 
-* Use Mockery only where the existing project test patterns already use it for that class or collaborator.
-* Do not introduce Mockery mocking for classes the surrounding tests exercise concretely (models, factories, value objects).
-* Prefer real model/factory instances over mocks when the existing test patterns in that module do so.
+Mocks are allowed under the categories defined by `phpunit-mocking`.
 
-## Assertions And Fixtures
+Ordinary services may be mocked when they are downstream orchestration collaborators.
 
-* Use model factories from `database/factories` to build test data.
-* Keep assertions specific to the single behavior under test.
-* Do not assert on unrelated side effects that are not part of the behavior being verified.
+Random, map, logging, broadcasting, error-reporting, and forced-failure boundaries may be mocked.
+
+The class owning the asserted business rule must not be replaced by a mock.
+
+There is no target mock count.
+
+Physical Laravel logs must not be read by tests.
+
+## Maps
+
+Do not create fake map image files.
+
+Do not use:
+
+- `Storage::fake('maps')`
+- `imagecreatetruecolor()`
+- `imagecolorallocate()`
+- `imagefill()`
+- `ob_start()`
+- `imagepng()`
+- `Storage::disk('maps')->put(...)`
+- `imagedestroy()`
+
+Use the character’s existing map, create only necessary locations, use required cache setup, or mock the map validation dependency through the existing pattern.
+
+## What Not To Test
+
+Do not retain tests that only prove:
+
+- Laravel relationships.
+- Ordinary model persistence.
+- Factory defaults.
+- Basic constructors.
+- Direct property assignment.
+- Framework behavior without application-specific behavior.
+- Enum constants equal their declared values.
+- The same service rule through several upper layers.
+- Equivalent values execute the same production branch.
 
 ## Running Tests
 
-* Run each required targeted test command exactly once.
-* Do not run the same test command repeatedly.
-* Do not run test loops such as `for i in 1 2 3; do ...; done` around a test command.
-* Do not run the full suite unless explicitly asked.
-* Do not run coverage unless explicitly asked.
-* If a required command fails, make one relevant fix, then rerun that command exactly once more.
-* Do not rerun a passing command again just to prove stability unless explicitly asked.
+Follow the task’s command restrictions.
 
-## Output Rules
+When the task forbids tests:
 
-* Do not claim a test command was run unless it was actually run.
-* If a command cannot be run, say exactly why.
-* Report actual pass/fail results, not assumed results.
+- Do not run PHPUnit.
+- Do not run targeted tests.
+- Do not run the full suite.
+- Do not run coverage.
+- Do not run tests indirectly.
+- Do not claim passing tests or measured coverage.
+
+## Output
+
+Report only factual work performed.
+
+Do not claim commands were run unless they were run.
+
+Do not claim behavior was verified by execution when only static inspection occurred.

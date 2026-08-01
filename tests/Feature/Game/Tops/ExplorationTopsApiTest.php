@@ -2,21 +2,21 @@
 
 namespace Tests\Feature\Game\Tops;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\ExplorationLog;
-use App\Flare\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateExplorationLog;
+use Tests\Traits\CreateUser;
 
 class ExplorationTopsApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacter, CreateExplorationLog, CreateUser, RefreshDatabase;
 
     public function test_authenticated_users_can_call_exploration_tops_api(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id, 'name' => 'Explorer']);
-        ExplorationLog::factory()->create(['character_id' => $character->id, 'user_id' => $user->id, 'kills' => 5, 'started_at' => now()]);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'name' => 'Explorer']);
+        $this->createExplorationLog(['character_id' => $character->id, 'user_id' => $user->id, 'kills' => 5, 'started_at' => now()]);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/exploration');
         $data = json_decode($response->getContent(), true);

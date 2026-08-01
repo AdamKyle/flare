@@ -710,7 +710,6 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::GOLD_MINES->value,
-            'enemy_strength_type' => null,
         ]);
 
         $this->createCharacterAutomation([
@@ -733,7 +732,6 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_DUNGEONS->value,
-            'enemy_strength_type' => null,
         ]);
 
         $this->createCharacterAutomation([
@@ -756,30 +754,6 @@ class AutomationRestrictionServiceTest extends TestCase
             'x' => 32,
             'y' => 16,
             'type' => LocationType::PURGATORY_SMITH_HOUSE->value,
-            'enemy_strength_type' => null,
-        ]);
-
-        $this->createCharacterAutomation([
-            'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
-            'started_in_special_location' => false,
-        ]);
-
-        $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION, $location));
-    }
-
-    public function test_exploration_started_in_regular_context_blocks_enemy_strength_modifying_location(): void
-    {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $location = $this->createLocation([
-            'game_map_id' => $character->map->game_map_id,
-            'x' => 32,
-            'y' => 16,
-            'type' => null,
-            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $this->createCharacterAutomation([

@@ -53,7 +53,11 @@ jobs:
         run: yarn build
 
       - name: Prepare diagnostics directories
-        run: mkdir -p test-results test-coverage
+        shell: bash
+        run: |
+          rm -rf test-results
+          mkdir -p test-results
+          rm -f junit.xml storage/logs/*.log
 
       - name: Capture environment diagnostics
         shell: bash
@@ -92,6 +96,9 @@ jobs:
             mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --batch --skip-column-names --execute='SELECT VERSION();'
             echo "Coverage drivers:"
             php -m | grep -Ei '^(xdebug|pcov)$' || echo "Neither Xdebug nor PCOV is loaded."
+            echo "Xdebug details:"
+            php --ri xdebug || true
+            echo "Intended XDEBUG_MODE: off"
           } > test-results/environment.txt 2>&1
           exit 0
 
@@ -119,27 +126,46 @@ jobs:
           DB_USER: root
           DB_PASSWORD: password
           TIME_ZONE: America/Edmonton
+          XDEBUG_MODE: off
         shell: bash
         run: |
+          set -euo pipefail
+          vendor/bin/phpunit \
+            --log-junit=test-results/junit.xml \
+            --log-events-verbose-text=test-results/phpunit-events.log \
+            > >(tee test-results/phpunit.log) 2>&1 &
+          phpunit_pid=$!
+          started_at=$SECONDS
+
+          (
+            while kill -0 "$phpunit_pid" 2>/dev/null; do
+              {
+                echo "UTC timestamp: $(date -u --iso-8601=seconds)"
+                echo "PHPUnit PID: $phpunit_pid"
+                echo "Elapsed seconds: $((SECONDS - started_at))"
+                ps -p "$phpunit_pid" -o pid=,etime=,%cpu=,%mem=,rss=,vsz=,state= || true
+                echo "Recent PHPUnit events:"
+                tail -n 20 test-results/phpunit-events.log 2>/dev/null || true
+              } >> test-results/heartbeat.log
+              sleep 60
+            done
+          ) &
+          heartbeat_pid=$!
+
           set +e
-          set -o pipefail
-          /usr/bin/time -v vendor/bin/phpunit \
-            --log-junit test-results/junit.xml \
-            --testdox-text test-results/testdox.txt \
-            --coverage-clover test-results/coverage-clover.xml \
-            --coverage-cobertura test-results/coverage-cobertura.xml \
-            --coverage-text=test-results/coverage.txt \
-            --coverage-html test-coverage \
-            2>&1 | tee test-results/phpunit.log
-          phpunit_exit_code=${PIPESTATUS[0]}
+          wait "$phpunit_pid"
+          phpunit_exit_code=$?
+          set -e
+          kill "$heartbeat_pid" 2>/dev/null || true
+          wait "$heartbeat_pid" 2>/dev/null || true
           echo "$phpunit_exit_code" > test-results/phpunit-exit-code.txt
-          exit 0
+          exit "$phpunit_exit_code"
 
       - name: Report slow tests and overall timing
         if: always()
         shell: bash
         run: |
-          mkdir -p test-results test-coverage
+          mkdir -p test-results
           python3 - <<'PY'
           import pathlib
           import xml.etree.ElementTree as ET
@@ -207,8 +233,28 @@ jobs:
         shell: bash
         run: |
           set +e
-          mkdir -p test-results test-coverage
+          mkdir -p test-results
           {
+            echo "Final UTC timestamp: $(date -u --iso-8601=seconds)"
+            echo "PHPUnit console tail:"
+            tail -n 200 test-results/phpunit.log 2>/dev/null || true
+            echo "PHPUnit event tail:"
+            tail -n 200 test-results/phpunit-events.log 2>/dev/null || true
+            echo "Heartbeat tail:"
+            tail -n 100 test-results/heartbeat.log 2>/dev/null || true
+            echo "Last test preparation started:"
+            grep 'Test Preparation Started' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
+            echo "Last test prepared:"
+            grep 'Test Prepared' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
+            echo "Last test finished:"
+            grep 'Test Finished' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
+            echo "Last error or failure event:"
+            grep -E 'Test (Errored|Failed)' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
+            if [[ ! -s test-results/junit.xml ]] || ! python3 -c 'import sys, xml.etree.ElementTree as ET; ET.parse(sys.argv[1])' test-results/junit.xml 2>/dev/null; then
+              echo "JUnit unavailable or incomplete"
+            fi
+            echo "Relevant processes:"
+            ps aux | grep -E '[p]hp|[m]ysql' || true
             echo "Laravel logs:"
             find storage/logs -maxdepth 1 -type f -name '*.log' -print -exec tail -n 200 {} \;
             echo "MySQL version and status:"
@@ -218,11 +264,11 @@ jobs:
             echo "Post-test memory:"
             free -h
             echo "Diagnostic directory sizes:"
-            du -sh test-results test-coverage
+            du -sh test-results
           } > test-results/post-test-diagnostics.txt 2>&1
           exit 0
 
-      - name: Upload test diagnostics and coverage
+      - name: Upload test diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -231,7 +277,6 @@ jobs:
           retention-days: 14
           path: |
             test-results/**
-            test-coverage/**
             storage/logs/*.log
 
       - name: Report PHPUnit result

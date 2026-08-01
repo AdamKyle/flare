@@ -15,7 +15,7 @@ class BattleRewardQueueRepairResultTransformer extends BaseTransformer
             'restarted_processor_count' => (int) $result['restarted_processor_count'],
             'cleared_inactive_queue_state_count' => (int) $result['cleared_inactive_queue_state_count'],
             'resumable_step_count' => (int) $result['resumable_step_count'],
-            'un_emitted_message_count' => (int) $result['un_emitted_message_count'],
+            'un_emitted_message_count' => (int) $result['unemitted_message_count'],
         ];
     }
 }

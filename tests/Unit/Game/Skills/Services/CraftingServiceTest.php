@@ -6,7 +6,6 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ArmourTypes;
 use App\Flare\Values\CharacterClassValue;
 use App\Flare\Values\ItemSpecialtyType;
@@ -36,10 +35,11 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateNpc;
+use Tests\Traits\CreateScheduledEvent;
 
 class CraftingServiceTest extends TestCase
 {
-    use CreateClass, CreateEvent, CreateFactionLoyalty, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateNpc, RefreshDatabase;
+    use CreateClass, CreateEvent, CreateFactionLoyalty, CreateGameSkill, CreateGlobalEventGoal, CreateItem, CreateNpc, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -869,7 +869,7 @@ class CraftingServiceTest extends TestCase
 
         $craftingService = $this->app->make(CraftingService::class);
 
-        $schedule = ScheduledEvent::factory()->create([
+        $schedule = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'status' => ScheduledEventStatus::RUNNING,
         ]);

@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\EventType;
@@ -14,14 +13,15 @@ use Tests\TestCase;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGlobalEventGoal;
+use Tests\Traits\CreateScheduledEvent;
 
 class GlobalEventGoalEligibilityServiceTest extends TestCase
 {
-    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, RefreshDatabase;
+    use CreateEvent, CreateGameMap, CreateGlobalEventGoal, CreateScheduledEvent, RefreshDatabase;
 
     public function test_crafting_eligibility_returns_exact_map_event_goal(): void
     {
-        $schedule = ScheduledEvent::factory()->create([
+        $schedule = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'status' => ScheduledEventStatus::RUNNING,
         ]);
@@ -52,7 +52,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
 
     public function test_enchanting_eligibility_returns_exact_map_event_goal(): void
     {
-        $schedule = ScheduledEvent::factory()->create([
+        $schedule = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
             'status' => ScheduledEventStatus::RUNNING,
         ]);
@@ -83,7 +83,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
 
     public function test_crafting_goal_is_null_when_character_not_on_event_map(): void
     {
-        $schedule = ScheduledEvent::factory()->create([
+        $schedule = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'status' => ScheduledEventStatus::RUNNING,
         ]);
@@ -111,7 +111,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
 
     public function test_crafting_goal_is_null_when_schedule_has_not_started_yet(): void
     {
-        $schedule = ScheduledEvent::factory()->create([
+        $schedule = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'status' => ScheduledEventStatus::QUEUED,
         ]);
@@ -141,12 +141,12 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
 
     public function test_event_for_character_map_resolves_winter_and_delusional_independently(): void
     {
-        $winterSchedule = ScheduledEvent::factory()->create([
+        $winterSchedule = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
             'status' => ScheduledEventStatus::RUNNING,
         ]);
 
-        $delusionalSchedule = ScheduledEvent::factory()->create([
+        $delusionalSchedule = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'status' => ScheduledEventStatus::RUNNING,
         ]);

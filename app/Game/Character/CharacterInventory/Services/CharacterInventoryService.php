@@ -5,6 +5,7 @@ namespace App\Game\Character\CharacterInventory\Services;
 use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Items\Transformers\QuestItemTransformer;
+use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
@@ -20,6 +21,7 @@ use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\DisenchantService;
@@ -233,6 +235,10 @@ class CharacterInventoryService
             ->get();
 
         foreach ($inventorySets as $index => $inventorySet) {
+            $inventorySet->slots->each(function (SetSlot $slot): void {
+                $slot->setRelation('item', $this->itemEnricherFactory->buildItem($slot->item));
+            });
+
             $slots = new LeagueCollection($inventorySet->slots, $this->inventoryTransformer);
             $slotCount = $inventorySet->currentSlotCount();
             $remainingInventorySpace = max(0, $this->character->inventory_max - $this->character->getInventoryCount());
@@ -320,7 +326,7 @@ class CharacterInventoryService
     /**
      * Returns the usable items.
      */
-    public function getUsableItems(string $searchText = '', array $filters = []): Collection
+    public function getUsableItems(string $searchText = '', array $filters = []): array
     {
         $alchemyBag = $this->character->alchemyBag;
 

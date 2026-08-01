@@ -4,8 +4,6 @@ namespace Tests\Feature\Game\BatchCrafting\Controllers;
 
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\InventorySet;
-use App\Flare\Models\Item;
-use App\Flare\Models\ScheduledEvent;
 use App\Flare\Models\SetSlot;
 use App\Flare\Values\AutomationType;
 use App\Flare\Values\ItemSpecialtyType;
@@ -29,14 +27,16 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateInventory;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateInventorySlot;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateScheduledEvent;
 use Tests\Traits\CreateUser;
 
 class BatchCraftingControllerTest extends TestCase
 {
-    use CreateAlchemyBag, CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateInventory, CreateInventorySlot, CreateItem, CreateItemAffix, CreateUser, RefreshDatabase;
+    use CreateAlchemyBag, CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacter, CreateCharacterAutomation, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalEventGoal, CreateInventory, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateScheduledEvent, CreateUser, RefreshDatabase;
 
     public function test_start_craft_batch(): void
     {
@@ -938,7 +938,7 @@ class BatchCraftingControllerTest extends TestCase
             ->assignSkill($spellCrafting, 5, false)
             ->getCharacter();
         $character->update(['gold' => 100, 'inventory_max' => 10]);
-        $schedule = ScheduledEvent::factory()->create(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
         $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
         $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
@@ -961,7 +961,7 @@ class BatchCraftingControllerTest extends TestCase
         $character->skills()
             ->whereHas('baseSkill', fn ($query) => $query->where('type', SkillTypeValue::ENCHANTING->value))
             ->update(['level' => 5]);
-        $schedule = ScheduledEvent::factory()->create(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
         $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
         $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
@@ -1010,7 +1010,7 @@ class BatchCraftingControllerTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
         $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 5, 'xp' => 0, 'xp_max' => 100]);
         $this->createItem(['name' => 'Preview Set Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
-        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
         $prefix = $this->createItemAffix(['name' => 'HTTP Preview Prefix', 'type' => 'prefix', 'cost' => 30, 'int_required' => 0, 'skill_level_required' => 1]);
         $suffix = $this->createItemAffix(['name' => 'HTTP Preview Suffix', 'type' => 'suffix', 'cost' => 40, 'int_required' => 0, 'skill_level_required' => 1]);
 
@@ -1116,8 +1116,8 @@ class BatchCraftingControllerTest extends TestCase
         $ring = $this->createGameSkill(['name' => 'Ring Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
         $spell = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
         $character->skills()->createMany([['game_skill_id' => $armour->id, 'level' => 5], ['game_skill_id' => $ring->id, 'level' => 5], ['game_skill_id' => $spell->id, 'level' => 5]]);
-        Item::factory()->state(['can_craft' => true, 'skill_level_required' => 0, 'cost' => 1])->sequence(['type' => 'body', 'crafting_type' => 'armour'], ['type' => 'leggings', 'crafting_type' => 'armour'], ['type' => 'sleeves', 'crafting_type' => 'armour'], ['type' => 'gloves', 'crafting_type' => 'armour'], ['type' => 'feet', 'crafting_type' => 'armour'], ['type' => 'helmet', 'crafting_type' => 'armour'], ['type' => 'ring', 'crafting_type' => 'ring'], ['type' => 'ring', 'crafting_type' => 'ring'], ['type' => 'spell-damage', 'crafting_type' => 'spell'], ['type' => 'spell-healing', 'crafting_type' => 'spell'])->count(10)->create();
-        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $this->createCraftableEquipmentItems(['cost' => 1]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
         $this->createItemAffix(['name' => 'Default Plan Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
         $this->createItemAffix(['name' => 'Default Plan Suffix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
 
@@ -1194,7 +1194,7 @@ class BatchCraftingControllerTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
-        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
         $suffix = $this->createItemAffix(['name' => 'Wrong Type Affix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
 
         $keys = collect($this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
@@ -1226,7 +1226,7 @@ class BatchCraftingControllerTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
         $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
         $item = $this->createItem(['name' => 'Destination Test Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1]);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1257,7 +1257,7 @@ class BatchCraftingControllerTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
         $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1283,7 +1283,7 @@ class BatchCraftingControllerTest extends TestCase
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Destination Test Sword', 'type' => 'sword', 'crafting_type' => 'weapon', 'default_position' => 'sword', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $prefix = $this->createItemAffix(['name' => 'Destination Test Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1313,7 +1313,7 @@ class BatchCraftingControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 100, 'inventory_max' => 10]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1340,7 +1340,7 @@ class BatchCraftingControllerTest extends TestCase
         $character->skills()->create(['game_skill_id' => $trinketry->id, 'character_id' => $character->id, 'level' => 1, 'xp' => 0, 'xp_max' => 100, 'is_locked' => false]);
         $this->createItem(['type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'trinket']);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1387,14 +1387,14 @@ class BatchCraftingControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'max_slots' => 1,
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
-        $targetSet = InventorySet::factory()->create(['character_id' => $character->id]);
+        $targetSet = $this->createInventorySet(['character_id' => $character->id]);
 
         $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
@@ -1416,7 +1416,7 @@ class BatchCraftingControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1425,7 +1425,7 @@ class BatchCraftingControllerTest extends TestCase
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
         $this->createItemAffix(['name' => 'Selected Set Prefix', 'type' => 'prefix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
         $this->createItemAffix(['name' => 'Selected Set Suffix', 'type' => 'suffix', 'cost' => 10, 'int_required' => 0, 'skill_level_required' => 1]);
-        $targetSet = InventorySet::factory()->create(['character_id' => $character->id]);
+        $targetSet = $this->createInventorySet(['character_id' => $character->id]);
 
         $previewResponse = $this->actingAs($character->user)->call('POST', route('batch-crafting.preview', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
@@ -1462,7 +1462,7 @@ class BatchCraftingControllerTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
         $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
         $filler = $this->createItem(['name' => 'Filler Item', 'type' => 'dagger']);
-        $craftedItemsSet = InventorySet::factory()->create([
+        $craftedItemsSet = $this->createInventorySet([
             'character_id' => $character->id,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
@@ -1525,7 +1525,7 @@ class BatchCraftingControllerTest extends TestCase
         $ring = $this->createGameSkill(['name' => 'Ring Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
         $spell = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
         $character->skills()->createMany([['game_skill_id' => $armour->id, 'level' => 5], ['game_skill_id' => $ring->id, 'level' => 5], ['game_skill_id' => $spell->id, 'level' => 5]]);
-        Item::factory()->state(['can_craft' => true, 'skill_level_required' => 0, 'cost' => 1])->sequence(['type' => 'body', 'crafting_type' => 'armour'], ['type' => 'leggings', 'crafting_type' => 'armour'], ['type' => 'sleeves', 'crafting_type' => 'armour'], ['type' => 'gloves', 'crafting_type' => 'armour'], ['type' => 'feet', 'crafting_type' => 'armour'], ['type' => 'helmet', 'crafting_type' => 'armour'], ['type' => 'ring', 'crafting_type' => 'ring'], ['type' => 'ring', 'crafting_type' => 'ring'], ['type' => 'spell-damage', 'crafting_type' => 'spell'], ['type' => 'spell-healing', 'crafting_type' => 'spell'])->count(10)->create();
+        $this->createCraftableEquipmentItems(['cost' => 1]);
         $prefix = $this->createItemAffix(['name' => 'Start Finalized Keys Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $processor = resolve(BatchCraftingProcessor::class);
         $keys = $processor->craftEnchantSetPlanKeys($processor->craftSetQueue());
@@ -1691,7 +1691,7 @@ class BatchCraftingControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
         $item = $this->createItem(['name' => 'Validation Output Set Id Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1]);
-        $set = InventorySet::factory()->create(['character_id' => $character->id]);
+        $set = $this->createInventorySet(['character_id' => $character->id]);
 
         $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,

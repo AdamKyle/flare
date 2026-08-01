@@ -475,7 +475,10 @@ class DisenchantServiceTest extends TestCase
             'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
         ]))->getCharacter();
 
-        (new DisenchantMany($character, [$this->itemToDisenchant->id, $this->itemToDisenchant->id]))->handle($disenchantingService, $skillCheckServiceMock);
+        $this->app->instance(DisenchantService::class, $disenchantingService);
+        $this->app->instance(SkillCheckService::class, $skillCheckServiceMock);
+
+        DisenchantMany::dispatch($character, [$this->itemToDisenchant->id, $this->itemToDisenchant->id]);
 
         $character = $character->refresh();
 
@@ -502,7 +505,10 @@ class DisenchantServiceTest extends TestCase
             'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
         ]))->getCharacter();
 
-        (new DisenchantMany($character, [$this->itemToDisenchant->id]))->handle($disenchantingService, $skillCheckServiceMock);
+        $this->app->instance(DisenchantService::class, $disenchantingService);
+        $this->app->instance(SkillCheckService::class, $skillCheckServiceMock);
+
+        DisenchantMany::dispatch($character, [$this->itemToDisenchant->id]);
 
         $character = $character->refresh();
 
@@ -529,7 +535,10 @@ class DisenchantServiceTest extends TestCase
             'effect' => ItemEffectsValue::GOLD_DUST_RUSH,
         ]))->getCharacter();
 
-        (new DisenchantMany($character, array_fill(0, 20, $this->itemToDisenchant->id)))->handle($disenchantingService, $skillCheckServiceMock);
+        $this->app->instance(DisenchantService::class, $disenchantingService);
+        $this->app->instance(SkillCheckService::class, $skillCheckServiceMock);
+
+        DisenchantMany::dispatch($character, array_fill(0, 20, $this->itemToDisenchant->id));
 
         $character = $character->refresh();
 

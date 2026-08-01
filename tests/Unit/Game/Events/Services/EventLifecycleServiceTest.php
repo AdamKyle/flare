@@ -5,7 +5,6 @@ namespace Tests\Unit\Game\Events\Services;
 use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Location;
-use App\Flare\Models\Monster;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
@@ -16,13 +15,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGlobalEventGoal;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateRaid;
 use Tests\Traits\CreateScheduledEvent;
 
 class EventLifecycleServiceTest extends TestCase
 {
-    use CreateGameMap, CreateLocation, CreateRaid, CreateScheduledEvent, RefreshDatabase;
+    use CreateGameMap, CreateGlobalEventGoal, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
     public function test_manual_cancellation_ignores_future_runtime_end_time_and_fully_tears_down(): void
     {
@@ -58,7 +59,7 @@ class EventLifecycleServiceTest extends TestCase
 
         $this->assertEquals(ScheduledEventStatus::CANCELLED, $scheduledEvent->status);
 
-        InitiateWeeklyCelestialSpawnEvent::dispatchSync($scheduledEvent->id);
+        InitiateWeeklyCelestialSpawnEvent::dispatch($scheduledEvent->id);
 
         $this->assertEquals(0, Event::where('scheduled_event_id', $scheduledEvent->id)->count());
     }
@@ -130,13 +131,13 @@ class EventLifecycleServiceTest extends TestCase
         $locationTwo = $this->createLocation(['game_map_id' => $gameMapTwo->id]);
 
         $raidOne = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $locationOne->id,
             'corrupted_location_ids' => [],
         ]);
 
         $raidTwo = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $locationTwo->id,
             'corrupted_location_ids' => [],
         ]);
@@ -164,7 +165,7 @@ class EventLifecycleServiceTest extends TestCase
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -249,7 +250,7 @@ class EventLifecycleServiceTest extends TestCase
             'scheduled_event_id' => $scheduledEvent->id,
         ]);
 
-        $unrelatedGoal = GlobalEventGoal::factory()->create([
+        $unrelatedGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
@@ -286,7 +287,7 @@ class EventLifecycleServiceTest extends TestCase
         ]);
 
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -353,7 +354,7 @@ class EventLifecycleServiceTest extends TestCase
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -422,13 +423,13 @@ class EventLifecycleServiceTest extends TestCase
         $locationTwo = $this->createLocation(['game_map_id' => $gameMapTwo->id]);
 
         $raidOne = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $locationOne->id,
             'corrupted_location_ids' => [],
         ]);
 
         $raidTwo = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $locationTwo->id,
             'corrupted_location_ids' => [],
         ]);
@@ -502,7 +503,7 @@ class EventLifecycleServiceTest extends TestCase
         ]);
 
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -694,7 +695,7 @@ class EventLifecycleServiceTest extends TestCase
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -788,7 +789,7 @@ class EventLifecycleServiceTest extends TestCase
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
         $raid = $this->createRaid([
-            'raid_boss_id' => Monster::factory()->create()->id,
+            'raid_boss_id' => $this->createMonster()->id,
             'raid_boss_location_id' => $location->id,
             'corrupted_location_ids' => [],
         ]);
@@ -810,7 +811,7 @@ class EventLifecycleServiceTest extends TestCase
             'ends_at' => now()->addMinutes(5),
         ]);
 
-        $unrelatedGoal = GlobalEventGoal::factory()->create([
+        $unrelatedGoal = $this->createGlobalEventGoal([
             'event_type' => EventType::WEEKLY_CELESTIALS,
         ]);
 

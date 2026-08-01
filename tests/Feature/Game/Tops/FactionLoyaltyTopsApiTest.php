@@ -2,22 +2,22 @@
 
 namespace Tests\Feature\Game\Tops;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateUser;
 
 class FactionLoyaltyTopsApiTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacter, CreateGameMap, CreateUser, RefreshDatabase;
 
     public function test_authenticated_users_can_call_faction_loyalty_tops_api(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id, 'name' => 'Loyalist']);
-        $map = GameMap::factory()->create();
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'name' => 'Loyalist']);
+        $map = $this->createGameMap();
         Faction::create(['character_id' => $character->id, 'game_map_id' => $map->id, 'current_level' => 7, 'current_points' => 100, 'points_needed' => 200, 'maxed' => false, 'title' => 'Known']);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/faction-loyalty');

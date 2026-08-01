@@ -4,9 +4,6 @@ namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\UnitInQueue;
 use App\Game\Kingdoms\Jobs\RecruitUnits;
-use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
-use App\Game\Kingdoms\Service\UnitService;
-use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -54,11 +51,7 @@ class RecruitUnitsTest extends TestCase
             'completed_at' => now(),
         ]);
 
-        (new RecruitUnits($unit, $kingdom, 1, $queue->id))->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityUnitManagement::class),
-            resolve(UnitService::class),
-        );
+        RecruitUnits::dispatch($unit, $kingdom, 1, $queue->id);
 
         $kingdom = $kingdom->refresh();
 

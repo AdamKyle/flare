@@ -313,12 +313,10 @@ class GemWorldGenerationService
             'is_port' => $template->is_port,
             'can_players_enter' => $template->can_players_enter,
             'can_auto_battle' => true,
-            'enemy_strength_type' => null,
             'type' => $this->locationTypeForTemplate($template),
             'x' => $placement->x,
             'y' => $placement->y,
             'minutes_between_delve_fights' => $template->type === LocationTemplateType::DELVE->value ? 5 : null,
-            'delve_enemy_strength_increase' => $template->type === LocationTemplateType::DELVE->value ? 0.05 : null,
         ]);
     }
 

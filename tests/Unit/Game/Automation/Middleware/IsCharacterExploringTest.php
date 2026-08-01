@@ -3,19 +3,18 @@
 namespace Tests\Unit\Game\Automation\Middleware;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Middleware\IsCharacterExploring;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAutomationRequest;
 use Tests\Traits\CreateCharacterAutomation;
 
 class IsCharacterExploringTest extends TestCase
 {
+    use CreateAutomationRequest;
     use CreateCharacterAutomation {
         createCharacterAutomation as createCharacterAutomationRecord;
     }
@@ -42,7 +41,7 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $response = $this->middleware->handle($this->jsonRequest(), function () {
+        $response = $this->middleware->handle($this->createAutomationJsonRequest(), function () {
             return response()->json([
                 'message' => 'continued',
             ]);
@@ -56,9 +55,9 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createCharacterAutomation();
+        $this->createExplorationAutomation($this->character);
 
-        $response = $this->middleware->handle($this->jsonRequest(), function () {
+        $response = $this->middleware->handle($this->createAutomationJsonRequest(), function () {
             return response()->json([
                 'message' => 'continued',
             ]);
@@ -77,9 +76,9 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createCharacterAutomation();
+        $this->createExplorationAutomation($this->character);
 
-        $this->middleware->handle($this->jsonRequest(), function () {
+        $this->middleware->handle($this->createAutomationJsonRequest(), function () {
             return response()->json([
                 'message' => 'continued',
             ]);
@@ -92,7 +91,7 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $response = $this->middleware->handle($this->webRequest(), function () {
+        $response = $this->middleware->handle($this->createAutomationWebRequest(), function () {
             return response('continued');
         });
 
@@ -104,9 +103,9 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createCharacterAutomation();
+        $this->createExplorationAutomation($this->character);
 
-        $response = $this->middleware->handle($this->webRequest(), function () {
+        $response = $this->middleware->handle($this->createAutomationWebRequest(), function () {
             return response('continued');
         });
 
@@ -117,36 +116,12 @@ class IsCharacterExploringTest extends TestCase
     {
         Event::fake();
 
-        $this->createCharacterAutomation();
+        $this->createExplorationAutomation($this->character);
 
-        $this->middleware->handle($this->webRequest(), function () {
+        $this->middleware->handle($this->createAutomationWebRequest(), function () {
             return response('continued');
         });
 
         Event::assertDispatched(ServerMessageEvent::class);
-    }
-
-    private function jsonRequest(): Request
-    {
-        return Request::create('/test', 'POST', [], [], [], [
-            'HTTP_ACCEPT' => 'application/json',
-        ]);
-    }
-
-    private function webRequest(): Request
-    {
-        return Request::create('/test', 'POST', [], [], [], [
-            'HTTP_ACCEPT' => 'text/html',
-        ]);
-    }
-
-    private function createCharacterAutomation(): CharacterAutomation
-    {
-        return $this->createCharacterAutomationRecord([
-            'character_id' => $this->character->id,
-            'type' => AutomationType::EXPLORING,
-            'started_at' => now(),
-            'completed_at' => now()->addSeconds(3),
-        ]);
     }
 }

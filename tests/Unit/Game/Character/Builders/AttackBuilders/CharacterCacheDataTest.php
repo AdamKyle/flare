@@ -3,20 +3,16 @@
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders;
 
 use App\Flare\Items\Values\ItemType;
-use App\Flare\Models\Character;
 use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateItem;
 
 class CharacterCacheDataTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -39,28 +35,10 @@ class CharacterCacheDataTest extends TestCase
         $this->characterCacheData = null;
     }
 
-    private function setUpCharacterForTests(): Character
-    {
-        $item = $this->createItem([
-            'type' => WeaponTypes::STAVE,
-            'base_damage' => 10,
-        ]);
-
-        $spellDamage = $this->createItem([
-            'type' => SpellTypes::DAMAGE,
-            'base_damage' => 10,
-        ]);
-
-        return $this->character->inventoryManagement()
-            ->giveItem($item, true, 'left-hand')
-            ->giveItem($spellDamage, true, 'spell-one')
-            ->getCharacter();
-    }
-
     public function test_cached_ac_is_set_up()
     {
 
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $this->characterCacheData->setCharacterDefendAc($character, 10);
 
@@ -69,7 +47,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_get_attack_data_for_attack_type()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $data = $this->characterCacheData->getDataFromAttackCache($character, AttackTypeValue::ATTACK);
 
@@ -78,7 +56,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_get_stat_from_character_sheet_cache_when_cache_does_not_exist()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $value = $this->characterCacheData->getCachedCharacterData($character, 'str');
 
@@ -87,7 +65,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_get_stat_from_character_sheet_cache_data_when_level_does_not_match()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         Cache::put('character-sheet-'.$character->id, [
             'level' => 0,
@@ -100,7 +78,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_delete_character_sheet_data()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         Cache::put('character-sheet-'.$character->id, [
             'level' => 0,
@@ -113,7 +91,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_get_existing_character_sheet_cache()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $characterSheet = [
             'level' => 0,
@@ -128,7 +106,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_get_character_sheet_when_it_does_not_exist()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $data = $this->characterCacheData->getCharacterSheetCache($character);
 
@@ -137,7 +115,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_update_existing_character_sheet()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $characterSheet = [
             'level' => 0,
@@ -156,7 +134,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_update_non_existent_character_sheet()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $this->characterCacheData->updateCharacterSheetCache($character, [
             'name' => 'Hello',
@@ -169,7 +147,7 @@ class CharacterCacheDataTest extends TestCase
 
     public function test_get_character_sheet_cache()
     {
-        $character = $this->setUpCharacterForTests();
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
         $data = $this->characterCacheData->characterSheetCache($character);
 

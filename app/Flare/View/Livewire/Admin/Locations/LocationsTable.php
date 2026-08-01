@@ -16,7 +16,7 @@ class LocationsTable extends DataTableComponent
     private array $weeklyFightLocations = [
         LocationType::LORDS_STRONG_HOLD,
         LocationType::BROKEN_ANVIL,
-        LocationType::TWSITED_MAIDENS_DUNGEONS,
+        LocationType::TWISTED_MAIDENS_DUNGEONS,
         LocationType::ALCHEMY_CHURCH,
     ];
 

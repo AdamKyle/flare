@@ -2,6 +2,7 @@
 
 namespace App\Game\Tops\Services;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
@@ -44,6 +45,7 @@ class CharacterTopsInspectionService
         private readonly CharacterStatDetailsTransformer $characterStatDetailsTransformer,
         private readonly BasicSkillsTransformer $basicSkillsTransformer,
         private readonly ItemTransformer $itemTransformer,
+        private readonly ItemEnricherFactory $itemEnricherFactory,
         private readonly GuideQuestService $guideQuestService,
         private readonly CharacterPassiveSkills $characterPassiveSkills,
         private readonly SkillsTransformer $skillsTransformer,
@@ -582,8 +584,9 @@ class CharacterTopsInspectionService
             ];
         }
 
-        $transformedItem = $this->itemTransformer->transform($item);
-        $transformedItem['sockets'] = $item->sockets
+        $enrichedItem = $this->itemEnricherFactory->buildItem($item);
+        $transformedItem = $this->itemTransformer->transform($enrichedItem);
+        $transformedItem['sockets'] = $enrichedItem->sockets
             ->filter(fn ($socket): bool => ! is_null($socket->gem))
             ->map(fn ($socket): array => $this->characterGemsTransformer->transform($socket->gem))
             ->values()
@@ -593,8 +596,8 @@ class CharacterTopsInspectionService
             ...$transformedItem,
             'position' => $position,
             'slot_id' => $slotId,
-            'item_id' => $item->id,
-            'item_name' => $item->affix_name,
+            'item_id' => $enrichedItem->id,
+            'item_name' => $enrichedItem->affix_name,
         ];
     }
 
@@ -776,7 +779,7 @@ class CharacterTopsInspectionService
                 'x' => $dropLocation->x,
                 'y' => $dropLocation->y,
                 'hours_to_drop' => $dropLocation->hours_to_drop,
-                'delve_enemy_strength_increase' => $dropLocation->delve_enemy_strength_increase,
+                'minutes_between_delve_fights' => $dropLocation->minutes_between_delve_fights,
                 'map' => $this->publicQuestMap($dropLocation->map, $depth + 1),
             ],
             'locations' => collect($item->locations)->map(fn ($location): array => [

@@ -233,7 +233,7 @@ class BattleRewardQueueAdminService
                     'oldest_processing_request_created_at' => CharacterBattleRewardRequest::forCharacter($state->character_id)
                         ->processing()
                         ->min('created_at'),
-                    'requests' => $requests->map(fn (CharacterBattleRewardRequest $rewardRequest): array => $this->requestPayload($rewardRequest))->values(),
+                    'requests' => $requests->map(fn (CharacterBattleRewardRequest $rewardRequest): array => $this->requestPayload($rewardRequest))->values()->all(),
                 ];
             })
             ->all();

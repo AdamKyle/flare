@@ -7,7 +7,6 @@ use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Skills\Handlers\UpdateItemSkill;
 use Facades\App\Game\Skills\Handlers\UpdateItemSkill as UpdateItemSkillFacade;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
@@ -57,16 +56,7 @@ class SecondaryRewardServiceTest extends TestCase
     {
         $character = $this->characterFactory->getCharacter();
 
-        DB::table('sessions')->truncate();
-
-        DB::table('sessions')->insert([[
-            'id' => '1',
-            'user_id' => $character->user->id,
-            'ip_address' => '1',
-            'user_agent' => '1',
-            'payload' => '1',
-            'last_activity' => 1602801731,
-        ]]);
+        $this->characterFactory->createSessionForCharacter();
 
         Event::fake();
 

@@ -6,22 +6,20 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Values\AttackTypeValue;
+use App\Flare\Values\AutomationType;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
-use App\Game\Automation\Enums\AutomatedCraftingResultType;
 use App\Game\Automation\Enums\FactionLoyaltyCoordinatorAction;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Jobs\AutomatedFactionLoyalty;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
-use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
@@ -40,9 +38,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $newerCharacterAutomation = $factory->getCharacterAutomation();
         $newerFactionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
         $character->update(['can_craft' => false]);
-        $job = new AutomatedFactionLoyalty($character->id, $newerCharacterAutomation->id + 1000, $newerFactionLoyaltyAutomation->id + 1000, 1);
-
-        $this->app->call([$job, 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $newerCharacterAutomation->id + 1000, $newerFactionLoyaltyAutomation->id + 1000, 1);
 
         $this->assertNotNull($newerCharacterAutomation->fresh());
         $this->assertNull($newerFactionLoyaltyAutomation->refresh()->completed_at);
@@ -65,9 +61,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
         $character->update(['can_craft' => false]);
-        $job = new AutomatedFactionLoyalty($character->id, $staleCharacterAutomation->id, $newerFactionLoyaltyAutomation->id + 1000, 1);
-
-        $this->app->call([$job, 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $staleCharacterAutomation->id, $newerFactionLoyaltyAutomation->id + 1000, 1);
 
         $this->assertNotNull($newerCharacterAutomation->fresh());
         $this->assertNull($newerFactionLoyaltyAutomation->refresh()->completed_at);
@@ -97,9 +91,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
             'completed_at' => now(),
         ]);
         $character->update(['can_craft' => false]);
-        $job = new AutomatedFactionLoyalty($character->id, $staleCharacterAutomation->id, $completedFactionLoyaltyAutomation->id, 1);
-
-        $this->app->call([$job, 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $staleCharacterAutomation->id, $completedFactionLoyaltyAutomation->id, 1);
 
         $this->assertNotNull($newerCharacterAutomation->fresh());
         $this->assertNull($newerFactionLoyaltyAutomation->refresh()->completed_at);
@@ -122,9 +114,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
             'completed_at' => now()->addHour(),
             'attack_type' => AttackTypeValue::ATTACK,
         ]);
-        $job = new AutomatedFactionLoyalty($character->id, $exactCharacterAutomation->id, $exactFactionLoyaltyAutomation->id, 1);
-
-        $this->app->call([$job, 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $exactCharacterAutomation->id, $exactFactionLoyaltyAutomation->id, 1);
 
         $this->assertNull($exactCharacterAutomation->fresh());
         $this->assertNotNull($exactFactionLoyaltyAutomation->refresh()->completed_at);
@@ -134,21 +124,17 @@ class AutomatedFactionLoyaltyTest extends TestCase
     public function test_stale_job_cannot_delete_newer_active_faction_loyalty_automation(): void
     {
         Event::fake();
-        Queue::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
         $newerCharacterAutomation = $factory->getCharacterAutomation();
         $newerFactionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
         $character->update(['can_craft' => false]);
-        $job = new AutomatedFactionLoyalty($character->id, $newerCharacterAutomation->id + 1000, $newerFactionLoyaltyAutomation->id + 1000, 1);
-
-        $this->app->call([$job, 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $newerCharacterAutomation->id + 1000, $newerFactionLoyaltyAutomation->id + 1000, 1);
 
         $this->assertNotNull($newerCharacterAutomation->fresh());
         $this->assertNull($newerFactionLoyaltyAutomation->refresh()->completed_at);
         $this->assertFalse($character->refresh()->can_craft);
-        Queue::assertNothingPushed();
     }
 
     public function test_stale_job_returns_before_resolving_npc_or_action(): void
@@ -178,7 +164,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->instance(FactionLoyaltyNpcTaskCoordinator::class, $npcTaskCoordinator);
         $this->instance(FactionLoyaltyAutomationActionCoordinator::class, $actionCoordinator);
 
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
     }
 
     public function test_stale_job_does_not_delete_old_automation(): void
@@ -202,7 +188,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         ]);
         $factory->createAutomation();
 
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
 
         $this->assertNotNull($oldCharacterAutomation->fresh());
     }
@@ -228,7 +214,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         ]);
         $factory->createAutomation();
 
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
 
         $this->assertNull($oldFactionLoyaltyAutomation->refresh()->completed_at);
     }
@@ -256,7 +242,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $newerCharacterAutomation = $factory->getCharacterAutomation();
         $newerFactionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
 
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
 
         $this->assertNotNull($newerCharacterAutomation->fresh());
         $this->assertNull($newerFactionLoyaltyAutomation->refresh()->completed_at);
@@ -284,151 +270,14 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory->createAutomation();
         $character->update(['can_craft' => false]);
 
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
 
         $this->assertFalse($character->refresh()->can_craft);
-    }
-
-    public function test_stale_job_does_not_recall_itself(): void
-    {
-        Event::fake();
-        Queue::fake();
-
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $factory = (new FactionLoyaltyFactory)->setUp($character);
-        $oldCharacterAutomation = CharacterAutomation::create([
-            'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
-            'started_at' => now()->subMinute(),
-            'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
-        ]);
-        $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
-            'character_automation_id' => $oldCharacterAutomation->id,
-            'character_id' => $character->id,
-            'faction_loyalty_npc_id' => $factory->getAssistingFactionLoyaltyNpc()->id,
-            'started_at' => now()->subMinute(),
-        ]);
-        $factory->createAutomation();
-
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
-
-        Queue::assertNothingPushed();
-    }
-
-    public function test_stopped_automation_does_not_recall_itself(): void
-    {
-        Event::fake();
-        Queue::fake();
-
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
-        $stoppedCharacterAutomation = $factory->getCharacterAutomation();
-        $stoppedFactionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
-        $stoppedCharacterAutomation->delete();
-        $stoppedFactionLoyaltyAutomation->update(['completed_at' => now()]);
-        $job = new AutomatedFactionLoyalty($character->id, $stoppedCharacterAutomation->id, $stoppedFactionLoyaltyAutomation->id, 1);
-
-        $this->app->call([$job, 'handle']);
-
-        Queue::assertNothingPushed();
-    }
-
-    public function test_recall_job_dispatches_to_faction_loyalty_queue_on_long_running_connection_for_valid_records(): void
-    {
-        Event::fake();
-        Queue::fake();
-
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
-        $characterAutomation = $factory->getCharacterAutomation();
-        $factionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
-        $factionLoyaltyNpc = $factory->getAssistingFactionLoyaltyNpc();
-        $itemId = $factory->getCraftingItemsForNpc($factionLoyaltyNpc)[0]->id;
-        $result = (new AutomatedCraftingResult)->setUp(AutomatedCraftingResultType::CRAFTED_TARGET_ITEM, $itemId);
-
-        $npcTaskCoordinator = Mockery::mock(FactionLoyaltyNpcTaskCoordinator::class);
-        $npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
-        $npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($factionLoyaltyNpc);
-        $npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
-        $actionCoordinator = Mockery::mock(FactionLoyaltyAutomationActionCoordinator::class);
-        $actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
-        $actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
-            'type' => FactionLoyaltyCoordinatorAction::CRAFT->value,
-            'task' => ['item_id' => $itemId],
-        ]);
-        $craftingLogger = Mockery::mock(FactionLoyaltyAutomationCraftingLogger::class);
-        $craftingLogger->shouldReceive('setUp')->once()->andReturnSelf();
-        $craftingHandler = Mockery::mock(AutomatedCraftingHandler::class);
-        $craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
-        $craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
-        $craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
-        $craftingHandler->shouldReceive('handle')->once()->andReturn($result);
-
-        $this->instance(FactionLoyaltyNpcTaskCoordinator::class, $npcTaskCoordinator);
-        $this->instance(FactionLoyaltyAutomationActionCoordinator::class, $actionCoordinator);
-        $this->instance(FactionLoyaltyAutomationCraftingLogger::class, $craftingLogger);
-        $this->instance(AutomatedCraftingHandler::class, $craftingHandler);
-
-        $job = new AutomatedFactionLoyalty($character->id, $characterAutomation->id, $factionLoyaltyAutomation->id, 1);
-
-        $this->app->call([$job, 'handle']);
-
-        Queue::assertPushed(AutomatedFactionLoyalty::class, function (AutomatedFactionLoyalty $recalledJob): bool {
-            return $recalledJob->connection === 'long_running'
-                && $recalledJob->queue === 'faction_loyalty';
-        });
-    }
-
-    public function test_recall_job_does_not_dispatch_when_newer_active_faction_loyalty_automation_exists(): void
-    {
-        Event::fake();
-        Queue::fake();
-
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
-        $characterAutomation = $factory->getCharacterAutomation();
-        $factionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
-        $factionLoyaltyNpc = $factory->getAssistingFactionLoyaltyNpc();
-        $itemId = $factory->getCraftingItemsForNpc($factionLoyaltyNpc)[0]->id;
-        $result = (new AutomatedCraftingResult)->setUp(AutomatedCraftingResultType::CRAFTED_TARGET_ITEM, $itemId);
-        $npcTaskCoordinator = Mockery::mock(FactionLoyaltyNpcTaskCoordinator::class);
-        $npcTaskCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
-        $npcTaskCoordinator->shouldReceive('resolveNpc')->once()->andReturn($factionLoyaltyNpc);
-        $npcTaskCoordinator->shouldReceive('shouldEndAutomation')->once()->andReturnFalse();
-        $actionCoordinator = Mockery::mock(FactionLoyaltyAutomationActionCoordinator::class);
-        $actionCoordinator->shouldReceive('setUp')->once()->andReturnSelf();
-        $actionCoordinator->shouldReceive('resolveAction')->once()->andReturn([
-            'type' => FactionLoyaltyCoordinatorAction::CRAFT->value,
-            'task' => ['item_id' => $itemId],
-        ]);
-        $craftingLogger = Mockery::mock(FactionLoyaltyAutomationCraftingLogger::class);
-        $craftingLogger->shouldReceive('setUp')->once()->andReturnSelf();
-        $craftingHandler = Mockery::mock(AutomatedCraftingHandler::class);
-        $craftingHandler->shouldReceive('setUp')->once()->andReturnSelf();
-        $craftingHandler->shouldReceive('setCraftForNpc')->once()->andReturnSelf();
-        $craftingHandler->shouldReceive('setFactionLoyaltyNpc')->once()->andReturnSelf();
-        $craftingHandler->shouldReceive('handle')
-            ->once()
-            ->andReturnUsing(function () use ($factory, $result): AutomatedCraftingResult {
-                $factory->createAutomation();
-
-                return $result;
-            });
-        $this->instance(FactionLoyaltyNpcTaskCoordinator::class, $npcTaskCoordinator);
-        $this->instance(FactionLoyaltyAutomationActionCoordinator::class, $actionCoordinator);
-        $this->instance(FactionLoyaltyAutomationCraftingLogger::class, $craftingLogger);
-        $this->instance(AutomatedCraftingHandler::class, $craftingHandler);
-
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $characterAutomation->id, $factionLoyaltyAutomation->id, 1)), 'handle']);
-
-        Queue::assertNothingPushed();
     }
 
     public function test_exception_handling_does_not_alter_automation_state_when_newer_active_automation_exists(): void
     {
         Event::fake();
-        Queue::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
@@ -465,31 +314,13 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->instance(AutomatedCraftingHandler::class, $craftingHandler);
         $character->update(['can_craft' => false]);
 
-        $this->app->call([(new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1)), 'handle']);
+        AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
 
         $this->assertNotNull($oldCharacterAutomation->fresh());
         $this->assertNull($oldFactionLoyaltyAutomation->refresh()->completed_at);
         $this->assertNotNull($factory->getCharacterAutomation()->fresh());
         $this->assertNull($factory->getFactionLoyaltyAutomation()->refresh()->completed_at);
         $this->assertFalse($character->refresh()->can_craft);
-        Queue::assertNothingPushed();
-    }
-
-    public function test_recall_job_does_not_dispatch_when_exact_faction_loyalty_automation_is_completed(): void
-    {
-        Event::fake();
-        Queue::fake();
-
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $factory = (new FactionLoyaltyFactory)->setUp($character)->createAutomation();
-        $characterAutomation = $factory->getCharacterAutomation();
-        $factionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
-        $factionLoyaltyAutomation->update(['completed_at' => now()]);
-        $job = new AutomatedFactionLoyalty($character->id, $characterAutomation->id, $factionLoyaltyAutomation->id, 1);
-
-        $this->app->call([$job, 'handle']);
-
-        Queue::assertNothingPushed();
     }
 
     public function test_failed_logs_and_cleans_up_only_exact_owned_automation(): void

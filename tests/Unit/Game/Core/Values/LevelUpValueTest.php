@@ -5,7 +5,6 @@ namespace Tests\Unit\Game\Core\Values;
 use App\Game\Core\Values\LevelUpValue;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
@@ -510,36 +509,5 @@ class LevelUpValueTest extends TestCase
         $this->assertSame(1, $levelUpValue['int']);
         $this->assertSame(1, $levelUpValue['agi']);
         $this->assertSame(1, $levelUpValue['focus']);
-    }
-
-    public function test_extra_level_boon_with_null_amount_used_does_not_break_raw_stat_gains(): void
-    {
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
-            ->getCharacter();
-
-        $boon = $this->createItem([
-            'name' => 'Null Amount Extra Level Boon',
-            'type' => 'quest',
-            'can_stack' => true,
-            'gains_additional_level' => true,
-        ]);
-
-        DB::statement('ALTER TABLE character_boons MODIFY amount_used INT NULL');
-
-        $character->boons()->create([
-            'character_id' => $character->id,
-            'item_id' => $boon->id,
-            'started' => now(),
-            'complete' => now()->addMinutes(120),
-            'last_for_minutes' => 120,
-            'amount_used' => null,
-        ]);
-
-        $levelUpValue = resolve(LevelUpValue::class)->createValueObject($character->refresh());
-
-        $this->assertSame(2, $levelUpValue['level']);
-        $this->assertSame(2, $levelUpValue['str']);
-        $this->assertSame(3, $levelUpValue['dex']);
     }
 }

@@ -3,23 +3,23 @@
 namespace Tests\Unit\Flare\Middleware;
 
 use App\Flare\Middleware\TrackSessionLifeMiddleware;
-use App\Flare\Models\User;
-use App\Flare\Models\UserLoginDuration;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
+use Tests\Traits\CreateUser;
+use Tests\Traits\CreateUserLoginDuration;
 
 class TrackSessionLifeMiddlewareTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateUser, CreateUserLoginDuration, RefreshDatabase;
 
     public function test_active_request_updates_heartbeat_and_activity_time(): void
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
-        $user = User::factory()->create();
-        $session = UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHour(), 'last_activity' => now()->subMinute(), 'last_heart_beat' => now()->subMinute()]);
+        $user = $this->createUser();
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHour(), 'last_activity' => now()->subMinute(), 'last_heart_beat' => now()->subMinute()]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -32,8 +32,8 @@ class TrackSessionLifeMiddlewareTest extends TestCase
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
         config(['session.lifetime' => 30]);
-        $user = User::factory()->create();
-        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subDay(), 'last_activity' => now()->subMinute(), 'last_heart_beat' => now()->subMinute()]);
+        $user = $this->createUser();
+        $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subDay(), 'last_activity' => now()->subMinute(), 'last_heart_beat' => now()->subMinute()]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -45,8 +45,8 @@ class TrackSessionLifeMiddlewareTest extends TestCase
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
         config(['session.lifetime' => 30]);
-        $user = User::factory()->create();
-        $session = UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHours(2)]);
+        $user = $this->createUser();
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHours(2)]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -58,8 +58,8 @@ class TrackSessionLifeMiddlewareTest extends TestCase
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
         config(['session.lifetime' => 30]);
-        $user = User::factory()->create();
-        $session = UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHour()]);
+        $user = $this->createUser();
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHour()]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -71,8 +71,8 @@ class TrackSessionLifeMiddlewareTest extends TestCase
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
         config(['session.lifetime' => 30]);
-        $user = User::factory()->create();
-        $session = UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHour()]);
+        $user = $this->createUser();
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHours(3), 'last_activity' => now()->subHour(), 'last_heart_beat' => now()->subHour()]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -85,8 +85,8 @@ class TrackSessionLifeMiddlewareTest extends TestCase
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
         config(['session.lifetime' => 30]);
-        $user = User::factory()->create();
-        $session = UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHour(), 'last_activity' => now()->subHours(2), 'last_heart_beat' => now()->subHours(2)]);
+        $user = $this->createUser();
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHour(), 'last_activity' => now()->subHours(2), 'last_heart_beat' => now()->subHours(2)]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -96,7 +96,7 @@ class TrackSessionLifeMiddlewareTest extends TestCase
 
     public function test_no_open_session_exits_without_creating_a_record(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createUser();
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
@@ -107,9 +107,9 @@ class TrackSessionLifeMiddlewareTest extends TestCase
     public function test_closed_session_is_not_rewritten(): void
     {
         Carbon::setTestNow('2026-07-19 12:00:00');
-        $user = User::factory()->create();
+        $user = $this->createUser();
         $loggedOutAt = now()->subHour();
-        $session = UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now()->subHours(2), 'logged_out_at' => $loggedOutAt, 'duration_in_seconds' => 3600, 'last_activity' => $loggedOutAt, 'last_heart_beat' => $loggedOutAt]);
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHours(2), 'logged_out_at' => $loggedOutAt, 'duration_in_seconds' => 3600, 'last_activity' => $loggedOutAt, 'last_heart_beat' => $loggedOutAt]);
         $this->actingAs($user);
 
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));

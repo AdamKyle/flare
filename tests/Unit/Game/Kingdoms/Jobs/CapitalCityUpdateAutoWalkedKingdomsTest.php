@@ -67,7 +67,10 @@ class CapitalCityUpdateAutoWalkedKingdomsTest extends TestCase
                     && $context['exception'] instanceof RuntimeException,
             ));
 
-        (new CapitalCityUpdateAutoWalkedKingdoms($kingdom->id))->handle($transformer, $manager);
+        $this->app->instance(KingdomTransformer::class, $transformer);
+        $this->app->instance(Manager::class, $manager);
+
+        CapitalCityUpdateAutoWalkedKingdoms::dispatch($kingdom->id);
 
         $this->addToAssertionCount(1);
     }

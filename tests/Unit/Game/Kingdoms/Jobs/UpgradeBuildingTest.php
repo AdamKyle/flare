@@ -4,9 +4,6 @@ namespace Tests\Unit\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\BuildingInQueue;
 use App\Game\Kingdoms\Jobs\UpgradeBuilding;
-use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
-use App\Game\Kingdoms\Service\KingdomMaxResourceRecalculationService;
-use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\BuildingQueueType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -43,12 +40,7 @@ class UpgradeBuildingTest extends TestCase
             'completed_at' => now()->subMinute(),
         ]);
 
-        $job = new UpgradeBuilding($building, $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id);
 
         $this->assertSame(1, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));
@@ -84,12 +76,7 @@ class UpgradeBuildingTest extends TestCase
             'level' => 2,
         ]);
 
-        $job = new UpgradeBuilding($building->refresh(), $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building->refresh(), $character->user, $queue->id);
 
         $this->assertSame(2, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));
@@ -122,12 +109,7 @@ class UpgradeBuildingTest extends TestCase
             'completed_at' => now()->subMinute(),
         ]);
 
-        $job = new UpgradeBuilding($building, $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id);
 
         $this->assertSame(3, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));
@@ -160,12 +142,7 @@ class UpgradeBuildingTest extends TestCase
             'completed_at' => now()->subMinute(),
         ]);
 
-        $job = new UpgradeBuilding($building, $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id);
 
         $this->assertSame(1, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));
@@ -204,12 +181,7 @@ class UpgradeBuildingTest extends TestCase
             'completed_at' => now()->subMinute(),
         ]);
 
-        $job = new UpgradeBuilding($building, $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id);
 
         $this->assertSame(2, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));
@@ -247,12 +219,7 @@ class UpgradeBuildingTest extends TestCase
             'completed_at' => now()->subMinute(),
         ]);
 
-        $job = new UpgradeBuilding($building, $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id);
 
         $this->assertSame(2, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));
@@ -291,12 +258,7 @@ class UpgradeBuildingTest extends TestCase
             'completed_at' => now()->subMinute(),
         ]);
 
-        $job = new UpgradeBuilding($building, $character->user, $queue->id);
-        $job->handle(
-            resolve(UpdateKingdom::class),
-            resolve(CapitalCityBuildingManagement::class),
-            resolve(KingdomMaxResourceRecalculationService::class)
-        );
+        UpgradeBuilding::dispatch($building, $character->user, $queue->id);
 
         $this->assertSame(2, $building->refresh()->level);
         $this->assertNull(BuildingInQueue::find($queue->id));

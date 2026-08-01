@@ -38,7 +38,9 @@ class BatchCraftingJobTest extends TestCase
         });
         $service->shouldReceive('isContinuousFiniteMode')->twice()->andReturn(true, false);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame('completed', $batchCrafting->refresh()->status);
     }
@@ -57,7 +59,9 @@ class BatchCraftingJobTest extends TestCase
         });
         $service->shouldReceive('isContinuousFiniteMode')->once()->andReturn(false);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertNull($batchCrafting->refresh()->progress['next_attempt_at'] ?? null);
     }
@@ -76,7 +80,9 @@ class BatchCraftingJobTest extends TestCase
         });
         $service->shouldReceive('isContinuousFiniteMode')->once()->andReturn(false);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame('cancelled', $batchCrafting->refresh()->status);
     }
@@ -95,7 +101,9 @@ class BatchCraftingJobTest extends TestCase
         });
         $service->shouldReceive('isContinuousFiniteMode')->once()->andReturn(false);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame('completed', $batchCrafting->refresh()->status);
     }
@@ -110,7 +118,9 @@ class BatchCraftingJobTest extends TestCase
         $service->shouldReceive('processOneOperation')->once()->andReturn($batchCrafting);
         $service->shouldReceive('isContinuousFiniteMode')->once()->andReturn(false);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertTrue($batchCrafting->refresh()->isRunning());
     }
@@ -121,7 +131,9 @@ class BatchCraftingJobTest extends TestCase
         $service->shouldNotReceive('markProcessing');
         $service->shouldNotReceive('processOneOperation');
 
-        (new BatchCraftingJob(999999))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch(999999);
 
         $this->assertNull(BatchCrafting::find(999999));
     }
@@ -135,7 +147,9 @@ class BatchCraftingJobTest extends TestCase
         $service->shouldNotReceive('markProcessing');
         $service->shouldNotReceive('processOneOperation');
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame('completed', $batchCrafting->refresh()->status);
     }
@@ -149,7 +163,9 @@ class BatchCraftingJobTest extends TestCase
         $service->shouldNotReceive('markProcessing');
         $service->shouldNotReceive('processOneOperation');
 
-        (new BatchCraftingJob($batchCrafting->id))->handle($service);
+        $this->app->instance(BatchCraftingService::class, $service);
+
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame('cancelled', $batchCrafting->refresh()->status);
     }
@@ -160,7 +176,7 @@ class BatchCraftingJobTest extends TestCase
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
         $batchCrafting = $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $user->id, 'ends_at' => now()->subSecond()]);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle(resolve(BatchCraftingService::class));
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame(BatchCraftingEndReason::COMPLETED_DURATION->value, $batchCrafting->refresh()->ended_reason);
     }
@@ -173,7 +189,7 @@ class BatchCraftingJobTest extends TestCase
 
         resolve(BatchCraftingService::class)->cancel($character);
 
-        (new BatchCraftingJob($batchCrafting->id))->handle(resolve(BatchCraftingService::class));
+        BatchCraftingJob::dispatch($batchCrafting->id);
 
         $this->assertSame(BatchCraftingEndReason::CANCELLED->value, $batchCrafting->refresh()->ended_reason);
         $this->assertSame(0, $batchCrafting->refresh()->crafted_count);

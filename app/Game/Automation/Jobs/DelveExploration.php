@@ -40,6 +40,8 @@ use Throwable;
 
 class DelveExploration implements ShouldQueue
 {
+    const float ENEMY_STRENGTH_INCREMENT = 0.05;
+
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     const int MAX_ATTEMPTS = 10;
@@ -158,7 +160,7 @@ class DelveExploration implements ShouldQueue
 
                 $battleEventHandler->processMonsterDeath($this->character->id, $params['selected_monster_id'], $this->battleData);
 
-                $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + $this->location->delve_enemy_strength_increase;
+                $newStatIncreaseValue = $delveAutomation->increase_enemy_strength + self::ENEMY_STRENGTH_INCREMENT;
 
                 if ($newStatIncreaseValue >= self::MAX_INCREASE_PERCENTAGE) {
                     $newStatIncreaseValue = self::MAX_INCREASE_PERCENTAGE;

@@ -227,8 +227,9 @@ class RaidBossRewardHandlerTest extends TestCase
         ]);
 
         $battleEventHandler = $this->createMock(BattleEventHandler::class);
+        $this->app->instance(BattleEventHandler::class, $battleEventHandler);
 
-        (new RaidBossRewardHandler($charB->id, $bossBMonster->id, $raid->id))->handle($battleEventHandler);
+        RaidBossRewardHandler::dispatch($charB->id, $bossBMonster->id, $raid->id);
 
         $this->assertSame(0, $bossBParticipation->refresh()->attacks_left);
         $this->assertSame(3, $bossAParticipation->refresh()->attacks_left);

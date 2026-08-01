@@ -3,6 +3,7 @@
 namespace App\Game\Core\Controllers;
 
 use App\Flare\Models\Character;
+use App\Game\Character\CharacterSheet\Transformers\CharacterStatDetailsTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -14,10 +15,22 @@ class GameTopsController extends Controller
         return view('game.tops.characters');
     }
 
-    public function characterStats(Character $character): View
+    public function characterStats(Character $character, CharacterStatDetailsTransformer $characterStatDetailsTransformer): View
     {
+        $stats = $characterStatDetailsTransformer->transform($character);
+
         return view('game.tops.character-info', [
             'character' => $character,
+            'attackData' => [
+                'attack' => [
+                    'weapon_damage' => $stats['weapon_attack'],
+                    'ring_damage' => $stats['ring_damage'],
+                ],
+                'cast' => [
+                    'spell_damage' => $stats['spell_damage'],
+                    'heal_for' => $stats['healing_amount'],
+                ],
+            ],
         ]);
     }
 

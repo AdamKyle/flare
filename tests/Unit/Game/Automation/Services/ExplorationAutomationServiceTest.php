@@ -344,7 +344,6 @@ class ExplorationAutomationServiceTest extends TestCase
             'x' => $this->character->map->character_position_x,
             'y' => $this->character->map->character_position_y,
             'type' => LocationType::GOLD_MINES->value,
-            'enemy_strength_type' => LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY,
         ]);
 
         $this->service->beginAutomation($this->character, [

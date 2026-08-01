@@ -20,7 +20,7 @@ class KingdomBuildingUnlockSyncServiceTest extends TestCase
             'effect_type' => PassiveSkillTypeValue::UNLOCKS_BUILDING,
         ]);
         $characterFactory = (new CharacterFactory)
-            ->createBaseCharacter([], [], true, false)
+            ->createBaseCharacter(assignPassiveSkills: false)
             ->givePlayerLocation();
         $character = $characterFactory->getCharacter();
         $character->passiveSkills()->create([
@@ -57,7 +57,7 @@ class KingdomBuildingUnlockSyncServiceTest extends TestCase
             'effect_type' => PassiveSkillTypeValue::UNLOCKS_BUILDING,
         ]);
         $characterFactory = (new CharacterFactory)
-            ->createBaseCharacter([], [], true, false)
+            ->createBaseCharacter(assignPassiveSkills: false)
             ->givePlayerLocation();
         $character = $characterFactory->getCharacter();
         $character->passiveSkills()->create([

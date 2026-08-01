@@ -9,7 +9,6 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\User;
-use App\Flare\Values\LocationType;
 use App\Flare\Values\MapNameValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
@@ -17,7 +16,6 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Values\MapTileValue;
-use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
 use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Illuminate\Support\Facades\Cache;
@@ -191,21 +189,6 @@ class BaseMovementService
     protected function canPlayerEnterLocation(Character $character, Location $location): bool
     {
         if ($this->sendAutomationRestrictionMessage($character, AutomationRestrictionService::ENTER_LOCATION, $location)) {
-
-            return false;
-        }
-
-        if (! is_null($location->enemy_strength_type) && $character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty()) {
-
-            if (! is_null($location->type)) {
-                $locationType = LocationType::tryFrom($location->type);
-
-                if (! is_null($locationType) && ($locationType->isGoldMines() || $locationType->isPurgatoryDungeons())) {
-                    return true;
-                }
-            }
-
-            event(new ServerMessageEvent($character->user, 'No. You are currently auto battling and the monsters here are different. Stop auto battling, then enter, then begin again.'));
 
             return false;
         }

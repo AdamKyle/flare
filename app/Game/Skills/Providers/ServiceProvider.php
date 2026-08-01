@@ -37,6 +37,7 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
+use App\Game\Skills\Transformers\CraftableItemTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 

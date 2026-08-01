@@ -50,7 +50,7 @@ class BuildCacheTest extends TestCase
 
         $character = $state->getCharacter();
 
-        BuildCharacterCacheData::dispatchSync($character->id);
+        BuildCharacterCacheData::dispatch($character->id);
 
         $this->assertNotNull($character);
 
@@ -58,7 +58,7 @@ class BuildCacheTest extends TestCase
 
     public function test_no_op_when_state_has_no_character(): void
     {
-        BuildCharacterCacheData::dispatchSync(0);
+        BuildCharacterCacheData::dispatch(0);
 
         $this->assertNull(Cache::get('character-attack-data-0'));
     }

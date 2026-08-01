@@ -6,9 +6,12 @@ use App\Flare\Models\CapitalCityBuildingQueue;
 use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\KingdomLog;
 use App\Game\Kingdoms\Handlers\CapitalCityHandlers\CapitalCityKingdomLogHandler;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequest;
+use App\Game\Kingdoms\Jobs\CapitalCityBuildingRequestMovement;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpBuildingRequests;
 use App\Game\Kingdoms\Jobs\CapitalCityQueueUpUnitRequests;
-use App\Game\Kingdoms\Service\CapitalCityManagementService;
+use App\Game\Kingdoms\Jobs\CapitalCityUnitRequest;
+use App\Game\Kingdoms\Jobs\CapitalCityUnitRequestMovement;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\UnitNames;
@@ -106,7 +109,10 @@ class CapitalCityQueueMessagesTest extends TestCase
 
     public function test_building_request_queue_starts_with_empty_messages(): void
     {
-        Queue::fake();
+        Queue::fake([
+            CapitalCityBuildingRequest::class,
+            CapitalCityBuildingRequestMovement::class,
+        ]);
         Event::fake();
 
         $characterFactory = (new CharacterFactory)
@@ -143,10 +149,10 @@ class CapitalCityQueueMessagesTest extends TestCase
         $character = $characterFactory->getCharacter();
         $building = $targetKingdom->buildings()->first();
 
-        (new CapitalCityQueueUpBuildingRequests($character->id, $capitalCity->id, [[
+        CapitalCityQueueUpBuildingRequests::dispatch($character->id, $capitalCity->id, [[
             'kingdomId' => $targetKingdom->id,
             'buildingIds' => [$building->id],
-        ]], 'upgrade'))->handle(resolve(CapitalCityManagementService::class));
+        ]], 'upgrade');
 
         $capitalCityBuildingQueue = CapitalCityBuildingQueue::where('kingdom_id', $targetKingdom->id)->first();
 
@@ -155,7 +161,10 @@ class CapitalCityQueueMessagesTest extends TestCase
 
     public function test_unit_request_queue_starts_with_empty_messages(): void
     {
-        Queue::fake();
+        Queue::fake([
+            CapitalCityUnitRequest::class,
+            CapitalCityUnitRequestMovement::class,
+        ]);
         Event::fake();
 
         $characterFactory = (new CharacterFactory)
@@ -204,13 +213,13 @@ class CapitalCityQueueMessagesTest extends TestCase
             'required_level' => 1,
         ]);
 
-        (new CapitalCityQueueUpUnitRequests($character->id, $capitalCity->id, [[
+        CapitalCityQueueUpUnitRequests::dispatch($character->id, $capitalCity->id, [[
             'kingdom_id' => $targetKingdom->id,
             'unit_requests' => [[
                 'unit_name' => UnitNames::SPEARMEN,
                 'unit_amount' => 1,
             ]],
-        ]]))->handle(resolve(CapitalCityManagementService::class));
+        ]]);
 
         $capitalCityUnitQueue = CapitalCityUnitQueue::where('kingdom_id', $targetKingdom->id)->first();
 

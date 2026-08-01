@@ -520,7 +520,6 @@ class CharacterCurrencyRewardServiceTest extends TestCase
             'x' => 12,
             'y' => 12,
             'type' => LocationType::PURGATORY_DUNGEONS->value,
-            'enemy_strength_type' => 1,
         ]);
 
         $character = $character->refresh();

@@ -21,7 +21,7 @@ class KingdomBuilderTest extends TestCase
         parent::setUp();
 
         $this->character = (new CharacterFactory)
-            ->createBaseCharacter([], [], true, false)
+            ->createBaseCharacter(assignPassiveSkills: false)
             ->givePlayerLocation()
             ->createPassiveForCharacter(PassiveSkillTypeValue::RESOURCE_INCREASE, [
                 'current_level' => 10,

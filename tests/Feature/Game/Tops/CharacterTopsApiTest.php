@@ -2,33 +2,44 @@
 
 namespace Tests\Feature\Game\Tops;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
-use App\Flare\Models\GameMap;
-use App\Flare\Models\GuideQuest;
 use App\Flare\Models\Inventory;
-use App\Flare\Models\InventorySlot;
-use App\Flare\Models\Item;
-use App\Flare\Models\Map;
-use App\Flare\Models\Npc;
-use App\Flare\Models\Quest;
-use App\Flare\Models\QuestsCompleted;
-use App\Flare\Models\User;
-use App\Flare\Models\UserLoginDuration;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateCharacterClassRank;
 use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
+use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGuideQuest;
+use Tests\Traits\CreateInventorySlot;
+use Tests\Traits\CreateItem;
+use Tests\Traits\CreateMap;
+use Tests\Traits\CreateNpc;
+use Tests\Traits\CreateQuest;
+use Tests\Traits\CreateQuestsCompleted;
+use Tests\Traits\CreateUser;
+use Tests\Traits\CreateUserLoginDuration;
 
 class CharacterTopsApiTest extends TestCase
 {
+    use CreateCharacter;
     use CreateCharacterClassRank;
     use CreateCharacterClassSpecialitiesEquipped;
     use CreateClass;
     use CreateGameClassSpecial;
+    use CreateGameMap;
+    use CreateGuideQuest;
+    use CreateInventorySlot;
+    use CreateItem;
+    use CreateMap;
+    use CreateNpc;
+    use CreateQuest;
+    use CreateQuestsCompleted;
+    use CreateUser;
+    use CreateUserLoginDuration;
     use RefreshDatabase;
 
     public function test_unauthenticated_users_cannot_call_character_tops_api(): void
@@ -38,9 +49,9 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_authenticated_users_can_call_character_tops_api_without_private_fields(): void
     {
-        $user = User::factory()->create(['email' => 'private@example.com', 'password' => 'secret', 'remember_token' => 'token', 'ip_address' => '127.0.0.1']);
-        Character::factory()->create(['user_id' => $user->id, 'name' => 'Public Hero', 'level' => 10]);
-        UserLoginDuration::factory()->create(['user_id' => $user->id, 'logged_in_at' => now(), 'last_activity' => now(), 'last_heart_beat' => now()]);
+        $user = $this->createUser(['email' => 'private@example.com', 'password' => 'secret', 'remember_token' => 'token', 'ip_address' => '127.0.0.1']);
+        $this->createCharacter(['user_id' => $user->id, 'name' => 'Public Hero', 'level' => 10]);
+        $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now(), 'last_activity' => now(), 'last_heart_beat' => now()]);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters');
         $data = json_decode($response->getContent(), true);
@@ -56,8 +67,8 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_character_profile_overview_returns_whitelisted_public_fields(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id, 'name' => 'Profile Hero']);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id, 'name' => 'Profile Hero']);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters/'.$character->id.'/overview');
         $data = json_decode($response->getContent(), true);
@@ -70,7 +81,7 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_signed_in_user_can_request_another_public_characters_stat_break_down(): void
     {
-        $viewer = User::factory()->create();
+        $viewer = $this->createUser();
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/stat-break-down', ['stat_type' => 'str']);
@@ -82,7 +93,7 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_signed_in_user_can_request_another_public_characters_specific_stat_break_down(): void
     {
-        $viewer = User::factory()->create();
+        $viewer = $this->createUser();
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/specific-attribute-break-down', ['type' => 'health', 'is_voided' => 0]);
@@ -94,7 +105,7 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_tops_stat_break_down_request_does_not_mutate_character(): void
     {
-        $viewer = User::factory()->create();
+        $viewer = $this->createUser();
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $goldBeforeRequest = $character->gold;
 
@@ -115,8 +126,8 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_character_profile_overview_does_not_expose_ip(): void
     {
-        $user = User::factory()->create(['ip_address' => '10.0.0.1']);
-        $character = Character::factory()->create(['user_id' => $user->id]);
+        $user = $this->createUser(['ip_address' => '10.0.0.1']);
+        $character = $this->createCharacter(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters/'.$character->id.'/overview');
 
@@ -126,8 +137,8 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_character_profile_overview_does_not_expose_remember_token(): void
     {
-        $user = User::factory()->create(['remember_token' => 'private-token']);
-        $character = Character::factory()->create(['user_id' => $user->id]);
+        $user = $this->createUser(['remember_token' => 'private-token']);
+        $character = $this->createCharacter(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters/'.$character->id.'/overview');
 
@@ -146,7 +157,7 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_authenticated_non_owner_can_inspect_read_only_full_profile(): void
     {
-        $viewer = User::factory()->create();
+        $viewer = $this->createUser();
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->user->update([
             'email' => 'owner@example.com',
@@ -154,14 +165,14 @@ class CharacterTopsApiTest extends TestCase
             'remember_token' => 'private-token',
             'ip_address' => '10.0.0.1',
         ]);
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'name' => 'Public Inspect Sword',
             'type' => 'weapon',
             'base_damage' => 10,
             'base_ac' => 2,
             'holy_stacks' => 3,
         ]);
-        InventorySlot::factory()->create([
+        $this->createInventorySlot([
             'inventory_id' => $character->inventory->id,
             'item_id' => $item->id,
             'equipped' => true,
@@ -195,14 +206,14 @@ class CharacterTopsApiTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $user = $character->user;
-        $item = Item::factory()->create([
+        $item = $this->createItem([
             'name' => 'Color Sword',
             'type' => 'weapon',
             'base_damage' => 15,
             'base_ac' => 5,
             'description' => 'Safe public description.',
         ]);
-        InventorySlot::factory()->create([
+        $this->createInventorySlot([
             'inventory_id' => $character->inventory->id,
             'item_id' => $item->id,
             'equipped' => true,
@@ -231,9 +242,9 @@ class CharacterTopsApiTest extends TestCase
     public function test_profile_includes_completed_quest_details_and_real_completion_chart(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $gameMap = GameMap::factory()->create();
-        $npc = Npc::factory()->create(['game_map_id' => $gameMap->id]);
-        $quest = Quest::factory()->create([
+        $gameMap = $this->createGameMap();
+        $npc = $this->createNpc(['game_map_id' => $gameMap->id]);
+        $quest = $this->createQuest([
             'name' => 'Public Quest Detail',
             'npc_id' => $npc->id,
             'before_completion_description' => 'Quest before text.',
@@ -241,7 +252,7 @@ class CharacterTopsApiTest extends TestCase
             'reward_gold' => 100,
             'reward_xp' => 200,
         ]);
-        QuestsCompleted::factory()->create([
+        $this->createQuestsCompleted([
             'character_id' => $character->id,
             'quest_id' => $quest->id,
             'guide_quest_id' => null,
@@ -263,14 +274,14 @@ class CharacterTopsApiTest extends TestCase
     public function test_profile_includes_completed_guide_quest_details(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $guideQuest = GuideQuest::factory()->create([
+        $guideQuest = $this->createGuideQuest([
             'name' => 'Public Guide Quest Detail',
             'intro_text' => 'Guide intro.',
             'instructions' => 'Guide instructions.',
             'gold_reward' => 50,
             'xp_reward' => 75,
         ]);
-        QuestsCompleted::factory()->create([
+        $this->createQuestsCompleted([
             'character_id' => $character->id,
             'quest_id' => null,
             'guide_quest_id' => $guideQuest->id,
@@ -397,14 +408,14 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_quest_details_payload_does_not_expose_mutation_urls_or_private_viewer_fields(): void
     {
-        $owner = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $owner->id, 'name' => 'Owner Hero']);
-        $viewer = User::factory()->create(['email' => 'viewer-private@example.com']);
-        Character::factory()->create(['user_id' => $viewer->id, 'name' => 'Viewer Hero']);
-        $gameMap = GameMap::factory()->create();
-        $npc = Npc::factory()->create(['game_map_id' => $gameMap->id]);
-        $quest = Quest::factory()->create(['name' => 'Mutation Safe Quest', 'npc_id' => $npc->id]);
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $quest->id, 'created_at' => now()]);
+        $owner = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $owner->id, 'name' => 'Owner Hero']);
+        $viewer = $this->createUser(['email' => 'viewer-private@example.com']);
+        $this->createCharacter(['user_id' => $viewer->id, 'name' => 'Viewer Hero']);
+        $gameMap = $this->createGameMap();
+        $npc = $this->createNpc(['game_map_id' => $gameMap->id]);
+        $quest = $this->createQuest(['name' => 'Mutation Safe Quest', 'npc_id' => $npc->id]);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'quest_id' => $quest->id, 'created_at' => now()]);
 
         $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
         $data = json_decode($response->getContent(), true);
@@ -417,14 +428,14 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_guide_quest_details_payload_does_not_expose_mutation_urls_or_private_viewer_fields(): void
     {
-        $owner = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $owner->id, 'name' => 'Owner Hero']);
-        $viewer = User::factory()->create(['email' => 'guide-viewer-private@example.com']);
-        $viewerCharacter = Character::factory()->create(['user_id' => $viewer->id, 'name' => 'Viewer Hero']);
-        $viewerGameMap = GameMap::factory()->create();
-        Map::factory()->create(['character_id' => $viewerCharacter->id, 'game_map_id' => $viewerGameMap->id]);
-        $guideQuest = GuideQuest::factory()->create(['name' => 'Mutation Safe Guide Quest']);
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'guide_quest_id' => $guideQuest->id, 'created_at' => now()]);
+        $owner = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $owner->id, 'name' => 'Owner Hero']);
+        $viewer = $this->createUser(['email' => 'guide-viewer-private@example.com']);
+        $viewerCharacter = $this->createCharacter(['user_id' => $viewer->id, 'name' => 'Viewer Hero']);
+        $viewerGameMap = $this->createGameMap();
+        $this->createMap(['character_id' => $viewerCharacter->id, 'game_map_id' => $viewerGameMap->id]);
+        $guideQuest = $this->createGuideQuest(['name' => 'Mutation Safe Guide Quest']);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'guide_quest_id' => $guideQuest->id, 'created_at' => now()]);
 
         $response = $this->actingAs($viewer)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
         $data = json_decode($response->getContent(), true);
@@ -454,8 +465,8 @@ class CharacterTopsApiTest extends TestCase
 
     public function test_stats_endpoint_for_character_with_no_inventory_returns_null_detail_fields_and_does_not_create_an_inventory(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters/'.$character->id.'/stats');
         $data = json_decode($response->getContent(), true);

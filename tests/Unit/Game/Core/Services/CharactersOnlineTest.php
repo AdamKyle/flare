@@ -2,22 +2,22 @@
 
 namespace Tests\Unit\Game\Core\Services;
 
-use App\Flare\Models\User;
-use App\Flare\Models\UserLoginDuration;
 use App\Game\Core\Services\CharactersOnline;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateUser;
+use Tests\Traits\CreateUserLoginDuration;
 
 class CharactersOnlineTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateUser, CreateUserLoginDuration, RefreshDatabase;
 
     public function test_current_online_data_includes_character_name_level_map_and_duration(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $character->update(['name' => 'Online Details Character', 'level' => 77]);
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subMinutes(10),
             'last_activity' => now()->subMinute(),
@@ -36,7 +36,7 @@ class CharactersOnlineTest extends TestCase
     public function test_current_online_data_includes_currently_exploring_and_activity_timestamps(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subMinutes(5),
             'last_activity' => now()->subMinutes(2),
@@ -55,14 +55,14 @@ class CharactersOnlineTest extends TestCase
     {
         $onlineCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $offlineCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $onlineCharacter->user_id,
             'logged_in_at' => now()->subMinutes(5),
             'last_activity' => now(),
             'last_heart_beat' => now(),
             'duration_in_seconds' => null,
         ]);
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $offlineCharacter->user_id,
             'logged_in_at' => now()->subMinutes(30),
             'logged_out_at' => now()->subMinutes(10),
@@ -80,7 +80,7 @@ class CharactersOnlineTest extends TestCase
     public function test_current_online_excludes_stale_open_login_rows_with_old_heartbeat(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subHours(2),
             'last_activity' => now()->subHour(),
@@ -96,7 +96,7 @@ class CharactersOnlineTest extends TestCase
     public function test_current_online_includes_open_login_rows_with_recent_heartbeat(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subMinutes(10),
             'last_activity' => now()->subMinute(),
@@ -113,7 +113,7 @@ class CharactersOnlineTest extends TestCase
     public function test_current_online_excludes_rows_with_completed_duration(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subMinutes(15),
             'logged_out_at' => now()->subMinute(),
@@ -130,7 +130,7 @@ class CharactersOnlineTest extends TestCase
     public function test_current_online_excludes_rows_with_logged_out_at_set(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subMinutes(15),
             'logged_out_at' => now()->subMinute(),
@@ -147,7 +147,7 @@ class CharactersOnlineTest extends TestCase
     public function test_historical_filter_returns_total_duration_and_never_marks_exploring(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subDays(2),
             'logged_out_at' => now()->subDays(2)->addMinutes(30),
@@ -155,7 +155,7 @@ class CharactersOnlineTest extends TestCase
             'last_heart_beat' => now()->subDays(2)->addMinutes(30),
             'duration_in_seconds' => 1800,
         ]);
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subDay(),
             'logged_out_at' => now()->subDay()->addMinutes(15),
@@ -173,7 +173,7 @@ class CharactersOnlineTest extends TestCase
     public function test_historical_filter_returns_completed_duration_rows_only(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subDays(2),
             'logged_out_at' => now()->subDays(2)->addMinutes(10),
@@ -181,7 +181,7 @@ class CharactersOnlineTest extends TestCase
             'last_heart_beat' => now()->subDays(2)->addMinutes(10),
             'duration_in_seconds' => 600,
         ]);
-        UserLoginDuration::factory()->create([
+        $this->createUserLoginDuration([
             'user_id' => $character->user_id,
             'logged_in_at' => now()->subDay(),
             'last_activity' => now()->subMinute(),
@@ -196,8 +196,8 @@ class CharactersOnlineTest extends TestCase
 
     public function test_users_without_characters_are_skipped(): void
     {
-        $user = User::factory()->create();
-        UserLoginDuration::factory()->create([
+        $user = $this->createUser();
+        $this->createUserLoginDuration([
             'user_id' => $user->id,
             'logged_in_at' => now()->subMinutes(5),
             'last_activity' => now(),

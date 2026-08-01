@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Skills\Events;
 
 use App\Game\Skills\Events\UpdateSkillEvent;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -11,7 +12,7 @@ use Tests\Traits\CreateSkill;
 
 class UpdateSkillEventTest extends TestCase
 {
-    use CreateGameMap, CreateGameSkill, CreateSkill;
+    use CreateGameMap, CreateGameSkill, CreateSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 

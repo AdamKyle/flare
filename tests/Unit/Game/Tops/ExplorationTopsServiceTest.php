@@ -2,22 +2,22 @@
 
 namespace Tests\Unit\Game\Tops;
 
-use App\Flare\Models\Character;
-use App\Flare\Models\ExplorationLog;
-use App\Flare\Models\User;
 use App\Game\Tops\Services\ExplorationTopsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateExplorationLog;
+use Tests\Traits\CreateUser;
 
 class ExplorationTopsServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacter, CreateExplorationLog, CreateUser, RefreshDatabase;
 
     public function test_exploration_tops_ranks_by_kills(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        ExplorationLog::factory()->create(['character_id' => $character->id, 'user_id' => $user->id, 'kills' => 10, 'started_at' => now()]);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $this->createExplorationLog(['character_id' => $character->id, 'user_id' => $user->id, 'kills' => 10, 'started_at' => now()]);
 
         $data = $this->app->make(ExplorationTopsService::class)->leaderboard(['period' => 'current_month']);
 
@@ -26,9 +26,9 @@ class ExplorationTopsServiceTest extends TestCase
 
     public function test_exploration_tops_includes_length_of_time_seconds_from_started_and_ended_at(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        ExplorationLog::factory()->create([
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $this->createExplorationLog([
             'character_id' => $character->id,
             'user_id' => $user->id,
             'started_at' => now()->subMinutes(5),
@@ -42,9 +42,9 @@ class ExplorationTopsServiceTest extends TestCase
 
     public function test_exploration_current_month_and_all_time_use_cumulative_rows(): void
     {
-        $user = User::factory()->create();
-        $character = Character::factory()->create(['user_id' => $user->id]);
-        ExplorationLog::factory()->create(['character_id' => $character->id, 'user_id' => $user->id, 'kills' => 10, 'started_at' => now()->subMonths(2), 'ended_at' => now()->subMonths(2)->addMinute()]);
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+        $this->createExplorationLog(['character_id' => $character->id, 'user_id' => $user->id, 'kills' => 10, 'started_at' => now()->subMonths(2), 'ended_at' => now()->subMonths(2)->addMinute()]);
 
         $currentMonth = $this->app->make(ExplorationTopsService::class)->leaderboard(['period' => 'current_month']);
         $allTime = $this->app->make(ExplorationTopsService::class)->leaderboard(['period' => 'all_time']);

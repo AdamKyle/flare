@@ -5,14 +5,13 @@ namespace Tests\Feature\Game\Kingdoms\Middleware;
 use App\Flare\Models\Kingdom;
 use App\Game\Kingdoms\Middleware\DoesKingdomBelongToAuthorizedUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Route;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateRouteRequest;
 
 class DoesKingdomBelongToAuthorizedUserTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateRouteRequest, RefreshDatabase;
 
     public function test_owner_is_allowed_for_own_kingdom(): void
     {
@@ -22,7 +21,7 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         $this->actingAs($character->user);
 
         $response = (new DoesKingdomBelongToAuthorizedUser)->handle(
-            $this->requestWithRouteParameters([
+            $this->createRequestWithRouteParameters([
                 'kingdom' => $kingdom,
                 'character' => $character,
             ]),
@@ -41,7 +40,7 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         $this->actingAs($nonOwner->user);
 
         $response = (new DoesKingdomBelongToAuthorizedUser)->handle(
-            $this->requestWithRouteParameters([
+            $this->createRequestWithRouteParameters([
                 'kingdom' => $kingdom,
                 'character' => $owner,
             ]),
@@ -65,7 +64,7 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         $this->actingAs($nonOwner->user);
 
         $response = (new DoesKingdomBelongToAuthorizedUser)->handle(
-            $this->requestWithRouteParameters([
+            $this->createRequestWithRouteParameters([
                 'kingdom' => $kingdom,
             ]),
             fn () => response('allowed')
@@ -76,21 +75,5 @@ class DoesKingdomBelongToAuthorizedUserTest extends TestCase
         $this->assertSame('Nope. Not allowed to do that.', $responseData['error']);
         $this->assertArrayNotHasKey('message', $responseData);
         $this->assertArrayNotHasKey('reason', $responseData);
-    }
-
-    private function requestWithRouteParameters(array $parameters): Request
-    {
-        $request = Request::create('/test', 'POST');
-        $request->headers->set('Accept', 'application/json');
-        $route = new Route(['POST'], '/test', fn () => null);
-        $route->bind($request);
-
-        foreach ($parameters as $name => $value) {
-            $route->setParameter($name, $value);
-        }
-
-        $request->setRouteResolver(fn () => $route);
-
-        return $request;
     }
 }

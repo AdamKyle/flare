@@ -3,22 +3,21 @@
 namespace Tests\Feature\Game\Market\Controllers;
 
 use App\Flare\Models\InventorySet;
-use App\Flare\Models\Location;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
 use App\Flare\Models\SetSlot;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateMarketScenario;
 
 class MarketControllerSecurityTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateItem, CreateMarketScenario, RefreshDatabase;
 
     public function test_failed_purchase_for_full_inventory_unlocks_listing(): void
     {
-        [$buyer, $listing] = $this->marketScenario([
+        [$buyer, $listing] = $this->createMarketScenario([
             'gold' => 1000,
             'inventory_max' => 0,
         ]);
@@ -34,7 +33,7 @@ class MarketControllerSecurityTest extends TestCase
 
     public function test_failed_purchase_for_low_gold_unlocks_listing(): void
     {
-        [$buyer, $listing] = $this->marketScenario([
+        [$buyer, $listing] = $this->createMarketScenario([
             'gold' => 0,
             'inventory_max' => 75,
         ]);
@@ -50,7 +49,7 @@ class MarketControllerSecurityTest extends TestCase
 
     public function test_failed_buy_and_replace_for_full_inventory_unlocks_listing(): void
     {
-        [$buyer, $listing] = $this->marketScenario([
+        [$buyer, $listing] = $this->createMarketScenario([
             'gold' => 1000,
             'inventory_max' => 0,
         ]);
@@ -67,7 +66,7 @@ class MarketControllerSecurityTest extends TestCase
 
     public function test_failed_buy_and_replace_for_low_gold_unlocks_listing(): void
     {
-        [$buyer, $listing] = $this->marketScenario([
+        [$buyer, $listing] = $this->createMarketScenario([
             'gold' => 0,
             'inventory_max' => 75,
         ]);
@@ -84,7 +83,7 @@ class MarketControllerSecurityTest extends TestCase
 
     public function test_failed_buy_and_replace_rolls_back_purchase_and_unlocks_listing(): void
     {
-        [$buyer, $listing] = $this->marketScenario([
+        [$buyer, $listing] = $this->createMarketScenario([
             'gold' => 1000,
             'inventory_max' => 75,
         ], [
@@ -121,33 +120,5 @@ class MarketControllerSecurityTest extends TestCase
         $this->assertSame($inventoryCount, $buyer->inventory->slots()->count());
         $this->assertSame($historyCount, MarketHistory::count());
         $this->assertTrue(MarketBoard::where('id', $listing->id)->exists());
-    }
-
-    private function marketScenario(array $buyerAttributes, array $listingItemAttributes = []): array
-    {
-        $buyer = (new CharacterFactory)
-            ->createBaseCharacter()
-            ->givePlayerLocation()
-            ->updateCharacter($buyerAttributes)
-            ->getCharacter();
-        $seller = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        Location::create([
-            'name' => 'Market Port',
-            'game_map_id' => $buyer->map->game_map_id,
-            'description' => 'Port',
-            'is_port' => true,
-            'can_players_enter' => true,
-            'can_auto_battle' => true,
-            'x' => $buyer->x_position,
-            'y' => $buyer->y_position,
-        ]);
-        $listing = MarketBoard::create([
-            'character_id' => $seller->id,
-            'item_id' => $this->createItem($listingItemAttributes)->id,
-            'listed_price' => 100,
-            'is_locked' => false,
-        ]);
-
-        return [$buyer, $listing];
     }
 }

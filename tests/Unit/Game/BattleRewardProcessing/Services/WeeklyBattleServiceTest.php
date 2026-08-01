@@ -13,10 +13,11 @@ use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateMonster;
+use Tests\Traits\CreateWeeklyMonsterFight;
 
 class WeeklyBattleServiceTest extends TestCase
 {
-    use CreateMonster, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateMonster, CreateWeeklyMonsterFight, MockeryPHPUnitIntegration, RefreshDatabase;
 
     public function test_claim_monster_death_creates_weekly_row_immediately(): void
     {
@@ -36,7 +37,7 @@ class WeeklyBattleServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
-        $fight = WeeklyMonsterFight::factory()->create(['character_id' => $character->id, 'monster_id' => $monster->id, 'character_deaths' => 2]);
+        $fight = $this->createWeeklyMonsterFight(['character_id' => $character->id, 'monster_id' => $monster->id, 'character_deaths' => 2]);
         $service = new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class));
 
         $service->claimMonsterDeath($character, $monster);
@@ -119,7 +120,7 @@ class WeeklyBattleServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $monster = $this->createMonster(['only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value]);
-        WeeklyMonsterFight::factory()->create(['character_id' => $character->id, 'monster_id' => $monster->id, 'monster_was_killed' => true, 'reward_processed_at' => null]);
+        $this->createWeeklyMonsterFight(['character_id' => $character->id, 'monster_id' => $monster->id, 'monster_was_killed' => true, 'reward_processed_at' => null]);
         $handler = Mockery::mock(LocationSpecialtyHandler::class);
         $handler->shouldReceive('handleMonsterFromSpecialLocation')->once();
 
@@ -163,7 +164,7 @@ class WeeklyBattleServiceTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $monster = $this->createMonster(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
-        $fight = WeeklyMonsterFight::factory()->create(['character_id' => $character->id, 'monster_id' => $monster->id, 'character_deaths' => 2]);
+        $fight = $this->createWeeklyMonsterFight(['character_id' => $character->id, 'monster_id' => $monster->id, 'character_deaths' => 2]);
 
         (new WeeklyBattleService(Mockery::mock(LocationSpecialtyHandler::class)))->handleCharacterDeath($character, $monster);
 
