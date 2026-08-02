@@ -251,7 +251,7 @@ class GlobalEventStepRotatorServiceTest extends TestCase
 
         // Enchant inventories (should be purged when current step == ENCHANT)
         $inv = GlobalEventCraftingInventory::create([
-            'global_event_id' => $goal->id,
+            'global_event_goal_id' => $goal->id,
             'character_id' => $character->id,
         ]);
 

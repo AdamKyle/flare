@@ -161,7 +161,7 @@ class CharacterFactory
             'base_damage' => 10,
         ]);
         $damageSpell = $this->createItem([
-            'type' => 'damage',
+            'type' => ItemType::SPELL_DAMAGE->value,
             'base_damage' => 10,
         ]);
 

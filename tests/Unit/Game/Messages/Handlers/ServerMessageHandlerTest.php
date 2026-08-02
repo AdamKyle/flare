@@ -76,9 +76,9 @@ class ServerMessageHandlerTest extends TestCase
 
         Log::shouldReceive('warning')->once();
 
-        $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+        $result = $this->serverMessageHandler->sendBasicMessage($user, 'test message');
 
-        $this->assertTrue(true);
+        $this->assertNull($result);
     }
 
     public function test_send_basic_message_logs_warning_with_context_when_broadcast_transport_fails(): void
@@ -99,7 +99,9 @@ class ServerMessageHandlerTest extends TestCase
                     && $context['user_id'] === $user->id;
             });
 
-        $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+        $result = $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+
+        $this->assertNull($result);
     }
 
     public function test_send_basic_message_does_not_throw_on_non_broadcast_exception(): void

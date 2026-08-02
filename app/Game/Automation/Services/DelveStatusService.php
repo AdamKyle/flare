@@ -18,9 +18,11 @@ use League\Fractal\Resource\Item as FractalItem;
 
 class DelveStatusService
 {
+    public function __construct(private readonly ItemTransformer $itemTransformer) {}
+
     public function questItemDetail(Item $item): array
     {
-        $fractalItem = new FractalItem($item, new ItemTransformer);
+        $fractalItem = new FractalItem($item, $this->itemTransformer);
 
         return (new Manager)->createData($fractalItem)->toArray()['data'];
     }

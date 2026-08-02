@@ -3,6 +3,7 @@
 namespace App\Game\BatchCrafting\Providers;
 
 use App\Admin\Services\MonitoredBugReportService;
+use App\Flare\Transformers\ItemTransformer;
 use App\Game\BatchCrafting\Services\BatchCraftingLogger;
 use App\Game\BatchCrafting\Services\BatchCraftingProcessor;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
@@ -42,6 +43,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(HandleUpdatingCraftingGlobalEventGoal::class),
                 $app->make(HandleUpdatingEnchantingGlobalEventGoal::class),
                 $app->make(ServerMessageHandler::class),
+                $app->make(ItemTransformer::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(EventBatchEnchantingAffixSelector::class),
                 $app->make(SetHandsValidation::class),
@@ -56,6 +58,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EnchantingService::class),
                 $app->make(BatchCraftingSetService::class),
                 $app->make(HolyItemService::class),
+                $app->make(ItemTransformer::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(GlobalEventGoalProgressionService::class),
                 $app->make(MonitoredBugReportService::class),

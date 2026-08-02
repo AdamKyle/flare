@@ -119,15 +119,7 @@ class EventParticipantNotifierServiceTest extends TestCase
             'should_be_mythic' => false,
         ]);
 
-        // Duplicate participation rows for A + one for B (de-dup should still notify twice)
-        $this->createGlobalEventParticipation([
-            'global_event_goal_id' => $goal->id,
-            'character_id' => $charA->id,
-            'current_kills' => 0,
-            'current_crafts' => 0,
-            'current_enchants' => 0,
-        ]);
-
+        // One participation and one cumulative contribution row per character and goal.
         $this->createGlobalEventParticipation([
             'global_event_goal_id' => $goal->id,
             'character_id' => $charA->id,
@@ -144,16 +136,11 @@ class EventParticipantNotifierServiceTest extends TestCase
             'current_enchants' => 0,
         ]);
 
-        // Aggregates: A gets 10+15=25 kills and 2 crafts; B gets 6 crafts (5+1) and 5 enchants (2+3)
+        // Totals: A gets 25 kills and 2 crafts; B gets 6 crafts and 5 enchants.
         $this->createGlobalEventKill([
             'global_event_goal_id' => $goal->id,
             'character_id' => $charA->id,
-            'kills' => 10,
-        ]);
-        $this->createGlobalEventKill([
-            'global_event_goal_id' => $goal->id,
-            'character_id' => $charA->id,
-            'kills' => 15,
+            'kills' => 25,
         ]);
 
         $this->createGlobalEventCrafts([
@@ -164,23 +151,13 @@ class EventParticipantNotifierServiceTest extends TestCase
         $this->createGlobalEventCrafts([
             'global_event_goal_id' => $goal->id,
             'character_id' => $charB->id,
-            'crafts' => 5,
-        ]);
-        $this->createGlobalEventCrafts([
-            'global_event_goal_id' => $goal->id,
-            'character_id' => $charB->id,
-            'crafts' => 1,
+            'crafts' => 6,
         ]);
 
         $this->createGlobalEventEnchants([
             'global_event_goal_id' => $goal->id,
             'character_id' => $charB->id,
-            'enchants' => 2,
-        ]);
-        $this->createGlobalEventEnchants([
-            'global_event_goal_id' => $goal->id,
-            'character_id' => $charB->id,
-            'enchants' => 3,
+            'enchants' => 5,
         ]);
 
         $participantsCount = 2;

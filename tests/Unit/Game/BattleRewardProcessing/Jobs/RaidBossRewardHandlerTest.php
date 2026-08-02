@@ -226,7 +226,7 @@ class RaidBossRewardHandlerTest extends TestCase
             'attacks_left' => 2,
         ]);
 
-        $battleEventHandler = $this->createMock(BattleEventHandler::class);
+        $battleEventHandler = $this->createStub(BattleEventHandler::class);
         $this->app->instance(BattleEventHandler::class, $battleEventHandler);
 
         RaidBossRewardHandler::dispatch($charB->id, $bossBMonster->id, $raid->id);

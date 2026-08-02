@@ -43,7 +43,9 @@ class NpcQuestRewardHandlerTest extends TestCase
         ]);
 
         $handler = resolve(NpcQuestRewardHandler::class);
-        $handler->processReward($quest, $npc, $character);
+        $result = $handler->processReward($quest, $npc, $character);
+
+        $this->assertNull($result);
 
         $character = $character->refresh();
         $this->assertEquals($initialSetCount + 10, $character->inventorySets()->count());
@@ -147,7 +149,9 @@ class NpcQuestRewardHandlerTest extends TestCase
             ->with($quest, $character)
             ->ordered();
 
-        $handler->processReward($quest, $npc, $character);
+        $result = $handler->processReward($quest, $npc, $character);
+
+        $this->assertNull($result);
     }
 
     public function test_process_non_xp_rewards_does_not_award_xp(): void

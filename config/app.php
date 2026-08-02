@@ -257,6 +257,7 @@ return [
         App\Flare\GemWorldGeneration\Providers\ServiceProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
+        App\Flare\Items\Providers\ServiceProvider::class,
 
         /**
          * Component Related

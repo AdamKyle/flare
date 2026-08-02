@@ -1788,7 +1788,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $dagger = $this->createItem(['name' => 'Clean Iron Dagger', 'type' => 'dagger', 'can_craft' => true]);
         $helmet = $this->createItem(['name' => 'Clean Iron Helmet', 'type' => 'helmet', 'can_craft' => true]);
         $ring = $this->createItem(['name' => 'Clean Copper Ring', 'type' => 'ring', 'can_craft' => true]);
-        $guideQuestService = new AdminGuideQuestService();
+        $guideQuestService = resolve(AdminGuideQuestService::class);
 
         $params = $guideQuestService->cleanRequest([
             'required_batch_crafting_type' => null,

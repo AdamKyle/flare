@@ -52,7 +52,7 @@
             @endif
 
             @if (! is_null($guideQuest->skill_type_name))
-              <x-core.dl.dt>Requireed Skill Type</x-core.dl.dt>
+              <x-core.dl.dt>Required Skill Type</x-core.dl.dt>
               <x-core.dl.dd>{{ $guideQuest->skill_type_name }}</x-core.dl.dd>
               <x-core.dl.dt>Required Skill Type Level</x-core.dl.dt>
               <x-core.dl.dd>{{ $guideQuest->required_skill_type_level }}</x-core.dl.dd>
@@ -128,7 +128,7 @@
             @endif
 
             @if (! is_null($guideQuest->required_str))
-              <x-core.dl.dt>Required Strengh</x-core.dl.dt>
+              <x-core.dl.dt>Required Strength</x-core.dl.dt>
               <x-core.dl.dd>{{ number_format($guideQuest->required_str) }}</x-core.dl.dd>
             @endif
 
@@ -200,6 +200,23 @@
             @if (! is_null($guideQuest->required_fame_level))
               <x-core.dl.dt>Required Fame Level</x-core.dl.dt>
               <x-core.dl.dd>{{ number_format($guideQuest->required_fame_level) }}</x-core.dl.dd>
+            @endif
+
+            @if (! is_null($guideQuest->required_batch_crafting_type) && ! is_null($guideQuest->required_batch_crafting_hours))
+              <x-core.dl.dt>Required Batch Crafting</x-core.dl.dt>
+              <x-core.dl.dd>Run {{ $guideQuest->required_batch_crafting_type_name }} for at least {{ $guideQuest->required_batch_crafting_hours }} {{ $guideQuest->required_batch_crafting_hours === 1 ? 'hour' : 'hours' }}.</x-core.dl.dd>
+            @endif
+
+            @foreach ($guideQuest->required_batch_crafted_item_names as $requiredItem)
+              <x-core.dl.dt>Required Item</x-core.dl.dt>
+              <x-core.dl.dd>
+                Have {{ $requiredItem['amount'] }}x {{ $requiredItem['name'] }} of type {{ $requiredItem['type_name'] }} in your {{ $requiredItem['source'] === 'alchemy_bag' ? 'alchemy bag' : 'inventory' }}{{ $requiredItem['must_be_enchanted'] ? ' with both a prefix and a suffix' : '' }}.
+              </x-core.dl.dd>
+            @endforeach
+
+            @if (! empty($guideQuest->required_batch_crafted_item_names))
+              <x-core.dl.dt>Item Consumption</x-core.dl.dt>
+              <x-core.dl.dd>These items are consumed when the guide quest is handed in.</x-core.dl.dd>
             @endif
           </x-core.dl.dl>
 

@@ -10,6 +10,7 @@ use App\Flare\Items\Builders\BuildMythicItem;
 use App\Flare\Items\Builders\BuildUniqueItem;
 use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Items\Builders\RandomItemDropBuilder;
+use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -182,15 +183,15 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ItemTransformer::class, function ($app) {
-            return new ItemTransformer;
+            return new ItemTransformer($app->make(ItemEnricherFactory::class));
         });
 
         $this->app->bind(UsableItemTransformer::class, function ($app) {
             return new UsableItemTransformer;
         });
 
-        $this->app->bind(InventoryTransformer::class, function () {
-            return new InventoryTransformer;
+        $this->app->bind(InventoryTransformer::class, function ($app) {
+            return new InventoryTransformer($app->make(ItemEnricherFactory::class));
         });
 
         $this->app->bind(KingdomAttackLogsTransformer::class, function () {

@@ -122,6 +122,6 @@ class CharactersOnline
             return 0;
         }
 
-        return now()->diffInSeconds($login->logged_in_at);
+        return (int) $login->logged_in_at->diffInSeconds(now());
     }
 }

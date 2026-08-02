@@ -30,6 +30,7 @@ class ComparisonService
         CharacterInventoryService $characterInventoryService,
         EquipItemService $equipItemService,
         ItemAtonements $itemAtonements,
+        private readonly ItemTransformer $itemTransformer,
     ) {
         $this->validEquipPositionsValue = $validEquipPositionsValue;
         $this->characterInventoryService = $characterInventoryService;
@@ -162,7 +163,7 @@ class ComparisonService
 
     protected function itemDetails(Item $item): array
     {
-        $resource = new FractalItem($item, new ItemTransformer());
+        $resource = new FractalItem($item, $this->itemTransformer);
 
         return (new Manager)->createData($resource)->toArray()['data'];
     }

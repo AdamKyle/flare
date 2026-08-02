@@ -6,6 +6,7 @@ use App\Flare\Models\CharacterBattleRewardQueueState;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
 use App\Flare\Models\CharacterBattleRewardRequestStep;
+use Tests\Setup\Character\CharacterFactory;
 
 trait CreateCharacterBattleReward
 {
@@ -16,6 +17,10 @@ trait CreateCharacterBattleReward
 
     public function createCharacterBattleRewardRequest(array $options = []): CharacterBattleRewardRequest
     {
+        if (! array_key_exists('character_id', $options)) {
+            $options['character_id'] = (new CharacterFactory)->createBaseCharacter()->getCharacter()->id;
+        }
+
         return CharacterBattleRewardRequest::factory()->create($options);
     }
 

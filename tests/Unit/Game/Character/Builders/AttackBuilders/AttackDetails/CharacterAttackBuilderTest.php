@@ -11,11 +11,12 @@ use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class CharacterAttackBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItemAffix, RefreshDatabase;
+    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 

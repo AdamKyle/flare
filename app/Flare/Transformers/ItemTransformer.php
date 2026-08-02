@@ -2,6 +2,7 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
@@ -16,11 +17,14 @@ class ItemTransformer extends TransformerAbstract
 
     protected array $defaultIncludes = ['drop_location'];
 
+    public function __construct(private readonly ItemEnricherFactory $itemEnricherFactory) {}
+
     /**
      * Gets the response data for the character sheet
      */
     public function transform(Item $item): array
     {
+        $item = $this->itemEnricherFactory->buildItem(clone $item);
         $itemSkills = [];
         $itemSkillProgressions = [];
 
@@ -41,19 +45,19 @@ class ItemTransformer extends TransformerAbstract
             'raw_damage' => $item->base_damage,
             'raw_ac' => $item->base_ac,
             'raw_healing' => $item->base_healing,
-            'base_damage' => $item->getTotalDamage(),
-            'base_ac' => $item->getTotalDefence(),
-            'base_healing' => $item->getTotalHealing(),
+            'base_damage' => $item->total_damage,
+            'base_ac' => $item->total_defence,
+            'base_healing' => $item->total_healing,
             'base_damage_mod' => is_null($item->base_damage_mod) ? 0.0 : $item->base_damage_mod,
             'base_ac_mod' => $item->base_ac_mod,
             'base_healing_mod' => $item->base_healing_mod,
-            'str_modifier' => $item->getTotalPercentageForStat('str'),
-            'dur_modifier' => $item->getTotalPercentageForStat('dur'),
-            'int_modifier' => $item->getTotalPercentageForStat('int'),
-            'dex_modifier' => $item->getTotalPercentageForStat('dex'),
-            'chr_modifier' => $item->getTotalPercentageForStat('chr'),
-            'agi_modifier' => $item->getTotalPercentageForStat('agi'),
-            'focus_modifier' => $item->getTotalPercentageForStat('focus'),
+            'str_modifier' => $item->str_mod,
+            'dur_modifier' => $item->dur_mod,
+            'int_modifier' => $item->int_mod,
+            'dex_modifier' => $item->dex_mod,
+            'chr_modifier' => $item->chr_mod,
+            'agi_modifier' => $item->agi_mod,
+            'focus_modifier' => $item->focus_mod,
             'type' => $item->type,
             'default_position' => $item->default_position,
             'skill_name' => $item->skill_name,

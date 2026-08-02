@@ -3,6 +3,7 @@
 namespace App\Game\Automation\Providers;
 
 use App\Flare\Services\CharacterRewardService;
+use App\Flare\Transformers\ItemTransformer;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
@@ -57,8 +58,8 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(DelveStatusService::class, function () {
-            return new DelveStatusService;
+        $this->app->bind(DelveStatusService::class, function ($app) {
+            return new DelveStatusService($app->make(ItemTransformer::class));
         });
 
         $this->app->bind(FactionLoyaltyAutomationService::class, function ($app) {

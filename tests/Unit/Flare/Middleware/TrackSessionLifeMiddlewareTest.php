@@ -3,6 +3,7 @@
 namespace Tests\Unit\Flare\Middleware;
 
 use App\Flare\Middleware\TrackSessionLifeMiddleware;
+use App\Flare\Models\UserLoginDuration;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -78,7 +79,7 @@ class TrackSessionLifeMiddlewareTest extends TestCase
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
 
         $session->refresh();
-        $this->assertSame($session->logged_in_at->diffInSeconds($session->logged_out_at), $session->duration_in_seconds);
+        $this->assertSame((int) $session->logged_in_at->diffInSeconds($session->logged_out_at), $session->duration_in_seconds);
     }
 
     public function test_expired_session_end_cannot_precede_login(): void

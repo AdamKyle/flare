@@ -12,6 +12,7 @@ use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Flare\Transformers\InventoryTransformer;
+use App\Flare\Transformers\ItemTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
@@ -104,7 +105,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ValidEquipPositionsValue::class),
                 $app->make(CharacterInventoryService::class),
                 $app->make(EquipItemService::class),
-                $app->make(ItemAtonements::class)
+                $app->make(ItemAtonements::class),
+                $app->make(ItemTransformer::class),
             );
         });
 

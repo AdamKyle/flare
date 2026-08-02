@@ -9,10 +9,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 
 class CharacterCacheDataTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 

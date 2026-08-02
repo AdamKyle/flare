@@ -70,6 +70,7 @@ class BatchCraftingProcessor
         private readonly HandleUpdatingCraftingGlobalEventGoal $handleUpdatingCraftingGlobalEventGoal,
         private readonly HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal,
         private readonly ServerMessageHandler $serverMessageHandler,
+        private readonly ItemTransformer $itemTransformer,
         ?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null,
         ?EventBatchEnchantingAffixSelector $eventBatchEnchantingAffixSelector = null,
         ?SetHandsValidation $setHandsValidation = null,
@@ -4825,7 +4826,7 @@ class BatchCraftingProcessor
             'crafted_at' => now()->toJSON(),
             'full_item_details' => $item->type === 'alchemy'
                 ? (new UsableItemTransformer())->transform($item)
-                : (new ItemTransformer())->transform($item),
+                : $this->itemTransformer->transform($item),
         ];
     }
 

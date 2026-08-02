@@ -417,7 +417,7 @@ class EventLifecycleService
             Cache::forget('map-locations-'.$gameMapId);
         }
 
-        event(new CorruptLocations($this->locationService->fetchCorruptedLocationData($raid)->toArray()));
+        event(new CorruptLocations($this->locationService->fetchCorruptedLocationData($raid)));
     }
 
     private function updateMonstersForCharactersAtRaidLocations(Raid $raid): void

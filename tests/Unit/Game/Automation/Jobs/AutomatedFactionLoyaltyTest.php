@@ -165,6 +165,9 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->instance(FactionLoyaltyAutomationActionCoordinator::class, $actionCoordinator);
 
         AutomatedFactionLoyalty::dispatch($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1);
+
+        $this->assertNotNull($oldCharacterAutomation->fresh());
+        $this->assertNull($oldFactionLoyaltyAutomation->refresh()->completed_at);
     }
 
     public function test_stale_job_does_not_delete_old_automation(): void
@@ -440,6 +443,9 @@ class AutomatedFactionLoyaltyTest extends TestCase
 
         (new AutomatedFactionLoyalty($character->id, $oldCharacterAutomation->id, $oldFactionLoyaltyAutomation->id, 1))
             ->failed(new Exception('Job failed.'));
+
+        $this->assertNotNull($oldCharacterAutomation->fresh());
+        $this->assertNull($oldFactionLoyaltyAutomation->refresh()->completed_at);
     }
 
     public function test_failed_does_not_delete_old_automation_when_newer_active_automation_exists(): void

@@ -88,6 +88,7 @@ class BatchCraftingService
         private readonly EnchantingService $enchantingService,
         private readonly BatchCraftingSetService $batchCraftingSetService,
         private readonly HolyItemService $holyItemService,
+        private readonly ItemTransformer $itemTransformer,
         ?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null,
         ?GlobalEventGoalProgressionService $globalEventGoalProgressionService = null,
         ?MonitoredBugReportService $monitoredBugReportService = null,
@@ -1246,7 +1247,7 @@ class BatchCraftingService
                 'selected_item_id' => $item?->id,
                 'selected_item_name' => $item?->affix_name ?? $item?->name,
                 'selected_item_cost' => (int) ($item?->cost ?? 0),
-                'selected_item_details' => is_null($item) ? null : (new ItemTransformer())->transform($item),
+                'selected_item_details' => is_null($item) ? null : $this->itemTransformer->transform($item),
                 'selected_item_type' => $item?->type,
                 'selected_item_handedness' => is_null($item) ? null : $this->setHandsValidation->handedness($item),
                 'prefix_cost' => $prefixCost,
@@ -3299,7 +3300,7 @@ class BatchCraftingService
             if (! empty($itemApplications)) {
                 $plannedItems[] = [
                     'item' => $this->itemSnapshot($targetSlot->item),
-                    'full_item_details' => (new ItemTransformer())->transform($targetSlot->item),
+                    'full_item_details' => $this->itemTransformer->transform($targetSlot->item),
                     'target_slot_id' => $targetSlot->id,
                     'current_stacks' => $currentStacks,
                     'planned_applications' => count($itemApplications),
@@ -3385,7 +3386,7 @@ class BatchCraftingService
             'can_view' => false,
             'full_item_details' => $item->type === 'alchemy'
                 ? (new UsableItemTransformer())->transform($item)
-                : (new ItemTransformer())->transform($item),
+                : $this->itemTransformer->transform($item),
         ];
     }
 

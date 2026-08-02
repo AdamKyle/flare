@@ -17,7 +17,7 @@ class UpdateBaseCharacterInformationTest extends TestCase
     public function test_event_implements_should_broadcast_not_should_broadcast_now(): void
     {
         $user = $this->createUser();
-        $event = new UpdateBaseCharacterInformation($user, []);
+        $event = new UpdateBaseCharacterInformation($user, ['data' => []]);
 
         $this->assertInstanceOf(ShouldBroadcast::class, $event);
         $this->assertNotInstanceOf(ShouldBroadcastNow::class, $event);
@@ -26,7 +26,7 @@ class UpdateBaseCharacterInformationTest extends TestCase
     public function test_broadcast_queue_returns_character_broadcasts(): void
     {
         $user = $this->createUser();
-        $event = new UpdateBaseCharacterInformation($user, []);
+        $event = new UpdateBaseCharacterInformation($user, ['data' => []]);
 
         $this->assertEquals('character_broadcasts', $event->broadcastQueue());
     }
@@ -34,7 +34,7 @@ class UpdateBaseCharacterInformationTest extends TestCase
     public function test_broadcast_channel_includes_user_id(): void
     {
         $user = $this->createUser();
-        $event = new UpdateBaseCharacterInformation($user, []);
+        $event = new UpdateBaseCharacterInformation($user, ['data' => []]);
 
         $channel = $event->broadcastOn();
 

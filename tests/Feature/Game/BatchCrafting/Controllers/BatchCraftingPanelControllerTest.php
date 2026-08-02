@@ -19,9 +19,9 @@ class BatchCraftingPanelControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id]);
 
-        $response = $this->actingAs($user)->get(route('batch-crafting.status', ['character' => $character]));
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
 
-        $response->assertOk();
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
         $this->assertFalse($response->json('active'));
         $this->assertFalse($response->json('is_visible'));
         $this->assertNull($response->json('batch'));
@@ -39,9 +39,9 @@ class BatchCraftingPanelControllerTest extends TestCase
             'progress' => ['craft_mode' => 'specific_item', 'output_destination' => 'inventory'],
         ]);
 
-        $response = $this->actingAs($user)->get(route('batch-crafting.status', ['character' => $character]));
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
 
-        $response->assertOk();
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
         $this->assertTrue($response->json('active'));
         $this->assertTrue($response->json('is_visible'));
         $this->assertSame(BatchCraftingType::CRAFT->value, $response->json('batch.batch_type'));
@@ -58,11 +58,11 @@ class BatchCraftingPanelControllerTest extends TestCase
             'completed_at' => now(),
         ]);
 
-        $this->actingAs($user)
-            ->post(route('batch-crafting.dismiss', ['character' => $character]))
-            ->assertOk();
+        $dismissResponse = $this->actingAs($user)->call('POST', route('batch-crafting.dismiss', ['character' => $character]));
 
-        $response = $this->actingAs($user)->get(route('batch-crafting.status', ['character' => $character]));
+        $this->assertSame(200, $dismissResponse->getStatusCode(), $dismissResponse->getContent());
+
+        $response = $this->actingAs($user)->call('GET', route('batch-crafting.status', ['character' => $character]));
 
         $this->assertFalse($response->json('is_visible'));
     }

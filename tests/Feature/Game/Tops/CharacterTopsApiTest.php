@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Tops;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
 use App\Flare\Models\Inventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -222,6 +223,7 @@ class CharacterTopsApiTest extends TestCase
 
         $response = $this->actingAs($user)->call('GET', '/api/game/tops/characters/'.$character->id.'/profile');
         $itemPayload = json_decode($response->getContent(), true)['equipment']['items'][0];
+        $enrichedItem = resolve(ItemEnricherFactory::class)->buildItem($item);
 
         $this->assertArrayHasKey('item_name', $itemPayload);
         $this->assertArrayHasKey('item_id', $itemPayload);
@@ -236,7 +238,7 @@ class CharacterTopsApiTest extends TestCase
         $this->assertArrayHasKey('holy_stacks_applied', $itemPayload);
         $this->assertArrayHasKey('sockets', $itemPayload);
         $this->assertSame('Color Sword', $itemPayload['item_name']);
-        $this->assertSame($item->getTotalDamage(), $itemPayload['base_damage']);
+        $this->assertSame($enrichedItem->total_damage, $itemPayload['base_damage']);
     }
 
     public function test_profile_includes_completed_quest_details_and_real_completion_chart(): void

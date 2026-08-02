@@ -2,17 +2,22 @@
 
 namespace App\Flare\Transformers;
 
+use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
 use League\Fractal\TransformerAbstract;
 
 class InventoryTransformer extends TransformerAbstract
 {
+    public function __construct(private readonly ItemEnricherFactory $itemEnricherFactory) {}
+
     /**
      * Gets the response data for the inventory sheet
      */
     public function transform(InventorySlot|SetSlot $slot): array
     {
+        $slot->setRelation('item', $this->itemEnricherFactory->buildItem(clone $slot->item));
+
         return [
             'item_id' => $slot->item->id,
             'slot_id' => $slot->id,
@@ -25,9 +30,9 @@ class InventoryTransformer extends TransformerAbstract
             'is_cosmic' => $slot->item->is_cosmic,
             'holy_stacks_applied' => $slot->item->holy_stacks_applied,
             'max_holy_stacks' => $slot->item->holy_stacks,
-            'ac' => $slot->item->getTotalDefence(),
-            'attack' => $slot->item->getTotalDamage(),
-            'healing' => $slot->item->getTotalHealing(),
+            'ac' => $slot->item->total_defence,
+            'attack' => $slot->item->total_damage,
+            'healing' => $slot->item->total_healing,
             'usable' => $slot->item->usable,
             'damages_kingdoms' => $slot->item->damages_kingdoms,
             'kingdom_damage' => $slot->item->kingdom_damage,

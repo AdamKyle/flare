@@ -26,7 +26,7 @@ class KingdomInformationTest extends TestCase
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($kingdom->id, $responseData['id']);
+        $this->assertEquals($kingdom->id, $responseData['data']['id']);
     }
 
     public function test_character_can_view_npc_kingdom_on_current_map(): void
@@ -43,7 +43,7 @@ class KingdomInformationTest extends TestCase
         $responseData = json_decode($response->getContent(), true);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($kingdom->id, $responseData['id']);
+        $this->assertEquals($kingdom->id, $responseData['data']['id']);
     }
 
     public function test_character_cannot_view_kingdom_from_another_map(): void

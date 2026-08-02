@@ -33,7 +33,10 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
         $npcQuestsHandler->shouldReceive('handleNpcQuest')
             ->once()
-            ->with($character, $quest);
+            ->with(
+                Mockery::on(fn (Character $queuedCharacter): bool => $queuedCharacter->is($character)),
+                Mockery::on(fn ($queuedQuest): bool => $queuedQuest->is($quest)),
+            );
         $npcQuestsHandler->shouldReceive('questRewardHandler')
             ->twice()
             ->andReturn($rewardHandler);
@@ -59,15 +62,21 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
         $npcQuestsHandler->shouldReceive('handleNpcQuest')
             ->once()
-            ->with($character, $quest)
+            ->with(
+                Mockery::on(fn (Character $queuedCharacter): bool => $queuedCharacter->is($character)),
+                Mockery::on(fn ($queuedQuest): bool => $queuedQuest->is($quest)),
+            )
             ->andThrow(new Exception('Reward failed.'));
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Reward failed.');
 
         $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
 
-        HandInQuest::dispatch($character, $quest);
+        try {
+            HandInQuest::dispatch($character, $quest);
+            $this->fail('The reward exception was not rethrown.');
+        } catch (Exception $exception) {
+            $this->assertSame('Reward failed.', $exception->getMessage());
+            $this->assertSame(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
+        }
     }
 
     public function test_failed_reward_handling_does_not_fire_completed_message(): void
@@ -81,15 +90,21 @@ class HandInQuestTest extends TestCase
         $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
         $npcQuestsHandler->shouldReceive('handleNpcQuest')
             ->once()
-            ->with($character, $quest)
+            ->with(
+                Mockery::on(fn (Character $queuedCharacter): bool => $queuedCharacter->is($character)),
+                Mockery::on(fn ($queuedQuest): bool => $queuedQuest->is($quest)),
+            )
             ->andThrow(new Exception('Reward failed.'));
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Reward failed.');
 
         $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
 
-        HandInQuest::dispatch($character, $quest);
+        try {
+            HandInQuest::dispatch($character, $quest);
+            $this->fail('The reward exception was not rethrown.');
+        } catch (Exception $exception) {
+            $this->assertSame('Reward failed.', $exception->getMessage());
+            Event::assertNotDispatched(GlobalMessageEvent::class);
+        }
     }
 
     public function test_failed_reward_handling_logs_and_rethrows_exception(): void
@@ -101,21 +116,26 @@ class HandInQuestTest extends TestCase
         $quest = $this->createQuest(['npc_id' => $npc->id]);
         $exception = new Exception('Reward failed.');
 
-        Log::shouldReceive('error')
-            ->once()
-            ->with('Reward failed.');
+        Log::spy();
 
         $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
         $npcQuestsHandler->shouldReceive('handleNpcQuest')
             ->once()
-            ->with($character, $quest)
+            ->with(
+                Mockery::on(fn (Character $queuedCharacter): bool => $queuedCharacter->is($character)),
+                Mockery::on(fn ($queuedQuest): bool => $queuedQuest->is($quest)),
+            )
             ->andThrow($exception);
-
-        $this->expectExceptionObject($exception);
 
         $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
 
-        HandInQuest::dispatch($character, $quest);
+        try {
+            HandInQuest::dispatch($character, $quest);
+            $this->fail('The reward exception was not rethrown.');
+        } catch (Exception $thrownException) {
+            $this->assertSame('Reward failed.', $thrownException->getMessage());
+            Log::shouldHaveReceived('error')->once()->with('Reward failed.');
+        }
     }
 
     public function test_quest_completion_log_is_written_before_xp_reward_processing(): void

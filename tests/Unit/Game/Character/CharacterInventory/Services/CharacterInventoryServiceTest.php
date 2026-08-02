@@ -595,8 +595,10 @@ class CharacterInventoryServiceTest extends TestCase
 
         $sets = $this->characterInventoryService->setCharacter($character->refresh())->getCharacterInventorySets();
 
-        $this->assertSame(InventorySet::BATCH_CRAFTING_SET_NAME, array_key_last($sets));
-        $this->assertTrue($sets[InventorySet::BATCH_CRAFTING_SET_NAME]['is_batch_crafting_set']);
+        $lastSet = $sets['data'][array_key_last($sets['data'])];
+
+        $this->assertSame(InventorySet::BATCH_CRAFTING_SET_NAME, $lastSet['name']);
+        $this->assertTrue($lastSet['is_batch_crafting_set']);
     }
 
     public function test_batch_crafting_set_is_excluded_from_usable_sets(): void
