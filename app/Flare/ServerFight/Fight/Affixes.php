@@ -4,20 +4,22 @@ namespace App\Flare\ServerFight\Fight;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\AttackType;
 
 class Affixes extends BattleBase
 {
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
     }
 
     public function getCharacterAffixDamage(array $attackData, float $monsterResistance = 0.0): int
     {
 
-        if ($attackData['attack_type'] === AttackTypeValue::DEFEND) {
+        if ($attackData['attack_type'] === AttackType::DEFEND->value) {
             return 0;
         }
 
@@ -94,9 +96,9 @@ class Affixes extends BattleBase
         }
 
         $dc = 50 + 50 * $resistance;
-        $roll = rand(1, 100);
+        $successPercentage = max(0, 101 - (int) ceil($dc));
 
-        if ($roll < $dc) {
+        if (! $this->chanceCalculator->passesPercentage($successPercentage)) {
             $this->addMessage('The enemy resists your attempt to steal it\'s life.', 'enemy-action');
         } else {
             $this->addMessage('The enemy\'s blood flows through the air and gives you life: '.number_format($damage), 'player-action');
@@ -111,7 +113,7 @@ class Affixes extends BattleBase
     {
         $dc = 100 - 100 * $resistance;
 
-        if ($dc <= 0 || rand(1, 100) > $dc) {
+        if ($dc <= 0 || $this->chanceCalculator->passesPercentage(100 - floor($dc))) {
             $this->addMessage('Your damaging enchantments (resistible) have been resisted. However ...', 'enemy-action');
 
             $this->addMessage('Your (non resistible) enchantments glow with rage. Your enemy cowers: '.number_format($totalDamage), 'player-action');

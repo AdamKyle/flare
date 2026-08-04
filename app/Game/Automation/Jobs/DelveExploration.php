@@ -10,20 +10,20 @@ use App\Flare\Models\DelveExploration as DelveExplorationModel;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\Automation\Enums\DelveOutcome;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Events\DelveStatusUpdated;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Exceptions\MissingInventoryException;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
@@ -431,7 +431,7 @@ class DelveExploration implements ShouldQueue
 
             event(new DelveStatusUpdated($this->character->user->id));
 
-            CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE)->delete();
+            CharacterAutomation::where('character_id', $delveExploration->character_id)->where('type', AutomationType::DELVE->value)->delete();
 
             $this->sendOutEventLogUpdate('You died during the delve. Exploration has ended, but not all is lost, you awaken from your wounds there might be treasures waiting, treasures you collected. (See server messages for treasures)');
 
@@ -615,15 +615,15 @@ class DelveExploration implements ShouldQueue
         $uniqueItem = null;
 
         if ($timeElapsedInHours > 6) {
-            $cosmicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::COSMIC);
+            $cosmicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixTier::COSMIC->value);
         }
 
         if ($timeElapsedInHours > 4 && $timeElapsedInHours < 6) {
-            $mythicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::MYTHIC);
+            $mythicItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixTier::MYTHIC->value);
         }
 
         if ($timeElapsedInHours > 2) {
-            $uniqueItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixDetails::LEGENDARY);
+            $uniqueItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixTier::LEGENDARY->value);
         }
 
         $gold = 1_000;
@@ -676,8 +676,8 @@ class DelveExploration implements ShouldQueue
             $this->sendOutEventLogUpdate('Gained one thousand gold for completing the delve.', false, true);
         }
 
-        if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
-            $gold = MaxCurrenciesValue::MAX_GOLD;
+        if ($gold >= CurrencyLimit::MAX_GOLD) {
+            $gold = CurrencyLimit::MAX_GOLD;
         }
 
         $character->update(['gold' => $gold]);

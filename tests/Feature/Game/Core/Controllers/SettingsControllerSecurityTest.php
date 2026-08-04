@@ -3,8 +3,8 @@
 namespace Tests\Feature\Game\Core\Controllers;
 
 use App\Flare\Models\QuestsCompleted;
-use App\Flare\Values\FeatureTypes;
-use App\Flare\Values\NameTags;
+use App\Game\Character\Values\NameTag;
+use App\Game\Core\Values\FeatureType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -22,7 +22,7 @@ class SettingsControllerSecurityTest extends TestCase
         $quest = $this->createQuest([
             'npc_id' => $this->createNpc()->id,
             'item_id' => $this->createItem()->id,
-            'unlocks_feature' => FeatureTypes::COSMETIC_TEXT,
+            'unlocks_feature' => FeatureType::COSMETIC_TEXT->value,
             'unlocks_skill' => false,
         ]);
         QuestsCompleted::create([
@@ -66,7 +66,7 @@ class SettingsControllerSecurityTest extends TestCase
         $quest = $this->createQuest([
             'npc_id' => $this->createNpc()->id,
             'item_id' => $this->createItem()->id,
-            'unlocks_feature' => FeatureTypes::COSMETIC_NAME_TAGS,
+            'unlocks_feature' => FeatureType::COSMETIC_NAME_TAGS->value,
             'unlocks_skill' => false,
         ]);
         QuestsCompleted::create([
@@ -80,7 +80,7 @@ class SettingsControllerSecurityTest extends TestCase
         $response = $this->actingAs($user)->post(route('user.settings.cosmetic-name-tag', [
             'user' => $user->id,
         ]), [
-            'name_tag' => NameTags::EXPLORER,
+            'name_tag' => NameTag::EXPLORER->value,
             'email' => 'attacker@example.com',
             'password' => 'compromised',
             'is_banned' => true,
@@ -91,7 +91,7 @@ class SettingsControllerSecurityTest extends TestCase
 
         $response->assertSessionHas('success', 'Updated Name Tag options');
         $user = $user->refresh();
-        $this->assertSame(NameTags::EXPLORER, $user->name_tag);
+        $this->assertSame(NameTag::EXPLORER->value, $user->name_tag);
         $this->assertSame($originalEmail, $user->email);
         $this->assertSame($originalPassword, $user->password);
         $this->assertFalse($user->is_banned);

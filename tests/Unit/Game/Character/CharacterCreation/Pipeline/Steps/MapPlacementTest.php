@@ -3,9 +3,9 @@
 namespace Tests\Unit\Game\Character\CharacterCreation\Pipeline\Steps;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\MapNameValue;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\MapPlacement;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -29,7 +29,7 @@ class MapPlacementTest extends TestCase
         $user = $this->createUser();
         $race = $this->createRace();
         $class = $this->createClass();
-        $map = $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $map = $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $character = $this->createCharacter([
             'damage_stat' => $class->damage_stat,
@@ -69,7 +69,7 @@ class MapPlacementTest extends TestCase
 
     public function test_no_op_when_state_has_no_character(): void
     {
-        $map = $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $map = $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $state = app(CharacterBuildState::class)
             ->setMap($map)

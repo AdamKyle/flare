@@ -17,13 +17,13 @@ class MerchantSupply extends BattleBase
         if ($extraActionData['has_item']) {
 
             if (! ($extraActionData['chance'] >= 1)) {
-                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                     return;
                 }
             }
 
             $damage = $attackData['weapon_damage'];
-            $chance = rand(1, 100);
+            $chance = $this->randomNumberGenerator->numberBetween(1, 100);
 
             $this->addMessage('You stare the enemy down as pull a coin out of your pocket to flip ...', 'regular');
 

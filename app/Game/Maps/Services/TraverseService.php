@@ -8,12 +8,13 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilderWithDeductions;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;
@@ -59,7 +60,8 @@ class TraverseService
         MonsterTransformer $monsterTransformer,
         MonsterListService $monsterListService,
         LocationService $locationService,
-        MapTileValue $mapTileValue
+        MapTileValue $mapTileValue,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
     ) {
         $this->manager = $manager;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
@@ -86,7 +88,7 @@ class TraverseService
         if ($mapType->isLabyrinth()) {
             return $character->inventory->slots()
                 ->whereHas('item', function ($query) {
-                    $query->where('effect', ItemEffectsValue::LABYRINTH);
+                    $query->where('effect', ItemEffectType::LABYRINTH->value);
                 })
                 ->exists();
         }
@@ -94,7 +96,7 @@ class TraverseService
         if ($mapType->isDungeons()) {
             return $character->inventory->slots()
                 ->whereHas('item', function ($query) {
-                    $query->where('effect', ItemEffectsValue::DUNGEON);
+                    $query->where('effect', ItemEffectType::DUNGEON->value);
                 })
                 ->exists();
         }
@@ -102,7 +104,7 @@ class TraverseService
         if ($mapType->isShadowPlane()) {
             return $character->inventory->slots()
                 ->whereHas('item', function ($query) {
-                    $query->where('effect', ItemEffectsValue::SHADOW_PLANE);
+                    $query->where('effect', ItemEffectType::SHADOW_PLANE->value);
                 })
                 ->exists();
         }
@@ -110,7 +112,7 @@ class TraverseService
         if ($mapType->isHell()) {
             return $character->inventory->slots()
                 ->whereHas('item', function ($query) {
-                    $query->where('effect', ItemEffectsValue::HELL);
+                    $query->where('effect', ItemEffectType::HELL->value);
                 })
                 ->exists();
         }
@@ -118,7 +120,7 @@ class TraverseService
         if ($mapType->isPurgatory()) {
             return $character->inventory->slots()
                 ->whereHas('item', function ($query) {
-                    $query->where('effect', ItemEffectsValue::PURGATORY);
+                    $query->where('effect', ItemEffectType::PURGATORY->value);
                 })
                 ->exists();
         }
@@ -278,8 +280,8 @@ class TraverseService
 
         $this->mapTileValue->setUp($character, $destinationGameMap);
 
-        $candidateX = $xCoordinates[rand(0, $xMaxIndex)];
-        $candidateY = $yCoordinates[rand(0, $yMaxIndex)];
+        $candidateX = $xCoordinates[$this->randomNumberGenerator->numberBetween(0, $xMaxIndex)];
+        $candidateY = $yCoordinates[$this->randomNumberGenerator->numberBetween(0, $yMaxIndex)];
 
         $didReroll = false;
 
@@ -297,8 +299,8 @@ class TraverseService
 
             $didReroll = true;
 
-            $candidateX = $xCoordinates[rand(0, $xMaxIndex)];
-            $candidateY = $yCoordinates[rand(0, $yMaxIndex)];
+            $candidateX = $xCoordinates[$this->randomNumberGenerator->numberBetween(0, $xMaxIndex)];
+            $candidateY = $yCoordinates[$this->randomNumberGenerator->numberBetween(0, $yMaxIndex)];
         }
 
         $character->map()->update([
@@ -383,7 +385,7 @@ class TraverseService
 
     protected function getMonstersForMap(Map $characterMap, int $mapId): array
     {
-        $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        $canAccessPurgatory = $characterMap->character->inventory->slots->where('items.effect', ItemEffectType::PURGATORY->value)->count() > 0;
 
         $monsters = Cache::get('monsters')[GameMap::find($mapId)->name];
 

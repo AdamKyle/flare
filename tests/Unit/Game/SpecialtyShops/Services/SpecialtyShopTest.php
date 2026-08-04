@@ -3,8 +3,8 @@
 namespace Tests\Unit\Game\SpecialtyShops\Services;
 
 use App\Flare\Models\Item;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Character\Values\CharacterClass;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\SpecialtyShops\Services\SpecialtyShop;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -53,7 +53,7 @@ class SpecialtyShopTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,
@@ -71,7 +71,7 @@ class SpecialtyShopTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,
@@ -92,7 +92,7 @@ class SpecialtyShopTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS,
+            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,
@@ -104,7 +104,7 @@ class SpecialtyShopTest extends TestCase
         $response = $this->specialtyShop->purchaseItem($character->refresh(), $item->id, $item->specialty_type);
 
         $this->assertEquals(422, $response['status']);
-        $this->assertEquals('You are missing an item of type: weapon which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED.'. Item must be in your inventory.', $response['message']);
+        $this->assertEquals('You are missing an item of type: weapon which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED->value.'. Item must be in your inventory.', $response['message']);
     }
 
     public function test_purchase_hell_forged_item()
@@ -119,7 +119,7 @@ class SpecialtyShopTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,
@@ -135,7 +135,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals(200, $response['status']);
         $this->assertEquals(9000, $character->gold_dust);
         $this->assertEquals(9000, $character->shards);
-        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
+        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED->value)->get());
     }
 
     public function test_purchase_hell_forged_item_as_merchant()
@@ -149,14 +149,14 @@ class SpecialtyShopTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->class()->update([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]);
 
         $character = $character->refresh();
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,
@@ -172,7 +172,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals(200, $response['status']);
         $this->assertEquals(10000 - (1000 - (1000 * 0.05)), $character->gold_dust);
         $this->assertEquals(10000 - (1000 - (1000 * 0.05)), $character->shards);
-        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED)->get());
+        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::HELL_FORGED->value)->get());
     }
 
     public function test_purchase_purgatory_chain_item()
@@ -181,14 +181,14 @@ class SpecialtyShopTest extends TestCase
             'skill_level_required' => 400,
             'skill_level_trivial' => 401,
             'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS,
+            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,
@@ -204,7 +204,7 @@ class SpecialtyShopTest extends TestCase
         $this->assertEquals(200, $response['status']);
         $this->assertEquals(9000, $character->gold_dust);
         $this->assertEquals(9000, $character->shards);
-        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->get());
+        $this->assertCount(1, Item::where('name', $item->name)->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS->value)->get());
     }
 
     public function test_moves_affixes_and_holy_over()
@@ -213,7 +213,7 @@ class SpecialtyShopTest extends TestCase
             'skill_level_required' => 400,
             'skill_level_trivial' => 401,
             'type' => 'weapon',
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
         ]);
 
         $itemSuffix = $this->createItemAffix([
@@ -243,7 +243,7 @@ class SpecialtyShopTest extends TestCase
 
         $item = $this->createItem([
             'name' => 'Special Item',
-            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS,
+            'specialty_type' => ItemSpecialtyType::PURGATORY_CHAINS->value,
             'shards_cost' => 1000,
             'gold_dust_cost' => 1000,
             'cost' => 0,

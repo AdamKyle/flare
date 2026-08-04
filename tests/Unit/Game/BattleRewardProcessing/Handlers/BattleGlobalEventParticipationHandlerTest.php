@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -45,8 +45,8 @@ class BattleGlobalEventParticipationHandlerTest extends TestCase
         $globalEventGoal = $this->createGlobalEventGoal([
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->handler->handleGlobalEventParticipation($character, $globalEventGoal, 1);
@@ -75,8 +75,8 @@ class BattleGlobalEventParticipationHandlerTest extends TestCase
         $globalEventGoal = $this->createGlobalEventGoal([
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([
@@ -113,8 +113,8 @@ class BattleGlobalEventParticipationHandlerTest extends TestCase
         $globalEventGoal = $this->createGlobalEventGoal([
             'max_kills' => 10,
             'event_type' => EventType::WINTER_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([

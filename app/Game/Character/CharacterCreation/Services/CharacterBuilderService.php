@@ -2,7 +2,6 @@
 
 namespace App\Game\Character\CharacterCreation\Services;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterPassiveSkill;
@@ -15,13 +14,14 @@ use App\Flare\Models\Item;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Models\User;
-use App\Flare\Values\BaseSkillValue;
-use App\Flare\Values\BaseStatValue;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use Exception;
 
 class CharacterBuilderService
@@ -83,7 +83,7 @@ class CharacterBuilderService
      */
     public function createCharacter(User $user, GameMap $map, string $name): CharacterBuilderService
     {
-        $baseStat = resolve(BaseStatValue::class)->setRace($this->race)->setClass($this->class);
+        $baseStat = resolve(BaseStatCalculator::class)->setRace($this->race)->setClass($this->class);
 
         $this->character = Character::create([
             'user_id' => $user->id,
@@ -177,7 +177,7 @@ class CharacterBuilderService
 
             if (is_null($existingSkill)) {
                 $this->character->skills()->create(
-                    resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
+                    resolve(BaseSkillBuilder::class)->getBaseCharacterSkillValue($this->character, $skill)
                 );
             }
         }
@@ -190,7 +190,7 @@ class CharacterBuilderService
 
             if (is_null($existingSkill)) {
                 $this->character->skills()->create(
-                    resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($this->character, $skill)
+                    resolve(BaseSkillBuilder::class)->getBaseCharacterSkillValue($this->character, $skill)
                 );
             }
         }

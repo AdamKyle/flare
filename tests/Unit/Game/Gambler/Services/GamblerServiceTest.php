@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Game\Gambler\Services;
 
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Services\GamblerService;
@@ -163,7 +163,7 @@ class GamblerServiceTest extends TestCase
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -195,13 +195,13 @@ class GamblerServiceTest extends TestCase
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
         ]);
 
         $mercenarySlotItem = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->giveItem($mercenarySlotItem)->getCharacter();
@@ -232,7 +232,7 @@ class GamblerServiceTest extends TestCase
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
         ]);
 
         $this->createEvent([
@@ -345,7 +345,7 @@ class GamblerServiceTest extends TestCase
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -376,7 +376,7 @@ class GamblerServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $character->update(['gold' => 1000000, 'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST]);
+        $character->update(['gold' => 1000000, 'gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
 
         $character = $character->refresh();
 
@@ -385,7 +385,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('You got a 1,000 Gold dust!', $response['message']);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
     }
 
     public function test_rolled_two_of_shards_with_max_shards()
@@ -402,7 +402,7 @@ class GamblerServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $character->update(['gold' => 1000000, 'shards' => MaxCurrenciesValue::MAX_SHARDS]);
+        $character->update(['gold' => 1000000, 'shards' => CurrencyLimit::MAX_SHARDS]);
 
         $character = $character->refresh();
 
@@ -411,7 +411,7 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('You got a 1,000 Shards!', $response['message']);
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
     }
 
     public function test_rolled_two_of_copper_coins_with_item_with_max_copper_coins()
@@ -429,12 +429,12 @@ class GamblerServiceTest extends TestCase
         $item = $this->createItem([
             'name' => 'Copper Coins',
             'type' => 'quest',
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $character->update(['gold' => 1000000, 'copper_coins' => MaxCurrenciesValue::MAX_COPPER]);
+        $character->update(['gold' => 1000000, 'copper_coins' => CurrencyLimit::MAX_COPPER]);
 
         $character = $character->refresh();
 
@@ -443,6 +443,6 @@ class GamblerServiceTest extends TestCase
         $this->assertEquals(0, $character->gold);
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('You got a 1,000 Copper coins!', $response['message']);
-        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertEquals(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 }

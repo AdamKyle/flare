@@ -8,7 +8,7 @@ use App\Admin\Requests\AffixesImport as AffixesImportRequest;
 use App\Admin\Requests\AffixManagementRequest;
 use App\Admin\Services\ItemAffixService;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\ItemAffixType;
+use App\Game\Core\Items\Values\ItemAffixType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -33,7 +33,7 @@ class AffixesController extends Controller
 
         return view('admin.affixes.manage', array_merge([
             'itemAffix' => null,
-            'affixTypes' => ItemAffixType::$dropDownValues,
+            'affixTypes' => ItemAffixType::dropDownValues(),
         ], $this->itemAffixService->getFormData()));
     }
 
@@ -49,7 +49,7 @@ class AffixesController extends Controller
     {
         return view('admin.affixes.manage', array_merge([
             'itemAffix' => $affix,
-            'affixTypes' => ItemAffixType::$dropDownValues,
+            'affixTypes' => ItemAffixType::dropDownValues(),
         ], $this->itemAffixService->getFormData()));
     }
 
@@ -80,7 +80,7 @@ class AffixesController extends Controller
     public function exportItems()
     {
         return view('admin.affixes.export', [
-            'types' => ItemAffixType::$dropDownValues,
+            'types' => ItemAffixType::dropDownValues(),
         ]);
     }
 
@@ -101,7 +101,7 @@ class AffixesController extends Controller
 
         $type = $request->export_type;
 
-        $fileName = Str::snake(preg_replace('/[^a-zA-Z0-9\s]/', '', ItemAffixType::$dropDownValues[$type]));
+        $fileName = Str::snake(preg_replace('/[^a-zA-Z0-9\s]/', '', ItemAffixType::dropDownValues()[$type]));
 
         $response = Excel::download(new AffixesExport($type), $fileName.'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         ob_end_clean();

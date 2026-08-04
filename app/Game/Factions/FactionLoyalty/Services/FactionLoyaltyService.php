@@ -13,16 +13,19 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MapNameValue;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyAutomationWarningState;
+use App\Game\Maps\Values\MapName;
 use Exception;
 
 class FactionLoyaltyService
 {
     use ResponseBuilder;
+
+    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
 
     const CRAFTING_TYPES = [
         'weapon',
@@ -371,7 +374,7 @@ class FactionLoyaltyService
 
         while (count($tasks) < 3) {
 
-            $craftingType = self::CRAFTING_TYPES[rand(0, count(self::CRAFTING_TYPES) - 1)];
+            $craftingType = self::CRAFTING_TYPES[$this->randomNumberGenerator->numberBetween(0, count(self::CRAFTING_TYPES) - 1)];
 
             $item = $this->getItemForCraftingTask($craftingType, $gameMapName);
 
@@ -379,7 +382,7 @@ class FactionLoyaltyService
                 continue;
             }
 
-            $amount = rand(10, 50);
+            $amount = $this->randomNumberGenerator->numberBetween(10, 50);
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
@@ -412,11 +415,11 @@ class FactionLoyaltyService
         if (! is_null($gameMap->only_during_event_type)) {
 
             $hasPurgatoryItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
+                return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::PURGATORY->value;
             })->first();
 
             if (is_null($hasPurgatoryItem)) {
-                $gameMapId = GameMap::where('name', MapNameValue::SURFACE)->first()->id;
+                $gameMapId = GameMap::where('name', MapName::SURFACE->value)->first()->id;
             }
         }
 
@@ -434,7 +437,7 @@ class FactionLoyaltyService
                 continue;
             }
 
-            $amount = rand(10, 50);
+            $amount = $this->randomNumberGenerator->numberBetween(10, 50);
 
             $event = Event::where('type', EventType::WEEKLY_FACTION_LOYALTY_EVENT)->first();
 
@@ -475,7 +478,7 @@ class FactionLoyaltyService
     private function getItemForCraftingTask(string $type, string $gamMapName): Item
     {
 
-        $gameMapValue = new MapNameValue($gamMapName);
+        $gameMapValue = MapName::from($gamMapName);
 
         $item = Item::inRandomOrder()->doesntHave('itemSuffix')
             ->doesntHave('itemPrefix')

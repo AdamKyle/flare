@@ -19,7 +19,7 @@ class HammerSmash extends BattleBase
         if ($extraActionData['has_item']) {
 
             if (! ($extraActionData['chance'] >= 1)) {
-                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                     return;
                 }
             }
@@ -65,10 +65,7 @@ class HammerSmash extends BattleBase
      */
     protected function doAfterShocks(int $damage)
     {
-        $roll = rand(1, 100);
-        $roll = $roll + $roll * .60;
-
-        if ($roll > 99) {
+        if ($this->chanceCalculator->passesPercentage(39)) {
             $this->addMessage('The enemy feels the aftershocks of the Hammer Smash!', 'regular');
 
             for ($i = 3; $i > 0; $i--) {

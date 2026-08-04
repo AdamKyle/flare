@@ -4,8 +4,8 @@ namespace App\Game\Core\Traits;
 
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\User;
-use App\Flare\Transformers\MarketItemsTransformer;
 use App\Game\Core\Events\UpdateMarketBoardBroadcastEvent;
+use App\Game\Market\Transformers\MarketItemsTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 

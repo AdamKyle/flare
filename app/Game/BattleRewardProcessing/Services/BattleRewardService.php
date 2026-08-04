@@ -2,7 +2,6 @@
 
 namespace App\Game\BattleRewardProcessing\Services;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\CharacterBattleRewardRequestMessage;
@@ -10,9 +9,6 @@ use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
@@ -22,7 +18,10 @@ use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\BattleRewardProcessing\Jobs\Events\WinterEventChristmasGiftHandler;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
@@ -37,7 +36,6 @@ use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Closure;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -401,21 +399,19 @@ class BattleRewardService
 
         $goldBeforeReward = $this->character->gold;
 
-        DB::transaction(function () use ($step, $payload, $goldBeforeReward, $characterRewardService): void {
-            $this->earnedCurrencies = $characterRewardService->applyPlannedCurrencies($payload['plan']);
+        $this->earnedCurrencies = $characterRewardService->applyPlannedCurrencies($payload['plan']);
 
-            $character = $this->character->refresh();
-            $goldGained = $character->gold - $goldBeforeReward;
+        $character = $this->character->refresh();
+        $goldGained = $character->gold - $goldBeforeReward;
 
-            $this->goldRush->processPotentialGoldRush($character, $goldGained);
+        $this->goldRush->processPotentialGoldRush($character, $goldGained);
 
-            $this->character = $character->refresh();
+        $this->character = $character->refresh();
 
-            $this->battleRewardLedgerService->completeStep($step, [
-                'applied' => true,
-                'currencies' => $this->earnedCurrencies,
-            ]);
-        });
+        $this->battleRewardLedgerService->completeStep($step, [
+            'applied' => true,
+            'currencies' => $this->earnedCurrencies,
+        ]);
     }
 
     private function handleLedgerItemDrops(CharacterBattleRewardRequestStep $step): void
@@ -430,18 +426,16 @@ class BattleRewardService
             $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
         }
 
-        DB::transaction(function () use ($step, $payload): void {
-            $this->addDropRewardTotals(
-                $this->dropCheckService->applyPlannedDrops($this->character, $this->monster, $payload['plan'])
-            );
+        $this->addDropRewardTotals(
+            $this->dropCheckService->applyPlannedDrops($this->character, $this->monster, $payload['plan'])
+        );
 
-            $this->character = $this->character->refresh();
+        $this->character = $this->character->refresh();
 
-            $this->battleRewardLedgerService->completeStep($step, [
-                'applied' => true,
-                'drop_count' => count($payload['plan']['drops'] ?? []),
-            ]);
-        });
+        $this->battleRewardLedgerService->completeStep($step, [
+            'applied' => true,
+            'drop_count' => count($payload['plan']['drops'] ?? []),
+        ]);
     }
 
     private function handleLedgerSpecificLocationRewards(CharacterBattleRewardRequestStep $step): void
@@ -450,44 +444,40 @@ class BattleRewardService
         $totalKills = isset($this->context['total_creatures']) ? $this->context['total_creatures'] : 1;
 
         if (! isset($payload['plan'])) {
-            $step = DB::transaction(function () use ($step, $payload, $totalKills): CharacterBattleRewardRequestStep {
-                $payload['plan'] = $this->battleLocationRewardService
-                    ->setContext($this->character, $this->monster)
-                    ->planLocationReward($this->character, $this->monster, [
-                        'request_id' => $step->character_battle_reward_request_id,
-                        'kill_count' => $totalKills,
-                    ]);
+            $payload['plan'] = $this->battleLocationRewardService
+                ->setContext($this->character, $this->monster)
+                ->planLocationReward($this->character, $this->monster, [
+                    'request_id' => $step->character_battle_reward_request_id,
+                    'kill_count' => $totalKills,
+                ]);
 
-                $payload['planned_at'] = now()->toIso8601String();
+            $payload['planned_at'] = now()->toIso8601String();
 
-                return $this->battleRewardLedgerService->updateStepPayload($step, $payload);
-            });
+            $step = $this->battleRewardLedgerService->updateStepPayload($step, $payload);
         }
 
         $payload = $step->payload_json ?? [];
 
-        DB::transaction(function () use ($step, $payload): void {
-            $result = $this->battleLocationRewardService
-                ->setContext($this->character, $this->monster)
-                ->applyPlannedLocationReward($this->character, $payload['plan']);
+        $result = $this->battleLocationRewardService
+            ->setContext($this->character, $this->monster)
+            ->applyPlannedLocationReward($this->character, $payload['plan']);
 
-            $this->character = $this->character->refresh();
+        $this->character = $this->character->refresh();
 
-            foreach (($result['currencies'] ?? []) as $currency => $amount) {
-                if ($amount > 0) {
-                    $this->earnedCurrencies[$currency] = ($this->earnedCurrencies[$currency] ?? 0) + $amount;
-                }
+        foreach (($result['currencies'] ?? []) as $currency => $amount) {
+            if ($amount > 0) {
+                $this->earnedCurrencies[$currency] = ($this->earnedCurrencies[$currency] ?? 0) + $amount;
             }
+        }
 
-            $this->battleRewardLedgerService->completeStep($step, [
-                'applied' => true,
-                'handler' => $payload['plan']['handler'] ?? null,
-                'currencies' => $result['currencies'] ?? [],
-                'item_count' => $result['item_count'] ?? 0,
-                'event_created' => $result['event_created'] ?? false,
-                'noop' => $result['noop'] ?? false,
-            ]);
-        });
+        $this->battleRewardLedgerService->completeStep($step, [
+            'applied' => true,
+            'handler' => $payload['plan']['handler'] ?? null,
+            'currencies' => $result['currencies'] ?? [],
+            'item_count' => $result['item_count'] ?? 0,
+            'event_created' => $result['event_created'] ?? false,
+            'noop' => $result['noop'] ?? false,
+        ]);
     }
 
     private function handleLedgerExplorationContext(CharacterBattleRewardRequest $request): void
@@ -570,34 +560,32 @@ class BattleRewardService
         $goldDustAmount = (int) ($handlerPayload['gold_dust_amount'] ?? 0);
         $shardsAmount = (int) ($handlerPayload['shards_amount'] ?? 0);
 
-        DB::transaction(function () use ($step, $goldAmount, $goldDustAmount, $shardsAmount): void {
-            $character = $this->character->refresh();
+        $character = $this->character->refresh();
 
-            $character->update([
-                'gold' => min($character->gold + $goldAmount, MaxCurrenciesValue::MAX_GOLD),
-                'gold_dust' => min($character->gold_dust + $goldDustAmount, MaxCurrenciesValue::MAX_GOLD_DUST),
-                'shards' => min($character->shards + $shardsAmount, MaxCurrenciesValue::MAX_SHARDS),
-            ]);
+        $character->update([
+            'gold' => min($character->gold + $goldAmount, CurrencyLimit::MAX_GOLD),
+            'gold_dust' => min($character->gold_dust + $goldDustAmount, CurrencyLimit::MAX_GOLD_DUST),
+            'shards' => min($character->shards + $shardsAmount, CurrencyLimit::MAX_SHARDS),
+        ]);
 
-            $this->character = $character->refresh();
+        $this->character = $character->refresh();
 
-            $this->battleMessageHandler->handleCurrencyGainMessage(
-                $this->character->user, CurrenciesMessageTypes::GOLD, $goldAmount, $this->character->gold
-            );
-            $this->battleMessageHandler->handleCurrencyGainMessage(
-                $this->character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDustAmount, $this->character->gold_dust
-            );
-            $this->battleMessageHandler->handleCurrencyGainMessage(
-                $this->character->user, CurrenciesMessageTypes::SHARDS, $shardsAmount, $this->character->shards
-            );
+        $this->battleMessageHandler->handleCurrencyGainMessage(
+            $this->character->user, CurrenciesMessageTypes::GOLD, $goldAmount, $this->character->gold
+        );
+        $this->battleMessageHandler->handleCurrencyGainMessage(
+            $this->character->user, CurrenciesMessageTypes::GOLD_DUST, $goldDustAmount, $this->character->gold_dust
+        );
+        $this->battleMessageHandler->handleCurrencyGainMessage(
+            $this->character->user, CurrenciesMessageTypes::SHARDS, $shardsAmount, $this->character->shards
+        );
 
-            $this->battleRewardLedgerService->completeStep($step, [
-                'applied' => true,
-                'gold' => $goldAmount,
-                'gold_dust' => $goldDustAmount,
-                'shards' => $shardsAmount,
-            ]);
-        });
+        $this->battleRewardLedgerService->completeStep($step, [
+            'applied' => true,
+            'gold' => $goldAmount,
+            'gold_dust' => $goldDustAmount,
+            'shards' => $shardsAmount,
+        ]);
 
         $this->safelyDispatchBroadcastEvent(
             new UpdateTopBarEvent($this->character->refresh()),
@@ -627,34 +615,32 @@ class BattleRewardService
             return;
         }
 
-        DB::transaction(function () use ($step, $item): void {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($this->character)
-                ->setPaidAmount(RandomAffixDetails::LEGENDARY);
+        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($this->character)
+            ->setPaidAmount(RandomAffixTier::LEGENDARY->value);
 
-            $newItem = $item->duplicate();
+        $newItem = $item->duplicate();
 
-            $newItem->update([
-                'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
-                'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
-            ]);
+        $newItem->update([
+            'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
+            'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
+        ]);
 
-            $slot = $this->character->inventory->slots()->create([
-                'inventory_id' => $this->character->inventory->id,
-                'item_id' => $newItem->id,
-            ]);
+        $slot = $this->character->inventory->slots()->create([
+            'inventory_id' => $this->character->inventory->id,
+            'item_id' => $newItem->id,
+        ]);
 
-            ServerMessageHandler::sendBasicMessageWithId(
-                $this->character->user,
-                'You found something Unique in value child. A simple reward: '.$item->affix_name,
-                $slot->id
-            );
+        ServerMessageHandler::sendBasicMessageWithId(
+            $this->character->user,
+            'You found something Unique in value child. A simple reward: '.$item->affix_name,
+            $slot->id
+        );
 
-            $this->battleRewardLedgerService->completeStep($step, [
-                'applied' => true,
-                'item_id' => $newItem->id,
-                'slot_id' => $slot->id,
-            ]);
-        });
+        $this->battleRewardLedgerService->completeStep($step, [
+            'applied' => true,
+            'item_id' => $newItem->id,
+            'slot_id' => $slot->id,
+        ]);
     }
 
     private function handleFactionLoyaltyXpStep(CharacterBattleRewardRequest $request, CharacterBattleRewardRequestStep $step): void

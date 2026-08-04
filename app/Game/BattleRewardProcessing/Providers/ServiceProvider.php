@@ -2,8 +2,6 @@
 
 namespace App\Game\BattleRewardProcessing\Providers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
-use App\Flare\Services\CharacterRewardService;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
@@ -17,10 +15,21 @@ use App\Game\BattleRewardProcessing\Services\BattleRewardLedgerService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\BattleRewardService;
+use App\Game\BattleRewardProcessing\Services\CharacterCurrencyRewardService;
+use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
+use App\Game\BattleRewardProcessing\Services\CharacterXPService;
 use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\BattleRewardProcessing\Services\SecondaryRewardService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\ClassRanks\Services\ClassRankService;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Builders\BuildCosmicItem;
+use App\Game\Core\Items\Builders\BuildMythicItem;
+use App\Game\Core\Items\Builders\BuildUniqueItem;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Events\Services\EventGoalsService;
@@ -31,6 +40,7 @@ use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
+use League\Fractal\Manager;
 
 class ServiceProvider extends ApplicationServiceProvider
 {
@@ -41,13 +51,34 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        $this->app->singleton(CharacterCurrencyRewardService::class, fn ($app) => new CharacterCurrencyRewardService(
+            $app->make(BattleMessageHandler::class),
+            $app->make(RandomNumberGenerator::class),
+        ));
+        $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
+            $app->make(CharacterService::class),
+            $app->make(SkillService::class),
+            $app->make(Manager::class),
+            $app->make(CharacterSheetBaseInfoTransformer::class),
+            $app->make(BattleMessageHandler::class),
+        ));
+        $this->app->bind(CharacterRewardService::class, fn ($app) => new CharacterRewardService(
+            $app->make(CharacterXPService::class),
+            $app->make(CharacterCurrencyRewardService::class),
+            $app->make(SkillService::class),
+            $app->make(BuildUniqueItem::class),
+            $app->make(BuildMythicItem::class),
+            $app->make(BuildCosmicItem::class),
+        ));
+
         $this->app->singleton(BattleRewardMessageContext::class);
 
         $this->app->bind(FactionHandler::class, function ($app) {
             return new FactionHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(GuideQuestService::class),
-                $app->make(BattleMessageHandler::class)
+                $app->make(BattleMessageHandler::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -82,6 +113,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new PurgatorySmithHouseRewardHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BattleMessageHandler::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -89,6 +122,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new GoldMinesRewardHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BattleMessageHandler::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -96,12 +131,16 @@ class ServiceProvider extends ApplicationServiceProvider
             return new TheOldChurchRewardHandler(
                 $app->make(RandomAffixGenerator::class),
                 $app->make(BattleMessageHandler::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
         $this->app->bind(LocationSpecialtyHandler::class, function ($app) {
             return new LocationSpecialtyHandler(
                 $app->make(RandomAffixGenerator::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 

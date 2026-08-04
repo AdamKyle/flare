@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -2,12 +2,12 @@
 
 namespace App\Game\Skills\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Events\Concerns\UpdateCharacterEventGoalParticipation;
 use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;

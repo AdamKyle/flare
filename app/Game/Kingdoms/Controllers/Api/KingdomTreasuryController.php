@@ -4,8 +4,9 @@ namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Currency\Values\CurrencyType;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 use App\Game\Kingdoms\Jobs\MassEmbezzle;
 use App\Game\Kingdoms\Requests\KingdomDepositRequest;
@@ -37,7 +38,7 @@ class KingdomTreasuryController extends Controller
         $amountToEmbezzle = $request->embezzle_amount;
         $newAGoldAmount = $kingdom->character->gold + $amountToEmbezzle;
 
-        $maxCurrencies = new MaxCurrenciesValue($newAGoldAmount, MaxCurrenciesValue::GOLD);
+        $maxCurrencies = new CurrencyLimit($newAGoldAmount, CurrencyType::GOLD);
 
         if ($maxCurrencies->canNotGiveCurrency()) {
             return response()->json([

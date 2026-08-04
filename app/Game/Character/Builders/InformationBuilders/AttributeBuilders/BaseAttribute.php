@@ -2,12 +2,11 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Support\Collection;
 
 class BaseAttribute
@@ -51,7 +50,7 @@ class BaseAttribute
 
                 if (! is_array($onlyForType)) {
 
-                    if ($onlyForType === WeaponTypes::RING && $slot->item->type !== $onlyForType) {
+                    if ($onlyForType === ItemType::RING->value && $slot->item->type !== $onlyForType) {
                         continue;
                     }
 

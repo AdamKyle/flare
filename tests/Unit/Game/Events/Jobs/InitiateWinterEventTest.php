@@ -6,10 +6,10 @@ use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateWinterEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -51,7 +51,7 @@ class InitiateWinterEventTest extends TestCase
     {
 
         $this->createGameMap([
-            'name' => MapNameValue::ICE_PLANE,
+            'name' => MapName::ICE_PLANE->value,
             'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 
@@ -73,7 +73,7 @@ class InitiateWinterEventTest extends TestCase
     public function test_schedule_the_event_for_next_year()
     {
         $this->createGameMap([
-            'name' => MapNameValue::ICE_PLANE,
+            'name' => MapName::ICE_PLANE->value,
             'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 
@@ -121,7 +121,7 @@ class InitiateWinterEventTest extends TestCase
         $now = now();
 
         $this->createGameMap([
-            'name' => MapNameValue::ICE_PLANE,
+            'name' => MapName::ICE_PLANE->value,
             'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 
@@ -155,7 +155,7 @@ class InitiateWinterEventTest extends TestCase
     public function test_winter_start_creates_current_child_raids_only(): void
     {
         $this->createGameMap([
-            'name' => MapNameValue::ICE_PLANE,
+            'name' => MapName::ICE_PLANE->value,
             'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 
@@ -207,7 +207,7 @@ class InitiateWinterEventTest extends TestCase
     public function test_winter_start_reschedules_only_parent_for_next_year(): void
     {
         $this->createGameMap([
-            'name' => MapNameValue::ICE_PLANE,
+            'name' => MapName::ICE_PLANE->value,
             'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 
@@ -258,7 +258,7 @@ class InitiateWinterEventTest extends TestCase
     public function test_next_year_child_raids_are_not_created_early(): void
     {
         $this->createGameMap([
-            'name' => MapNameValue::ICE_PLANE,
+            'name' => MapName::ICE_PLANE->value,
             'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 

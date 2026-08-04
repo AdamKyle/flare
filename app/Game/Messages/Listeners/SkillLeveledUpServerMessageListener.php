@@ -2,9 +2,9 @@
 
 namespace App\Game\Messages\Listeners;
 
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Character\CharacterCreation\Events\CreateCharacterEvent;
 use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
+use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
 
 class SkillLeveledUpServerMessageListener
 {

@@ -5,10 +5,12 @@ namespace App\Game\Skills\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
@@ -28,7 +30,11 @@ class DisenchantService
 
     private ?InventorySlot $questSlot = null;
 
-    public function __construct(private readonly SkillCheckService $skillCheckService) {}
+    public function __construct(
+        private readonly SkillCheckService $skillCheckService,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly ChanceCalculator $chanceCalculator,
+    ) {}
 
     /**
      * Set up the service.
@@ -42,7 +48,7 @@ class DisenchantService
         })->first();
 
         $this->questSlot = $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::GOLD_DUST_RUSH->value;
         })->first();
 
         return $this;
@@ -81,7 +87,7 @@ class DisenchantService
 
         $disenchanted = $characterRoll >= $dcCheck;
 
-        if ($this->character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+        if ($this->character->gold_dust >= CurrencyLimit::MAX_GOLD_DUST) {
 
             $affixData = resolve(EnchantingService::class)->fetchAffixes($this->character->refresh());
 
@@ -147,7 +153,7 @@ class DisenchantService
 
         $canDisenchant = $characterRoll > $dcCheck;
 
-        if ($characterCurrentGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST && $canDisenchant) {
+        if ($characterCurrentGoldDust >= CurrencyLimit::MAX_GOLD_DUST && $canDisenchant) {
             event(new UpdateSkillEvent($this->disenchantingSkill));
 
             event(new UpdateCharacterInventoryCountEvent($this->character));
@@ -192,8 +198,8 @@ class DisenchantService
             }
         }
 
-        if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ($characterTotalGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
+            $characterTotalGoldDust = CurrencyLimit::MAX_GOLD_DUST;
         }
 
         $character->update([
@@ -203,7 +209,7 @@ class DisenchantService
         event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
         if ($goldDustRushAwarded) {
-            if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+            if ($characterTotalGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
                 event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. You are now capped!'));
             } else {
                 event(new ServerMessageEvent($character->user, 'Gold Dust Rush! You gained 5% bonus gold dust from disenchanting. Your new total is: '.number_format($characterTotalGoldDust)));
@@ -225,8 +231,8 @@ class DisenchantService
 
         $characterTotalGoldDust = $character->gold_dust + (int) floor($goldDustGain * 0.05);
 
-        if ($characterTotalGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $characterTotalGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ($characterTotalGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
+            $characterTotalGoldDust = CurrencyLimit::MAX_GOLD_DUST;
         }
 
         $character->update([
@@ -243,7 +249,7 @@ class DisenchantService
 
     protected function fetchGoldDustAmount(): int
     {
-        return rand(2, 1150);
+        return $this->randomNumberGenerator->numberBetween(2, 1150);
     }
 
     /**
@@ -251,6 +257,6 @@ class DisenchantService
      */
     protected function fetchDCRoll(): int
     {
-        return rand(1, 100);
+        return $this->chanceCalculator->passesOneIn(100) ? 100 : 99;
     }
 }

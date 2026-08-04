@@ -2,8 +2,6 @@
 
 namespace App\Game\Automation\Providers;
 
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Transformers\ItemTransformer;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
@@ -24,7 +22,9 @@ use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\TraverseService;

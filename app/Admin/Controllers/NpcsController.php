@@ -8,7 +8,7 @@ use App\Admin\Requests\NpcsImportRequest;
 use App\Admin\Requests\StoreNpcRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Npc;
-use App\Flare\Values\NpcTypes;
+use App\Game\Npcs\Values\NpcType;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -23,7 +23,7 @@ class NpcsController extends Controller
     {
 
         $npc->game_map_name = $npc->gameMap->name;
-        $npc->type_name = (new NpcTypes($npc->type))->getNamedValue();
+        $npc->type_name = (NpcType::from($npc->type))->getNamedValue();
 
         return view('admin.npcs.show', [
             'npc' => $npc,
@@ -35,7 +35,7 @@ class NpcsController extends Controller
         return view('admin.npcs.manage', [
             'npc' => null,
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
-            'types' => NpcTypes::getNamedValues(),
+            'types' => NpcType::getNamedValues(),
         ]);
     }
 
@@ -44,7 +44,7 @@ class NpcsController extends Controller
         return view('admin.npcs.manage', [
             'npc' => $npc,
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
-            'types' => NpcTypes::getNamedValues(),
+            'types' => NpcType::getNamedValues(),
         ]);
     }
 

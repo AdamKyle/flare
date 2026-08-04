@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Controllers\Api;
 
-use App\Flare\Services\EventSchedulerService;
+use App\Game\Events\Services\EventSchedulerService;
 use App\Http\Controllers\Controller;
 
 class EventCalendarController extends Controller

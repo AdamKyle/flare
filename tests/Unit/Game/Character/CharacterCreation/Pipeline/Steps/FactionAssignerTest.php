@@ -3,10 +3,10 @@
 namespace Tests\Unit\Game\Character\CharacterCreation\Pipeline\Steps;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\MapNameValue;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\FactionAssigner;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use App\Game\Core\Values\FactionLevel;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -31,9 +31,9 @@ class FactionAssignerTest extends TestCase
         $race = $this->createRace();
         $class = $this->createClass();
 
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE]);
-        $hell = $this->createGameMap(['name' => MapNameValue::HELL]);
-        $purgatory = $this->createGameMap(['name' => MapNameValue::PURGATORY]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value]);
+        $hell = $this->createGameMap(['name' => MapName::HELL->value]);
+        $purgatory = $this->createGameMap(['name' => MapName::PURGATORY->value]);
 
         $character = $this->createCharacter([
             'damage_stat' => $class->damage_stat,
@@ -87,9 +87,9 @@ class FactionAssignerTest extends TestCase
         $race = $this->createRace();
         $class = $this->createClass();
 
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
-        $this->createGameMap(['name' => MapNameValue::HELL]);
-        $this->createGameMap(['name' => MapNameValue::PURGATORY]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
+        $this->createGameMap(['name' => MapName::HELL->value]);
+        $this->createGameMap(['name' => MapName::PURGATORY->value]);
 
         $character = $this->createCharacter([
             'damage_stat' => $class->damage_stat,

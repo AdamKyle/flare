@@ -3,7 +3,7 @@
 namespace App\Admin\Import\LocationTemplates\Sheets;
 
 use App\Flare\Models\LocationTemplate;
-use App\Flare\Values\LocationTemplateType;
+use App\Game\Maps\Values\LocationTemplateType;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Concerns\ToCollection;

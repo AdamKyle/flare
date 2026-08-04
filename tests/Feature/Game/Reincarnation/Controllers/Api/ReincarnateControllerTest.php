@@ -3,8 +3,8 @@
 namespace Tests\Feature\Game\Reincarnation\Controllers\Api;
 
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\FeatureTypes;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Values\FeatureType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -42,14 +42,14 @@ class ReincarnateControllerTest extends TestCase
             'last_leg' => 1900,
         ]);
 
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 

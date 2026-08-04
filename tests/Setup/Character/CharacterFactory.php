@@ -2,7 +2,6 @@
 
 namespace Tests\Setup\Character;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameClass;
@@ -11,10 +10,11 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Quest;
 use App\Flare\Models\User;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
@@ -306,10 +306,10 @@ class CharacterFactory
         $this->character->currentAutomations()->create(array_merge([
             'character_id' => $this->character->id,
             'monster_id' => null,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addHours(25),
-            'attack_type' => AttackTypeValue::CAST,
+            'attack_type' => AttackType::CAST->value,
         ], $options));
 
         return $this;

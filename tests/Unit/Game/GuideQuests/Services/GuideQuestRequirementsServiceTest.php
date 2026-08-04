@@ -3,19 +3,19 @@
 namespace Tests\Unit\Game\GuideQuests\Services;
 
 use App\Admin\Services\GuideQuestService as AdminGuideQuestService;
-use App\Flare\Items\Values\AlchemyItemType;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
+use App\Game\Core\Items\Values\AlchemyItemType;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\GuideQuests\Services\GuideQuestRequirementsService;
+use App\Game\Maps\Values\MapName;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -331,11 +331,11 @@ class GuideQuestRequirementsServiceTest extends TestCase
     {
         $requireditem = $this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::LABYRINTH,
+            'effect' => ItemEffectType::LABYRINTH->value,
         ]);
 
         $gameMap = $this->createGameMap([
-            'name' => MapNameValue::LABYRINTH,
+            'name' => MapName::LABYRINTH->value,
         ]);
 
         $guideQuest = $this->createGuideQuest([
@@ -568,13 +568,13 @@ class GuideQuestRequirementsServiceTest extends TestCase
     public function test_required_speciality_item_is_in_inventory()
     {
         $item = $this->createItem([
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $guideQuest = $this->createGuideQuest([
-            'required_specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'required_specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
         ]);
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredSpecialtyType($character, $guideQuest)->getFinishedRequirements();
@@ -585,13 +585,13 @@ class GuideQuestRequirementsServiceTest extends TestCase
     public function test_required_speciality_item_is_in_set()
     {
         $item = $this->createItem([
-            'specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
         ]);
 
         $character = $this->character->inventorySetManagement()->createInventorySets(2)->putItemInSet($item, 1)->getCharacter();
 
         $guideQuest = $this->createGuideQuest([
-            'required_specialty_type' => ItemSpecialtyType::HELL_FORGED,
+            'required_specialty_type' => ItemSpecialtyType::HELL_FORGED->value,
         ]);
 
         $finishedRequirements = $this->guideQuestRequirementsService->requiredSpecialtyType($character, $guideQuest)->getFinishedRequirements();
@@ -900,7 +900,7 @@ class GuideQuestRequirementsServiceTest extends TestCase
 
         $character->map()->update([
             'game_map_id' => $this->createGameMap([
-                'name' => MapNameValue::ICE_PLANE,
+                'name' => MapName::ICE_PLANE->value,
             ])->id,
         ]);
 
@@ -916,8 +916,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
             'max_kills' => 1000,
             'event_type' => EventType::WINTER_EVENT,
             'event_id' => $event->id,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([
@@ -972,8 +972,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
             'max_crafts' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_id' => $event->id,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventCrafts([
@@ -1010,8 +1010,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $eventGoal = $this->createGlobalEventGoal([
             'max_crafts' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventCrafts([
@@ -1043,8 +1043,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
             'max_enchants' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_id' => $event->id,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventEnchants([
@@ -1081,8 +1081,8 @@ class GuideQuestRequirementsServiceTest extends TestCase
         $eventGoal = $this->createGlobalEventGoal([
             'max_enchants' => 1000,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventEnchants([

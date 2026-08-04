@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
-use App\Flare\Values\MapNameValue;
 use App\Game\Events\Services\FactionLoyaltyPledgeCleanupService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\MockInterface;
@@ -52,7 +52,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
 
     public function test_unpledge_if_on_faction_when_no_loyalty_record_does_nothing(): void
     {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter()
@@ -76,7 +76,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
 
     public function test_unpledge_if_on_faction_when_loyalty_exists_without_assisting_npc_removes_pledge_only(): void
     {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter()
@@ -108,7 +108,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
 
     public function test_unpledge_if_on_faction_when_assisting_npc_stops_assistance_then_removes_pledge(): void
     {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter()

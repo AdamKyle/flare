@@ -9,6 +9,7 @@ import React, {
   useMemo,
   useRef,
   useState,
+  useId,
 } from 'react';
 import { createPortal } from 'react-dom';
 import { match } from 'ts-pattern';
@@ -59,7 +60,15 @@ const Dropdown = ({
   disabled,
   focus_selected_on_open,
   use_portal,
+  id,
+  aria_label,
+  aria_labelled_by,
+  header_slot,
 }: DropdownProps) => {
+  const generatedId = useId().replace(/:/g, '');
+  const triggerId = id ?? `dropdown-trigger-${generatedId}`;
+  const listboxId = `dropdown-listbox-${generatedId}`;
+  const searchId = `dropdown-search-${generatedId}`;
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
@@ -70,6 +79,7 @@ const Dropdown = ({
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const prevForceClearRef = useRef<boolean | undefined>(undefined);
   const portalMenuRef = useRef<HTMLDivElement>(null);
@@ -186,12 +196,26 @@ const Dropdown = ({
     }
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (disabled) {
       return;
     }
 
     if (!isOpen) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        setIsOpen(true);
+        return;
+      }
+
+      if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+        event.preventDefault();
+        setIsOpen(true);
+        setFocusedIndex(
+          event.key === 'ArrowDown' ? 0 : Math.max(displayItems.length - 1, 0)
+        );
+      }
+
       return;
     }
 
@@ -220,6 +244,12 @@ const Dropdown = ({
         setIsOpen(false);
         setFocusedIndex(null);
         setSearchTerm('');
+        triggerRef.current?.focus();
+      })
+      .with('Tab', () => {
+        setIsOpen(false);
+        setFocusedIndex(null);
+        setSearchTerm('');
       })
       .otherwise(() => {});
   };
@@ -230,7 +260,7 @@ const Dropdown = ({
     }
   };
 
-  const handleClearSelection = (mouseEvent: MouseEvent<HTMLElement>) => {
+  const handleClearSelection = (mouseEvent: MouseEvent<HTMLButtonElement>) => {
     if (disabled) {
       return;
     }
@@ -286,16 +316,22 @@ const Dropdown = ({
   const renderIcon = () => {
     if (disabled) {
       return (
-        <i className="fas fa-chevron-down text-gray-400 dark:text-gray-500" />
+        <i
+          aria-hidden="true"
+          className="fas fa-chevron-down text-gray-400 dark:text-gray-500"
+        />
       );
     }
 
     return selectedValue === '' ? (
-      <i className="fas fa-chevron-down text-gray-500 dark:text-gray-300" />
+      <i
+        aria-hidden="true"
+        className="fas fa-chevron-down text-gray-500 dark:text-gray-300"
+      />
     ) : (
       <i
-        className="fas fa-times cursor-pointer text-gray-500 dark:text-gray-300"
-        onClick={handleClearSelection}
+        aria-hidden="true"
+        className="fas fa-chevron-down text-gray-500 dark:text-gray-300"
       />
     );
   };
@@ -304,7 +340,7 @@ const Dropdown = ({
     displayItems.map((item, index) => (
       <li
         key={item.value + '-' + index}
-        id={`dropdown-item-${index}`}
+        id={`${listboxId}-option-${index}`}
         role="option"
         aria-selected={selectedValue === item.value}
         tabIndex={-1}
@@ -350,12 +386,9 @@ const Dropdown = ({
 
     const listMarkup = (
       <ul
-        id="dropdown-listbox"
+        id={listboxId}
         role="listbox"
         ref={listRef}
-        aria-activedescendant={
-          focusedIndex !== null ? `dropdown-item-${focusedIndex}` : undefined
-        }
         className={clsx(
           'w-full text-black dark:text-white',
           !use_pagination && 'max-h-60 overflow-auto',
@@ -363,7 +396,14 @@ const Dropdown = ({
             'scrollbar-thumb-rounded-md scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800'
         )}
       >
-        {renderItems()}
+        {header_slot}
+        {displayItems.length === 0 ? (
+          <li className="px-4 py-3 text-gray-600 dark:text-gray-300">
+            No options available.
+          </li>
+        ) : (
+          renderItems()
+        )}
       </ul>
     );
 
@@ -372,6 +412,7 @@ const Dropdown = ({
         <>
           <div className="p-2">
             <input
+              id={searchId}
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -395,6 +436,7 @@ const Dropdown = ({
         <>
           <div className="p-2">
             <input
+              id={searchId}
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -430,6 +472,7 @@ const Dropdown = ({
         <div className={wrapperClasses}>
           <div className="p-2">
             <input
+              id={searchId}
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -456,6 +499,7 @@ const Dropdown = ({
       <div className={wrapperClasses}>
         <div className="p-2">
           <input
+            id={searchId}
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -473,29 +517,53 @@ const Dropdown = ({
     <div
       ref={containerRef}
       onBlur={handleBlur}
-      tabIndex={disabled ? -1 : 0}
-      onKeyDown={disabled ? undefined : handleKeyDown}
       className={clsx('relative w-full', is_in_modal && 'overflow-visible')}
     >
-      <div
-        tabIndex={disabled ? -1 : 0}
-        role="button"
-        aria-haspopup="listbox"
-        aria-disabled={disabled || undefined}
-        aria-expanded={disabled ? false : isOpen}
-        aria-controls={disabled ? undefined : 'dropdown-listbox'}
-        onClick={disabled ? undefined : handleTriggerClick}
-        className={clsx(
-          'relative flex w-full items-center rounded-md border p-2 pr-10 pl-3',
-          disabled
-            ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-80 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500'
-            : 'border-gray-500 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800'
+      <div className="relative flex w-full items-center">
+        <button
+          ref={triggerRef}
+          id={triggerId}
+          type="button"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={disabled ? false : isOpen}
+          aria-controls={disabled ? undefined : listboxId}
+          aria-label={
+            aria_label ??
+            (aria_labelled_by
+              ? undefined
+              : (selection_placeholder ?? 'Select an option'))
+          }
+          aria-labelledby={aria_labelled_by}
+          aria-activedescendant={
+            isOpen && focusedIndex !== null
+              ? `${listboxId}-option-${focusedIndex}`
+              : undefined
+          }
+          onClick={disabled ? undefined : handleTriggerClick}
+          onKeyDown={disabled ? undefined : handleKeyDown}
+          className={clsx(
+            'relative flex w-full items-center rounded-md border p-2 pr-10 pl-3 text-left',
+            disabled
+              ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-80 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500'
+              : 'border-gray-500 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800'
+          )}
+        >
+          <span className="flex-1 truncate">{renderSelectionText()}</span>
+          <span className="absolute top-1/2 right-3 -translate-y-1/2">
+            {renderIcon()}
+          </span>
+        </button>
+        {selectedValue !== '' && !disabled && (
+          <button
+            type="button"
+            aria-label="Clear selection"
+            onClick={handleClearSelection}
+            className="absolute top-1/2 right-9 z-10 -translate-y-1/2 rounded p-2 text-gray-500 hover:text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:text-gray-300 dark:hover:text-white"
+          >
+            <i aria-hidden="true" className="fas fa-times" />
+          </button>
         )}
-      >
-        <span className="flex-1 truncate">{renderSelectionText()}</span>
-        <span className="absolute top-1/2 right-3 -translate-y-1/2">
-          {renderIcon()}
-        </span>
       </div>
 
       {renderDropdownList()}

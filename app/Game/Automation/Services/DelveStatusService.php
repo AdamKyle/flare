@@ -11,8 +11,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Values\LocationType;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Maps\Values\LocationType;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
 

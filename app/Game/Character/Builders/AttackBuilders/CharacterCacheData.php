@@ -2,11 +2,11 @@
 
 namespace App\Game\Character\Builders\AttackBuilders;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
-use App\Flare\Transformers\CharacterAttackDataTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;

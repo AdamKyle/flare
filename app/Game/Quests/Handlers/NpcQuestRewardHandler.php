@@ -6,11 +6,12 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Currency\Values\CurrencyType;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -188,7 +189,7 @@ class NpcQuestRewardHandler
     {
 
         if (! is_null($quest->rewardItem->effect)) {
-            $effectType = new ItemEffectsValue($quest->rewardItem->effect);
+            $effectType = ItemEffectType::from($quest->rewardItem->effect);
 
             if ($effectType->getCopperCoins()) {
                 broadcast(new GlobalMessageEvent('Lighting streaks across the skies, blackness fills the skies. A thunderous roar is heard across the land.'));
@@ -253,8 +254,8 @@ class NpcQuestRewardHandler
 
         $newValue = $character->gold + $quest->reward_gold;
 
-        if ($newValue > MaxCurrenciesValue::MAX_GOLD) {
-            $newValue = MaxCurrenciesValue::MAX_GOLD;
+        if ($newValue > CurrencyLimit::MAX_GOLD) {
+            $newValue = CurrencyLimit::MAX_GOLD;
         }
 
         $character->update([
@@ -271,8 +272,8 @@ class NpcQuestRewardHandler
 
         $newValue = $character->gold_dust + $quest->reward_gold_dust;
 
-        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::GOLD_DUST))->canNotGiveCurrency()) {
-            $newValue = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ((new CurrencyLimit($newValue, CurrencyType::GOLD_DUST))->canNotGiveCurrency()) {
+            $newValue = CurrencyLimit::MAX_GOLD_DUST;
         }
 
         $character->update([
@@ -289,8 +290,8 @@ class NpcQuestRewardHandler
 
         $newValue = $character->shards + $quest->reward_shards;
 
-        if ((new MaxCurrenciesValue($newValue, MaxCurrenciesValue::SHARDS))->canNotGiveCurrency()) {
-            $newValue = MaxCurrenciesValue::MAX_SHARDS;
+        if ((new CurrencyLimit($newValue, CurrencyType::SHARDS))->canNotGiveCurrency()) {
+            $newValue = CurrencyLimit::MAX_SHARDS;
         }
 
         $character->update([

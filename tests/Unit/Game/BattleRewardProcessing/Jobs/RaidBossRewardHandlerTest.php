@@ -4,10 +4,11 @@ namespace Tests\Unit\Game\BattleRewardProcessing\Jobs;
 
 use App\Flare\Models\ItemSkill;
 use App\Flare\Models\RaidBoss;
-use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Jobs\RaidBossRewardHandler;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -128,11 +129,11 @@ class RaidBossRewardHandlerTest extends TestCase
         $secondMonster = $this->createMonster();
         $gameMap = $this->createGameMap();
         $location = $this->createLocation(['game_map_id' => $gameMap->id]);
-        $this->createItem(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER]);
+        $this->createItem(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER->value]);
         $raid = $this->createRaid([
             'raid_boss_id' => $firstMonster->id,
             'raid_boss_location_id' => $location->id,
-            'item_specialty_reward_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER,
+            'item_specialty_reward_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
         ]);
         $firstRaidBoss = RaidBoss::create([
             'raid_id' => $raid->id,
@@ -160,6 +161,7 @@ class RaidBossRewardHandlerTest extends TestCase
             new RaidBossRewardHandler($charA->id, $secondMonster->id, $raid->id),
             $raid,
             $secondRaidBoss,
+            resolve(RandomNumberGenerator::class),
         );
 
         Event::assertDispatched(GlobalMessageEvent::class, function (GlobalMessageEvent $event) use ($charA) {
@@ -191,7 +193,7 @@ class RaidBossRewardHandlerTest extends TestCase
         $bossAMonster = $this->createMonster();
         $bossBMonster = $this->createMonster();
 
-        $this->createItem(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER]);
+        $this->createItem(['specialty_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER->value]);
 
         $dummyRaid = $this->createRaid([
             'raid_boss_id' => $bossAMonster->id,
@@ -204,7 +206,7 @@ class RaidBossRewardHandlerTest extends TestCase
             'raid_boss_id' => $bossAMonster->id,
             'raid_boss_location_id' => $location->id,
             'artifact_item_id' => $artifactItem->id,
-            'item_specialty_reward_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER,
+            'item_specialty_reward_type' => ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
         ]);
 
         $bossARaidBoss = RaidBoss::create(['raid_id' => $raid->id, 'raid_boss_id' => $bossAMonster->id]);

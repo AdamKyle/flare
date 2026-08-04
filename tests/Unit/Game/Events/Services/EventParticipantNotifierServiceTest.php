@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Services\EventParticipantNotifierService;
 use App\Game\Events\Values\EventType;
@@ -28,9 +28,9 @@ class EventParticipantNotifierServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -53,9 +53,9 @@ class EventParticipantNotifierServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -76,9 +76,9 @@ class EventParticipantNotifierServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -113,9 +113,9 @@ class EventParticipantNotifierServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 

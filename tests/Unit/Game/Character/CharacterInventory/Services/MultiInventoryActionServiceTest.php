@@ -5,7 +5,7 @@ namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 use App\Flare\Models\InventorySet;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Tests\Setup\Character\CharacterFactory;

@@ -9,7 +9,6 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Enums\AutomatedCraftingResultType;
@@ -24,6 +23,7 @@ use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedCraftingResult;
 use App\Game\Automation\Values\AutomatedFightResult;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Exceptions\MissingInventoryException;
@@ -736,7 +736,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
     {
         $this->characterAutomation = CharacterAutomation::where('id', $this->automationId)
             ->where('character_id', $this->characterId)
-            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('type', AutomationType::FACTION_LOYALTY->value)
             ->first();
 
         if (is_null($this->characterAutomation)) {
@@ -941,7 +941,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
             || is_null($this->characterAutomation)
             || $this->characterAutomation->id !== $this->automationId
             || $this->characterAutomation->character_id !== $this->characterId
-            || $this->characterAutomation->type !== AutomationType::FACTION_LOYALTY
+            || $this->characterAutomation->type !== AutomationType::FACTION_LOYALTY->value
             || is_null($this->factionLoyaltyAutomation)
             || $this->factionLoyaltyAutomation->id !== $this->factionLoyaltyAutomationId
             || $this->factionLoyaltyAutomation->character_id !== $this->characterId
@@ -1031,7 +1031,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
         $characterAutomation = CharacterAutomation::where('id', $this->automationId)
             ->where('character_id', $this->characterId)
-            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('type', AutomationType::FACTION_LOYALTY->value)
             ->first();
 
         $factionLoyaltyAutomation = FactionLoyaltyAutomation::where('id', $this->factionLoyaltyAutomationId)
@@ -1116,7 +1116,7 @@ class AutomatedFactionLoyalty implements ShouldQueue
             ->whereNull('completed_at')
             ->whereHas('characterAutomation', function ($query): void {
                 $query->where('character_id', $this->characterId)
-                    ->where('type', AutomationType::FACTION_LOYALTY)
+                    ->where('type', AutomationType::FACTION_LOYALTY->value)
                     ->where('id', '>', $this->automationId)
                     ->where('completed_at', '>', now());
             })

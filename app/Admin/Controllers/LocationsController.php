@@ -8,7 +8,7 @@ use App\Admin\Requests\LocationsImportRequest;
 use App\Admin\Services\LocationService;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;

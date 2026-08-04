@@ -2,6 +2,7 @@
 
 namespace App\Game\Gambler\Providers;
 
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gambler\Handlers\SpinHandler;
 use App\Game\Gambler\Services\GamblerService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -15,8 +16,8 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-        $this->app->bind(SpinHandler::class, function () {
-            return new SpinHandler;
+        $this->app->bind(SpinHandler::class, function ($app) {
+            return new SpinHandler($app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(GamblerService::class, function ($app) {

@@ -4,7 +4,7 @@ namespace App\Game\Maps\Values;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use Illuminate\Support\Facades\Storage;
 
 class MapTileValue
@@ -150,7 +150,7 @@ class MapTileValue
         $color = $this->getTileColor($x, $y);
 
         if ($this->isDeathWaterTile((int) $color)) {
-            return in_array(ItemEffectsValue::WALK_ON_DEATH_WATER, $this->itemEffects);
+            return in_array(ItemEffectType::WALK_ON_DEATH_WATER->value, $this->itemEffects);
         }
 
         // We are not death water
@@ -166,7 +166,7 @@ class MapTileValue
         $color = $this->getTileColor($x, $y);
 
         if ($this->isWaterTile((int) $color)) {
-            return in_array(ItemEffectsValue::WALK_ON_WATER, $this->itemEffects);
+            return in_array(ItemEffectType::WALK_ON_WATER->value, $this->itemEffects);
         }
 
         // We are not water
@@ -181,7 +181,7 @@ class MapTileValue
         $color = $this->getTileColor($x, $y);
 
         if ($this->isMagma((int) $color)) {
-            return in_array(ItemEffectsValue::WALK_ON_MAGMA, $this->itemEffects);
+            return in_array(ItemEffectType::WALK_ON_MAGMA->value, $this->itemEffects);
         }
 
         // We are not death water
@@ -212,7 +212,7 @@ class MapTileValue
         $color = $this->getTileColor($x, $y);
 
         if ($this->isIcePlaneIce((int) $color)) {
-            return in_array(ItemEffectsValue::WALK_ON_ICE, $this->itemEffects);
+            return in_array(ItemEffectType::WALK_ON_ICE->value, $this->itemEffects);
         }
 
         return true;
@@ -226,7 +226,7 @@ class MapTileValue
         $color = $this->getTileColor($x, $y);
 
         if ($this->isDelusionalMemoriesWater($color)) {
-            return in_array(ItemEffectsValue::WALK_ON_DELUSIONAL_MEMORIES_WATER, $this->itemEffects);
+            return in_array(ItemEffectType::WALK_ON_DELUSIONAL_MEMORIES_WATER->value, $this->itemEffects);
         }
 
         return true;

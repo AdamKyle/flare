@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -55,14 +55,14 @@ class EquipItemServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
             ]), 75)
             ->getCharacterFactory()
             ->inventorySetManagement()
             ->createInventorySets()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
             ]), 0, 'left-hand', true)
             ->getCharacter();
 
@@ -80,7 +80,7 @@ class EquipItemServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
@@ -91,14 +91,14 @@ class EquipItemServiceTest extends TestCase
             ->createInventorySets()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
                 ])->id,
             ]), 0, 'right-hand', true)
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
             ]), 0, 'left-hand', true)
             ->getCharacter();
 
@@ -116,7 +116,7 @@ class EquipItemServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'name' => 'To Replace',
             ]))
             ->getCharacterFactory()
@@ -124,7 +124,7 @@ class EquipItemServiceTest extends TestCase
             ->createInventorySets()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'name' => 'Equipped',
             ]), 0, 'left-hand', true)
             ->getCharacter();
@@ -147,17 +147,17 @@ class EquipItemServiceTest extends TestCase
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
             ]), true, 'left-hand')
             ->giveItem($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
                 ])->id,
             ]), true, 'right-hand')
             ->giveItem($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
@@ -180,7 +180,7 @@ class EquipItemServiceTest extends TestCase
             ->inventorySetManagement()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
@@ -188,7 +188,7 @@ class EquipItemServiceTest extends TestCase
             ]), 0, 'right-hand', true)
             ->getCharacter();
 
-        $this->assertEquals(WeaponTypes::WEAPON, $this->equipItemService->getUniqueFromSet(
+        $this->assertEquals(ItemType::WEAPON->value, $this->equipItemService->getUniqueFromSet(
             $character->inventorySets->first()
         )->item->type);
     }
@@ -199,7 +199,7 @@ class EquipItemServiceTest extends TestCase
             ->inventorySetManagement()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',
@@ -207,7 +207,7 @@ class EquipItemServiceTest extends TestCase
             ]), 0, 'right-hand', true)
             ->getCharacter();
 
-        $this->assertEquals(WeaponTypes::WEAPON, $this->equipItemService->getUniqueFromSet(
+        $this->assertEquals(ItemType::WEAPON->value, $this->equipItemService->getUniqueFromSet(
             $character->inventorySets->first()
         )->item->type);
     }
@@ -217,7 +217,7 @@ class EquipItemServiceTest extends TestCase
         $this->assertTrue(
             $this->equipItemService->isItemToEquipUnique(
                 $this->createItem([
-                    'type' => WeaponTypes::WEAPON,
+                    'type' => ItemType::WEAPON->value,
                     'item_prefix_id' => $this->createItemAffix([
                         'randomly_generated' => true,
                         'type' => 'prefix',
@@ -232,7 +232,7 @@ class EquipItemServiceTest extends TestCase
         $this->assertTrue(
             $this->equipItemService->isItemToEquipUnique(
                 $this->createItem([
-                    'type' => WeaponTypes::WEAPON,
+                    'type' => ItemType::WEAPON->value,
                     'item_suffix_id' => $this->createItemAffix([
                         'randomly_generated' => true,
                         'type' => 'suffix',
@@ -246,7 +246,7 @@ class EquipItemServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
@@ -256,7 +256,7 @@ class EquipItemServiceTest extends TestCase
             ->inventorySetManagement()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_prefix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'prefix',
@@ -278,7 +278,7 @@ class EquipItemServiceTest extends TestCase
     {
         $character = $this->character->inventoryManagement()
             ->giveItemMultipleTimes($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',
@@ -288,7 +288,7 @@ class EquipItemServiceTest extends TestCase
             ->inventorySetManagement()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::WEAPON,
+                'type' => ItemType::WEAPON->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',
@@ -311,7 +311,7 @@ class EquipItemServiceTest extends TestCase
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
-                'type' => WeaponTypes::BOW,
+                'type' => ItemType::BOW->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',
@@ -336,7 +336,7 @@ class EquipItemServiceTest extends TestCase
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
-                'type' => WeaponTypes::HAMMER,
+                'type' => ItemType::HAMMER->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',
@@ -361,7 +361,7 @@ class EquipItemServiceTest extends TestCase
         $character = $this->character
             ->inventoryManagement()
             ->giveItem($this->createItem([
-                'type' => WeaponTypes::STAVE,
+                'type' => ItemType::STAVE->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',
@@ -387,7 +387,7 @@ class EquipItemServiceTest extends TestCase
             ->inventoryManagement()
             ->giveItem(
                 $this->createItem([
-                    'type' => WeaponTypes::STAVE,
+                    'type' => ItemType::STAVE->value,
                     'item_suffix_id' => $this->createItemAffix([
                         'randomly_generated' => true,
                         'type' => 'suffix',
@@ -398,7 +398,7 @@ class EquipItemServiceTest extends TestCase
             ->inventorySetManagement()
             ->createInventorySets()
             ->putItemInSet($this->createItem([
-                'type' => WeaponTypes::STAVE,
+                'type' => ItemType::STAVE->value,
                 'item_suffix_id' => $this->createItemAffix([
                     'randomly_generated' => true,
                     'type' => 'suffix',

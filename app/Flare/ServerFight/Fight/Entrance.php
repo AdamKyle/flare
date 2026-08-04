@@ -6,6 +6,8 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class Entrance extends BattleBase
 {
@@ -13,9 +15,9 @@ class Entrance extends BattleBase
 
     private bool $isCharacterEntranced;
 
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->enemyEntranced = false;
         $this->isCharacterEntranced = false;
@@ -82,9 +84,11 @@ class Entrance extends BattleBase
             return true;
         }
 
-        $roll = rand(1, 100);
+        if ($chance <= -1) {
+            return false;
+        }
 
-        return ($roll + $roll * $chance) > 50;
+        return $this->chanceCalculator->passesPercentage(100 - floor(50 / (1 + $chance)));
     }
 
     protected function canPlayerEntranceMonster(Character $character, ServerMonster $monster, array $attackType): bool
@@ -99,9 +103,11 @@ class Entrance extends BattleBase
             return true;
         }
 
-        $roll = rand(1, 100);
+        if ($chance <= -1) {
+            return false;
+        }
 
-        return ($roll + $roll * $chance) > 50;
+        return $this->chanceCalculator->passesPercentage(100 - floor(50 / (1 + $chance)));
     }
 
     protected function canMonsterEntrancePlayer(Character $character, ServerMonster $monster, bool $isPlayerVoided): bool
@@ -113,7 +119,9 @@ class Entrance extends BattleBase
             return true;
         }
 
-        $roll = rand(1, 100);
+        if ($chance <= -1) {
+            return false;
+        }
 
         $dc = 50;
 
@@ -121,6 +129,6 @@ class Entrance extends BattleBase
             $dc = ceil($this->characterCacheData->getCachedCharacterData($character, $isPlayerVoided ? 'voided_focus' : 'focus') * 0.05);
         }
 
-        return ($roll + $roll * $chance) > $dc;
+        return $this->chanceCalculator->passesPercentage(100 - floor($dc / (1 + $chance)));
     }
 }

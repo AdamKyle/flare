@@ -13,9 +13,9 @@ use App\Flare\Models\GuideQuest;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MapNameValue;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
@@ -45,8 +45,8 @@ class GuideQuestsController
             'guide_quest' => $guideQuestData,
             'game_skills' => GameSkill::pluck('name', 'id')->toArray(),
             'faction_maps' => GameMap::whereNotIn('name', [
-                MapNameValue::PURGATORY,
-                MapNameValue::ICE_PLANE,
+                MapName::PURGATORY->value,
+                MapName::ICE_PLANE->value,
             ])->pluck('name', 'id')->toArray(),
             'quests' => Quest::pluck('name', 'id')->toArray(),
             'quest_items' => \App\Flare\Models\Item::where('type', 'quest')->pluck('name', 'id')->toArray(),

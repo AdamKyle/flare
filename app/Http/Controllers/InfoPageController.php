@@ -24,9 +24,9 @@ use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\LocationType;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Values\View\ClassBonusInformation;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -106,19 +106,19 @@ class InfoPageController extends Controller
     {
 
         $effects = match ($map->name) {
-            'Labyrinth' => ItemEffectsValue::LABYRINTH,
-            'Dungeons' => ItemEffectsValue::DUNGEON,
-            'Shadow Plane' => ItemEffectsValue::SHADOW_PLANE,
-            'Hell' => ItemEffectsValue::HELL,
-            'Purgatory' => ItemEffectsValue::PURGATORY,
+            'Labyrinth' => ItemEffectType::LABYRINTH->value,
+            'Dungeons' => ItemEffectType::DUNGEON->value,
+            'Shadow Plane' => ItemEffectType::SHADOW_PLANE->value,
+            'Hell' => ItemEffectType::HELL->value,
+            'Purgatory' => ItemEffectType::PURGATORY->value,
             default => '',
         };
 
         $walkOnWater = match ($map->name) {
-            'Labyrinth', 'Surface' => ItemEffectsValue::WALK_ON_WATER,
-            'Dungeons' => ItemEffectsValue::WALK_ON_DEATH_WATER,
-            'Hell' => ItemEffectsValue::WALK_ON_MAGMA,
-            'The Ice Plane' => ItemEffectsValue::WALK_ON_ICE,
+            'Labyrinth', 'Surface' => ItemEffectType::WALK_ON_WATER->value,
+            'Dungeons' => ItemEffectType::WALK_ON_DEATH_WATER->value,
+            'Hell' => ItemEffectType::WALK_ON_MAGMA->value,
+            'The Ice Plane' => ItemEffectType::WALK_ON_ICE->value,
             default => '',
         };
 

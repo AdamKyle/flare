@@ -2,22 +2,22 @@
 
 namespace App\Game\Skills\Providers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Console\Commands\AssignNewSkillsToPlayers;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
@@ -33,11 +33,14 @@ use App\Game\Skills\Services\GemService;
 use App\Game\Skills\Services\ItemListCostTransformerService;
 use App\Game\Skills\Services\ItemSkillService;
 use App\Game\Skills\Services\MassDisenchantService;
+use App\Game\Skills\Services\SkillBonusContextService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
+use App\Game\Skills\Transformers\BasicSkillsTransformer;
 use App\Game\Skills\Transformers\CraftableItemTransformer;
+use App\Game\Skills\Transformers\SkillsTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -50,6 +53,8 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        $this->app->bind(SkillBonusContextService::class);
+
         $this->commands([
             AssignNewSkillsToPlayers::class,
         ]);
@@ -58,8 +63,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ItemListCostTransformerService;
         });
 
-        $this->app->bind(SkillCheckService::class, function () {
-            return new SkillCheckService;
+        $this->app->bind(SkillCheckService::class, function ($app) {
+            return new SkillCheckService($app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(EnchantItemService::class, function ($app) {
@@ -113,7 +118,11 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(MassDisenchantService::class, function ($app) {
-            return new MassDisenchantService($app->make(SkillCheckService::class));
+            return new MassDisenchantService(
+                $app->make(SkillCheckService::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
+            );
         });
 
         $this->app->bind(SkillService::class, function ($app) {
@@ -124,6 +133,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(BattleMessageHandler::class),
                 $app->make(PlainDataSerializer::class),
+                $app->make(RandomNumberGenerator::class),
             );
         });
 
@@ -148,7 +158,8 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(GemService::class, function ($app) {
             return new GemService(
-                $app->make(GemBuilder::class)
+                $app->make(GemBuilder::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -162,6 +173,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(DisenchantService::class, function ($app) {
             return new DisenchantService(
                 $app->make(SkillCheckService::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -179,6 +192,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(DisenchantManyService::class, function ($app) {
             return new DisenchantManyService(
                 $app->make(SkillCheckService::class),
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
             );
         });
     }

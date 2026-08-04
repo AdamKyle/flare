@@ -11,9 +11,9 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MapNameValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -160,11 +160,11 @@ class AssignNewNpcsToFactionLoyalty extends Command
         if (! is_null($gameMap->only_during_event_type)) {
 
             $hasPurgatoryItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
+                return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::PURGATORY->value;
             })->first();
 
             if (is_null($hasPurgatoryItem)) {
-                $gameMapId = GameMap::where('name', MapNameValue::SURFACE)->first()->id;
+                $gameMapId = GameMap::where('name', MapName::SURFACE->value)->first()->id;
             }
         }
 
@@ -228,7 +228,7 @@ class AssignNewNpcsToFactionLoyalty extends Command
     private function getItemForCraftingTask(string $type, string $gamMapName): Item
     {
 
-        $gameMapValue = new MapNameValue($gamMapName);
+        $gameMapValue = MapName::from($gamMapName);
 
         $item = Item::inRandomOrder()->doesntHave('itemSuffix')
             ->doesntHave('itemPrefix')

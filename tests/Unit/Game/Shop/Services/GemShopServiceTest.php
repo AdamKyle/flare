@@ -3,7 +3,7 @@
 namespace Tests\Unit\Game\Shop\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Shop\Services\GemShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -72,9 +72,9 @@ class GemShopServiceTest extends TestCase
     {
 
         $this->character->update([
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $this->character = $this->character->refresh();
@@ -87,9 +87,9 @@ class GemShopServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEmpty($character->gemBag->gemSlots);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
-        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 
     public function test_sell_all_gems()
@@ -108,9 +108,9 @@ class GemShopServiceTest extends TestCase
     public function test_sell_all_gems_when_currency_capped()
     {
         $this->character->update([
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $this->character = $this->character->refresh();
@@ -121,8 +121,8 @@ class GemShopServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEmpty($character->gemBag->gemSlots);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
-        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 }

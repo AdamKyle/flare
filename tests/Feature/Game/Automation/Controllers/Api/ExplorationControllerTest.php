@@ -5,9 +5,9 @@ namespace Tests\Feature\Game\Automation\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationType;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -52,7 +52,7 @@ class ExplorationControllerTest extends TestCase
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
                 'selected_monster_id' => $this->monster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -70,13 +70,13 @@ class ExplorationControllerTest extends TestCase
         CharacterAutomation::create([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
             'move_down_monster_list_every' => 10,
             'previous_level' => $this->character->level,
             'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $response = $this->actingAs($this->character->user)
@@ -115,13 +115,13 @@ class ExplorationControllerTest extends TestCase
         CharacterAutomation::create([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
             'move_down_monster_list_every' => 10,
             'previous_level' => $this->character->level,
             'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $response = $this->actingAs($this->character->user)
@@ -130,7 +130,7 @@ class ExplorationControllerTest extends TestCase
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
                 'selected_monster_id' => $this->monster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -157,7 +157,7 @@ class ExplorationControllerTest extends TestCase
                 'auto_attack_length' => 1,
                 'move_down_the_list_every' => 10,
                 'selected_monster_id' => $this->monster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);

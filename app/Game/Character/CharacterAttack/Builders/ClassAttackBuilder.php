@@ -1,0 +1,564 @@
+<?php
+
+namespace App\Game\Character\CharacterAttack\Builders;
+
+use App\Flare\Models\Character;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
+use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterAttack\Values\ClassSpecialAttackType;
+use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Character\Values\CharacterClass;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+
+class ClassAttackBuilder
+{
+    private CharacterClass $classType;
+
+    private Character $character;
+
+    private CharacterStatBuilder $characterInfo;
+
+    private array $chance = [
+        'chance' => 0.05,
+        'class_name' => null,
+    ];
+
+    /**
+     * @throws Exception
+     */
+    public function __construct(Character $character)
+    {
+        $this->classType = CharacterClass::from($character->class->name);
+        $this->characterInfo = resolve(CharacterStatBuilder::class)->setCharacter($character);
+        $this->character = $character;
+    }
+
+    public function buildAttackData(): array
+    {
+        if ($this->classType->isFighter()) {
+            $this->buildFighterChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isProphet()) {
+            $this->buildProphetChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isThief()) {
+            $this->buildThiefChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isRanger()) {
+            $this->buildRangersChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isHeretic()) {
+            $this->buildHereticChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isVampire()) {
+            $this->buildVampiresChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isBlacksmith()) {
+            $this->buildBlacksmithsChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isArcaneAlchemist()) {
+            $this->buildArcaneAlchemistChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isPrisoner()) {
+            $this->buildPrisonerChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isAlcoholic()) {
+            $this->buildAlcoholicsChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isMerchant()) {
+            $this->buildMerchantsPlace();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isGunslinger()) {
+            $this->buildGunSlingersChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isDancer()) {
+            $this->buildSensualDance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isBookBinder()) {
+            $this->buildBookBindersFear();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isCleric()) {
+            $this->buildHolySmite();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isApothecary()) {
+            $this->buildPlagueSurge();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isBuccaneer()) {
+            $this->buildBuccaneersChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        if ($this->classType->isBeastmaster()) {
+            $this->buildBeastmasterChance();
+
+            return $this->addDisplayOnlyClassData();
+        }
+
+        return $this->addDisplayOnlyClassData();
+    }
+
+    public function buildFighterChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::FIGHTERS_DOUBLE_DAMAGE->value;
+        $this->chance['only'] = ItemType::SWORD->value;
+        $this->chance['class_name'] = 'Fighter';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::SWORD->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::SWORD->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildProphetChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::PROPHET_HEALING->value;
+        $this->chance['only'] = ItemType::CENSER->value;
+        $this->chance['class_name'] = 'Prophet';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CENSER->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::CENSER->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildThiefChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::THIEVES_SHADOW_DANCE->value;
+        $this->chance['only'] = ItemType::DAGGER->value;
+        $this->chance['class_name'] = 'Thief';
+        $this->chance['has_item'] = $this->hasMultipleOfSameType(ItemType::DAGGER->value, 2);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::DAGGER->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildHereticChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::HERETICS_DOUBLE_CAST->value;
+        $this->chance['only'] = ItemType::WAND->value;
+        $this->chance['class_name'] = 'Heretic';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::WAND->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::WAND->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildRangersChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::RANGER_TRIPLE_ATTACK->value;
+        $this->chance['only'] = ItemType::BOW->value;
+        $this->chance['class_name'] = 'Ranger';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::BOW->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::BOW->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildVampiresChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::VAMPIRE_THIRST->value;
+        $this->chance['only'] = ItemType::CLAW->value;
+        $this->chance['class_name'] = 'Vampire';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CLAW->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::CLAW->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildBlacksmithsChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::BLACKSMITHS_HAMMER_SMASH->value;
+        $this->chance['only'] = ItemType::HAMMER->value;
+        $this->chance['class_name'] = 'Blacksmith';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::HAMMER->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::HAMMER->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildArcaneAlchemistChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::ARCANE_ALCHEMISTS_DREAMS->value;
+        $this->chance['only'] = ItemType::STAVE->value;
+        $this->chance['class_name'] = 'Arcane Alchemist';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::STAVE->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::STAVE->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildPrisonerChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::PRISONER_RAGE->value;
+        $this->chance['only'] = 'Any weapon type equipped';
+        $this->chance['class_name'] = 'Prisoner';
+        $this->chance['has_item'] = $this->hasAnyWeaponEquipped();
+        $this->chance['amount'] = $this->getItemCollectionCountForAnyType();
+        $this->addClassBonusChance();
+    }
+
+    public function buildAlcoholicsChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::ALCOHOLIC_PUKE->value;
+        $this->chance['only'] = 'No weapon equipped';
+        $this->chance['class_name'] = 'Alcoholic';
+        $this->chance['has_item'] = $this->hasNoWeaponEquipped();
+        $this->chance['amount'] = $this->getItemCollectionCountForAnyType();
+        $this->addClassBonusChance();
+    }
+
+    public function buildGunSlingersChance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::GUNSLINGERS_ASSASSINATION->value;
+        $this->chance['only'] = ItemType::GUN->value;
+        $this->chance['class_name'] = 'Gunslinger';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::GUN->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::GUN->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildSensualDance()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::SENSUAL_DANCE->value;
+        $this->chance['only'] = ItemType::FAN->value;
+        $this->chance['class_name'] = 'Dancer';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::FAN->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::FAN->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildBookBindersFear()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::BOOK_BINDERS_FEAR->value;
+        $this->chance['only'] = ucwords(str_replace('-', ' ', ItemType::SCRATCH_AWL->value));
+        $this->chance['class_name'] = 'Book Binder';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::SCRATCH_AWL->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::SCRATCH_AWL->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildHolySmite()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::HOLY_SMITE->value;
+        $this->chance['only'] = 'Mace and Shield';
+        $this->chance['class_name'] = 'Cleric';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::MACE->value) && $this->hasItemTypeEquipped(ArmourType::SHIELD->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::MACE->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildMerchantsPlace()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::MERCHANTS_SUPPLY->value;
+        $this->chance['only'] = 'Stave or Bow';
+        $this->chance['class_name'] = 'Merchant';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::STAVE->value) || $this->hasItemTypeEquipped(ItemType::BOW->value);
+        $this->chance['amount'] = $this->getItemCollectionCountForTypes([
+            ItemType::STAVE->value,
+            ItemType::BOW->value,
+        ]);
+        $this->addClassBonusChance();
+    }
+
+    public function buildPlagueSurge()
+    {
+        $this->chance['type'] = ClassSpecialAttackType::PLAGUE_SURGE->value;
+        $this->chance['only'] = 'Censer or Dagger';
+        $this->chance['class_name'] = 'Apothecary';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::CENSER->value) && $this->hasItemTypeEquipped(ItemType::DAGGER->value);
+        $this->chance['amount'] = $this->getItemCollectionCountForTypes([
+            ItemType::CENSER->value,
+            ItemType::DAGGER->value,
+        ]);
+        $this->addClassBonusChance();
+    }
+
+    public function buildBeastmasterChance(): void
+    {
+        if ($this->hasItemTypeEquipped(ItemType::BOW->value)) {
+            $this->chance['type'] = ClassSpecialAttackType::DEVILS_PIERCING_SHOT->value;
+            $this->chance['only'] = ItemType::BOW->value;
+            $this->chance['class_name'] = 'Beastmaster';
+            $this->chance['has_item'] = true;
+            $this->chance['amount'] = $this->getItemCollection(ItemType::BOW->value)->count();
+            $this->addClassBonusChance();
+
+            return;
+        }
+
+        $this->chance['type'] = ClassSpecialAttackType::BEAST_STOMP->value;
+        $this->chance['only'] = ItemType::HAMMER->value;
+        $this->chance['class_name'] = 'Beastmaster';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::HAMMER->value);
+        $this->chance['amount'] = $this->getItemCollection(ItemType::HAMMER->value)->count();
+        $this->addClassBonusChance();
+    }
+
+    public function buildBuccaneersChance(): void
+    {
+        if ($this->hasMultipleOfSameType(ItemType::GUN->value, 2)) {
+            $this->chance['type'] = ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value;
+            $this->chance['only'] = 'Two Guns';
+            $this->chance['class_name'] = 'Buccaneer';
+            $this->chance['has_item'] = true;
+            $this->chance['amount'] = 2;
+            $this->addClassBonusChance();
+
+            return;
+        }
+
+        $this->chance['type'] = ClassSpecialAttackType::BUCCANEERS_BARRAGE->value;
+        $this->chance['only'] = 'Gun and Shield';
+        $this->chance['class_name'] = 'Buccaneer';
+        $this->chance['has_item'] = $this->hasItemTypeEquipped(ItemType::GUN->value)
+            && $this->hasItemTypeEquipped(ArmourType::SHIELD->value);
+        $this->chance['amount'] = $this->getItemCollectionCountForTypes([
+            ItemType::GUN->value,
+            ArmourType::SHIELD->value,
+        ]);
+        $this->addClassBonusChance();
+    }
+
+    private function addClassBonusChance(): void
+    {
+        $this->chance['chance'] = min(1, $this->chance['chance'] + $this->characterInfo->classBonus());
+    }
+
+    private function addDisplayOnlyClassData(): array
+    {
+        $classWeapons = $this->getClassWeapons();
+
+        $this->chance['class_id'] = $this->character->game_class_id;
+        $this->chance['class_weapons'] = $classWeapons;
+        $this->chance['attack_type'] = $this->getAttackType();
+        $this->chance['equipped_class_items'] = $this->getEquippedClassItems($classWeapons);
+
+        return $this->chance;
+    }
+
+    private function getClassWeapons(): array
+    {
+        $classWeapons = ItemTypeMapping::getForClass($this->character->class->name);
+
+        if (is_null($classWeapons)) {
+            return [];
+        }
+
+        if (is_array($classWeapons)) {
+            return $classWeapons;
+        }
+
+        return [$classWeapons];
+    }
+
+    private function getAttackType(): string
+    {
+        if ($this->classType->isHeretic()) {
+            return $this->formatAttackType(AttackType::CAST->value);
+        }
+
+        if ($this->classType->isProphet()) {
+            return $this->formatAttackType(AttackType::CAST->value);
+        }
+
+        return $this->formatAttackType(AttackType::ATTACK->value);
+    }
+
+    private function formatAttackType(string $attackType): string
+    {
+        return match ($attackType) {
+            AttackType::ATTACK->value => 'Attack',
+            AttackType::CAST->value => 'Cast',
+            AttackType::ATTACK_AND_CAST->value => 'Attack and Cast',
+            AttackType::CAST_AND_ATTACK->value => 'Cast and Attack',
+            AttackType::DEFEND->value => 'Defend',
+        };
+    }
+
+    private function getEquippedClassItems(array $classWeapons): array
+    {
+        if (empty($classWeapons)) {
+            return [];
+        }
+
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        $inventoryItems = InventorySlot::where('inventory_id', $inventory->id)
+            ->where('equipped', true)
+            ->whereHas('item', function ($query) use ($classWeapons) {
+                $query->whereIn('type', $classWeapons);
+            })
+            ->with('item')
+            ->get();
+
+        $setEquipped = $this->character->inventorySets->where('is_equipped', true)->first();
+
+        if (is_null($setEquipped)) {
+            return $this->mapEquippedClassItems($inventoryItems);
+        }
+
+        $setItems = SetSlot::where('inventory_set_id', $setEquipped->id)
+            ->whereHas('item', function ($query) use ($classWeapons) {
+                $query->whereIn('type', $classWeapons);
+            })
+            ->with('item')
+            ->get();
+
+        return $this->mapEquippedClassItems($inventoryItems->merge($setItems));
+    }
+
+    private function mapEquippedClassItems(Collection $items): array
+    {
+        return $items->map(function ($slot) {
+            return [
+                'item_id' => $slot->item->id,
+                'item_name' => $slot->item->affix_name,
+                'type' => $slot->item->type,
+                'attached_affixes_count' => $slot->item->affix_count,
+                'is_unique' => $slot->item->is_unique,
+                'is_mythic' => $slot->item->is_mythic,
+                'is_cosmic' => $slot->item->is_cosmic,
+                'has_holy_stacks_applied' => $slot->item->holy_stacks_applied,
+            ];
+        })->values()->toArray();
+    }
+
+    private function hasItemTypeEquipped(string $type): bool
+    {
+        return $this->getItemCollection($type)->isNotEmpty();
+    }
+
+    private function hasAnyWeaponEquipped(): bool
+    {
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
+
+        foreach ($itemTypes as $type) {
+            if ($this->getItemCollection($type)->isNotEmpty()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function hasNoWeaponEquipped(): bool
+    {
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
+        $typeIsNotEquipped = false;
+
+        foreach ($itemTypes as $type) {
+            if ($this->getItemCollection($type)->isNotEmpty()) {
+                $typeIsNotEquipped = true;
+            } else {
+                $typeIsNotEquipped = false;
+            }
+        }
+
+        return $typeIsNotEquipped;
+    }
+
+    private function hasMultipleOfSameType(string $type, int $amountNeeded = 1): bool
+    {
+        return $this->getItemCollection($type)->count() === $amountNeeded;
+    }
+
+    private function getItemCollectionCountForAnyType(): int
+    {
+        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
+        $count = 0;
+
+        foreach ($itemTypes as $type) {
+            $itemCollection = $this->getItemCollection($type);
+
+            if ($itemCollection->isNotEmpty()) {
+                $count += $itemCollection->count();
+            }
+        }
+
+        return $count;
+    }
+
+    private function getItemCollectionCountForTypes(array $types): int
+    {
+        $count = 0;
+
+        foreach ($types as $type) {
+            $itemCollection = $this->getItemCollection($type);
+
+            if ($itemCollection->isNotEmpty()) {
+                $count += $itemCollection->count();
+            }
+        }
+
+        return $count;
+    }
+
+    private function getItemCollection(string $type): Collection
+    {
+
+        $inventory = Inventory::where('character_id', $this->character->id)->first();
+
+        $slots = InventorySlot::where('inventory_slots.inventory_id', $inventory->id)->where('inventory_slots.equipped', true)->join('items', function ($join) use ($type) {
+            $join->on('items.id', '=', 'inventory_slots.item_id')
+                ->where('items.type', '=', $type);
+        })->select('inventory_slots.*')->get();
+
+        if ($slots->isEmpty()) {
+            $setEquipped = $this->character->inventorySets->where('is_equipped', true)->first();
+
+            if (! is_null($setEquipped)) {
+                $slots = SetSlot::where('set_slots.inventory_set_id', $setEquipped->id)->join('items', function ($join) use ($type) {
+                    $join->on('items.id', '=', 'set_slots.item_id')
+                        ->where('items.type', '=', $type);
+                })->select('set_slots.*')->get();
+            }
+        }
+
+        return $slots;
+    }
+}

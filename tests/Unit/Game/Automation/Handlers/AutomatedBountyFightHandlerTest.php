@@ -6,14 +6,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Enums\AutomatedFightResultType;
 use App\Game\Automation\Handlers\AutomatedBountyFightHandler;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationFightLogger;
 use App\Game\Automation\Values\AutomatedFightResult;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
+use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
+use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -114,7 +114,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                 $this->factionLoyaltyAutomation,
                 $this->factionLoyaltyNpc,
                 ['monster_id' => 1],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -137,7 +137,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -162,7 +162,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 1,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -183,7 +183,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -235,7 +235,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -268,7 +268,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -292,7 +292,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->twice()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn($fightData);
         $this->monsterFightService
@@ -300,7 +300,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->times(48)
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true, false, true)
             ->andReturn($fightData);
         $this->characterRewardService
@@ -342,7 +342,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 50,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -356,7 +356,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 50,
                     'current_amount' => 25,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -386,7 +386,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->times(100)
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn($fightData);
 
         $result = $this->handler
@@ -399,7 +399,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -443,7 +443,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->once()
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn($fightData);
         $this->battleEventHandler
             ->shouldNotReceive('processMonsterDeath');
@@ -462,7 +462,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -489,7 +489,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->once()
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn([
                 'health' => [
                     'current_character_health' => 10,
@@ -537,7 +537,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -572,7 +572,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->times(100)
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn($fightData);
 
         $result = $this->handler
@@ -585,7 +585,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -619,7 +619,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->times(100)
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn($fightData);
 
         $result = $this->handler
@@ -632,7 +632,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -686,7 +686,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -708,7 +708,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -721,7 +721,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $trainingMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -745,7 +745,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -767,7 +767,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -780,7 +780,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $trainingMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -803,7 +803,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -830,7 +830,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -843,13 +843,13 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $trainingMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn($fightData);
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->times(100)
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn($fightData);
 
         $this->battleEventHandler
@@ -867,7 +867,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -890,7 +890,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $bountyMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -903,7 +903,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->once()
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $trainingMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true)
             ->andReturn([
                 'health' => [
@@ -916,7 +916,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
             ->times(24)
             ->with(Mockery::type(Character::class), [
                 'selected_monster_id' => $trainingMonster->id,
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ], true, false, true)
             ->andReturn([
                 'health' => [
@@ -971,7 +971,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -1013,7 +1013,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->monsterFightService
             ->shouldReceive('fightMonster')
             ->once()
-            ->with(Mockery::type(Character::class), AttackTypeValue::ATTACK, false, true)
+            ->with(Mockery::type(Character::class), AttackType::ATTACK->value, false, true)
             ->andReturn([
                 'health' => [
                     'current_character_health' => 10,
@@ -1059,7 +1059,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();
@@ -1099,7 +1099,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
                     'required_amount' => 1,
                     'current_amount' => 0,
                 ],
-                AttackTypeValue::ATTACK,
+                AttackType::ATTACK->value,
                 $this->fightLogger,
             )
             ->handle();

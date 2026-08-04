@@ -6,12 +6,14 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class Counter extends BattleBase
 {
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
     }
 
     public function setIsAttackerVoided(bool $voided)
@@ -79,10 +81,7 @@ class Counter extends BattleBase
     {
 
         if ($chance > 0.0) {
-            $roll = rand(1, 100);
-            $roll = $roll + $roll * $chance;
-
-            if ($roll > 75) {
+            if ($this->chanceCalculator->passesPercentage(100 - floor(75 / (1 + $chance)))) {
                 return true;
             }
         }

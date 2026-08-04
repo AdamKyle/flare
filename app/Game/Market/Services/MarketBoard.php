@@ -6,10 +6,10 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\MarketBoard as MarketBoardModel;
 use App\Flare\Models\MarketHistory;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Http\Request;
@@ -28,6 +28,8 @@ class MarketBoard
      */
     public function buyAndReplaceItem(Request $request, Character $character, MarketBoardModel $listing, int $price): void
     {
+        $this->equipItemService->validateReplacementEligibility($character, $listing->item, $request->position);
+
         $slot = $this->buyItem($character, $listing, $price, true);
 
         $request->merge([
@@ -82,8 +84,8 @@ class MarketBoard
 
         $newGold = $gold + $listingCharacter->gold;
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
+        if ($newGold > CurrencyLimit::MAX_GOLD) {
+            $newGold = CurrencyLimit::MAX_GOLD;
         }
 
         $listingCharacter->update([

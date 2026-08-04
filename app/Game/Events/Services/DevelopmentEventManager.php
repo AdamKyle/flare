@@ -9,7 +9,6 @@ use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Raids\Services\RaidMapConflictService;
 use App\Game\Raids\Values\RaidType;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
 
@@ -181,11 +180,30 @@ class DevelopmentEventManager
             ];
         }
 
+        $this->guardAgainstDuplicateRequestEntries($resolved);
         $this->guardAgainstDuplicateActiveNonRaidTypes($resolved);
         $this->guardAgainstDuplicateActiveRaids($resolved);
         $this->guardAgainstRequestedMapConflicts($resolved);
 
         return $resolved;
+    }
+
+    private function guardAgainstDuplicateRequestEntries(array $resolved): void
+    {
+        $labels = array_column($resolved, 'label');
+
+        if (count($labels) !== count(array_unique($labels))) {
+            throw new RuntimeException('The same event cannot be requested more than once.');
+        }
+
+        $raidIds = array_values(array_filter(array_map(
+            fn (array $entry) => $entry['raid']?->id,
+            $resolved,
+        )));
+
+        if (count($raidIds) !== count(array_unique($raidIds))) {
+            throw new RuntimeException('The same raid cannot be requested more than once.');
+        }
     }
 
     private function guardAgainstDuplicateActiveNonRaidTypes(array $resolved): void
@@ -274,8 +292,8 @@ class DevelopmentEventManager
     /**
      * Re-validates everything under the manager lock, cancels every
      * confirmed-and-still-conflicting schedule, then creates and dispatches
-     * the requested schedules. Creation happens in a single transaction;
-     * dispatch happens only after that transaction commits. If creation or
+     * the requested schedules. Dispatch happens only after each schedule's
+     * durable state is written. If creation or
      * dispatch fails, any schedules newly created by this call are removed
      * and the failure is rethrown. Cancelled conflicting schedules are not
      * reconstructed; teardown is not transactionally reversible.
@@ -296,6 +314,7 @@ class DevelopmentEventManager
             $reloadedRequest = $this->reloadResolvedRequest($resolvedRequest);
             $confirmedScheduleIds = $this->confirmedConflictScheduleIds($confirmedConflicts);
 
+            $this->guardAgainstDuplicateRequestEntries($reloadedRequest);
             $this->guardAgainstDuplicateActiveNonRaidTypes($reloadedRequest);
             $this->guardAgainstDuplicateActiveRaids($reloadedRequest);
             $this->guardAgainstRequestedMapConflicts($reloadedRequest);
@@ -329,41 +348,37 @@ class DevelopmentEventManager
             $createdScheduleIds = [];
 
             try {
-                $created = DB::transaction(function () use ($reloadedRequest, $startDate, $endDate, $existingSeasonalParentId, &$createdScheduleIds) {
-                    $schedules = [];
+                $created = [];
 
-                    foreach ($reloadedRequest as $entry) {
-                        $parent = ScheduledEvent::create([
-                            'event_type' => $entry['event_type'],
-                            'raid_id' => $entry['label'] === self::INDEPENDENT_RAID ? $entry['raid']->id : null,
-                            'parent_scheduled_event_id' => $existingSeasonalParentId,
+                foreach ($reloadedRequest as $entry) {
+                    $parent = ScheduledEvent::create([
+                        'event_type' => $entry['event_type'],
+                        'raid_id' => $entry['label'] === self::INDEPENDENT_RAID ? $entry['raid']->id : null,
+                        'parent_scheduled_event_id' => $existingSeasonalParentId,
+                        'start_date' => $startDate,
+                        'end_date' => $endDate,
+                        'description' => $this->descriptionFor($entry),
+                        'status' => ScheduledEventStatus::SCHEDULED,
+                    ]);
+
+                    $createdScheduleIds[] = $parent->id;
+                    $created[] = $parent;
+
+                    if (in_array($entry['label'], [self::WINTER_EVENT, self::DELUSIONAL_EVENT], true)) {
+                        $child = ScheduledEvent::create([
+                            'event_type' => EventType::RAID_EVENT,
+                            'raid_id' => $entry['raid']->id,
+                            'parent_scheduled_event_id' => $parent->id,
                             'start_date' => $startDate,
                             'end_date' => $endDate,
-                            'description' => $this->descriptionFor($entry),
+                            'description' => $entry['raid']->scheduled_event_description ?? $entry['raid']->name,
                             'status' => ScheduledEventStatus::SCHEDULED,
                         ]);
 
-                        $createdScheduleIds[] = $parent->id;
-                        $schedules[] = $parent;
-
-                        if (in_array($entry['label'], [self::WINTER_EVENT, self::DELUSIONAL_EVENT], true)) {
-                            $child = ScheduledEvent::create([
-                                'event_type' => EventType::RAID_EVENT,
-                                'raid_id' => $entry['raid']->id,
-                                'parent_scheduled_event_id' => $parent->id,
-                                'start_date' => $startDate,
-                                'end_date' => $endDate,
-                                'description' => $entry['raid']->scheduled_event_description ?? $entry['raid']->name,
-                                'status' => ScheduledEventStatus::SCHEDULED,
-                            ]);
-
-                            $createdScheduleIds[] = $child->id;
-                            $schedules[] = $child;
-                        }
+                        $createdScheduleIds[] = $child->id;
+                        $created[] = $child;
                     }
-
-                    return $schedules;
-                });
+                }
 
                 foreach ($created as $schedule) {
                     if (is_null($schedule->parent_scheduled_event_id) || $schedule->parent_scheduled_event_id === $existingSeasonalParentId) {

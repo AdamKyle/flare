@@ -4,8 +4,6 @@ namespace App\Game\BatchCrafting\Services;
 
 use App\Admin\Events\BatchCraftingMonitoringUpdated;
 use App\Admin\Services\MonitoredBugReportService;
-use App\Flare\Items\Values\ArmourType;
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
@@ -16,10 +14,8 @@ use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\SetSlot;
 use App\Flare\Models\Skill;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\UsableItemTransformer;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\BatchCrafting\Events\BatchCraftingStatusUpdated;
 use App\Game\BatchCrafting\Jobs\BatchCraftingJob;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
@@ -27,17 +23,21 @@ use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Events\ServerMessageEvent;
-use App\Game\NpcActions\WorkBench\Services\HolyItemService;
+use App\Game\Npcs\Actions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Values\SkillTypeValue;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -129,7 +129,7 @@ class BatchCraftingService
             ]);
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::FACTION_LOYALTY)->where('completed_at', '>', now())->exists()) {
+        if ($character->currentAutomations()->where('type', AutomationType::FACTION_LOYALTY->value)->where('completed_at', '>', now())->exists()) {
             throw ValidationException::withMessages([
                 'batch_crafting' => 'Batch crafting cannot start while faction loyalty automation is running.',
             ]);

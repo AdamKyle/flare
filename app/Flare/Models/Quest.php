@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\FeatureTypes;
+use App\Game\Core\Values\FeatureType;
 use App\Game\Events\Values\EventType;
 use Database\Factories\QuestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -222,10 +222,10 @@ class Quest extends Model
         return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
-    public function unlocksFeature(): ?FeatureTypes
+    public function unlocksFeature(): ?FeatureType
     {
         if (! is_null($this->unlocks_feature)) {
-            return new FeatureTypes($this->unlocks_feature);
+            return FeatureType::from($this->unlocks_feature);
         }
 
         return null;

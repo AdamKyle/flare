@@ -4,13 +4,13 @@ namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as GameEvent;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Services\WinterEventEnderService;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,7 +59,7 @@ class WinterEventEnderServiceTest extends TestCase
 
     public function test_end_returns_early_when_ice_map_missing(): void
     {
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $this->instance(
             KingdomEventService::class,
@@ -92,7 +92,7 @@ class WinterEventEnderServiceTest extends TestCase
 
     public function test_end_returns_early_when_surface_map_missing(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
 
         $this->instance(
             KingdomEventService::class,
@@ -125,8 +125,8 @@ class WinterEventEnderServiceTest extends TestCase
 
     public function test_end_moves_characters_resets_progress_unpledges_and_cleans_up(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE]);
-        $iceMap = $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value]);
+        $iceMap = $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
 
         $this->instance(
             MapTileValue::class,
@@ -146,8 +146,8 @@ class WinterEventEnderServiceTest extends TestCase
         $this->service = app()->make(WinterEventEnderService::class);
 
         Cache::put('monsters', [
-            MapNameValue::SURFACE => [],
-            MapNameValue::ICE_PLANE => [],
+            MapName::SURFACE->value => [],
+            MapName::ICE_PLANE->value => [],
         ]);
 
         $character = (new CharacterFactory)
@@ -160,7 +160,7 @@ class WinterEventEnderServiceTest extends TestCase
             ->assignUnits()
             ->getCharacter();
 
-        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE, 'type' => WeaponTypes::HAMMER]);
+        $this->createItem(['specialty_type' => ItemSpecialtyType::CORRUPTED_ICE->value, 'type' => ItemType::HAMMER->value]);
 
         $scheduled = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,

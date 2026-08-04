@@ -10,7 +10,7 @@ use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Messages\Types\KingdomMessageTypes;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -85,7 +85,7 @@ class RebuildBuilding implements ShouldQueue
 
         $updateKingdom->updateKingdom($kingdom);
 
-        if (UserOnlineValue::isOnline($this->user)) {
+        if (UserOnlineService::isOnline($this->user)) {
             $x = $kingdom->x_position;
             $y = $kingdom->y_position;
             $plane = $kingdom->gameMap->name;

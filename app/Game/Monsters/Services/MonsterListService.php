@@ -4,7 +4,7 @@ namespace App\Game\Monsters\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -227,6 +227,6 @@ class MonsterListService
     {
         $slots = optional($character->inventory)->slots;
 
-        return $slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        return $slots->where('item.effect', ItemEffectType::PURGATORY->value)->count() > 0;
     }
 }

@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\KingdomCache;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
@@ -50,7 +50,7 @@ class KingdomSettleService
 
         if ($character->map->gameMap->mapType()->isTheIcePlane()) {
 
-            $hasQuestItem = $character->inventory->slots->where('item.type', 'quest')->where('item.effect', ItemEffectsValue::SETTLE_IN_ICE_PLANE)->isNotEmpty();
+            $hasQuestItem = $character->inventory->slots->where('item.type', 'quest')->where('item.effect', ItemEffectType::SETTLE_IN_ICE_PLANE->value)->isNotEmpty();
 
             if (! $hasQuestItem) {
                 return $this->errorResult('The Queen of Ice will not allow you to settle here child.');

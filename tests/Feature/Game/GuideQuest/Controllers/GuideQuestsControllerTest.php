@@ -2,8 +2,9 @@
 
 namespace Tests\Feature\Game\GuideQuest\Controllers;
 
-use App\Flare\Items\Values\AlchemyItemType;
+use App\Flare\Models\CharacterBattleRewardRequest;
 use App\Flare\Models\QuestsCompleted;
+use App\Game\Core\Items\Values\AlchemyItemType;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -34,6 +35,20 @@ class GuideQuestsControllerTest extends TestCase
 
         $this->character = null;
         $this->guideQuestService = null;
+    }
+
+    public function test_repeated_guide_quest_hand_in_creates_one_completion_and_one_reward_request(): void
+    {
+        $quest = $this->createGuideQuest(['required_level' => 1]);
+        $character = $this->character->updateUser(['guide_enabled' => true])->getCharacter();
+
+        $firstResult = $this->guideQuestService->handInQuest($character, $quest);
+        $secondResult = $this->guideQuestService->handInQuest($character->refresh(), $quest->refresh());
+
+        $this->assertTrue($firstResult);
+        $this->assertFalse($secondResult);
+        $this->assertSame(1, QuestsCompleted::where('character_id', $character->id)->where('guide_quest_id', $quest->id)->count());
+        $this->assertSame(1, CharacterBattleRewardRequest::where('character_id', $character->id)->count());
     }
 
     public function test_should_see_completed_guide_quest()

@@ -14,7 +14,7 @@ class DoubleHeal extends BattleBase
         if ($extraActionData['has_item']) {
 
             if (! ($extraActionData['chance'] >= 1)) {
-                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                     return 0;
                 }
             }
@@ -24,7 +24,7 @@ class DoubleHeal extends BattleBase
 
             $this->addMessage('Your prayers were heard by The Creator and he grants you extra life!', 'regular');
 
-            if (rand(1, 100) > (100 - 100 * $criticality)) {
+            if ($this->chanceCalculator->passesPercentage($criticality * 100)) {
                 $this->addMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'regular');
 
                 return $healFor *= 2;

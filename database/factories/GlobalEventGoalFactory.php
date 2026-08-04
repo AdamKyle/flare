@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

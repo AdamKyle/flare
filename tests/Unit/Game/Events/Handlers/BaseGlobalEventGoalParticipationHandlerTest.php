@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Game\Events\Handlers;
 
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -47,9 +47,9 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
             'reward_every' => 10,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -73,7 +73,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
         Event::fake();
 
         $item = $this->createItem([
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -89,9 +89,9 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
             'reward_every' => 10,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -112,7 +112,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
     public function test_player_is_rewarded_with_unique_item()
     {
         $this->createItem([
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $character = $this->character->getCharacter();
@@ -122,9 +122,9 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
             'reward_every' => 10,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -151,7 +151,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
     public function test_player_is_rewarded_with_mythic_item()
     {
         $this->createItem([
-            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'specialty_type' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $character = $this->character->getCharacter();
@@ -161,7 +161,7 @@ class BaseGlobalEventGoalParticipationHandlerTest extends TestCase
             'reward_every' => 10,
             'next_reward_at' => 10,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => false,
             'should_be_mythic' => true,
         ]);

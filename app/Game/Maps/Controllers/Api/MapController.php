@@ -4,7 +4,7 @@ namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Quest;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Requests\MoveRequest;
 use App\Game\Maps\Requests\QuestDataRequest;
@@ -72,7 +72,7 @@ class MapController extends Controller
             ->where('character_id', $character->id)
             ->where('completed_at', '>', now())
             ->where(function ($query) {
-                $query->where('type', AutomationType::DELVE);
+                $query->where('type', AutomationType::DELVE->value);
             })
             ->exists()
         ) {

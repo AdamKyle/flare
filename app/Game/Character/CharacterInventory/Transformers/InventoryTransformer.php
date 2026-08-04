@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Game\Character\CharacterInventory\Transformers;
+
+use App\Flare\Models\InventorySlot;
+use App\Flare\Models\SetSlot;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use League\Fractal\TransformerAbstract;
+
+class InventoryTransformer extends TransformerAbstract
+{
+    public function __construct(private readonly ItemEnricherFactory $itemEnricherFactory) {}
+
+    /**
+     * Gets the response data for the inventory sheet
+     */
+    public function transform(InventorySlot|SetSlot $slot): array
+    {
+        $slot->setRelation('item', $this->itemEnricherFactory->buildItem(clone $slot->item));
+
+        return [
+            'item_id' => $slot->item->id,
+            'slot_id' => $slot->id,
+            'name' => $slot->item->affix_name,
+            'description' => $slot->item->description,
+            'type' => $slot->item->type,
+            'affix_count' => $slot->item->affix_count,
+            'is_unique' => $slot->item->is_unique,
+            'is_mythic' => $slot->item->is_mythic,
+            'is_cosmic' => $slot->item->is_cosmic,
+            'holy_stacks_applied' => $slot->item->holy_stacks_applied,
+            'max_holy_stacks' => $slot->item->holy_stacks,
+            'ac' => $slot->item->total_defence,
+            'attack' => $slot->item->total_damage,
+            'healing' => $slot->item->total_healing,
+            'usable' => $slot->item->usable,
+            'damages_kingdoms' => $slot->item->damages_kingdoms,
+            'kingdom_damage' => $slot->item->kingdom_damage,
+            'lasts_for' => $slot->item->lasts_for,
+            'can_stack' => $slot->item->can_stack,
+            'effect' => $slot->item->effect,
+            'position' => $slot->position,
+            'increase_skill_bonus_by' => $slot->item->increase_skill_bonus_by,
+            'increase_skill_training_bonus_by' => $slot->item->increase_skill_training_bonus_by,
+            'base_healing_mod' => $slot->item->base_healing_mod,
+            'base_ac_mod' => $slot->item->base_ac_mod,
+            'base_damage_mod' => $slot->item->base_damage_mod,
+            'stat_increase' => $slot->item->stat_increase,
+            'holy_level' => $slot->item->holy_level,
+        ];
+    }
+}

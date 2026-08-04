@@ -5,8 +5,8 @@ namespace App\Game\Core\Values;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Concerns\Boons;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
 class LevelUpValue
@@ -117,7 +117,7 @@ class LevelUpValue
         $inventory = Inventory::where('character_id', $character->id)->first();
 
         return $inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::CONTINUE_LEVELING;
+            return $slot->item->effect === ItemEffectType::CONTINUE_LEVELING->value;
         })->isNotEmpty();
     }
 }

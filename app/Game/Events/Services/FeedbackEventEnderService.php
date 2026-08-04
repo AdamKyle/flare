@@ -4,7 +4,6 @@ namespace App\Game\Events\Services;
 
 use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\CreateSurveySnapshot;
 use App\Game\Events\Services\Concerns\EventEnder;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;

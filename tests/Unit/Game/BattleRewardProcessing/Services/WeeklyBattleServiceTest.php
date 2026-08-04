@@ -3,9 +3,9 @@
 namespace Tests\Unit\Game\BattleRewardProcessing\Services;
 
 use App\Flare\Models\WeeklyMonsterFight;
-use App\Flare\Values\LocationType;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;

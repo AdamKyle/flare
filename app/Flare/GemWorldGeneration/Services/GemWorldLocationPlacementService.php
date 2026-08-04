@@ -7,7 +7,7 @@ use App\Flare\GemWorldGeneration\Exceptions\CouldNotPlaceGeneratedGemWorldLocati
 use App\Flare\GemWorldGeneration\Values\GemWorldLocationPlacement;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationTemplateType;
+use App\Game\Maps\Values\LocationTemplateType;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 

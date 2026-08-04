@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\Quests\Handlers;
 
-use App\Flare\Values\FeatureTypes;
+use App\Game\Core\Values\FeatureType;
 use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -30,7 +30,7 @@ class NpcQuestRewardHandlerTest extends TestCase
 
         $quest = $this->createQuest([
             'npc_id' => $npc->id,
-            'unlocks_feature' => FeatureTypes::EXTEND_SETS,
+            'unlocks_feature' => FeatureType::EXTEND_SETS->value,
             'unlocks_skill' => false,
             'reward_gold' => null,
             'reward_gold_dust' => null,
@@ -59,7 +59,7 @@ class NpcQuestRewardHandlerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createQuest([
             'npc_id' => $npc->id,
-            'unlocks_feature' => FeatureTypes::CAPITAL_CITIES,
+            'unlocks_feature' => FeatureType::CAPITAL_CITIES->value,
             'unlocks_skill' => false,
             'reward_gold' => null,
             'reward_gold_dust' => null,
@@ -87,7 +87,7 @@ class NpcQuestRewardHandlerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createQuest([
             'npc_id' => $npc->id,
-            'unlocks_feature' => FeatureTypes::CAPITAL_CITY_GOLD_BARS,
+            'unlocks_feature' => FeatureType::CAPITAL_CITY_GOLD_BARS->value,
             'unlocks_skill' => false,
             'reward_gold' => null,
             'reward_gold_dust' => null,

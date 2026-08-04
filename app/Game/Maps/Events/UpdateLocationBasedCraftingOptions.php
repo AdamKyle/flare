@@ -2,10 +2,9 @@
 
 namespace App\Game\Maps\Events;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\User;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Maps\Values\LocationBasedCraftingOptions;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -25,6 +24,8 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
 
     public bool $canAccessLabyrinthOracle = false;
 
+    public bool $canAccessSeerCamp = false;
+
     /**
      * Create a new event instance.
      */
@@ -32,26 +33,12 @@ class UpdateLocationBasedCraftingOptions implements ShouldBroadcastNow
     {
         $this->user = $user->refresh();
 
-        $this->canUseWorkBench = $this->canUseWorkBench($user->character);
-        $this->canUseQueenOfHearts = $this->canUseQueenOfHearts($user->character);
-        $this->canAccessLabyrinthOracle = $this->canUseLabyrinthOracle($user->character);
-    }
+        $locationBasedCraftingOptions = LocationBasedCraftingOptions::fromCharacter($user->character);
 
-    protected function canUseWorkBench(Character $character): bool
-    {
-        return $character->map->gameMap->mapType()->isPurgatory();
-    }
-
-    protected function canUseQueenOfHearts(Character $character): bool
-    {
-        return $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::QUEEN_OF_HEARTS;
-        })->isNotEmpty() && $character->map->gameMap->mapType()->isHell();
-    }
-
-    protected function canUseLabyrinthOracle(Character $character): bool
-    {
-        return $character->map->gameMap->mapType()->isLabyrinth();
+        $this->canUseWorkBench = $locationBasedCraftingOptions->canUseWorkBench;
+        $this->canUseQueenOfHearts = $locationBasedCraftingOptions->canUseQueenOfHearts;
+        $this->canAccessLabyrinthOracle = $locationBasedCraftingOptions->canAccessLabyrinthOracle;
+        $this->canAccessSeerCamp = $locationBasedCraftingOptions->canAccessSeerCamp;
     }
 
     /**

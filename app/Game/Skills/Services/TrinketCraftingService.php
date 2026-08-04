@@ -12,7 +12,6 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Support\Facades\DB;
 
 class TrinketCraftingService
 {
@@ -128,65 +127,65 @@ class TrinketCraftingService
         bool $suppressSuccessServerMessage = false,
         ?callable $destinationCreator = null,
     ): array {
-        return DB::transaction(function () use ($character, $item, $suppressSuccessServerMessage, $destinationCreator): array {
-            $trinkentrySkill = $this->fetchCharacterSkill($character);
+        $trinkentrySkill = $this->fetchCharacterSkill($character);
 
-            if (! $this->canAfford($character, $item)) {
-                return [
-                    'success' => false,
-                    'item' => null,
-                    'reason' => 'not_enough_currency',
-                    'destination' => null,
-                    'cost' => $this->craftingCost($character->refresh(), $item),
-                ];
-            }
+        if (! $this->canAfford($character, $item)) {
+            return [
+                'success' => false,
+                'item' => null,
+                'reason' => 'not_enough_currency',
+                'destination' => null,
+                'cost' => $this->craftingCost($character->refresh(), $item),
+            ];
+        }
 
-            if ($trinkentrySkill->level < $item->skill_level_required) {
-                ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
+        if ($trinkentrySkill->level < $item->skill_level_required) {
+            ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
-                return ['success' => false, 'item' => null, 'reason' => 'skill_too_low', 'destination' => null];
-            }
+            return ['success' => false, 'item' => null, 'reason' => 'skill_too_low', 'destination' => null];
+        }
 
-            if ($trinkentrySkill->level > $item->skill_level_trivial) {
-                ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
-
-                $this->deductCraftingCost($character, $item);
-
-                if (! $suppressSuccessServerMessage) {
-                    ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
-                }
-
-                $destination = is_null($destinationCreator) ? null : $destinationCreator($item);
-
-                if (! is_null($destinationCreator) && ! is_array($destination)) {
-                    throw new BatchCraftingDestinationFullException('The retained Batch Crafting destination could not accept the crafted trinket.');
-                }
-
-                return ['success' => true, 'item' => $item, 'reason' => null, 'destination' => $destination];
-            }
-
-            $this->deductCraftingCost($character, $item);
-
-            if (! $this->canCraft($trinkentrySkill)) {
-                event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
-
-                return ['success' => false, 'item' => null, 'reason' => 'failed_roll', 'destination' => null];
-            }
-
-            if (! $suppressSuccessServerMessage) {
-                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
-            }
-
+        if ($trinkentrySkill->level > $item->skill_level_trivial) {
             $destination = is_null($destinationCreator) ? null : $destinationCreator($item);
 
             if (! is_null($destinationCreator) && ! is_array($destination)) {
                 throw new BatchCraftingDestinationFullException('The retained Batch Crafting destination could not accept the crafted trinket.');
             }
 
-            $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $trinkentrySkill);
+            ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
+
+            $this->deductCraftingCost($character, $item);
+
+            if (! $suppressSuccessServerMessage) {
+                ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+            }
 
             return ['success' => true, 'item' => $item, 'reason' => null, 'destination' => $destination];
-        });
+        }
+
+        if (! $this->canCraft($trinkentrySkill)) {
+            $this->deductCraftingCost($character, $item);
+
+            event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
+
+            return ['success' => false, 'item' => null, 'reason' => 'failed_roll', 'destination' => null];
+        }
+
+        $destination = is_null($destinationCreator) ? null : $destinationCreator($item);
+
+        if (! is_null($destinationCreator) && ! is_array($destination)) {
+            throw new BatchCraftingDestinationFullException('The retained Batch Crafting destination could not accept the crafted trinket.');
+        }
+
+        $this->deductCraftingCost($character, $item);
+
+        if (! $suppressSuccessServerMessage) {
+            ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED, $item->name);
+        }
+
+        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $trinkentrySkill);
+
+        return ['success' => true, 'item' => $item, 'reason' => null, 'destination' => $destination];
     }
 
     /**

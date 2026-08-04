@@ -5,9 +5,9 @@ namespace App\Game\SpecialtyShops\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Values\ItemSpecialtyType;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -39,10 +39,10 @@ class SpecialtyShop
         }
 
         if (! $this->hasTypeOfItemToTrade($character, $type, $item->type)) {
-            $specialtyType = new ItemSpecialtyType($type);
+            $specialtyType = ItemSpecialtyType::from($type);
 
             if ($specialtyType->isPurgatoryChains()) {
-                return $this->errorResult('You are missing an item of type: '.$item->type.' which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED.'. Item must be in your inventory.');
+                return $this->errorResult('You are missing an item of type: '.$item->type.' which must be of specialty type: '.ItemSpecialtyType::HELL_FORGED->value.'. Item must be in your inventory.');
             }
 
             return $this->errorResult('You are missing an item of type: '.$item->type.' with a crafting level of 400. Item must be in your inventory.');
@@ -219,11 +219,11 @@ class SpecialtyShop
      */
     protected function getItemToTrade(Character $character, string $specialtyType, string $itemType): ?InventorySlot
     {
-        $specialtyType = new ItemSpecialtyType($specialtyType);
+        $specialtyType = ItemSpecialtyType::from($specialtyType);
 
         if ($specialtyType->isPurgatoryChains()) {
             return $character->inventory->slots->filter(function ($slot) use ($itemType) {
-                if ($slot->item->type === $itemType && $slot->item->specialty_type === ItemSpecialtyType::HELL_FORGED) {
+                if ($slot->item->type === $itemType && $slot->item->specialty_type === ItemSpecialtyType::HELL_FORGED->value) {
                     return $slot;
                 }
             })->first();
@@ -231,7 +231,7 @@ class SpecialtyShop
 
         if ($specialtyType->isTwistedEarth()) {
             return $character->inventory->slots->filter(function ($slot) use ($itemType) {
-                if ($slot->item->type === $itemType && $slot->item->specialty_type === ItemSpecialtyType::PURGATORY_CHAINS) {
+                if ($slot->item->type === $itemType && $slot->item->specialty_type === ItemSpecialtyType::PURGATORY_CHAINS->value) {
                     return $slot;
                 }
             })->first();

@@ -10,10 +10,10 @@ use App\Flare\ServerFight\Fight\Attack;
 use App\Flare\ServerFight\Fight\Voidance;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Services\DelveMonsterService;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Exploration\Services\DelveMonsterService;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Support\Facades\Cache;
 
@@ -381,7 +381,7 @@ class MonsterPlayerFight
         }
 
         if ($gameMap->mapType()->isTheIcePlane() || $gameMap->mapType()->isDelusionalMemories()) {
-            $canAccessPurgatory = $this->character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+            $canAccessPurgatory = $this->character->inventory->slots->where('item.effect', ItemEffectType::PURGATORY->value)->count() > 0;
 
             if ($canAccessPurgatory) {
                 $monsters = $monsters['regular'];

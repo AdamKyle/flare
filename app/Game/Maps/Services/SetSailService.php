@@ -8,6 +8,7 @@ use App\Flare\Models\Location;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
@@ -25,6 +26,7 @@ class SetSailService extends BaseMovementService
         MovementService $movementService,
         PortService $portService,
         TraverseService $traverseService,
+        ChanceCalculator $chanceCalculator,
     ) {
         parent::__construct(
             $mapTileValue,
@@ -32,6 +34,7 @@ class SetSailService extends BaseMovementService
             $conjureService,
             $movementService,
             $traverseService,
+            $chanceCalculator,
         );
 
         $this->portService = $portService;

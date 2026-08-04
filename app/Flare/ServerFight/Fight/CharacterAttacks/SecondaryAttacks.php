@@ -7,8 +7,10 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\Traits\ElementAttackData;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\AttackType;
 
 class SecondaryAttacks extends BattleBase
 {
@@ -16,9 +18,9 @@ class SecondaryAttacks extends BattleBase
 
     private Affixes $affixes;
 
-    public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator, Affixes $affixes)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->affixes = $affixes;
     }
@@ -167,13 +169,13 @@ class SecondaryAttacks extends BattleBase
             return;
         }
 
-        if ($this->attackData['attack_type'] === AttackTypeValue::DEFEND) {
+        if ($this->attackData['attack_type'] === AttackType::DEFEND->value) {
             return;
         }
 
         $damageType = match ($this->attackData['attack_type']) {
-            AttackTypeValue::ATTACK, AttackTypeValue::ATTACK_AND_CAST => 'weapon_attack',
-            AttackTypeValue::CAST, AttackTypeValue::CAST_AND_ATTACK => 'spell_attack',
+            AttackType::ATTACK->value, AttackType::ATTACK_AND_CAST->value => 'weapon_attack',
+            AttackType::CAST->value, AttackType::CAST_AND_ATTACK->value => 'spell_attack',
         };
 
         $this->elementalAttack($character, $monster, $damageType);

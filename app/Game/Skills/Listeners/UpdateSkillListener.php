@@ -2,18 +2,19 @@
 
 namespace App\Game\Skills\Listeners;
 
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Skill;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
-use Facades\App\Flare\Calculators\SkillXPCalculator;
+use Facades\App\Game\Skills\Calculators\SkillXPCalculator;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 
@@ -21,8 +22,10 @@ class UpdateSkillListener
 {
     private SkillService $skillService;
 
-    public function __construct(SkillService $skillService)
-    {
+    public function __construct(
+        SkillService $skillService,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {
         $this->skillService = $skillService;
     }
 
@@ -88,7 +91,7 @@ class UpdateSkillListener
 
             $skill->update([
                 'level' => $level,
-                'xp_max' => $skill->can_train ? $level * 10 : rand(100, 350),
+                'xp_max' => $skill->can_train ? $level * 10 : $this->randomNumberGenerator->numberBetween(100, 350),
                 'base_damage_mod' => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
                 'base_healing_mod' => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
                 'base_ac_mod' => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,

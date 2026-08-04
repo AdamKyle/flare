@@ -369,7 +369,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\NpcActions\SeerActions\Controllers')
+            ->namespace('App\Game\Npcs\Actions\Seer\Controllers')
             ->group(base_path('routes/game/npc-actions/seer-actions/api.php'));
     }
 
@@ -377,7 +377,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\NpcActions\QueenOfHeartsActions\Controllers')
+            ->namespace('App\Game\Npcs\Actions\QueenOfHearts\Controllers')
             ->group(base_path('routes/game/npc-actions/queen-of-hearts/api.php'));
     }
 
@@ -385,7 +385,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\NpcActions\LabyrinthOracle\Controllers')
+            ->namespace('App\Game\Npcs\Actions\LabyrinthOracle\Controllers')
             ->group(base_path('routes/game/npc-actions/labyrinth-oracle/api.php'));
     }
 
@@ -393,7 +393,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\NpcActions\WorkBench\Controllers')
+            ->namespace('App\Game\Npcs\Actions\WorkBench\Controllers')
             ->group(base_path('routes/game/npc-actions/work-bench/api.php'));
     }
 

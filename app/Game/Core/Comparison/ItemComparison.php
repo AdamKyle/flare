@@ -2,11 +2,11 @@
 
 namespace App\Game\Core\Comparison;
 
-use App\Flare\Items\Values\ArmourType;
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Traits\IsItemUnique;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison

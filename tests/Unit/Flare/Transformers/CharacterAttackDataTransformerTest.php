@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Flare\Transformers;
 
-use App\Flare\Transformers\CharacterAttackDataTransformer;
-use App\Flare\Transformers\DataSets\CharacterAttackData;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Character\CharacterAttack\DataSets\CharacterAttackData;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -24,7 +24,7 @@ class CharacterAttackDataTransformerTest extends TestCase
     public function test_character_attack_data_transformer_produces_attack_array(): void
     {
         $item = $this->createItem([
-            'type' => WeaponTypes::WEAPON,
+            'type' => ItemType::WEAPON->value,
             'base_damage' => 10,
         ]);
 

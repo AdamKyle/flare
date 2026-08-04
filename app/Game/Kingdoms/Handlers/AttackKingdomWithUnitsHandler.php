@@ -8,7 +8,7 @@ use App\Flare\Models\KingdomUnit;
 use App\Game\Kingdoms\Traits\CalculateMorale;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 
 class AttackKingdomWithUnitsHandler
 {
@@ -101,7 +101,7 @@ class AttackKingdomWithUnitsHandler
             ' on the plane: '.$mapName.' at (X/Y): '.$x.'/'.$y.' and is now the rightful ruler!'));
 
             if (! is_null($originalOwner)) {
-                if (UserOnlineValue::isOnline($originalOwner->user)) {
+                if (UserOnlineService::isOnline($originalOwner->user)) {
                     event(new ServerMessageEvent($originalOwner->user, 'You lost your kingdom: '.$kingdomName.
                         ' on plane: '.$mapName.' at (X/Y): '.$x.'/'.$y.' to: '.$characterName.' who now the rightful owner'));
                 }

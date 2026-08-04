@@ -4,8 +4,8 @@ namespace App\Game\Core\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
+use App\Game\Core\Items\Values\ItemEffectType;
 
 trait CharacterMaxLevel
 {
@@ -16,7 +16,7 @@ trait CharacterMaxLevel
     {
 
         $hasQuestItem = $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::CONTINUE_LEVELING;
+            return $slot->item->effect === ItemEffectType::CONTINUE_LEVELING->value;
         })->isNotEmpty();
 
         if ($hasQuestItem) {

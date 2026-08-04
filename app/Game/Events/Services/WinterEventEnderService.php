@@ -7,10 +7,10 @@ use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Services\Concerns\EventEnder;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
 
@@ -31,9 +31,9 @@ class WinterEventEnderService implements EventEnder
 
     public function end(EventType $type, ScheduledEvent $scheduled, ActiveEvent $current): void
     {
-        $this->kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
+        $this->kingdomEventService->handleKingdomRewardsForEvent(MapName::ICE_PLANE->value);
 
-        $iceMap = GameMap::query()->where('name', MapNameValue::ICE_PLANE)->first();
+        $iceMap = GameMap::query()->where('name', MapName::ICE_PLANE->value)->first();
 
         if (is_null($iceMap)) {
             $this->announcementCleanup->deleteByEventId($current->id);
@@ -42,7 +42,7 @@ class WinterEventEnderService implements EventEnder
             return;
         }
 
-        $surfaceMap = GameMap::query()->where('name', MapNameValue::SURFACE)->first();
+        $surfaceMap = GameMap::query()->where('name', MapName::SURFACE->value)->first();
 
         if (is_null($surfaceMap)) {
             $this->announcementCleanup->deleteByEventId($current->id);

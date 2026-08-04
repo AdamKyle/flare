@@ -6,8 +6,10 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\AttackType;
 
 class AttackAndCast extends BattleBase
 {
@@ -15,11 +17,13 @@ class AttackAndCast extends BattleBase
 
     public function __construct(
         CharacterCacheData $characterCacheData,
+        ChanceCalculator $chanceCalculator,
+        RandomNumberGenerator $randomNumberGenerator,
         private Entrance $entrance,
         private WeaponType $weaponType,
         private CastType $castType
     ) {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
     }
 
     public function setWhichCastType(string $type = 'attack_and_cast')
@@ -68,7 +72,7 @@ class AttackAndCast extends BattleBase
 
         $this->weaponType->setMonsterHealth($this->monsterHealth);
         $this->weaponType->setCharacterHealth($this->characterHealth);
-        $this->weaponType->setCharacterAttackData($character, $this->isVoided, AttackTypeValue::ATTACK_AND_CAST);
+        $this->weaponType->setCharacterAttackData($character, $this->isVoided, AttackType::ATTACK_AND_CAST->value);
 
         if ($disableSecondaryAttacks) {
             $this->weaponType->doNotAllowSecondaryAttacks();

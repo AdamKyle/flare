@@ -5,20 +5,20 @@ namespace App\Game\Market\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Traits\IsItemUnique;
-use App\Flare\Transformers\MarketItemsTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder;
 use App\Game\Market\Enums\MarketHistorySecondaryFilter;
 use App\Game\Market\Requests\ChangeItemTypeRequest;
 use App\Game\Market\Requests\HistoryRequest;
 use App\Game\Market\Requests\ListPriceRequest;
+use App\Game\Market\Transformers\MarketItemsTransformer;
 use App\Http\Controllers\Controller;
 use Carbon\CarbonImmutable;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -76,8 +76,8 @@ class MarketController extends Controller
 
         $listPrice = $request->list_for;
 
-        if ($listPrice > MaxCurrenciesValue::MAX_GOLD) {
-            $listPrice = MaxCurrenciesValue::MAX_GOLD;
+        if ($listPrice > CurrencyLimit::MAX_GOLD) {
+            $listPrice = CurrencyLimit::MAX_GOLD;
         }
 
         MarketBoard::create([

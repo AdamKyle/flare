@@ -3,8 +3,8 @@
 namespace App\Game\Kingdoms\Service;
 
 use App\Flare\Models\Kingdom;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Kingdoms\Handlers\UpdateKingdomHandler;
 
 class KingdomService
@@ -32,8 +32,8 @@ class KingdomService
 
         $newGold = $character->gold + $amountToEmbezzle;
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
+        if ($newGold > CurrencyLimit::MAX_GOLD) {
+            $newGold = CurrencyLimit::MAX_GOLD;
         }
 
         $character->update([

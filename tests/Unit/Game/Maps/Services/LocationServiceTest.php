@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Game\Maps\Services;
 
-use App\Flare\Values\LocationType;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Maps\Services\LocationService;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;

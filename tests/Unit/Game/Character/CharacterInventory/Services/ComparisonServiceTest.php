@@ -2,10 +2,9 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Items\Values\ItemType;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\SpellTypes;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -183,11 +182,11 @@ class ComparisonServiceTest extends TestCase
 
     public function test_build_shop_data_for_armour_type()
     {
-        $item = $this->createItem(['type' => ArmourTypes::SHIELD]);
+        $item = $this->createItem(['type' => ArmourType::SHIELD->value]);
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type' => ArmourTypes::SHIELD,
+                'type' => ArmourType::SHIELD->value,
                 'base_ac' => 25,
                 'str_mod' => 0.10,
             ]),
@@ -195,7 +194,7 @@ class ComparisonServiceTest extends TestCase
             'left-hand'
         )->getCharacter();
 
-        $comparisonData = $this->comparisonService->buildShopData($character, $item, ArmourTypes::SHIELD);
+        $comparisonData = $this->comparisonService->buildShopData($character, $item, ArmourType::SHIELD->value);
 
         $this->assertArrayHasKey('details', $comparisonData);
         $this->assertIsArray($comparisonData['details']);
@@ -208,7 +207,7 @@ class ComparisonServiceTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem(
             $this->createItem([
-                'type' => SpellTypes::HEALING,
+                'type' => ItemType::SPELL_HEALING->value,
                 'base_healing' => 25,
                 'str_mod' => 0.10,
             ]),
@@ -230,7 +229,7 @@ class ComparisonServiceTest extends TestCase
         $manager = $this->character->inventorySetManagement()
             ->createInventorySets(10)
             ->putItemInSet($this->createItem([
-                'type' => SpellTypes::HEALING,
+                'type' => ItemType::SPELL_HEALING->value,
                 'base_healing' => 25,
                 'str_mod' => 0.10,
             ]), 0, 'spell-one', true);

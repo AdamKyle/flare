@@ -13,7 +13,6 @@ use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Raids\Jobs\InitiateRaid;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class ScheduledEventDispatchService
@@ -24,9 +23,8 @@ class ScheduledEventDispatchService
      *
      * Refuses schedules that are terminal, cancelling, queued, starting, or
      * running. Sets the schedule to queued immediately (so a fast queue's
-     * initiation job status guard can pass), then defers the actual job push
-     * until after any ambient transaction commits, so a worker can never
-     * observe uncommitted schedule ownership.
+     * initiation job status guard can pass), then pushes the job after the
+     * durable status update succeeds.
      *
      * @return array{dispatched: bool, skipped_reason: ?string, status: string}
      */
@@ -49,9 +47,7 @@ class ScheduledEventDispatchService
         try {
             $scheduledEvent->applyStatus(ScheduledEventStatus::QUEUED);
 
-            DB::afterCommit(function () use ($scheduledEvent, $availableAt) {
-                $this->dispatchJobForType($scheduledEvent->fresh(), $availableAt);
-            });
+            $this->dispatchJobForType($scheduledEvent->fresh(), $availableAt);
         } catch (Throwable $throwable) {
             Cache::forget($cacheKey);
 

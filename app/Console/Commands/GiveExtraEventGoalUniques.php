@@ -2,12 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Item;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use Illuminate\Console\Command;
 
 class GiveExtraEventGoalUniques extends Command
@@ -58,14 +58,14 @@ class GiveExtraEventGoalUniques extends Command
 
     protected function generateItem(Character $character, RandomAffixGenerator $randomAffixGenerator): Item
     {
-        $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE)
+        $item = Item::where('specialty_type', ItemSpecialtyType::CORRUPTED_ICE->value)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
             ->inRandomOrder()
             ->first();
 
-        $randomAffixGenerator = $randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
+        $randomAffixGenerator = $randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixTier::LEGENDARY->value);
 
         $newItem = $item->duplicate();
 

@@ -2,8 +2,6 @@
 
 namespace App\Game\Character\CharacterInventory\Controllers\Api;
 
-use App\Flare\Items\Enricher\ItemEnricherFactory;
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
@@ -23,6 +21,8 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
 use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Values\ItemType;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;

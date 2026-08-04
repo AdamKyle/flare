@@ -2,13 +2,13 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\AttackDetails;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Map;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ItemType;
 use Exception;
 
 class CharacterAttackBuilder
@@ -48,7 +48,7 @@ class CharacterAttackBuilder
      */
     public function buildAttack(bool $voided = false): array
     {
-        $attack = $this->baseAttack(AttackTypeValue::ATTACK, $voided);
+        $attack = $this->baseAttack(AttackType::ATTACK->value, $voided);
 
         $attack['weapon_damage'] = $this->characterStatBuilder->buildDamage(ItemType::validWeapons(), $voided);
 
@@ -64,7 +64,7 @@ class CharacterAttackBuilder
      */
     public function buildCastAttack(bool $voided = false)
     {
-        $attack = $this->baseAttack(AttackTypeValue::CAST, $voided);
+        $attack = $this->baseAttack(AttackType::CAST->value, $voided);
 
         $attack['spell_damage'] = $this->characterStatBuilder->buildDamage('spell-damage', $voided);
         $attack['heal_for'] = $this->characterStatBuilder->buildHealing($voided);
@@ -79,7 +79,7 @@ class CharacterAttackBuilder
      */
     public function buildCastAndAttack(bool $voided = false): array
     {
-        return $this->castAndAttackPositionalDamage(AttackTypeValue::CAST_AND_ATTACK, 'spell-one', 'right-hand', $voided);
+        return $this->castAndAttackPositionalDamage(AttackType::CAST_AND_ATTACK->value, 'spell-one', 'right-hand', $voided);
     }
 
     /**
@@ -89,7 +89,7 @@ class CharacterAttackBuilder
      */
     public function buildAttackAndCast(bool $voided = false): array
     {
-        return $this->castAndAttackPositionalDamage(AttackTypeValue::ATTACK_AND_CAST, 'spell-two', 'left-hand', $voided);
+        return $this->castAndAttackPositionalDamage(AttackType::ATTACK_AND_CAST->value, 'spell-two', 'left-hand', $voided);
     }
 
     /**
@@ -99,7 +99,7 @@ class CharacterAttackBuilder
      */
     public function buildDefend(bool $voided = false): array
     {
-        $defence = $this->baseAttack(AttackTypeValue::DEFEND, $voided);
+        $defence = $this->baseAttack(AttackType::DEFEND->value, $voided);
 
         $defence['defence'] = $this->characterStatBuilder->buildDefence($voided);
 

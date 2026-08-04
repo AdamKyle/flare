@@ -15,7 +15,7 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
-use App\Flare\Values\FeatureTypes;
+use App\Game\Core\Values\FeatureType;
 use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Http\Controllers\Controller;
@@ -60,7 +60,7 @@ class QuestsController extends Controller
             'quests' => Quest::pluck('name', 'id')->toArray(),
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
             'skillTypes' => SkillTypeValue::getValues(),
-            'unlocksFeatures' => FeatureTypes::getSelectable(),
+            'unlocksFeatures' => FeatureType::getSelectable(),
             'passiveSkills' => PassiveSkill::pluck('name', 'id')->toArray(),
             'raids' => Raid::pluck('name', 'id')->toArray(),
             'requiredQuests' => Quest::pluck('name', 'id')->toArray(),
@@ -80,7 +80,7 @@ class QuestsController extends Controller
             'quests' => Quest::pluck('name', 'id')->toArray(),
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
             'skillTypes' => SkillTypeValue::getValues(),
-            'unlocksFeatures' => FeatureTypes::getSelectable(),
+            'unlocksFeatures' => FeatureType::getSelectable(),
             'passiveSkills' => PassiveSkill::pluck('name', 'id')->toArray(),
             'raids' => Raid::pluck('name', 'id')->toArray(),
             'requiredQuests' => Quest::pluck('name', 'id')->toArray(),

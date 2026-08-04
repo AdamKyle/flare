@@ -2,10 +2,10 @@
 
 namespace App\Console\DevelopmentCommands;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -53,9 +53,9 @@ class GivePlayerUniqueItem extends Command
         ]);
 
         $cost = match ($type) {
-            'unique' => RandomAffixDetails::LEGENDARY,
-            'mythic' => RandomAffixDetails::MYTHIC,
-            'cosmic' => RandomAffixDetails::COSMIC,
+            'unique' => RandomAffixTier::LEGENDARY->value,
+            'mythic' => RandomAffixTier::MYTHIC->value,
+            'cosmic' => RandomAffixTier::COSMIC->value,
             default => throw new Exception('undefined type for unique')
         };
 
@@ -101,8 +101,8 @@ class GivePlayerUniqueItem extends Command
         }
 
         match ($paidAmount) {
-            RandomAffixDetails::MYTHIC => $duplicateItem->update(['is_mythic' => true]),
-            RandomAffixDetails::COSMIC => $duplicateItem->update(['is_cosmic' => true]),
+            RandomAffixTier::MYTHIC->value => $duplicateItem->update(['is_mythic' => true]),
+            RandomAffixTier::COSMIC->value => $duplicateItem->update(['is_cosmic' => true]),
             default => null
         };
 

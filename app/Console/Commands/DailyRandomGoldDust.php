@@ -3,7 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\Character;
-use App\Flare\Services\DailyGoldDustService;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Events\Services\DailyGoldDustService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -30,7 +31,7 @@ class DailyRandomGoldDust extends Command
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator)
     {
         parent::__construct();
     }
@@ -46,7 +47,7 @@ class DailyRandomGoldDust extends Command
 
         $maxCharacters = count($characterIds) - 1;
 
-        $randomIndex = rand(0, $maxCharacters);
+        $randomIndex = $this->randomNumberGenerator->numberBetween(0, $maxCharacters);
 
         $characterWhoWon = $characterIds[$randomIndex];
 

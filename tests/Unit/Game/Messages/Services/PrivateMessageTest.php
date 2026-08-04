@@ -3,11 +3,11 @@
 namespace Tests\Unit\Game\Messages\Services;
 
 use App\Flare\Models\User;
-use App\Flare\Values\NpcTypes;
 use App\Game\Messages\Events\NPCMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Models\Message;
 use App\Game\Messages\Services\PrivateMessage;
+use App\Game\Npcs\Values\NpcType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -75,7 +75,7 @@ class PrivateMessageTest extends TestCase
         Auth::login($character->user);
 
         $npc = $this->createNpc([
-            'type' => NpcTypes::SUMMONER,
+            'type' => NpcType::SUMMONER->value,
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');
@@ -92,7 +92,7 @@ class PrivateMessageTest extends TestCase
         Auth::login($character->user);
 
         $npc = $this->createNpc([
-            'type' => NpcTypes::KINGDOM_HOLDER,
+            'type' => NpcType::KINGDOM_HOLDER->value,
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');
@@ -109,7 +109,7 @@ class PrivateMessageTest extends TestCase
         Auth::login($character->user);
 
         $npc = $this->createNpc([
-            'type' => NpcTypes::SPECIAL_ENCHANTS,
+            'type' => NpcType::SPECIAL_ENCHANTS->value,
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');
@@ -126,7 +126,7 @@ class PrivateMessageTest extends TestCase
         Auth::login($character->user);
 
         $npc = $this->createNpc([
-            'type' => NpcTypes::QUEST_GIVER,
+            'type' => NpcType::QUEST_GIVER->value,
         ]);
 
         $this->privateMessageService->sendPrivateMessage($npc->name, 'Test message');

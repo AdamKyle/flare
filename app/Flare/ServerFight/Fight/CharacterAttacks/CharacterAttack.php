@@ -9,7 +9,7 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\Defend;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\WeaponType;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\AttackTypeValue;
+use App\Game\Core\Combat\Values\AttackType;
 
 class CharacterAttack
 {
@@ -28,7 +28,7 @@ class CharacterAttack
         $this->weaponType->setIsRaidBoss($monster->isRaidBossMonster());
         $this->weaponType->setCharacterHealth($characterHealth);
         $this->weaponType->setMonsterHealth($monsterHealth);
-        $this->weaponType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK);
+        $this->weaponType->setCharacterAttackData($character, $isPlayerVoided, AttackType::ATTACK->value);
         $this->weaponType->setAllowEntrancing(true);
         $this->weaponType->doWeaponAttack($character, $monster);
 
@@ -42,7 +42,7 @@ class CharacterAttack
         $this->castType->setIsRaidBoss($monster->isRaidBossMonster());
         $this->castType->setCharacterHealth($characterHealth);
         $this->castType->setMonsterHealth($monsterHealth);
-        $this->castType->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::CAST);
+        $this->castType->setCharacterAttackData($character, $isPlayerVoided, AttackType::CAST->value);
         $this->castType->setAllowEntrancing(true);
 
         $this->castType->castAttack($character, $monster);
@@ -57,7 +57,7 @@ class CharacterAttack
         $this->attackAndCast->setIsRaidBoss($monster->isRaidBossMonster());
         $this->attackAndCast->setCharacterHealth($characterHealth);
         $this->attackAndCast->setMonsterHealth($monsterHealth);
-        $this->attackAndCast->setCharacterAttackData($character, $isPlayerVoided, AttackTypeValue::ATTACK_AND_CAST);
+        $this->attackAndCast->setCharacterAttackData($character, $isPlayerVoided, AttackType::ATTACK_AND_CAST->value);
         $this->attackAndCast->handleAttack($character, $monster);
 
         $this->type = $this->attackAndCast;

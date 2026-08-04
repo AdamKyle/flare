@@ -5,11 +5,11 @@ namespace App\Console\DevelopmentCommands;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\ItemHolyValue;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Items\Services\HolyItemBonusGenerator;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\HolyItemLevel;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Console\Command;
 
 class AssignTopEndGearToPlayer extends Command
@@ -31,7 +31,7 @@ class AssignTopEndGearToPlayer extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): void
+    public function handle(HolyItemBonusGenerator $holyItemBonusGenerator): void
     {
         $characterName = $this->argument('characterName');
 
@@ -46,7 +46,7 @@ class AssignTopEndGearToPlayer extends Command
         $topEndGear = Item::doesntHave('appliedHolyStacks')
             ->where('item_prefix_id', null)
             ->where('item_suffix_id', null)
-            ->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
+            ->where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS->value)
             ->get();
 
         if (empty($topEndGear)) {
@@ -71,11 +71,11 @@ class AssignTopEndGearToPlayer extends Command
 
         foreach ($topEndGear as $topEndItem) {
             if (
-                $topEndItem->type === ArmourTypes::SHIELD ||
-                $topEndItem->type === WeaponTypes::WEAPON ||
-                $topEndItem->type === SpellTypes::DAMAGE ||
-                $topEndItem->type === SpellTypes::HEALING ||
-                $topEndItem->type === WeaponTypes::RING
+                $topEndItem->type === ArmourType::SHIELD->value ||
+                $topEndItem->type === ItemType::WEAPON->value ||
+                $topEndItem->type === ItemType::SPELL_DAMAGE->value ||
+                $topEndItem->type === ItemType::SPELL_HEALING->value ||
+                $topEndItem->type === ItemType::RING->value
             ) {
 
                 for ($i = 1; $i <= 2; $i++) {
@@ -126,12 +126,12 @@ class AssignTopEndGearToPlayer extends Command
         $topEndOil = Item::where('type', 'alchemy')->where('name', 'like', '%Oil%')->orderBy('id', 'desc')->first();
 
         for ($i = 1; $i <= 20; $i++) {
-            $holyItemEffect = new ItemHolyValue($topEndOil->holy_level);
+            $holyItemLevel = HolyItemLevel::from($topEndOil->holy_level);
 
             $item->appliedHolyStacks()->create([
                 'item_id' => $item->id,
-                'devouring_darkness_bonus' => $holyItemEffect->getRandomDevoidanceIncrease(),
-                'stat_increase_bonus' => $holyItemEffect->getRandomStatIncrease() / 100,
+                'devouring_darkness_bonus' => $holyItemBonusGenerator->getRandomDevoidanceIncrease($holyItemLevel),
+                'stat_increase_bonus' => $holyItemBonusGenerator->getRandomStatIncrease($holyItemLevel) / 100,
             ]);
 
             $item = $item->refresh();

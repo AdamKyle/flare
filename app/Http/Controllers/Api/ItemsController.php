@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Flare\Models\Item;
-use App\Flare\Transformers\ItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;

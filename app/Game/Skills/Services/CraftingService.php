@@ -2,24 +2,22 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Factions\FactionLoyalty\Events\FactionLoyaltyUpdate;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CraftingMessageTypes;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\UpdateCraftingTasksForFactionLoyalty;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
@@ -28,7 +26,6 @@ use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
-use Illuminate\Support\Facades\DB;
 
 class CraftingService
 {
@@ -265,31 +262,29 @@ class CraftingService
         bool $suppressSuccessServerMessage = false,
         ?callable $destinationCreator = null,
     ): array {
-        return DB::transaction(function () use ($character, $item, $craftingType, $suppressSuccessServerMessage, $destinationCreator): array {
-            $skill = $this->fetchCraftingSkill($character, $craftingType);
+        $skill = $this->fetchCraftingSkill($character, $craftingType);
 
-            $cost = $this->getItemCost($character, $item);
+        $cost = $this->getItemCost($character, $item);
 
-            if ($cost > $character->gold) {
-                ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD);
+        if ($cost > $character->gold) {
+            ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD);
 
-                return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold', 'destination' => null];
-            }
+            return ['success' => false, 'item' => null, 'reason' => 'not_enough_gold', 'destination' => null];
+        }
 
-            $result = $this->attemptToCraftItemForBatch($character, $skill, $item, $suppressSuccessServerMessage);
+        $result = $this->attemptToCraftItemForBatch($character, $skill, $item, $suppressSuccessServerMessage);
 
-            if (! $result['success'] || is_null($destinationCreator)) {
-                return $result + ['destination' => null];
-            }
+        if (! $result['success'] || is_null($destinationCreator)) {
+            return $result + ['destination' => null];
+        }
 
-            $destination = $destinationCreator($result['item']);
+        $destination = $destinationCreator($result['item']);
 
-            if (! is_array($destination)) {
-                throw new \RuntimeException('The retained Batch Crafting destination could not accept the crafted item.');
-            }
+        if (! is_array($destination)) {
+            throw new \RuntimeException('The retained Batch Crafting destination could not accept the crafted item.');
+        }
 
-            return $result + ['destination' => $destination];
-        });
+        return $result + ['destination' => $destination];
     }
 
     /**
@@ -384,21 +379,21 @@ class CraftingService
 
         if (
             $character->classType()->isBlacksmith() &&
-            (WeaponTypes::isWeaponType($item->type) ||
-                ArmourTypes::isArmourType($item->type))
+            (in_array($item->type, [ItemType::WEAPON->value, ItemType::STAVE->value, ItemType::HAMMER->value, ItemType::BOW->value, ItemType::GUN->value, ItemType::MACE->value, ItemType::FAN->value, ItemType::SCRATCH_AWL->value, ItemType::RING->value, ItemType::SWORD->value, ItemType::CENSOR->value, ItemType::CLAW->value, ItemType::WAND->value], true) ||
+                ArmourType::tryFrom($item->type) !== null)
         ) {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Blacksmith, your crafting timeout is reduced by 25% for weapons (including rings) and armour.');
 
             $craftingTimeOut = ceil(10 - 10 * 0.25);
         }
 
-        if ($character->classType()->isBlacksmith() && SpellTypes::isSpellType($item->type)) {
+        if ($character->classType()->isBlacksmith() && in_array($item->type, [ItemType::SPELL_HEALING->value, ItemType::SPELL_DAMAGE->value], true)) {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Blacksmith, your crafting timeout is increased by 25% for spell crafting.');
 
             $craftingTimeOut = ceil(10 + 10 * 0.25);
         }
 
-        if ($character->classType()->isArcaneAlchemist() && SpellTypes::isSpellType($item->type)) {
+        if ($character->classType()->isArcaneAlchemist() && in_array($item->type, [ItemType::SPELL_HEALING->value, ItemType::SPELL_DAMAGE->value], true)) {
             ServerMessageHandler::sendBasicMessage($character->user, 'As a Arcane Alchemist, your crafting timeout is reduced by 15% for spell crafting.');
 
             $craftingTimeOut = ceil(10 - 10 * 0.15);
@@ -415,12 +410,12 @@ class CraftingService
             $cost = floor($cost - $cost * 0.30);
         }
 
-        if ($character->classType()->isBlacksmith() && (WeaponTypes::isWeaponType($item->type) || ArmourTypes::isArmourType($item->type)
+        if ($character->classType()->isBlacksmith() && (in_array($item->type, [ItemType::WEAPON->value, ItemType::STAVE->value, ItemType::HAMMER->value, ItemType::BOW->value, ItemType::GUN->value, ItemType::MACE->value, ItemType::FAN->value, ItemType::SCRATCH_AWL->value, ItemType::RING->value, ItemType::SWORD->value, ItemType::CENSOR->value, ItemType::CLAW->value, ItemType::WAND->value], true) || ArmourType::tryFrom($item->type) !== null
         )) {
             $cost = floor($cost - $cost * 0.25);
         }
 
-        if ($character->classType()->isArcaneAlchemist() && (SpellTypes::isSpellType($item->type))) {
+        if ($character->classType()->isArcaneAlchemist() && (in_array($item->type, [ItemType::SPELL_HEALING->value, ItemType::SPELL_DAMAGE->value], true))) {
             $cost = floor($cost - $cost * 0.15);
         }
 

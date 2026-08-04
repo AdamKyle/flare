@@ -7,7 +7,7 @@ use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\FactionLoyaltyNpcTask;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Values\MapNameValue;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Support\Collection;
 
 class UpdateFactionLoyaltyService
@@ -18,8 +18,8 @@ class UpdateFactionLoyaltyService
     public function updateFactionLoyaltyBountyTasks(Character $character): void
     {
         $gameMaps = GameMap::whereIn('name', [
-            MapNameValue::DELUSIONAL_MEMORIES,
-            MapNameValue::ICE_PLANE,
+            MapName::DELUSIONAL_MEMORIES->value,
+            MapName::ICE_PLANE->value,
         ])->get();
 
         $characterFactions = $character->factions()->whereIn('game_map_id', $gameMaps->pluck('id')->toArray())->get();

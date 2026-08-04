@@ -11,7 +11,7 @@ use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Messages\Types\KingdomMessageTypes;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -130,7 +130,7 @@ class RecruitUnits implements ShouldQueue
         $user = $kingdom->character->user;
         $plane = $kingdom->gameMap->name;
 
-        if (UserOnlineValue::isOnline($user)) {
+        if (UserOnlineService::isOnline($user)) {
 
             if ($user->show_unit_recruitment_messages) {
                 $message = $this->unit->name.' finished recruiting for kingdom: '.

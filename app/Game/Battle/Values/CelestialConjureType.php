@@ -22,7 +22,7 @@ class CelestialConjureType
     ];
 
     /**
-     * ItemEffectsValue constructor.
+     * ItemEffectType constructor.
      *
      * Throws if the value does not exist in the array of const values.
      *

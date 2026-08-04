@@ -4,7 +4,7 @@ namespace App\Flare\Models;
 
 use App\Flare\Models\Traits\CalculateSkillBonus;
 use App\Flare\Models\Traits\CalculateTimeReduction;
-use App\Flare\Services\SkillBonusContextService;
+use App\Game\Skills\Services\SkillBonusContextService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\SkillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

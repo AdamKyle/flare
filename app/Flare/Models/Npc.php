@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\NpcTypes;
+use App\Game\Npcs\Values\NpcType;
 use Database\Factories\NpcFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,9 +35,9 @@ class Npc extends Model
         'type' => 'integer',
     ];
 
-    public function type(): NpcTypes
+    public function type(): NpcType
     {
-        return new NpcTypes($this->type);
+        return NpcType::from($this->type);
     }
 
     public function gameMap()

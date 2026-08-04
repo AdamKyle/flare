@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\Npc;
-use App\Flare\Values\NpcTypes;
+use App\Game\Npcs\Values\NpcType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -26,7 +26,7 @@ class NpcFactory extends Factory
         return [
             'name' => Str::random(10),
             'real_name' => Str::random(10),
-            'type' => NpcTypes::KINGDOM_HOLDER,
+            'type' => NpcType::KINGDOM_HOLDER->value,
             'game_map_id' => null,
             'x_position' => 32,
             'y_position' => 144,

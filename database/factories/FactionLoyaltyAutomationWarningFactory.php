@@ -15,8 +15,8 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\Npc;
 use App\Flare\Models\User;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -65,8 +65,8 @@ class FactionLoyaltyAutomationWarningFactory extends Factory
         ]);
         $characterAutomation = CharacterAutomation::factory()->create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'type' => AutomationType::FACTION_LOYALTY->value,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $factionLoyaltyAutomation = FactionLoyaltyAutomation::factory()->create([
             'character_automation_id' => $characterAutomation->id,

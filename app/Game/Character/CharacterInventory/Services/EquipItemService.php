@@ -2,17 +2,17 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Items\Comparison\ItemComparison;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Comparison\ItemComparison;
 use App\Game\Core\Traits\ResponseBuilder;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -97,25 +97,11 @@ class EquipItemService
             throw new EquipItemException('The item you are trying to equip as a replacement, does not exist.');
         }
 
+        $this->validateReplacementEligibility($this->character, $characterSlot->item, $this->request['position']);
+
         $equippedSet = $this->character->inventorySets()->where('is_equipped', true)->first();
 
         if (! is_null($equippedSet)) {
-            if ($this->character->isInventoryFull()) {
-                throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
-            }
-
-            $uniqueSlot = $this->getUniqueFromSet($equippedSet);
-            $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
-            $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($equippedSet);
-
-            if (! is_null($uniqueSlot) && $isItemToEquipUnique && ! $isItemToReplaceUnique) {
-                throw new EquipItemException('Cannot equip another unique.');
-            }
-
-            if (! is_null($this->getEquippedTrinket($equippedSet)) && $characterSlot->item->type === 'trinket') {
-                throw new EquipItemException('Only one trinket can be equipped.');
-            }
-
             $this->unequipSlot($characterSlot, $equippedSet);
 
             $equippedSet->slots()->create([
@@ -127,14 +113,6 @@ class EquipItemService
 
             $characterSlot->delete();
         } else {
-            $uniqueSlot = $this->getUniqueFromSet($this->character->inventory);
-            $isItemToEquipUnique = $this->isItemToEquipUnique($characterSlot->item);
-            $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($this->character->inventory);
-
-            if (! is_null($uniqueSlot) && $isItemToEquipUnique && ! $isItemToReplaceUnique) {
-                throw new EquipItemException('Cannot equip another unique.');
-            }
-
             $this->unequipSlot($characterSlot, $this->character->inventory);
 
             $characterSlot->update([
@@ -148,6 +126,48 @@ class EquipItemService
         event(new UpdateCharacterInventoryCountEvent($character));
 
         return $characterSlot->item;
+    }
+
+    /**
+     * Validate replacement-equip rules for a specific item/position without mutating
+     * any state. Used both by replaceItem() and by callers (Shop/Market buy-and-replace)
+     * that must reject an invalid replacement before spending currency or granting items.
+     *
+     * @throws EquipItemException
+     */
+    public function validateReplacementEligibility(Character $character, Item $itemToEquip, string $position): void
+    {
+        $this->setRequest(['position' => $position])->setCharacter($character);
+
+        $equippedSet = $character->inventorySets()->where('is_equipped', true)->first();
+
+        if (! is_null($equippedSet)) {
+            if ($character->isInventoryFull()) {
+                throw new EquipItemException('Inventory is full. Cannot replace a set item. Please make some room.');
+            }
+
+            $uniqueSlot = $this->getUniqueFromSet($equippedSet);
+            $isItemToEquipUnique = $this->isItemToEquipUnique($itemToEquip);
+            $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($equippedSet);
+
+            if (! is_null($uniqueSlot) && $isItemToEquipUnique && ! $isItemToReplaceUnique) {
+                throw new EquipItemException('Cannot equip another unique.');
+            }
+
+            if (! is_null($this->getEquippedTrinket($equippedSet)) && $itemToEquip->type === 'trinket') {
+                throw new EquipItemException('Only one trinket can be equipped.');
+            }
+
+            return;
+        }
+
+        $uniqueSlot = $this->getUniqueFromSet($character->inventory);
+        $isItemToEquipUnique = $this->isItemToEquipUnique($itemToEquip);
+        $isItemToReplaceUnique = $this->isItemToBeReplacedUnique($character->inventory);
+
+        if (! is_null($uniqueSlot) && $isItemToEquipUnique && ! $isItemToReplaceUnique) {
+            throw new EquipItemException('Cannot equip another unique.');
+        }
     }
 
     public function getUniqueFromSet(Inventory|InventorySet $equipped): InventorySlot|SetSlot|null

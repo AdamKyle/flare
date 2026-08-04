@@ -4,7 +4,8 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Gems\Values\GemTypeValue;
@@ -76,9 +77,9 @@ class GemServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
             'gem_bag_limit' => 2,
         ]);
 
@@ -106,9 +107,9 @@ class GemServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $result = $this->gemService->generateGem($character, 4);
@@ -140,12 +141,12 @@ class GemServiceTest extends TestCase
         ]);
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -175,12 +176,12 @@ class GemServiceTest extends TestCase
         ]);
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -214,12 +215,12 @@ class GemServiceTest extends TestCase
         ]);
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -256,9 +257,9 @@ class GemServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $result = resolve(GemService::class)->generateGem($character, 1);
@@ -274,25 +275,25 @@ class GemServiceTest extends TestCase
     {
         Event::fake();
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(false);
         });
 
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $result = $gemService->generateGem($character, 1);
 
         $character = $character->refresh();
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_COPPER, $character->copper_coins);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
 
         $this->assertEquals(200, $result['status']);
     }
@@ -305,7 +306,7 @@ class GemServiceTest extends TestCase
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
-        $mock->__construct(resolve(GemBuilder::class));
+        $mock->__construct(resolve(GemBuilder::class), resolve(ChanceCalculator::class));
 
         $this->instance(
             GemService::class,
@@ -315,9 +316,9 @@ class GemServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $result = resolve(GemService::class)->generateGem($character, 1);
@@ -343,9 +344,9 @@ class GemServiceTest extends TestCase
         ]);
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $result = resolve(GemService::class)->generateGem($character, 1);
@@ -383,7 +384,7 @@ class GemServiceTest extends TestCase
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
-        $gemService->__construct($gemBuilder);
+        $gemService->__construct($gemBuilder, resolve(ChanceCalculator::class));
 
         $character = $this->character->getCharacter();
 
@@ -394,9 +395,9 @@ class GemServiceTest extends TestCase
         ]);
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $result = $gemService->generateGem($character, 1);

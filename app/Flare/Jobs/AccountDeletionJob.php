@@ -6,7 +6,7 @@ use App\Flare\Events\UpdateSiteStatisticsChart;
 use App\Flare\Mail\GenericMail;
 use App\Flare\Models\User;
 use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Services\CharacterDeletion;
+use App\Game\Character\Services\CharacterDeletion;
 use App\Game\Core\Traits\UpdateMarketBoard;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Bus\Queueable;

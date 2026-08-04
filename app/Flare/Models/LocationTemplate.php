@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\LocationTemplateType;
+use App\Game\Maps\Values\LocationTemplateType;
 use Database\Factories\LocationTemplateFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

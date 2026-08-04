@@ -4,7 +4,7 @@ namespace App\Game\Messages\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\User;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Services\PctService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
@@ -106,7 +106,13 @@ class PublicEntityCommand
     {
         return $this->character->inventory->slots->filter(function ($slot) {
             if ($slot->item->type === 'quest' && ! is_null($slot->item->effect)) {
-                return (new ItemEffectsValue($slot->item->effect))->teleportToCelestial();
+                $effect = ItemEffectType::tryFrom($slot->item->effect);
+
+                if (is_null($effect)) {
+                    throw new Exception('Invalid quest item effect.');
+                }
+
+                return $effect->teleportToCelestial();
             }
         })->isNotEmpty();
     }

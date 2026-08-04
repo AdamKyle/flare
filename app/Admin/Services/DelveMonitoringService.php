@@ -5,7 +5,7 @@ namespace App\Admin\Services;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\DelveLog;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class DelveMonitoringService
 {
     public function activeCharacters(): array
     {
-        return CharacterAutomation::where('type', AutomationType::DELVE)
+        return CharacterAutomation::where('type', AutomationType::DELVE->value)
             ->where('completed_at', '>', now())
             ->with('character:id,name')
             ->get()

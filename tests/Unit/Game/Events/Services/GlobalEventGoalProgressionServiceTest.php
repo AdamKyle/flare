@@ -3,7 +3,7 @@
 namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Models\GlobalEventGoal;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
@@ -29,7 +29,7 @@ class GlobalEventGoalProgressionServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_id' => $delusionalEvent->id,
             'max_kills' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $winterEvent = $this->createEvent(['type' => EventType::WINTER_EVENT]);
@@ -38,7 +38,7 @@ class GlobalEventGoalProgressionServiceTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'event_id' => $winterEvent->id,
             'max_kills' => 500,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
@@ -75,7 +75,7 @@ class GlobalEventGoalProgressionServiceTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'event_id' => $event->id,
             'max_kills' => 500,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
         ]);
 
         $result = resolve(GlobalEventGoalProgressionService::class)->advanceIfCurrentGoalComplete($goal);

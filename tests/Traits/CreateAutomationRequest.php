@@ -4,7 +4,7 @@ namespace Tests\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Http\Request;
 
 trait CreateAutomationRequest
@@ -23,7 +23,7 @@ trait CreateAutomationRequest
     {
         return $this->createCharacterAutomationRecord([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
         ]);

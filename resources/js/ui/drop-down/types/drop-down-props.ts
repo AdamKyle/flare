@@ -3,6 +3,9 @@ import React from 'react';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 export default interface DropdownProps {
+  id?: string;
+  aria_label?: string;
+  aria_labelled_by?: string;
   items: DropdownItem[];
   on_select: (item: DropdownItem) => void;
   on_clear?: () => void;

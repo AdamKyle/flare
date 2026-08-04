@@ -2,7 +2,7 @@
 
 namespace App\Game\Messages\Listeners;
 
-use App\Flare\Events\KingdomServerMessageEvent;
+use App\Game\Kingdoms\Events\KingdomServerMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent as ServerMessage;
 use Illuminate\Broadcasting\PendingBroadcast;
 

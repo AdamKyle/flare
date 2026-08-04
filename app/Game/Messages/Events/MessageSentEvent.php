@@ -3,7 +3,7 @@
 namespace App\Game\Messages\Events;
 
 use App\Flare\Models\User;
-use App\Flare\Values\NameTags;
+use App\Game\Character\Values\NameTag;
 use App\Game\Messages\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -40,7 +40,7 @@ class MessageSentEvent implements ShouldBroadcastNow
 
         $this->message = $message;
         $this->name = auth()->user()->hasRole('Admin') ? 'The Creator' : $user->character->name;
-        $this->nameTag = is_null($nameTag) ? null : NameTags::$valueNames[$user->name_tag];
+        $this->nameTag = is_null($nameTag) ? null : NameTag::from($user->name_tag)->label();
     }
 
     /**

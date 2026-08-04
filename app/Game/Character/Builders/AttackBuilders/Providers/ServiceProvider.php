@@ -2,13 +2,13 @@
 
 namespace App\Game\Character\Builders\AttackBuilders\Providers;
 
-use App\Flare\Transformers\CharacterAttackDataTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 

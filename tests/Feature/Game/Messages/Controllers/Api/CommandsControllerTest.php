@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Game\Messages\Controllers\Api;
 
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -72,7 +72,7 @@ class CommandsControllerTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+            'effect' => ItemEffectType::TELEPORT_TO_CELESTIAL->value,
         ]))->getCharacter();
 
         $response = $this->actingAs($character->user)
@@ -106,7 +106,7 @@ class CommandsControllerTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+            'effect' => ItemEffectType::TELEPORT_TO_CELESTIAL->value,
         ]))->getCharacter();
 
         $character->update([

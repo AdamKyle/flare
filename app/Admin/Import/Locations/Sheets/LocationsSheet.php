@@ -5,7 +5,7 @@ namespace App\Admin\Import\Locations\Sheets;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 

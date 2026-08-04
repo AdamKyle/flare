@@ -14,7 +14,7 @@ class AlchemistsRavenousDream extends BattleBase
         if ($extraActionData['has_item']) {
 
             if (! ($extraActionData['chance'] >= 1)) {
-                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                     return;
                 }
             }
@@ -27,7 +27,7 @@ class AlchemistsRavenousDream extends BattleBase
 
     protected function multiAttack(Character $character, array $attackData)
     {
-        $times = rand(2, 6);
+        $times = $this->randomNumberGenerator->numberBetween(2, 6);
         $originalTimes = $times;
         $percent = 0.10;
 

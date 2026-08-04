@@ -2,10 +2,10 @@
 
 namespace App\Game\Messages\Providers;
 
-use App\Flare\Events\KingdomServerMessageEvent;
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
+use App\Game\Kingdoms\Events\KingdomServerMessageEvent;
 use App\Game\Messages\Listeners\KingdomServerMessageListener;
 use App\Game\Messages\Listeners\SkillLeveledUpServerMessageListener;
+use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventsProvider extends ServiceProvider

@@ -2,9 +2,9 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Items\Values\AlchemyItemType;
-use App\Flare\Items\Values\ArmourType;
-use App\Flare\Items\Values\ItemType;
+use App\Game\Core\Items\Values\AlchemyItemType;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\GuideQuestFactory;

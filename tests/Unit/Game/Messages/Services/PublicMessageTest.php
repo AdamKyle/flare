@@ -3,7 +3,7 @@
 namespace Tests\Unit\Game\Messages\Services;
 
 use App\Flare\Models\User;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Messages\Events\MessageSentEvent;
 use App\Game\Messages\Models\Message;
 use App\Game\Messages\Services\PublicMessage;
@@ -337,7 +337,7 @@ class PublicMessageTest extends TestCase
 
         $item = $this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::HIDE_CHAT_LOCATION,
+            'effect' => ItemEffectType::HIDE_CHAT_LOCATION->value,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();

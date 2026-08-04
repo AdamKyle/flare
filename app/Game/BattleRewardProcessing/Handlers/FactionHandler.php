@@ -2,7 +2,6 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
 use App\Flare\Models\GameMap;
@@ -11,16 +10,18 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Currency\Values\CurrencyType;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Core\Values\FactionType;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Exception;
-use Illuminate\Support\Facades\DB;
 use Throwable;
 
 class FactionHandler
@@ -28,7 +29,8 @@ class FactionHandler
     public function __construct(
         private readonly RandomAffixGenerator $randomAffixGenerator,
         private readonly GuideQuestService $guideQuestService,
-        private readonly BattleMessageHandler $battleMessageHandler
+        private readonly BattleMessageHandler $battleMessageHandler,
+        private readonly ChanceCalculator $chanceCalculator,
     ) {}
 
     /**
@@ -48,57 +50,27 @@ class FactionHandler
 
         $totalPointsApplied = 0;
 
-        DB::transaction(function () use ($character, $map, $totalFactionPointsToReward, &$totalPointsApplied): void {
-            $faction = Faction::where('character_id', $character->id)
-                ->where('game_map_id', $map->id)
-                ->lockForUpdate()
-                ->first();
+        $faction = Faction::where('character_id', $character->id)
+            ->where('game_map_id', $map->id)
 
-            if (is_null($faction) || $faction->maxed) {
+            ->first();
+
+        if (is_null($faction) || $faction->maxed) {
+            return;
+        }
+
+        $remainingPoints = $totalFactionPointsToReward;
+
+        while ($remainingPoints > 0) {
+            $faction = $faction->refresh();
+
+            if ($faction->maxed) {
                 return;
             }
 
-            $remainingPoints = $totalFactionPointsToReward;
+            $pointsNeeded = $faction->points_needed - $faction->current_points;
 
-            while ($remainingPoints > 0) {
-                $faction = $faction->refresh();
-
-                if ($faction->maxed) {
-                    return;
-                }
-
-                $pointsNeeded = $faction->points_needed - $faction->current_points;
-
-                if ($pointsNeeded <= 0) {
-                    if (! FactionLevel::isMaxLevel($faction->current_level)) {
-                        $this->handleFactionLevelUp($character, $faction, $map->name);
-
-                        continue;
-                    }
-
-                    $this->handleFactionMaxedOut($character, $faction, $map->name);
-
-                    return;
-                }
-
-                $pointsToApply = min($remainingPoints, $pointsNeeded);
-
-                $newPoints = $faction->current_points + $pointsToApply;
-
-                $faction->update([
-                    'current_points' => $newPoints,
-                ]);
-
-                $totalPointsApplied += $pointsToApply;
-
-                $remainingPoints -= $pointsToApply;
-
-                $faction = $faction->refresh();
-
-                if ($faction->current_points !== $faction->points_needed) {
-                    continue;
-                }
-
+            if ($pointsNeeded <= 0) {
                 if (! FactionLevel::isMaxLevel($faction->current_level)) {
                     $this->handleFactionLevelUp($character, $faction, $map->name);
 
@@ -109,7 +81,35 @@ class FactionHandler
 
                 return;
             }
-        });
+
+            $pointsToApply = min($remainingPoints, $pointsNeeded);
+
+            $newPoints = $faction->current_points + $pointsToApply;
+
+            $faction->update([
+                'current_points' => $newPoints,
+            ]);
+
+            $totalPointsApplied += $pointsToApply;
+
+            $remainingPoints -= $pointsToApply;
+
+            $faction = $faction->refresh();
+
+            if ($faction->current_points !== $faction->points_needed) {
+                continue;
+            }
+
+            if (! FactionLevel::isMaxLevel($faction->current_level)) {
+                $this->handleFactionLevelUp($character, $faction, $map->name);
+
+                continue;
+            }
+
+            $this->handleFactionMaxedOut($character, $faction, $map->name);
+
+            return;
+        }
 
         if ($totalPointsApplied <= 0) {
             return;
@@ -402,10 +402,10 @@ class FactionHandler
 
         $characterNewGold = $character->gold + $gold;
 
-        $cannotHave = (new MaxCurrenciesValue($characterNewGold, 0))->canNotGiveCurrency();
+        $cannotHave = (new CurrencyLimit($characterNewGold, CurrencyType::GOLD))->canNotGiveCurrency();
 
         if ($cannotHave) {
-            $characterNewGold = MaxCurrenciesValue::MAX_GOLD;
+            $characterNewGold = CurrencyLimit::MAX_GOLD;
 
             $character->gold = $characterNewGold;
             $character->save();
@@ -431,7 +431,7 @@ class FactionHandler
      */
     protected function giveCharacterRandomItem(Character $character): Item
     {
-        $item = Item::where('cost', '<=', RandomAffixDetails::LEGENDARY)
+        $item = Item::where('cost', '<=', RandomAffixTier::LEGENDARY->value)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereNull('specialty_type')
@@ -442,7 +442,7 @@ class FactionHandler
 
         $randomAffix = $this->randomAffixGenerator
             ->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
+            ->setPaidAmount(RandomAffixTier::LEGENDARY->value);
 
         $duplicateItem = $item->duplicate();
 
@@ -450,7 +450,7 @@ class FactionHandler
             'item_prefix_id' => $randomAffix->generateAffix('prefix')->id,
         ]);
 
-        if (rand(1, 100) > 50) {
+        if ($this->chanceCalculator->passesPercentage(50.0)) {
             $duplicateItem->update([
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id,
             ]);
@@ -465,7 +465,7 @@ class FactionHandler
     public function playerHasQuestItem(Character $character): bool
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
-        $item = Item::where('effect', ItemEffectsValue::FACTION_POINTS)->first();
+        $item = Item::where('effect', ItemEffectType::FACTION_POINTS->value)->first();
 
         if (is_null($item)) {
             return false;

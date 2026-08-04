@@ -4,7 +4,7 @@ namespace Tests\Unit\Flare\Transformers;
 
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
-use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

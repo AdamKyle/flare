@@ -6,11 +6,11 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Location;
 use App\Flare\Models\RaidBoss;
-use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateWeeklyCelestialSpawnEvent;
 use App\Game\Events\Services\EventLifecycleService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use RuntimeException;
 use Tests\TestCase;
@@ -261,8 +261,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_cancelling_running_winter_event_ends_running_child_raid_with_normal_teardown_before_parent(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -333,8 +333,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_cancelling_running_delusional_event_ends_running_child_raid_before_parent(): void
     {
-        $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::DELUSIONAL_MEMORIES->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -384,8 +384,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_running_child_belonging_to_another_seasonal_schedule_is_untouched(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parentOne = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -477,8 +477,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_future_child_under_cancelled_parent_does_not_receive_raid_teardown(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -536,8 +536,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_future_child_under_cancelled_parent_is_marked_cancelled_so_it_cannot_start_later(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -573,8 +573,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_completed_child_remains_unchanged_when_parent_cancelled(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -607,8 +607,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_cancelled_child_remains_unchanged_when_parent_cancelled(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -643,8 +643,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_failed_child_remains_unchanged_when_parent_cancelled(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -727,8 +727,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_cancelling_one_winter_instance_does_not_end_concurrent_delusional_instance(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $winterParent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,
@@ -768,8 +768,8 @@ class EventLifecycleServiceTest extends TestCase
 
     public function test_no_global_event_table_is_truncated_during_seasonal_cascade(): void
     {
-        $this->createGameMap(['name' => MapNameValue::ICE_PLANE]);
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::ICE_PLANE->value]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $parent = $this->createScheduledEvent([
             'event_type' => EventType::WINTER_EVENT,

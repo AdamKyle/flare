@@ -8,7 +8,7 @@ use App\Admin\Import\MapGems\MapGemsImport;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
-use App\Flare\Values\MapNameValue;
+use App\Game\Maps\Values\MapName;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
@@ -107,7 +107,7 @@ class ImportGameData extends Command
         $gameMaps = GameMap::all();
 
         foreach ($gameMaps as $map) {
-            $mapValue = new MapNameValue($map->name);
+            $mapValue = MapName::from($map->name);
 
             $map->update($mapValue->getMapModifers());
         }
@@ -315,7 +315,7 @@ class ImportGameData extends Command
 
             $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
-            $mapValue = new MapNameValue($fileName);
+            $mapValue = MapName::from($fileName);
 
             $gameMap = GameMap::where('name', $fileName)->first();
 
@@ -331,8 +331,8 @@ class ImportGameData extends Command
                 'name' => $fileName,
                 'path' => $path,
                 'default' => $mapValue->isSurface(),
-                'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
-            ], (new MapNameValue($fileName))->getMapModifers());
+                'kingdom_color' => MapName::kingdomColors()[$fileName],
+            ], (MapName::from($fileName))->getMapModifers());
 
             GameMap::create($gameMapData);
         }

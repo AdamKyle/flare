@@ -9,12 +9,12 @@ use App\Flare\Models\CharacterBoon;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Jobs\CharacterBoonJob;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -462,7 +462,7 @@ class UseItemService
 
     private function automationName(CharacterAutomation $automation): string
     {
-        $automationType = new AutomationType($automation->type);
+        $automationType = AutomationType::from($automation->type);
 
         if ($automationType->isExploring()) {
             return 'Exploration';

@@ -4,8 +4,8 @@ namespace Tests\Unit\Admin\Import\Locations;
 
 use App\Admin\Import\Locations\Sheets\LocationsSheet;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationEffectValue;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationEffect;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -20,7 +20,7 @@ class LocationsSheetTest extends TestCase
 
         (new LocationsSheet)->collection(collect([
             collect(['name', 'game_map_id', 'description', 'enemy_strength_type', 'x', 'y']),
-            collect(['Imported Special', $gameMap->name, 'Imported special description', LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY, 16, 16]),
+            collect(['Imported Special', $gameMap->name, 'Imported special description', LocationEffect::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY->value, 16, 16]),
         ]));
 
         $this->assertSame(LocationType::SPECIAL->value, Location::where('name', 'Imported Special')->first()->type);
@@ -32,7 +32,7 @@ class LocationsSheetTest extends TestCase
 
         (new LocationsSheet)->collection(collect([
             collect(['name', 'game_map_id', 'description', 'enemy_strength_type', 'type', 'x', 'y']),
-            collect(['Imported Gold Mine', $gameMap->name, 'Imported gold mine description', LocationEffectValue::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY, LocationType::GOLD_MINES->value, 16, 16]),
+            collect(['Imported Gold Mine', $gameMap->name, 'Imported gold mine description', LocationEffect::INCREASE_STATS_BY_TWO_HUNDRED_FIFTY->value, LocationType::GOLD_MINES->value, 16, 16]),
         ]));
 
         $this->assertSame(LocationType::GOLD_MINES->value, Location::where('name', 'Imported Gold Mine')->first()->type);

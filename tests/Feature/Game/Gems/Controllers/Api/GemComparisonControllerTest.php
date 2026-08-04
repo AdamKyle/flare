@@ -95,4 +95,12 @@ class GemComparisonControllerTest extends TestCase
         $this->assertEquals($attachedGemExpected, $jsonData['attached_gems'][0]);
         $this->assertTrue($jsonData['has_gems_on_item']);
     }
+
+    public function test_scratch_missing_slot_id()
+    {
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/gem-comparison/'.$this->character->id, []);
+
+        $response->assertSessionHasErrors('slot_id');
+    }
 }

@@ -2,20 +2,20 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Cache;
@@ -24,7 +24,12 @@ class GoldMinesRewardHandler
 {
     private array $earnedCurrencies = [];
 
-    public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
+    public function __construct(
+        private RandomAffixGenerator $randomAffixGenerator,
+        private BattleMessageHandler $battleMessageHandler,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly ChanceCalculator $chanceCalculator,
+    ) {}
 
     public function getEarnedCurrencies(): array
     {
@@ -164,7 +169,7 @@ class GoldMinesRewardHandler
                 break;
             }
 
-            if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
+            if (! $this->chanceCalculator->passesPercentage((2 / $maxRoll) * 100, $lootingChance * 100)) {
                 continue;
             }
 
@@ -198,7 +203,7 @@ class GoldMinesRewardHandler
         }
 
         if (! $isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixTier::LEGENDARY->value);
 
             $newItem = $item->duplicate();
 
@@ -235,9 +240,9 @@ class GoldMinesRewardHandler
         $maximumAmount = is_null($event) ? 375 : 750;
         $maximumGold = is_null($event) ? 750 : 3750;
         $amounts = [
-            'gold' => RandomNumberGenerator::generateRandomNumber(1, $maximumGold) * $killCount,
-            'gold_dust' => RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount,
-            'shards' => RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount,
+            'gold' => $this->randomNumberGenerator->numberBetween(1, $maximumGold) * $killCount,
+            'gold_dust' => $this->randomNumberGenerator->numberBetween(1, $maximumAmount) * $killCount,
+            'shards' => $this->randomNumberGenerator->numberBetween(1, $maximumAmount) * $killCount,
         ];
 
         return $this->currencyPlanFromAmounts($character, $amounts);
@@ -246,10 +251,10 @@ class GoldMinesRewardHandler
     private function currencyPlanFromAmounts(Character $character, array $amounts): array
     {
         $maximums = [
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ];
         $starting = [];
         $target = [];
@@ -322,7 +327,7 @@ class GoldMinesRewardHandler
         $remainingSlots = max(0, $character->inventory_max - $character->getInventoryCount());
 
         for ($iterationIndex = 0; $iterationIndex < $killCount && count($items) < $remainingSlots; $iterationIndex++) {
-            if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
+            if (! $this->chanceCalculator->passesPercentage((2 / $maxRoll) * 100, $lootingChance * 100)) {
                 continue;
             }
 
@@ -350,7 +355,7 @@ class GoldMinesRewardHandler
             return null;
         }
 
-        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
+        $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixTier::LEGENDARY->value);
         $newItem = $item->duplicate();
         $newItem->update([
             'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
@@ -397,10 +402,9 @@ class GoldMinesRewardHandler
         }
 
         $chancePercent = 10 + $killCount;
-        $threshold = 100 - $chancePercent;
 
         return [
-            'create' => RandomNumberGenerator::generateTrueRandomNumber(100) >= $threshold,
+            'create' => $this->chanceCalculator->passesPercentage($chancePercent + 1),
             'type' => EventType::GOLD_MINES,
             'announcement' => 'gold_mines',
             'message' => 'There comes a howling scream from the depths of the mines in the land of tormenting shadows.
@@ -440,9 +444,7 @@ class GoldMinesRewardHandler
         }
 
         $chancePercent = 10 + $killCount;
-        $threshold = 100 - $chancePercent;
-
-        if (RandomNumberGenerator::generateTrueRandomNumber(100) >= $threshold) {
+        if ($this->chanceCalculator->passesPercentage($chancePercent + 1)) {
             Event::create([
                 'type' => EventType::GOLD_MINES,
                 'started_at' => now(),

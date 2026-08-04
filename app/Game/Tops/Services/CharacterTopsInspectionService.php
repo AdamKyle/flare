@@ -2,7 +2,6 @@
 
 namespace App\Game\Tops\Services;
 
-use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\ExplorationLog;
@@ -18,19 +17,20 @@ use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
 use App\Flare\Models\UserLoginDuration;
-use App\Flare\Transformers\BasicSkillsTransformer;
-use App\Flare\Transformers\CharacterElementalAtonementTransformer;
-use App\Flare\Transformers\CharacterGemsTransformer;
-use App\Flare\Transformers\CharacterReincarnationInfoTransformer;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\SkillsTransformer;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterElementalAtonementTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterReincarnationInfoTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterResistanceInfoTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterStatDetailsTransformer;
 use App\Game\ClassRanks\Services\ClassRankService;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\GuideQuests\Services\GuideQuestService;
+use App\Game\Skills\Transformers\BasicSkillsTransformer;
+use App\Game\Skills\Transformers\SkillsTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use App\Game\Tops\Services\Concerns\BuildsTopsResponses;
 use Carbon\Carbon;

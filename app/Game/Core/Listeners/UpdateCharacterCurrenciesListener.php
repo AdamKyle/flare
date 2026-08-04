@@ -2,8 +2,8 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Flare\Transformers\CharacterCurrenciesTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterBaseDetailsTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterCurrenciesTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateCharacterCurrenciesBroadcastEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;

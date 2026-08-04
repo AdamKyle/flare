@@ -7,6 +7,7 @@ import UseCharacterUpdateParamsDefinition from 'game-data/hooks/definitions/use-
 const UseCharacterUpdates = ({
   userId,
   onEvent,
+  onCraftingOptionsEvent,
 }: UseCharacterUpdateParamsDefinition): UseCharacterUpdateDefinition => {
   const [listening, setListening] = useState<boolean>(false);
 
@@ -22,7 +23,13 @@ const UseCharacterUpdates = ({
       return null;
     }
 
-    return <CharacterUpdatesWire userId={userId} onEvent={onEvent} />;
+    return (
+      <CharacterUpdatesWire
+        userId={userId}
+        onEvent={onEvent}
+        onCraftingOptionsEvent={onCraftingOptionsEvent}
+      />
+    );
   };
 
   return { listening, start, renderWire };

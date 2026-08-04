@@ -4,8 +4,8 @@ namespace App\Game\Kingdoms\Handlers;
 
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 use App\Game\Messages\Events\ServerMessageEvent;
 
 class AttackLogHandler
@@ -175,7 +175,7 @@ class AttackLogHandler
         return [
             'to_kingdom_id' => $defenderKingdom->id,
             'from_kingdom_id' => $attackingKingdom->id,
-            'status' => $tookKingdom ? KingdomLogStatusValue::TAKEN : KingdomLogStatusValue::ATTACKED,
+            'status' => $tookKingdom ? KingdomLogStatus::TAKEN->value : KingdomLogStatus::ATTACKED->value,
             'old_buildings' => $this->oldDefenderBuildings,
             'new_buildings' => $this->newDefenderBuildings,
             'old_units' => $this->oldDefenderUnits,

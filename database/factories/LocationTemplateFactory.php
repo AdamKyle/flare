@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\LocationTemplate;
-use App\Flare\Values\LocationTemplateType;
+use App\Game\Maps\Values\LocationTemplateType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class LocationTemplateFactory extends Factory

@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Database\Factories\CharacterAutomationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -56,7 +56,7 @@ class CharacterAutomation extends Model
 
     public function type(): AutomationType
     {
-        return new AutomationType($this->type);
+        return AutomationType::from($this->type);
     }
 
     protected static function newFactory()

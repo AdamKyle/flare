@@ -6,6 +6,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
@@ -22,6 +23,7 @@ class WalkingService extends BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        ChanceCalculator $chanceCalculator,
     ) {
         parent::__construct(
             $mapTileValue,
@@ -29,6 +31,7 @@ class WalkingService extends BaseMovementService
             $conjureService,
             $movementService,
             $traverseService,
+            $chanceCalculator,
         );
     }
 

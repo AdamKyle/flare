@@ -10,8 +10,8 @@ use App\Admin\Services\AdminGemRollService;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Location;
-use App\Flare\Values\MapNameValue;
 use App\Game\Gems\Values\GemTypeValue;
+use App\Game\Maps\Values\MapName;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -51,15 +51,15 @@ class LocationGemsController extends Controller
     private function eligibleLocations(): Collection
     {
         $planeOrder = [
-            MapNameValue::SURFACE => 0,
-            MapNameValue::LABYRINTH => 1,
-            MapNameValue::DUNGEONS => 2,
-            MapNameValue::SHADOW_PLANE => 3,
-            MapNameValue::HELL => 4,
-            MapNameValue::PURGATORY => 5,
-            MapNameValue::TWISTED_MEMORIES => 6,
-            MapNameValue::ICE_PLANE => 7,
-            MapNameValue::DELUSIONAL_MEMORIES => 8,
+            MapName::SURFACE->value => 0,
+            MapName::LABYRINTH->value => 1,
+            MapName::DUNGEONS->value => 2,
+            MapName::SHADOW_PLANE->value => 3,
+            MapName::HELL->value => 4,
+            MapName::PURGATORY->value => 5,
+            MapName::TWISTED_MEMORIES->value => 6,
+            MapName::ICE_PLANE->value => 7,
+            MapName::DELUSIONAL_MEMORIES->value => 8,
         ];
 
         return Location::with('map')

@@ -15,7 +15,7 @@ use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Messages\Types\KingdomMessageTypes;
 use Exception;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -167,7 +167,7 @@ class UpgradeBuilding implements ShouldQueue
 
         $updateKingdom->updateKingdom($building->kingdom->refresh());
 
-        if (UserOnlineValue::isOnline($this->user)) {
+        if (UserOnlineService::isOnline($this->user)) {
             $kingdom = Kingdom::find($this->building->kingdom_id);
             $plane = $kingdom->gameMap->name;
 

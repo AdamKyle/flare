@@ -5,8 +5,8 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameBuilding;
 use App\Flare\Models\Kingdom;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Values\BuildingCosts;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
@@ -107,13 +107,13 @@ class CapitalCityGoldBarManagementService
 
         $convertedAmount = $goldBars * 2000000000;
 
-        if ($convertedAmount > MaxCurrenciesValue::MAX_GOLD) {
+        if ($convertedAmount > CurrencyLimit::MAX_GOLD) {
             return $this->errorResult('This would exceed the max amount of gold you can have.');
         }
 
         $newGold = $character->gold + $convertedAmount;
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+        if ($newGold > CurrencyLimit::MAX_GOLD) {
             return $this->errorResult('You would waste gold child. Cannot withdraw that amount.');
         }
 

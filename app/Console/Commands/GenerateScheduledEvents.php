@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Flare\Models\ScheduledEventConfiguration;
-use App\Flare\Services\EventSchedulerService;
+use App\Game\Events\Services\EventSchedulerService;
 use Illuminate\Console\Command;
 
 class GenerateScheduledEvents extends Command

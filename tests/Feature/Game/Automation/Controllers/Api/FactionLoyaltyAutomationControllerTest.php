@@ -7,8 +7,8 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
@@ -62,7 +62,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -119,16 +119,16 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         CharacterAutomation::create([
             'character_id' => $this->character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -144,16 +144,16 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         CharacterAutomation::create([
             'character_id' => $this->character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -170,16 +170,16 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         CharacterAutomation::create([
             'character_id' => $this->character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -202,7 +202,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -224,7 +224,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -245,7 +245,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -272,7 +272,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -299,7 +299,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         $response = $this->actingAs($this->character->user)
             ->call('POST', '/api/faction-loyalty-automation/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
-                'attack_type' => AttackTypeValue::ATTACK,
+                'attack_type' => AttackType::ATTACK->value,
             ]);
 
         $jsonData = json_decode($response->getContent(), true);
@@ -347,10 +347,10 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         $characterAutomation = CharacterAutomation::create([
             'character_id' => $this->character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $factionLoyaltyAutomation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,

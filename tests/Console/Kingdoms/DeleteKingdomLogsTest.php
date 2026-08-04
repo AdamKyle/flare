@@ -3,7 +3,7 @@
 namespace Tests\Console\Kingdoms;
 
 use App\Flare\Models\KingdomLog;
-use App\Flare\Values\KingdomLogStatusValue;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -28,7 +28,7 @@ class DeleteKingdomLogsTest extends TestCase
             'attacking_character_id' => $character->getCharacter()->id,
             'from_kingdom_id' => $character->getKingdom()->id,
             'to_kingdom_id' => $character->getKingdom()->id,
-            'status' => KingdomLogStatusValue::UNITS_RETURNING,
+            'status' => KingdomLogStatus::UNITS_RETURNING->value,
             'units_sent' => [],
             'units_survived' => [],
             'old_buildings' => $character->getKingdom()->load('buildings')->toArray(),

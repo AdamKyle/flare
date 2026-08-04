@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Game\Maps;
 
-use App\Flare\Values\MapNameValue;
 use App\Game\Maps\Services\WalkingService;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -35,7 +35,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
             })
         );
         Cache::put('celestial-spawn-rate', 0);
-        Cache::put('monsters', [MapNameValue::SURFACE => []]);
+        Cache::put('monsters', [MapName::SURFACE->value => []]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter()
@@ -61,7 +61,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
             })
         );
         Cache::put('celestial-spawn-rate', 0);
-        Cache::put('monsters', [MapNameValue::SURFACE => []]);
+        Cache::put('monsters', [MapName::SURFACE->value => []]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter()
@@ -86,7 +86,7 @@ class WalkingServiceAdjacentMovementTest extends TestCase
             })
         );
         Cache::put('celestial-spawn-rate', 0);
-        Cache::put('monsters', [MapNameValue::SURFACE => []]);
+        Cache::put('monsters', [MapName::SURFACE->value => []]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter()

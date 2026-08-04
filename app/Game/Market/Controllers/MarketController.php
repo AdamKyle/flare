@@ -6,19 +6,18 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
-use App\Flare\Transformers\MarketItemsTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Market\Services\MarketBoard as MarketBoardService;
 use App\Game\Market\Services\MarketSaleHistory;
+use App\Game\Market\Transformers\MarketItemsTransformer;
 use App\Http\Controllers\Controller;
 use Cache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use League\Fractal\Manager;
-use Throwable;
 
 class MarketController extends Controller
 {
@@ -96,9 +95,13 @@ class MarketController extends Controller
 
         if ($listing->is_locked) {
             return response()->redirectToRoute('game.market')->with('error', 'That item is not available at the moment. The owner might be adjusting the price or it\'s in the process of being sold.');
-        } else {
-            $listing->update(['is_locked' => true]);
         }
+
+        if (MarketBoard::whereKey($listing->id)->where('is_locked', false)->update(['is_locked' => true]) !== 1) {
+            return response()->redirectToRoute('game.market')->with('error', 'That item is not available at the moment. The owner might be adjusting the price or it\'s in the process of being sold.');
+        }
+
+        $listing->refresh();
 
         if ($character->isInventoryFull()) {
             $listing->update(['is_locked' => false]);
@@ -108,8 +111,8 @@ class MarketController extends Controller
 
         $totalPrice = ($listing->listed_price * 1.05);
 
-        if ($totalPrice > MaxCurrenciesValue::MAX_GOLD) {
-            $totalPrice = MaxCurrenciesValue::MAX_GOLD;
+        if ($totalPrice > CurrencyLimit::MAX_GOLD) {
+            $totalPrice = CurrencyLimit::MAX_GOLD;
         }
 
         if (! ($character->gold >= $totalPrice)) {
@@ -118,14 +121,16 @@ class MarketController extends Controller
             return redirect()->back()->with('error', 'Not enough gold. We add a 5% tax to the total price.');
         }
 
-        try {
-            DB::transaction(function () use ($request, $character, $listing, $totalPrice) {
-                $this->marketBoardService->buyAndReplaceItem($request, $character, $listing, $totalPrice);
-            });
-        } catch (Throwable) {
-            $listing->refresh()->update(['is_locked' => false]);
+        if (! MarketBoard::whereKey($listing->id)->where('is_locked', true)->where('character_id', '!=', $character->id)->exists()) {
+            return response()->redirectToRoute('game.market')->with('error', 'Looks like someone got to that before you!');
+        }
 
-            return redirect()->back()->with('error', 'Unable to replace that item.');
+        try {
+            $this->marketBoardService->buyAndReplaceItem($request, $character, $listing, $totalPrice);
+        } catch (EquipItemException $exception) {
+            $listing->update(['is_locked' => false]);
+
+            return redirect()->back()->with('error', $exception->getMessage());
         }
 
         return response()->redirectToRoute('game.market')->with('success', 'Item purchased and equipped!');
@@ -145,9 +150,13 @@ class MarketController extends Controller
 
         if ($listing->is_locked) {
             return response()->redirectToRoute('game.market')->with('error', 'That item is not available at the moment. The owner might be adjusting the price or it\'s in the process of being sold.');
-        } else {
-            $listing->update(['is_locked' => true]);
         }
+
+        if (MarketBoard::whereKey($listing->id)->where('is_locked', false)->update(['is_locked' => true]) !== 1) {
+            return response()->redirectToRoute('game.market')->with('error', 'That item is not available at the moment. The owner might be adjusting the price or it\'s in the process of being sold.');
+        }
+
+        $listing->refresh();
 
         if ($character->isInventoryFull()) {
             $listing->update(['is_locked' => false]);
@@ -157,14 +166,18 @@ class MarketController extends Controller
 
         $totalPrice = ($listing->listed_price * 1.05);
 
-        if ($totalPrice > MaxCurrenciesValue::MAX_GOLD) {
-            $totalPrice = MaxCurrenciesValue::MAX_GOLD;
+        if ($totalPrice > CurrencyLimit::MAX_GOLD) {
+            $totalPrice = CurrencyLimit::MAX_GOLD;
         }
 
         if (! ($character->gold >= $totalPrice)) {
             $listing->update(['is_locked' => false]);
 
             return response()->redirectToRoute('game.market')->with('error', 'Not enough gold. We add a 5% tax to the total price.');
+        }
+
+        if (! MarketBoard::whereKey($listing->id)->where('is_locked', true)->where('character_id', '!=', $character->id)->exists()) {
+            return response()->redirectToRoute('game.market')->with('error', 'Looks like someone got to that before you!');
         }
 
         $this->marketBoardService->buyItem($character, $listing, $totalPrice);
@@ -226,8 +239,8 @@ class MarketController extends Controller
 
         $listedPrice = $request->listed_price;
 
-        if ($listedPrice > MaxCurrenciesValue::MAX_GOLD) {
-            $listedPrice = MaxCurrenciesValue::MAX_GOLD;
+        if ($listedPrice > CurrencyLimit::MAX_GOLD) {
+            $listedPrice = CurrencyLimit::MAX_GOLD;
         }
 
         $marketBoard->update(array_merge([

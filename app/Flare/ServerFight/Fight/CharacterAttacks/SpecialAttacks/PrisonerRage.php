@@ -14,7 +14,7 @@ class PrisonerRage extends BattleBase
         if ($extraActionData['has_item']) {
 
             if (! ($extraActionData['chance'] >= 1)) {
-                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                     return;
                 }
             }
@@ -37,7 +37,7 @@ class PrisonerRage extends BattleBase
                 $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
             }
 
-            $times = rand(1, 4);
+            $times = $this->randomNumberGenerator->numberBetween(1, 4);
 
             for ($i = 0; $i <= $times; $i++) {
                 $this->doBaseAttack($damage);

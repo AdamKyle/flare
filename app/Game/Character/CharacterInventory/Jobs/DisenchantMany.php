@@ -5,7 +5,7 @@ namespace App\Game\Character\CharacterInventory\Jobs;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\SkillCheckService;
@@ -52,7 +52,7 @@ class DisenchantMany implements ShouldQueue
         foreach ($this->itemIds as $itemId) {
             $item = Item::find($itemId);
 
-            if ($character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
+            if ($character->gold_dust >= CurrencyLimit::MAX_GOLD_DUST) {
                 $this->processCappedGoldDust($character, $item, $disenchanted);
 
                 $character = $character->refresh();

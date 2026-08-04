@@ -2,8 +2,8 @@
 
 namespace App\Game\Events\Values;
 
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 
 class GlobalEventForEventTypeValue
 {
@@ -18,9 +18,9 @@ class GlobalEventForEventTypeValue
                 'reward_every' => 2000,
                 'next_reward_at' => 2000,
                 'event_type' => EventType::WINTER_EVENT,
-                'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+                'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
                 'should_be_unique' => true,
-                'unique_type' => RandomAffixDetails::LEGENDARY,
+                'unique_type' => RandomAffixTier::LEGENDARY->value,
                 'should_be_mythic' => false,
             ];
         }
@@ -31,9 +31,9 @@ class GlobalEventForEventTypeValue
                 'reward_every' => 2000,
                 'next_reward_at' => 2000,
                 'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-                'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+                'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
                 'should_be_unique' => false,
-                'unique_type' => RandomAffixDetails::MYTHIC,
+                'unique_type' => RandomAffixTier::MYTHIC->value,
                 'should_be_mythic' => true,
             ];
         }
@@ -57,9 +57,9 @@ class GlobalEventForEventTypeValue
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ];
     }
@@ -71,9 +71,9 @@ class GlobalEventForEventTypeValue
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ];
     }

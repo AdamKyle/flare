@@ -2,8 +2,8 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Flare\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\CharacterInventory\Events\CharacterInventoryCountUpdateBroadcaseEvent;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;

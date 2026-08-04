@@ -7,12 +7,12 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -122,10 +122,10 @@ class FactionLoyaltyServiceTest extends TestCase
         ]);
         $characterAutomation = CharacterAutomation::create([
             'character_id' => $this->character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $automation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,
@@ -209,10 +209,10 @@ class FactionLoyaltyServiceTest extends TestCase
         ]);
         $characterAutomation = CharacterAutomation::create([
             'character_id' => $this->character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $automation = $this->createFactionLoyaltyAutomation([
             'character_automation_id' => $characterAutomation->id,
@@ -428,9 +428,9 @@ class FactionLoyaltyServiceTest extends TestCase
             return $resultFaction['is_pledged'];
         }));
 
-        foreach (MapNameValue::$values as $value) {
+        foreach (MapName::values() as $value) {
 
-            if ($value === MapNameValue::SURFACE) {
+            if ($value === MapName::SURFACE->value) {
                 continue;
             }
 
@@ -682,11 +682,11 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->character->map()->update([
             'game_map_id' => $this->createGameMap([
                 'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+                'name' => MapName::DELUSIONAL_MEMORIES->value,
             ])->id,
         ]);
 
-        $surfaceGameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+        $surfaceGameMap = GameMap::where('name', MapName::SURFACE->value)->first();
 
         $this->character = $this->character->refresh();
 
@@ -789,7 +789,7 @@ class FactionLoyaltyServiceTest extends TestCase
             if ($task['type'] === 'bounty') {
                 $monster = Monster::find($task['monster_id']);
 
-                $this->assertEquals(MapNameValue::SURFACE, $monster->gameMap->name);
+                $this->assertEquals(MapName::SURFACE->value, $monster->gameMap->name);
             }
         }
     }
@@ -804,17 +804,17 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->character->map()->update([
             'game_map_id' => $this->createGameMap([
                 'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+                'name' => MapName::DELUSIONAL_MEMORIES->value,
             ])->id,
         ]);
 
         $this->character = $this->character->refresh();
 
-        $surfaceGameMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+        $surfaceGameMap = GameMap::where('name', MapName::SURFACE->value)->first();
 
         $item = $this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::PURGATORY,
+            'effect' => ItemEffectType::PURGATORY->value,
         ]);
 
         $this->character->inventory->slots()->create([
@@ -923,7 +923,7 @@ class FactionLoyaltyServiceTest extends TestCase
             if ($task['type'] === 'bounty') {
                 $monster = Monster::find($task['monster_id']);
 
-                $this->assertEquals(MapNameValue::DELUSIONAL_MEMORIES, $monster->gameMap->name);
+                $this->assertEquals(MapName::DELUSIONAL_MEMORIES->value, $monster->gameMap->name);
             }
         }
     }

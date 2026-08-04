@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Flare\Jobs\AccountDeletionJob;
 use App\Flare\Models\User;
-use App\Flare\Services\CharacterDeletion;
+use App\Game\Character\Services\CharacterDeletion;
 use Illuminate\Http\Request;
 
 class AccountDeletionController extends Controller

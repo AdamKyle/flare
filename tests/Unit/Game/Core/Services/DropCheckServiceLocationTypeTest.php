@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Core\Services;
 
-use App\Flare\Values\LocationType;
 use App\Game\Core\Services\DropCheckService;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
+use App\Game\Maps\Values\LocationType;
+use Facades\App\Game\Core\Chance\DropCheckCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

@@ -7,7 +7,7 @@ use App\Admin\Import\ClassSpecials\ClassSpecialsImport;
 use App\Admin\Requests\ClassSpecialsImportRequest;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
-use App\Flare\Values\AttackTypeValue;
+use App\Game\Core\Combat\Values\AttackType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -32,11 +32,11 @@ class ClassSpecialsController extends Controller
             'classSpecial' => null,
             'gameClasses' => GameClass::pluck('name', 'id')->toArray(),
             'forAttackType' => [
-                AttackTypeValue::ATTACK => AttackTypeValue::ATTACK,
-                AttackTypeValue::CAST => AttackTypeValue::CAST,
-                AttackTypeValue::ATTACK_AND_CAST => AttackTypeValue::ATTACK_AND_CAST,
-                AttackTypeValue::CAST_AND_ATTACK => AttackTypeValue::CAST_AND_ATTACK,
-                AttackTypeValue::DEFEND => AttackTypeValue::DEFEND,
+                AttackType::ATTACK->value => AttackType::ATTACK->value,
+                AttackType::CAST->value => AttackType::CAST->value,
+                AttackType::ATTACK_AND_CAST->value => AttackType::ATTACK_AND_CAST->value,
+                AttackType::CAST_AND_ATTACK->value => AttackType::CAST_AND_ATTACK->value,
+                AttackType::DEFEND->value => AttackType::DEFEND->value,
                 'any' => 'any',
             ],
         ]);
@@ -55,11 +55,11 @@ class ClassSpecialsController extends Controller
             'classSpecial' => $gameClassSpecial,
             'gameClasses' => GameClass::pluck('name', 'id')->toArray(),
             'forAttackType' => [
-                AttackTypeValue::ATTACK => AttackTypeValue::ATTACK,
-                AttackTypeValue::CAST => AttackTypeValue::CAST,
-                AttackTypeValue::ATTACK_AND_CAST => AttackTypeValue::ATTACK_AND_CAST,
-                AttackTypeValue::CAST_AND_ATTACK => AttackTypeValue::CAST_AND_ATTACK,
-                AttackTypeValue::DEFEND => AttackTypeValue::DEFEND,
+                AttackType::ATTACK->value => AttackType::ATTACK->value,
+                AttackType::CAST->value => AttackType::CAST->value,
+                AttackType::ATTACK_AND_CAST->value => AttackType::ATTACK_AND_CAST->value,
+                AttackType::CAST_AND_ATTACK->value => AttackType::CAST_AND_ATTACK->value,
+                AttackType::DEFEND->value => AttackType::DEFEND->value,
                 'any' => 'any',
             ],
         ]);

@@ -4,13 +4,6 @@ namespace App\Flare\Providers;
 
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Handlers\MessageThrottledHandler;
-use App\Flare\Items\Builders\AffixAttributeBuilder;
-use App\Flare\Items\Builders\BuildCosmicItem;
-use App\Flare\Items\Builders\BuildMythicItem;
-use App\Flare\Items\Builders\BuildUniqueItem;
-use App\Flare\Items\Builders\RandomAffixGenerator;
-use App\Flare\Items\Builders\RandomItemDropBuilder;
-use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Middleware\IsCharacterDeadMiddleware;
 use App\Flare\Middleware\IsCharacterWhoTheySayTheyAreMiddleware;
 use App\Flare\Middleware\IsGloballyTimedOut;
@@ -54,47 +47,42 @@ use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Flare\Services\CanUserEnterSiteService;
-use App\Flare\Services\CharacterCurrencyRewardService;
-use App\Flare\Services\CharacterDeletion;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Services\CharacterXPService;
-use App\Flare\Services\DailyGoldDustService;
-use App\Flare\Services\DelveMonsterService;
-use App\Flare\Services\EventSchedulerService;
 use App\Flare\Services\SiteAccessStatisticService;
-use App\Flare\Services\SkillBonusContextService;
-use App\Flare\Transformers\BasicKingdomTransformer;
-use App\Flare\Transformers\CharacterAttackTransformer;
-use App\Flare\Transformers\CharacterSheetBaseInfoTransformer;
-use App\Flare\Transformers\InventoryTransformer;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\MarketItemsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Flare\Transformers\UsableItemTransformer;
-use App\Flare\Values\BaseSkillValue;
-use App\Flare\Values\BaseStatValue;
 use App\Flare\View\Components\ItemDisplayColor;
 use App\Game\Battle\Services\AttackTimerService;
-use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanksWeaponMasteriesBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
-use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
-use App\Game\Character\CharacterCreation\State\CharacterBuildState;
-use App\Game\Core\Services\CharacterService;
-use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Builders\AffixAttributeBuilder;
+use App\Game\Core\Items\Builders\BuildCosmicItem;
+use App\Game\Core\Items\Builders\BuildMythicItem;
+use App\Game\Core\Items\Builders\BuildUniqueItem;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Builders\RandomItemDropBuilder;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Exploration\Services\DelveMonsterService;
+use App\Game\Kingdoms\Transformers\BasicKingdomTransformer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
 use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Transformers\UnitTransformer;
+use App\Game\Market\Transformers\MarketItemsTransformer;
 use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use App\Game\Quests\Transformers\QuestTransformer;
-use App\Game\Raids\Services\RaidMapConflictService;
-use App\Game\Skills\Services\SkillService;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
@@ -109,16 +97,15 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
 
-        $this->app->bind(BaseStatValue::class, function () {
-            return new BaseStatValue;
+        $this->app->bind(BaseStatCalculator::class, function () {
+            return new BaseStatCalculator;
         });
 
-        $this->app->bind(AffixAttributeBuilder::class, function () {
-            return new AffixAttributeBuilder;
-        });
-
-        $this->app->bind(DailyGoldDustService::class, function () {
-            return new DailyGoldDustService;
+        $this->app->bind(AffixAttributeBuilder::class, function ($app) {
+            return new AffixAttributeBuilder(
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
+            );
         });
 
         $this->app->bind(RandomAffixGenerator::class, function ($app) {
@@ -134,7 +121,10 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(RandomItemDropBuilder::class, function ($app) {
-            return new RandomItemDropBuilder;
+            return new RandomItemDropBuilder(
+                $app->make(RandomNumberGenerator::class),
+                $app->make(ChanceCalculator::class),
+            );
         });
 
         $this->app->bind(CharacterAttackTransformer::class, function ($app) {
@@ -198,33 +188,12 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomAttackLogsTransformer;
         });
 
-        $this->app->bind(BaseSkillValue::class, function ($app) {
-            return new BaseSkillValue;
+        $this->app->bind(BaseSkillBuilder::class, function ($app) {
+            return new BaseSkillBuilder($app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(CoordinatesCache::class, function ($app) {
             return new CoordinatesCache;
-        });
-
-        $this->app->bind(CharacterXPService::class, function ($app) {
-            return new CharacterXPService(
-                $app->make(CharacterService::class),
-                $app->make(SkillService::class),
-                $app->make(Manager::class),
-                $app->make(CharacterSheetBaseInfoTransformer::class),
-                $app->make(BattleMessageHandler::class),
-            );
-        });
-
-        $this->app->bind(CharacterRewardService::class, function ($app) {
-            return new CharacterRewardService(
-                $app->make(CharacterXPService::class),
-                $app->make(CharacterCurrencyRewardService::class),
-                $app->make(SkillService::class),
-                $app->make(BuildUniqueItem::class),
-                $app->make(BuildMythicItem::class),
-                $app->make(BuildCosmicItem::class)
-            );
         });
 
         $this->app->bind(MessageThrottledHandler::class, function ($app) {
@@ -235,49 +204,55 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CanUserEnterSiteService;
         });
 
-        $this->app->bind(ServerMonster::class, function () {
-            return new ServerMonster;
+        $this->app->bind(ServerMonster::class, function ($app) {
+            return new ServerMonster($app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(BuildMonster::class, function ($app) {
             return new BuildMonster(
                 $app->make(ServerMonster::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
             );
         });
 
-        $this->app->bind(Voidance::class, function () {
-            return new Voidance;
+        $this->app->bind(Voidance::class, function ($app) {
+            return new Voidance($app->make(ChanceCalculator::class));
         });
 
         $this->app->bind(Ambush::class, function ($app) {
             return new Ambush(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
             );
         });
 
         $this->app->bind(Entrance::class, function ($app) {
-            return new Entrance($app->make(CharacterCacheData::class));
+            return new Entrance($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(ElementalAttack::class, function ($app) {
-            return new ElementalAttack($app->make(CharacterCacheData::class));
+            return new ElementalAttack($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(MonsterSpecialAttack::class, function ($app) {
-            return new MonsterSpecialAttack($app->make(CharacterCacheData::class));
+            return new MonsterSpecialAttack($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(CanHit::class, function ($app) {
-            return new CanHit($app->make(CharacterCacheData::class));
+            return new CanHit($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class));
         });
 
         $this->app->bind(Affixes::class, function ($app) {
-            return new Affixes($app->make(CharacterCacheData::class));
+            return new Affixes($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(SecondaryAttacks::class, function ($app) {
             return new SecondaryAttacks(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Affixes::class)
             );
         });
@@ -285,6 +260,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(WeaponType::class, function ($app) {
             return new WeaponType(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
                 $app->make(SpecialAttacks::class),
@@ -294,6 +271,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CastType::class, function ($app) {
             return new CastType(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
                 $app->make(SpecialAttacks::class),
@@ -303,6 +282,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(AttackAndCast::class, function ($app) {
             return new AttackAndCast(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Entrance::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
@@ -312,6 +293,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CastAndAttack::class, function ($app) {
             return new CastAndAttack(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Entrance::class),
                 $app->make(WeaponType::class),
                 $app->make(CastType::class),
@@ -321,6 +304,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(Defend::class, function ($app) {
             return new Defend(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class),
                 $app->make(SecondaryAttacks::class),
@@ -345,6 +330,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(MonsterAttack::class, function ($app) {
             return new MonsterAttack(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(PlayerHealing::class),
                 $app->make(Entrance::class),
                 $app->make(CanHit::class)
@@ -361,6 +348,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(PlayerHealing::class, function ($app) {
             return new PlayerHealing(
                 $app->make(CharacterCacheData::class),
+                $app->make(ChanceCalculator::class),
+                $app->make(RandomNumberGenerator::class),
                 $app->make(Affixes::class),
                 $app->make(CastType::class),
             );
@@ -371,63 +360,59 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(HammerSmash::class, function ($app) {
-            return new HammerSmash($app->make(CharacterCacheData::class));
+            return new HammerSmash($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(AlchemistsRavenousDream::class, function ($app) {
-            return new AlchemistsRavenousDream($app->make(CharacterCacheData::class));
+            return new AlchemistsRavenousDream($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(TripleAttack::class, function ($app) {
-            return new TripleAttack($app->make(CharacterCacheData::class));
+            return new TripleAttack($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(DoubleAttack::class, function ($app) {
-            return new DoubleAttack($app->make(CharacterCacheData::class));
+            return new DoubleAttack($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(DoubleCast::class, function ($app) {
-            return new DoubleCast($app->make(CharacterCacheData::class));
+            return new DoubleCast($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(DoubleHeal::class, function ($app) {
-            return new DoubleHeal($app->make(CharacterCacheData::class));
+            return new DoubleHeal($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(VampireThirst::class, function ($app) {
-            return new VampireThirst($app->make(CharacterCacheData::class));
+            return new VampireThirst($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(ThiefBackStab::class, function ($app) {
-            return new ThiefBackStab($app->make(CharacterCacheData::class));
+            return new ThiefBackStab($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(BloodyPuke::class, function ($app) {
-            return new BloodyPuke($app->make(CharacterCacheData::class));
+            return new BloodyPuke($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(MerchantSupply::class, function ($app) {
-            return new MerchantSupply($app->make(CharacterCacheData::class));
+            return new MerchantSupply($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(PlagueSurge::class, function ($app) {
-            return new PlagueSurge($app->make(CharacterCacheData::class));
+            return new PlagueSurge($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(GunslingersAssassination::class, function ($app) {
-            return new GunslingersAssassination($app->make(CharacterCacheData::class));
+            return new GunslingersAssassination($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(SensualDance::class, function ($app) {
-            return new SensualDance($app->make(CharacterCacheData::class));
+            return new SensualDance($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(BookBindersFear::class, function ($app) {
-            return new BookBindersFear($app->make(CharacterCacheData::class));
-        });
-
-        $this->app->bind(DelveMonsterService::class, function () {
-            return new DelveMonsterService();
+            return new BookBindersFear($app->make(CharacterCacheData::class), $app->make(ChanceCalculator::class), $app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(BuildCosmicItem::class, function ($app) {
@@ -449,24 +434,12 @@ class ServiceProvider extends ApplicationServiceProvider
             );
         });
 
-        $this->app->bind(CharacterDeletion::class, function ($app) {
-            return new CharacterDeletion(
-                $app->make(GiveKingdomsToNpcHandler::class),
-                $app->make(CharacterCreationPipeline::class),
-                $app->make(CharacterBuildState::class),
-            );
-        });
-
         $this->app->bind(BuildMythicItem::class, function ($app) {
             return new BuildMythicItem($app->make(RandomAffixGenerator::class));
         });
 
         $this->app->bind(ClassRanksWeaponMasteriesBuilder::class, function () {
             return new ClassRanksWeaponMasteriesBuilder;
-        });
-
-        $this->app->bind(EventSchedulerService::class, function ($app) {
-            return new EventSchedulerService($app->make(RaidMapConflictService::class));
         });
 
         $this->app->bind(BuildQuestCacheService::class, function ($app) {
@@ -484,13 +457,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new PlainDataSerializer;
         });
 
-        $this->app->singleton(CharacterCurrencyRewardService::class, function ($app) {
-            return new CharacterCurrencyRewardService($app->make(BattleMessageHandler::class));
-        });
-
-        $this->app->bind(SkillBonusContextService::class, function () {
-            return new SkillBonusContextService();
-        });
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace App\Game\BatchCrafting\Providers;
 
 use App\Admin\Services\MonitoredBugReportService;
-use App\Flare\Transformers\ItemTransformer;
 use App\Game\BatchCrafting\Services\BatchCraftingLogger;
 use App\Game\BatchCrafting\Services\BatchCraftingProcessor;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
@@ -13,10 +12,12 @@ use App\Game\Character\CharacterInventory\Services\InventorySetService;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
+use App\Game\Core\Items\Services\HolyItemBonusGenerator;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Messages\Handlers\ServerMessageHandler;
-use App\Game\NpcActions\WorkBench\Services\HolyItemService;
+use App\Game\Npcs\Actions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\AlchemyService;
@@ -44,6 +45,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(HandleUpdatingEnchantingGlobalEventGoal::class),
                 $app->make(ServerMessageHandler::class),
                 $app->make(ItemTransformer::class),
+                $app->make(HolyItemBonusGenerator::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
                 $app->make(EventBatchEnchantingAffixSelector::class),
                 $app->make(SetHandsValidation::class),

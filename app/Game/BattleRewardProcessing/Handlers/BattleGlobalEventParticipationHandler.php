@@ -2,9 +2,9 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Events\Events\UpdateEventGoalCurrentProgressForCharacter;
 use App\Game\Events\Events\UpdateEventGoalProgress;
 use App\Game\Events\Handlers\BaseGlobalEventGoalParticipationHandler;

@@ -9,6 +9,8 @@ use App\Flare\ServerFight\Fight\ElementalAttack;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class BattleBase extends BattleMessages
 {
@@ -38,8 +40,11 @@ class BattleBase extends BattleMessages
 
     const MINIMUM_DAMAGE_FOR_A_PLAYER = 500_000_000;
 
-    public function __construct(CharacterCacheData $characterCacheData)
-    {
+    public function __construct(
+        CharacterCacheData $characterCacheData,
+        protected readonly ChanceCalculator $chanceCalculator,
+        protected readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {
         parent::__construct();
 
         $this->characterCacheData = $characterCacheData;

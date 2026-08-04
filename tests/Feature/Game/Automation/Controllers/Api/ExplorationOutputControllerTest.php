@@ -3,7 +3,7 @@
 namespace Tests\Feature\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -39,7 +39,7 @@ class ExplorationOutputControllerTest extends TestCase
     {
         $automation = $this->createCharacterAutomation([
             'character_id' => $this->character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'completed_at' => now()->addSeconds(3),
         ]);
 

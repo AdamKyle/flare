@@ -55,8 +55,7 @@ class CleanDuplicateQuestInventorySlots extends Command
 
     /**
      * Delete duplicate quest-item inventory slots, keeping the lowest slot ID
-     * per inventory/item pair. Each group is cleaned inside its own
-     * transaction with the owning inventory row locked.
+     * per inventory/item pair.
      */
     private function runApply(Collection $duplicateGroups): void
     {
@@ -67,61 +66,59 @@ class CleanDuplicateQuestInventorySlots extends Command
             $inventoryId = $group->inventory_id;
             $itemId = $group->item_id;
 
-            DB::transaction(function () use ($inventoryId, $itemId, &$totalGroupsCleaned, &$totalRowsDeleted): void {
-                $inventory = Inventory::where('id', $inventoryId)->lockForUpdate()->first();
+            $inventory = Inventory::where('id', $inventoryId)->first();
 
-                if (is_null($inventory)) {
-                    return;
-                }
+            if (is_null($inventory)) {
+                continue;
+            }
 
-                $slots = InventorySlot::where('inventory_id', $inventoryId)
-                    ->where('item_id', $itemId)
-                    ->whereHas('item', function ($query): void {
-                        $query->where('type', 'quest');
-                    })
-                    ->orderBy('id')
-                    ->get();
+            $slots = InventorySlot::where('inventory_id', $inventoryId)
+                ->where('item_id', $itemId)
+                ->whereHas('item', function ($query): void {
+                    $query->where('type', 'quest');
+                })
+                ->orderBy('id')
+                ->get();
 
-                if ($slots->count() < 2) {
-                    return;
-                }
+            if ($slots->count() < 2) {
+                continue;
+            }
 
-                $keeperId = $slots->first()->id;
-                $duplicateSlots = $slots->slice(1);
-                $deletedIds = [];
+            $keeperId = $slots->first()->id;
+            $duplicateSlots = $slots->slice(1);
+            $deletedIds = [];
 
-                foreach ($duplicateSlots as $duplicateSlot) {
-                    $deletedIds[] = $duplicateSlot->id;
-                    $duplicateSlot->delete();
-                }
+            foreach ($duplicateSlots as $duplicateSlot) {
+                $deletedIds[] = $duplicateSlot->id;
+                $duplicateSlot->delete();
+            }
 
-                $remainingSlots = InventorySlot::where('inventory_id', $inventoryId)
-                    ->where('item_id', $itemId)
-                    ->whereHas('item', function ($query): void {
-                        $query->where('type', 'quest');
-                    })
-                    ->orderBy('id')
-                    ->get();
+            $remainingSlots = InventorySlot::where('inventory_id', $inventoryId)
+                ->where('item_id', $itemId)
+                ->whereHas('item', function ($query): void {
+                    $query->where('type', 'quest');
+                })
+                ->orderBy('id')
+                ->get();
 
-                if ($remainingSlots->count() !== 1 || $remainingSlots->first()->id !== $keeperId) {
-                    throw new RuntimeException(sprintf(
-                        'Duplicate quest-item cleanup verification failed for inventory %d, item %d.',
-                        $inventoryId,
-                        $itemId
-                    ));
-                }
-
-                $totalGroupsCleaned++;
-                $totalRowsDeleted += count($deletedIds);
-
-                $this->line(sprintf(
-                    'Inventory: %d, Item: %d, Retained slot: %d, Deleted slots: %s',
+            if ($remainingSlots->count() !== 1 || $remainingSlots->first()->id !== $keeperId) {
+                throw new RuntimeException(sprintf(
+                    'Duplicate quest-item cleanup verification failed for inventory %d, item %d.',
                     $inventoryId,
-                    $itemId,
-                    $keeperId,
-                    implode(', ', $deletedIds)
+                    $itemId
                 ));
-            });
+            }
+
+            $totalGroupsCleaned++;
+            $totalRowsDeleted += count($deletedIds);
+
+            $this->line(sprintf(
+                'Inventory: %d, Item: %d, Retained slot: %d, Deleted slots: %s',
+                $inventoryId,
+                $itemId,
+                $keeperId,
+                implode(', ', $deletedIds)
+            ));
         }
 
         $this->info('Duplicate quest-item groups cleaned: '.$totalGroupsCleaned);

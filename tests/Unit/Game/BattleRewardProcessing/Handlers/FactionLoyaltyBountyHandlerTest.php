@@ -3,12 +3,12 @@
 namespace Tests\Unit\Game\BattleRewardProcessing\Handlers;
 
 use App\Flare\Models\CharacterBattleRewardRequest;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Handlers\FactionLoyaltyBountyHandler;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -196,7 +196,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
 
         $character->map()->update([
             'game_map_id' => $this->createGameMap([
-                'name' => MapNameValue::DELUSIONAL_MEMORIES,
+                'name' => MapName::DELUSIONAL_MEMORIES->value,
             ])->id,
         ]);
 
@@ -522,9 +522,9 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
             ->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -572,9 +572,9 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(2, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD, $character->gold);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
 
         $request = CharacterBattleRewardRequest::where('character_id', $character->id)
             ->where('source_type', BattleRewardRequestSourceType::FACTION_LOYALTY)
@@ -594,9 +594,9 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
             ->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -644,9 +644,9 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(25, $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->current_level);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD, $character->gold);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
         $this->assertCount(0, $character->factionLoyalties()->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks);
 
         $request = CharacterBattleRewardRequest::where('character_id', $character->id)
@@ -744,7 +744,7 @@ class FactionLoyaltyBountyHandlerTest extends TestCase
     public function test_does_not_handle_bounty_when_character_has_no_faction_for_monster_map()
     {
         $purgatoryMap = $this->createGameMap([
-            'name' => MapNameValue::PURGATORY,
+            'name' => MapName::PURGATORY->value,
         ]);
 
         $monster = $this->createMonster([

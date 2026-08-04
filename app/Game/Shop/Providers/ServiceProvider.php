@@ -3,11 +3,11 @@
 namespace App\Game\Shop\Providers;
 
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\UsableItemTransformer;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Shop\Services\GemShopService;
 use App\Game\Shop\Services\GoblinShopService;
 use App\Game\Shop\Services\ShopService;

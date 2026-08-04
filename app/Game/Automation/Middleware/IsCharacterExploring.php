@@ -2,7 +2,7 @@
 
 namespace App\Game\Automation\Middleware;
 
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Closure;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class IsCharacterExploring
     public function handle($request, Closure $next, $guard = null)
     {
         $isTooBusy = auth()->user()->character->currentAutomations()
-            ->where('type', AutomationType::EXPLORING)
+            ->where('type', AutomationType::EXPLORING->value)
             ->where('completed_at', '>', now())
             ->exists();
 

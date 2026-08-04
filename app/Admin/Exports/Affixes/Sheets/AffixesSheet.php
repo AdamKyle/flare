@@ -3,7 +3,7 @@
 namespace App\Admin\Exports\Affixes\Sheets;
 
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\ItemAffixType;
+use App\Game\Core\Items\Values\ItemAffixType;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -20,7 +20,7 @@ class AffixesSheet implements FromView, ShouldAutoSize, WithTitle
 
     public function view(): View
     {
-        $query = (new ItemAffixType(intval($this->type)))->query(ItemAffix::query());
+        $query = ItemAffixType::fromValue(intval($this->type))->query(ItemAffix::query());
 
         return view('admin.exports.affixes.sheets.affixes', [
             'affixes' => $query->where('randomly_generated', false)->orderBy('skill_level_required', 'asc')->get(),

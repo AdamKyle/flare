@@ -23,11 +23,11 @@ use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Skill;
 use App\Flare\Models\SmeltingProgress;
-use App\Flare\Services\CharacterDeletion;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\Character\Services\CharacterDeletion;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
+use App\Game\Npcs\Values\NpcType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -66,7 +66,7 @@ class CharacterDeletionTest extends TestCase
 
         $this->createNpc([
             'game_map_id' => GameMap::first()->id,
-            'type' => NpcTypes::KINGDOM_HOLDER,
+            'type' => NpcType::KINGDOM_HOLDER->value,
         ]);
 
         $this->characterDeletion = resolve(CharacterDeletion::class);
@@ -223,7 +223,7 @@ class CharacterDeletionTest extends TestCase
         ])->id;
         $globalEventGoalId = $this->createGlobalEventGoal([
             'event_type' => EventType::WEEKLY_CELESTIALS,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
         ])->id;
 
         $this->characterDeletion->deleteCharacterFromUser($character);

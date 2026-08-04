@@ -5,9 +5,9 @@ namespace App\Game\ClassRanks\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
-use App\Flare\Values\BaseSkillValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
 
@@ -63,7 +63,7 @@ class ManageClassService
         if (! is_null($characterSkill)) {
             $characterSkill->update(['is_hidden' => false]);
         } else {
-            $skillDetails = resolve(BaseSkillValue::class)->getBaseCharacterSkillValue($character, $skillToAdd);
+            $skillDetails = resolve(BaseSkillBuilder::class)->getBaseCharacterSkillValue($character, $skillToAdd);
 
             $character->skills()->create($skillDetails);
         }

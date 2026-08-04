@@ -4,10 +4,9 @@ namespace App\Game\Skills\Services\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use Exception;
 
 trait UpdateCharacterCurrency
@@ -29,12 +28,12 @@ trait UpdateCharacterCurrency
         }
 
         if ($character->classType()->isBlacksmith() && (
-            WeaponTypes::isWeaponType($item->type) || ArmourTypes::isArmourType($item->type)
+            in_array($item->type, [ItemType::WEAPON->value, ItemType::STAVE->value, ItemType::HAMMER->value, ItemType::BOW->value, ItemType::GUN->value, ItemType::MACE->value, ItemType::FAN->value, ItemType::SCRATCH_AWL->value, ItemType::RING->value, ItemType::SWORD->value, ItemType::CENSOR->value, ItemType::CLAW->value, ItemType::WAND->value], true) || ArmourType::tryFrom($item->type) !== null
         )) {
             $cost = floor($cost - $cost * 0.25);
         }
 
-        if ($character->classType()->isArcaneAlchemist() && SpellTypes::isSpellType($item->type)) {
+        if ($character->classType()->isArcaneAlchemist() && in_array($item->type, [ItemType::SPELL_HEALING->value, ItemType::SPELL_DAMAGE->value], true)) {
             $cost = floor($cost - $cost * 0.15);
         }
 

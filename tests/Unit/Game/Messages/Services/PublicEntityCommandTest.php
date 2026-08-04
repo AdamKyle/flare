@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Game\Messages\Services;
 
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\CelestialConjureType;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Services\PublicEntityCommand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -132,7 +132,7 @@ class PublicEntityCommandTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+            'effect' => ItemEffectType::TELEPORT_TO_CELESTIAL->value,
         ]))->getCharacter();
 
         $this->publicEntityCommand->setCharacter($character->user)->usePCTCommand();
@@ -148,7 +148,7 @@ class PublicEntityCommandTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+            'effect' => ItemEffectType::TELEPORT_TO_CELESTIAL->value,
         ]))->getCharacter();
         $character->update([
             'can_move' => false,
@@ -186,7 +186,7 @@ class PublicEntityCommandTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($this->createItem([
             'type' => 'quest',
-            'effect' => ItemEffectsValue::TELEPORT_TO_CELESTIAL,
+            'effect' => ItemEffectType::TELEPORT_TO_CELESTIAL->value,
         ]))->getCharacter();
 
         $this->publicEntityCommand->setCharacter($character->user)->usePCTCommand();

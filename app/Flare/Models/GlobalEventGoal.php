@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use Database\Factories\GlobalEventGoalFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -89,7 +89,7 @@ class GlobalEventGoal extends Model
 
     public function itemSpecialtyType(): ItemSpecialtyType
     {
-        return new ItemSpecialtyType($this->item_specialty_type_reward);
+        return ItemSpecialtyType::from($this->item_specialty_type_reward);
     }
 
     public function getTotalKillsAttribute(): int

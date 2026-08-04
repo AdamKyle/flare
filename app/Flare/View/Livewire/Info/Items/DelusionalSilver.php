@@ -3,7 +3,7 @@
 namespace App\Flare\View\Livewire\Info\Items;
 
 use App\Flare\Models\Item;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -21,7 +21,7 @@ class DelusionalSilver extends DataTableComponent
             ->whereNull('item_suffix_id')
             ->doesntHave('appliedHolyStacks')
             ->doesnthave('sockets')
-            ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER);
+            ->where('specialty_type', ItemSpecialtyType::DELUSIONAL_SILVER->value);
     }
 
     public function columns(): array

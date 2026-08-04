@@ -108,7 +108,7 @@ class PassiveSkillTypeValue
     ];
 
     /**
-     * NpcTypes constructor.
+     * NpcType constructor.
      *
      * Throws if the value does not exist in the array of const values.
      *

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Game\Gambler\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gambler\Values\CurrencyValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -44,7 +44,7 @@ class GamblerControllerTest extends TestCase
     public function test_roll_slots()
     {
 
-        $this->character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
+        $this->character->update(['gold' => CurrencyLimit::MAX_GOLD]);
 
         $this->character = $this->character->refresh();
 

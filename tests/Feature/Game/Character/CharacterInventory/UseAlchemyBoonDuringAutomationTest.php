@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory;
 
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -42,7 +42,7 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);
@@ -78,7 +78,7 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
         ]);

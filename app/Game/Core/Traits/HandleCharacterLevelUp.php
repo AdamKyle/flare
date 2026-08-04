@@ -4,11 +4,11 @@ namespace App\Game\Core\Traits;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Services\CharacterService;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -175,7 +175,7 @@ trait HandleCharacterLevelUp
         }
 
         return $character->inventory->slots->contains(function ($slot): bool {
-            return ! is_null($slot->item) && $slot->item->effect === ItemEffectsValue::CONTINUE_LEVELING;
+            return ! is_null($slot->item) && $slot->item->effect === ItemEffectType::CONTINUE_LEVELING->value;
         });
     }
 }

@@ -3,15 +3,15 @@
 namespace App\Game\Character\CharacterCreation\Pipeline\Steps;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\BaseStatValue;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Closure;
 
 class CharacterCreator
 {
-    private BaseStatValue $baseStatValue;
+    private BaseStatCalculator $baseStatValue;
 
-    public function __construct(BaseStatValue $baseStatValue)
+    public function __construct(BaseStatCalculator $baseStatValue)
     {
         $this->baseStatValue = $baseStatValue;
     }

@@ -9,7 +9,7 @@ use App\Admin\Requests\ItemsManagementRequest;
 use App\Admin\Services\ItemsService;
 use App\Flare\Models\Item;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -108,14 +108,14 @@ class ItemsController extends Controller
                 'trinket',
             ],
             'specialty-shops' => [
-                ItemSpecialtyType::PIRATE_LORD_LEATHER,
-                ItemSpecialtyType::HELL_FORGED,
-                ItemSpecialtyType::PURGATORY_CHAINS,
-                ItemSpecialtyType::CORRUPTED_ICE,
-                ItemSpecialtyType::DELUSIONAL_SILVER,
-                ItemSpecialtyType::TWISTED_EARTH,
-                ItemSpecialtyType::FAITHLESS_PLATE,
-                ItemSpecialtyType::LABYRINTH_CLOTH,
+                ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
+                ItemSpecialtyType::HELL_FORGED->value,
+                ItemSpecialtyType::PURGATORY_CHAINS->value,
+                ItemSpecialtyType::CORRUPTED_ICE->value,
+                ItemSpecialtyType::DELUSIONAL_SILVER->value,
+                ItemSpecialtyType::TWISTED_EARTH->value,
+                ItemSpecialtyType::FAITHLESS_PLATE->value,
+                ItemSpecialtyType::LABYRINTH_CLOTH->value,
             ],
         ];
 

@@ -3,9 +3,8 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -35,7 +34,7 @@ class ItemListCostTransformerService
 
     public function reduceCostOfCraftingItems(Character $character, Collection $items, bool $showMerchantMessage): SupportCollection
     {
-        if ($character->classType()->isBlacksmith() && $this->isItemsOfType($items, [WeaponTypes::WEAPON, ...ArmourTypes::armourTypes()])) {
+        if ($character->classType()->isBlacksmith() && $this->isItemsOfType($items, [ItemType::WEAPON->value, ...ArmourType::allTypes()])) {
             if ($showMerchantMessage) {
                 event(new ServerMessageEvent($character->user, 'As a Blacksmith, you get 25% reduction on crafting time out for weapons and armour, as well as cost reduction. Items in the list have been adjusted.'));
             }
@@ -51,7 +50,7 @@ class ItemListCostTransformerService
             return $this->reduceCostForCrafting($items, 0.30);
         }
 
-        if ($character->classType()->isArcaneAlchemist() && $this->isItemsOfType($items, [SpellTypes::DAMAGE, SpellTypes::HEALING])) {
+        if ($character->classType()->isArcaneAlchemist() && $this->isItemsOfType($items, [ItemType::SPELL_DAMAGE->value, ItemType::SPELL_HEALING->value])) {
             if ($showMerchantMessage) {
                 event(new ServerMessageEvent($character->user, 'As a Arcane Alchemist, you get 15% reduction on crafting time out for Spells, as well as cost reduction. Items in the list have been adjusted.'));
             }

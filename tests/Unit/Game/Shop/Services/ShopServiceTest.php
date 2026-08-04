@@ -2,9 +2,8 @@
 
 namespace Tests\Unit\Game\Shop\Services;
 
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
-use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Shop\Services\ShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -12,10 +11,11 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class ShopServiceTest extends TestCase
 {
-    use CreateGameSkill, CreateItem, RefreshDatabase;
+    use CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -97,14 +97,20 @@ class ShopServiceTest extends TestCase
 
     public function test_buy_and_replace_item()
     {
+        $existingShield = $this->createItem(['type' => 'shield']);
         $shield = $this->createItem(['type' => 'shield']);
 
-        $character = $this->character->getCharacter();
+        $character = $this->character->inventoryManagement()
+            ->giveItem($existingShield, true, 'left-hand')
+            ->getCharacter();
+
+        $equippedSlot = $character->inventory->slots->firstWhere('item_id', $existingShield->id);
 
         $character->update(['gold' => 100000]);
 
         $this->shopService->buyAndReplace($shield, $character->refresh(), [
             'position' => 'left-hand',
+            'slot_id' => $equippedSlot->id,
         ]);
 
         $character = $character->refresh();
@@ -113,7 +119,7 @@ class ShopServiceTest extends TestCase
             return $slot->item_id === $shield->id && $slot->equipped;
         })->first();
 
-        $this->assertLessThan(100000, $character->fold);
+        $this->assertLessThan(100000, $character->gold);
         $this->assertNotNull($inventorySlot);
     }
 
@@ -150,44 +156,40 @@ class ShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->gold);
     }
 
-    public function test_buy_and_replace_rolls_back_gold_on_replace_failure(): void
+    public function test_buy_and_replace_rejects_invalid_replacement_before_gold_or_inventory_changes(): void
     {
-        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
-        $character = $this->character->getCharacter();
+        $existingUniquePrefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => true]);
+        $existingUniqueItem = $this->createItem(['type' => 'shield', 'item_prefix_id' => $existingUniquePrefix->id]);
+        $existingLeftHandShield = $this->createItem(['type' => 'shield']);
+
+        $newUniquePrefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => true]);
+        $newUniqueShield = $this->createItem(['type' => 'shield', 'item_prefix_id' => $newUniquePrefix->id, 'cost' => 1000]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($existingUniqueItem, true, 'right-hand')
+            ->giveItem($existingLeftHandShield, true, 'left-hand')
+            ->getCharacter();
+
+        $equippedSlot = $character->inventory->slots->firstWhere('item_id', $existingLeftHandShield->id);
+
         $character->update(['gold' => 50000]);
+        $character = $character->refresh();
 
-        $equipItemService = Mockery::mock(EquipItemService::class);
-        $equipItemService->shouldReceive('setRequest')->andReturnSelf();
-        $equipItemService->shouldReceive('setCharacter')->andReturnSelf();
-        $equipItemService->shouldReceive('replaceItem')->andThrow(new EquipItemException('cannot equip'));
+        try {
+            $this->shopService->buyAndReplace($newUniqueShield, $character, [
+                'position' => 'left-hand',
+                'slot_id' => $equippedSlot->id,
+            ]);
 
-        $this->instance(EquipItemService::class, $equipItemService);
-        $shopService = resolve(ShopService::class);
+            $this->fail('Expected the invalid replacement to be rejected.');
+        } catch (EquipItemException $exception) {
+            $this->assertSame('Cannot equip another unique.', $exception->getMessage());
+        }
 
-        $this->expectException(EquipItemException::class);
-        $this->expectExceptionMessage('cannot equip');
+        $character = $character->refresh();
 
-        $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
-    }
-
-    public function test_buy_and_replace_rolls_back_inventory_slot_on_replace_failure(): void
-    {
-        $shield = $this->createItem(['type' => 'shield', 'cost' => 1000]);
-        $character = $this->character->getCharacter();
-        $character->update(['gold' => 50000]);
-
-        $equipItemService = Mockery::mock(EquipItemService::class);
-        $equipItemService->shouldReceive('setRequest')->andReturnSelf();
-        $equipItemService->shouldReceive('setCharacter')->andReturnSelf();
-        $equipItemService->shouldReceive('replaceItem')->andThrow(new EquipItemException('cannot equip'));
-
-        $this->instance(EquipItemService::class, $equipItemService);
-        $shopService = resolve(ShopService::class);
-
-        $this->expectException(EquipItemException::class);
-        $this->expectExceptionMessage('cannot equip');
-
-        $shopService->buyAndReplace($shield, $character->refresh(), ['position' => 'left-hand']);
+        $this->assertSame(50000, $character->gold);
+        $this->assertNull($character->inventory->slots->firstWhere('item_id', $newUniqueShield->id));
     }
 
     public function test_sell_item_do_not_go_above_max_gold()
@@ -195,7 +197,7 @@ class ShopServiceTest extends TestCase
         $shield = $this->createItem(['type' => 'shield']);
         $character = $this->character->inventoryManagement()->giveItem($shield)->getCharacter();
 
-        $character->update(['gold' => MaxCurrenciesValue::MAX_GOLD]);
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
 
         $character = $character->refresh();
 
@@ -204,6 +206,6 @@ class ShopServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertNull($character->inventory->slots()->where('item_id', $shield->id)->first());
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD, $character->gold);
     }
 }

@@ -9,6 +9,8 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use Cache;
 
 class CastType extends BattleBase
@@ -21,9 +23,9 @@ class CastType extends BattleBase
 
     private bool $allowEntrancing = false;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->entrance = $entrance;
         $this->canHit = $canHit;
@@ -192,7 +194,7 @@ class CastType extends BattleBase
 
                 $evasion = 100 - (100 - 100 * $monsterSpellEvasion);
 
-                if (rand(1, 100) > $evasion) {
+                if ($this->chanceCalculator->passesPercentage(100 - floor($evasion))) {
                     $this->addMessage('The enemy evades your magic!', 'enemy-action');
 
                     return;
@@ -227,7 +229,7 @@ class CastType extends BattleBase
     {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
-        if (rand(1, 100) > (100 - 100 * $criticality)) {
+        if ($this->chanceCalculator->passesPercentage($criticality * 100)) {
             $this->addMessage('Your magic radiates across the plane. Even The Creator is terrified! (Critical strike!)', 'player-action');
 
             $spellDamage *= 2;
@@ -337,7 +339,7 @@ class CastType extends BattleBase
     {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
-        if (rand(1, 100) > (100 - 100 * $criticality)) {
+        if ($this->chanceCalculator->passesPercentage($criticality * 100)) {
             $this->addMessage('The heavens open and your wounds start to heal over (Critical heal!)', 'player-action');
 
             $healFor *= 2;

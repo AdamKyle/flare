@@ -9,8 +9,8 @@ use App\Flare\Models\GlobalEventEnchant;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Services\GlobalEventStepRotatorService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
@@ -24,6 +24,26 @@ use Tests\Traits\CreateGlobalEventGoal;
 class GlobalEventStepRotatorServiceTest extends TestCase
 {
     use CreateEvent, CreateGlobalEventGoal, RefreshDatabase;
+
+    public function test_repeated_rotation_with_stale_event_state_does_not_rotate_twice(): void
+    {
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_goal_steps' => [GlobalEventSteps::BATTLE, GlobalEventSteps::CRAFT, GlobalEventSteps::ENCHANT],
+            'current_event_goal_step' => GlobalEventSteps::BATTLE,
+        ]);
+
+        $this->createGlobalEventGoal(['event_type' => $event->type]);
+
+        $rotator = app(GlobalEventStepRotatorService::class);
+        $firstResult = $rotator->rotate($event);
+        $secondResult = $rotator->rotate($event);
+
+        $this->assertNotNull($firstResult);
+        $this->assertNull($secondResult);
+        $this->assertSame(GlobalEventSteps::CRAFT, $event->refresh()->current_event_goal_step);
+        $this->assertSame(1, GlobalEventGoal::count());
+    }
 
     /**
      * Returns null when current step is not found in steps (no side effects).
@@ -43,9 +63,9 @@ class GlobalEventStepRotatorServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -87,9 +107,9 @@ class GlobalEventStepRotatorServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -167,9 +187,9 @@ class GlobalEventStepRotatorServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 
@@ -236,9 +256,9 @@ class GlobalEventStepRotatorServiceTest extends TestCase
             'reward_every' => 100,
             'next_reward_at' => 100,
             'event_type' => $event->type,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
         ]);
 

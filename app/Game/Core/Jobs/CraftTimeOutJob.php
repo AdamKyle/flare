@@ -3,7 +3,7 @@
 namespace App\Game\Core\Jobs;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Events\ShowCraftingTimeOutEvent;
 use Illuminate\Bus\Queueable;
@@ -53,7 +53,7 @@ class CraftTimeOutJob implements ShouldQueue
     private function hasActiveFactionLoyaltyAutomation(): bool
     {
         return $this->character->currentAutomations()
-            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('type', AutomationType::FACTION_LOYALTY->value)
             ->where('completed_at', '>', now())
             ->exists();
     }

@@ -2,13 +2,11 @@
 
 namespace App\Game\Character\Builders\InformationBuilders;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Traits\ElementAttackData;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
@@ -17,6 +15,8 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilde
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Items\Values\ItemType;
 use Exception;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
@@ -176,7 +176,7 @@ class CharacterStatBuilder
             return false;
         }
 
-        return ! is_null($this->questItems->where('item.effect', ItemEffectsValue::AFFIXES_IRRESISTIBLE)->first());
+        return ! is_null($this->questItems->where('item.effect', ItemEffectType::AFFIXES_IRRESISTIBLE->value)->first());
     }
 
     /**
@@ -229,7 +229,7 @@ class CharacterStatBuilder
         }
 
         $purgatoryQuestItem = $this->character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::PURGATORY;
+            return $slot->item->effect === ItemEffectType::PURGATORY->value;
         })->first();
 
         if (! is_null($purgatoryQuestItem)) {

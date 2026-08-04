@@ -6,12 +6,11 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Kingdoms\Handlers\Traits\DestroyKingdom;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 
 class KingdomEventService
@@ -36,7 +35,7 @@ class KingdomEventService
             $this->giveFullSetToWinner($character, $gameMap);
         }
 
-        $gameMapNameValue = new MapNameValue($gameMapName);
+        $gameMapNameValue = MapName::from($gameMapName);
 
         if ($gameMapNameValue->isTheIcePlane()) {
             event(new GlobalMessageEvent('The Queen Rages with her magics as she causes the ground and the ice to heave, crack and shatter taking the kingdoms with it! The people, their screams. Her laughter fills the air!'));
@@ -56,33 +55,33 @@ class KingdomEventService
     protected function giveFullSetToWinner(Character $character, GameMap $gameMap)
     {
         $types = [
-            WeaponTypes::BOW,
-            WeaponTypes::HAMMER,
-            WeaponTypes::RING,
-            WeaponTypes::RING,
-            WeaponTypes::STAVE,
-            WeaponTypes::WEAPON,
-            WeaponTypes::WEAPON,
-            SpellTypes::HEALING,
-            SpellTypes::DAMAGE,
-            ArmourTypes::BODY,
-            ArmourTypes::FEET,
-            ArmourTypes::GLOVES,
-            ArmourTypes::HELMET,
-            ArmourTypes::LEGGINGS,
-            ArmourTypes::SHIELD,
-            ArmourTypes::SHIELD,
-            ArmourTypes::SLEEVES,
+            ItemType::BOW->value,
+            ItemType::HAMMER->value,
+            ItemType::RING->value,
+            ItemType::RING->value,
+            ItemType::STAVE->value,
+            ItemType::WEAPON->value,
+            ItemType::WEAPON->value,
+            ItemType::SPELL_HEALING->value,
+            ItemType::SPELL_DAMAGE->value,
+            ArmourType::BODY->value,
+            ArmourType::FEET->value,
+            ArmourType::GLOVES->value,
+            ArmourType::HELMET->value,
+            ArmourType::LEGGINGS->value,
+            ArmourType::SHIELD->value,
+            ArmourType::SHIELD->value,
+            ArmourType::SLEEVES->value,
         ];
 
         foreach ($types as $type) {
 
             if ($gameMap->mapType()->isTheIcePlane()) {
-                $character = $this->giveItemsOfType($character, ItemSpecialtyType::CORRUPTED_ICE, $type);
+                $character = $this->giveItemsOfType($character, ItemSpecialtyType::CORRUPTED_ICE->value, $type);
             }
 
             if ($gameMap->mapType()->isDelusionalMemories()) {
-                $character = $this->giveItemsOfType($character, ItemSpecialtyType::DELUSIONAL_SILVER, $type);
+                $character = $this->giveItemsOfType($character, ItemSpecialtyType::DELUSIONAL_SILVER->value, $type);
             }
         }
     }

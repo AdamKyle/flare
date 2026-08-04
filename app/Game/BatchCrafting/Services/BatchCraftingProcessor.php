@@ -2,8 +2,6 @@
 
 namespace App\Game\BatchCrafting\Services;
 
-use App\Flare\Items\Values\ArmourType;
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
@@ -20,9 +18,6 @@ use App\Flare\Models\ItemAffix;
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\SetSlot;
 use App\Flare\Models\Skill;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\UsableItemTransformer;
-use App\Flare\Values\ItemHolyValue;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
@@ -34,10 +29,16 @@ use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Services\HolyItemBonusGenerator;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\HolyItemLevel;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Messages\Handlers\ServerMessageHandler;
-use App\Game\NpcActions\WorkBench\Services\HolyItemService;
+use App\Game\Npcs\Actions\WorkBench\Services\HolyItemService;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\AlchemyService;
@@ -45,8 +46,8 @@ use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Values\SkillTypeValue;
-use Facades\App\Flare\Calculators\SellItemCalculator;
-use Facades\App\Flare\Calculators\SkillXPCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
+use Facades\App\Game\Skills\Calculators\SkillXPCalculator;
 use Illuminate\Support\Collection;
 
 class BatchCraftingProcessor
@@ -71,6 +72,7 @@ class BatchCraftingProcessor
         private readonly HandleUpdatingEnchantingGlobalEventGoal $handleUpdatingEnchantingGlobalEventGoal,
         private readonly ServerMessageHandler $serverMessageHandler,
         private readonly ItemTransformer $itemTransformer,
+        private readonly HolyItemBonusGenerator $holyItemBonusGenerator,
         ?GlobalEventGoalEligibilityService $globalEventGoalEligibilityService = null,
         ?EventBatchEnchantingAffixSelector $eventBatchEnchantingAffixSelector = null,
         ?SetHandsValidation $setHandsValidation = null,
@@ -1762,9 +1764,9 @@ class BatchCraftingProcessor
 
     private function applyHolyOilToSetSlot(SetSlot $setSlot, AlchemyBagSlot $oilSlot): array
     {
-        $holyItemEffect = new ItemHolyValue($oilSlot->item->holy_level);
-        $devouringDarknessBonus = $holyItemEffect->getRandomDevoidanceIncrease();
-        $statIncreaseBonus = $holyItemEffect->getRandomStatIncrease() / 100;
+        $holyItemLevel = HolyItemLevel::from($oilSlot->item->holy_level);
+        $devouringDarknessBonus = $this->holyItemBonusGenerator->getRandomDevoidanceIncrease($holyItemLevel);
+        $statIncreaseBonus = $this->holyItemBonusGenerator->getRandomStatIncrease($holyItemLevel) / 100;
 
         if ($setSlot->item->appliedHolyStacks->isEmpty()) {
             $newItem = $setSlot->item->duplicate();
@@ -4024,7 +4026,7 @@ class BatchCraftingProcessor
                 : 'crafted_items_set';
 
             if ($destination === 'inventory') {
-                $inventory = Inventory::where('character_id', $character->id)->lockForUpdate()->first();
+                $inventory = Inventory::where('character_id', $character->id)->first();
 
                 if (is_null($inventory) || $character->refresh()->isInventoryFull()) {
                     return null;
@@ -4046,7 +4048,7 @@ class BatchCraftingProcessor
             if ($destination === 'inventory_set') {
                 $set = InventorySet::where('id', (int) ($progress['output_set_id'] ?? 0))
                     ->where('character_id', $character->id)
-                    ->lockForUpdate()
+
                     ->first();
 
                 if (is_null($set) || $set->isBatchCraftingSet() || $set->is_equipped || $set->remainingSlots() < 1) {

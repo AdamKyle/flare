@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Character\Builders\CharacterInformation\AttributeBuilder;
 
-use App\Flare\Values\CharacterClassValue;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\Values\CharacterClass;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -51,7 +51,7 @@ class DamageBuilderTest extends TestCase
     public function test_arcane_alchemist_does_more_damage_with_stave()
     {
         $arcaneAlchemist = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
             'damage_stat' => 'str',
         ]))->assignSkill(
             $this->createGameSkill([
@@ -69,7 +69,7 @@ class DamageBuilderTest extends TestCase
             ->getCharacter();
 
         $prophet = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::PROPHET,
+            'name' => CharacterClass::PROPHET->value,
             'damage_stat' => 'str',
         ]))->assignSkill(
             $this->createGameSkill([

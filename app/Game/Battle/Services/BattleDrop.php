@@ -2,26 +2,26 @@
 
 namespace App\Game\Battle\Services;
 
-use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationType;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Currency\Values\CurrencyType;
+use App\Game\Core\Items\Builders\RandomItemDropBuilder;
 use App\Game\Core\Traits\CanHaveQuestItem;
+use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\DisenchantService;
 use Exception;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Chance\DropCheckCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
-use Illuminate\Support\Facades\DB;
 
 class BattleDrop
 {
@@ -163,7 +163,7 @@ class BattleDrop
 
     public function planDelveLocationQuestItem(Character $character): ?Item
     {
-        $automation = $character->currentAutomations()->where('type', AutomationType::DELVE)->first();
+        $automation = $character->currentAutomations()->where('type', AutomationType::DELVE->value)->first();
 
         if (is_null($automation)) {
             return null;
@@ -189,7 +189,7 @@ class BattleDrop
 
     public function planSpecialLocationQuestItem(Character $character): ?Item
     {
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->exists()) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING->value)->exists()) {
             return null;
         }
 
@@ -207,7 +207,7 @@ class BattleDrop
      */
     public function handleDelveLocationQuestItems(Character $character): void
     {
-        $automation = $character->currentAutomations()->where('type', AutomationType::DELVE)->first();
+        $automation = $character->currentAutomations()->where('type', AutomationType::DELVE->value)->first();
 
         if (is_null($automation)) {
             return;
@@ -286,7 +286,7 @@ class BattleDrop
      */
     public function handleSpecialLocationQuestItem(Character $character): void
     {
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->exists()) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING->value)->exists()) {
             return;
         }
 
@@ -520,7 +520,7 @@ class BattleDrop
      */
     private function handleDisenchantOrAutoSell(Character $character, Item $item): void
     {
-        $maxCurrenciesValue = new MaxCurrenciesValue($character->gold_dust, MaxCurrenciesValue::GOLD_DUST);
+        $maxCurrenciesValue = new CurrencyLimit($character->gold_dust, CurrencyType::GOLD_DUST);
 
         if ($character->user->auto_sell_item) {
             if ($maxCurrenciesValue->canNotGiveCurrency()) {
@@ -573,23 +573,21 @@ class BattleDrop
      */
     private function giveQuestItemToPlayer(Character $character, Item $item): void
     {
-        DB::transaction(function () use ($character, $item): void {
-            $inventory = Inventory::where('character_id', $character->id)->lockForUpdate()->first();
+        $inventory = Inventory::where('character_id', $character->id)->first();
 
-            if (! $this->canHaveItem($character, $item)) {
-                return;
-            }
+        if (! $this->canHaveItem($character, $item)) {
+            return;
+        }
 
-            $slot = $inventory->slots()->create([
-                'item_id' => $item->id,
-                'inventory_id' => $inventory->id,
-            ]);
+        $slot = $inventory->slots()->create([
+            'item_id' => $item->id,
+            'inventory_id' => $inventory->id,
+        ]);
 
-            $message = $character->name.' has found: '.$item->affix_name;
+        $message = $character->name.' has found: '.$item->affix_name;
 
-            ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id);
+        ServerMessageHandler::sendBasicMessageWithId($character->user, 'You found: '.$item->affix_name.' on the enemies corpse.', $slot->id);
 
-            broadcast(new GlobalMessageEvent($message));
-        });
+        broadcast(new GlobalMessageEvent($message));
     }
 }

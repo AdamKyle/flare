@@ -7,11 +7,11 @@ use App\Flare\Models\CapitalCityUnitQueue;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Events\UpdateCapitalCityBuildingQueueTable;
 use App\Game\Kingdoms\Events\UpdateCapitalCityUnitQueueTable;
 use App\Game\Kingdoms\Service\UpdateKingdom;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 
 class CapitalCityKingdomLogHandler
 {
@@ -41,7 +41,7 @@ class CapitalCityKingdomLogHandler
                     'messages' => $capitalCityBuildingQueue->messages ?? [],
                     'building_data' => $buildingData,
                 ],
-                'status' => KingdomLogStatusValue::CAPITAL_CITY_BUILDING_REQUEST,
+                'status' => KingdomLogStatus::CAPITAL_CITY_BUILDING_REQUEST->value,
                 'published' => true,
             ]);
 
@@ -81,7 +81,7 @@ class CapitalCityKingdomLogHandler
                     'messages' => $capitalCityUnitQueue->messages ?? [],
                     'unit_data' => $unitData,
                 ],
-                'status' => KingdomLogStatusValue::CAPITAL_CITY_UNIT_REQUEST,
+                'status' => KingdomLogStatus::CAPITAL_CITY_UNIT_REQUEST->value,
                 'published' => true,
             ]);
 

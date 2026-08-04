@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Flare\Values;
 
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use Tests\TestCase;
 
 class LocationTypeTest extends TestCase

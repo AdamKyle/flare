@@ -7,7 +7,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Values\NpcTypes;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Request\CelestialFightRequest;
@@ -17,6 +16,7 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\NpcMessageTypes;
+use App\Game\Npcs\Values\NpcType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -59,7 +59,7 @@ class CelestialBattleController extends Controller
             return $restrictionResponse;
         }
 
-        $npc = Npc::where('type', NpcTypes::SUMMONER)->first();
+        $npc = Npc::where('type', NpcType::SUMMONER->value)->first();
 
         if (! $this->conjureService->canConjure($character, $npc, $request->type)) {
             return response()->json([

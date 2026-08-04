@@ -9,21 +9,22 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
-use App\Flare\Services\CharacterRewardService;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Services\ExplorationWarningService;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;
+use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Exceptions\MissingInventoryException;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
 use App\Game\Skills\Services\SkillService;
@@ -112,6 +113,7 @@ class Exploration implements ShouldQueue
         FactionHandler $factionHandler,
         ExplorationLogService $explorationLogService,
         ExplorationWarningService $explorationWarningService,
+        RandomNumberGenerator $randomNumberGenerator,
     ): void {
 
         $this->characterRewardService = $characterRewardService;
@@ -187,7 +189,7 @@ class Exploration implements ShouldQueue
 
             $roundStartedAt = now();
 
-            if ($this->encounter($automation, $params, $this->timeDelay)) {
+            if ($this->encounter($automation, $params, $this->timeDelay, $randomNumberGenerator)) {
 
                 if (! is_null($this->explorationLog)) {
                     $this->explorationLogService->recordFightTotals($this->explorationLog, [
@@ -285,7 +287,7 @@ class Exploration implements ShouldQueue
      *
      * @throws InvalidArgumentException
      */
-    private function encounter(CharacterAutomation $automation, array $params, int $timeDelay): bool
+    private function encounter(CharacterAutomation $automation, array $params, int $timeDelay, RandomNumberGenerator $randomNumberGenerator): bool
     {
 
         $this->sendOutEventLogUpdate('You and The Guide search the area looking for any other signs of them. That\'s when The Guide spots them and points', true);
@@ -311,7 +313,7 @@ class Exploration implements ShouldQueue
         $encounterDamageBlocked = 0;
 
         for ($creatureCount = 1; $creatureCount <= $enemies; $creatureCount++) {
-            if (! $this->fightAutomationMonster($automation, $params)) {
+            if (! $this->fightAutomationMonster($automation, $params, $randomNumberGenerator)) {
                 return false;
             }
 
@@ -355,7 +357,7 @@ class Exploration implements ShouldQueue
         return true;
     }
 
-    private function builtMonsterSnapshot(array $fightData): ?array
+    private function builtMonsterSnapshot(array $fightData, RandomNumberGenerator $randomNumberGenerator): ?array
     {
         if (! isset($fightData['monster']) || ! is_array($fightData['monster'])) {
             return null;
@@ -401,7 +403,7 @@ class Exploration implements ShouldQueue
             $attackRange = $builtMonster['attack_range'] ?? $baseMonster?->getAttribute('attack_range');
             if (is_string($attackRange) && str_contains($attackRange, '-')) {
                 [$min, $max] = array_map('intval', explode('-', $attackRange, 2));
-                $attackDamage = ($min === $max) ? $min : rand(min($min, $max), max($min, $max));
+                $attackDamage = ($min === $max) ? $min : $randomNumberGenerator->numberBetween(min($min, $max), max($min, $max));
             } else {
                 $attackDamage = (int) ($attackRange ?? 0);
             }
@@ -528,7 +530,7 @@ class Exploration implements ShouldQueue
      *
      * @throws InvalidArgumentException
      */
-    private function fightAutomationMonster(CharacterAutomation $automation, array $params): bool
+    private function fightAutomationMonster(CharacterAutomation $automation, array $params, RandomNumberGenerator $randomNumberGenerator): bool
     {
         $this->currentState = 'setting_up_fight';
 
@@ -572,7 +574,7 @@ class Exploration implements ShouldQueue
                 $snapshotData['monster']['attack_damage'] = $data['attack_damage'];
             }
 
-            $builtMonsterSnapshot = $this->builtMonsterSnapshot($snapshotData);
+            $builtMonsterSnapshot = $this->builtMonsterSnapshot($snapshotData, $randomNumberGenerator);
 
             if (! is_null($builtMonsterSnapshot)) {
                 $this->explorationLogService->recordMonsterSnapshot($this->explorationLog, $builtMonsterSnapshot, false);
@@ -832,7 +834,7 @@ class Exploration implements ShouldQueue
     {
         $automation = CharacterAutomation::where('id', $this->automationId)
             ->where('character_id', $this->character->id)
-            ->where('type', AutomationType::EXPLORING)
+            ->where('type', AutomationType::EXPLORING->value)
             ->first();
         $context = $this->failureContext($throwable, $reason, $automation);
 
@@ -940,8 +942,8 @@ class Exploration implements ShouldQueue
 
         $gold = $character->gold + 10_000;
 
-        if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
-            $gold = MaxCurrenciesValue::MAX_GOLD;
+        if ($gold >= CurrencyLimit::MAX_GOLD) {
+            $gold = CurrencyLimit::MAX_GOLD;
         }
 
         $character->update(['gold' => $gold]);

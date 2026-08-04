@@ -5,7 +5,7 @@ namespace App\Game\Maps\Services\Common;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
 use App\Game\Monsters\Services\MonsterListService;
@@ -27,7 +27,7 @@ trait UpdateRaidMonstersForLocation
 
         $monsters = $monsterListService->getMonstersForCharacterAsList($character);
 
-        $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectsValue::PURGATORY)->count() > 0;
+        $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectType::PURGATORY->value)->count() > 0;
 
         if (! is_null($character->map->gameMap->only_during_event_type)) {
             if (! $hasAccessToPurgatory) {

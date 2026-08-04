@@ -5,10 +5,9 @@ namespace App\Game\BattleRewardProcessing\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\Models\WeeklyMonsterFight;
-use App\Flare\Values\LocationType;
 use App\Game\BattleRewardProcessing\Handlers\LocationSpecialtyHandler;
+use App\Game\Maps\Values\LocationType;
 use Exception;
-use Illuminate\Support\Facades\DB;
 
 class WeeklyBattleService
 {
@@ -65,21 +64,19 @@ class WeeklyBattleService
 
         $this->claimMonsterDeath($character, $monster);
 
-        return DB::transaction(function () use ($character, $monster): Character {
-            $weeklyMonsterFight = WeeklyMonsterFight::where('character_id', $character->id)
-                ->where('monster_id', $monster->id)
-                ->lockForUpdate()
-                ->first();
+        $weeklyMonsterFight = WeeklyMonsterFight::where('character_id', $character->id)
+            ->where('monster_id', $monster->id)
 
-            if (is_null($weeklyMonsterFight) || ! is_null($weeklyMonsterFight->reward_processed_at)) {
-                return $character;
-            }
+            ->first();
 
-            $character = $this->handleReward($character, $monster, $weeklyMonsterFight);
-            $weeklyMonsterFight->update(['reward_processed_at' => now()]);
-
+        if (is_null($weeklyMonsterFight) || ! is_null($weeklyMonsterFight->reward_processed_at)) {
             return $character;
-        });
+        }
+
+        $character = $this->handleReward($character, $monster, $weeklyMonsterFight);
+        $weeklyMonsterFight->update(['reward_processed_at' => now()]);
+
+        return $character;
     }
 
     public function claimMonsterDeath(Character $character, Monster $monster): void

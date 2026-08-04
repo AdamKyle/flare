@@ -2,7 +2,7 @@
 
 namespace App\Game\Core\Listeners;
 
-use App\Flare\Services\CharacterRewardService;
+use App\Game\BattleRewardProcessing\Services\CharacterRewardService;
 use App\Game\Core\Events\CharacterLevelUpEvent;
 use App\Game\Core\Events\UpdateCharacterEvent;
 

@@ -8,16 +8,17 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\NpcTypes;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Events\UpdateMap;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\NpcMessageTypes;
+use App\Game\Npcs\Values\NpcType;
 use Exception;
 use Facades\App\Flare\Cache\CoordinatesCache;
 
@@ -25,8 +26,10 @@ class ConjureService
 {
     private NpcServerMessageBuilder $npcServerMessageBuilder;
 
-    public function __construct(NpcServerMessageBuilder $npcServerMessageBuilder)
-    {
+    public function __construct(
+        NpcServerMessageBuilder $npcServerMessageBuilder,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
 
@@ -43,10 +46,10 @@ class ConjureService
         $x = $this->getXPosition();
         $y = $this->getYPosition();
 
-        $monster = $this->createCelestialRecord($x, $y, [MapNameValue::ICE_PLANE]);
+        $monster = $this->createCelestialRecord($x, $y, [MapName::ICE_PLANE->value]);
 
         $types = ['has awoken', 'has angered', 'has enraged', 'has set free', 'has set loose'];
-        $randomIndex = rand(0, count($types) - 1);
+        $randomIndex = $this->randomNumberGenerator->numberBetween(0, count($types) - 1);
         $plane = $monster->gameMap->name;
 
         event(new GlobalMessageEvent($character->name.' '.$types[$randomIndex].': '.$monster->name.' on the '.$plane.' plane at (X/Y): '.$x.'/'.$y));
@@ -60,7 +63,7 @@ class ConjureService
     public function conjure(Monster $monster, Character $character, string $type): void
     {
         $healthRange = explode('-', $monster->health_range);
-        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]);
+        $currentMonsterHealth = $this->randomNumberGenerator->numberBetween((int) $healthRange[0], (int) $healthRange[1]);
 
         $x = $this->getXPosition();
         $y = $this->getYPosition();
@@ -80,7 +83,7 @@ class ConjureService
         ]);
 
         $type = new CelestialConjureType($type === 'private' ? CelestialConjureType::PRIVATE : CelestialConjureType::PUBLIC);
-        $npc = Npc::where('type', NpcTypes::SUMMONER)->first();
+        $npc = Npc::where('type', NpcType::SUMMONER->value)->first();
         $plane = $character->map->gameMap->name;
 
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build(NpcMessageTypes::LOCATION_OF_CONJURE, $npc, $celestialFight)));
@@ -149,7 +152,7 @@ class ConjureService
 
         $user = $character->user;
         $characterMapId = $character->map->game_map_id;
-        $npc = Npc::where('type', NpcTypes::SUMMONER)->where('game_map_id', $characterMapId)->first();
+        $npc = Npc::where('type', NpcType::SUMMONER->value)->where('game_map_id', $characterMapId)->first();
 
         event(new UpdateCharacterBaseDetailsEvent($character));
 
@@ -161,7 +164,7 @@ class ConjureService
      */
     protected function getXPosition(): int
     {
-        return CoordinatesCache::getFromCache()['x'][rand(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
+        return CoordinatesCache::getFromCache()['x'][$this->randomNumberGenerator->numberBetween(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
     }
 
     /**
@@ -169,7 +172,7 @@ class ConjureService
      */
     protected function getYPosition(): int
     {
-        return CoordinatesCache::getFromCache()['y'][rand(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+        return CoordinatesCache::getFromCache()['y'][$this->randomNumberGenerator->numberBetween(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
     }
 
     private function isEventWithCelestialsRunning(): bool
@@ -188,7 +191,7 @@ class ConjureService
         $gameMapId = null;
 
         if ($eventType->isDelusionalMemoriesEvent()) {
-            $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+            $gameMap = GameMap::where('name', MapName::DELUSIONAL_MEMORIES->value)->first();
 
             if (is_null($gameMap)) {
                 return false;
@@ -212,7 +215,7 @@ class ConjureService
             ->first();
 
         $healthRange = explode('-', $monster->health_range);
-        $currentMonsterHealth = rand($healthRange[0], $healthRange[1]) + 10;
+        $currentMonsterHealth = $this->randomNumberGenerator->numberBetween((int) $healthRange[0], (int) $healthRange[1]) + 10;
 
         CelestialFight::create([
             'monster_id' => $monster->id,

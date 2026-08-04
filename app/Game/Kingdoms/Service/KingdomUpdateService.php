@@ -9,16 +9,16 @@ use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomBuilding;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\Skill;
-use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Kingdoms\Handlers\GiveKingdomsToNpcHandler;
 use App\Game\Kingdoms\Handlers\TooMuchPopulationHandler;
 use App\Game\Kingdoms\Handlers\Traits\DestroyKingdom;
 use App\Game\Kingdoms\Traits\CalculateMorale;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Values\SkillTypeValue;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 
 class KingdomUpdateService
 {
@@ -122,7 +122,7 @@ class KingdomUpdateService
 
             $additionalLogData['kingdom_data']['reason'] = 'Your kingdom was handed over to The Old Man and made a NPC kingdom because you did not walk it with in 90 days.';
 
-            $this->createKingdomLog($character, $additionalLogData, KingdomLogStatusValue::NOT_WALKED);
+            $this->createKingdomLog($character, $additionalLogData, KingdomLogStatus::NOT_WALKED->value);
 
             event(new GlobalMessageEvent('A kingdom on: '.$gameMapName.' at (X/Y): '.$xPosition.'/'.$yPosition.' has been neglected. The Old Man has taken it (New NPC Kingdom up for grabs).'));
 
@@ -139,7 +139,7 @@ class KingdomUpdateService
 
                 $additionalLogData['kingdom_data']['reason'] = 'Your kingdom was over populated and you could not afford the 10,000 Gold per additional person over your max population.';
 
-                $this->createKingdomLog($character, $additionalLogData, KingdomLogStatusValue::OVER_POPULATED);
+                $this->createKingdomLog($character, $additionalLogData, KingdomLogStatus::OVER_POPULATED->value);
 
                 return;
             }
@@ -489,7 +489,7 @@ class KingdomUpdateService
     {
         $user = $this->kingdom->character->user;
 
-        if (UserOnlineValue::isOnline($user) && $user->show_kingdom_update_messages) {
+        if (UserOnlineService::isOnline($user) && $user->show_kingdom_update_messages) {
             $x = $this->kingdom->x_position;
             $y = $this->kingdom->y_position;
             $gameMap = $this->kingdom->gameMap;
@@ -508,7 +508,7 @@ class KingdomUpdateService
     {
         $user = $this->kingdom->character->user;
 
-        if (UserOnlineValue::isOnline($user) && $user->show_kingdom_update_messages) {
+        if (UserOnlineService::isOnline($user) && $user->show_kingdom_update_messages) {
             $x = $this->kingdom->x_position;
             $y = $this->kingdom->y_position;
             $gameMap = $this->kingdom->gameMap;

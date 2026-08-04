@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\ItemAffixType;
+use App\Game\Core\Items\Values\ItemAffixType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ItemAffixFactory extends Factory

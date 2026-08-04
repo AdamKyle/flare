@@ -14,8 +14,6 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\EventSchedulerService;
-use App\Flare\Values\MapNameValue;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Values\FactionLevel;
@@ -25,6 +23,7 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
@@ -281,11 +280,11 @@ class EventLifecycleService
 
     private function teardownWinterEvent(Event $event): void
     {
-        $this->kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::ICE_PLANE);
+        $this->kingdomEventService->handleKingdomRewardsForEvent(MapName::ICE_PLANE->value);
 
-        $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $gameMap = GameMap::where('name', MapName::ICE_PLANE->value)->first();
         $faction = Faction::where('game_map_id', $gameMap->id)->first();
-        $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+        $surfaceMap = GameMap::where('name', MapName::SURFACE->value)->first();
 
         $this->resetCharactersOnEventMap($gameMap, $surfaceMap, $faction);
 
@@ -308,11 +307,11 @@ class EventLifecycleService
 
     private function teardownDelusionalEvent(Event $event): void
     {
-        $this->kingdomEventService->handleKingdomRewardsForEvent(MapNameValue::DELUSIONAL_MEMORIES);
+        $this->kingdomEventService->handleKingdomRewardsForEvent(MapName::DELUSIONAL_MEMORIES->value);
 
-        $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $gameMap = GameMap::where('name', MapName::DELUSIONAL_MEMORIES->value)->first();
         $faction = Faction::where('game_map_id', $gameMap->id)->first();
-        $surfaceMap = GameMap::where('name', MapNameValue::SURFACE)->first();
+        $surfaceMap = GameMap::where('name', MapName::SURFACE->value)->first();
 
         $this->resetCharactersOnEventMap($gameMap, $surfaceMap, $faction);
 

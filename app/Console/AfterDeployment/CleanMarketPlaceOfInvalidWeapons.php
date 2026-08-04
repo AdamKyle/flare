@@ -4,7 +4,7 @@ namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\MarketBoard;
 use App\Flare\Models\MarketHistory;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use Illuminate\Console\Command;
 
 class CleanMarketPlaceOfInvalidWeapons extends Command
@@ -59,8 +59,8 @@ class CleanMarketPlaceOfInvalidWeapons extends Command
 
             $newGold = $character->gold + $marketEntry->listed_price;
 
-            if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-                $newGold = MaxCurrenciesValue::MAX_GOLD;
+            if ($newGold > CurrencyLimit::MAX_GOLD) {
+                $newGold = CurrencyLimit::MAX_GOLD;
             }
 
             $character->update([

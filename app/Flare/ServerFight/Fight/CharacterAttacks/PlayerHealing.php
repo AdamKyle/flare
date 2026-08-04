@@ -7,6 +7,8 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\Affixes;
 use App\Flare\ServerFight\Fight\CharacterAttacks\Types\CastType;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class PlayerHealing extends BattleBase
 {
@@ -14,9 +16,9 @@ class PlayerHealing extends BattleBase
 
     private CastType $castType;
 
-    public function __construct(CharacterCacheData $characterCacheData, Affixes $affixes, CastType $castType)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator, Affixes $affixes, CastType $castType)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->affixes = $affixes;
         $this->castType = $castType;
@@ -26,7 +28,7 @@ class PlayerHealing extends BattleBase
     {
         $chance = $attackType['res_chance'];
 
-        if (rand(1, 100) > (100 - 100 * $chance)) {
+        if ($this->chanceCalculator->passesPercentage($chance * 100)) {
             $this->addMessage('You are pulled back from the void and given one health!', 'player-action');
 
             $this->characterHealth = 1;

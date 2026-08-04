@@ -6,12 +6,12 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\EventSchedulerService;
-use App\Flare\Values\MapNameValue;
+use App\Game\Events\Services\EventSchedulerService;
 use App\Game\Events\Services\ScheduledEventDispatchService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use App\Game\Events\Values\ScheduledEventStatus;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use Carbon\Carbon;
@@ -95,7 +95,7 @@ class InitiateWinterEvent implements ShouldQueue
 
         GlobalEventGoal::create($globalEventGoalData);
 
-        $gameMap = GameMap::where('name', MapNameValue::ICE_PLANE)->first();
+        $gameMap = GameMap::where('name', MapName::ICE_PLANE->value)->first();
 
         event(new GlobalMessageEvent('While on the The Ice Plane, characters who kill: ANY CREATURE in either manual or exploration, will increase the new: Global Event Goal. Players will be rewarded with random Corrupted Ice Gear when specific milestones are reached.'));
 

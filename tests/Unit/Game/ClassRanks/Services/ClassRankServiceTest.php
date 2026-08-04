@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Game\ClassRanks\Services;
 
-use App\Flare\Items\Values\ItemType;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

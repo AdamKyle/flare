@@ -2,7 +2,6 @@
 
 namespace Tests\Setup\FactionLoyalty;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Faction;
@@ -14,9 +13,10 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\MapNameValue;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ItemType;
+use App\Game\Maps\Values\MapName;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateFactionLoyaltyAutomation;
@@ -110,11 +110,11 @@ class FactionLoyaltyFactory
     /**
      * Create faction loyalty automation records.
      */
-    public function createAutomation(string $attackType = AttackTypeValue::ATTACK): FactionLoyaltyFactory
+    public function createAutomation(string $attackType = AttackType::ATTACK->value): FactionLoyaltyFactory
     {
         $this->characterAutomation = $this->createCharacterAutomation([
             'character_id' => $this->character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addHours(8),
             'attack_type' => $attackType,
@@ -326,7 +326,7 @@ class FactionLoyaltyFactory
         }
 
         $gameMap = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
+            'name' => MapName::SURFACE->value,
             'path' => 'surface',
             'default' => true,
             'can_traverse' => true,
@@ -351,8 +351,8 @@ class FactionLoyaltyFactory
      */
     private function createNextGameMap(int $index): GameMap
     {
-        $mapNames = array_values(MapNameValue::$values);
-        $mapName = $mapNames[$index] ?? MapNameValue::SURFACE;
+        $mapNames = array_values(MapName::values());
+        $mapName = $mapNames[$index] ?? MapName::SURFACE->value;
 
         return $this->createGameMap([
             'name' => $mapName,

@@ -10,6 +10,8 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class Defend extends BattleBase
 {
@@ -25,9 +27,9 @@ class Defend extends BattleBase
 
     private SpecialAttacks $specialAttacks;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator, Entrance $entrance, CanHit $canHit, SecondaryAttacks $secondaryAttacks, SpecialAttacks $specialAttacks)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->entrance = $entrance;
         $this->canHit = $canHit;

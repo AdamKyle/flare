@@ -23,8 +23,8 @@ use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\PrisonerRage;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\SensualDance;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\TripleAttack;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\VampireThirst;
-use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Character\CharacterAttack\Values\ClassSpecialAttackType;
 use Exception;
 
 class SpecialAttacks extends BattleMessages
@@ -168,7 +168,7 @@ class SpecialAttacks extends BattleMessages
         if ($character->classType()->isBuccaneer()) {
             $extraActionData = resolve(CharacterCacheData::class)->getCachedCharacterData($character, 'extra_action_chance');
 
-            if (isset($extraActionData['type']) && $extraActionData['type'] === ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE) {
+            if (isset($extraActionData['type']) && $extraActionData['type'] === ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value) {
                 return $this->buccaneersDualGunBarrage($character, $attackData);
             }
 
@@ -178,7 +178,7 @@ class SpecialAttacks extends BattleMessages
         if ($character->classType()->isBeastmaster()) {
             $extraActionData = resolve(CharacterCacheData::class)->getCachedCharacterData($character, 'extra_action_chance');
 
-            if (isset($extraActionData['type']) && $extraActionData['type'] === ClassAttackValue::BEAST_STOMP) {
+            if (isset($extraActionData['type']) && $extraActionData['type'] === ClassSpecialAttackType::BEAST_STOMP->value) {
                 return $this->beastStomp($character, $attackData);
             }
 

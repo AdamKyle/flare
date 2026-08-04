@@ -2,7 +2,6 @@
 
 namespace App\Game\Battle\Providers;
 
-use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\ServerFight\Monster\BuildMonster;
 use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
@@ -17,6 +16,8 @@ use App\Game\Battle\Services\RaidBattleService;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Builders\RandomItemDropBuilder;
 use App\Game\Core\Services\GoldRush;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Values\MapTileValue;
@@ -38,6 +39,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ConjureService::class, function ($app) {
             return new ConjureService(
                 $app->make(NpcServerMessageBuilder::class),
+                $app->make(RandomNumberGenerator::class),
             );
         });
 
@@ -59,6 +61,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterCacheData::class),
                 $app->make(MonsterPlayerFight::class),
                 $app->make(MapTileValue::class),
+                $app->make(RandomNumberGenerator::class),
             );
         });
 

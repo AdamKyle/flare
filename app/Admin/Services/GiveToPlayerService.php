@@ -5,7 +5,7 @@ namespace App\Admin\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\Item;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use InvalidArgumentException;
 
 class GiveToPlayerService
@@ -43,10 +43,10 @@ class GiveToPlayerService
     private function maxForCurrency(string $currency): int
     {
         return match ($currency) {
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
             default => throw new InvalidArgumentException('Invalid currency.'),
         };
     }

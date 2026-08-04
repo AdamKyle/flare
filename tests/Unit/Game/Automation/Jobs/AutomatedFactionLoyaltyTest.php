@@ -5,8 +5,6 @@ namespace Tests\Unit\Game\Automation\Jobs;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Coordinators\FactionLoyaltyAutomationActionCoordinator;
 use App\Game\Automation\Coordinators\FactionLoyaltyNpcTaskCoordinator;
 use App\Game\Automation\Enums\FactionLoyaltyCoordinatorAction;
@@ -15,7 +13,9 @@ use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Jobs\AutomatedFactionLoyalty;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Combat\Values\AttackType;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -55,10 +55,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $newerFactionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
         $staleCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $character->update(['can_craft' => false]);
         AutomatedFactionLoyalty::dispatch($character->id, $staleCharacterAutomation->id, $newerFactionLoyaltyAutomation->id + 1000, 1);
@@ -78,10 +78,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $newerFactionLoyaltyAutomation = $factory->getFactionLoyaltyAutomation();
         $staleCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $completedFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $staleCharacterAutomation->id,
@@ -109,10 +109,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $exactCharacterAutomation->update(['completed_at' => now()->subSecond()]);
         $unrelatedAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         AutomatedFactionLoyalty::dispatch($character->id, $exactCharacterAutomation->id, $exactFactionLoyaltyAutomation->id, 1);
 
@@ -145,10 +145,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -178,10 +178,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -204,10 +204,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -230,10 +230,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -259,10 +259,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -386,10 +386,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $staleCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $staleFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $staleCharacterAutomation->id,
@@ -428,10 +428,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -454,10 +454,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -479,10 +479,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,
@@ -504,10 +504,10 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $factory = (new FactionLoyaltyFactory)->setUp($character);
         $oldCharacterAutomation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now()->subMinute(),
             'completed_at' => now()->addHour(),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
         $oldFactionLoyaltyAutomation = FactionLoyaltyAutomation::create([
             'character_automation_id' => $oldCharacterAutomation->id,

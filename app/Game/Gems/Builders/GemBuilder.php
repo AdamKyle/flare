@@ -3,11 +3,14 @@
 namespace App\Game\Gems\Builders;
 
 use App\Flare\Models\Gem;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Gems\Values\GemTypeValue;
 
 class GemBuilder
 {
+    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
+
     /**
      * @var array|string[]
      */
@@ -44,7 +47,7 @@ class GemBuilder
         $rolls = [];
 
         while (count($rolls) !== 3) {
-            $roll = rand($data['min'], $data['max']) / 100;
+            $roll = $this->randomNumberGenerator->numberBetween($data['min'], $data['max']) / 100;
 
             if (! in_array($roll, $rolls)) {
                 $rolls[] = $roll;
@@ -84,7 +87,7 @@ class GemBuilder
     protected function buildDataForGem(array $rolls, int $tier): array
     {
         return [
-            'name' => $this->names[rand(0, count($this->names) - 1)],
+            'name' => $this->names[$this->randomNumberGenerator->numberBetween(0, count($this->names) - 1)],
             'domain' => Gem::DOMAIN_CHARACTER,
             'tier' => $tier,
             'primary_atonement_type' => GemTypeValue::FIRE,

@@ -4,7 +4,7 @@ namespace App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\Values\ClassAttackValue;
+use App\Game\Character\CharacterAttack\Values\ClassSpecialAttackType;
 
 class DevilsPiercingShot extends BattleBase
 {
@@ -16,12 +16,12 @@ class DevilsPiercingShot extends BattleBase
             return;
         }
 
-        if (! isset($extraActionData['type']) || $extraActionData['type'] !== ClassAttackValue::DEVILS_PIERCING_SHOT) {
+        if (! isset($extraActionData['type']) || $extraActionData['type'] !== ClassSpecialAttackType::DEVILS_PIERCING_SHOT->value) {
             return;
         }
 
         if (! ($extraActionData['chance'] >= 1)) {
-            if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+            if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                 return;
             }
         }

@@ -5,14 +5,14 @@ namespace App\Game\Maps\Services;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MapNameValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMapDetailsBroadcast;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Bus\PendingDispatch;
@@ -215,7 +215,7 @@ class PctService
         if (is_null($celestial)) {
             $celestial = CelestialFight::where('type', CelestialConjureType::PUBLIC)->first();
 
-            $eventMapNames = [MapNameValue::DELUSIONAL_MEMORIES];
+            $eventMapNames = [MapName::DELUSIONAL_MEMORIES->value];
 
             if (is_null($celestial)) {
                 return null;
@@ -223,7 +223,7 @@ class PctService
 
             if (in_array($celestial->monster->game_map_id, $eventMapNames)) {
                 $questItemSlot = $character->inventory->slots->filter(function ($slot) {
-                    return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
+                    return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::PURGATORY->value;
                 })->first();
 
                 if (is_null($questItemSlot)) {

@@ -6,13 +6,13 @@ use App\Flare\Models\Event;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\EventSchedulerService;
-use App\Flare\Values\MapNameValue;
+use App\Game\Events\Services\EventSchedulerService;
 use App\Game\Events\Services\ScheduledEventDispatchService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventForEventTypeValue;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Quests\Services\BuildQuestCacheService;
 use Carbon\Carbon;
@@ -102,7 +102,7 @@ class InitiateDelusionalMemoriesEvent implements ShouldQueue
 
         GlobalEventGoal::create($globalEventGoalData);
 
-        $gameMap = GameMap::where('name', MapNameValue::DELUSIONAL_MEMORIES)->first();
+        $gameMap = GameMap::where('name', MapName::DELUSIONAL_MEMORIES->value)->first();
 
         event(new GlobalMessageEvent('"Child! We need you!" The Red Hawk Soldier looks at you. There is a fear in his eyes. "Please child. Fight with us!"', 'raid-global-message'));
 

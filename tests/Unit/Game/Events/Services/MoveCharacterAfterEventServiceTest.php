@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
-use App\Flare\Values\MapNameValue;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Services\MoveCharacterAfterEventService;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use Facades\App\Flare\Cache\CoordinatesCache as CoordinatesCacheFacade;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -60,8 +60,8 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
         // Seed monsters cache for maps used in the test:
         Cache::put('monsters', [
-            MapNameValue::SURFACE => [],
-            MapNameValue::LABYRINTH => [],
+            MapName::SURFACE->value => [],
+            MapName::LABYRINTH->value => [],
         ]);
 
         $this->service = $this->app->make(MoveCharacterAfterEventService::class);
@@ -76,7 +76,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
     public function test_for_characters_on_map_invokes_callback_with_characters(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $firstCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(10, 10, $surfaceMap)->getCharacter();
         $secondCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(11, 11, $surfaceMap)->getCharacter();
@@ -105,7 +105,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
     public function test_stop_exploration_for_stops_exploration(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $firstCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(5, 5, $surfaceMap)
             ->assignAutomation([])->getCharacter();
@@ -123,7 +123,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
     public function test_reset_faction_progress_for_map_does_nothing_with_empty_collection(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $emptyCharacters = new EloquentCollection();
         $this->service->resetFactionProgressForMap($emptyCharacters, $surfaceMap->id);
@@ -132,7 +132,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
     public function test_reset_faction_progress_for_map_resets_values(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $character = (new CharacterFactory())->createBaseCharacter()
             ->givePlayerLocation(16, 16, $surfaceMap)
@@ -156,7 +156,7 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
     public function test_move_all_to_surface_does_nothing_with_empty_collection(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $emptyCharacters = new EloquentCollection();
         $this->service->moveAllToSurface($emptyCharacters, $surfaceMap);
@@ -165,8 +165,8 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
     public function test_move_all_to_surface_moves_characters(): void
     {
-        $surfaceMap = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
-        $labyrinthMap = $this->createGameMap(['name' => MapNameValue::LABYRINTH, 'default' => false]);
+        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
+        $labyrinthMap = $this->createGameMap(['name' => MapName::LABYRINTH->value, 'default' => false]);
 
         $firstCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(12, 12, $labyrinthMap)->getCharacter();
         $secondCharacter = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation(13, 13, $labyrinthMap)->getCharacter();

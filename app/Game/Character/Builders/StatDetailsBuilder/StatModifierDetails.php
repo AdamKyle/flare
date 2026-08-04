@@ -2,13 +2,13 @@
 
 namespace App\Game\Character\Builders\StatDetailsBuilder;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Items\Values\ItemType;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
@@ -269,7 +269,7 @@ class StatModifierDetails
         }
 
         $purgatoryQuestItem = $this->character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::PURGATORY;
+            return $slot->item->effect === ItemEffectType::PURGATORY->value;
         })->first();
 
         if (! is_null($purgatoryQuestItem)) {

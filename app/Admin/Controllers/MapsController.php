@@ -6,7 +6,7 @@ use App\Admin\Requests\MapUploadValidation;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -25,30 +25,30 @@ class MapsController extends Controller
     {
         $effectiveMap = $gameMap->effectiveGameMap();
         $effects = match ($effectiveMap->name) {
-            'Labyrinth' => ItemEffectsValue::LABYRINTH,
-            'Dungeons' => ItemEffectsValue::DUNGEON,
-            'Shadow Plane' => ItemEffectsValue::SHADOW_PLANE,
-            'Hell' => ItemEffectsValue::HELL,
-            'Purgatory' => ItemEffectsValue::PURGATORY,
+            'Labyrinth' => ItemEffectType::LABYRINTH->value,
+            'Dungeons' => ItemEffectType::DUNGEON->value,
+            'Shadow Plane' => ItemEffectType::SHADOW_PLANE->value,
+            'Hell' => ItemEffectType::HELL->value,
+            'Purgatory' => ItemEffectType::PURGATORY->value,
             default => '',
         };
 
         $walkOnWater = null;
 
         if ($gameMap->mapType()->isHell()) {
-            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_MAGMA)->first();
+            $walkOnWater = Item::where('effect', ItemEffectType::WALK_ON_MAGMA->value)->first();
         }
 
         if ($gameMap->mapType()->isDungeons()) {
-            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_DEATH_WATER)->first();
+            $walkOnWater = Item::where('effect', ItemEffectType::WALK_ON_DEATH_WATER->value)->first();
         }
 
         if ($gameMap->mapType()->isSurface() || $gameMap->mapType()->isLabyrinth()) {
-            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_WATER)->first();
+            $walkOnWater = Item::where('effect', ItemEffectType::WALK_ON_WATER->value)->first();
         }
 
         if ($gameMap->mapType()->isTheIcePlane()) {
-            $walkOnWater = Item::where('effect', ItemEffectsValue::WALK_ON_ICE)->first();
+            $walkOnWater = Item::where('effect', ItemEffectType::WALK_ON_ICE->value)->first();
         }
 
         return view('admin.maps.map', [

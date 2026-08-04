@@ -4,10 +4,10 @@ namespace App\Game\Gambler\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Events\Values\EventType;
 use App\Game\Gambler\Events\GamblerSlotTimeOut;
@@ -99,7 +99,7 @@ class GamblerService
         $attribute = (new CurrencyValue($rollInfo['matching']))->getAttribute();
 
         if ($attribute === 'copper_coins') {
-            $hasItem = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->isNotEmpty();
+            $hasItem = $character->inventory->slots->where('item.effect', ItemEffectType::GET_COPPER_COINS->value)->isNotEmpty();
 
             if (! $hasItem) {
                 return $this->successResult([
@@ -118,7 +118,7 @@ class GamblerService
         }
 
         $foundQuestItem = $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::MERCENARY_SLOT_BONUS;
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::MERCENARY_SLOT_BONUS->value;
         })->first();
 
         if (! is_null($foundQuestItem)) {
@@ -147,20 +147,20 @@ class GamblerService
     {
 
         if ($attribute === 'gold_dust') {
-            if ($amount > MaxCurrenciesValue::MAX_GOLD_DUST) {
-                return MaxCurrenciesValue::MAX_GOLD_DUST;
+            if ($amount > CurrencyLimit::MAX_GOLD_DUST) {
+                return CurrencyLimit::MAX_GOLD_DUST;
             }
         }
 
         if ($attribute === 'shards') {
-            if ($amount > MaxCurrenciesValue::MAX_SHARDS) {
-                return MaxCurrenciesValue::MAX_SHARDS;
+            if ($amount > CurrencyLimit::MAX_SHARDS) {
+                return CurrencyLimit::MAX_SHARDS;
             }
         }
 
         if ($attribute === 'copper_coins') {
-            if ($amount > MaxCurrenciesValue::MAX_COPPER) {
-                return MaxCurrenciesValue::MAX_COPPER;
+            if ($amount > CurrencyLimit::MAX_COPPER) {
+                return CurrencyLimit::MAX_COPPER;
             }
         }
 

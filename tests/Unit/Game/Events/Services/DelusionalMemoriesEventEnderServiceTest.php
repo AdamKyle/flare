@@ -4,11 +4,11 @@ namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as GameEvent;
-use App\Flare\Values\MapNameValue;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Events\Services\DelusionalMemoriesEventEnderService;
 use App\Game\Events\Services\KingdomEventService;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\DeleteAnnouncementEvent;
 use App\Game\Messages\Events\GlobalMessageEvent;
@@ -58,7 +58,7 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
 
     public function test_end_returns_early_when_delusional_map_missing(): void
     {
-        $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $this->createGameMap(['name' => MapName::SURFACE->value]);
 
         $mockRewards = Mockery::mock(KingdomEventService::class, function (MockInterface $m) {
             $m->shouldReceive('handleKingdomRewardsForEvent')->once();
@@ -88,7 +88,7 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
 
     public function test_end_returns_early_when_surface_map_missing(): void
     {
-        $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES]);
+        $this->createGameMap(['name' => MapName::DELUSIONAL_MEMORIES->value]);
 
         $scheduled = $this->createScheduledEvent([
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
@@ -111,8 +111,8 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
 
     public function test_end_moves_characters_resets_progress_unpledges_and_cleans_up(): void
     {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE]);
-        $delusional = $this->createGameMap(['name' => MapNameValue::DELUSIONAL_MEMORIES]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value]);
+        $delusional = $this->createGameMap(['name' => MapName::DELUSIONAL_MEMORIES->value]);
 
         $this->instance(
             MapTileValue::class,
@@ -142,8 +142,8 @@ class DelusionalMemoriesEventEnderServiceTest extends TestCase
             ->getCharacter();
 
         Cache::put('monsters', [
-            MapNameValue::SURFACE => [],
-            MapNameValue::DELUSIONAL_MEMORIES => [],
+            MapName::SURFACE->value => [],
+            MapName::DELUSIONAL_MEMORIES->value => [],
         ]);
 
         $scheduled = $this->createScheduledEvent([

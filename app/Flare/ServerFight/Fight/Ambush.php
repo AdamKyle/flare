@@ -6,14 +6,16 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class Ambush extends BattleBase
 {
     private array $healthObject;
 
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
     }
 
     public function handleAmbush(Character $character, ServerMonster $monster, bool $isCharacterVoided = false, bool $isEnemyVoided = false): Ambush
@@ -147,10 +149,7 @@ class Ambush extends BattleBase
 
         $chance = $ambushChance - $monsterAmbushResistance;
 
-        $roll = rand(1, 100);
-        $dc = 100 - (100 * $chance);
-
-        return $roll > $dc;
+        return $this->chanceCalculator->passesPercentage($chance * 100);
     }
 
     public function canMonsterAmbushPlayer(float $ambushChance, float $playerAmbushResistance): bool
@@ -166,6 +165,6 @@ class Ambush extends BattleBase
 
         $chance = $ambushChance - $playerAmbushResistance;
 
-        return rand(1, 100) > (100 - 100 * $chance);
+        return $this->chanceCalculator->passesPercentage($chance * 100);
     }
 }

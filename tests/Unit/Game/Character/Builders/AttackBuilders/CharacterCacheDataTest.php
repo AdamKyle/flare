@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Character\Builders\AttackBuilders;
 
-use App\Flare\Items\Values\ItemType;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
@@ -50,7 +50,7 @@ class CharacterCacheDataTest extends TestCase
     {
         $character = $this->character->equipBasicAttackLoadout()->getCharacter();
 
-        $data = $this->characterCacheData->getDataFromAttackCache($character, AttackTypeValue::ATTACK);
+        $data = $this->characterCacheData->getDataFromAttackCache($character, AttackType::ATTACK->value);
 
         $this->assertGreaterThan(0, $data['weapon_damage']);
     }

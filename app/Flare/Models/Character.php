@@ -2,9 +2,9 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\CharacterClassValue;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\Values\CharacterClass;
 use Database\Factories\CharacterFactory;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -273,7 +273,7 @@ class Character extends Model
     public function isFactionLoyaltyAutomationRunning(): bool
     {
         return $this->currentAutomations()
-            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('type', AutomationType::FACTION_LOYALTY->value)
             ->where('completed_at', '>', now())
             ->exists();
     }
@@ -296,9 +296,9 @@ class Character extends Model
      *
      * @throws Exception
      */
-    public function classType(): CharacterClassValue
+    public function classType(): CharacterClass
     {
-        return new CharacterClassValue($this->class->name);
+        return CharacterClass::from($this->class->name);
     }
 
     /**

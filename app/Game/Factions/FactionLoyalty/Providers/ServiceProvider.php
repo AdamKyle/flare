@@ -2,6 +2,7 @@
 
 namespace App\Game\Factions\FactionLoyalty\Providers;
 
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Factions\FactionLoyalty\Services\UpdateFactionLoyaltyService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
@@ -16,7 +17,7 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
         $this->app->bind(FactionLoyaltyService::class, function ($app) {
-            return new FactionLoyaltyService;
+            return new FactionLoyaltyService($app->make(RandomNumberGenerator::class));
         });
 
         $this->app->bind(UpdateFactionLoyaltyService::class, function ($app) {

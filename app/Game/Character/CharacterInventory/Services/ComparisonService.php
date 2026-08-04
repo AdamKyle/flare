@@ -2,14 +2,14 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Items\Transformers\EquippableItemTransformer;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
 use League\Fractal\Manager;

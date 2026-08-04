@@ -3,7 +3,7 @@
 namespace App\Game\Maps\Transformers;
 
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use League\Fractal\TransformerAbstract;
 
 class LocationTransformer extends TransformerAbstract

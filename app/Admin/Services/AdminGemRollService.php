@@ -6,11 +6,13 @@ use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMapGemParamter;
 use App\Flare\Models\Gem;
 use App\Flare\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use InvalidArgumentException;
 
 class AdminGemRollService
 {
+    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
+
     public function rollMapGem(GameMapGemParamter $gameMapGemParamter, User $admin): Gem
     {
         return $this->roll(
@@ -37,42 +39,33 @@ class AdminGemRollService
         string $domain,
         string $sourceForeignKey,
     ): Gem {
-        return DB::transaction(function () use (
-            $profile,
-            $admin,
-            $domain,
-            $sourceForeignKey,
-        ): Gem {
-            $lockedProfile = $profile->newQuery()
-                ->lockForUpdate()
-                ->findOrFail($profile->getKey());
-            $rollNumber = $lockedProfile->roll_count + 1;
-            $gemData = [
-                'name' => $lockedProfile->name,
-                'domain' => $domain,
-                'rolled_by_user_id' => $admin->id,
-                'roll_number' => $rollNumber,
-                $sourceForeignKey => $lockedProfile->id,
-                'crafting_skill_ids' => $lockedProfile->crafting_skill_ids,
-                'monster_atonement' => $lockedProfile->monster_atonement,
-                'monster_atonement_amount' => $this->rollRange($lockedProfile->monster_atonement_range),
-            ];
+        $currentProfile = $profile->newQuery()->findOrFail($profile->getKey());
+        $rollNumber = $currentProfile->roll_count + 1;
+        $gemData = [
+            'name' => $currentProfile->name,
+            'domain' => $domain,
+            'rolled_by_user_id' => $admin->id,
+            'roll_number' => $rollNumber,
+            $sourceForeignKey => $currentProfile->id,
+            'crafting_skill_ids' => $currentProfile->crafting_skill_ids,
+            'monster_atonement' => $currentProfile->monster_atonement,
+            'monster_atonement_amount' => $this->rollRange($currentProfile->monster_atonement_range),
+        ];
 
-            foreach ($lockedProfile->rollableRangeFields() as $rangeField) {
-                $gemData[str($rangeField)->beforeLast('_range')->toString()] = $this->rollRange(
-                    $lockedProfile->{$rangeField},
-                );
-            }
+        foreach ($currentProfile->rollableRangeFields() as $rangeField) {
+            $gemData[str($rangeField)->beforeLast('_range')->toString()] = $this->rollRange(
+                $currentProfile->{$rangeField},
+            );
+        }
 
-            $gem = Gem::create($gemData);
+        $gem = Gem::create($gemData);
 
-            $lockedProfile->update([
-                'rolled_gem_id' => $gem->id,
-                'roll_count' => $rollNumber,
-            ]);
+        $currentProfile->update([
+            'rolled_gem_id' => $gem->id,
+            'roll_count' => $rollNumber,
+        ]);
 
-            return $gem;
-        });
+        return $gem;
     }
 
     private function rollRange(?string $range): ?float
@@ -96,7 +89,7 @@ class AdminGemRollService
 
         $lower = min($firstValue, $secondValue);
         $upper = max($firstValue, $secondValue);
-        $percentage = mt_rand() / mt_getrandmax();
+        $percentage = $this->randomNumberGenerator->numberBetween(0, 1_000_000) / 1_000_000;
 
         return round($lower + (($upper - $lower) * $percentage), 8);
     }

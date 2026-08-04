@@ -4,7 +4,7 @@ namespace App\Console\DevelopmentCommands;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Values\FactionType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Console\Command;
@@ -56,10 +56,10 @@ class MaxOutCharacter extends Command
         $character = $this->maxOutClassRanks($character);
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();

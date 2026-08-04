@@ -3,8 +3,8 @@
 namespace App\Game\Kingdoms\Controllers\Api;
 
 use App\Flare\Models\Kingdom;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Kingdoms\Requests\PurchaseGoldBarsRequest;
 use App\Game\Kingdoms\Requests\WithdrawGoldBarsRequest;
 use App\Game\Kingdoms\Service\UpdateKingdom;
@@ -119,7 +119,7 @@ class KingdomGoldBarsController extends Controller
 
         $newGold = $character->gold + $totalGold;
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
+        if ($newGold > CurrencyLimit::MAX_GOLD) {
             return response()->json([
                 'message' => 'You would waste gold if you withdrew this amount.',
             ], 422);

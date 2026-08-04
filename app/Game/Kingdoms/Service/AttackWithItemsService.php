@@ -5,9 +5,9 @@ namespace App\Game\Kingdoms\Service;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Kingdoms\Traits\CalculateMorale;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Collection;
@@ -136,7 +136,7 @@ class AttackWithItemsService
     ): void {
         $attributes = [
             'to_kingdom_id' => $kingdom->id,
-            'status' => KingdomLogStatusValue::BOMBS_DROPPED,
+            'status' => KingdomLogStatus::BOMBS_DROPPED->value,
             'old_buildings' => $this->oldBuildings,
             'new_buildings' => $this->newBuildings,
             'old_units' => $this->oldUnits,

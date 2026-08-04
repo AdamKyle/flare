@@ -2,18 +2,19 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\WeeklyMonsterFight;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MapNameValue;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\BattleRewardProcessing\Exceptions\WeeklyRewardInventoryFullException;
 use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -23,8 +24,11 @@ class LocationSpecialtyHandler
 
     private RandomAffixGenerator $randomAffixGenerator;
 
-    public function __construct(RandomAffixGenerator $randomAffixGenerator)
-    {
+    public function __construct(
+        RandomAffixGenerator $randomAffixGenerator,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly ChanceCalculator $chanceCalculator,
+    ) {
         $this->randomAffixGenerator = $randomAffixGenerator;
     }
 
@@ -48,7 +52,7 @@ class LocationSpecialtyHandler
 
         $chance = 0.01 + ($lootingDropChance < 0 ? 0 : $lootingDropChance);
 
-        if (DropCheckCalculator::fetchDifficultItemChance($chance, 100)) {
+        if ($this->chanceCalculator->passesPercentage(2.0, $chance * 100)) {
             $this->giveItemReward($character, $mainItemIsCosmic);
         }
 
@@ -127,7 +131,7 @@ class LocationSpecialtyHandler
 
         $randomAffix = $this->randomAffixGenerator
             ->setCharacter($character)
-            ->setPaidAmount(($secondaryIsLegendary ? RandomAffixDetails::LEGENDARY : ($isCosmic ? RandomAffixDetails::COSMIC : RandomAffixDetails::MYTHIC)));
+            ->setPaidAmount(($secondaryIsLegendary ? RandomAffixTier::LEGENDARY->value : ($isCosmic ? RandomAffixTier::COSMIC->value : RandomAffixTier::MYTHIC->value)));
 
         $duplicateItem = $item->duplicate();
 
@@ -136,7 +140,7 @@ class LocationSpecialtyHandler
         ]);
 
         // @codeCoverageIgnoreStart
-        if (rand(1, 100) > 50) {
+        if ($this->chanceCalculator->passesPercentage(50.0)) {
             $duplicateItem->update([
                 'item_suffix_id' => $randomAffix->generateAffix('suffix')->id,
             ]);
@@ -172,9 +176,9 @@ class LocationSpecialtyHandler
         $totalEquippedChance = 0;
 
         $totalEquippedChance = match ($character->map->gameMap->name) {
-            MapNameValue::HELL => $equippedChance * $equippedItems->whereNull('item.specialty_type')->where('item.skill_level_required', 400)->count(),
-            MapNameValue::DELUSIONAL_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)->count(),
-            MapNameValue::TWISTED_MEMORIES => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::TWISTED_EARTH)->count(),
+            MapName::HELL->value => $equippedChance * $equippedItems->whereNull('item.specialty_type')->where('item.skill_level_required', 400)->count(),
+            MapName::DELUSIONAL_MEMORIES->value => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::PURGATORY_CHAINS->value)->count(),
+            MapName::TWISTED_MEMORIES->value => $equippedChance * $equippedItems->where('item.specialty_type', ItemSpecialtyType::TWISTED_EARTH->value)->count(),
             default => 0.0
         };
 
@@ -182,9 +186,9 @@ class LocationSpecialtyHandler
 
         if ($chance >= 80) {
             $typeOfItem = match ($character->map->gameMap->name) {
-                MapNameValue::HELL => ItemSpecialtyType::HELL_FORGED,
-                MapNameValue::DELUSIONAL_MEMORIES => ItemSpecialtyType::DELUSIONAL_SILVER,
-                MapNameValue::TWISTED_MEMORIES => ItemSpecialtyType::FAITHLESS_PLATE,
+                MapName::HELL->value => ItemSpecialtyType::HELL_FORGED->value,
+                MapName::DELUSIONAL_MEMORIES->value => ItemSpecialtyType::DELUSIONAL_SILVER->value,
+                MapName::TWISTED_MEMORIES->value => ItemSpecialtyType::FAITHLESS_PLATE->value,
                 default => null
             };
         }
@@ -194,6 +198,6 @@ class LocationSpecialtyHandler
 
     protected function getChance(): int
     {
-        return rand(1, 100);
+        return $this->randomNumberGenerator->numberBetween(1, 100);
     }
 }

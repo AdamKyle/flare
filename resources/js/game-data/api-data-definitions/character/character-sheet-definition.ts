@@ -61,6 +61,12 @@ export default interface CharacterSheetDefinition {
   can_craft?: boolean;
   can_craft_again_at?: number;
   is_faction_loyalty_automation_running?: boolean;
+  is_alchemy_locked?: boolean;
+  can_use_work_bench?: boolean;
+  can_access_queen?: boolean;
+  can_access_purgatory_chains?: boolean;
+  can_access_labyrinth_oracle?: boolean;
+  can_access_seer_camp?: boolean;
   current_fame_tasks?: Array<{
     type?: string;
     item_name?: string;

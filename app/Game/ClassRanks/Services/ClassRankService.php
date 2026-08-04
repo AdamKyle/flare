@@ -2,7 +2,6 @@
 
 namespace App\Game\ClassRanks\Services;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
@@ -15,6 +14,7 @@ use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;

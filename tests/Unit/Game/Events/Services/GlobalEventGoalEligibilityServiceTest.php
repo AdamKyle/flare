@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Game\Events\Services;
 
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
@@ -37,7 +37,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_id' => $event->id,
             'max_crafts' => 100,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $gameMap = $this->createGameMap(['only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);
@@ -68,7 +68,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
             'event_type' => EventType::WINTER_EVENT,
             'event_id' => $event->id,
             'max_enchants' => 100,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
         ]);
 
         $gameMap = $this->createGameMap(['only_during_event_type' => EventType::WINTER_EVENT]);
@@ -99,7 +99,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_id' => $event->id,
             'max_crafts' => 100,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -127,7 +127,7 @@ class GlobalEventGoalEligibilityServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'event_id' => $event->id,
             'max_crafts' => 100,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
         ]);
 
         $gameMap = $this->createGameMap(['only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT]);

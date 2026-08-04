@@ -7,7 +7,7 @@ use App\Admin\Requests\DeleteEventRequest;
 use App\Admin\Requests\ManageEventRequest;
 use App\Flare\Models\Raid;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\EventSchedulerService;
+use App\Game\Events\Services\EventSchedulerService;
 use App\Game\Events\Values\EventType;
 use App\Http\Controllers\Controller;
 

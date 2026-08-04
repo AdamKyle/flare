@@ -2,10 +2,9 @@
 
 namespace App\Game\Character\CharacterInventory\Validations;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\Item;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Support\Collection;
 
 class SetHandsValidation
@@ -43,7 +42,7 @@ class SetHandsValidation
 
     public function isHandItem(Item $item): bool
     {
-        return $item->type === 'shield' || $item->type === WeaponTypes::WEAPON || in_array($item->type, ItemType::validWeapons(), true);
+        return $item->type === 'shield' || $item->type === ItemType::WEAPON->value || in_array($item->type, ItemType::validWeapons(), true);
     }
 
     public function handedness(Item $item): ?string
@@ -52,7 +51,7 @@ class SetHandsValidation
             return 'shield';
         }
 
-        if ($item->type === WeaponTypes::WEAPON) {
+        if ($item->type === ItemType::WEAPON->value) {
             return 'single_handed';
         }
 

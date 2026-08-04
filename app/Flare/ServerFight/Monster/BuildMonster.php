@@ -3,13 +3,18 @@
 namespace App\Flare\ServerFight\Monster;
 
 use App\Flare\ServerFight\BattleMessages;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class BuildMonster extends BattleMessages
 {
     private ServerMonster $serverMonster;
 
-    public function __construct(ServerMonster $serverMonster)
-    {
+    public function __construct(
+        ServerMonster $serverMonster,
+        private readonly ChanceCalculator $chanceCalculator,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {
         parent::__construct();
 
         $this->serverMonster = $serverMonster;
@@ -50,14 +55,14 @@ class BuildMonster extends BattleMessages
             $dc = 99;
         }
 
-        return rand(1, 100) > $dc;
+        return $this->chanceCalculator->passesPercentage(100 - $dc);
     }
 
     protected function buildHealth(array $monster): int
     {
         $healthArray = explode('-', $monster['health_range']);
 
-        $health = rand($healthArray[0], $healthArray[1]);
+        $health = $this->randomNumberGenerator->numberBetween($healthArray[0], $healthArray[1]);
 
         $increasesHealthBy = $monster['increases_damage_by'];
 

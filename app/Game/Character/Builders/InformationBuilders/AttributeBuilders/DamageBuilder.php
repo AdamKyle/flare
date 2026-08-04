@@ -2,11 +2,10 @@
 
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Items\Values\ItemType;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -90,7 +89,7 @@ class DamageBuilder extends BaseAttribute
             $details['percentage_of_stat_used'] = 0.08;
         } elseif ($this->character->class->type()->isArcaneAlchemist()) {
             $hasStaveEquipped = $this->inventory->filter(function ($slot) {
-                return $slot->item->type === WeaponTypes::STAVE;
+                return $slot->item->type === ItemType::STAVE->value;
             })->isNotEmpty();
 
             if ($hasStaveEquipped) {
@@ -314,7 +313,7 @@ class DamageBuilder extends BaseAttribute
         }
 
         $hasPurgatoryItem = $this->character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::PURGATORY;
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::PURGATORY->value;
         })->first();
 
         if (! is_null($hasPurgatoryItem)) {

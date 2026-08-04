@@ -2,16 +2,19 @@
 
 namespace App\Game\Gambler\Handlers;
 
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gambler\Values\CurrencyValue;
 
 class SpinHandler
 {
+    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
+
     public function roll(): array
     {
 
-        $rollOne = rand(0, count(CurrencyValue::getIcons()) - 1);
-        $rollTwo = rand(0, count(CurrencyValue::getIcons()) - 1);
-        $rollThree = rand(0, count(CurrencyValue::getIcons()) - 1);
+        $rollOne = $this->randomNumberGenerator->numberBetween(0, count(CurrencyValue::getIcons()) - 1);
+        $rollTwo = $this->randomNumberGenerator->numberBetween(0, count(CurrencyValue::getIcons()) - 1);
+        $rollThree = $this->randomNumberGenerator->numberBetween(0, count(CurrencyValue::getIcons()) - 1);
 
         $rolls = [$rollOne, $rollTwo, $rollThree];
 

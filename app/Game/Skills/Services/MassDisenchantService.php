@@ -5,11 +5,13 @@ namespace App\Game\Skills\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Events\CharacterInventoryUpdateBroadCastEvent;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Values\ItemEffectType;
 use Illuminate\Support\Collection;
 
 class MassDisenchantService
@@ -36,8 +38,11 @@ class MassDisenchantService
 
     private ?InventorySlot $questSlot = null;
 
-    public function __construct(SkillCheckService $skillCheckService)
-    {
+    public function __construct(
+        SkillCheckService $skillCheckService,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly ChanceCalculator $chanceCalculator,
+    ) {
         $this->skillCheckService = $skillCheckService;
     }
 
@@ -57,7 +62,7 @@ class MassDisenchantService
         })->first();
 
         $this->questSlot = $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectsValue::GOLD_DUST_RUSH;
+            return $slot->item->type === 'quest' && $slot->item->effect === ItemEffectType::GOLD_DUST_RUSH->value;
         })->first();
 
         $this->baseSkillXP = 25 + 25 * $this->disenchantingSkill->skill_training_bonus;
@@ -105,8 +110,8 @@ class MassDisenchantService
 
         $newGoldDust = $this->character->gold_dust + $this->goldDust;
 
-        if ($newGoldDust > MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $newGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ($newGoldDust > CurrencyLimit::MAX_GOLD_DUST) {
+            $newGoldDust = CurrencyLimit::MAX_GOLD_DUST;
         }
 
         $character = $this->character;
@@ -174,7 +179,7 @@ class MassDisenchantService
 
         $skill->update([
             'level' => $level,
-            'xp_max' => $skill->can_train ? $level * 10 : rand(100, 350),
+            'xp_max' => $skill->can_train ? $level * 10 : $this->randomNumberGenerator->numberBetween(100, 350),
             'base_damage_mod' => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
             'base_healing_mod' => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
             'base_ac_mod' => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,
@@ -197,7 +202,7 @@ class MassDisenchantService
 
         if ($roll > $dcCheck) {
 
-            if (! ($this->goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST)) {
+            if (! ($this->goldDust >= CurrencyLimit::MAX_GOLD_DUST)) {
                 $goldDust = $this->updateGoldDust();
                 $this->goldDust += $goldDust;
                 $this->goldDustRushGain += $goldDust;
@@ -210,7 +215,7 @@ class MassDisenchantService
             return;
         }
 
-        if (! ($this->goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST)) {
+        if (! ($this->goldDust >= CurrencyLimit::MAX_GOLD_DUST)) {
             $this->goldDust += $this->updateGoldDust(true);
         }
 
@@ -249,7 +254,7 @@ class MassDisenchantService
 
     protected function fetchGoldDustAmount(): int
     {
-        return rand(2, 1150);
+        return $this->randomNumberGenerator->numberBetween(2, 1150);
     }
 
     /**
@@ -257,7 +262,7 @@ class MassDisenchantService
      */
     protected function fetchDCRoll(): int
     {
-        return rand(1, 100);
+        return $this->chanceCalculator->passesOneIn(100) ? 100 : 99;
     }
 
     protected function normalizeMaxLevelSkill(Skill $skill, string $leveledType): Skill

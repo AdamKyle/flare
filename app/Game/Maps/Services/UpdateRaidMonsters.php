@@ -6,6 +6,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Maps\Values\MapTileValue;
 
 class UpdateRaidMonsters extends BaseMovementService
@@ -16,13 +17,15 @@ class UpdateRaidMonsters extends BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        ChanceCalculator $chanceCalculator,
     ) {
         parent::__construct(
             $mapTileValue,
             $coordinatesCache,
             $conjureService,
             $movementService,
-            $traverseService
+            $traverseService,
+            $chanceCalculator,
         );
     }
 

@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Flare\Values\MapNameValue;
+use App\Game\Maps\Values\MapName;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 
@@ -27,7 +27,7 @@ class ResetEnemyKingdomCache extends Command
      */
     public function handle()
     {
-        foreach (MapNameValue::$values as $name) {
+        foreach (MapName::values() as $name) {
             Cache::delete('enemy-kingdoms-'.$name);
         }
     }

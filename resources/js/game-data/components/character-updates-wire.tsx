@@ -5,10 +5,12 @@ import { CoreWebSocketChannels } from 'game-data/components/event-enums/core-web
 import { CoreWebSocketEventNames } from 'game-data/components/event-enums/core-web-socket-event-names';
 import CharacterUpdateWireProps from 'game-data/components/types/character-update-wire-props';
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
+import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
 
 export const CharacterUpdatesWire = ({
   userId,
   onEvent,
+  onCraftingOptionsEvent,
 }: CharacterUpdateWireProps) => {
   useWebsocket<UseCharterUpdateStreamResponse>({
     url: CoreWebSocketChannels.UPDATE_CHARACTER,
@@ -24,6 +26,14 @@ export const CharacterUpdatesWire = ({
     type: ChannelType.PRIVATE,
     channelName: CoreWebSocketEventNames.UPDATE_CORE_CHARACTER_DETAILS,
     onEvent,
+  });
+
+  useWebsocket<UseLocationBasedCraftingOptionsStreamResponse>({
+    url: CoreWebSocketChannels.UPDATE_LOCATION_BASED_CRAFTING_OPTIONS,
+    params: { userId },
+    type: ChannelType.PRIVATE,
+    channelName: CoreWebSocketEventNames.UPDATE_LOCATION_BASED_CRAFTING_OPTIONS,
+    onEvent: onCraftingOptionsEvent,
   });
 
   return null;

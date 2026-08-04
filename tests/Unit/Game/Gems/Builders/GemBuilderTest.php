@@ -3,7 +3,9 @@
 namespace Tests\Unit\Game\Gems\Builders;
 
 use App\Flare\Models\Gem;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\MockInterface;
@@ -14,69 +16,79 @@ class GemBuilderTest extends TestCase
 {
     use CreateGem, RefreshDatabase;
 
-    public function test_create_a_gem()
+    public function test_creates_a_new_gem_when_no_matching_gem_exists(): void
     {
-        $gemBuilder = resolve(GemBuilder::class);
+        $this->instance(
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+                $mock->shouldReceive('numberBetween')->andReturn(5, 10, 15, 3);
+            })
+        );
 
-        $createdGem = $gemBuilder->buildGem(1);
+        $gem = resolve(GemBuilder::class)->buildGem(1);
 
-        $gem = Gem::find($createdGem->id);
-
-        $this->assertNotNull($gem);
-
-        $this->assertEquals(1, $gem->tier);
+        $this->assertSame('Glinting Bytocchacuaite', $gem->name);
         $this->assertSame(Gem::DOMAIN_CHARACTER, $gem->domain);
+        $this->assertSame(1, $gem->tier);
+        $this->assertSame(GemTypeValue::FIRE, $gem->primary_atonement_type);
+        $this->assertSame(GemTypeValue::WATER, $gem->secondary_atonement_type);
+        $this->assertSame(GemTypeValue::ICE, $gem->tertiary_atonement_type);
+        $this->assertEquals(0.05, $gem->primary_atonement_amount);
+        $this->assertEquals(0.1, $gem->secondary_atonement_amount);
+        $this->assertEquals(0.15, $gem->tertiary_atonement_amount);
     }
 
-    public function test_find_existing_gem()
+    public function test_reuses_matching_character_domain_gem(): void
     {
-        $gem = $this->createGem();
-
-        $this->instance(
-            GemBuilder::class,
-            Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($gem) {
-                $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('buildDataForGem')->once()->andReturn($gem->getAttributes());
-            })
-        );
-
-        $gemBuilder = resolve(GemBuilder::class);
-
-        $foundGem = $gemBuilder->buildGem(1);
-
-        $this->assertEquals($gem->id, $foundGem->id);
-    }
-
-    public function test_generated_map_gem_is_not_reused_as_character_gem(): void
-    {
-        $characterGemData = $this->createGem()->only([
-            'name',
-            'tier',
-            'primary_atonement_type',
-            'secondary_atonement_type',
-            'tertiary_atonement_type',
-            'primary_atonement_amount',
-            'secondary_atonement_amount',
-            'tertiary_atonement_amount',
+        $existingGem = $this->createGem([
+            'name' => 'Glinting Bytocchacuaite',
+            'domain' => Gem::DOMAIN_CHARACTER,
+            'tier' => 1,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::WATER,
+            'tertiary_atonement_type' => GemTypeValue::ICE,
+            'primary_atonement_amount' => 0.05,
+            'secondary_atonement_amount' => 0.1,
+            'tertiary_atonement_amount' => 0.15,
         ]);
-        Gem::query()->delete();
-        $mapGem = Gem::create(array_merge($characterGemData, [
-            'domain' => Gem::DOMAIN_MAP,
-        ]));
 
         $this->instance(
-            GemBuilder::class,
-            Mockery::mock(GemBuilder::class, function (MockInterface $mock) use ($characterGemData) {
-                $mock->makePartial()
-                    ->shouldAllowMockingProtectedMethods()
-                    ->shouldReceive('buildDataForGem')
-                    ->once()
-                    ->andReturn(array_merge($characterGemData, ['domain' => Gem::DOMAIN_CHARACTER]));
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+                $mock->shouldReceive('numberBetween')->andReturn(5, 10, 15, 3);
             })
         );
 
-        $characterGem = resolve(GemBuilder::class)->buildGem(1);
+        $gem = resolve(GemBuilder::class)->buildGem(1);
 
-        $this->assertNotSame($mapGem->id, $characterGem->id);
-        $this->assertSame(Gem::DOMAIN_CHARACTER, $characterGem->domain);
+        $this->assertSame($existingGem->id, $gem->id);
+        $this->assertSame(1, Gem::count());
+    }
+
+    public function test_does_not_reuse_matching_map_domain_gem_for_character_gem(): void
+    {
+        $this->createGem([
+            'name' => 'Glinting Bytocchacuaite',
+            'domain' => Gem::DOMAIN_MAP,
+            'tier' => 1,
+            'primary_atonement_type' => GemTypeValue::FIRE,
+            'secondary_atonement_type' => GemTypeValue::WATER,
+            'tertiary_atonement_type' => GemTypeValue::ICE,
+            'primary_atonement_amount' => 0.05,
+            'secondary_atonement_amount' => 0.1,
+            'tertiary_atonement_amount' => 0.15,
+        ]);
+
+        $this->instance(
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+                $mock->shouldReceive('numberBetween')->andReturn(5, 10, 15, 3);
+            })
+        );
+
+        $gem = resolve(GemBuilder::class)->buildGem(1);
+
+        $this->assertSame(Gem::DOMAIN_CHARACTER, $gem->domain);
+        $this->assertSame(2, Gem::count());
     }
 }

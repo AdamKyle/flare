@@ -7,8 +7,8 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
-use App\Flare\Values\MapNameValue;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
+use App\Game\Maps\Values\MapName;
 use DateTimeInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
@@ -49,7 +49,7 @@ class CharacterBuildStateTest extends TestCase
         $class = $this->createClass();
 
         $map = $this->createGameMap([
-            'name' => MapNameValue::SURFACE,
+            'name' => MapName::SURFACE->value,
         ]);
 
         $character = $this->createCharacter([
@@ -109,7 +109,7 @@ class CharacterBuildStateTest extends TestCase
         $this->assertSame($state, $state->setClass($class));
         $this->assertSame($class->id, $state->getClass()->id);
 
-        $map = $this->createGameMap(['name' => MapNameValue::SURFACE]);
+        $map = $this->createGameMap(['name' => MapName::SURFACE->value]);
         $this->assertSame($state, $state->setMap($map));
         $this->assertSame($map->id, $state->getMap()->id);
 

@@ -2,13 +2,13 @@
 
 namespace App\Game\Character\CharacterSheet\Transformers;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Transformers\BaseTransformer;
-use App\Flare\Transformers\CharacterInventoryCountTransformer;
-use App\Flare\Values\ClassAttackValue;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\CharacterAttack\Builders\ClassAttackBuilder;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
+use App\Game\Core\Items\Values\ItemType;
 use League\Fractal\Resource\Item;
 
 class CharacterBaseDetailsTransformer extends BaseTransformer
@@ -47,7 +47,7 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
             'attack' => $characterStatBuilder->buildTotalAttack(),
             'health' => $characterStatBuilder->buildHealth(),
             'ac' => $characterStatBuilder->buildDefence(),
-            'class_bonus_chance' => (new ClassAttackValue($character))->buildAttackData()['chance'],
+            'class_bonus_chance' => (new ClassAttackBuilder($character))->buildAttackData()['chance'],
             'gold' => $character->gold,
             'gold_dust' => $character->gold_dust,
             'shards' => $character->shards,

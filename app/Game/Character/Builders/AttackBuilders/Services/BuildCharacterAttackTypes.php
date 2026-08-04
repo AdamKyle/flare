@@ -3,9 +3,9 @@
 namespace App\Game\Character\Builders\AttackBuilders\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Transformers\Traits\SkillsTransformerTrait;
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Skills\Transformers\Traits\SkillsTransformerTrait;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;

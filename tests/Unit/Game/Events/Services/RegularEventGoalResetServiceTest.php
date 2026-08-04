@@ -4,8 +4,8 @@ namespace Tests\Unit\Game\Events\Services;
 
 use App\Flare\Models\GlobalEventKill;
 use App\Flare\Models\GlobalEventParticipation;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Services\RegularEventGoalResetService;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -43,9 +43,9 @@ class RegularEventGoalResetServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'reward_every' => 100,
             'next_reward_at' => 999, // will be reset to reward_every
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
             'max_kills' => 1000,
         ]);
@@ -54,9 +54,9 @@ class RegularEventGoalResetServiceTest extends TestCase
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
             'reward_every' => 50,
             'next_reward_at' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => true,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
             'should_be_mythic' => false,
             'max_kills' => 10,
         ]);

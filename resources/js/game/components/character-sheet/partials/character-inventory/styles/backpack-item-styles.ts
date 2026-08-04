@@ -1,5 +1,6 @@
 import { match } from 'ts-pattern';
 
+import ItemColorFieldsDefinition from './item-color-fields-definition';
 import { BaseItemDetails } from '../../../../../api-definitions/items/base-item-details';
 import ItemDetails from '../../../../../api-definitions/items/item-details';
 import { InventoryItemTypes } from '../enums/inventory-item-types';
@@ -171,7 +172,7 @@ export const backpackItemTextColors = (
 };
 
 export const planeTextItemColors = (
-  item: BaseItemDetails | ItemDetails
+  item: ItemColorFieldsDefinition
 ): string => {
   return match(item)
     .with(

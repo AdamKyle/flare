@@ -1,19 +1,35 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import React, { ReactNode, useState } from 'react';
 
-import { ScreenMapper } from './component-mapping/screen-registery';
+import { ScreenMapper } from './component-mapping/screen-registry';
 import { CraftingTypes } from './enums/crafting-types';
 import { useManageCraftingCardVisibility } from './hooks/use-manage-crafting-card-visibility';
+import CraftingScreenTransition from './shared/crafting-screen-transition';
+import { useLocationRestrictedCraftingAction } from './shared/hooks/use-location-restricted-crafting-action';
 import FloatingCard from '../../../components/icon-section/floating-card';
 
+import { useGameData } from 'game-data/hooks/use-game-data';
+
 const CraftingCard = (): ReactNode => {
+  const { gameData } = useGameData();
   const { closeCraftingCard } = useManageCraftingCardVisibility();
 
   const [activeCraftingType, setActiveCraftingType] = useState<CraftingTypes>(
     CraftingTypes.HOME
   );
 
+  const { locationRestrictionWarning, clearLocationRestrictionWarning } =
+    useLocationRestrictedCraftingAction({
+      activeCraftingType,
+      setActiveCraftingType,
+      character: gameData?.character ?? null,
+    });
+
   const ActiveScreen = ScreenMapper[activeCraftingType];
+
+  const handleCloseCraftingCard = () => {
+    clearLocationRestrictionWarning();
+    closeCraftingCard();
+  };
 
   const renderBackAction = () => {
     if (activeCraftingType === CraftingTypes.HOME) {
@@ -23,32 +39,24 @@ const CraftingCard = (): ReactNode => {
     return setActiveCraftingType(CraftingTypes.HOME);
   };
 
-  if (!ActiveScreen) {
-    return null;
-  }
-
   return (
     <FloatingCard
       title={activeCraftingType}
-      close_action={closeCraftingCard}
+      close_action={handleCloseCraftingCard}
       back_action={
         activeCraftingType === CraftingTypes.HOME ? undefined : renderBackAction
       }
     >
-      <div className="relative overflow-hidden">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={activeCraftingType}
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={{ duration: 0.25 }}
-            className="w-full"
-          >
-            <ActiveScreen setActiveCraftingType={setActiveCraftingType} />
-          </motion.div>
-        </AnimatePresence>
-      </div>
+      <CraftingScreenTransition
+        screenKey={activeCraftingType}
+        label={`${activeCraftingType} crafting screen`}
+      >
+        <ActiveScreen
+          setActiveCraftingType={setActiveCraftingType}
+          locationRestrictionWarning={locationRestrictionWarning}
+          clearLocationRestrictionWarning={clearLocationRestrictionWarning}
+        />
+      </CraftingScreenTransition>
     </FloatingCard>
   );
 };

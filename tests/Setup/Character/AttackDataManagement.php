@@ -3,23 +3,23 @@
 namespace Tests\Setup\Character;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\AttackTypeValue;
+use App\Game\Core\Combat\Values\AttackType;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\AttackDataCacheSetUp;
 
 class AttackDataManagement
 {
     private const ATTACK_TYPE_MAP = [
-        'attack' => AttackTypeValue::ATTACK,
-        'voided_attack' => AttackTypeValue::ATTACK,
-        'cast' => AttackTypeValue::CAST,
-        'voided_cast' => AttackTypeValue::CAST,
-        'cast_and_attack' => AttackTypeValue::CAST_AND_ATTACK,
-        'voided_cast_and_attack' => AttackTypeValue::CAST_AND_ATTACK,
-        'attack_and_cast' => AttackTypeValue::ATTACK_AND_CAST,
-        'voided_attack_and_cast' => AttackTypeValue::ATTACK_AND_CAST,
-        'defend' => AttackTypeValue::DEFEND,
-        'voided_defend' => AttackTypeValue::DEFEND,
+        'attack' => AttackType::ATTACK->value,
+        'voided_attack' => AttackType::ATTACK->value,
+        'cast' => AttackType::CAST->value,
+        'voided_cast' => AttackType::CAST->value,
+        'cast_and_attack' => AttackType::CAST_AND_ATTACK->value,
+        'voided_cast_and_attack' => AttackType::CAST_AND_ATTACK->value,
+        'attack_and_cast' => AttackType::ATTACK_AND_CAST->value,
+        'voided_attack_and_cast' => AttackType::ATTACK_AND_CAST->value,
+        'defend' => AttackType::DEFEND->value,
+        'voided_defend' => AttackType::DEFEND->value,
     ];
 
     private Character $character;

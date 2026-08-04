@@ -7,9 +7,9 @@ use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\GlobalEventParticipation;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Character\Values\CharacterClass;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
@@ -147,7 +147,7 @@ class EnchantingServiceTest extends TestCase
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => false,
             'should_be_mythic' => true,
         ]);
@@ -184,7 +184,7 @@ class EnchantingServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))
             ->assignSkill($this->enchantingSkill)
             ->givePlayerLocation()
@@ -265,7 +265,7 @@ class EnchantingServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->getCharacter();
 
         $result = $this->enchantingService->getCostOfEnchantment($character, [
@@ -484,7 +484,7 @@ class EnchantingServiceTest extends TestCase
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => false,
             'should_be_mythic' => true,
         ]);
@@ -690,7 +690,7 @@ class EnchantingServiceTest extends TestCase
             'max_enchants' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => false,
             'should_be_mythic' => true,
         ]);

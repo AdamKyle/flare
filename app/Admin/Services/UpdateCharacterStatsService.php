@@ -7,7 +7,7 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class UpdateCharacterStatsService
@@ -106,7 +106,7 @@ class UpdateCharacterStatsService
 
             $character->save();
 
-            if (UserOnlineValue::isOnline($character->user)) {
+            if (UserOnlineService::isOnline($character->user)) {
                 event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
 
                 ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NEW_DAMAGE_STAT, $newClass->damage_stat);

@@ -2,12 +2,12 @@
 
 namespace App\Game\Skills\Controllers\Api;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Skills\Requests\CraftingValidation;

@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Character\CharacterCreation\Pipeline\Steps;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
@@ -10,6 +9,7 @@ use App\Flare\Models\GameClass;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\ClassRankAssigner;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Tests\TestCase;

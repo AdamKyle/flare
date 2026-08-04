@@ -1,0 +1,135 @@
+import { useMemo, useState } from 'react';
+
+import UseQueenRerollFlowDefinition, {
+  UseQueenRerollFlowParams,
+} from './definitions/use-queen-reroll-flow-definition';
+import QueenInventorySlotDefinition from '../api/definitions/queen-inventory-slot-definition';
+import { useRerollQueenAffixApi } from '../api/hooks/use-reroll-queen-affix-api';
+import { QueenAffixSelection } from '../enums/queen-affix-selection';
+import { QueenRerollType } from '../enums/queen-reroll-type';
+import { buildRerollQueenAffixRequest } from '../utils/build-reroll-queen-affix-request';
+
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+
+const rerollTypeOptions: DropdownItem[] = [
+  { label: 'Base Details', value: QueenRerollType.BASE },
+  { label: 'Core Stats', value: QueenRerollType.STATS },
+  { label: 'Skill Modifiers', value: QueenRerollType.SKILLS },
+  { label: 'Damage Modifiers', value: QueenRerollType.DAMAGE },
+  { label: 'Resistances', value: QueenRerollType.RESISTANCE },
+  { label: 'All of it', value: QueenRerollType.EVERYTHING },
+];
+
+const buildAffixOptions = (
+  selectedSlot: QueenInventorySlotDefinition | null
+): DropdownItem[] => {
+  if (!selectedSlot) {
+    return [];
+  }
+
+  const options: DropdownItem[] = [];
+
+  if (selectedSlot.item.item_prefix?.randomly_generated) {
+    options.push({ label: 'Prefix', value: QueenAffixSelection.PREFIX });
+  }
+
+  if (selectedSlot.item.item_suffix?.randomly_generated) {
+    options.push({ label: 'Suffix', value: QueenAffixSelection.SUFFIX });
+  }
+
+  if (options.length === 2) {
+    options.push({
+      label: 'Both',
+      value: QueenAffixSelection.ALL_ENCHANTMENTS,
+    });
+  }
+
+  return options;
+};
+
+export const useQueenRerollFlow = ({
+  characterId,
+  data,
+  onDataReplaced,
+  onSuccess,
+}: UseQueenRerollFlowParams): UseQueenRerollFlowDefinition => {
+  const [slotId, setSlotId] = useState<number | null>(null);
+  const [affix, setAffix] = useState<QueenAffixSelection | null>(null);
+  const [rerollType, setRerollType] = useState<QueenRerollType | null>(null);
+
+  const slots = data.unique_slots;
+  const hasSlots = slots.length > 0;
+
+  const selectedSlot = useMemo(
+    () => slots.find((slot) => slot.id === slotId) ?? null,
+    [slots, slotId]
+  );
+
+  const slotOptions = useMemo<DropdownItem[]>(
+    () =>
+      slots.map((slot) => ({ label: slot.item.affix_name, value: slot.id })),
+    [slots]
+  );
+
+  const affixOptions = useMemo<DropdownItem[]>(
+    () => buildAffixOptions(selectedSlot),
+    [selectedSlot]
+  );
+
+  const request = buildRerollQueenAffixRequest(slotId, affix, rerollType);
+
+  const { submitting, error, reroll } = useRerollQueenAffixApi({
+    characterId,
+    request,
+  });
+
+  const selectedCost =
+    affix && rerollType
+      ? (data.costs.reroll[affix]?.[rerollType] ?? null)
+      : null;
+
+  const canSubmit = request !== null && !submitting;
+
+  const handleSelectSlot = (option: DropdownItem): void => {
+    setSlotId(Number(option.value));
+    setAffix(null);
+    setRerollType(null);
+  };
+
+  const handleSelectAffix = (option: DropdownItem): void => {
+    setAffix(option.value as QueenAffixSelection);
+  };
+
+  const handleSelectRerollType = (option: DropdownItem): void => {
+    setRerollType(option.value as QueenRerollType);
+  };
+
+  const handleSubmit = async (): Promise<void> => {
+    const response = await reroll();
+
+    if (!response) {
+      return;
+    }
+
+    onDataReplaced(response);
+    onSuccess(response.message);
+  };
+
+  return {
+    hasSlots,
+    slotOptions,
+    affixOptions,
+    rerollTypeOptions,
+    selectedSlotId: slotId,
+    selectedAffix: affix,
+    selectedRerollType: rerollType,
+    selectedCost,
+    submitting,
+    error,
+    canSubmit,
+    handleSelectSlot,
+    handleSelectAffix,
+    handleSelectRerollType,
+    handleSubmit,
+  };
+};

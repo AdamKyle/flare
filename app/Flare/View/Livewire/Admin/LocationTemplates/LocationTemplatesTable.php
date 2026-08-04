@@ -3,7 +3,7 @@
 namespace App\Flare\View\Livewire\Admin\LocationTemplates;
 
 use App\Flare\Models\LocationTemplate;
-use App\Flare\Values\LocationTemplateType;
+use App\Game\Maps\Values\LocationTemplateType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;

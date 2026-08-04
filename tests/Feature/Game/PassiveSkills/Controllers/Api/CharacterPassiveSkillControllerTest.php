@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\PassiveSkills\Controllers\Api;
 
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -35,7 +35,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'completed_at' => now()->addHour(),
         ]);
 
@@ -55,7 +55,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'completed_at' => now()->addHour(),
         ]);
 
@@ -80,7 +80,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'completed_at' => now()->addHour(),
         ]);
 

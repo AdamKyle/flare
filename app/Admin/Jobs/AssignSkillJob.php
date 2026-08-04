@@ -4,7 +4,7 @@ namespace App\Admin\Jobs;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
-use App\Flare\Values\BaseSkillValue;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,7 +28,7 @@ class AssignSkillJob implements ShouldQueue
         $this->skillId = $skillId;
     }
 
-    public function handle(BaseSkillValue $baseSkillValue)
+    public function handle(BaseSkillBuilder $baseSkillValue)
     {
         $character = Character::find($this->characterId);
 

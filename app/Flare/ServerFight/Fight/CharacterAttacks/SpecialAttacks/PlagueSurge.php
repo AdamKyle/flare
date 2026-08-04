@@ -13,7 +13,7 @@ class PlagueSurge extends BattleBase
 
         if ($extraActionData['has_item']) {
             if (! ($extraActionData['chance'] >= 1)) {
-                if (! (rand(1, 100) > (100 - 100 * $extraActionData['chance']))) {
+                if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
                     return;
                 }
             }

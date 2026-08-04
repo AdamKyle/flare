@@ -9,15 +9,15 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\User;
-use App\Flare\Values\MapNameValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use Exception;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Illuminate\Support\Facades\Cache;
 
 class BaseMovementService
@@ -40,6 +40,7 @@ class BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        protected readonly ChanceCalculator $chanceCalculator,
     ) {
 
         $this->mapTileValue = $mapTileValue;
@@ -94,7 +95,7 @@ class BaseMovementService
     protected function traversePlayer(Location $location, Character $character): bool
     {
         if ($location->type === LocationType::TWISTED_GATE->value) {
-            $gameMap = GameMap::where('name', MapNameValue::TWISTED_MEMORIES)->first();
+            $gameMap = GameMap::where('name', MapName::TWISTED_MEMORIES->value)->first();
 
             if (is_null($gameMap)) {
                 throw new Exception('Could not traverse to Twisted Gate.');
@@ -147,12 +148,10 @@ class BaseMovementService
     protected function awakensCelestial(): bool
     {
         if (Cache::has('celestial-spawn-rate')) {
-            $needed = 100 - (100 * Cache::get('celestial-spawn-rate'));
-
-            return rand(1, 100) > $needed;
+            return $this->chanceCalculator->passesPercentage(ceil(100 * Cache::get('celestial-spawn-rate')));
         }
 
-        return RandomNumberGenerator::generateTrueRandomNumber(500, 0.02) >= 499;
+        return $this->chanceCalculator->passesPercentage(0.4, 2.0);
     }
 
     /**

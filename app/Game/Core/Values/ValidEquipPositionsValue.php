@@ -2,9 +2,9 @@
 
 namespace App\Game\Core\Values;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Item;
-use App\Flare\Values\ArmourTypes;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 
 class ValidEquipPositionsValue
 {
@@ -15,7 +15,7 @@ class ValidEquipPositionsValue
     {
         if (! is_null($item->default_position)) {
             if (in_array($item->default_position, array_merge(
-                ArmourTypes::armourTypes(),
+                ArmourType::allTypes(),
             ))) {
                 return [$item->default_position];
             }

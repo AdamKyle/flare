@@ -4,8 +4,9 @@ namespace App\Game\Kingdoms\Jobs;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Currency\Values\CurrencyType;
 use App\Game\Kingdoms\Service\KingdomService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
@@ -90,7 +91,7 @@ class MassEmbezzle implements ShouldQueue
     protected function cannotGiveCurrency(Kingdom $kingdom)
     {
         $newGoldAmount = $this->character->gold + $this->amount;
-        $maxCurrencies = new MaxCurrenciesValue($newGoldAmount, MaxCurrenciesValue::GOLD);
+        $maxCurrencies = new CurrencyLimit($newGoldAmount, CurrencyType::GOLD);
 
         if ($maxCurrencies->canNotGiveCurrency()) {
             $kingdom = $this->kingdom;

@@ -4,7 +4,7 @@ namespace Tests\Unit\Flare\ServerFight\Fight\CharacterAttacks;
 
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks\BuccaneersDualGunBarrage;
-use App\Flare\Values\ClassAttackValue;
+use App\Game\Character\CharacterAttack\Values\ClassSpecialAttackType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
@@ -30,7 +30,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => false,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 
@@ -59,7 +59,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_BARRAGE->value,
             ],
         ]);
 
@@ -88,7 +88,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 0.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 
@@ -116,7 +116,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 
@@ -145,7 +145,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 
@@ -178,7 +178,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 
@@ -206,7 +206,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 
@@ -241,7 +241,7 @@ class BuccaneersDualGunBarrageTest extends TestCase
             'extra_action_chance' => [
                 'has_item' => true,
                 'chance' => 1.0,
-                'type' => ClassAttackValue::BUCCANEERS_DUAL_GUN_BARRAGE,
+                'type' => ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value,
             ],
         ]);
 

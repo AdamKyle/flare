@@ -8,17 +8,16 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\HandleCharacterLevelUp;
 use App\Game\Events\Values\EventType;
 use App\Game\GuideQuests\Events\ShowGuideQuestCompletedToast;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Illuminate\Support\Facades\DB;
 
 class GuideQuestService
 {
@@ -78,24 +77,29 @@ class GuideQuestService
 
     public function handInQuest(Character $character, GuideQuest $quest): bool
     {
+        $character = Character::find($character->id);
+        $quest = GuideQuest::find($quest->id);
+
+        if (is_null($character) || is_null($quest)) {
+            return false;
+        }
+
         if (! $this->canHandInQuest($character, $quest)) {
             return false;
         }
 
-        $handedIn = DB::transaction(function () use ($character, $quest) {
-            if (! $this->consumeRequiredBatchCraftedItems($character, $quest)) {
-                return false;
-            }
+        $completion = QuestsCompleted::firstOrCreate([
+            'character_id' => $character->id,
+            'guide_quest_id' => $quest->id,
+        ]);
 
-            QuestsCompleted::create([
-                'character_id' => $character->id,
-                'guide_quest_id' => $quest->id,
-            ]);
+        if (! $completion->wasRecentlyCreated) {
+            return false;
+        }
 
-            return true;
-        });
+        if (! $this->consumeRequiredBatchCraftedItems($character, $quest)) {
+            $completion->delete();
 
-        if (! $handedIn) {
             return false;
         }
 
@@ -125,16 +129,16 @@ class GuideQuestService
         $goldDust = $character->gold_dust + $quest->gold_dust_reward;
         $shards = $character->shards + $quest->shards_reward;
 
-        if ($gold >= MaxCurrenciesValue::MAX_GOLD) {
-            $gold = MaxCurrenciesValue::MAX_GOLD;
+        if ($gold >= CurrencyLimit::MAX_GOLD) {
+            $gold = CurrencyLimit::MAX_GOLD;
         }
 
-        if ($goldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $goldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ($goldDust >= CurrencyLimit::MAX_GOLD_DUST) {
+            $goldDust = CurrencyLimit::MAX_GOLD_DUST;
         }
 
-        if ($shards >= MaxCurrenciesValue::MAX_SHARDS) {
-            $shards = MaxCurrenciesValue::MAX_SHARDS;
+        if ($shards >= CurrencyLimit::MAX_SHARDS) {
+            $shards = CurrencyLimit::MAX_SHARDS;
         }
 
         $character = $this->giveXP($character, $quest);
@@ -174,7 +178,7 @@ class GuideQuestService
             return false;
         }
 
-        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING)->get()->isNotEmpty() && ! $ignoreAutomation) {
+        if ($character->currentAutomations()->where('type', AutomationType::EXPLORING->value)->get()->isNotEmpty() && ! $ignoreAutomation) {
             return false;
         }
 

@@ -2,8 +2,8 @@
 
 use App\Flare\Providers\EventsProvider;
 use App\Flare\Providers\ServiceProvider;
-use App\Flare\Values\GameVersionHelper;
-use App\Flare\Values\Wrappers\HasGuideQuestsCompletedOrEnabled;
+use App\Flare\Support\GameVersion;
+use App\Game\GuideQuests\Services\GuideQuestVisibilityService;
 use App\Providers\AppServiceProvider;
 use App\Providers\EventServiceProvider;
 use App\Providers\HorizonServiceProvider;
@@ -257,7 +257,8 @@ return [
         App\Flare\GemWorldGeneration\Providers\ServiceProvider::class,
         App\Flare\MapGenerator\Providers\ServiceProvider::class,
         App\Flare\GameImporter\Providers\ServiceProvider::class,
-        App\Flare\Items\Providers\ServiceProvider::class,
+        App\Game\Core\Items\Providers\ServiceProvider::class,
+        App\Game\Core\Chance\Providers\ServiceProvider::class,
 
         /**
          * Component Related
@@ -287,10 +288,7 @@ return [
         /**
          * Npc Actions
          */
-        App\Game\NpcActions\QueenOfHeartsActions\Providers\ServiceProvider::class,
-        App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,
-        App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
-        App\Game\NpcActions\LabyrinthOracle\Providers\ServiceProvider::class,
+        App\Game\Npcs\Providers\ServiceProvider::class,
 
         /**
          * Game Related
@@ -322,9 +320,6 @@ return [
         App\Game\Gambler\Providers\ServiceProvider::class,
         App\Game\Reincarnate\Providers\ServiceProvider::class,
         App\Game\ClassRanks\Providers\ServiceProvider::class,
-        App\Game\NpcActions\SeerActions\Providers\ServiceProvider::class,
-        App\Game\NpcActions\QueenOfHeartsActions\Providers\ServiceProvider::class,
-        App\Game\NpcActions\WorkBench\Providers\ServiceProvider::class,
         App\Game\Raids\Providers\ServiceProvider::class,
         App\Game\Factions\FactionLoyalty\Providers\ServiceProvider::class,
         App\Game\Tops\Providers\ServiceProvider::class,
@@ -387,8 +382,8 @@ return [
         /**
          * Game Related
          */
-        'GameVersion' => GameVersionHelper::class,
-        'GuideQuests' => HasGuideQuestsCompletedOrEnabled::class,
+        'GameVersion' => GameVersion::class,
+        'GuideQuests' => GuideQuestVisibilityService::class,
     ],
 
 ];

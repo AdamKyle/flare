@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Automation\Handlers;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;
@@ -12,6 +11,7 @@ use App\Game\Automation\Handlers\AutomatedCraftingHandler;
 use App\Game\Automation\Loggers\FactionLoyaltyAutomationCraftingLogger;
 use App\Game\Automation\Values\AutomatedCraftingAttemptTracker;
 use App\Game\Automation\Values\AutomatedCraftingResult;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Shop\Services\ShopService;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;

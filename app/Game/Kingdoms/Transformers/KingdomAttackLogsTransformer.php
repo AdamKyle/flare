@@ -5,7 +5,7 @@ namespace App\Game\Kingdoms\Transformers;
 use App\Flare\Models\Character;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
-use App\Flare\Values\KingdomLogStatusValue;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 use Exception;
 use League\Fractal\TransformerAbstract;
 
@@ -50,7 +50,7 @@ class KingdomAttackLogsTransformer extends TransformerAbstract
             'morale_loss' => $log->morale_loss,
             'opened' => $log->opened,
             'created_at' => $log->created_at->setTimezone(env('TIME_ZONE'))->format('Y-m-d H:m:s'),
-            'took_kingdom' => (new KingdomLogStatusValue($log->status))->tookKingdom(),
+            'took_kingdom' => (KingdomLogStatus::from($log->status))->tookKingdom(),
             'additional_details' => $log->additional_details,
         ];
     }
@@ -129,7 +129,7 @@ class KingdomAttackLogsTransformer extends TransformerAbstract
      */
     protected function getStatusName(int $status): string
     {
-        $logStatus = new KingdomLogStatusValue($status);
+        $logStatus = KingdomLogStatus::from($status);
 
         if ($logStatus->attackedKingdom()) {
             return 'Attacked kingdom';

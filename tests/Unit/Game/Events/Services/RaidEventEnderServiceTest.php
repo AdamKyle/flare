@@ -5,9 +5,9 @@ namespace Tests\Unit\Game\Events\Services;
 use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ActiveEvent;
 use App\Flare\Models\Location;
-use App\Flare\Values\MapNameValue;
 use App\Game\Events\Services\RaidEventEnderService;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Raids\Events\CorruptLocations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -66,7 +66,7 @@ class RaidEventEnderServiceTest extends TestCase
 
     public function test_end_returns_early_when_scheduled_has_no_raid_and_cleans_up(): void
     {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $activeEvent = $this->createEvent([
             'type' => EventType::RAID_EVENT,
@@ -99,7 +99,7 @@ class RaidEventEnderServiceTest extends TestCase
 
     public function test_end_with_raid_uncorrupts_locations_purges_raid_data_updates_monsters_and_cleans_up(): void
     {
-        $surface = $this->createGameMap(['name' => MapNameValue::SURFACE, 'default' => true]);
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
 
         $bossLocation = $this->createLocation([
             'name' => 'Raid Boss Lair',

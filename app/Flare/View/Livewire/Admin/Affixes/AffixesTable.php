@@ -3,7 +3,7 @@
 namespace App\Flare\View\Livewire\Admin\Affixes;
 
 use App\Flare\Models\ItemAffix;
-use App\Flare\Values\ItemAffixType;
+use App\Game\Core\Items\Values\ItemAffixType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -31,14 +31,14 @@ class AffixesTable extends DataTableComponent
                         return $builder->where('randomly_generated', false);
                     }
 
-                    return (new ItemAffixType(intval($value)))->query($builder);
+                    return ItemAffixType::fromValue(intval($value))->query($builder);
                 }),
         ];
     }
 
     protected function buildOptions(): array
     {
-        return array_merge(['Please select' => 'please select'], ItemAffixType::$dropDownValues);
+        return array_merge(['Please select' => 'please select'], ItemAffixType::dropDownValues());
     }
 
     public function columns(): array

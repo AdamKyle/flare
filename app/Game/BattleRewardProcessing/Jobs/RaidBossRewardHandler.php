@@ -12,6 +12,7 @@ use App\Flare\Models\RaidBossParticipation;
 use App\Game\Battle\Concerns\HandleGivingAncestorItem;
 use App\Game\Battle\Events\UpdateRaidAttacksLeft;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -43,7 +44,7 @@ class RaidBossRewardHandler implements ShouldQueue
      *
      * @throws \Exception
      */
-    public function handle(BattleEventHandler $battleEventHandler)
+    public function handle(BattleEventHandler $battleEventHandler, RandomNumberGenerator $randomNumberGenerator)
     {
         $character = Character::find($this->characterId);
 
@@ -57,7 +58,7 @@ class RaidBossRewardHandler implements ShouldQueue
                 ->where('raid_boss_id', $this->monsterId)
                 ->firstOrFail();
 
-            $this->handleWhenRaidBossIsKilled($character, $killedRaidBoss->raidBoss);
+            $this->handleWhenRaidBossIsKilled($character, $killedRaidBoss->raidBoss, $randomNumberGenerator);
 
             $location = Location::where('x', $character->map->character_position_x)->where('y', $character->map->character_position_y)->first();
 
@@ -72,7 +73,7 @@ class RaidBossRewardHandler implements ShouldQueue
      * - Give ancestral item to winner.
      * - Give top 10 damage dealers a piece of gear.
      */
-    private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss): void
+    private function handleWhenRaidBossIsKilled(Character $charater, Monster $raidBoss, RandomNumberGenerator $randomNumberGenerator): void
     {
         event(new GlobalMessageEvent($charater->name.' Has slaughted: '.$raidBoss->name.' and has recieved a special Ancient gift from The Poet him self!'));
 
@@ -83,7 +84,7 @@ class RaidBossRewardHandler implements ShouldQueue
 
         $this->giveAncientReward($charater, $raid->artifact_item_id);
 
-        $this->giveGearReward($raid, $raidBossRecord);
+        $this->giveGearReward($raid, $raidBossRecord, $randomNumberGenerator);
 
         $this->zeroKilledBossParticipations($raid, $raidBossRecord);
     }
@@ -110,7 +111,7 @@ class RaidBossRewardHandler implements ShouldQueue
             });
     }
 
-    private function giveGearReward(Raid $raid, RaidBoss $raidBoss): void
+    private function giveGearReward(Raid $raid, RaidBoss $raidBoss, RandomNumberGenerator $randomNumberGenerator): void
     {
         $raidParticipation = RaidBossParticipation::where('raid_id', $raid->id)
             ->where('raid_boss_id', $raidBoss->id)
@@ -150,7 +151,7 @@ class RaidBossRewardHandler implements ShouldQueue
                 if (in_array($duplicatedItem->type, $validSocketTypes)) {
 
                     $duplicatedItem->update([
-                        'socket_count' => rand(0, 6),
+                        'socket_count' => $randomNumberGenerator->numberBetween(0, 6),
                     ]);
 
                     $duplicatedItem = $duplicatedItem->refresh();

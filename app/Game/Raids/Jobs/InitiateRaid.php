@@ -10,7 +10,7 @@ use App\Flare\Models\Location;
 use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Services\EventSchedulerService;
+use App\Game\Events\Services\EventSchedulerService;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
 use App\Game\Maps\Services\LocationService;

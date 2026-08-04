@@ -2,10 +2,6 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Items\Enricher\ItemEnricherFactory;
-use App\Flare\Items\Transformers\EquippableItemTransformer;
-use App\Flare\Items\Transformers\QuestItemTransformer;
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
@@ -14,21 +10,25 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\InventoryTransformer;
-use App\Flare\Transformers\UsableItemTransformer;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\EquippableItemTransformer;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\DisenchantService;
 use App\Game\Skills\Services\MassDisenchantService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -197,7 +197,7 @@ class CharacterInventoryService
      */
     public function disenchantAllItems(Collection $slots, Character $character): array
     {
-        $maxedOutGoldDust = $character->gold_dust >= MaxCurrenciesValue::MAX_GOLD_DUST;
+        $maxedOutGoldDust = $character->gold_dust >= CurrencyLimit::MAX_GOLD_DUST;
 
         $this->massDisenchantService->setUp($character)->disenchantItems($slots);
 
@@ -911,7 +911,7 @@ class CharacterInventoryService
      */
     private function fetchType(string $type): string
     {
-        if (in_array($type, ArmourTypes::armourTypes())) {
+        if (in_array($type, ArmourType::allTypes())) {
             $type = 'armour';
         }
 

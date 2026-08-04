@@ -9,7 +9,6 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;
 use App\Game\BattleRewardProcessing\Events\BattleRewardQueueUpdated;
 use App\Game\BattleRewardProcessing\Jobs\ProcessCharacterBattleRewardQueue;
 use App\Game\Core\Traits\SafelyBroadcastsEvents;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BattleRewardResumeService
@@ -44,115 +43,105 @@ class BattleRewardResumeService
         }
 
         foreach ($query->pluck('id') as $stateId) {
-            $result = DB::transaction(function () use ($stateId, $apply): ?array {
-                $state = CharacterBattleRewardQueueState::query()
-                    ->lockForUpdate()
-                    ->find($stateId);
+            $state = CharacterBattleRewardQueueState::query()->find($stateId);
 
-                if (is_null($state) || ! $this->queueManager->isQueueStateStale($state)) {
-                    return null;
-                }
-
-                if ($this->queueManager->isProcessorLocked($state->character_id)) {
-                    return null;
-                }
-
-                $processingRequests = CharacterBattleRewardRequest::query()
-                    ->with(['steps', 'messages'])
-                    ->forCharacter($state->character_id)
-                    ->processing()
-                    ->lockForUpdate()
-                    ->get();
-
-                $legacyFailedCount = 0;
-                $resumedCount = 0;
-                $resumableStepCount = 0;
-
-                foreach ($processingRequests as $request) {
-                    if ($request->steps->isEmpty()) {
-                        $legacyFailedCount++;
-
-                        if ($apply) {
-                            $request->update([
-                                'status' => BattleRewardRequestStatus::FAILED,
-                                'failed_reason' => self::LEGACY_FAILED_REASON,
-                                'completed_at' => now(),
-                            ]);
-                        }
-
-                        continue;
-                    }
-
-                    $resumedCount++;
-
-                    if ($apply) {
-                        foreach ($request->steps as $step) {
-                            if ($this->battleRewardLedgerService->markStaleStepResumable($step, $this->queueManager->staleCutoff())) {
-                                $resumableStepCount++;
-                            }
-                        }
-
-                        $request->update([
-                            'status' => BattleRewardRequestStatus::RESUMABLE,
-                            'failed_reason' => null,
-                            'completed_at' => null,
-                        ]);
-
-                        $this->battleRewardLedgerService->log('resume.recovered_request', $request->refresh(), null, [
-                            'status' => BattleRewardRequestStatus::RESUMABLE->value,
-                        ]);
-                    }
-                }
-
-                $hasQueuedRequests = CharacterBattleRewardRequest::query()
-                    ->forCharacter($state->character_id)
-                    ->queued()
-                    ->exists();
-
-                $shouldRestart = $hasQueuedRequests || $resumedCount > 0;
-
-                if ($apply) {
-                    $state->update([
-                        'is_processing' => $shouldRestart,
-                        'started_at' => $shouldRestart ? now() : null,
-                        'heartbeat_at' => $shouldRestart ? now() : null,
-                    ]);
-
-                    DB::afterCommit(function () use ($state, $shouldRestart): void {
-                        if ($shouldRestart) {
-                            ProcessCharacterBattleRewardQueue::dispatch($state->character_id)
-                                ->onConnection('battle_reward_processing')
-                                ->onQueue('battle_reward_processing');
-
-                            $this->battleRewardLedgerService->log('resume.dispatched_processor', new CharacterBattleRewardRequest([
-                                'character_id' => $state->character_id,
-                            ]));
-                        }
-
-                        $this->safelyDispatchBroadcastEvent(
-                            new BattleRewardQueueUpdated($state->character_id, BattleRewardQueueUpdated::REPAIRED),
-                        );
-                    });
-                }
-
-                return [
-                    'resumed_count' => $resumedCount,
-                    'legacy_failed_count' => $legacyFailedCount,
-                    'resumable_step_count' => $resumableStepCount,
-                    'restarted' => $shouldRestart,
-                    'cleared' => ! $shouldRestart,
-                    'unemitted_count' => CharacterBattleRewardRequest::query()
-                        ->forCharacter($state->character_id)
-                        ->whereHas('messages', fn ($query) => $query->unemitted())
-                        ->withCount(['messages as unemitted_messages_count' => fn ($query) => $query->unemitted()])
-                        ->get()
-                        ->sum('unemitted_messages_count'),
-                ];
-            });
-
-            if (is_null($result)) {
+            if (is_null($state) || ! $this->queueManager->isQueueStateStale($state)) {
                 continue;
             }
+
+            if ($this->queueManager->isProcessorLocked($state->character_id)) {
+                continue;
+            }
+
+            $processingRequests = CharacterBattleRewardRequest::query()
+                ->with(['steps', 'messages'])
+                ->forCharacter($state->character_id)
+                ->processing()
+
+                ->get();
+
+            $legacyFailedCount = 0;
+            $resumedCount = 0;
+            $resumableStepCount = 0;
+
+            foreach ($processingRequests as $request) {
+                if ($request->steps->isEmpty()) {
+                    $legacyFailedCount++;
+
+                    if ($apply) {
+                        $request->update([
+                            'status' => BattleRewardRequestStatus::FAILED,
+                            'failed_reason' => self::LEGACY_FAILED_REASON,
+                            'completed_at' => now(),
+                        ]);
+                    }
+
+                    continue;
+                }
+
+                $resumedCount++;
+
+                if ($apply) {
+                    foreach ($request->steps as $step) {
+                        if ($this->battleRewardLedgerService->markStaleStepResumable($step, $this->queueManager->staleCutoff())) {
+                            $resumableStepCount++;
+                        }
+                    }
+
+                    $request->update([
+                        'status' => BattleRewardRequestStatus::RESUMABLE,
+                        'failed_reason' => null,
+                        'completed_at' => null,
+                    ]);
+
+                    $this->battleRewardLedgerService->log('resume.recovered_request', $request->refresh(), null, [
+                        'status' => BattleRewardRequestStatus::RESUMABLE->value,
+                    ]);
+                }
+            }
+
+            $hasQueuedRequests = CharacterBattleRewardRequest::query()
+                ->forCharacter($state->character_id)
+                ->queued()
+                ->exists();
+
+            $shouldRestart = $hasQueuedRequests || $resumedCount > 0;
+
+            if ($apply) {
+                $state->update([
+                    'is_processing' => $shouldRestart,
+                    'started_at' => $shouldRestart ? now() : null,
+                    'heartbeat_at' => $shouldRestart ? now() : null,
+                ]);
+
+                if ($shouldRestart) {
+                    ProcessCharacterBattleRewardQueue::dispatch($state->character_id)
+                        ->onConnection('battle_reward_processing')
+                        ->onQueue('battle_reward_processing');
+
+                    $this->battleRewardLedgerService->log('resume.dispatched_processor', new CharacterBattleRewardRequest([
+                        'character_id' => $state->character_id,
+                    ]));
+                }
+
+                $this->safelyDispatchBroadcastEvent(
+                    new BattleRewardQueueUpdated($state->character_id, BattleRewardQueueUpdated::REPAIRED),
+                );
+            }
+
+            $result = [
+                'resumed_count' => $resumedCount,
+                'legacy_failed_count' => $legacyFailedCount,
+                'resumable_step_count' => $resumableStepCount,
+                'restarted' => $shouldRestart,
+                'cleared' => ! $shouldRestart,
+                'unemitted_count' => CharacterBattleRewardRequest::query()
+                    ->forCharacter($state->character_id)
+                    ->whereHas('messages', fn ($query) => $query->unemitted())
+                    ->withCount(['messages as unemitted_messages_count' => fn ($query) => $query->unemitted()])
+                    ->get()
+                    ->sum('unemitted_messages_count'),
+            ];
 
             $summary['repaired_queue_state_count']++;
             $summary[$apply ? 'resumed_processing_request_count' : 'would_resume_processing_request_count'] += $result['resumed_count'];
@@ -237,157 +226,148 @@ class BattleRewardResumeService
                 }
             }
 
-            $result = DB::transaction(function () use ($cid, $apply): ?array {
+            $state = CharacterBattleRewardQueueState::query()
+                ->where('character_id', $cid)
+                ->first();
+
+            if (is_null($state) && $apply) {
+                CharacterBattleRewardQueueState::query()->insertOrIgnore([
+                    'character_id' => $cid,
+                    'is_processing' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
                 $state = CharacterBattleRewardQueueState::query()
                     ->where('character_id', $cid)
-                    ->lockForUpdate()
-                    ->first();
 
-                if (is_null($state) && $apply) {
-                    CharacterBattleRewardQueueState::query()->insertOrIgnore([
-                        'character_id' => $cid,
-                        'is_processing' => false,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-
-                    $state = CharacterBattleRewardQueueState::query()
-                        ->where('character_id', $cid)
-                        ->lockForUpdate()
-                        ->firstOrFail();
-                }
-
-                $isStale = ! is_null($state) && $this->queueManager->isQueueStateStale($state);
-
-                $processingRequests = CharacterBattleRewardRequest::query()
-                    ->with(['steps', 'messages'])
-                    ->forCharacter($cid)
-                    ->processing()
-                    ->lockForUpdate()
-                    ->get();
-
-                $recoveredCount = 0;
-                $legacyFailedCount = 0;
-                $legacySkippedCount = 0;
-                $resumableStepCount = 0;
-                $isPendingOnly = false;
-                $shouldMarkInactive = false;
-                $shouldDispatch = false;
-
-                if ($processingRequests->isNotEmpty()) {
-                    foreach ($processingRequests as $request) {
-                        if ($request->steps->isNotEmpty()) {
-                            if ($apply) {
-                                foreach ($request->steps as $step) {
-                                    if (in_array($step->status, [
-                                        BattleRewardStepStatus::RUNNING,
-                                        BattleRewardStepStatus::CHECKPOINTED,
-                                    ], true)) {
-                                        $step->update([
-                                            'status' => BattleRewardStepStatus::RESUMABLE,
-                                            'heartbeat_at' => now(),
-                                        ]);
-                                        $resumableStepCount++;
-                                    }
-                                }
-
-                                $request->update([
-                                    'status' => BattleRewardRequestStatus::RESUMABLE,
-                                    'failed_reason' => null,
-                                    'completed_at' => null,
-                                ]);
-
-                                $this->battleRewardLedgerService->log('resume.recovered_request', $request->refresh(), null, [
-                                    'status' => BattleRewardRequestStatus::RESUMABLE->value,
-                                ]);
-                            }
-
-                            $recoveredCount++;
-                        } elseif ($isStale) {
-                            $legacyFailedCount++;
-
-                            if ($apply) {
-                                $request->update([
-                                    'status' => BattleRewardRequestStatus::FAILED,
-                                    'failed_reason' => self::LEGACY_FAILED_REASON,
-                                    'completed_at' => now(),
-                                ]);
-                            }
-                        } else {
-                            $legacySkippedCount++;
-                        }
-                    }
-
-                    if ($recoveredCount > 0) {
-                        $shouldDispatch = true;
-                    }
-                } else {
-                    $hasQueuedRequests = $this->queueManager->hasPendingRequests($cid);
-
-                    if ($hasQueuedRequests) {
-                        $isPendingOnly = true;
-                        $shouldDispatch = true;
-                    } else {
-                        $shouldMarkInactive = true;
-                    }
-                }
-
-                if ($apply) {
-                    if ($shouldMarkInactive) {
-                        $state?->update([
-                            'is_processing' => false,
-                            'started_at' => null,
-                            'heartbeat_at' => null,
-                        ]);
-                    } elseif ($shouldDispatch) {
-                        $state?->update([
-                            'is_processing' => true,
-                            'started_at' => now(),
-                            'heartbeat_at' => now(),
-                        ]);
-                    }
-
-                    DB::afterCommit(function () use ($cid, $shouldDispatch, $shouldMarkInactive): void {
-                        if ($shouldDispatch) {
-                            ProcessCharacterBattleRewardQueue::dispatch($cid)
-                                ->onConnection('battle_reward_processing')
-                                ->onQueue('battle_reward_processing');
-
-                            $this->battleRewardLedgerService->log('resume.dispatched_processor', new CharacterBattleRewardRequest([
-                                'character_id' => $cid,
-                            ]));
-                        }
-
-                        if (! $shouldMarkInactive) {
-                            $this->safelyDispatchBroadcastEvent(
-                                new BattleRewardQueueUpdated($cid, BattleRewardQueueUpdated::REPAIRED),
-                            );
-                        }
-                    });
-                }
-
-                $unemittedCount = CharacterBattleRewardRequest::query()
-                    ->forCharacter($cid)
-                    ->whereHas('messages', fn ($q) => $q->unemitted())
-                    ->withCount(['messages as unemitted_count' => fn ($q) => $q->unemitted()])
-                    ->get()
-                    ->sum('unemitted_count');
-
-                return [
-                    'recovered_count' => $recoveredCount,
-                    'legacy_failed_count' => $legacyFailedCount,
-                    'legacy_skipped_count' => $legacySkippedCount,
-                    'resumable_step_count' => $resumableStepCount,
-                    'is_pending_only' => $isPendingOnly,
-                    'should_mark_inactive' => $shouldMarkInactive,
-                    'should_dispatch' => $shouldDispatch,
-                    'unemitted_count' => $unemittedCount,
-                ];
-            });
-
-            if (is_null($result)) {
-                continue;
+                    ->firstOrFail();
             }
+
+            $isStale = ! is_null($state) && $this->queueManager->isQueueStateStale($state);
+
+            $processingRequests = CharacterBattleRewardRequest::query()
+                ->with(['steps', 'messages'])
+                ->forCharacter($cid)
+                ->processing()
+
+                ->get();
+
+            $recoveredCount = 0;
+            $legacyFailedCount = 0;
+            $legacySkippedCount = 0;
+            $resumableStepCount = 0;
+            $isPendingOnly = false;
+            $shouldMarkInactive = false;
+            $shouldDispatch = false;
+
+            if ($processingRequests->isNotEmpty()) {
+                foreach ($processingRequests as $request) {
+                    if ($request->steps->isNotEmpty()) {
+                        if ($apply) {
+                            foreach ($request->steps as $step) {
+                                if (in_array($step->status, [
+                                    BattleRewardStepStatus::RUNNING,
+                                    BattleRewardStepStatus::CHECKPOINTED,
+                                ], true)) {
+                                    $step->update([
+                                        'status' => BattleRewardStepStatus::RESUMABLE,
+                                        'heartbeat_at' => now(),
+                                    ]);
+                                    $resumableStepCount++;
+                                }
+                            }
+
+                            $request->update([
+                                'status' => BattleRewardRequestStatus::RESUMABLE,
+                                'failed_reason' => null,
+                                'completed_at' => null,
+                            ]);
+
+                            $this->battleRewardLedgerService->log('resume.recovered_request', $request->refresh(), null, [
+                                'status' => BattleRewardRequestStatus::RESUMABLE->value,
+                            ]);
+                        }
+
+                        $recoveredCount++;
+                    } elseif ($isStale) {
+                        $legacyFailedCount++;
+
+                        if ($apply) {
+                            $request->update([
+                                'status' => BattleRewardRequestStatus::FAILED,
+                                'failed_reason' => self::LEGACY_FAILED_REASON,
+                                'completed_at' => now(),
+                            ]);
+                        }
+                    } else {
+                        $legacySkippedCount++;
+                    }
+                }
+
+                if ($recoveredCount > 0) {
+                    $shouldDispatch = true;
+                }
+            } else {
+                $hasQueuedRequests = $this->queueManager->hasPendingRequests($cid);
+
+                if ($hasQueuedRequests) {
+                    $isPendingOnly = true;
+                    $shouldDispatch = true;
+                } else {
+                    $shouldMarkInactive = true;
+                }
+            }
+
+            if ($apply) {
+                if ($shouldMarkInactive) {
+                    $state?->update([
+                        'is_processing' => false,
+                        'started_at' => null,
+                        'heartbeat_at' => null,
+                    ]);
+                } elseif ($shouldDispatch) {
+                    $state?->update([
+                        'is_processing' => true,
+                        'started_at' => now(),
+                        'heartbeat_at' => now(),
+                    ]);
+                }
+
+                if ($shouldDispatch) {
+                    ProcessCharacterBattleRewardQueue::dispatch($cid)
+                        ->onConnection('battle_reward_processing')
+                        ->onQueue('battle_reward_processing');
+
+                    $this->battleRewardLedgerService->log('resume.dispatched_processor', new CharacterBattleRewardRequest([
+                        'character_id' => $cid,
+                    ]));
+                }
+
+                if (! $shouldMarkInactive) {
+                    $this->safelyDispatchBroadcastEvent(
+                        new BattleRewardQueueUpdated($cid, BattleRewardQueueUpdated::REPAIRED),
+                    );
+                }
+            }
+
+            $unemittedCount = CharacterBattleRewardRequest::query()
+                ->forCharacter($cid)
+                ->whereHas('messages', fn ($q) => $q->unemitted())
+                ->withCount(['messages as unemitted_count' => fn ($q) => $q->unemitted()])
+                ->get()
+                ->sum('unemitted_count');
+
+            $result = [
+                'recovered_count' => $recoveredCount,
+                'legacy_failed_count' => $legacyFailedCount,
+                'legacy_skipped_count' => $legacySkippedCount,
+                'resumable_step_count' => $resumableStepCount,
+                'is_pending_only' => $isPendingOnly,
+                'should_mark_inactive' => $shouldMarkInactive,
+                'should_dispatch' => $shouldDispatch,
+                'unemitted_count' => $unemittedCount,
+            ];
 
             $summary[$apply ? 'recovered_processing_request_count' : 'would_recover_processing_request_count'] += $result['recovered_count'];
             $summary['legacy_failed_processing_request_count'] += $result['legacy_failed_count'];
@@ -454,15 +434,11 @@ class BattleRewardResumeService
 
             foreach ($ledgerBacked as $request) {
                 if ($apply) {
-                    DB::transaction(function () use ($request, &$resumableStepCount): void {
-                        $locked = CharacterBattleRewardRequest::query()
-                            ->with('steps')
-                            ->lockForUpdate()
-                            ->findOrFail($request->id);
+                    $locked = CharacterBattleRewardRequest::query()
+                        ->with('steps')
+                        ->findOrFail($request->id);
 
-                        if ($locked->status !== BattleRewardRequestStatus::PROCESSING) {
-                            return;
-                        }
+                    if ($locked->status === BattleRewardRequestStatus::PROCESSING) {
 
                         foreach ($locked->steps as $step) {
                             if (in_array($step->status, [
@@ -486,7 +462,7 @@ class BattleRewardResumeService
                         $this->battleRewardLedgerService->log('resume.force_recovered_request', $locked->refresh(), null, [
                             'status' => BattleRewardRequestStatus::RESUMABLE->value,
                         ]);
-                    });
+                    }
 
                     $summary['force_recovered_request_count']++;
                 } else {

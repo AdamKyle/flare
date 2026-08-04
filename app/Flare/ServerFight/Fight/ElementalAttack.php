@@ -5,14 +5,16 @@ namespace App\Flare\ServerFight\Fight;
 use App\Flare\ServerFight\BattleBase;
 use App\Flare\Traits\ElementAttackData;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class ElementalAttack extends BattleBase
 {
     use ElementAttackData;
 
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
     }
 
     /**

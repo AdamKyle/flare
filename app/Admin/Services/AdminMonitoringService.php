@@ -4,13 +4,13 @@ namespace App\Admin\Services;
 
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 
 class AdminMonitoringService
 {
     public function activeExplorationCount(): int
     {
-        return CharacterAutomation::where('type', AutomationType::EXPLORING)
+        return CharacterAutomation::where('type', AutomationType::EXPLORING->value)
             ->where('completed_at', '>', now())
             ->count();
     }
@@ -23,7 +23,7 @@ class AdminMonitoringService
 
     public function activeDelveCount(): int
     {
-        return CharacterAutomation::where('type', AutomationType::DELVE)
+        return CharacterAutomation::where('type', AutomationType::DELVE->value)
             ->where('completed_at', '>', now())
             ->count();
     }

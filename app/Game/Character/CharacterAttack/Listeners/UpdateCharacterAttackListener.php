@@ -2,9 +2,9 @@
 
 namespace App\Game\Character\CharacterAttack\Listeners;
 
-use App\Flare\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackBroadcastEvent;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
+use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item;
 

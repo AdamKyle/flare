@@ -115,7 +115,7 @@ class MassImportCustomData extends Command
 
             $path = Storage::disk('maps')->putFile($fileName, new File(resource_path('maps').'/'.$file));
 
-            $mapValue = new MapNameValue($fileName);
+            $mapValue = MapName::from($fileName);
 
             $gameMap = GameMap::where('name', $fileName)->first();
 
@@ -131,8 +131,8 @@ class MassImportCustomData extends Command
                 'name' => $fileName,
                 'path' => $path,
                 'default' => $mapValue->isSurface(),
-                'kingdom_color' => MapNameValue::$kingdomColors[$fileName],
-            ], (new MapNameValue($fileName))->getMapModifers());
+                'kingdom_color' => MapName::kingdomColors()[$fileName],
+            ], (MapName::from($fileName))->getMapModifers());
 
             GameMap::create($gameMapData);
         }

@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Game\Events\Concerns;
 
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
 use App\Game\BattleRewardProcessing\Handlers\BattleGlobalEventParticipationHandler;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -45,8 +45,8 @@ class UpdateCharacterEventGoalParticipationTest extends TestCase
         $goal = $this->createGlobalEventGoal([
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([
@@ -82,8 +82,8 @@ class UpdateCharacterEventGoalParticipationTest extends TestCase
         $goal = $this->createGlobalEventGoal([
             'max_crafts' => 100,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([
@@ -119,8 +119,8 @@ class UpdateCharacterEventGoalParticipationTest extends TestCase
         $goal = $this->createGlobalEventGoal([
             'max_enchants' => 100,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([
@@ -156,8 +156,8 @@ class UpdateCharacterEventGoalParticipationTest extends TestCase
         $goal = $this->createGlobalEventGoal([
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([
@@ -197,15 +197,15 @@ class UpdateCharacterEventGoalParticipationTest extends TestCase
         $goal1 = $this->createGlobalEventGoal([
             'max_kills' => 100,
             'event_type' => EventType::WINTER_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::CORRUPTED_ICE->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $goal2 = $this->createGlobalEventGoal([
             'max_kills' => 200,
             'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
-            'unique_type' => RandomAffixDetails::LEGENDARY,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
+            'unique_type' => RandomAffixTier::LEGENDARY->value,
         ]);
 
         $this->createGlobalEventParticipation([

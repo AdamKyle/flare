@@ -15,7 +15,7 @@ use App\Game\Shop\Requests\ShopReplaceItemValidation;
 use App\Game\Shop\Requests\ShopSellValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

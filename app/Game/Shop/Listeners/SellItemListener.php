@@ -2,12 +2,12 @@
 
 namespace App\Game\Shop\Listeners;
 
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Skills\Services\EnchantingService;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 
 class SellItemListener
 {
@@ -24,8 +24,8 @@ class SellItemListener
 
         $totalNewGold = $event->character->gold + SellItemCalculator::fetchSalePriceWithAffixes($item);
 
-        if ($totalNewGold > MaxCurrenciesValue::MAX_GOLD) {
-            $totalNewGold = MaxCurrenciesValue::MAX_GOLD;
+        if ($totalNewGold > CurrencyLimit::MAX_GOLD) {
+            $totalNewGold = CurrencyLimit::MAX_GOLD;
         }
 
         $event->character->update([

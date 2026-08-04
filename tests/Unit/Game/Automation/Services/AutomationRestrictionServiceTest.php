@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Game\Automation\Services;
 
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationType;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -130,10 +130,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_DELVE));
@@ -145,10 +145,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_EXPLORATION));
@@ -160,10 +160,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
@@ -175,10 +175,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
@@ -190,10 +190,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
@@ -205,10 +205,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::PCT));
@@ -220,10 +220,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_FIGHTING));
@@ -235,10 +235,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
@@ -250,10 +250,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_EXPLORATION));
@@ -265,10 +265,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::MANUAL_FIGHTING));
@@ -280,10 +280,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::START_FACTION_LOYALTY));
@@ -295,10 +295,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::PCT));
@@ -310,10 +310,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::DIRECTIONAL_MOVEMENT));
@@ -325,10 +325,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::ENTER_LOCATION));
@@ -340,10 +340,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TELEPORT));
@@ -355,10 +355,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::SET_SAIL));
@@ -370,10 +370,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::TRAVERSE));
@@ -385,10 +385,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_CONJURING));
@@ -400,10 +400,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertTrue($this->service->isBlocked($character, AutomationRestrictionService::CELESTIAL_FIGHTING));
@@ -415,10 +415,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_CRAFTING));
@@ -430,10 +430,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertFalse($this->service->isBlocked($character, AutomationRestrictionService::START_ITEM_CRAFTING));
@@ -445,10 +445,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -461,10 +461,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -477,10 +477,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -493,10 +493,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -509,10 +509,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -525,10 +525,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -541,10 +541,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -557,10 +557,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -573,10 +573,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -589,10 +589,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -605,10 +605,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => true,
         ]);
 
@@ -628,10 +628,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => true,
         ]);
 
@@ -644,10 +644,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -668,10 +668,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -692,10 +692,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -714,10 +714,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -736,10 +736,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -758,10 +758,10 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
@@ -773,10 +773,10 @@ class AutomationRestrictionServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $context = $this->service->blockedContext($character, AutomationRestrictionService::MANUAL_FIGHTING);
@@ -792,19 +792,19 @@ class AutomationRestrictionServiceTest extends TestCase
 
         $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now()->subMinutes(10),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'started_in_special_location' => false,
         ]);
 
         $newestAutomation = $this->createCharacterAutomation([
             'character_id' => $character->id,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(3),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $activeAutomation = $this->service->activeAutomation($character);

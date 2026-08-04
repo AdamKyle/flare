@@ -5,8 +5,8 @@ namespace Tests\Unit\Flare\ServerFight\Fight\CharacterAttacks;
 use App\Flare\Models\Location;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SecondaryAttacks;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\LocationType;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Tests\Setup\Character\CharacterFactory;
@@ -33,12 +33,12 @@ class SecondaryAttacksTest extends TestCase
             'is_raid_boss' => false,
         ]);
 
-        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $serverMonster = resolve(ServerMonster::class)->setHealth(1000)->setMonster($monster->toArray());
         $secondaryAttacks = resolve(SecondaryAttacks::class);
         $secondaryAttacks->setCharacterHealth(900);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'damage_deduction' => 0.0,
             'affixes' => [
                 'cant_be_resisted' => true,
@@ -92,12 +92,12 @@ class SecondaryAttacksTest extends TestCase
             'is_raid_boss' => false,
         ]);
 
-        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $serverMonster = resolve(ServerMonster::class)->setHealth(1000)->setMonster($monster->toArray());
         $secondaryAttacks = resolve(SecondaryAttacks::class);
         $secondaryAttacks->setCharacterHealth(250);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'damage_deduction' => 0.0,
             'affixes' => [
                 'cant_be_resisted' => true,
@@ -131,12 +131,12 @@ class SecondaryAttacksTest extends TestCase
             'is_raid_boss' => false,
         ]);
 
-        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $serverMonster = resolve(ServerMonster::class)->setHealth(1000)->setMonster($monster->toArray());
         $secondaryAttacks = resolve(SecondaryAttacks::class);
         $secondaryAttacks->setCharacterHealth(500);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'damage_deduction' => 0.0,
             'affixes' => [
                 'cant_be_resisted' => true,
@@ -184,12 +184,12 @@ class SecondaryAttacksTest extends TestCase
             'is_raid_boss' => false,
         ]);
 
-        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $serverMonster = resolve(ServerMonster::class)->setHealth(1000)->setMonster($monster->toArray());
         $secondaryAttacks = resolve(SecondaryAttacks::class);
         $secondaryAttacks->setCharacterHealth(1000);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'damage_deduction' => 0.0,
             'affixes' => [],
             'weapon_damage' => 100,
@@ -229,12 +229,12 @@ class SecondaryAttacksTest extends TestCase
             'is_raid_boss' => false,
         ]);
 
-        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $serverMonster = resolve(ServerMonster::class)->setHealth(1000)->setMonster($monster->toArray());
         $secondaryAttacks = resolve(SecondaryAttacks::class);
         $secondaryAttacks->setCharacterHealth(1000);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'damage_deduction' => 0.0,
             'affixes' => [],
             'weapon_damage' => 200,
@@ -249,7 +249,7 @@ class SecondaryAttacksTest extends TestCase
         $secondaryAttacks->setCharacterHealth(1000);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::CAST,
+            'attack_type' => AttackType::CAST->value,
             'damage_deduction' => 0.0,
             'affixes' => [],
             'spell_damage' => 100,
@@ -264,7 +264,7 @@ class SecondaryAttacksTest extends TestCase
         $secondaryAttacks->setCharacterHealth(1000);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::ATTACK_AND_CAST,
+            'attack_type' => AttackType::ATTACK_AND_CAST->value,
             'damage_deduction' => 0.0,
             'affixes' => [],
             'weapon_damage' => 200,
@@ -280,7 +280,7 @@ class SecondaryAttacksTest extends TestCase
         $secondaryAttacks->setCharacterHealth(1000);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::CAST_AND_ATTACK,
+            'attack_type' => AttackType::CAST_AND_ATTACK->value,
             'damage_deduction' => 0.0,
             'affixes' => [],
             'weapon_damage' => 200,
@@ -319,12 +319,12 @@ class SecondaryAttacksTest extends TestCase
             'is_raid_boss' => false,
         ]);
 
-        $serverMonster = (new ServerMonster)->setHealth(1000)->setMonster($monster->toArray());
+        $serverMonster = resolve(ServerMonster::class)->setHealth(1000)->setMonster($monster->toArray());
         $secondaryAttacks = resolve(SecondaryAttacks::class);
         $secondaryAttacks->setCharacterHealth(1000);
         $secondaryAttacks->setMonsterHealth(1000);
         $secondaryAttacks->setAttackData([
-            'attack_type' => AttackTypeValue::DEFEND,
+            'attack_type' => AttackType::DEFEND->value,
             'damage_deduction' => 0.0,
             'affixes' => [],
             'special_damage' => [],

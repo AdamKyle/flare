@@ -10,7 +10,7 @@ use App\Flare\Models\Quest;
 use App\Flare\Models\SmeltingProgress;
 use App\Flare\Models\UnitInQueue;
 use App\Flare\Models\UnitMovementQueue;
-use App\Flare\Values\FeatureTypes;
+use App\Game\Core\Values\FeatureType;
 use App\Game\Kingdoms\Values\BuildingActions;
 use App\Game\Kingdoms\Values\CapitalCityQueueStatus;
 use App\Game\Kingdoms\Values\KingdomMaxValue;
@@ -318,7 +318,7 @@ class KingdomTransformer extends TransformerAbstract
         $character = $kingdom->character;
 
         $completedQuest = $character->questsCompleted->whereNotNull('quest_id')->filter(function ($completedQuest) {
-            return $completedQuest->quest->unlocks_feature === FeatureTypes::CAPITAL_CITIES;
+            return $completedQuest->quest->unlocks_feature === FeatureType::CAPITAL_CITIES->value;
         })->first();
 
         return ! is_null($completedQuest);
@@ -353,11 +353,11 @@ class KingdomTransformer extends TransformerAbstract
         $completedQuest = $kingdom->character->questsCompleted()->whereNotNull(
             'quest_id'
         )->get()->filter(function ($completedQuest) {
-            return $completedQuest->quest->unlocks_feature === FeatureTypes::CAPITAL_CITY_GOLD_BARS;
+            return $completedQuest->quest->unlocks_feature === FeatureType::CAPITAL_CITY_GOLD_BARS->value;
         })->first();
 
         if (is_null($completedQuest)) {
-            $quest = Quest::where('unlocks_feature', FeatureTypes::CAPITAL_CITY_GOLD_BARS)->first();
+            $quest = Quest::where('unlocks_feature', FeatureType::CAPITAL_CITY_GOLD_BARS->value)->first();
 
             if (! is_null($quest)) {
                 $features['capital_city_gold_bars'] = [

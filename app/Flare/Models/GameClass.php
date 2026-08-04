@@ -2,7 +2,7 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Values\CharacterClassValue;
+use App\Game\Character\Values\CharacterClass;
 use Database\Factories\GameClassFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -77,7 +77,7 @@ class GameClass extends Model
 
     public function type()
     {
-        return new CharacterClassValue($this->name);
+        return CharacterClass::from($this->name);
     }
 
     protected static function newFactory()

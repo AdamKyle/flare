@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\ClassRanks\Controllers\Api;
 
-use App\Flare\Values\BaseSkillValue;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
@@ -38,7 +38,7 @@ class ManageClassControllerTest extends TestCase
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
 
-        $skillData = (new BaseSkillValue)->getBaseCharacterSkillValue($character, $skill);
+        $skillData = resolve(BaseSkillBuilder::class)->getBaseCharacterSkillValue($character, $skill);
         $skillData['is_locked'] = false;
 
         $character->skills()->create($skillData);

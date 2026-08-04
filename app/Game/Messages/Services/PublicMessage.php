@@ -3,7 +3,7 @@
 namespace App\Game\Messages\Services;
 
 use App\Flare\Models\User;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Messages\Events\MessageSentEvent;
 use App\Game\Messages\Models\Message;
 use App\Game\Messages\Values\MapChatColor;
@@ -126,7 +126,7 @@ class PublicMessage
         }
 
         return $user->character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::HIDE_CHAT_LOCATION;
+            return $slot->item->effect === ItemEffectType::HIDE_CHAT_LOCATION->value;
         })->isNotEmpty();
     }
 }

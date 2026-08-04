@@ -3,8 +3,8 @@
 namespace Tests\Unit\Game\Reincarnation\Services;
 
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\FeatureTypes;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Values\FeatureType;
 use App\Game\Reincarnate\Services\CharacterReincarnationService;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -63,7 +63,7 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_cannot_reincarnate_when_cannot_level_to_max_when_not_max_level()
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
@@ -75,7 +75,7 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_cannot_reincarnate_when_quest_not_complete()
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
@@ -91,14 +91,14 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_cannot_reincarnate_when_cannot_afford()
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 
@@ -117,14 +117,14 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_can_reincarnate()
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 
@@ -163,14 +163,14 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_reincarnation_will_not_go_above_max_value()
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->update(['level' => 5000]);
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 
@@ -211,14 +211,14 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_cannot_reincarnate_when_stats_are_maxed()
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $character->update(['level' => 2000]);
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 
@@ -249,7 +249,7 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_already_correct_character_keeps_existing_reincarnation_behavior(): void
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = (new CharacterFactory)
             ->createBaseCharacter(
@@ -265,7 +265,7 @@ class CharacterReincarnationServiceTest extends TestCase
             ->getCharacter();
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 
@@ -325,12 +325,12 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_focus_is_the_last_processed_stat_when_included_in_reincarnation(): void
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 
@@ -362,12 +362,12 @@ class CharacterReincarnationServiceTest extends TestCase
 
     public function test_focus_maxed_before_reincarnation_changes_selected_bonus_to_agility(): void
     {
-        $item = $this->createItem(['effect' => ItemEffectsValue::CONTINUE_LEVELING]);
+        $item = $this->createItem(['effect' => ItemEffectType::CONTINUE_LEVELING->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
         $quest = $this->createQuest([
-            'unlocks_feature' => FeatureTypes::REINCARNATION,
+            'unlocks_feature' => FeatureType::REINCARNATION->value,
             'npc_id' => $this->createNpc()->id,
         ]);
 

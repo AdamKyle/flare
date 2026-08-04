@@ -6,7 +6,7 @@ use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 
 class LocationService
 {

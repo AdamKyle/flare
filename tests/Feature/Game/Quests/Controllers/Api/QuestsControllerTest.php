@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\Quests\Controllers\Api;
 
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -27,7 +27,7 @@ class QuestsControllerTest extends TestCase
             ->createBaseCharacter()
             ->givePlayerLocation();
         $characterFactory->assignAutomation([
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
         ]);
         $character = $characterFactory->getCharacter();
 
@@ -47,7 +47,7 @@ class QuestsControllerTest extends TestCase
             'npc_id' => $this->createNpc()->id,
         ]);
         $characterFactory->assignAutomation([
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
         ]);
         $character = $characterFactory->getCharacter();
 
@@ -67,7 +67,7 @@ class QuestsControllerTest extends TestCase
             'npc_id' => $this->createNpc()->id,
         ]);
         $characterFactory->assignAutomation([
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
         ]);
         $character = $characterFactory->getCharacter();
 
@@ -91,7 +91,7 @@ class QuestsControllerTest extends TestCase
             'npc_id' => $this->createNpc()->id,
         ]);
         $characterFactory->assignAutomation([
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
         ]);
         $character = $characterFactory->getCharacter();
 
@@ -289,7 +289,7 @@ class QuestsControllerTest extends TestCase
             'npc_id' => $this->createNpc()->id,
         ]);
         $characterFactory->assignAutomation([
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
         ]);
         $character = $characterFactory->getCharacter();
 

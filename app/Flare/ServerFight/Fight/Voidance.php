@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\ServerFight\BattleMessages;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
 
 class Voidance extends BattleMessages
 {
@@ -13,7 +14,7 @@ class Voidance extends BattleMessages
 
     private bool $enemyIsVoided;
 
-    public function __construct()
+    public function __construct(private readonly ChanceCalculator $chanceCalculator)
     {
         parent::__construct();
 
@@ -109,9 +110,7 @@ class Voidance extends BattleMessages
             return true;
         }
 
-        $roll = rand(1, 100);
-
-        return $roll > (100 - 100 * ($voidanceChance - $voidResistance));
+        return $this->chanceCalculator->passesPercentage(($voidanceChance - $voidResistance) * 100);
     }
 
     private function canPlayerDeVoidEnemy(float $deVoidanceChance, float $devoidanceResistance = 0.0): bool
@@ -120,8 +119,6 @@ class Voidance extends BattleMessages
             return true;
         }
 
-        $roll = rand(1, 100);
-
-        return $roll > (100 - 100 * ($deVoidanceChance - $devoidanceResistance));
+        return $this->chanceCalculator->passesPercentage(($deVoidanceChance - $devoidanceResistance) * 100);
     }
 }

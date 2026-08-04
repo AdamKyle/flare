@@ -8,6 +8,7 @@ use App\Flare\Models\Location;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -29,6 +30,7 @@ class TeleportService extends BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        ChanceCalculator $chanceCalculator,
         private readonly Manager $manager,
         private readonly CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
         private readonly GameTimerService $gameTimerService,
@@ -39,6 +41,7 @@ class TeleportService extends BaseMovementService
             $conjureService,
             $movementService,
             $traverseService,
+            $chanceCalculator,
         );
     }
 

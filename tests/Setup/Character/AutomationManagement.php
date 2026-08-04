@@ -6,8 +6,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\FactionLoyaltyAutomation;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateDelveAutomation;
 use Tests\Traits\CreateFactionLoyaltyAutomation;
@@ -40,10 +40,10 @@ class AutomationManagement
 
         $this->characterAutomation = $this->createCharacterAutomation(array_merge([
             'character_id' => $this->character->id,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(2),
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ], $options));
 
         return $this;

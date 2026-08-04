@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\Raid;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 

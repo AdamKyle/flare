@@ -5,7 +5,7 @@ namespace Tests\Console;
 use App\Flare\Jobs\AccountDeletionJob;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\UserSiteAccessStatistics;
-use App\Flare\Values\NpcTypes;
+use App\Game\Npcs\Values\NpcType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
@@ -44,7 +44,7 @@ class DeleteFlaggedUsersTest extends TestCase
 
         $this->createNpc([
             'game_map_id' => GameMap::first()->id,
-            'type' => NpcTypes::KINGDOM_HOLDER,
+            'type' => NpcType::KINGDOM_HOLDER->value,
         ]);
 
         UserSiteAccessStatistics::create([

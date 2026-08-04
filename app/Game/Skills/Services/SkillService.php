@@ -2,16 +2,17 @@
 
 namespace App\Game\Skills\Services;
 
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Skill;
-use App\Flare\Transformers\BasicSkillsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
-use App\Flare\Transformers\SkillsTransformer;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
+use App\Game\Skills\Transformers\BasicSkillsTransformer;
+use App\Game\Skills\Transformers\SkillsTransformer;
 use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
@@ -30,6 +31,7 @@ class SkillService
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly BattleMessageHandler $battleMessageHandler,
         private readonly PlainDataSerializer $plainDataSerializer,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
     ) {}
 
     /**
@@ -110,7 +112,7 @@ class SkillService
         $skill->update([
             'currently_training' => true,
             'xp_towards' => $xpPercentage,
-            'xp_max' => is_null($skill->xp_max) ? rand(100, 150) : $skill->xp_max,
+            'xp_max' => is_null($skill->xp_max) ? $this->randomNumberGenerator->numberBetween(100, 150) : $skill->xp_max,
         ]);
 
         return $this->successResult([
@@ -354,7 +356,7 @@ class SkillService
 
             $skill->update([
                 'level' => $level,
-                'xp_max' => $skill->can_train ? $level * 10 : rand(100, 350),
+                'xp_max' => $skill->can_train ? $level * 10 : $this->randomNumberGenerator->numberBetween(100, 350),
                 'base_damage_mod' => $skill->base_damage_mod + $skill->baseSkill->base_damage_mod_bonus_per_level,
                 'base_healing_mod' => $skill->base_healing_mod + $skill->baseSkill->base_healing_mod_bonus_per_level,
                 'base_ac_mod' => $skill->base_ac_mod + $skill->baseSkill->base_ac_mod_bonus_per_level,

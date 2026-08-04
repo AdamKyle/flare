@@ -6,21 +6,20 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\ItemTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\EquipItemService;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateTopBarEvent;
+use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
-use Facades\App\Flare\Calculators\SellItemCalculator;
+use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Facades\DB;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
@@ -95,8 +94,8 @@ class ShopService
 
         $newGold = $character->gold + $totalSoldFor;
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
+        if ($newGold > CurrencyLimit::MAX_GOLD) {
+            $newGold = CurrencyLimit::MAX_GOLD;
         }
 
         $character->update([
@@ -134,23 +133,46 @@ class ShopService
      */
     public function buyAndReplace(Item $item, Character $character, array $requestData): void
     {
-        DB::transaction(function () use ($item, $character, $requestData): void {
-            event(new BuyItemEvent($item, $character));
+        $replacementSlotId = $requestData['slot_id'] ?? null;
+        $replacementSlot = $character->inventory->slots()
+            ->whereKey($replacementSlotId)
+            ->where('equipped', true)
+            ->first();
+        $cost = $item->cost;
 
-            $character = $character->refresh();
+        if ($character->classType()->isMerchant()) {
+            $cost = floor($cost - $cost * 0.25);
+        }
 
-            $inventory = Inventory::where('character_id', $character->id)->first();
+        if (is_null($replacementSlot) || $character->gold < $cost || $character->isInventoryFull()) {
+            return;
+        }
 
-            $slot = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+        if (! InventorySlot::whereKey($replacementSlot->id)->where('inventory_id', $character->inventory->id)->where('equipped', true)->exists()) {
+            return;
+        }
 
-            $requestData['slot_id'] = $slot->id;
+        $this->equipItemService->validateReplacementEligibility($character, $item, $requestData['position']);
 
-            $this->equipItemService->setRequest($requestData)
-                ->setCharacter($character)
-                ->replaceItem();
+        event(new BuyItemEvent($item, $character));
 
-            CharacterAttackTypesCacheBuilder::dispatch($character);
-        });
+        $character = $character->refresh();
+
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $slot = InventorySlot::where('equipped', false)->where('item_id', $item->id)->where('inventory_id', $inventory->id)->first();
+
+        if (is_null($slot)) {
+            return;
+        }
+
+        $requestData['slot_id'] = $slot->id;
+
+        $this->equipItemService->setRequest($requestData)
+            ->setCharacter($character)
+            ->replaceItem();
+
+        CharacterAttackTypesCacheBuilder::dispatch($character);
     }
 
     /**
@@ -195,8 +217,8 @@ class ShopService
 
         $newGold = $character->gold + $totalSoldFor;
 
-        if ($newGold > MaxCurrenciesValue::MAX_GOLD) {
-            $newGold = MaxCurrenciesValue::MAX_GOLD;
+        if ($newGold > CurrencyLimit::MAX_GOLD) {
+            $newGold = CurrencyLimit::MAX_GOLD;
 
             event(new ServerMessageEvent($character->user, 'You are Gold Dust Capped so the item: '.$item->affix_name.' auto sold for: '.number_format($totalSoldFor).' Gold. You are now gold capped at: '.number_format($newGold).' Gold. Go spend some of it, or buy Gold Bars for your kingdoms.'));
         } else {

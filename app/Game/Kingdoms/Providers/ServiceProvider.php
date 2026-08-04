@@ -2,7 +2,6 @@
 
 namespace App\Game\Kingdoms\Providers;
 
-use App\Flare\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Builders\KingdomBuilder;
 use App\Game\Kingdoms\Console\Commands\DeleteKingdomLogs;
@@ -54,6 +53,7 @@ use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Kingdoms\Service\UnitReturnService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
 use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;

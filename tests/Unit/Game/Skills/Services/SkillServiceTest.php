@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Game\Skills\Services;
 
-use App\Flare\Events\SkillLeveledUpServerMessageEvent;
 use App\Flare\Models\GameSkill;
+use App\Game\Skills\Events\SkillLeveledUpServerMessageEvent;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;

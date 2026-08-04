@@ -4,8 +4,8 @@ namespace App\Flare\View\Livewire\Admin\Locations;
 
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
-use App\Flare\Values\LocationType;
 use App\Flare\View\Livewire\Admin\Locations\Values\LocationTableSelectOptions;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Database\Eloquent\Builder;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;

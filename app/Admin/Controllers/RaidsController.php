@@ -10,7 +10,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Raid;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Raids\Values\RaidType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -52,10 +52,10 @@ class RaidsController extends Controller
             'locations' => Location::all(),
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
             'itemTypes' => [
-                ItemSpecialtyType::PIRATE_LORD_LEATHER,
-                ItemSpecialtyType::CORRUPTED_ICE,
-                ItemSpecialtyType::DELUSIONAL_SILVER,
-                ItemSpecialtyType::LABYRINTH_CLOTH,
+                ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
+                ItemSpecialtyType::CORRUPTED_ICE->value,
+                ItemSpecialtyType::DELUSIONAL_SILVER->value,
+                ItemSpecialtyType::LABYRINTH_CLOTH->value,
             ],
             'raidTypes' => RaidType::$selectionOptions,
             'artifacts' => Item::where('type', 'artifact')->whereDoesntHave('itemSkillProgressions')->get(),
@@ -79,10 +79,10 @@ class RaidsController extends Controller
             'locations' => Location::all(),
             'raidBosses' => Monster::where('is_raid_boss', true)->get(),
             'itemTypes' => [
-                ItemSpecialtyType::PIRATE_LORD_LEATHER,
-                ItemSpecialtyType::CORRUPTED_ICE,
-                ItemSpecialtyType::DELUSIONAL_SILVER,
-                ItemSpecialtyType::LABYRINTH_CLOTH,
+                ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
+                ItemSpecialtyType::CORRUPTED_ICE->value,
+                ItemSpecialtyType::DELUSIONAL_SILVER->value,
+                ItemSpecialtyType::LABYRINTH_CLOTH->value,
             ],
             'raidTypes' => RaidType::$selectionOptions,
             'artifacts' => Item::where('type', 'artifact')->doesntHave('itemSkillProgressions')->get(),

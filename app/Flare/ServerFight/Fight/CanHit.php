@@ -5,6 +5,7 @@ namespace App\Flare\ServerFight\Fight;
 use App\Flare\Models\Character;
 use App\Flare\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
 
 class CanHit
 {
@@ -12,7 +13,7 @@ class CanHit
 
     const MINIMUM_DAMAGE_FOR_A_PLAYER = 500_000_000;
 
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, private readonly ChanceCalculator $chanceCalculator)
     {
         $this->characterCacheData = $characterCacheData;
     }
@@ -66,7 +67,7 @@ class CanHit
                 return true;
             }
 
-            return rand(1, 100) > (100 - 100 * $extraActionInfo['chance']);
+            return $this->chanceCalculator->passesPercentage($extraActionInfo['chance'] * 100);
         }
 
         return false;

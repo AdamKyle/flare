@@ -3,8 +3,10 @@
 namespace App\Flare\ServerFight\Monster;
 
 use App\Flare\ServerFight\BattleBase;
-use App\Flare\Values\RaidAttackTypesValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Raids\Values\RaidAttackType;
 
 class MonsterSpecialAttack extends BattleBase
 {
@@ -16,9 +18,9 @@ class MonsterSpecialAttack extends BattleBase
 
     const DELUSIONAL_MEMORIES_ATTACK_DAMAGE_AMOUNT = 0.25;
 
-    public function __construct(CharacterCacheData $characterCacheData)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
     }
 
     /**
@@ -29,7 +31,7 @@ class MonsterSpecialAttack extends BattleBase
     public function doSpecialAttack(int $specialAttackType, int $damageStat, int $ac): void
     {
 
-        $specialAttackType = new RaidAttackTypesValue($specialAttackType);
+        $specialAttackType = RaidAttackType::from($specialAttackType);
 
         $this->addMessage('The enemy charges at you with their special attack...', 'enemy-action');
 

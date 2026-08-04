@@ -3,7 +3,7 @@
 namespace App\Game\Monsters\Transformers;
 
 use App\Flare\Models\Monster;
-use App\Flare\Transformers\Traits\SkillsTransformerTrait;
+use App\Game\Skills\Transformers\Traits\SkillsTransformerTrait;
 use League\Fractal\TransformerAbstract;
 
 /**

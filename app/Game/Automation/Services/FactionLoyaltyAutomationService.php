@@ -6,11 +6,11 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\AutomatedFactionLoyalty;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -48,7 +48,7 @@ class FactionLoyaltyAutomationService
 
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
-            'type' => AutomationType::FACTION_LOYALTY,
+            'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
             'completed_at' => now()->addHours(8),
             'attack_type' => $attackType,
@@ -107,7 +107,7 @@ class FactionLoyaltyAutomationService
     public function stopAutomation(Character $character): array
     {
         $characterAutomation = CharacterAutomation::where('character_id', $character->id)
-            ->where('type', AutomationType::FACTION_LOYALTY)
+            ->where('type', AutomationType::FACTION_LOYALTY->value)
             ->where('completed_at', '>', now())
             ->orderByDesc('id')
             ->first();

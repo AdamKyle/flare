@@ -3,7 +3,7 @@
 namespace App\Game\Maps\Services\Common;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 
 trait CanPlayerMassEmbezzle
 {
@@ -13,7 +13,7 @@ trait CanPlayerMassEmbezzle
     public function canMassEmbezzle(Character $character, bool $canManage): bool
     {
         $hasItem = $character->inventory->slots->filter(function ($slot) {
-            return $slot->item->effect === ItemEffectsValue::MASS_EMBEZZLE && $slot->item->type === 'quest';
+            return $slot->item->effect === ItemEffectType::MASS_EMBEZZLE->value && $slot->item->type === 'quest';
         })->first();
 
         return $hasItem && ! $character->is_dead && ! $character->is_mass_embezzling && $canManage;

@@ -7,7 +7,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
 use App\Flare\Models\Quest;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Contracts\View\View;
 
@@ -36,7 +36,7 @@ trait ItemsShowInformation
         $skills = [];
 
         if (! is_null($item->effect)) {
-            $effect = new ItemEffectsValue($item->effect);
+            $effect = ItemEffectType::from($item->effect);
 
             if ($effect->walkOnWater()) {
                 $effects = 'Walk on water (Surface and Labyrinth)';

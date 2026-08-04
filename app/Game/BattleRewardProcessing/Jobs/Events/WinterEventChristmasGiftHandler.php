@@ -2,17 +2,18 @@
 
 namespace App\Game\BattleRewardProcessing\Jobs\Events;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
-use App\Flare\Items\Builders\RandomItemDropBuilder;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Builders\RandomItemDropBuilder;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -28,8 +29,12 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
     /**
      * Handle the job
      */
-    public function handle(RandomAffixGenerator $randomAffixGenerator, RandomItemDropBuilder $randomItemDropBuilder): void
-    {
+    public function handle(
+        RandomAffixGenerator $randomAffixGenerator,
+        RandomItemDropBuilder $randomItemDropBuilder,
+        RandomNumberGenerator $randomNumberGenerator,
+        ChanceCalculator $chanceCalculator,
+    ): void {
         $character = Character::find($this->characterId);
         $scheduledEvent = ScheduledEvent::where('event_type', EventType::WINTER_EVENT)->where('currently_running', true)->first();
 
@@ -45,7 +50,7 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
             return;
         }
 
-        if ($this->canHaveWinterGift()) {
+        if ($this->canHaveWinterGift($chanceCalculator)) {
 
             if ($character->isInventoryFull()) {
                 event(new ServerMessageEvent($character->user, 'Mr. Whiskers could not give you a christmas gift. He is sad. You made a fluffy black cat sad because your inventory is full. Make some room for next time child.'));
@@ -53,12 +58,12 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
                 return;
             }
 
-            $typeOfGear = $this->getType();
+            $typeOfGear = $this->getType($randomNumberGenerator);
 
-            $costOfAffixToGenerate = $this->getCostOfAffixToAttach();
+            $costOfAffixToGenerate = $this->getCostOfAffixToAttach($randomNumberGenerator);
 
-            if (is_null($typeOfGear) || ($costOfAffixToGenerate < RandomAffixDetails::LEGENDARY)) {
-                $itemToGive = $randomItemDropBuilder->generateItem(rand(0, 400));
+            if (is_null($typeOfGear) || ($costOfAffixToGenerate < RandomAffixTier::LEGENDARY->value)) {
+                $itemToGive = $randomItemDropBuilder->generateItem($randomNumberGenerator->numberBetween(0, 400));
 
                 $this->giveItemToPlayer($character, $itemToGive, 0);
 
@@ -71,9 +76,9 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
                 return;
             }
 
-            $numberOfAffixesToAttach = $this->howManyAffixesToAttach();
+            $numberOfAffixesToAttach = $this->howManyAffixesToAttach($chanceCalculator);
 
-            $itemToGive = $this->attachAffixes($character, $randomAffixGenerator, $itemToGive, $costOfAffixToGenerate, $numberOfAffixesToAttach);
+            $itemToGive = $this->attachAffixes($character, $randomAffixGenerator, $itemToGive, $costOfAffixToGenerate, $numberOfAffixesToAttach, $chanceCalculator);
 
             $this->giveItemToPlayer($character, $itemToGive, $costOfAffixToGenerate);
         }
@@ -82,9 +87,9 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
     /**
      * Can have winter gift?
      */
-    private function canHaveWinterGift(): bool
+    private function canHaveWinterGift(ChanceCalculator $chanceCalculator): bool
     {
-        return RandomNumberGenerator::generateTrueRandomNumber(100) > 65;
+        return $chanceCalculator->passesPercentage(35.0);
     }
 
     /**
@@ -92,27 +97,27 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      *
      * Null means base gear
      */
-    private function getType(): ?string
+    private function getType(RandomNumberGenerator $randomNumberGenerator): ?string
     {
 
-        $randomChance = RandomNumberGenerator::generateTrueRandomNumber(100);
+        $randomChance = $randomNumberGenerator->numberBetween(1, 100);
 
         if ($randomChance < 50) {
             return null;
         }
 
         $specialtyTypesOfgear = [
-            ItemSpecialtyType::CORRUPTED_ICE,
-            ItemSpecialtyType::HELL_FORGED,
-            ItemSpecialtyType::PURGATORY_CHAINS,
-            ItemSpecialtyType::PIRATE_LORD_LEATHER,
-            ItemSpecialtyType::DELUSIONAL_SILVER,
-            ItemSpecialtyType::TWISTED_EARTH,
-            ItemSpecialtyType::FAITHLESS_PLATE,
-            ItemSpecialtyType::PIRATE_LORD_LEATHER,
+            ItemSpecialtyType::CORRUPTED_ICE->value,
+            ItemSpecialtyType::HELL_FORGED->value,
+            ItemSpecialtyType::PURGATORY_CHAINS->value,
+            ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
+            ItemSpecialtyType::DELUSIONAL_SILVER->value,
+            ItemSpecialtyType::TWISTED_EARTH->value,
+            ItemSpecialtyType::FAITHLESS_PLATE->value,
+            ItemSpecialtyType::PIRATE_LORD_LEATHER->value,
         ];
 
-        return $specialtyTypesOfgear[rand(0, count($specialtyTypesOfgear) - 1)];
+        return $specialtyTypesOfgear[$randomNumberGenerator->numberBetween(0, count($specialtyTypesOfgear) - 1)];
     }
 
     /**
@@ -138,24 +143,24 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      *
      * - Anything less then legendary will be a regular affix.
      */
-    private function getCostOfAffixToAttach(): int
+    private function getCostOfAffixToAttach(RandomNumberGenerator $randomNumberGenerator): int
     {
-        $randomChance = RandomNumberGenerator::generateTrueRandomNumber(500);
+        $randomChance = $randomNumberGenerator->numberBetween(1, 500);
 
         if ($randomChance >= 450) {
-            return RandomAffixDetails::COSMIC;
+            return RandomAffixTier::COSMIC->value;
         }
 
         if ($randomChance >= 375) {
-            return RandomAffixDetails::MYTHIC;
+            return RandomAffixTier::MYTHIC->value;
         }
 
         if ($randomChance >= 100) {
-            return RandomAffixDetails::LEGENDARY;
+            return RandomAffixTier::LEGENDARY->value;
         }
 
         // Anything less then a legendary
-        return RandomAffixDetails::LEGENDARY - 1;
+        return RandomAffixTier::LEGENDARY->value - 1;
     }
 
     /**
@@ -163,27 +168,27 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
      *
      * - 1 or 2
      */
-    private function howManyAffixesToAttach(): int
+    private function howManyAffixesToAttach(ChanceCalculator $chanceCalculator): int
     {
-        return rand(1, 100) > 75 ? 2 : 1;
+        return $chanceCalculator->passesPercentage(25.0) ? 2 : 1;
     }
 
     /**
      * Attach affixes to item
      */
-    private function attachAffixes(Character $character, RandomAffixGenerator $randomAffixGenerator, Item $item, int $costOfAffix, int $numberOfAffixes): Item
+    private function attachAffixes(Character $character, RandomAffixGenerator $randomAffixGenerator, Item $item, int $costOfAffix, int $numberOfAffixes, ChanceCalculator $chanceCalculator): Item
     {
         $item = $item->duplicate();
 
         $randomAffixGenerator = $randomAffixGenerator->setCharacter($character)->setPaidAmount($costOfAffix);
 
         if ($numberOfAffixes === 1) {
-            $whichSide = rand(1, 100) > 50 ? 'suffix' : 'prefix';
+            $whichSide = $chanceCalculator->passesPercentage(50.0) ? 'suffix' : 'prefix';
 
             $item->update([
                 'item_'.$whichSide.'_id' => $randomAffixGenerator->generateAffix($whichSide)->id,
-                'is_mythic' => $costOfAffix === RandomAffixDetails::MYTHIC,
-                'is_cosmic' => $costOfAffix === RandomAffixDetails::COSMIC,
+                'is_mythic' => $costOfAffix === RandomAffixTier::MYTHIC->value,
+                'is_cosmic' => $costOfAffix === RandomAffixTier::COSMIC->value,
             ]);
 
             return $item->refresh();
@@ -192,8 +197,8 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
         $item->update([
             'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
             'item_suffix_id' => $randomAffixGenerator->generateAffix('suffix')->id,
-            'is_mythic' => $costOfAffix === RandomAffixDetails::MYTHIC,
-            'is_cosmic' => $costOfAffix === RandomAffixDetails::COSMIC,
+            'is_mythic' => $costOfAffix === RandomAffixTier::MYTHIC->value,
+            'is_cosmic' => $costOfAffix === RandomAffixTier::COSMIC->value,
         ]);
 
         return $item->refresh();
@@ -215,9 +220,9 @@ class WinterEventChristmasGiftHandler implements ShouldQueue
         }
 
         $type = match (true) {
-            $costOfAffix === RandomAffixDetails::LEGENDARY => 'Unique',
-            $costOfAffix === RandomAffixDetails::MYTHIC => 'Mythical',
-            $costOfAffix === RandomAffixDetails::COSMIC => 'Comic',
+            $costOfAffix === RandomAffixTier::LEGENDARY->value => 'Unique',
+            $costOfAffix === RandomAffixTier::MYTHIC->value => 'Mythical',
+            $costOfAffix === RandomAffixTier::COSMIC->value => 'Comic',
             default => 'Normal'
         };
 

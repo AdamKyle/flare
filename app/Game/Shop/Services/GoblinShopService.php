@@ -7,7 +7,7 @@ use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Pagination\Pagination;
-use App\Flare\Transformers\UsableItemTransformer;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use Illuminate\Database\Eloquent\Collection;

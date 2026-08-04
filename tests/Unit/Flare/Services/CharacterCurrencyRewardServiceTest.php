@@ -2,12 +2,15 @@
 
 namespace Tests\Unit\Flare\Services;
 
-use App\Flare\Services\CharacterCurrencyRewardService;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\LocationType;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
+use App\Game\BattleRewardProcessing\Services\CharacterCurrencyRewardService;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -132,7 +135,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
     {
         $character = $this->character->getCharacter();
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD - 1,
+            'gold' => CurrencyLimit::MAX_GOLD - 1,
         ]);
 
         $monster = $this->createMonster([
@@ -146,7 +149,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->characterCurrencyRewardService->getCharacter();
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD, $character->gold);
     }
 
     public function test_currency_event_reward_does_nothing_when_event_not_running()
@@ -223,17 +226,22 @@ class CharacterCurrencyRewardServiceTest extends TestCase
             'is_celestial_entity' => false,
         ]);
 
-        $this->characterCurrencyRewardService
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 375)->andReturn(7);
+        $randomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 375)->andReturn(11);
+        $characterCurrencyRewardService = new CharacterCurrencyRewardService(
+            resolve(BattleMessageHandler::class),
+            $randomNumberGenerator,
+        );
+
+        $characterCurrencyRewardService
             ->setCharacter($character->refresh())
             ->currencyEventReward($monster);
 
-        $character = $this->characterCurrencyRewardService->getCharacter();
+        $character = $characterCurrencyRewardService->getCharacter();
 
-        $this->assertGreaterThanOrEqual(1, $character->shards);
-        $this->assertLessThanOrEqual(375, $character->shards);
-
-        $this->assertGreaterThanOrEqual(1, $character->gold_dust);
-        $this->assertLessThanOrEqual(375, $character->gold_dust);
+        $this->assertSame(7, $character->shards);
+        $this->assertSame(11, $character->gold_dust);
 
         $this->assertEquals(0, $character->copper_coins);
     }
@@ -246,7 +254,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
@@ -286,15 +294,15 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($copperCoinsItem)->getCharacter();
         $character->update([
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $monster = $this->createMonster([
@@ -308,9 +316,9 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->characterCurrencyRewardService->getCharacter();
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 
     public function test_currency_event_reward_awards_currencies_when_auto_battling()
@@ -359,12 +367,12 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $this->createItem([
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
             'type' => 'quest',
         ]);
 
@@ -403,12 +411,12 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $this->createItem([
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
             'type' => 'quest',
         ]);
 
@@ -447,12 +455,12 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $this->createItem([
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
             'type' => 'quest',
         ]);
 
@@ -492,12 +500,12 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $mercenarySlotBonusItem = $this->createItem([
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
             'type' => 'quest',
         ]);
 
@@ -536,7 +544,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $character = $this->characterCurrencyRewardService->getCharacter();
 
         $this->assertGreaterThan(-1000, $character->copper_coins);
-        $this->assertLessThan(MaxCurrenciesValue::COPPER, $character->copper_coins);
+        $this->assertLessThan(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 
     public function test_give_currencies_awards_gold_for_kill_count()
@@ -564,7 +572,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
     {
         $character = $this->character->getCharacter();
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD - 5,
+            'gold' => CurrencyLimit::MAX_GOLD - 5,
         ]);
 
         $monster = $this->createMonster([
@@ -578,7 +586,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->characterCurrencyRewardService->getCharacter();
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD, $character->gold);
     }
 
     public function test_distribute_copper_coins_increases_by_exact_earned_amount_when_below_max(): void
@@ -590,12 +598,12 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $this->createItem([
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
             'type' => 'quest',
         ]);
 
@@ -623,7 +631,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $character = $this->characterCurrencyRewardService->getCharacter();
 
         $this->assertGreaterThan(400000, $character->copper_coins);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertLessThan(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 
     public function test_distribute_copper_coins_caps_at_max_copper(): void
@@ -635,19 +643,19 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         ]);
 
         $copperCoinsItem = $this->createItem([
-            'effect' => ItemEffectsValue::GET_COPPER_COINS,
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
             'type' => 'quest',
         ]);
 
         $this->createItem([
-            'effect' => ItemEffectsValue::MERCENARY_SLOT_BONUS,
+            'effect' => ItemEffectType::MERCENARY_SLOT_BONUS->value,
             'type' => 'quest',
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($copperCoinsItem)->getCharacter();
         $character->update([
             'gold' => 0,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER - 1,
+            'copper_coins' => CurrencyLimit::MAX_COPPER - 1,
         ]);
 
         $character->map->update([
@@ -667,7 +675,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->characterCurrencyRewardService->getCharacter();
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_COPPER, $character->copper_coins);
+        $this->assertEquals(CurrencyLimit::MAX_COPPER, $character->copper_coins);
     }
 
     public function test_currency_event_reward_scales_shards_and_gold_dust_with_kill_count()
@@ -713,8 +721,8 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
         $character->update([
-            'shards' => MaxCurrenciesValue::MAX_SHARDS - 1,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST - 1,
+            'shards' => CurrencyLimit::MAX_SHARDS - 1,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST - 1,
             'copper_coins' => 0,
         ]);
 
@@ -729,8 +737,8 @@ class CharacterCurrencyRewardServiceTest extends TestCase
 
         $character = $this->characterCurrencyRewardService->getCharacter();
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertEquals(0, $character->copper_coins);
     }
 }

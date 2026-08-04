@@ -2,13 +2,14 @@
 
 namespace Tests\Unit\Flare\Calculators;
 
-use App\Flare\Calculators\GoldRushCheckCalculator;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Core\Chance\GoldRushCheckCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Services\GoldRush;
-use Facades\App\Flare\Calculators\GoldRushCheckCalculator as GoldRushCheckCalculatorFacade;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
+use Facades\App\Game\Core\Chance\GoldRushCheckCalculator as GoldRushCheckCalculatorFacade;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateLocation;
@@ -19,28 +20,36 @@ class GoldRushCheckCalculatorTest extends TestCase
 
     public function test_base_gold_rush_procs_at_boundary(): void
     {
-        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(100);
+        $generator = Mockery::mock(RandomNumberGenerator::class);
+        $generator->shouldReceive('numberBetween')->once()->with(1, 10_000)->andReturn(100);
+        $this->instance(RandomNumberGenerator::class, $generator);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance());
     }
 
     public function test_base_gold_rush_does_not_proc_outside_boundary(): void
     {
-        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(101);
+        $generator = Mockery::mock(RandomNumberGenerator::class);
+        $generator->shouldReceive('numberBetween')->once()->with(1, 10_000)->andReturn(101);
+        $this->instance(RandomNumberGenerator::class, $generator);
 
         $this->assertFalse(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance());
     }
 
     public function test_map_drop_bonus_increases_gold_rush_chance(): void
     {
-        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(1600);
+        $generator = Mockery::mock(RandomNumberGenerator::class);
+        $generator->shouldReceive('numberBetween')->once()->with(1, 10_000)->andReturn(1600);
+        $this->instance(RandomNumberGenerator::class, $generator);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance(0.15));
     }
 
     public function test_special_location_drop_bonus_increases_gold_rush_chance(): void
     {
-        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(600);
+        $generator = Mockery::mock(RandomNumberGenerator::class);
+        $generator->shouldReceive('numberBetween')->once()->with(1, 10_000)->andReturn(600);
+        $this->instance(RandomNumberGenerator::class, $generator);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance(
             0.0,
@@ -50,7 +59,9 @@ class GoldRushCheckCalculatorTest extends TestCase
 
     public function test_combined_gold_rush_chance_clamps_at_one_hundred_percent(): void
     {
-        RandomNumberGenerator::shouldReceive('generateTrueRandomNumber')->once()->with(10000)->andReturn(10000);
+        $generator = Mockery::mock(RandomNumberGenerator::class);
+        $generator->shouldNotReceive('numberBetween');
+        $this->instance(RandomNumberGenerator::class, $generator);
 
         $this->assertTrue(resolve(GoldRushCheckCalculator::class)->fetchGoldRushChance(0.60, 0.60));
     }
@@ -111,12 +122,12 @@ class GoldRushCheckCalculatorTest extends TestCase
 
         $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD - 10,
+            'gold' => CurrencyLimit::MAX_GOLD - 10,
         ]);
 
         resolve(GoldRush::class)->processPotentialGoldRush($character->refresh(), 1000);
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD, $character->refresh()->gold);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD, $character->refresh()->gold);
     }
 
     public function test_gold_rush_uses_map_drop_bonus_for_chance(): void

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\Maps\Controllers\Api;
 
-use App\Flare\Values\MapNameValue;
+use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -34,7 +34,7 @@ class TeleportControllerSecurityTest extends TestCase
             })
         );
         Cache::put('celestial-spawn-rate', 0);
-        Cache::put('monsters', [MapNameValue::SURFACE => []]);
+        Cache::put('monsters', [MapName::SURFACE->value => []]);
         Queue::fake();
 
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));

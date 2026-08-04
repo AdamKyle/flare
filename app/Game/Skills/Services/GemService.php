@@ -7,6 +7,7 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
+use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -22,7 +23,10 @@ class GemService
 {
     use ResponseBuilder;
 
-    public function __construct(private GemBuilder $gemBuilder) {}
+    public function __construct(
+        private GemBuilder $gemBuilder,
+        private readonly ChanceCalculator $chanceCalculator,
+    ) {}
 
     /**
      * Generate the gem.
@@ -197,10 +201,9 @@ class GemService
             return true;
         }
 
-        $roll = rand(1, 100) / 100;
         $effectiveChance = min(1.0, $chance + $skill->skill_bonus);
 
-        return $roll <= $effectiveChance;
+        return $this->chanceCalculator->passesPercentage(floor($effectiveChance * 100));
     }
 
     /**

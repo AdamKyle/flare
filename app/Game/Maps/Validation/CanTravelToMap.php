@@ -4,7 +4,7 @@ namespace App\Game\Maps\Validation;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
-use App\Flare\Values\ItemEffectsValue;
+use App\Game\Core\Items\Values\ItemEffectType;
 
 class CanTravelToMap
 {
@@ -49,7 +49,7 @@ class CanTravelToMap
     {
         if ($gameMap->mapType()->isLabyrinth()) {
             $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::LABYRINTH;
+                return $slot->item->effect === ItemEffectType::LABYRINTH->value;
             })->all();
 
             return ! empty($hasItem);
@@ -62,7 +62,7 @@ class CanTravelToMap
     {
         if ($gameMap->mapType()->isDungeons()) {
             $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::DUNGEON;
+                return $slot->item->effect === ItemEffectType::DUNGEON->value;
             })->all();
 
             return ! empty($hasItem);
@@ -75,7 +75,7 @@ class CanTravelToMap
     {
         if ($gameMap->mapType()->isShadowPlane()) {
             $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::SHADOW_PLANE;
+                return $slot->item->effect === ItemEffectType::SHADOW_PLANE->value;
             })->all();
 
             return ! empty($hasItem);
@@ -88,7 +88,7 @@ class CanTravelToMap
     {
         if ($gameMap->mapType()->isHell()) {
             $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::HELL;
+                return $slot->item->effect === ItemEffectType::HELL->value;
             })->all();
 
             return ! empty($hasItem);
@@ -101,7 +101,7 @@ class CanTravelToMap
     {
         if ($gameMap->mapType()->isPurgatory()) {
             $hasItem = $character->inventory->slots->filter(function ($slot) {
-                return $slot->item->effect === ItemEffectsValue::PURGATORY;
+                return $slot->item->effect === ItemEffectType::PURGATORY->value;
             })->all();
 
             return ! empty($hasItem);

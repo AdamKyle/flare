@@ -2,7 +2,7 @@
 
 namespace App\Game\Messages\Services;
 
-use App\Flare\Values\NameTags;
+use App\Game\Character\Values\NameTag;
 use App\Game\Messages\Models\Message;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
@@ -76,7 +76,7 @@ class FetchMessages
         $nameTag = $user->name_tag;
 
         $message->name = $user->character->name;
-        $message->name_tag = is_null($nameTag) ? null : NameTags::$valueNames[$nameTag];
+        $message->name_tag = is_null($nameTag) ? null : NameTag::from($nameTag)->label();
 
         return $message;
     }

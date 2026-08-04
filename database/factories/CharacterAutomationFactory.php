@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class CharacterAutomationFactory extends Factory
@@ -25,7 +25,7 @@ class CharacterAutomationFactory extends Factory
         return [
             'character_id' => null,
             'monster_id' => null,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addSeconds(5),
             'move_down_monster_list_every' => null,

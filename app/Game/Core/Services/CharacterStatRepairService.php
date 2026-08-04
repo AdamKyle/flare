@@ -3,12 +3,12 @@
 namespace App\Game\Core\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\BaseStatValue;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
 class CharacterStatRepairService
 {
-    public function __construct(private readonly BaseStatValue $baseStatValue) {}
+    public function __construct(private readonly BaseStatCalculator $baseStatValue) {}
 
     public function getMinimumReincarnationBonus(Character $character, int $maxLevel): int
     {

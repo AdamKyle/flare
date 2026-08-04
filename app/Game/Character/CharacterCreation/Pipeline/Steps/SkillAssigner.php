@@ -5,15 +5,15 @@ namespace App\Game\Character\CharacterCreation\Pipeline\Steps;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Skill;
-use App\Flare\Values\BaseSkillValue;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Support\Collection;
 
 class SkillAssigner
 {
-    public function __construct(private readonly BaseSkillValue $baseSkillValue) {}
+    public function __construct(private readonly BaseSkillBuilder $baseSkillValue) {}
 
     /**
      * Assign all starting skills to the character using a single bulk insert.

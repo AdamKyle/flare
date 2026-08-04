@@ -11,15 +11,15 @@ use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Skill;
 use App\Flare\Models\User;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\LocationType;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\BatchCrafting\Services\BatchCraftingService;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Battle\Services\AttackTimerService;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
+use App\Game\Maps\Values\LocationType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Carbon\Carbon;
 use Illuminate\Broadcasting\Channel;
@@ -63,7 +63,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
             'is_faction_loyalty_automation_running' => $character->isFactionLoyaltyAutomationRunning(),
             'is_delve_running' => $character->currentAutomations()
                 ->where('character_id', $character->id)
-                ->where('type', AutomationType::DELVE)
+                ->where('type', AutomationType::DELVE->value)
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_delve_visible' => $this->isDelveVisible($character),
@@ -109,9 +109,9 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
         }
 
         $name = match ($automation->type) {
-            AutomationType::EXPLORING => 'Exploration',
-            AutomationType::DELVE => 'Delve',
-            AutomationType::FACTION_LOYALTY => 'Faction Loyalty',
+            AutomationType::EXPLORING->value => 'Exploration',
+            AutomationType::DELVE->value => 'Delve',
+            AutomationType::FACTION_LOYALTY->value => 'Faction Loyalty',
             default => null,
         };
 
@@ -165,7 +165,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     {
         $isDelveActive = $character->currentAutomations()
             ->where('character_id', $character->id)
-            ->where('type', AutomationType::DELVE)
+            ->where('type', AutomationType::DELVE->value)
             ->where('completed_at', '>', now())
             ->exists();
 
@@ -254,7 +254,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     {
         $characterMap = $character->map;
 
-        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE)->first();
+        $questItemForDelve = Item::where('effect', ItemEffectType::DELVE->value)->first();
 
         if (is_null($questItemForDelve)) {
             return false;
@@ -273,7 +273,7 @@ class UpdateCharacterStatus implements ShouldBroadcastNow
     private function canSetPactOptionsForDelve(Character $character): bool
     {
 
-        $questItemForDelve = Item::where('effect', ItemEffectsValue::DELVE_PACK_CHOICE)->first();
+        $questItemForDelve = Item::where('effect', ItemEffectType::DELVE_PACK_CHOICE->value)->first();
 
         if (is_null($questItemForDelve)) {
             return false;

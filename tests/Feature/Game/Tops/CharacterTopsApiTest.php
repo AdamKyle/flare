@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Game\Tops;
 
-use App\Flare\Items\Enricher\ItemEnricherFactory;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
 use App\Flare\Models\Inventory;
+use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

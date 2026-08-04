@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { baseStyle } from 'ui/alerts/styles/base-style';
 import { variantStyle } from 'ui/alerts/styles/variant-style';
 import AlertProps from 'ui/alerts/types/alert-props';
@@ -20,7 +21,6 @@ export const Alert = (props: AlertProps) => {
     }
 
     setVisible(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.force_close, props.on_close, props.children]);
 
   const handleClose = (): void => {
@@ -37,8 +37,13 @@ export const Alert = (props: AlertProps) => {
     }
 
     return (
-      <button type="button" onClick={handleClose} className="ml-4">
-        <i className="fas fa-times" />
+      <button
+        type="button"
+        aria-label="Close alert"
+        onClick={handleClose}
+        className="ml-4 rounded p-1 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      >
+        <i className="fas fa-times" aria-hidden="true" />
       </button>
     );
   };
@@ -50,6 +55,11 @@ export const Alert = (props: AlertProps) => {
 
     return (
       <div
+        role={props.variant === AlertVariant.DANGER ? 'alert' : 'status'}
+        aria-live={
+          props.variant === AlertVariant.DANGER ? 'assertive' : 'polite'
+        }
+        aria-atomic="true"
         className={clsx(
           baseStyle(),
           variantStyle(props.variant),

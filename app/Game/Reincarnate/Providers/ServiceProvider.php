@@ -2,8 +2,8 @@
 
 namespace App\Game\Reincarnate\Providers;
 
-use App\Flare\Values\BaseStatValue;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Reincarnate\Services\CharacterReincarnationService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -19,7 +19,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(CharacterReincarnationService::class, function ($app) {
             return new CharacterReincarnationService(
                 $app->make(UpdateCharacterAttackTypesHandler::class),
-                $app->make(BaseStatValue::class)
+                $app->make(BaseStatCalculator::class)
             );
         });
     }

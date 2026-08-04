@@ -7,8 +7,10 @@ use App\Flare\ServerFight\BattleBase;
 use App\Flare\ServerFight\Fight\CharacterAttacks\PlayerHealing;
 use App\Flare\ServerFight\Monster\MonsterSpecialAttack;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\AttackType;
 
 class MonsterAttack extends BattleBase
 {
@@ -20,9 +22,9 @@ class MonsterAttack extends BattleBase
 
     private CanHit $canHit;
 
-    public function __construct(CharacterCacheData $characterCacheData, PlayerHealing $playerHealing, Entrance $entrance, CanHit $canHit)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator, PlayerHealing $playerHealing, Entrance $entrance, CanHit $canHit)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->entrance = $entrance;
         $this->canHit = $canHit;
@@ -209,7 +211,7 @@ class MonsterAttack extends BattleBase
     {
         $attack = $monster->buildAttack();
 
-        if (rand(1, 100) > (100 - 100 * $monster->getMonsterStat('criticality'))) {
+        if ($this->chanceCalculator->passesPercentage($monster->getMonsterStat('criticality') * 100)) {
             $this->addMessage($monster->getName().' grows enraged and lashes out with all fury! (Critical Strike!)', 'regular');
 
             $attack *= 2;
@@ -225,7 +227,7 @@ class MonsterAttack extends BattleBase
             $ac = $playerCachedDefence;
         }
 
-        $attackType = (new AttackTypeValue($previousAttackType));
+        $attackType = (AttackType::from($previousAttackType));
 
         if ($attackType->isDefend()) {
             $classBonus = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance')['chance'];
@@ -250,7 +252,7 @@ class MonsterAttack extends BattleBase
     protected function fireEnchantments(ServerMonster $monster, Character $character)
     {
         $maxAffixDamage = $monster->getMonsterStat('max_affix_damage');
-        $maxAffixDamage = rand(1, $maxAffixDamage);
+        $maxAffixDamage = $this->randomNumberGenerator->numberBetween(1, $maxAffixDamage);
         $damageReduction = $this->characterCacheData->getCachedCharacterData($character, 'affix_damage_reduction');
 
         $maxAffixDamage = $maxAffixDamage - $maxAffixDamage * $damageReduction;
@@ -278,10 +280,7 @@ class MonsterAttack extends BattleBase
 
         if ($spellDamage > 0) {
             $spellEvasion = $this->characterCacheData->getCachedCharacterData($character, 'spell_evasion');
-            $dc = 100 - 100 * $spellEvasion;
-            $roll = rand(1, 100);
-
-            if ($spellEvasion >= 1 || $roll > $dc) {
+            if ($spellEvasion >= 1 || $this->chanceCalculator->passesPercentage($spellEvasion * 100)) {
                 $this->addMessage('You evade the enemy\'s spells!', 'player-action');
 
                 return;
@@ -289,7 +288,7 @@ class MonsterAttack extends BattleBase
 
             $criticality = $monster->getMonsterStat('criticality');
 
-            if (rand(1, 100) > (100 - 100 * $criticality)) {
+            if ($this->chanceCalculator->passesPercentage($criticality * 100)) {
                 $this->addMessage($monster->getName().' With a fury of hatred their spells fly viciously at you! (Critical Strike!)', 'regular');
 
                 $spellDamage *= 2;

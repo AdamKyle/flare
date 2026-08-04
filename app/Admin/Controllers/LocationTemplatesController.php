@@ -7,7 +7,7 @@ use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
 use App\Admin\Requests\LocationTemplateManagementRequest;
 use App\Admin\Requests\LocationTemplatesImportRequest;
 use App\Flare\Models\LocationTemplate;
-use App\Flare\Values\LocationTemplateType;
+use App\Game\Maps\Values\LocationTemplateType;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;

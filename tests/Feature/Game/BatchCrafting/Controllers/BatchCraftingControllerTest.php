@@ -5,11 +5,11 @@ namespace Tests\Feature\Game\BatchCrafting\Controllers;
 use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\SetSlot;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\BatchCrafting\Services\BatchCraftingProcessor;
 use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
 use App\Game\BatchCrafting\Values\BatchCraftingType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
@@ -665,7 +665,7 @@ class BatchCraftingControllerTest extends TestCase
     {
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
-        $this->createCharacterAutomation(['character_id' => $character->id, 'type' => AutomationType::FACTION_LOYALTY]);
+        $this->createCharacterAutomation(['character_id' => $character->id, 'type' => AutomationType::FACTION_LOYALTY->value]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
@@ -681,7 +681,7 @@ class BatchCraftingControllerTest extends TestCase
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
         $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
-        $this->createCharacterAutomation(['character_id' => $character->id, 'type' => AutomationType::EXPLORING]);
+        $this->createCharacterAutomation(['character_id' => $character->id, 'type' => AutomationType::EXPLORING->value]);
 
         $this->actingAs($user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
@@ -940,7 +940,7 @@ class BatchCraftingControllerTest extends TestCase
         $character->update(['gold' => 100, 'inventory_max' => 10]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
         $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::CRAFT, 'ends_at' => now()->addHour()]);
-        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_crafts' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED->value]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $character = $character->refresh();
@@ -963,7 +963,7 @@ class BatchCraftingControllerTest extends TestCase
             ->update(['level' => 5]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING]);
         $event = $this->createEvent(['type' => EventType::WINTER_EVENT, 'scheduled_event_id' => $schedule->id, 'current_event_goal_step' => GlobalEventSteps::ENCHANT, 'ends_at' => now()->addHour()]);
-        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED]);
+        $this->createGlobalEventGoal(['event_type' => $event->type, 'event_id' => $event->id, 'max_enchants' => 100, 'item_specialty_type_reward' => ItemSpecialtyType::HELL_FORGED->value]);
         $eventMap = $this->createGameMap(['only_during_event_type' => $event->type]);
         $character->map()->update(['game_map_id' => $eventMap->id]);
         $character = $character->refresh();

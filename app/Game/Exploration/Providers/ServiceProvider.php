@@ -8,6 +8,7 @@ use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Services\ExplorationWarningService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Exploration\Services\DelveMonsterService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -19,6 +20,7 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+        $this->app->bind(DelveMonsterService::class);
 
         $this->app->bind(ExplorationAutomationService::class, function ($app) {
             return new ExplorationAutomationService(

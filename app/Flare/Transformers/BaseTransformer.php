@@ -9,8 +9,8 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\MaxLevelConfiguration;
 use App\Flare\Models\Skill;
-use App\Flare\Values\ItemEffectsValue;
 use App\Game\Battle\Values\MaxLevel;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\TransformerAbstract;
@@ -84,7 +84,7 @@ class BaseTransformer extends TransformerAbstract
 
     public function getMaxLevel(Character $character)
     {
-        $item = Item::where('effect', ItemEffectsValue::CONTINUE_LEVELING)->first();
+        $item = Item::where('effect', ItemEffectType::CONTINUE_LEVELING->value)->first();
 
         if (is_null($item)) {
             return MaxLevel::MAX_LEVEL;

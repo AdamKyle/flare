@@ -2,9 +2,10 @@
 
 namespace App\Game\Gems\Providers;
 
-use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
+use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Services\AttachedGemService;
 use App\Game\Gems\Services\GemComparison;
@@ -43,8 +44,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new ItemAtonements($app->make(GemComparison::class));
         });
 
-        $this->app->bind(GemBuilder::class, function () {
-            return new GemBuilder;
+        $this->app->bind(GemBuilder::class, function ($app) {
+            return new GemBuilder($app->make(RandomNumberGenerator::class));
         });
     }
 

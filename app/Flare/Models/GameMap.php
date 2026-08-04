@@ -2,9 +2,9 @@
 
 namespace App\Flare\Models;
 
-use App\Flare\Items\DataBuilders\QuestItem\QuestItemBuilder;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\MapNameValue;
+use App\Game\Core\Items\DataBuilders\QuestItem\QuestItemBuilder;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Maps\Values\MapName;
 use Database\Factories\GameMapFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -89,9 +89,9 @@ class GameMap extends Model
         return $this->belongsTo(GameLocationGemParamter::class, 'game_location_gem_paramter_id');
     }
 
-    public function mapType(): MapNameValue
+    public function mapType(): MapName
     {
-        return new MapNameValue($this->effectiveGameMap()->name);
+        return MapName::from($this->effectiveGameMap()->name);
     }
 
     public function isGeneratedGemMap(): bool
@@ -132,17 +132,17 @@ class GameMap extends Model
 
         switch ($this->effectiveGameMap()->name) {
             case 'Labyrinth':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::LABYRINTH)->first());
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::LABYRINTH->value)->first());
             case 'Dungeons':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::DUNGEON)->first());
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::DUNGEON->value)->first());
             case 'Shadow Plane':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::SHADOW_PLANE)->first());
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::SHADOW_PLANE->value)->first());
             case 'Hell':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::HELL)->first());
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::HELL->value)->first());
             case 'Purgatory':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::PURGATORY)->first());
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::PURGATORY->value)->first());
             case 'Twisted Memories':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectsValue::TWISTED_TREE_BRANCH)->first());
+                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::TWISTED_TREE_BRANCH->value)->first());
             case 'Surface':
             default:
                 return null;

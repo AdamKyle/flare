@@ -7,6 +7,7 @@ import CharacterSheetDefinition from '../api-data-definitions/character/characte
 import GameDataDefinition from '../deffinitions/game-data-definition';
 
 import UseCharterUpdateStreamResponse from 'game-data/hooks/definitions/use-character-update-stream-response';
+import UseLocationBasedCraftingOptionsStreamResponse from 'game-data/hooks/definitions/use-location-based-crafting-options-stream-response';
 import UseMonsterUpdateStreamResponse from 'game-data/hooks/definitions/use-monster-update-stream-response';
 import { useAnnouncementUpdates } from 'game-data/hooks/use-announcement-updates';
 import useCharacterUpdates from 'game-data/hooks/use-character-updates';
@@ -75,6 +76,27 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     });
   };
 
+  const handleOnCraftingOptionsUpdate = (
+    data: UseLocationBasedCraftingOptionsStreamResponse
+  ) => {
+    setGameData((prev): GameDataDefinition | null => {
+      if (!prev || !prev.character) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        character: {
+          ...prev.character,
+          can_use_work_bench: data.canUseWorkBench,
+          can_access_queen: data.canUseQueenOfHearts,
+          can_access_labyrinth_oracle: data.canAccessLabyrinthOracle,
+          can_access_seer_camp: data.canAccessSeerCamp,
+        },
+      };
+    });
+  };
+
   const handleUpdateAnnouncements = (data: AnnouncementMessageDefinition) => {
     setGameData((prev): GameDataDefinition | null => {
       if (!prev) {
@@ -130,6 +152,7 @@ const GameDataProvider = (props: GameDataProviderProps) => {
   } = useCharacterUpdates({
     userId: userIdForWire,
     onEvent: handleOnCharacterUpdate,
+    onCraftingOptionsEvent: handleOnCraftingOptionsUpdate,
   });
 
   const {

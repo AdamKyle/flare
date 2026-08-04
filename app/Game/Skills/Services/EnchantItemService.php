@@ -7,7 +7,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use Exception;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
@@ -203,11 +203,11 @@ class EnchantItemService
         if ($affix->type === 'suffix') {
 
             if (! is_null($clonedItem->itemSuffix)) {
-                if ($clonedItem->itemSuffix->cost === RandomAffixDetails::MYTHIC) {
+                if ($clonedItem->itemSuffix->cost === RandomAffixTier::MYTHIC->value) {
                     $clonedItem->item_suffix_id = null;
                 }
 
-                if ($clonedItem->itemSuffix->cost === RandomAffixDetails::COSMIC) {
+                if ($clonedItem->itemSuffix->cost === RandomAffixTier::COSMIC->value) {
                     $clonedItem->item_suffix_id = null;
                 }
             }
@@ -216,11 +216,11 @@ class EnchantItemService
         if ($affix->type === 'prefix') {
 
             if (! is_null($clonedItem->itemPrefix)) {
-                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::MYTHIC) {
+                if ($clonedItem->itemPrefix->cost === RandomAffixTier::MYTHIC->value) {
                     $clonedItem->item_prefix_id = null;
                 }
 
-                if ($clonedItem->itemPrefix->cost === RandomAffixDetails::COSMIC) {
+                if ($clonedItem->itemPrefix->cost === RandomAffixTier::COSMIC->value) {
                     $clonedItem->item_prefix_id = null;
                 }
             }

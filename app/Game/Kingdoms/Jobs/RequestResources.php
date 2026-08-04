@@ -5,12 +5,12 @@ namespace App\Game\Kingdoms\Jobs;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\KingdomLog;
 use App\Flare\Models\UnitMovementQueue;
-use App\Flare\Values\KingdomLogStatusValue;
 use App\Game\Core\Services\GameTimerService;
 use App\Game\Kingdoms\Events\UpdateKingdomQueues;
 use App\Game\Kingdoms\Service\CapitalCityBuildingManagement;
 use App\Game\Kingdoms\Service\CapitalCityUnitManagement;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Values\KingdomLogStatus;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Bus\Queueable;
@@ -62,7 +62,7 @@ class RequestResources implements ShouldQueue
                     Your spearmen tried to save the people, but they were cut down.',
                     ],
                 ],
-                'status' => KingdomLogStatusValue::RESOURCES_LOST,
+                'status' => KingdomLogStatus::RESOURCES_LOST->value,
             ]);
         }
 
@@ -90,7 +90,7 @@ class RequestResources implements ShouldQueue
             'to_kingdom_id' => $requestedKingdom->id,
             'opened' => false,
             'additional_details' => $logDetails,
-            'status' => KingdomLogStatusValue::RESOURCES_REQUESTED,
+            'status' => KingdomLogStatus::RESOURCES_REQUESTED->value,
             'published' => true,
         ]);
 

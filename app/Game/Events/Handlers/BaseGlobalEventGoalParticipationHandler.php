@@ -2,11 +2,11 @@
 
 namespace App\Game\Events\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\Item;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Concerns\UpdateCharacterEventGoalParticipation;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Messages\Events\ServerMessageEvent;
@@ -101,7 +101,7 @@ class BaseGlobalEventGoalParticipationHandler
 
         if ($globalEventGoal->should_be_unique) {
 
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::LEGENDARY);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixTier::LEGENDARY->value);
 
             $newItem = $item->duplicate();
 
@@ -124,7 +124,7 @@ class BaseGlobalEventGoalParticipationHandler
         }
 
         if ($globalEventGoal->should_be_mythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MYTHIC);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixTier::MYTHIC->value);
 
             $newItem = $item->duplicate();
 

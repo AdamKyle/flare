@@ -6,10 +6,10 @@ use App\Flare\Models\Announcement;
 use App\Flare\Models\Event as ModelsEvent;
 use App\Flare\Models\GlobalEventGoal;
 use App\Flare\Models\ScheduledEvent;
-use App\Flare\Values\MapNameValue;
 use App\Game\Events\Jobs\InitiateDelusionalMemoriesEvent;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\ScheduledEventStatus;
+use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -51,7 +51,7 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
     {
 
         $this->createGameMap([
-            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            'name' => MapName::DELUSIONAL_MEMORIES->value,
             'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
@@ -73,7 +73,7 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
     public function test_delusional_start_creates_current_child_raids_only(): void
     {
         $this->createGameMap([
-            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            'name' => MapName::DELUSIONAL_MEMORIES->value,
             'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 
@@ -125,7 +125,7 @@ class InitiateDelusionalMemoriesEventTest extends TestCase
     public function test_delusional_start_reschedules_only_parent_for_next_year(): void
     {
         $this->createGameMap([
-            'name' => MapNameValue::DELUSIONAL_MEMORIES,
+            'name' => MapName::DELUSIONAL_MEMORIES->value,
             'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
         ]);
 

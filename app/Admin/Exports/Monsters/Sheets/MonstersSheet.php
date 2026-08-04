@@ -3,7 +3,7 @@
 namespace App\Admin\Exports\Monsters\Sheets;
 
 use App\Flare\Models\Monster;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;

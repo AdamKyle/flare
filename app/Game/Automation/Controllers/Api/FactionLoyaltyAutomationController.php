@@ -3,11 +3,11 @@
 namespace App\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Requests\FactionLoyaltyAutomationRequest;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\FactionLoyaltyAutomationService;
+use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Illuminate\Http\JsonResponse;
@@ -23,7 +23,7 @@ class FactionLoyaltyAutomationController
 
     public function begin(FactionLoyaltyAutomationRequest $request, Character $character): JsonResponse
     {
-        if (! AttackTypeValue::attackTypeExists($request->attack_type)) {
+        if (! AttackType::attackTypeExists($request->attack_type)) {
             return response()->json([
                 'message' => 'Invalid attack type was selected. Please select from the drop down.',
             ], 422);

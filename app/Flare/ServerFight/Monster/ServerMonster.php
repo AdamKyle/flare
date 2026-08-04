@@ -3,6 +3,8 @@
 namespace App\Flare\ServerFight\Monster;
 
 use App\Flare\Traits\ElementAttackData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class ServerMonster
 {
@@ -11,6 +13,11 @@ class ServerMonster
     private int $health;
 
     private array $monster;
+
+    public function __construct(
+        private readonly ChanceCalculator $chanceCalculator,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+    ) {}
 
     public function setHealth(int $health): ServerMonster
     {
@@ -40,11 +47,7 @@ class ServerMonster
             return true;
         }
 
-        $roll = rand(1, 100);
-
-        $dc = (100 - 100 * $chance);
-
-        return $roll > $dc;
+        return $this->chanceCalculator->passesPercentage($chance * 100);
     }
 
     public function canMonsterVoidPlayer(float $devouringLightResistance): bool
@@ -61,18 +64,14 @@ class ServerMonster
             return true;
         }
 
-        $roll = rand(1, 100);
-
-        $dc = (100 - 100 * $chance);
-
-        return $roll > $dc;
+        return $this->chanceCalculator->passesPercentage($chance * 100);
     }
 
     public function buildAttack(): int
     {
         $attackArray = explode('-', $this->monster['attack_range']);
 
-        $attack = rand($attackArray[0], $attackArray[1]);
+        $attack = $this->randomNumberGenerator->numberBetween($attackArray[0], $attackArray[1]);
 
         $increasesHealthBy = $this->monster['increases_damage_by'];
 

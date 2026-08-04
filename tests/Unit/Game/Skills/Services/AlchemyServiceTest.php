@@ -4,8 +4,8 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\Values\CharacterClass;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -75,7 +75,7 @@ class AlchemyServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
         ]))->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::ALCHEMY->value,
         ]), 10)->givePlayerLocation()->getCharacter();
@@ -94,7 +94,7 @@ class AlchemyServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->assignSkill($this->createGameSkill([
             'type' => SkillTypeValue::ALCHEMY->value,
         ]), 10)->givePlayerLocation()->getCharacter();
@@ -139,7 +139,7 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
         ]);
 
         $character = $character->refresh();
@@ -158,8 +158,8 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -182,8 +182,8 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -209,8 +209,8 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -219,8 +219,8 @@ class AlchemyServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
     }
 
     public function test_transmute_and_fail()
@@ -238,8 +238,8 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -268,8 +268,8 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
         $character = $character->refresh();
@@ -307,8 +307,8 @@ class AlchemyServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
             'alchemy_bag_limit' => 1,
         ]);
 
@@ -347,16 +347,16 @@ class AlchemyServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
-        $goldDustAfterOriginalCost = MaxCurrenciesValue::MAX_GOLD_DUST - $this->alchemyItem->gold_dust_cost;
-        $shardsAfterOriginalCost = MaxCurrenciesValue::MAX_SHARDS - $this->alchemyItem->shards_cost;
+        $goldDustAfterOriginalCost = CurrencyLimit::MAX_GOLD_DUST - $this->alchemyItem->gold_dust_cost;
+        $shardsAfterOriginalCost = CurrencyLimit::MAX_SHARDS - $this->alchemyItem->shards_cost;
 
         $character = $character->refresh();
 
@@ -383,16 +383,16 @@ class AlchemyServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
         ]);
 
-        $goldDustAfterOriginalCost = MaxCurrenciesValue::MAX_GOLD_DUST - $this->alchemyItem->gold_dust_cost;
-        $shardsAfterOriginalCost = MaxCurrenciesValue::MAX_SHARDS - $this->alchemyItem->shards_cost;
+        $goldDustAfterOriginalCost = CurrencyLimit::MAX_GOLD_DUST - $this->alchemyItem->gold_dust_cost;
+        $shardsAfterOriginalCost = CurrencyLimit::MAX_SHARDS - $this->alchemyItem->shards_cost;
 
         $character = $character->refresh();
 

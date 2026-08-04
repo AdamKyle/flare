@@ -5,7 +5,7 @@ namespace App\Game\BattleRewardProcessing\Handlers;
 use App\Flare\Models\User;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
-use Facades\App\Flare\Values\UserOnlineValue;
+use Facades\App\Flare\Services\UserOnlineService;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 
 class BattleMessageHandler
@@ -19,7 +19,7 @@ class BattleMessageHandler
     public function handleMessageForExplorationXp(User $user, int $numberOfCreatures, int $totalXp): void
     {
 
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -37,7 +37,7 @@ class BattleMessageHandler
      */
     public function handleXPMessage(User $user, int $xpGiven, int $currentXp): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -57,7 +57,7 @@ class BattleMessageHandler
      */
     public function handleFactionLoyaltyXp(User $user, int $totalXp, int $newFameLevel, string $npcName): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -75,7 +75,7 @@ class BattleMessageHandler
      */
     public function handleFactionPointGain(User $user, int $numberOfPointsToGain, int $currentPoints, int $maxPointsNeeded): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -102,7 +102,7 @@ class BattleMessageHandler
      */
     public function handleCurrencyGainMessage(User $user, CurrenciesMessageTypes $currencyType, int $currencyGain, int $newTotal): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -135,7 +135,7 @@ class BattleMessageHandler
      */
     public function handleClassRankMessage(User $user, ClassRanksMessageTypes $classRanksMessageTypes, string $className, int $xpGiven, int $currentXp, ?string $weaponMastery = null, ?string $classspecial = null): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -165,7 +165,7 @@ class BattleMessageHandler
      */
     public function handleItemKillCountMessage(User $user, string $itemName, string $skillName, int $currentKillCount, int $maxKillsNeeded): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 
@@ -185,7 +185,7 @@ class BattleMessageHandler
      */
     public function handleSkillXpUpdate(User $user, string $skillName, int $xpRewarded): void
     {
-        if (! UserOnlineValue::isOnline($user)) {
+        if (! UserOnlineService::isOnline($user)) {
             return;
         }
 

@@ -2,18 +2,19 @@
 
 namespace App\Game\Events\Providers;
 
-use App\Flare\Services\CreateSurveySnapshot;
-use App\Flare\Services\EventSchedulerService;
 use App\Game\Automation\Services\ExplorationAutomationService;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\RestartGlobalEventGoal;
 use App\Game\Events\Registry\EventEnderRegistry;
 use App\Game\Events\Services\AnnouncementCleanupService;
+use App\Game\Events\Services\CreateSurveySnapshot;
+use App\Game\Events\Services\DailyGoldDustService;
 use App\Game\Events\Services\DelusionalMemoriesEventEnderService;
 use App\Game\Events\Services\EventGoalRestartGuardService;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\EventParticipantNotifierService;
+use App\Game\Events\Services\EventSchedulerService;
 use App\Game\Events\Services\FactionLoyaltyPledgeCleanupService;
 use App\Game\Events\Services\FeedbackEventEnderService;
 use App\Game\Events\Services\GlobalEventGoalCleanupService;
@@ -33,6 +34,7 @@ use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
+use App\Game\Raids\Services\RaidMapConflictService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -42,6 +44,10 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(DailyGoldDustService::class);
+        $this->app->bind(EventSchedulerService::class, fn ($app) => new EventSchedulerService(
+            $app->make(RaidMapConflictService::class),
+        ));
 
         $this->commands([
             EndScheduledEvent::class,

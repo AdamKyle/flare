@@ -4,8 +4,8 @@ namespace App\Game\Shop\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -36,16 +36,16 @@ class GemShopService
         $newShards = $cost['shards'] + $character->shards;
         $newCopperCoins = $cost['copper_coins'] + $character->copper_coins;
 
-        if ($newGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $newGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ($newGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
+            $newGoldDust = CurrencyLimit::MAX_GOLD_DUST;
         }
 
-        if ($newShards >= MaxCurrenciesValue::MAX_SHARDS) {
-            $newShards = MaxCurrenciesValue::MAX_SHARDS;
+        if ($newShards >= CurrencyLimit::MAX_SHARDS) {
+            $newShards = CurrencyLimit::MAX_SHARDS;
         }
 
-        if ($newCopperCoins >= MaxCurrenciesValue::MAX_COPPER) {
-            $newCopperCoins = MaxCurrenciesValue::MAX_COPPER;
+        if ($newCopperCoins >= CurrencyLimit::MAX_COPPER) {
+            $newCopperCoins = CurrencyLimit::MAX_COPPER;
         }
 
         $character->update([
@@ -94,16 +94,16 @@ class GemShopService
         $newShards += $character->shards;
         $newCopperCoins += $character->copper_coins;
 
-        if ($newGoldDust >= MaxCurrenciesValue::MAX_GOLD_DUST) {
-            $newGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        if ($newGoldDust >= CurrencyLimit::MAX_GOLD_DUST) {
+            $newGoldDust = CurrencyLimit::MAX_GOLD_DUST;
         }
 
-        if ($newShards >= MaxCurrenciesValue::MAX_SHARDS) {
-            $newShards = MaxCurrenciesValue::MAX_SHARDS;
+        if ($newShards >= CurrencyLimit::MAX_SHARDS) {
+            $newShards = CurrencyLimit::MAX_SHARDS;
         }
 
-        if ($newCopperCoins >= MaxCurrenciesValue::MAX_COPPER) {
-            $newCopperCoins = MaxCurrenciesValue::MAX_COPPER;
+        if ($newCopperCoins >= CurrencyLimit::MAX_COPPER) {
+            $newCopperCoins = CurrencyLimit::MAX_COPPER;
         }
 
         $character->update([

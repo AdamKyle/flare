@@ -7,15 +7,15 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Monster;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
 use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Maps\Values\LocationType;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -67,7 +67,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'move_down_monster_list_every' => 10,
             'previous_level' => $this->character->level,
             'current_level' => $this->character->level,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
     }
 
@@ -87,14 +87,14 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
 
         $this->assertEquals($this->character->id, $automation->character_id);
         $this->assertEquals($this->monster->id, $automation->monster_id);
-        $this->assertEquals(AutomationType::EXPLORING, $automation->type);
+        $this->assertEquals(AutomationType::EXPLORING->value, $automation->type);
     }
 
     public function test_begin_automation_dispatches_update_character_status(): void
@@ -106,7 +106,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Event::assertDispatched(UpdateCharacterStatus::class);
@@ -121,7 +121,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
@@ -138,7 +138,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Event::assertDispatched(AutomationLogUpdate::class, function (AutomationLogUpdate $event) {
@@ -158,7 +158,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Event::assertDispatched(AutomationTimeOut::class);
@@ -173,7 +173,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Queue::assertPushed(Exploration::class);
@@ -188,7 +188,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Queue::assertPushed(Exploration::class, function (Exploration $job): bool {
@@ -204,7 +204,7 @@ class ExplorationAutomationServiceTest extends TestCase
 
         $this->assertNull(
             CharacterAutomation::where('character_id', $this->character->id)
-                ->where('type', AutomationType::EXPLORING)
+                ->where('type', AutomationType::EXPLORING->value)
                 ->first()
         );
     }
@@ -265,7 +265,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 3,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -284,12 +284,12 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::CAST,
+            'attack_type' => AttackType::CAST->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
 
-        $this->assertEquals(AttackTypeValue::CAST, $automation->attack_type);
+        $this->assertEquals(AttackType::CAST->value, $automation->attack_type);
     }
 
     public function test_begin_automation_persists_move_down_monster_list_every(): void
@@ -301,7 +301,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 25,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -324,7 +324,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -350,7 +350,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -367,7 +367,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -442,7 +442,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         Queue::assertPushed(Exploration::class, function (Exploration $job) use ($now): bool {
@@ -461,7 +461,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -471,7 +471,7 @@ class ExplorationAutomationServiceTest extends TestCase
         $this->assertNull($log->ended_at);
         $this->assertEquals($automation->id, $log->character_automation_id);
         $this->assertEquals($this->monster->id, $log->monster_id);
-        $this->assertEquals(AttackTypeValue::ATTACK, $log->attack_type);
+        $this->assertEquals(AttackType::ATTACK->value, $log->attack_type);
     }
 
     public function test_begin_automation_creates_exploration_log_with_starting_level(): void
@@ -486,7 +486,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $log = ExplorationLog::where('character_id', $this->character->id)->first();
@@ -504,7 +504,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $automation = CharacterAutomation::query()->latest('id')->first();
@@ -536,7 +536,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'selected_monster_id' => $this->monster->id,
             'auto_attack_length' => 1,
             'move_down_the_list_every' => 10,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
         ]);
 
         $this->assertNotNull($oldWarning->fresh());
@@ -554,7 +554,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'user_id' => $this->character->user_id,
             'character_automation_id' => $this->automation->id,
             'monster_id' => $this->monster->id,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'ended_at' => null,
         ]);
 
@@ -576,7 +576,7 @@ class ExplorationAutomationServiceTest extends TestCase
             'user_id' => $this->character->user_id,
             'character_automation_id' => $this->automation->id,
             'monster_id' => $this->monster->id,
-            'attack_type' => AttackTypeValue::ATTACK,
+            'attack_type' => AttackType::ATTACK->value,
             'ended_at' => null,
         ]);
 

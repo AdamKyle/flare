@@ -5,12 +5,12 @@ namespace App\Game\Reincarnate\Services;
 use App\Admin\Events\AdminStatisticsDashboardUpdated;
 use App\Flare\Models\Character;
 use App\Flare\Models\MaxLevelConfiguration;
-use App\Flare\Values\BaseStatValue;
-use App\Flare\Values\FeatureTypes;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\CharacterMaxLevel;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Core\Values\FeatureType;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 
 class CharacterReincarnationService
@@ -19,7 +19,7 @@ class CharacterReincarnationService
 
     public function __construct(
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        private readonly BaseStatValue $baseStatValue
+        private readonly BaseStatCalculator $baseStatValue
     ) {}
 
     public function reincarnate(Character $character): array
@@ -36,7 +36,7 @@ class CharacterReincarnationService
         }
 
         $completedQuest = $character->questsCompleted()->whereNotNull('quest_id')->get()->filter(function ($completedQuest) {
-            return $completedQuest->quest->unlocks_feature === FeatureTypes::REINCARNATION;
+            return $completedQuest->quest->unlocks_feature === FeatureType::REINCARNATION->value;
         })->first();
 
         if (is_null($completedQuest)) {

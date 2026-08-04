@@ -4,12 +4,12 @@ namespace App\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\LocationType;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Requests\ExplorationRequest;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Maps\Values\LocationType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -27,9 +27,9 @@ class ExplorationController extends Controller
     public function begin(ExplorationRequest $request, Character $character): JsonResponse
     {
         $params = $request->all();
-        $params['attack_type'] = empty($params['attack_type']) ? AttackTypeValue::ATTACK : $params['attack_type'];
+        $params['attack_type'] = empty($params['attack_type']) ? AttackType::ATTACK->value : $params['attack_type'];
 
-        if (! AttackTypeValue::attackTypeExists($params['attack_type'])) {
+        if (! AttackType::attackTypeExists($params['attack_type'])) {
             return response()->json([
                 'message' => 'Invalid attack type was selected. Please select from the drop down.',
             ], 422);

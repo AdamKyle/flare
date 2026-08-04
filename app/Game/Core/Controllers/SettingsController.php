@@ -5,13 +5,13 @@ namespace App\Game\Core\Controllers;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
-use App\Flare\Values\FeatureTypes;
-use App\Flare\Values\NameTags;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
+use App\Game\Character\Values\NameTag;
 use App\Game\Core\Requests\CosmeticTextRequest;
 use App\Game\Core\Requests\NameTagRequest;
 use App\Game\Core\Requests\RaceChangerRequest;
+use App\Game\Core\Values\FeatureType;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\Request;
@@ -27,9 +27,9 @@ class SettingsController extends Controller
     public function index(User $user)
     {
 
-        $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() > 0;
-        $canUseNameTags = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_NAME_TAGS)->count() > 0;
-        $canUseCosmeticRaceChanger = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_RACE_CHANGER)->count() > 0;
+        $canUseCosmeticText = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_TEXT->value)->count() > 0;
+        $canUseNameTags = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_NAME_TAGS->value)->count() > 0;
+        $canUseCosmeticRaceChanger = $user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_RACE_CHANGER->value)->count() > 0;
 
         return view('game.core.settings.settings', [
             'user' => $user,
@@ -40,7 +40,7 @@ class SettingsController extends Controller
             'cosmeticText' => $canUseCosmeticText,
             'cosmeticNameTag' => $canUseNameTags,
             'cosmeticRaceChanger' => $canUseCosmeticRaceChanger,
-            'nameTags' => NameTags::$valueNames,
+            'nameTags' => NameTag::options(),
         ]);
     }
 
@@ -134,7 +134,7 @@ class SettingsController extends Controller
     public function cosmeticText(CosmeticTextRequest $request, User $user)
     {
 
-        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_TEXT)->count() <= 0) {
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_TEXT->value)->count() <= 0) {
             return redirect()->back()->with('error', 'Missing required quest completion for that action.');
         }
 
@@ -150,14 +150,14 @@ class SettingsController extends Controller
     public function cosmeticNametag(NameTagRequest $request, User $user)
     {
 
-        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_NAME_TAGS)->count() <= 0) {
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_NAME_TAGS->value)->count() <= 0) {
             return redirect()->back()->with('error', 'Missing required quest completion for that action.');
         }
 
         $nameTag = $request->name_tag;
 
         try {
-            (new NameTags($nameTag));
+            NameTag::from($nameTag);
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'No such name tag.');
         }
@@ -172,7 +172,7 @@ class SettingsController extends Controller
     public function cosmeticRaceChanger(RaceChangerRequest $request, User $user)
     {
 
-        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureTypes::COSMETIC_RACE_CHANGER)->count() <= 0) {
+        if ($user->character->questsCompleted->where('quest.unlocks_feature', FeatureType::COSMETIC_RACE_CHANGER->value)->count() <= 0) {
             return redirect()->back()->with('error', 'Missing required quest completion for that action.');
         }
 

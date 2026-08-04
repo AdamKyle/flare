@@ -10,10 +10,10 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
-use App\Flare\Values\LocationType;
-use App\Flare\Values\RaidAttackTypesValue;
+use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Raids\Values\RaidAttackType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -51,7 +51,7 @@ class MonstersController extends Controller
             'monster' => null,
             'gameMaps' => GameMap::all(),
             'questItems' => Item::where('type', 'quest')->get(),
-            'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
+            'specialAttacks' => RaidAttackType::attackTypeNames(),
             'locationTypes' => LocationType::getNamedValues(),
         ]);
     }
@@ -62,7 +62,7 @@ class MonstersController extends Controller
             'monster' => $monster,
             'gameMaps' => GameMap::all(),
             'questItems' => Item::where('type', 'quest')->get(),
-            'specialAttacks' => RaidAttackTypesValue::$attackTypeNames,
+            'specialAttacks' => RaidAttackType::attackTypeNames(),
             'locationTypes' => LocationType::getNamedValues(),
         ]);
     }

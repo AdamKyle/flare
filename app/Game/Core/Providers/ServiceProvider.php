@@ -2,9 +2,9 @@
 
 namespace App\Game\Core\Providers;
 
-use App\Flare\Items\Builders\BuildMythicItem;
-use App\Flare\Values\BaseStatValue;
 use App\Game\Battle\Services\BattleDrop;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
+use App\Game\Core\Items\Builders\BuildMythicItem;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\Core\Services\CharactersOnline;
 use App\Game\Core\Services\CharacterStatRepairService;
@@ -47,7 +47,7 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(CharacterStatRepairService::class, function ($app) {
             return new CharacterStatRepairService(
-                $app->make(BaseStatValue::class)
+                $app->make(BaseStatCalculator::class)
             );
         });
     }

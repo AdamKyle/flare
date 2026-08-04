@@ -6,7 +6,7 @@ use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 
 class AutomationRestrictionService
 {
@@ -93,7 +93,7 @@ class AutomationRestrictionService
 
     public function blockedMessage(CharacterAutomation $automation, ?string $action = null): string
     {
-        $automationType = new AutomationType($automation->type);
+        $automationType = AutomationType::from($automation->type);
 
         if ($action === self::START_FACTION_LOYALTY && ($automationType->isExploring() || $automationType->isDelve())) {
             $automationName = $this->automationName($automation);
@@ -115,7 +115,7 @@ class AutomationRestrictionService
 
     private function automationBlocksAction(CharacterAutomation $automation, string $action, ?Location $destinationLocation = null): bool
     {
-        $automationType = new AutomationType($automation->type);
+        $automationType = AutomationType::from($automation->type);
 
         if ($automationType->isFactionLoyalty()) {
             return in_array($action, [
@@ -225,7 +225,7 @@ class AutomationRestrictionService
 
     private function automationName(CharacterAutomation $automation): string
     {
-        $automationType = new AutomationType($automation->type);
+        $automationType = AutomationType::from($automation->type);
 
         if ($automationType->isExploring()) {
             return 'Exploration';

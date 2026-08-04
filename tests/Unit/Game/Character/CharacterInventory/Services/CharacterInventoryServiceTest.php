@@ -4,8 +4,8 @@ namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\ItemSkill;
-use App\Flare\Values\WeaponTypes;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -241,7 +241,7 @@ class CharacterInventoryServiceTest extends TestCase
     {
         $alchemyItem = $this->createItem(['type' => 'alchemy']);
         $questItem = $this->createItem(['type' => 'quest']);
-        $regularItem = $this->createItem(['type' => WeaponTypes::WEAPON]);
+        $regularItem = $this->createItem(['type' => ItemType::WEAPON->value]);
 
         $character = $this->character->inventoryManagement()->giveItem($alchemyItem)->giveItem($questItem)->giveItem($regularItem)->getCharacter();
 
@@ -551,7 +551,7 @@ class CharacterInventoryServiceTest extends TestCase
     public function test_destroy_all_alchemy_items_does_not_touch_normal_or_quest_inventory(): void
     {
         $normalItem = $this->createItem([
-            'type' => WeaponTypes::WEAPON,
+            'type' => ItemType::WEAPON->value,
         ]);
         $questItem = $this->createItem([
             'type' => 'quest',

@@ -4,7 +4,7 @@ namespace App\Admin\Services;
 
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
-use App\Flare\Values\AutomationType;
+use App\Game\Automation\Values\AutomationType;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ class ExplorationMonitoringService
 {
     public function activeCharacters(): array
     {
-        return CharacterAutomation::where('type', AutomationType::EXPLORING)
+        return CharacterAutomation::where('type', AutomationType::EXPLORING->value)
             ->where('completed_at', '>', now())
             ->with('character:id,name', 'monster:id,name')
             ->get()

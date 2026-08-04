@@ -19,7 +19,7 @@ use App\Game\Events\Concerns\ShouldShowEnchantingEventButton;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
-use App\Game\NpcActions\QueenOfHeartsActions\Services\RandomEnchantmentService;
+use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
@@ -163,7 +163,7 @@ class EnchantingService
      *
      * @throws Exception
      */
-    public function enchant(Character $character, array $params, InventorySlot|GlobalEventCraftingInventorySlot $slot, int $cost): void
+    public function enchant(Character $character, array $params, InventorySlot|GlobalEventCraftingInventorySlot $slot, int $cost): bool
     {
         $enchantingSkill = $this->getEnchantingSkill($character);
 
@@ -173,9 +173,11 @@ class EnchantingService
 
         $character = $character->refresh();
 
-        $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
+        $enchantSucceeded = $this->attachAffixes($params['affix_ids'], $slot, $enchantingSkill, $character);
 
         $this->enchantItemService->updateSlot($slot, $params['enchant_for_event']);
+
+        return $enchantSucceeded;
     }
 
     /**
@@ -334,7 +336,7 @@ class EnchantingService
         return $affixes;
     }
 
-    protected function attachAffixes(array $affixes, InventorySlot|GlobalEventCraftingInventorySlot $slot, Skill $enchantingSkill, Character $character)
+    protected function attachAffixes(array $affixes, InventorySlot|GlobalEventCraftingInventorySlot $slot, Skill $enchantingSkill, Character $character): bool
     {
         foreach ($affixes as $affixId) {
             $slot = $slot->refresh();
@@ -351,13 +353,13 @@ class EnchantingService
             if ($enchantingSkill->level < $affix->skill_level_required) {
                 ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
-                return;
+                return false;
             }
 
             if ($character->getInformation()->statMod('int') < $affix->int_required) {
                 ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::INT_TO_LOW_ENCHANTING);
 
-                return;
+                return false;
             }
 
             if ($enchantingSkill->level > $affix->skill_level_trivial) {
@@ -379,10 +381,12 @@ class EnchantingService
              */
             if (! $this->wasTooEasy) {
                 if (! $this->processedEnchant($slot, $affix, $character, $enchantingSkill)) {
-                    return;
+                    return false;
                 }
             }
         }
+
+        return true;
     }
 
     protected function processedEnchant(InventorySlot|GlobalEventCraftingInventorySlot $slot, ItemAffix $affix, Character $character, Skill $enchantingSkill, bool $tooEasy = false)

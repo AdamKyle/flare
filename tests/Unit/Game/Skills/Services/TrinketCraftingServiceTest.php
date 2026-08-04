@@ -4,9 +4,9 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Values\MaxCurrenciesValue;
 use App\Game\Character\CharacterInventory\Exceptions\BatchCraftingDestinationFullException;
+use App\Game\Character\Values\CharacterClass;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -87,7 +87,7 @@ class TrinketCraftingServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->assignSkill($this->trinketSkill)->getCharacter();
 
         $result = $this->trinketCraftingService->fetchItemsToCraft($character, true);
@@ -104,7 +104,7 @@ class TrinketCraftingServiceTest extends TestCase
     public function test_crafting_cost_returns_discounted_gold_dust_and_copper_for_merchant(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->assignSkill($this->trinketSkill)->getCharacter();
         $character->update(['gold_dust' => 1000, 'copper_coins' => 1000]);
 
@@ -277,7 +277,7 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
         ]);
 
         $this->trinketCraftingService->craft($character->refresh(), $this->trinket);
@@ -294,8 +294,8 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
@@ -318,8 +318,8 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
@@ -346,8 +346,8 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
@@ -371,8 +371,8 @@ class TrinketCraftingServiceTest extends TestCase
             return $event->message === 'You failed to craft the trinket. All your efforts fall apart before your eyes!';
         });
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
     }
 
     public function test_craft_the_item()
@@ -380,8 +380,8 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
@@ -390,8 +390,8 @@ class TrinketCraftingServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
     }
 
     public function test_craft_the_item_and_giveitem()
@@ -399,8 +399,8 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
@@ -420,20 +420,20 @@ class TrinketCraftingServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
     public function test_craft_the_item_as_merchant()
     {
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->assignSkill($this->trinketSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
         $character = $character->refresh();
@@ -456,8 +456,8 @@ class TrinketCraftingServiceTest extends TestCase
         $actualGoldDustCost = floor($this->trinket->gold_dust_cost - $this->trinket->gold_dust_cost * 0.10);
         $actualCopperCoinCost = floor($this->trinket->copper_coin_cost - $this->trinket->copper_coin_cost * 0.10);
 
-        $this->assertEquals(MaxCurrenciesValue::MAX_GOLD_DUST - $actualGoldDustCost, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS - $actualCopperCoinCost, $character->shards);
+        $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST - $actualGoldDustCost, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS - $actualCopperCoinCost, $character->shards);
         $this->assertCount(1, $character->inventory->slots->toArray());
     }
 
@@ -468,8 +468,8 @@ class TrinketCraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
             'inventory_max' => 0,
         ]);
 
@@ -490,8 +490,8 @@ class TrinketCraftingServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD_DUST, $character->gold_dust);
-        $this->assertLessThan(MaxCurrenciesValue::MAX_SHARDS, $character->shards);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
+        $this->assertLessThan(CurrencyLimit::MAX_SHARDS, $character->shards);
         $this->assertCount(0, $character->inventory->slots->toArray());
 
         Event::assertDispatched(function (ServerMessageEvent $event) {

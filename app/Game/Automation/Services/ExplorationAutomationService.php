@@ -6,14 +6,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Values\AttackTypeValue;
-use App\Flare\Values\AutomationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Jobs\Exploration;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Combat\Values\AttackType;
 use Illuminate\Support\Facades\Cache;
 
 class ExplorationAutomationService
@@ -42,12 +42,12 @@ class ExplorationAutomationService
                 ->first()?->id;
         }
 
-        $attackType = empty($params['attack_type']) ? AttackTypeValue::ATTACK : $params['attack_type'];
+        $attackType = empty($params['attack_type']) ? AttackType::ATTACK->value : $params['attack_type'];
 
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
             'monster_id' => $selectedMonsterId,
-            'type' => AutomationType::EXPLORING,
+            'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
             'completed_at' => now()->addHours($params['auto_attack_length'] ?? 1),
             'move_down_monster_list_every' => $params['move_down_the_list_every'] ?? null,
@@ -75,7 +75,7 @@ class ExplorationAutomationService
 
     public function stopExploration(Character $character)
     {
-        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING)->first();
+        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::EXPLORING->value)->first();
 
         if (is_null($characterAutomation)) {
             return response()->json([

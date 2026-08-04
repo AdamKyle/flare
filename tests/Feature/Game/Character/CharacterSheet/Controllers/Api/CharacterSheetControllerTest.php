@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Game\Character\CharacterSheet\Controllers\Api;
 
-use App\Flare\Items\Values\ItemType;
+use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;

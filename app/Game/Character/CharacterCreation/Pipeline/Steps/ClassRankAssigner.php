@@ -2,7 +2,6 @@
 
 namespace App\Game\Character\CharacterCreation\Pipeline\Steps;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassRankWeaponMastery;
 use App\Flare\Models\GameClass;
@@ -10,6 +9,7 @@ use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
+use App\Game\Core\Items\Values\ItemType;
 use Closure;
 use DateTimeInterface;
 

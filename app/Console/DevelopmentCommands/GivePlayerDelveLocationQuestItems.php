@@ -6,7 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Console\Command;
 
 class GivePlayerDelveLocationQuestItems extends Command

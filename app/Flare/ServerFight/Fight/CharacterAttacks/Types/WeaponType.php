@@ -8,8 +8,10 @@ use App\Flare\ServerFight\Fight\CanHit;
 use App\Flare\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
 use App\Flare\ServerFight\Fight\Entrance;
 use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\Values\AttackTypeValue;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Combat\Values\AttackType;
 
 class WeaponType extends BattleBase
 {
@@ -21,9 +23,9 @@ class WeaponType extends BattleBase
 
     private bool $canEntrance = false;
 
-    public function __construct(CharacterCacheData $characterCacheData, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
+    public function __construct(CharacterCacheData $characterCacheData, ChanceCalculator $chanceCalculator, RandomNumberGenerator $randomNumberGenerator, Entrance $entrance, CanHit $canHit, SpecialAttacks $specialAttacks)
     {
-        parent::__construct($characterCacheData);
+        parent::__construct($characterCacheData, $chanceCalculator, $randomNumberGenerator);
 
         $this->entrance = $entrance;
         $this->canHit = $canHit;
@@ -34,11 +36,11 @@ class WeaponType extends BattleBase
     {
 
         $voidedTypes = [
-            AttackTypeValue::VOIDED_ATTACK,
-            AttackTypeValue::VOIDED_CAST,
-            AttackTypeValue::VOIDED_ATTACK_AND_CAST,
-            AttackTypeValue::VOIDED_CAST_AND_ATTACK,
-            AttackTypeValue::VOIDED_DEFEND,
+            AttackType::VOIDED_ATTACK->value,
+            AttackType::VOIDED_CAST->value,
+            AttackType::VOIDED_ATTACK_AND_CAST->value,
+            AttackType::VOIDED_CAST_AND_ATTACK->value,
+            AttackType::VOIDED_DEFEND->value,
         ];
 
         if ($isVoided && ! in_array($type, $voidedTypes)) {
@@ -161,7 +163,7 @@ class WeaponType extends BattleBase
     {
         $criticality = $this->characterCacheData->getCachedCharacterData($character, 'skills')['criticality'];
 
-        if (rand(1, 100) > (100 - 100 * $criticality)) {
+        if ($this->chanceCalculator->passesPercentage($criticality * 100)) {
             $this->addMessage('You become overpowered with rage! (Critical strike!)', 'player-action');
 
             $weaponDamage *= 2;

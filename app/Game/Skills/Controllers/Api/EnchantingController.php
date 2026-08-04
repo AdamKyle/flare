@@ -58,6 +58,7 @@ class EnchantingController extends Controller
             return response()->json([
                 'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
                 'skill_xp' => $this->enchantingService->getEnchantingXP($character),
+                'enchant_succeeded' => false,
             ]);
         }
 
@@ -65,12 +66,13 @@ class EnchantingController extends Controller
 
         event(new CraftedItemTimeOutEvent($character->refresh(), $timeOut));
 
-        $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
+        $enchantSucceeded = $this->enchantingService->enchant($character, $request->all(), $slot, $cost);
 
         return response()->json([
             'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
             'inventory_count' => $this->craftingService->getInventoryCount($character),
+            'enchant_succeeded' => $enchantSucceeded,
         ]);
     }
 }

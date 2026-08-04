@@ -3,7 +3,6 @@
 namespace App\Game\Maps\Providers;
 
 use App\Flare\Cache\CoordinatesCache;
-use App\Flare\Items\Transformers\QuestItemTransformer;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Services\ConjureService;
@@ -11,6 +10,9 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Services\GameTimerService;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
@@ -61,6 +63,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(ChanceCalculator::class),
                 $app->make(Manager::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(GameTimerService::class),
@@ -74,6 +77,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -84,6 +88,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -95,6 +100,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MovementService::class),
                 $app->make(PortService::class),
                 $app->make(TraverseService::class),
+                $app->make(ChanceCalculator::class),
             );
         });
 
@@ -117,7 +123,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MonsterTransformer::class),
                 $app->make(MonsterListService::class),
                 $app->make(LocationService::class),
-                $app->make(MapTileValue::class)
+                $app->make(MapTileValue::class),
+                $app->make(RandomNumberGenerator::class),
             );
         });
 

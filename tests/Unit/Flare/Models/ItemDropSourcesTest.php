@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Flare\Models;
 
-use App\Flare\Values\LocationType;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;

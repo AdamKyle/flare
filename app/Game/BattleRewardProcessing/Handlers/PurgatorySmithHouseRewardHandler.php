@@ -2,22 +2,22 @@
 
 namespace App\Game\BattleRewardProcessing\Handlers;
 
-use App\Flare\Items\Builders\RandomAffixGenerator;
 use App\Flare\Models\Character;
 use App\Flare\Models\Event;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Values\ItemEffectsValue;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\RandomAffixDetails;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\RandomAffixTier;
 use App\Game\Events\Values\EventType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Types\CurrenciesMessageTypes;
 use Exception;
-use Facades\App\Flare\Calculators\DropCheckCalculator;
-use Facades\App\Flare\RandomNumber\RandomNumberGenerator;
 use Facades\App\Game\Core\Handlers\AnnouncementHandler;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Cache;
@@ -26,7 +26,12 @@ class PurgatorySmithHouseRewardHandler
 {
     private array $earnedCurrencies = [];
 
-    public function __construct(private RandomAffixGenerator $randomAffixGenerator, private BattleMessageHandler $battleMessageHandler) {}
+    public function __construct(
+        private RandomAffixGenerator $randomAffixGenerator,
+        private BattleMessageHandler $battleMessageHandler,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly ChanceCalculator $chanceCalculator,
+    ) {}
 
     public function getEarnedCurrencies(): array
     {
@@ -191,7 +196,7 @@ class PurgatorySmithHouseRewardHandler
 
         $lootingChance = min($lootingChance + ($monster->drop_check * 0.25), $maximumChance);
 
-        if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
+        if (! $this->chanceCalculator->passesPercentage((2 / $maxRoll) * 100, $lootingChance * 100)) {
             return false;
         }
 
@@ -207,7 +212,7 @@ class PurgatorySmithHouseRewardHandler
      */
     protected function rewardForCharacter(Character $character, bool $isMythic = false): bool
     {
-        $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
+        $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS->value)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
@@ -220,7 +225,7 @@ class PurgatorySmithHouseRewardHandler
         }
 
         if ($isMythic) {
-            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixDetails::MYTHIC);
+            $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)->setPaidAmount(RandomAffixTier::MYTHIC->value);
 
             $newItem = $item->duplicate();
 
@@ -243,7 +248,7 @@ class PurgatorySmithHouseRewardHandler
         }
 
         $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount(RandomAffixDetails::LEGENDARY);
+            ->setPaidAmount(RandomAffixTier::LEGENDARY->value);
 
         $newItem = $item->duplicate();
 
@@ -270,9 +275,7 @@ class PurgatorySmithHouseRewardHandler
 
         $chancePercent = 10 + $killCount;
 
-        $threshold = 100 - $chancePercent;
-
-        if (RandomNumberGenerator::generateTrueRandomNumber(100) >= $threshold) {
+        if ($this->chanceCalculator->passesPercentage($chancePercent + 1)) {
             Event::create([
                 'type' => EventType::PURGATORY_SMITH_HOUSE,
                 'started_at' => now(),
@@ -307,15 +310,15 @@ class PurgatorySmithHouseRewardHandler
     {
         $maximumAmount = is_null($event) ? 750 : 3_750;
         $amounts = [
-            'gold_dust' => RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount,
-            'shards' => RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount,
+            'gold_dust' => $this->randomNumberGenerator->numberBetween(1, $maximumAmount) * $killCount,
+            'shards' => $this->randomNumberGenerator->numberBetween(1, $maximumAmount) * $killCount,
             'copper_coins' => 0,
         ];
 
-        $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectsValue::GET_COPPER_COINS)->count() > 0;
+        $hasItemForCopperCoins = $character->inventory->slots->where('item.effect', ItemEffectType::GET_COPPER_COINS->value)->count() > 0;
 
         if ($hasItemForCopperCoins) {
-            $amounts['copper_coins'] = RandomNumberGenerator::generateRandomNumber(1, $maximumAmount) * $killCount;
+            $amounts['copper_coins'] = $this->randomNumberGenerator->numberBetween(1, $maximumAmount) * $killCount;
         }
 
         return $this->currencyPlanFromAmounts($character, $amounts);
@@ -324,10 +327,10 @@ class PurgatorySmithHouseRewardHandler
     private function currencyPlanFromAmounts(Character $character, array $amounts): array
     {
         $maximums = [
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
-            'gold_dust' => MaxCurrenciesValue::MAX_GOLD_DUST,
-            'shards' => MaxCurrenciesValue::MAX_SHARDS,
-            'copper_coins' => MaxCurrenciesValue::MAX_COPPER,
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+            'copper_coins' => CurrencyLimit::MAX_COPPER,
         ];
         $starting = [];
         $target = [];
@@ -419,7 +422,7 @@ class PurgatorySmithHouseRewardHandler
 
         $lootingChance = min($lootingChance + ($monster->drop_check * 0.25), $maximumChance);
 
-        if (! DropCheckCalculator::fetchDifficultItemChance($lootingChance, $maxRoll)) {
+        if (! $this->chanceCalculator->passesPercentage((2 / $maxRoll) * 100, $lootingChance * 100)) {
             return null;
         }
 
@@ -428,7 +431,7 @@ class PurgatorySmithHouseRewardHandler
 
     private function planItemReward(Character $character, bool $isMythic): ?array
     {
-        $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS)
+        $item = Item::where('specialty_type', ItemSpecialtyType::PURGATORY_CHAINS->value)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->whereDoesntHave('appliedHolyStacks')
@@ -441,7 +444,7 @@ class PurgatorySmithHouseRewardHandler
         }
 
         $randomAffixGenerator = $this->randomAffixGenerator->setCharacter($character)
-            ->setPaidAmount($isMythic ? RandomAffixDetails::MYTHIC : RandomAffixDetails::LEGENDARY);
+            ->setPaidAmount($isMythic ? RandomAffixTier::MYTHIC->value : RandomAffixTier::LEGENDARY->value);
         $newItem = $item->duplicate();
         $updates = [
             'item_prefix_id' => $randomAffixGenerator->generateAffix('prefix')->id,
@@ -496,10 +499,9 @@ class PurgatorySmithHouseRewardHandler
         }
 
         $chancePercent = 10 + $killCount;
-        $threshold = 100 - $chancePercent;
 
         return [
-            'create' => RandomNumberGenerator::generateTrueRandomNumber(100) >= $threshold,
+            'create' => $this->chanceCalculator->passesPercentage($chancePercent + 1),
             'type' => EventType::PURGATORY_SMITH_HOUSE,
             'announcement' => 'purgatory_house',
             'message' => 'The floor boards creak and the cries of the children trapped in their own misery wale across the lands. '.

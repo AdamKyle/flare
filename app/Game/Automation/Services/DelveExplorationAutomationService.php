@@ -7,16 +7,16 @@ use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
-use App\Flare\Values\AutomationType;
-use App\Flare\Values\LocationType;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Events\AutomationStatus;
 use App\Game\Automation\Events\AutomationTimeOut;
 use App\Game\Automation\Events\DelveStatusUpdated;
 use App\Game\Automation\Jobs\DelveExploration as DelveExplorationProcessing;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Support\Facades\Cache;
 
 class DelveExplorationAutomationService
@@ -45,7 +45,7 @@ class DelveExplorationAutomationService
         $automation = CharacterAutomation::create([
             'character_id' => $character->id,
             'monster_id' => $monsterId,
-            'type' => AutomationType::DELVE,
+            'type' => AutomationType::DELVE->value,
             'started_at' => now(),
             'completed_at' => now()->addHours(8),
             'attack_type' => $params['attack_type'],
@@ -75,7 +75,7 @@ class DelveExplorationAutomationService
 
     public function stopExploration(Character $character)
     {
-        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE)->first();
+        $characterAutomation = CharacterAutomation::where('character_id', $character->id)->where('type', AutomationType::DELVE->value)->first();
 
         if (is_null($characterAutomation)) {
             return $this->errorResult('Nope. You don\'t own that.');

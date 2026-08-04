@@ -4,9 +4,9 @@ namespace App\Game\Gems\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Transformers\CharacterGemsTransformer;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;

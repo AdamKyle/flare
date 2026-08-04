@@ -3,7 +3,7 @@
 namespace App\Console\AfterDeployment;
 
 use App\Flare\Models\Item;
-use App\Flare\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
 use Exception;
 use Illuminate\Console\Command;
 
@@ -47,7 +47,7 @@ class AddHolyStacksToItems extends Command
                     $maxStacks = 0;
 
                     if (! is_null($item->specialty_type)) {
-                        $type = new ItemSpecialtyType($item->specialty_type);
+                        $type = ItemSpecialtyType::from($item->specialty_type);
 
                         if ($type->isHellForged() ||
                             $type->isPurgatoryChains() ||

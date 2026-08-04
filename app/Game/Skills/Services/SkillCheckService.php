@@ -3,9 +3,12 @@
 namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Skill;
+use App\Game\Core\Chance\RandomNumberGenerator;
 
 class SkillCheckService
 {
+    public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
+
     /**
      * Fetches the DC check.
      *
@@ -14,7 +17,7 @@ class SkillCheckService
     public function getDCCheck(Skill $skill, int $dcIncrease = 0): int
     {
 
-        $dcCheck = (rand(1, 400) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
+        $dcCheck = ($this->randomNumberGenerator->numberBetween(1, 400) + ($dcIncrease !== 0 ? $dcIncrease : 0)) - $skill->level;
 
         if ($dcCheck > 400) {
             // @codeCoverageIgnoreStart
@@ -38,7 +41,7 @@ class SkillCheckService
             return 401;
         }
 
-        $roll = rand(1, 400);
+        $roll = $this->randomNumberGenerator->numberBetween(1, 400);
         $roll += $roll * $skill->skill_bonus;
 
         return $roll;

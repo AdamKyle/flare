@@ -5,8 +5,10 @@ namespace App\Game\Skills\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Skill;
-use App\Flare\Transformers\CharacterInventoryCountTransformer;
-use App\Flare\Values\MaxCurrenciesValue;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
+use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use Illuminate\Database\Eloquent\Builder;
@@ -20,6 +22,8 @@ class DisenchantManyService
 
     public function __construct(
         private readonly SkillCheckService $skillCheckService,
+        private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly ChanceCalculator $chanceCalculator,
     ) {}
 
     /**
@@ -44,7 +48,7 @@ class DisenchantManyService
         }
 
         $disenchantingSkill = $this->getDisenchantingSkill($character);
-        $maxGoldDust = MaxCurrenciesValue::MAX_GOLD_DUST;
+        $maxGoldDust = CurrencyLimit::MAX_GOLD_DUST;
         $interestDcThreshold = 500 - (int) (500 * 0.10);
         $runningGoldDustTotal = (int) $character->gold_dust;
 
@@ -215,7 +219,7 @@ class DisenchantManyService
      */
     private function computeBaseGoldDust(Skill $skill): int
     {
-        $baseGoldDust = rand(2, 1150);
+        $baseGoldDust = $this->randomNumberGenerator->numberBetween(2, 1150);
         $baseGoldDust = (int) floor($baseGoldDust + ($baseGoldDust * (float) $skill->bonus));
 
         return $baseGoldDust;
@@ -227,13 +231,9 @@ class DisenchantManyService
      */
     protected function passesInterest(int $interestDcThreshold): bool
     {
-        $roll = rand(1, 500);
+        $successPercentage = ((501 - $interestDcThreshold) / 500) * 100;
 
-        if ($roll >= $interestDcThreshold) {
-            return true;
-        }
-
-        return false;
+        return $this->chanceCalculator->passesPercentage($successPercentage);
     }
 
     /**

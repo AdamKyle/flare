@@ -2,7 +2,6 @@
 
 namespace App\Game\Character\CharacterInventory\Services;
 
-use App\Flare\Items\Values\ItemType;
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Flare\Models\InventorySlot;
@@ -12,8 +11,9 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
-use App\Game\NpcActions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
+use App\Game\Npcs\Actions\LabyrinthOracle\Events\LabyrinthOracleUpdate;
 use Exception;
 use Psr\SimpleCache\InvalidArgumentException;
 

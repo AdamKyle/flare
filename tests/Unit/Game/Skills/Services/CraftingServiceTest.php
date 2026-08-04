@@ -6,12 +6,11 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\GlobalEventCraftingInventory;
 use App\Flare\Models\GlobalEventCraftingInventorySlot;
 use App\Flare\Models\Item;
-use App\Flare\Values\ArmourTypes;
-use App\Flare\Values\CharacterClassValue;
-use App\Flare\Values\ItemSpecialtyType;
-use App\Flare\Values\MaxCurrenciesValue;
-use App\Flare\Values\SpellTypes;
-use App\Flare\Values\WeaponTypes;
+use App\Game\Character\Values\CharacterClass;
+use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Values\ArmourType;
+use App\Game\Core\Items\Values\ItemSpecialtyType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Events\Values\ScheduledEventStatus;
@@ -104,7 +103,7 @@ class CraftingServiceTest extends TestCase
         ]))->getCharacter();
 
         $this->createItem([
-            'type' => ArmourTypes::SHIELD,
+            'type' => ArmourType::SHIELD->value,
             'crafting_type' => 'armour',
             'skill_level_required' => 1,
             'skill_level_trivial' => 100,
@@ -123,7 +122,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $this->createItem([
-            'type' => WeaponTypes::WEAPON,
+            'type' => ItemType::WEAPON->value,
             'crafting_type' => 'weapon',
             'skill_level_required' => 1,
             'skill_level_trivial' => 100,
@@ -145,7 +144,7 @@ class CraftingServiceTest extends TestCase
         ]))->getCharacter();
 
         $this->createItem([
-            'type' => SpellTypes::DAMAGE,
+            'type' => ItemType::SPELL_DAMAGE->value,
             'crafting_type' => 'spell',
             'skill_level_required' => 1,
             'skill_level_trivial' => 100,
@@ -164,7 +163,7 @@ class CraftingServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::BLACKSMITH,
+            'name' => CharacterClass::BLACKSMITH->value,
         ]))->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation()->getCharacter();
@@ -184,7 +183,7 @@ class CraftingServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation()->getCharacter();
@@ -204,7 +203,7 @@ class CraftingServiceTest extends TestCase
         Event::fake();
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
         ]))->assignSkill(
             $this->craftingSkill
         )->givePlayerLocation()->getCharacter();
@@ -229,7 +228,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
         ]))->assignSkill(
             $this->craftingSkill
         )->assignSkill(
@@ -237,7 +236,7 @@ class CraftingServiceTest extends TestCase
         )->givePlayerLocation()->getCharacter();
 
         $spellToCraft = $this->createItem([
-            'type' => SpellTypes::DAMAGE,
+            'type' => ItemType::SPELL_DAMAGE->value,
             'skill_level_required' => 1,
             'skill_level_trivial' => 10,
             'crafting_type' => 'spell',
@@ -299,7 +298,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -329,7 +328,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -357,7 +356,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -371,7 +370,7 @@ class CraftingServiceTest extends TestCase
 
         $character = $character->refresh();
 
-        $this->assertLessThan(MaxCurrenciesValue::MAX_GOLD, $character->gold);
+        $this->assertLessThan(CurrencyLimit::MAX_GOLD, $character->gold);
     }
 
     public function test_general_craft_inventory_is_full()
@@ -389,7 +388,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
             'inventory_max' => 0,
         ]);
 
@@ -424,7 +423,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -456,7 +455,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -486,11 +485,11 @@ class CraftingServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::BLACKSMITH,
+            'name' => CharacterClass::BLACKSMITH->value,
         ]))->assignSkill($this->craftingSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -520,14 +519,14 @@ class CraftingServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::BLACKSMITH,
+            'name' => CharacterClass::BLACKSMITH->value,
         ]))->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
             'type' => SkillTypeValue::CRAFTING,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -565,11 +564,11 @@ class CraftingServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::MERCHANT,
+            'name' => CharacterClass::MERCHANT->value,
         ]))->assignSkill($this->craftingSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -599,11 +598,11 @@ class CraftingServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
         ]))->assignSkill($this->craftingSkill)->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
@@ -635,14 +634,14 @@ class CraftingServiceTest extends TestCase
         );
 
         $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass([
-            'name' => CharacterClassValue::ARCANE_ALCHEMIST,
+            'name' => CharacterClass::ARCANE_ALCHEMIST->value,
         ]))->assignSkill($this->createGameSkill([
             'name' => 'Spell Crafting',
             'type' => SkillTypeValue::CRAFTING,
         ]))->givePlayerLocation()->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -718,7 +717,7 @@ class CraftingServiceTest extends TestCase
             ->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -797,7 +796,7 @@ class CraftingServiceTest extends TestCase
             ->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $craftingService = $this->app->make(CraftingService::class);
@@ -886,7 +885,7 @@ class CraftingServiceTest extends TestCase
             'max_crafts' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => false,
             'should_be_mythic' => true,
         ]);
@@ -898,7 +897,7 @@ class CraftingServiceTest extends TestCase
         ]);
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character->map()->update([
@@ -951,7 +950,7 @@ class CraftingServiceTest extends TestCase
             'max_crafts' => 100,
             'reward_every' => 10,
             'next_reward_at' => 10,
-            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
             'should_be_unique' => false,
             'should_be_mythic' => true,
         ]);
@@ -959,7 +958,7 @@ class CraftingServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $character->update([
-            'gold' => MaxCurrenciesValue::MAX_GOLD,
+            'gold' => CurrencyLimit::MAX_GOLD,
         ]);
 
         $character = $character->refresh();
