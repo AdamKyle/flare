@@ -63,14 +63,14 @@ class DeleteFlaggedUsersTest extends TestCase
             'will_be_deleted' => true,
         ]);
 
-        $this->assertEquals(0, $this->artisan('delete:flagged-users'));
+        $this->artisan('delete:flagged-users')->assertExitCode(0);
 
         Queue::assertPushed(AccountDeletionJob::class);
     }
 
     public function test_do_not_deleted_non_flagged_users()
     {
-        $this->assertEquals(0, $this->artisan('delete:flagged-users'));
+        $this->artisan('delete:flagged-users')->assertExitCode(0);
 
         Queue::assertNotPushed(AccountDeletionJob::class);
     }

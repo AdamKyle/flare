@@ -22,12 +22,12 @@ class BattleRewardQueueControllerTest extends TestCase
     {
         $admin = $this->createAdmin($this->createAdminRole());
 
-        $this->actingAs($admin)
-            ->visitRoute('home')
-            ->see('Character Reward Queue')
-            ->click('Character Reward Queue')
-            ->seeRouteIs('admin.character-reward-queue')
-            ->see('Character Reward Queue');
+        $homeResponse = $this->actingAs($admin)->get(route('home'));
+        $homeResponse->assertSee('Character Reward Queue');
+
+        $queueResponse = $this->actingAs($admin)->get(route('admin.character-reward-queue'));
+        $queueResponse->assertOk();
+        $queueResponse->assertSee('Character Reward Queue');
     }
 
     public function test_non_admin_cannot_view_reward_queue_page(): void

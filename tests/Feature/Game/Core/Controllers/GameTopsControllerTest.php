@@ -51,9 +51,9 @@ class GameTopsControllerTest extends TestCase
         $characterFactory = (new CharacterFactory)->createBaseCharacter()->equipStartingEquipment();
         $character = $characterFactory->getCharacter();
 
-        $this->actingAs($viewer->user)
-            ->visit('/game/tops/characters/'.$character->id)
-            ->see('Rusty Dagger')
-            ->see('Right hand');
+        $response = $this->actingAs($viewer->user)->get('/game/tops/characters/'.$character->id);
+
+        $response->assertSee('Rusty Dagger');
+        $response->assertSee('Right hand');
     }
 }

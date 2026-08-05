@@ -15,8 +15,9 @@ class ItemsControllerTest extends TestCase
     {
         $item = $this->createItem(['name' => 'Ironclad Helm', 'type' => 'helmet']);
 
-        $this->visit('/items/'.$item->id)
-            ->see('Ironclad Helm');
+        $response = $this->get('/items/'.$item->id);
+
+        $response->assertSee('Ironclad Helm');
     }
 
     public function test_item_show_page_renders_item_skills_table_when_item_has_skills(): void
@@ -30,8 +31,9 @@ class ItemsControllerTest extends TestCase
 
         $item = $this->createItem(['name' => 'Ironclad Sword', 'type' => 'weapon', 'item_skill_id' => $itemSkill->id]);
 
-        $this->visit('/items/'.$item->id)
-            ->see('Blade Mastery')
-            ->see('Increases blade proficiency.');
+        $response = $this->get('/items/'.$item->id);
+
+        $response->assertSee('Blade Mastery');
+        $response->assertSee('Increases blade proficiency.');
     }
 }

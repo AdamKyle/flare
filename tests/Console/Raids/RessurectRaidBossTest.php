@@ -111,7 +111,7 @@ class RessurectRaidBossTest extends TestCase
             'killed_boss' => true,
         ]);
 
-        $this->artisan('ressurect:raid-boss');
+        $this->artisan('ressurect:raid-boss')->assertExitCode(0);
 
         $this->assertEquals(100, $raidBoss->refresh()->boss_current_hp);
         $this->assertSame(0, RaidBossParticipation::where('raid_boss_id', $raidBoss->id)->count());
@@ -167,7 +167,7 @@ class RessurectRaidBossTest extends TestCase
             'killed_boss' => false,
         ]);
 
-        $this->artisan('ressurect:raid-boss');
+        $this->artisan('ressurect:raid-boss')->assertExitCode(0);
 
         $this->assertEquals(100, $raidBoss->refresh()->boss_current_hp);
         $this->assertNull($participation->fresh());
@@ -221,7 +221,7 @@ class RessurectRaidBossTest extends TestCase
             'killed_boss' => true,
         ]);
 
-        $this->artisan('ressurect:raid-boss');
+        $this->artisan('ressurect:raid-boss')->assertExitCode(0);
 
         $this->assertEquals(0, $raidBoss->refresh()->boss_current_hp);
         $this->assertNotNull($participation->fresh());

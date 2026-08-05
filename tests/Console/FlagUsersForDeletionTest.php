@@ -20,7 +20,7 @@ class FlagUsersForDeletionTest extends TestCase
             'last_logged_in' => now()->subMonths(5),
         ]);
 
-        $this->assertEquals(0, $this->artisan('flag:users-for-deletion'));
+        $this->artisan('flag:users-for-deletion')->assertExitCode(0);
 
         $user = $user->refresh();
 
@@ -37,7 +37,7 @@ class FlagUsersForDeletionTest extends TestCase
             'last_logged_in' => now(),
         ]);
 
-        $this->assertEquals(0, $this->artisan('flag:users-for-deletion'));
+        $this->artisan('flag:users-for-deletion')->assertExitCode(0);
 
         $user = $user->refresh();
 

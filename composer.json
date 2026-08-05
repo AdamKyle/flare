@@ -36,10 +36,11 @@
         "barryvdh/laravel-ide-helper": "^3.5.5",
         "beyondcode/laravel-dump-server": "^2.1.0",
         "fakerphp/faker": "^1.21.0",
-        "laravel/browser-kit-testing": "^7.2.4",
         "laravel/pint": "^1.25",
         "mockery/mockery": "^1.6.6",
         "nunomaduro/collision": "^8.1",
+        "pestphp/pest": "^4.7",
+        "pestphp/pest-plugin-laravel": "^4.1",
         "phpunit/phpunit": "^12.0",
         "spatie/laravel-ignition": "^2.0"
     },
@@ -49,7 +50,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "php-http/discovery": false
+            "php-http/discovery": false,
+            "pestphp/pest-plugin": true
         }
     },
     "extra": {

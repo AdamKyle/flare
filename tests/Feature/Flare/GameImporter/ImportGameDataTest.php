@@ -17,7 +17,7 @@ class ImportGameDataTest extends TestCase
     {
         Excel::fake();
 
-        $this->artisan('import:game-data', ['dirName' => 'Location Templates']);
+        $this->artisan('import:game-data', ['dirName' => 'Location Templates'])->assertExitCode(0);
 
         Excel::assertImported(resource_path('data-imports').'/Location Templates/location_templates.xlsx', function (LocationTemplatesImport $import) {
             return $import instanceof LocationTemplatesImport;
@@ -28,7 +28,7 @@ class ImportGameDataTest extends TestCase
     {
         Excel::fake();
 
-        $this->artisan('import:game-data', ['dirName' => 'World Gems']);
+        $this->artisan('import:game-data', ['dirName' => 'World Gems'])->assertExitCode(0);
 
         Excel::assertImported(resource_path('data-imports').'/World Gems/map-gems.xlsx', function (MapGemsImport $import) {
             return $import instanceof MapGemsImport;

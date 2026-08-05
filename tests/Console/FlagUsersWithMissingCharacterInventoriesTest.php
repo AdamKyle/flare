@@ -17,10 +17,8 @@ class FlagUsersWithMissingCharacterInventoriesTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->inventory()->delete();
 
-        $this->assertSame(
-            0,
-            $this->artisan('flag:users-with-missing-character-inventories', ['--dry-run' => true]),
-        );
+        $this->artisan('flag:users-with-missing-character-inventories', ['--dry-run' => true])
+            ->assertExitCode(0);
 
         $this->assertFalse($character->user->refresh()->will_be_deleted);
         $this->assertTrue(Character::whereKey($character->id)->exists());
@@ -31,7 +29,7 @@ class FlagUsersWithMissingCharacterInventoriesTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->inventory()->delete();
 
-        $this->assertSame(0, $this->artisan('flag:users-with-missing-character-inventories'));
+        $this->artisan('flag:users-with-missing-character-inventories')->assertExitCode(0);
 
         $this->assertTrue($character->user->refresh()->will_be_deleted);
         $this->assertTrue(Character::whereKey($character->id)->exists());

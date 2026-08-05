@@ -41,7 +41,7 @@ class GiveKingdomsToNpcsTest extends TestCase
             'updated_at' => now()->subDays(50),
         ]);
 
-        $this->assertEquals(0, $this->artisan('npc:take-kingdoms'));
+        $this->artisan('npc:take-kingdoms')->assertExitCode(0);
 
         $this->assertNotEmpty(Kingdom::where('npc_owned', true)->get());
     }

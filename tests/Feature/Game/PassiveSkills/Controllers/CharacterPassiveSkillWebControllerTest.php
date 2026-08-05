@@ -17,12 +17,12 @@ class CharacterPassiveSkillWebControllerTest extends TestCase
 
         $other = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        $this->actingAs($other->user)
+        $response = $this->actingAs($other->user)
             ->get(route('view.passive.skill', [
                 'characterPassiveSkill' => $ownerSkill->id,
                 'character' => $other->id,
             ]));
 
-        $this->assertSessionHas('error', 'You do not own that.');
+        $response->assertSessionHas('error', 'You do not own that.');
     }
 }

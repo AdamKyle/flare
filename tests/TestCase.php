@@ -2,10 +2,10 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\HtmlString;
-use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 use Mockery;
 use Tests\Setup\AttackDataCacheSetUp;
 
@@ -14,8 +14,6 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     protected bool $useMockForAttackDataCache = true;
-
-    public string $baseUrl = 'http://localhost';
 
     public ?AttackDataCacheSetUp $attackDataCacheSetUp;
 

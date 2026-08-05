@@ -42,7 +42,7 @@ class DeleteKingdomLogsTest extends TestCase
 
         KingdomLog::first()->update(['created_at' => now()->subDays(550)]);
 
-        $this->assertEquals(0, $this->artisan('clean:kingdomLogs'));
+        $this->artisan('clean:kingdomLogs')->assertExitCode(0);
 
         $this->assertTrue(KingdomLog::all()->isEmpty());
     }

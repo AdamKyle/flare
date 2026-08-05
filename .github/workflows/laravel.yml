@@ -5,6 +5,7 @@ on: [push]
 jobs:
   laravel-tests:
     runs-on: ubuntu-latest
+
     env:
       TIME_ZONE: America/Edmonton
 
@@ -29,80 +30,31 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.4
+          coverage: pcov
 
       - name: Copy .env
         run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           rm -rf vendor
           composer install --no-interaction --prefer-dist --no-progress
           yarn install
 
-      # TODO: There is an issue with the way we use resizable box, commented for now to fix that later
-      # - name: Type Check
+      # TODO: There is an issue with the way we use resizable box, commented for now to fix that later.
+      # - name: Type check
       #   run: yarn type-check
 
       - name: Generate key
         run: php artisan key:generate
 
-      - name: Link Storage
+      - name: Link storage
         run: php artisan storage:link
 
-      - name: Install dependencies (Laravel Vite)
+      - name: Build frontend
         run: yarn build
 
-      - name: Prepare diagnostics directories
-        shell: bash
-        run: |
-          rm -rf test-results
-          mkdir -p test-results
-          rm -f junit.xml storage/logs/*.log
-
-      - name: Capture environment diagnostics
-        shell: bash
-        continue-on-error: true
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 33306
-          DB_USER: root
-          MYSQL_PWD: password
-        run: |
-          set +e
-          {
-            echo "UTC timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-            echo "Commit SHA: $GITHUB_SHA"
-            echo "Runner OS:"
-            uname -a
-            test -f /etc/os-release && cat /etc/os-release
-            echo "CPU count: $(getconf _NPROCESSORS_ONLN)"
-            echo "Memory:"
-            free -h
-            echo "Disk usage:"
-            df -h
-            echo "PHP version:"
-            php --version
-            echo "Loaded PHP configuration:"
-            php --ini
-            echo "Loaded PHP extensions:"
-            php -m
-            echo "Composer version:"
-            composer --version
-            echo "Locked direct dependencies:"
-            composer show --locked --direct
-            echo "MySQL client version:"
-            mysql --version
-            echo "MySQL server version:"
-            mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --batch --skip-column-names --execute='SELECT VERSION();'
-            echo "Coverage drivers:"
-            php -m | grep -Ei '^(xdebug|pcov)$' || echo "Neither Xdebug nor PCOV is loaded."
-            echo "Xdebug details:"
-            php --ri xdebug || true
-            echo "Intended XDEBUG_MODE: off"
-          } > test-results/environment.txt 2>&1
-          exit 0
-
-      - name: Run database migration
+      - name: Run database migrations
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -111,13 +63,9 @@ jobs:
           DB_USER: root
           DB_PASSWORD: password
           TIME_ZONE: America/Edmonton
-        shell: bash
-        run: |
-          set -o pipefail
-          /usr/bin/time -v php artisan migrate 2>&1 | tee test-results/migrate.log
+        run: php artisan migrate
 
-      - name: Execute tests (Unit and Feature tests) via PHPUnit
-        id: phpunit
+      - name: Run Pest tests with coverage
         env:
           DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
@@ -126,178 +74,16 @@ jobs:
           DB_USER: root
           DB_PASSWORD: password
           TIME_ZONE: America/Edmonton
-          XDEBUG_MODE: off
-        shell: bash
         run: |
-          set -euo pipefail
-          vendor/bin/phpunit \
-            --log-junit=test-results/junit.xml \
-            --log-events-verbose-text=test-results/phpunit-events.log \
-            > >(tee test-results/phpunit.log) 2>&1 &
-          phpunit_pid=$!
-          started_at=$SECONDS
+          php -d memory_limit=-1 -d max_execution_time=0 ./vendor/bin/pest \
+            --stop-on-failure \
+            --coverage-html=./test-coverage
 
-          (
-            while kill -0 "$phpunit_pid" 2>/dev/null; do
-              {
-                echo "UTC timestamp: $(date -u --iso-8601=seconds)"
-                echo "PHPUnit PID: $phpunit_pid"
-                echo "Elapsed seconds: $((SECONDS - started_at))"
-                ps -p "$phpunit_pid" -o pid=,etime=,%cpu=,%mem=,rss=,vsz=,state= || true
-                echo "Recent PHPUnit events:"
-                tail -n 20 test-results/phpunit-events.log 2>/dev/null || true
-              } >> test-results/heartbeat.log
-              sleep 60
-            done
-          ) &
-          heartbeat_pid=$!
-
-          set +e
-          wait "$phpunit_pid"
-          phpunit_exit_code=$?
-          set -e
-          kill "$heartbeat_pid" 2>/dev/null || true
-          wait "$heartbeat_pid" 2>/dev/null || true
-          echo "$phpunit_exit_code" > test-results/phpunit-exit-code.txt
-          exit "$phpunit_exit_code"
-
-      - name: Report slow tests and overall timing
-        if: always()
-        shell: bash
-        run: |
-          mkdir -p test-results
-          python3 - <<'PY'
-          import pathlib
-          import xml.etree.ElementTree as ET
-
-          results = pathlib.Path('test-results')
-          junit = results / 'junit.xml'
-          report = results / 'slow-tests.txt'
-          rows = []
-
-          if junit.exists():
-              try:
-                  root = ET.parse(junit).getroot()
-                  for case in root.iter('testcase'):
-                      rows.append((
-                          float(case.get('time', '0') or 0),
-                          case.get('class', 'unknown class'),
-                          case.get('name', 'unknown method'),
-                      ))
-              except (ET.ParseError, ValueError) as error:
-                  report.write_text(f'Unable to parse JUnit XML: {error}\n')
-          else:
-              report.write_text('JUnit XML was not generated.\n')
-
-          if rows:
-              rows.sort(reverse=True)
-              report.write_text(
-                  'Slowest tests (descending duration)\n'
-                  + '\n'.join(
-                      f'{duration:.6f}s\t{class_name}\t{method_name}'
-                      for duration, class_name, method_name in rows[:200]
-                  )
-                  + '\n'
-              )
-          elif junit.exists() and not report.exists():
-              report.write_text('JUnit XML contained no test cases.\n')
-          PY
-          {
-            echo "## Test timing diagnostics"
-            echo
-            echo "### Migration timing"
-            grep -E 'Elapsed \(wall clock\) time|Maximum resident set size|Percent of CPU' test-results/migrate.log || true
-            echo
-            echo "### PHPUnit timing"
-            grep -E 'Elapsed \(wall clock\) time|Maximum resident set size|Percent of CPU' test-results/phpunit.log || true
-            echo
-            echo "### PHPUnit exit code"
-            if [[ -f test-results/phpunit-exit-code.txt ]]; then
-              head -n 1 test-results/phpunit-exit-code.txt || true
-            else
-              echo "PHPUnit did not produce an exit code."
-            fi
-            echo
-            echo "### Slowest available tests"
-            head -n 21 test-results/slow-tests.txt || true
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Capture post-test diagnostics
-        if: always()
-        continue-on-error: true
-        env:
-          DB_HOST: 127.0.0.1
-          DB_PORT: 33306
-          DB_USER: root
-          MYSQL_PWD: password
-        shell: bash
-        run: |
-          set +e
-          mkdir -p test-results
-          {
-            echo "Final UTC timestamp: $(date -u --iso-8601=seconds)"
-            echo "PHPUnit console tail:"
-            tail -n 200 test-results/phpunit.log 2>/dev/null || true
-            echo "PHPUnit event tail:"
-            tail -n 200 test-results/phpunit-events.log 2>/dev/null || true
-            echo "Heartbeat tail:"
-            tail -n 100 test-results/heartbeat.log 2>/dev/null || true
-            echo "Last test preparation started:"
-            grep 'Test Preparation Started' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
-            echo "Last test prepared:"
-            grep 'Test Prepared' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
-            echo "Last test finished:"
-            grep 'Test Finished' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
-            echo "Last error or failure event:"
-            grep -E 'Test (Errored|Failed)' test-results/phpunit-events.log 2>/dev/null | tail -n 1 || true
-            if [[ ! -s test-results/junit.xml ]] || ! python3 -c 'import sys, xml.etree.ElementTree as ET; ET.parse(sys.argv[1])' test-results/junit.xml 2>/dev/null; then
-              echo "JUnit unavailable or incomplete"
-            fi
-            echo "Relevant processes:"
-            ps aux | grep -E '[p]hp|[m]ysql' || true
-            echo "Laravel logs:"
-            find storage/logs -maxdepth 1 -type f -name '*.log' -print -exec tail -n 200 {} \;
-            echo "MySQL version and status:"
-            mysql --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" --execute='SELECT VERSION(); SHOW GLOBAL STATUS WHERE Variable_name IN ("Threads_connected", "Threads_running", "Slow_queries", "Questions", "Uptime");'
-            echo "Post-test disk usage:"
-            df -h
-            echo "Post-test memory:"
-            free -h
-            echo "Diagnostic directory sizes:"
-            du -sh test-results
-          } > test-results/post-test-diagnostics.txt 2>&1
-          exit 0
-
-      - name: Upload test diagnostics
+      - name: Upload test coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: laravel-test-diagnostics-${{ github.run_id }}-${{ github.sha }}
+          name: laravel-test-coverage-${{ github.run_id }}-${{ github.sha }}
           if-no-files-found: warn
           retention-days: 14
-          path: |
-            test-results/**
-            storage/logs/*.log
-
-      - name: Report PHPUnit result
-        if: ${{ always() && steps.phpunit.outcome != 'skipped' }}
-        shell: bash
-        run: |
-          if [[ ! -f test-results/phpunit-exit-code.txt ]]; then
-            echo "PHPUnit did not produce an exit code."
-            exit 1
-          fi
-
-          phpunit_exit_code=$(head -n 1 test-results/phpunit-exit-code.txt)
-
-          if [[ ! "$phpunit_exit_code" =~ ^[0-9]+$ ]]; then
-            echo "PHPUnit produced an invalid exit code: $phpunit_exit_code"
-            exit 1
-          fi
-
-          if (( phpunit_exit_code != 0 )); then
-            echo "PHPUnit failed with exit code $phpunit_exit_code."
-            exit "$phpunit_exit_code"
-          fi
-
-          echo "PHPUnit passed."
+          path: test-coverage/**

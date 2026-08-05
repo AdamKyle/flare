@@ -162,11 +162,10 @@ class MarketControllerTest extends TestCase
         $slotId = $inventory->getSlotId(0);
         $marketListingCountBeforeSale = MarketBoard::count();
 
-        $this->actingAs($seller->user)->json('POST', '/api/market-board/sell-item/'.$seller->id, [
+        $response = $this->actingAs($seller->user)->json('POST', '/api/market-board/sell-item/'.$seller->id, [
             'slot_id' => $slotId,
             'list_for' => -1,
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $this->assertSame($marketListingCountBeforeSale, MarketBoard::count());
@@ -182,11 +181,10 @@ class MarketControllerTest extends TestCase
         $slotId = $inventory->getSlotId(0);
         $marketListingCountBeforeSale = MarketBoard::count();
 
-        $this->actingAs($seller->user)->json('POST', '/api/market-board/sell-item/'.$seller->id, [
+        $response = $this->actingAs($seller->user)->json('POST', '/api/market-board/sell-item/'.$seller->id, [
             'slot_id' => $slotId,
             'list_for' => 0,
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $this->assertSame($marketListingCountBeforeSale, MarketBoard::count());

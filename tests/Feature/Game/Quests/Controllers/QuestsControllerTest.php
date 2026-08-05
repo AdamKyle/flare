@@ -2,16 +2,16 @@
 
 namespace Tests\Feature\Game\Quests\Controllers;
 
-use App\Flare\Models\QuestsCompleted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateQuest;
+use Tests\Traits\CreateQuestsCompleted;
 
 class QuestsControllerTest extends TestCase
 {
-    use CreateNpc, CreateQuest, RefreshDatabase;
+    use CreateNpc, CreateQuest, CreateQuestsCompleted, RefreshDatabase;
 
     public function test_index_requires_authentication(): void
     {
@@ -31,14 +31,14 @@ class QuestsControllerTest extends TestCase
         $quest = $this->createQuest(['npc_id' => $npc->id, 'name' => 'Rescue The Miller']);
         $otherQuest = $this->createQuest(['npc_id' => $npc->id, 'name' => 'Bandit Cleanup']);
 
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $quest->id]);
-        QuestsCompleted::factory()->create(['character_id' => $otherCharacter->id, 'quest_id' => $otherQuest->id]);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'quest_id' => $quest->id]);
+        $this->createQuestsCompleted(['character_id' => $otherCharacter->id, 'quest_id' => $otherQuest->id]);
 
-        $this->actingAs($character->user)
-            ->visit('/game/completed-quests/'.$character->user->id)
-            ->see('Rescue The Miller')
-            ->see($npc->gameMap->name)
-            ->dontSee('Bandit Cleanup');
+        $response = $this->actingAs($character->user)->get('/game/completed-quests/'.$character->user->id);
+
+        $response->assertSee('Rescue The Miller');
+        $response->assertSee($npc->gameMap->name);
+        $response->assertDontSee('Bandit Cleanup');
     }
 
     public function test_index_excludes_guide_quest_completions(): void
@@ -48,8 +48,8 @@ class QuestsControllerTest extends TestCase
         $npc = $this->createNpc();
         $quest = $this->createQuest(['npc_id' => $npc->id, 'name' => 'Rescue The Miller']);
 
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $quest->id]);
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => null, 'guide_quest_id' => 1]);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'quest_id' => $quest->id]);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'quest_id' => null, 'guide_quest_id' => 1]);
 
         $response = $this->actingAs($character->user)
             ->call('GET', '/game/completed-quests/'.$character->user->id);
@@ -66,8 +66,8 @@ class QuestsControllerTest extends TestCase
         $matchingQuest = $this->createQuest(['npc_id' => $npc->id, 'name' => 'Rescue The Miller']);
         $otherQuest = $this->createQuest(['npc_id' => $npc->id, 'name' => 'Bandit Cleanup']);
 
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $matchingQuest->id]);
-        QuestsCompleted::factory()->create(['character_id' => $character->id, 'quest_id' => $otherQuest->id]);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'quest_id' => $matchingQuest->id]);
+        $this->createQuestsCompleted(['character_id' => $character->id, 'quest_id' => $otherQuest->id]);
 
         $response = $this->actingAs($character->user)
             ->call('GET', '/game/completed-quests/'.$character->user->id, ['search' => 'Rescue']);
@@ -81,8 +81,8 @@ class QuestsControllerTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
 
-        $this->actingAs($character->user)
-            ->visit('/game/completed-quests/'.$character->user->id)
-            ->see('No completed quests yet.');
+        $response = $this->actingAs($character->user)->get('/game/completed-quests/'.$character->user->id);
+
+        $response->assertSee('No completed quests yet.');
     }
 }

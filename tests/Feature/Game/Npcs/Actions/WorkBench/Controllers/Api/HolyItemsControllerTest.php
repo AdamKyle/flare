@@ -299,12 +299,10 @@ class HolyItemsControllerTest extends TestCase
             'amount' => 1,
         ]);
 
-        $this->actingAs($character->user)
+        $response = $this->actingAs($character->user)
             ->json('POST', '/api/character/'.$character->id.'/smithy-workbench/apply', [
                 'alchemy_slot_id' => $alchemySlot->id,
             ]);
-
-        $response = $this->response;
 
         $response->assertStatus(422);
 

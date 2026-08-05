@@ -63,7 +63,7 @@ class ClearCelestialsTest extends TestCase
             'character_current_health' => 10,
         ]);
 
-        $this->assertEquals(0, $this->artisan('clear:celestials'));
+        $this->artisan('clear:celestials')->assertExitCode(0);
 
         $this->assertTrue(CelestialFight::all()->isEmpty());
         $this->assertTrue(CharacterInCelestialFight::all()->isEmpty());

@@ -17,7 +17,7 @@ class CreateAdminTest extends TestCase
     {
         $this->createAdminRole();
 
-        $this->assertEquals(0, $this->artisan('create:admin test@gmail.com'));
+        $this->artisan('create:admin test@gmail.com')->assertExitCode(0);
     }
 
     public function test_create_admin_user_exists()
@@ -26,6 +26,6 @@ class CreateAdminTest extends TestCase
 
         $user = $this->createUser();
 
-        $this->assertEquals(0, $this->artisan('create:admin '.$user->email));
+        $this->artisan('create:admin '.$user->email)->assertExitCode(0);
     }
 }

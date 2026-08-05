@@ -26,7 +26,7 @@ class AddHolyStacksToItemsTest extends TestCase
             'skill_level_trivial' => 5,
         ]);
 
-        $this->assertEquals(0, $this->artisan('add:holy-stacks-to-items'));
+        $this->artisan('add:holy-stacks-to-items')->assertExitCode(0);
 
         $highLevelItem = $highLevelItem->refresh();
         $lowLevelItem = $lowLevelItem->refresh();

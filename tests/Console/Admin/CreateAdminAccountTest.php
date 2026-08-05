@@ -21,7 +21,7 @@ class CreateAdminAccountTest extends TestCase
 
         $this->createAdminRole();
 
-        $this->assertEquals(0, $this->artisan('create:admin sample@void.com'));
+        $this->artisan('create:admin sample@void.com')->assertExitCode(0);
 
         Mail::assertSent(GeneratedAdmin::class);
 
@@ -39,7 +39,7 @@ class CreateAdminAccountTest extends TestCase
 
         $this->createAdminRole();
 
-        $this->assertEquals(0, $this->artisan('create:admin'));
+        $this->artisan('create:admin')->execute();
 
         Mail::assertNotSent(GeneratedAdmin::class);
 
@@ -57,7 +57,7 @@ class CreateAdminAccountTest extends TestCase
 
         $this->createAdminRole();
 
-        $this->assertEquals(0, $this->artisan('create:admin sample@void.com'));
+        $this->artisan('create:admin sample@void.com')->assertExitCode(0);
 
         /**
          * There should only be one admin. Not two.

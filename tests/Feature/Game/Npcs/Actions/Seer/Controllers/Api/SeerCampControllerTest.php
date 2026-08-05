@@ -327,10 +327,8 @@ class SeerCampControllerTest extends TestCase
 
         $goldBarsBefore = $character->kingdoms->sum('gold_bars');
 
-        $this->actingAs($character->user)
+        $response = $this->actingAs($character->user)
             ->json('POST', '/api/seer-camp/add-sockets/'.$character->id, []);
-
-        $response = $this->response;
 
         $response->assertStatus(422);
 

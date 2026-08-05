@@ -1152,7 +1152,7 @@ class BatchCraftingControllerTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
 
-        $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($character->user)->post(route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => [
@@ -1163,7 +1163,7 @@ class BatchCraftingControllerTest extends TestCase
         ]);
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
-        $this->response->assertStatus(302);
+        $response->assertStatus(302);
         $this->assertTrue(session()->has('errors'));
     }
 
@@ -1234,7 +1234,7 @@ class BatchCraftingControllerTest extends TestCase
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => [
@@ -1244,7 +1244,6 @@ class BatchCraftingControllerTest extends TestCase
                 'craft_amount' => 1,
             ],
         ]);
-        $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
         $this->assertStringContainsString('may not exceed 0 for the selected destination', $response->json('errors')['progress.craft_amount'][0]);
@@ -1265,12 +1264,11 @@ class BatchCraftingControllerTest extends TestCase
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'experience'],
         ]);
-        $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
         $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors')['batch_crafting'][0]);
@@ -1291,7 +1289,7 @@ class BatchCraftingControllerTest extends TestCase
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $item->id]);
 
-        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => [
@@ -1302,7 +1300,6 @@ class BatchCraftingControllerTest extends TestCase
                 'enchant_affix_ids' => [$prefix->id],
             ],
         ]);
-        $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
         $this->assertStringContainsString('may not exceed 0 for the selected destination', $response->json('errors')['progress.craft_amount'][0]);
@@ -1321,12 +1318,11 @@ class BatchCraftingControllerTest extends TestCase
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
 
-        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'experience'],
         ]);
-        $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
         $this->assertStringContainsString('Crafted Items Set is full', $response->json('errors.batch_crafting.0'));
@@ -1348,11 +1344,10 @@ class BatchCraftingControllerTest extends TestCase
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::TRINKETRY->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
         ]);
-        $response = $this->response;
 
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->first());
         $response->assertStatus(422);
@@ -1371,12 +1366,11 @@ class BatchCraftingControllerTest extends TestCase
         $alchemy = $this->createGameSkill(['name' => 'Alchemy', 'type' => SkillTypeValue::ALCHEMY->value, 'max_level' => 400]);
         $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ALCHEMY->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['alchemy_mode' => 'experience'],
         ]);
-        $response = $this->response;
 
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::ALCHEMY->value)->first());
     }
@@ -1396,7 +1390,7 @@ class BatchCraftingControllerTest extends TestCase
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
         $targetSet = $this->createInventorySet(['character_id' => $character->id]);
 
-        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => [
@@ -1404,7 +1398,6 @@ class BatchCraftingControllerTest extends TestCase
                 'selected_set_id' => $targetSet->id,
             ],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::CRAFT->value)->first());
@@ -1439,7 +1432,7 @@ class BatchCraftingControllerTest extends TestCase
             'suffix_affix_id' => $defaultSuffixId,
         ]])->all();
 
-        $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($character->user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => [
@@ -1448,7 +1441,6 @@ class BatchCraftingControllerTest extends TestCase
                 'enchant_plan' => $enchantPlan,
             ],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $this->assertNull(BatchCrafting::where('character_id', $character->id)->where('batch_type', BatchCraftingType::CRAFT_AND_ENCHANT->value)->first());
@@ -1470,12 +1462,11 @@ class BatchCraftingControllerTest extends TestCase
         ]);
         SetSlot::create(['inventory_set_id' => $craftedItemsSet->id, 'item_id' => $filler->id]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'experience'],
         ]);
-        $response = $this->response;
 
         $this->assertStringNotContainsString('cannot start without inventory space', $response->json('errors.batch_crafting.0'));
     }
@@ -1487,12 +1478,11 @@ class BatchCraftingControllerTest extends TestCase
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
         $character->skills()->create(['game_skill_id' => $weaponCrafting->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'experience'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(200);
         $this->assertNotNull(BatchCrafting::where('character_id', $character->id)->first());
@@ -1548,12 +1538,11 @@ class BatchCraftingControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'experience', 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1565,12 +1554,11 @@ class BatchCraftingControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'experience', 'output_destination' => 'crafted_items_set'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1581,12 +1569,11 @@ class BatchCraftingControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'event', 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1597,12 +1584,11 @@ class BatchCraftingControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ENCHANT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['enchant_mode' => 'event', 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1616,12 +1602,11 @@ class BatchCraftingControllerTest extends TestCase
         $character->skills()->create(['game_skill_id' => $alchemy->id, 'character_id' => $character->id, 'level' => 2, 'xp' => 25, 'xp_max' => 100, 'is_locked' => false]);
         $item = $this->createItem(['name' => 'Validation Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::ALCHEMY->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 1, 'alchemy_item_id' => $item->id, 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1632,12 +1617,11 @@ class BatchCraftingControllerTest extends TestCase
         $user = $this->createUser();
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'shards' => 100]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::TRINKETRY->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['trinketry_mode' => 'experience', 'output_destination' => 'crafted_items_set'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1656,14 +1640,13 @@ class BatchCraftingControllerTest extends TestCase
         $alchemyBag = $this->createAlchemyBag(['character_id' => $character->id]);
         $oilSlot = $this->createAlchemyBagSlot(['alchemy_bag_id' => $alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oil->id, 'amount' => 1]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::HOLY_OILS->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'selected_items' => [$slot->id],
             'selected_oils' => [$oilSlot->id],
             'progress' => ['holy_oil_mode' => 'selected', 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1675,12 +1658,11 @@ class BatchCraftingControllerTest extends TestCase
         $character = $this->createCharacter(['user_id' => $user->id, 'inventory_max' => 10, 'gold' => 100]);
         $item = $this->createItem(['name' => 'Validation Sell Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::SELL->value,
             'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_destination']);
@@ -1693,12 +1675,11 @@ class BatchCraftingControllerTest extends TestCase
         $item = $this->createItem(['name' => 'Validation Output Set Id Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'output_destination' => 'crafted_items_set', 'output_set_id' => $set->id],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['progress.output_set_id']);
@@ -1712,12 +1693,11 @@ class BatchCraftingControllerTest extends TestCase
         $user = $character->user;
         $item = $this->createItem(['name' => 'Valid Amount Destination Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1]);
 
-        $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
+        $response = $this->actingAs($user)->json('POST', route('batch-crafting.start', ['character' => $character]), [
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::KEEP->value,
             'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'output_destination' => 'inventory'],
         ]);
-        $response = $this->response;
 
         $response->assertStatus(200);
         $batchCrafting = BatchCrafting::where('character_id', $character->id)->first();

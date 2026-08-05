@@ -21,7 +21,7 @@ class CleanChatTest extends TestCase
             'created_at' => now()->subMonths(6),
         ]);
 
-        $this->assertEquals(0, $this->artisan('clean:chat'));
+        $this->artisan('clean:chat')->assertExitCode(0);
 
         $this->assertTrue(Message::all()->isEmpty());
     }

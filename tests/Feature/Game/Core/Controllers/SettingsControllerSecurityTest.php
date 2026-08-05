@@ -45,7 +45,7 @@ class SettingsControllerSecurityTest extends TestCase
             'is_silenced' => true,
             'timeout_until' => now()->addYear(),
             'will_be_deleted' => true,
-        ])->response;
+        ]);
 
         $response->assertSessionHas('success', 'Updated Cosmetic Text options');
         $user = $user->refresh();
@@ -87,7 +87,7 @@ class SettingsControllerSecurityTest extends TestCase
             'is_silenced' => true,
             'timeout_until' => now()->addYear(),
             'will_be_deleted' => true,
-        ])->response;
+        ]);
 
         $response->assertSessionHas('success', 'Updated Name Tag options');
         $user = $user->refresh();
