@@ -3,6 +3,7 @@
 namespace App\Game\Npcs\Actions\LabyrinthOracle\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Npcs\Actions\LabyrinthOracle\Requests\ItemTransferRequest;
 use App\Game\Npcs\Actions\LabyrinthOracle\Services\ItemTransferService;
 use App\Http\Controllers\Controller;
@@ -24,6 +25,13 @@ class LabyrinthOracleController extends Controller
             'inventory' => $this->itemTransferService->fetchInventoryItems($character),
             'costs' => $this->itemTransferService->getCosts(),
         ]);
+    }
+
+    public function items(PaginationRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->itemTransferService->fetchPaginatedInventoryItems($character, $request->per_page, $request->page, $request->search_text)
+        );
     }
 
     /**

@@ -38,71 +38,30 @@
       integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
       crossorigin="anonymous"
     />
-    @auth
-      @if (auth()->user()->hasRole('Admin'))
-        <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
-        />
-      @endif
-    @endauth
-
-    @livewireStyles
-    @vite('resources/js/vendor/livewire-data-tables.js')
-    @vite('resources/js/vendor/livewire.js')
+    @vite('resources/js/layouts/app-layout.ts')
     @stack('head')
   </head>
-  <body
-    x-data="{
-      loaded: true,
-      darkMode: false,
-      stickyMenu: false,
-      sidebarToggle: false,
-      scrollTop: false,
-    }"
-    x-init="
-      darkMode = JSON.parse(localStorage.getItem('darkMode'))
-      document.documentElement.classList.toggle('dark', darkMode)
-      $watch('darkMode', (value) => {
-        localStorage.setItem('darkMode', JSON.stringify(value))
-        document.documentElement.classList.toggle('dark', value)
-      })
-    "
-    class="bg-gray-100 transition-colors duration-200 dark:bg-gray-800"
-  >
-    <x-core.page.page-wrapper>
-      @include('layouts.partials.core-side-bar')
-      <x-core.page.content-area>
-        <x-header.core-header
-          :user="auth()->user()"
-          :isLoggedIn="!is_null(auth()->user())"
-        />
-        <main>
-          @include('layouts.partials.alerts')
-          @yield('content')
-        </main>
-      </x-core.page.content-area>
-    </x-core.page.page-wrapper>
-    @livewireScriptConfig
+  <body class="bg-gray-100 transition-colors duration-200 dark:bg-gray-800">
+    <x-core.page.content-area>
+      @include('layouts.partials.plain-header', [
+        'isLoggedIn' => ! is_null(auth()->user()),
+        'user' => auth()->user(),
+      ])
+      <main>
+        @include('layouts.partials.alerts')
+        @yield('content')
+      </main>
+    </x-core.page.content-area>
     @if (! is_null(auth()->user()))
-      @if (! auth()->user()->hasRole('Admin'))
-        @vite('resources/js/app.ts')
-        <script>
-          setInterval(() => {
-            fetch('/api/game-heart-beat', {
-              method: 'POST',
-              headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-            });
-          }, 30000);
-        </script>
-      @else
-        @vite('resources/js/admin-apps.ts')
-
-        <script>
-          const lightbox = GLightbox();
-        </script>
-      @endif
+      @vite('resources/js/app.ts')
+      <script>
+        setInterval(() => {
+          fetch('/api/game-heart-beat', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+          });
+        }, 30000);
+      </script>
     @endif
 
     @stack('scripts')

@@ -3,13 +3,12 @@ import React, { ReactNode } from 'react';
 import QueenActionSelection from './queen-action-selection';
 import QueenMoveAffixesForm from './queen-move-affixes-form';
 import QueenRerollForm from './queen-reroll-form';
+import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import { QueenAction } from '../enums/queen-action';
 import { useQueenOfHeartsFlow } from '../hooks/use-queen-of-hearts-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
@@ -29,7 +28,7 @@ const QueenOfHeartsFlow = (): ReactNode => {
     handleMoveSuccess,
   } = useQueenOfHeartsFlow();
 
-  const renderAlerts = (): ReactNode => {
+  const renderStatus = (): ReactNode => {
     if (!error && !status) {
       return null;
     }
@@ -42,8 +41,12 @@ const QueenOfHeartsFlow = (): ReactNode => {
     );
   };
 
-  const renderEmptyState = (): ReactNode => {
-    if (hasData || error) {
+  const renderSelectionForm = (): ReactNode => {
+    if (hasData) {
+      return <QueenActionSelection onSelect={selectAction} />;
+    }
+
+    if (error) {
       return null;
     }
 
@@ -51,54 +54,6 @@ const QueenOfHeartsFlow = (): ReactNode => {
       <Alert variant={AlertVariant.INFO}>
         Unable to load your inventory right now.
       </Alert>
-    );
-  };
-
-  const renderActionSelection = (): ReactNode => {
-    if (action || !hasData) {
-      return null;
-    }
-
-    return <QueenActionSelection onSelect={selectAction} />;
-  };
-
-  const renderActiveActionForm = (): ReactNode => {
-    if (!data || !action) {
-      return null;
-    }
-
-    if (action === QueenAction.REROLL_ITEM) {
-      return (
-        <QueenRerollForm
-          data={data}
-          characterId={characterId}
-          onDataReplaced={replaceData}
-          onSuccess={handleRerollSuccess}
-        />
-      );
-    }
-
-    return (
-      <QueenMoveAffixesForm
-        data={data}
-        characterId={characterId}
-        onDataReplaced={replaceData}
-        onSuccess={handleMoveSuccess}
-      />
-    );
-  };
-
-  const renderChangeActionButton = (): ReactNode => {
-    if (!action) {
-      return null;
-    }
-
-    return (
-      <Button
-        label="Change Action"
-        on_click={resetAction}
-        variant={ButtonVariant.PRIMARY}
-      />
     );
   };
 
@@ -122,17 +77,45 @@ const QueenOfHeartsFlow = (): ReactNode => {
     );
   }
 
-  return (
-    <div className="space-y-4 text-gray-900 dark:text-gray-100">
-      <h2 className="text-xl font-semibold">Queen of Hearts</h2>
+  if (data && action === QueenAction.REROLL_ITEM) {
+    return (
+      <QueenRerollForm
+        data={data}
+        characterId={characterId}
+        rootStatus={renderStatus()}
+        helpLink={renderHelpLink()}
+        onDataReplaced={replaceData}
+        onSuccess={handleRerollSuccess}
+        onChangeAction={resetAction}
+      />
+    );
+  }
 
-      {renderAlerts()}
-      {renderEmptyState()}
-      {renderActionSelection()}
-      {renderActiveActionForm()}
-      {renderChangeActionButton()}
-      {renderHelpLink()}
-    </div>
+  if (data && action === QueenAction.MOVE_ENCHANTS) {
+    return (
+      <QueenMoveAffixesForm
+        data={data}
+        characterId={characterId}
+        rootStatus={renderStatus()}
+        helpLink={renderHelpLink()}
+        onDataReplaced={replaceData}
+        onSuccess={handleMoveSuccess}
+        onChangeAction={resetAction}
+      />
+    );
+  }
+
+  return (
+    <CraftingActionLayout
+      heading={
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Queen of Hearts
+        </h2>
+      }
+      status={renderStatus()}
+      form={renderSelectionForm()}
+      help_link={renderHelpLink()}
+    />
   );
 };
 

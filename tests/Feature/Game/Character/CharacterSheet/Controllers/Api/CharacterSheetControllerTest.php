@@ -34,4 +34,40 @@ class CharacterSheetControllerTest extends TestCase
 
         $this->assertGreaterThan(0, $jsonData['data']['healing_amount']);
     }
+
+    public function test_character_sheet_returns_complete_contract_with_numeric_values_and_nested_resources()
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character-sheet/'.$character->id);
+
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $this->assertSame($character->id, $data['id']);
+        $this->assertSame($character->user_id, $data['user_id']);
+        $this->assertSame($character->name, $data['name']);
+        $this->assertIsInt($data['level']);
+        $this->assertIsInt($data['max_level']);
+        $this->assertIsInt($data['gold']);
+        $this->assertIsInt($data['gold_dust']);
+        $this->assertIsInt($data['shards']);
+        $this->assertIsInt($data['copper_coins']);
+        $this->assertIsInt($data['gold_bars']);
+        $this->assertIsNumeric($data['str_raw']);
+        $this->assertIsNumeric($data['str_modded']);
+        $this->assertIsNumeric($data['attack']);
+        $this->assertIsNumeric($data['ac']);
+        $this->assertIsNumeric($data['health']);
+        $this->assertIsNumeric($data['resurrection_chance']);
+        $this->assertIsArray($data['inventory_count']);
+        $this->assertIsArray($data['resistance_info']);
+        $this->assertIsArray($data['elemental_atonements']);
+        $this->assertIsArray($data['reincarnation_info']);
+        $this->assertArrayHasKey('can_craft', $data);
+        $this->assertArrayHasKey('is_automation_running', $data);
+    }
 }

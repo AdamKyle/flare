@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Game\Npcs\Actions\LabyrinthOracle\Controllers\Api;
 
+use App\Flare\Models\ItemSkill;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Events\ServerMessageEvent;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
@@ -130,6 +132,47 @@ class LabyrinthOracleControllerTest extends TestCase
         $this->assertCount(4, $jsonData['inventory']);
     }
 
+    public function test_paginated_items_endpoint_respects_ownership_pagination_and_search()
+    {
+        $itemOne = $this->createItem(['name' => 'Alpha Item']);
+        $itemTwo = $this->createItem(['name' => 'Beta Item']);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemOne)
+            ->giveItem($itemTwo)
+            ->getCharacter();
+
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($this->createItem(['name' => 'Other Character Item']))
+            ->getCharacter();
+
+        $firstPage = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/labyrinth-oracle/items', [
+                'per_page' => 1,
+                'page' => 1,
+            ]);
+
+        $firstPageData = json_decode($firstPage->getContent(), true);
+
+        $searchResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/labyrinth-oracle/items', [
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $searchData = json_decode($searchResponse->getContent(), true);
+
+        $this->assertEquals(200, $firstPage->status());
+        $this->assertCount(1, $firstPageData['data']);
+        $this->assertTrue($firstPageData['meta']['can_load_more']);
+        $this->assertCount(1, $searchData['data']);
+        $this->assertEquals($itemTwo->id, $searchData['data'][0]['id']);
+        $this->assertNotEquals($otherCharacter->id, $character->id);
+    }
+
     public function test_inventory_items_includes_transfer_costs()
     {
         $character = $this->character->getCharacter();
@@ -205,7 +248,76 @@ class LabyrinthOracleControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals(2, count($jsonData['inventory']));
+        $this->assertNotNull($jsonData['source_result_preview']);
+        $this->assertNotNull($jsonData['destination_result_preview']);
+        $this->assertNotSame(
+            $jsonData['source_result_preview']['item_id'],
+            $jsonData['destination_result_preview']['item_id']
+        );
 
         Event::assertDispatched(ServerMessageEvent::class);
+    }
+
+    public function test_paginated_items_endpoint_with_populated_rows_does_not_lazy_load()
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+
+        $itemSkill = ItemSkill::create([
+            'name' => 'Item Mastery',
+            'description' => 'Increases item proficiency.',
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+        ]);
+
+        $decoratedItem = $this->createItem([
+            'name' => 'Decorated Item',
+            'item_prefix_id' => $prefix->id,
+            'item_suffix_id' => $suffix->id,
+            'holy_stacks' => 5,
+        ]);
+
+        $decoratedItem->appliedHolyStacks()->create([
+            'item_id' => $decoratedItem->id,
+            'devouring_darkness_bonus' => 0.1,
+            'stat_increase_bonus' => 0.1,
+        ]);
+
+        $decoratedItem->itemSkillProgressions()->create([
+            'item_id' => $decoratedItem->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 1,
+            'current_kill' => 10,
+            'is_training' => false,
+        ]);
+
+        $decoratedItem = $decoratedItem->refresh();
+
+        $plainItem = $this->createItem(['name' => 'Plain Item']);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($decoratedItem)
+            ->giveItem($plainItem)
+            ->getCharacter();
+
+        Model::preventLazyLoading();
+
+        try {
+            $response = $this->actingAs($character->user)
+                ->call('GET', '/api/character/'.$character->id.'/labyrinth-oracle/items', [
+                    'per_page' => 15,
+                    'page' => 1,
+                ]);
+
+            $response->assertOk();
+
+            $data = json_decode($response->getContent(), true);
+
+            $this->assertCount(2, $data['data']);
+            $this->assertArrayHasKey('preview', $data['data'][0]);
+        } finally {
+            Model::preventLazyLoading(false);
+        }
     }
 }

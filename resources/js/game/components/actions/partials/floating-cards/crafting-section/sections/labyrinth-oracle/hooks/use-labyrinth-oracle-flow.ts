@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 
 import UseLabyrinthOracleFlowDefinition from './definitions/use-labyrinth-oracle-flow-definition';
+import CraftingItemPreviewDefinition from '../../../shared/api/definitions/crafting-item-preview-definition';
 import { useLabyrinthOracleApi } from '../api/hooks/use-labyrinth-oracle-api';
+import { useLabyrinthOracleItemsApi } from '../api/hooks/use-labyrinth-oracle-items-api';
 import { useTransferItemAttributesApi } from '../api/hooks/use-transfer-item-attributes-api';
 import { buildTransferItemAttributesRequest } from '../utils/build-transfer-item-attributes-request';
 
@@ -16,9 +18,15 @@ export const useLabyrinthOracleFlow = (): UseLabyrinthOracleFlowDefinition => {
     characterId,
   });
 
+  const itemsApi = useLabyrinthOracleItemsApi({ character_id: characterId });
+
   const [sourceId, setSourceId] = useState<number | null>(null);
   const [destinationId, setDestinationId] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [sourceResultPreview, setSourceResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
+  const [destinationResultPreview, setDestinationResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
 
   const request = buildTransferItemAttributesRequest(sourceId, destinationId);
 
@@ -29,13 +37,14 @@ export const useLabyrinthOracleFlow = (): UseLabyrinthOracleFlowDefinition => {
   } = useTransferItemAttributesApi({ characterId, request });
 
   const sourceItem = useMemo(
-    () => data?.inventory.find((item) => item.id === sourceId) ?? null,
-    [data, sourceId]
+    () => itemsApi.loadedItems.find((item) => item.id === sourceId) ?? null,
+    [itemsApi.loadedItems, sourceId]
   );
 
   const destinationItem = useMemo(
-    () => data?.inventory.find((item) => item.id === destinationId) ?? null,
-    [data, destinationId]
+    () =>
+      itemsApi.loadedItems.find((item) => item.id === destinationId) ?? null,
+    [itemsApi.loadedItems, destinationId]
   );
 
   const isSameItemSelected =
@@ -52,6 +61,8 @@ export const useLabyrinthOracleFlow = (): UseLabyrinthOracleFlowDefinition => {
 
     setSourceId(id);
     setStatus(null);
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
   };
 
   const selectDestination = (id: number): void => {
@@ -61,9 +72,14 @@ export const useLabyrinthOracleFlow = (): UseLabyrinthOracleFlowDefinition => {
 
     setDestinationId(id);
     setStatus(null);
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
   };
 
   const submitTransfer = async (): Promise<void> => {
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
+
     const response = await transfer();
 
     if (!response) {
@@ -72,6 +88,8 @@ export const useLabyrinthOracleFlow = (): UseLabyrinthOracleFlowDefinition => {
 
     replaceData(response);
     setStatus(response.message ?? 'The attributes were transferred.');
+    setSourceResultPreview(response.source_result_preview ?? null);
+    setDestinationResultPreview(response.destination_result_preview ?? null);
     setSourceId(null);
     setDestinationId(null);
   };
@@ -90,6 +108,9 @@ export const useLabyrinthOracleFlow = (): UseLabyrinthOracleFlowDefinition => {
     hasEnoughItemsToTransfer,
     submitting,
     canSubmit,
+    sourceResultPreview,
+    destinationResultPreview,
+    itemsApi,
     selectSource,
     selectDestination,
     submitTransfer,

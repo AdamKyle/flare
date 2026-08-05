@@ -17,26 +17,42 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
         'inventory_count',
     ];
 
+    public function __construct(
+        private readonly CharacterStatBuilder $characterStatBuilder,
+        private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
+    ) {}
+
     /**
      * Gets the response data for the character sheet
      */
     public function transform(Character $character): array
     {
 
-        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character);
+        $characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
         $gameClass = GameClass::find($character->game_class_id);
 
         return [
+            'id' => $character->id,
+            'user_id' => $character->user_id,
+            'name' => $character->name,
             'game_map_id' => $character->map->game_map_id,
             'class' => $gameClass->name,
             'class_id' => $gameClass->id,
             'race' => $character->race->name,
             'race_id' => $character->race->id,
             'to_hit_stat' => $character->class->to_hit_stat,
+            'damage_stat' => $character->class->damage_stat,
             'level' => $character->level,
             'max_level' => $this->getMaxLevel($character),
             'xp' => (int) $character->xp,
             'xp_next' => (int) $character->xp_next,
+            'str_raw' => $character->str,
+            'dur_raw' => $character->dur,
+            'dex_raw' => $character->dex,
+            'chr_raw' => $character->chr,
+            'int_raw' => $character->int,
+            'agi_raw' => $character->agi,
+            'focus_raw' => $character->focus,
             'str_modded' => $characterStatBuilder->statMod('str'),
             'dur_modded' => $characterStatBuilder->statMod('dur'),
             'dex_modded' => $characterStatBuilder->statMod('dex'),
@@ -76,7 +92,7 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
      */
     public function includeInventoryCount(Character $character)
     {
-        return $this->item($character, new CharacterInventoryCountTransformer);
+        return $this->item($character, $this->characterInventoryCountTransformer);
     }
 
     /**

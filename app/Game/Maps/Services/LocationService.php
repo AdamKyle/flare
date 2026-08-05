@@ -22,6 +22,7 @@ use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;
 use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Maps\Transformers\CondensedKingdomTransformer;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use Illuminate\Support\Facades\Storage;
 use League\Fractal\Manager;
@@ -46,6 +47,7 @@ class LocationService
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly QuestItemTransformer $questItemTransformer,
         private readonly LocationsTransformer $locationTransformer,
+        private readonly CondensedKingdomTransformer $condensedKingdomTransformer,
         private readonly PlainDataSerializer $plainArraySerializer,
         private readonly Pagination $pagination,
         private readonly Manager $manager
@@ -73,7 +75,7 @@ class LocationService
             //            'can_settle_kingdom' => $this->canSettle,
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
-            'enemy_kingdoms' => [], // $this->getEnemyKingdoms($character),
+            'enemy_kingdoms' => $this->getCondensedEnemyKingdoms($character),
             //            'characters_on_map' => $this->getActiveUsersCountForMap($character),
             //            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
             //            'is_event_based' => $this->isEventBasedUpdate,
@@ -156,12 +158,26 @@ class LocationService
 
     protected function getNpcKingdoms(Character $character): array
     {
-        return Kingdom::select('id', 'x_position', 'y_position', 'name')
-            ->whereNull('character_id')
+        $kingdoms = Kingdom::whereNull('character_id')
             ->where('game_map_id', $character->map->game_map_id)
             ->where('npc_owned', true)
-            ->get()
-            ->toArray();
+            ->get();
+
+        return $kingdoms->map(fn (Kingdom $kingdom) => $this->condensedKingdomTransformer->transform($kingdom))->all();
+    }
+
+    /**
+     * Fetch the condensed rows for other characters' kingdoms on the same map.
+     */
+    protected function getCondensedEnemyKingdoms(Character $character): array
+    {
+        $kingdoms = Kingdom::where('game_map_id', $character->map->game_map_id)
+            ->where('npc_owned', false)
+            ->whereNotNull('character_id')
+            ->where('character_id', '!=', $character->id)
+            ->get();
+
+        return $kingdoms->map(fn (Kingdom $kingdom) => $this->condensedKingdomTransformer->transform($kingdom))->all();
     }
 
     public function getCharacterPositionData(Map $map): array

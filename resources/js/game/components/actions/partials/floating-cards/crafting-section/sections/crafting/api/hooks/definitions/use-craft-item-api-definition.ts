@@ -1,4 +1,4 @@
-import CraftableItemDefinition from '../../definitions/craftable-item-definition';
+import CraftingItemPreviewDefinition from '../../../../../shared/api/definitions/crafting-item-preview-definition';
 import CraftingApiResponseDefinition from '../../definitions/crafting-api-response-definition';
 
 export default interface UseCraftItemApiDefinition {
@@ -7,7 +7,7 @@ export default interface UseCraftItemApiDefinition {
   successMessage: string | null;
   craftingResponse: CraftingApiResponseDefinition | null;
   craftedInventorySlotId: number | null;
-  craftedItemDetails: CraftableItemDefinition | null;
+  resultPreview: CraftingItemPreviewDefinition | null;
   craftItem: (craftForNpc: boolean, craftForEvent: boolean) => void;
   clearMessages: () => void;
 }

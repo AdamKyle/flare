@@ -59,8 +59,8 @@ class HolyItemServiceTest extends TestCase
 
         $this->assertCount(1, $result['items']);
         $this->assertCount(1, $result['alchemy_items']);
-        $this->assertEquals($slot->id, $result['alchemy_items']->first()->id);
-        $this->assertEquals(4, $result['alchemy_items']->first()->amount);
+        $this->assertEquals($slot->id, $result['alchemy_items']->first()['id']);
+        $this->assertEquals(4, $result['alchemy_items']->first()['stack_amount']);
     }
 
     public function test_fetch_smithing_items_includes_cost_lookup_keyed_by_slot_ids(): void

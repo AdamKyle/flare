@@ -64,4 +64,27 @@ class AutomationLogUpdateTest extends TestCase
         $this->assertInstanceOf(PrivateChannel::class, $channel);
         $this->assertEquals('private-automation-log-update-'.$user->id, $channel->name);
     }
+
+    public function test_event_broadcasts_under_its_own_class_name(): void
+    {
+        $user = $this->createUser();
+
+        $event = new AutomationLogUpdate($user->id, 'Test automation message');
+
+        $this->assertFalse(method_exists($event, 'broadcastAs'));
+        $this->assertEquals('App\Game\Automation\Events\AutomationLogUpdate', get_class($event));
+    }
+
+    public function test_event_broadcast_payload_only_contains_expected_public_properties(): void
+    {
+        $user = $this->createUser();
+
+        $event = new AutomationLogUpdate($user->id, 'Test automation message', true, true);
+
+        $this->assertFalse(method_exists($event, 'broadcastWith'));
+        $this->assertSame(
+            ['message', 'makeItalic', 'isReward', 'timeStamp', 'socket'],
+            array_keys(get_object_vars($event))
+        );
+    }
 }

@@ -51,7 +51,7 @@ class MapController extends Controller
 
     public function mapInformation(Character $character, LocationService $locationService): JsonResponse
     {
-        return response()->json($locationService->getLocationData($character));
+        return response()->json($locationService->getMapData($character));
     }
 
     public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse

@@ -268,12 +268,21 @@
           take place whe equipped.
         </p>
 
-        @livewire(
-          'admin.item-skills.item-skills-table',
-          [
-            'itemSkillId' => $item->itemSkill->id,
-          ]
-        )
+        @php
+          $itemSkillsColumns = \App\Flare\View\Tables\Definitions\ItemSkillsTableDefinition::columns();
+          $itemSkillsPaginator = \App\Flare\View\Tables\TableQueryBuilder::paginate(
+              \App\Flare\View\Tables\Definitions\ItemSkillsTableDefinition::builder($item->itemSkill->id),
+              $itemSkillsColumns,
+              request()
+          );
+        @endphp
+
+        <x-core.tables.data-table
+          :paginator="$itemSkillsPaginator"
+          :columns="$itemSkillsColumns"
+          :searchable="true"
+          empty-message="No item skills found."
+        />
       </x-core.cards.card-with-title>
     @endif
   </div>

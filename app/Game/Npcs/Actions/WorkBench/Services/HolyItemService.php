@@ -7,13 +7,17 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Items\Services\HolyItemBonusGenerator;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Items\Values\HolyItemLevel;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Npcs\Actions\WorkBench\Transformers\WorkBenchHolyOilTransformer;
+use App\Game\Npcs\Actions\WorkBench\Transformers\WorkBenchTargetTransformer;
 use Illuminate\Database\Eloquent\Collection as DBCollection;
 use Illuminate\Support\Collection;
 
@@ -21,7 +25,66 @@ class HolyItemService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly HolyItemBonusGenerator $holyItemBonusGenerator) {}
+    public function __construct(
+        private readonly HolyItemBonusGenerator $holyItemBonusGenerator,
+        private readonly Pagination $pagination,
+        private readonly WorkBenchTargetTransformer $workBenchTargetTransformer,
+        private readonly WorkBenchHolyOilTransformer $workBenchHolyOilTransformer,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+    ) {}
+
+    /**
+     * Fetches a paginated, searchable list of inventory items eligible for Holy Oil application.
+     */
+    public function fetchPaginatedTargetItems(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $query = InventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks', 'item.itemSkillProgressions'])
+            ->where('inventory_id', $inventory->id)
+            ->where('equipped', false)
+            ->whereHas('item', function ($itemQuery) {
+                $itemQuery->whereRaw('holy_stacks > (select count(*) from holy_stacks where holy_stacks.item_id = items.id)');
+            });
+
+        if ($search !== '') {
+            $query->whereHas('item', function ($itemQuery) use ($search) {
+                $itemQuery->where('name', 'LIKE', '%'.$search.'%');
+            });
+        }
+
+        $paginator = $query->orderByDesc('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->workBenchTargetTransformer);
+    }
+
+    /**
+     * Fetches a paginated, searchable list of Holy Oils from the character's Alchemy Bag.
+     */
+    public function fetchPaginatedHolyOils(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        if (is_null($character->alchemyBag)) {
+            return $this->pagination->paginateCollectionResponse(new Collection, $perPage, $page);
+        }
+
+        $query = $character->alchemyBag->slots()
+            ->with('item')
+            ->where('character_id', $character->id)
+            ->whereHas('item', function ($itemQuery) {
+                $itemQuery->where('can_use_on_other_items', true)
+                    ->whereNotNull('holy_level');
+            });
+
+        if ($search !== '') {
+            $query->whereHas('item', function ($itemQuery) use ($search) {
+                $itemQuery->where('name', 'LIKE', '%'.$search.'%');
+            });
+        }
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->workBenchHolyOilTransformer);
+    }
 
     public function fetchSmithingItems(Character $character): array
     {
@@ -29,11 +92,12 @@ class HolyItemService
 
         $items = $this->fetchValidItems($slots)->reverse()->values();
         $alchemyItems = $this->fetchAlchemyItems($character)->values();
+        $costs = $this->buildCostLookup($items, $alchemyItems);
 
         return $this->successResult([
-            'items' => $items,
-            'alchemy_items' => $alchemyItems,
-            'costs' => $this->buildCostLookup($items, $alchemyItems),
+            'items' => $items->map(fn ($slot) => $this->workBenchTargetTransformer->transform($slot))->values(),
+            'alchemy_items' => $alchemyItems->map(fn ($slot) => $this->workBenchHolyOilTransformer->transform($slot))->values(),
+            'costs' => $costs,
         ]);
     }
 
@@ -116,7 +180,9 @@ class HolyItemService
             event(new ServerMessageEvent($character->user, 'You have applied the max stacks allowed. Item has been removed from list of items you can use at the work bench.'));
         }
 
-        return $this->fetchSmithingItems($character);
+        return array_merge($this->fetchSmithingItems($character), [
+            'result_preview' => $this->craftingItemPreviewTransformer->transform($slot->item, $slot->id),
+        ]);
     }
 
     public function getCost(Item $item, Item $alchemyItem): int

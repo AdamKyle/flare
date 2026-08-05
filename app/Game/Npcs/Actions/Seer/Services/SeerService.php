@@ -4,14 +4,19 @@ namespace App\Game\Npcs\Actions\Seer\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GemBagSlot;
+use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
 use App\Game\Core\Chance\RandomNumberGenerator;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Services\GemComparison;
 use App\Game\Messages\Types\NpcMessageTypes;
+use App\Game\Npcs\Actions\Seer\Transformers\SeerGemTransformer;
+use App\Game\Npcs\Actions\Seer\Transformers\SeerInventoryItemTransformer;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 use Facades\App\Game\Core\Handlers\HandleGoldBarsAsACurrency;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
@@ -31,8 +36,128 @@ class SeerService
     public function __construct(
         GemComparison $gemComparison,
         private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly Pagination $pagination,
+        private readonly SeerInventoryItemTransformer $seerInventoryItemTransformer,
+        private readonly SeerGemTransformer $seerGemTransformer,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
     ) {
         $this->gemComparison = $gemComparison;
+    }
+
+    /**
+     * Fetches a paginated, searchable list of items for the given purpose.
+     *
+     * "sockets" returns every socketable item. "attach" returns only items that already have sockets.
+     */
+    public function fetchPaginatedItems(Character $character, string $purpose, int $perPage, int $page, string $search = ''): array
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $eligibleTypes = [
+            ItemType::WEAPON->value,
+            ItemType::STAVE->value,
+            ItemType::BOW->value,
+            ItemType::HAMMER->value,
+            ArmourType::SHIELD->value,
+            ArmourType::BODY->value,
+            ArmourType::SLEEVES->value,
+            ArmourType::HELMET->value,
+            ArmourType::FEET->value,
+            ArmourType::LEGGINGS->value,
+            ArmourType::GLOVES->value,
+        ];
+
+        $query = InventorySlot::with(['item' => function ($itemQuery) {
+            $itemQuery->with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
+                ->withCount('sockets');
+        }])
+            ->where('inventory_id', $inventory->id)
+            ->whereHas('item', function ($itemQuery) use ($eligibleTypes, $purpose) {
+                $itemQuery->whereNotNull('socket_count')->whereIn('type', $eligibleTypes);
+
+                if ($purpose === 'attach') {
+                    $itemQuery->where('socket_count', '>', 0);
+                }
+            });
+
+        if ($search !== '') {
+            $query->whereHas('item', function ($itemQuery) use ($search) {
+                $itemQuery->where('name', 'LIKE', '%'.$search.'%')
+                    ->orWhereHas('itemPrefix', fn ($prefixQuery) => $prefixQuery->where('name', 'LIKE', '%'.$search.'%'))
+                    ->orWhereHas('itemSuffix', fn ($suffixQuery) => $suffixQuery->where('name', 'LIKE', '%'.$search.'%'));
+            });
+        }
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->seerInventoryItemTransformer);
+    }
+
+    /**
+     * Fetches a paginated, searchable list of Gems available in the character's Gem Bag.
+     */
+    public function fetchPaginatedGems(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        if (is_null($character->gemBag)) {
+            return $this->pagination->paginateCollectionResponse(collect(), $perPage, $page);
+        }
+
+        $query = GemBagSlot::with('gem')->where('gem_bag_id', $character->gemBag->id);
+
+        if ($search !== '') {
+            $query->whereHas('gem', function ($gemQuery) use ($search) {
+                $gemQuery->where('name', 'LIKE', '%'.$search.'%');
+            });
+        }
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->seerGemTransformer);
+    }
+
+    /**
+     * Fetches a paginated, searchable list of items that currently have removable Gems attached.
+     */
+    public function fetchPaginatedItemsWithGems(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $eligibleTypes = [
+            ItemType::WEAPON->value,
+            ItemType::STAVE->value,
+            ItemType::BOW->value,
+            ItemType::HAMMER->value,
+            ArmourType::SHIELD->value,
+            ArmourType::BODY->value,
+            ArmourType::SLEEVES->value,
+            ArmourType::HELMET->value,
+            ArmourType::FEET->value,
+            ArmourType::LEGGINGS->value,
+            ArmourType::GLOVES->value,
+        ];
+
+        $query = InventorySlot::with(['item' => function ($itemQuery) {
+            $itemQuery->with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
+                ->withCount('sockets');
+        }])
+            ->where('inventory_id', $inventory->id)
+            ->whereHas('item', function ($itemQuery) use ($eligibleTypes) {
+                $itemQuery->whereNotNull('socket_count')
+                    ->whereIn('type', $eligibleTypes)
+                    ->whereHas('sockets');
+            });
+
+        if ($search !== '') {
+            $query->whereHas('item', function ($itemQuery) use ($search) {
+                $itemQuery->where('name', 'LIKE', '%'.$search.'%')
+                    ->orWhereHas('itemPrefix', fn ($prefixQuery) => $prefixQuery->where('name', 'LIKE', '%'.$search.'%'))
+                    ->orWhereHas('itemSuffix', fn ($suffixQuery) => $suffixQuery->where('name', 'LIKE', '%'.$search.'%'));
+            });
+        }
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->seerInventoryItemTransformer);
     }
 
     /**
@@ -53,7 +178,7 @@ class SeerService
      */
     public function getItems(Character $character, bool $isManagingGems = false): array
     {
-        return array_values(array_filter($character->inventory->slots->whereNotNull('item.socket_count')->whereIn('item.type', [
+        $slots = $character->inventory->slots->whereNotNull('item.socket_count')->whereIn('item.type', [
             ItemType::WEAPON->value,
             ItemType::STAVE->value,
             ItemType::BOW->value,
@@ -65,24 +190,13 @@ class SeerService
             ArmourType::FEET->value,
             ArmourType::LEGGINGS->value,
             ArmourType::GLOVES->value,
-        ])->map(function ($slot) use ($isManagingGems) {
+        ]);
 
-            if ($isManagingGems) {
-                if ($slot->item->socket_count > 0) {
-                    return [
-                        'name' => $slot->item->affix_name,
-                        'slot_id' => $slot->id,
-                        'socket_amount' => $slot->item->socket_count,
-                    ];
-                }
-            } else {
-                return [
-                    'name' => $slot->item->affix_name,
-                    'slot_id' => $slot->id,
-                    'socket_amount' => $slot->item->socket_count,
-                ];
-            }
-        })->toArray()));
+        if ($isManagingGems) {
+            $slots = $slots->filter(fn ($slot) => $slot->item->socket_count > 0);
+        }
+
+        return $slots->map(fn ($slot) => $this->seerInventoryItemTransformer->transform($slot))->values()->toArray();
     }
 
     /**
@@ -90,14 +204,7 @@ class SeerService
      */
     public function getGems(Character $character): array
     {
-        return array_values($character->gemBag->gemSlots->map(function ($slot) {
-            return [
-                'name' => $slot->gem->name,
-                'amount' => $slot->amount,
-                'tier' => $slot->gem->tier,
-                'slot_id' => $slot->id,
-            ];
-        })->toArray());
+        return $character->gemBag->gemSlots->map(fn ($slot) => $this->seerGemTransformer->transform($slot))->values()->toArray();
     }
 
     /**
@@ -146,6 +253,7 @@ class SeerService
             'gems' => $this->getGems($character),
             'costs' => $this->getCosts(),
             'message' => $message,
+            'result_preview' => $this->craftingItemPreviewTransformer->transform($slot->item, $slot->id),
         ]);
     }
 

@@ -11,6 +11,7 @@ use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Enricher\Manifest\Concerns\ManifestSchema;
 use App\Game\Core\Items\Enricher\Manifest\EquippableManifest;
 use App\Game\Core\Items\Transformers\BaseEquippableItemTransformer;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Items\Transformers\UsableItemTransformer;
@@ -48,6 +49,12 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ManifestSchema::class, EquippableManifest::class);
+
+        $this->app->bind(CraftingItemPreviewTransformer::class, function ($app) {
+            return new CraftingItemPreviewTransformer(
+                $app->make(ItemEnricherFactory::class),
+            );
+        });
 
         $this->app->singleton(ItemEnricherFactory::class, function ($app) {
             return new ItemEnricherFactory(

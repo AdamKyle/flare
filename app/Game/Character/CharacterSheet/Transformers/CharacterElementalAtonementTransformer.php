@@ -13,8 +13,12 @@ class CharacterElementalAtonementTransformer extends BaseTransformer
     public function transform(Character $character): array
     {
 
-        return [
-            'elemental_atonement' => $character->getInformation()->buildElementalAtonement(),
+        return $character->getInformation()->buildElementalAtonement() ?? [
+            'atonements' => [],
+            'highest_element' => [
+                'name' => 'N/A',
+                'damage' => 0,
+            ],
         ];
     }
 }

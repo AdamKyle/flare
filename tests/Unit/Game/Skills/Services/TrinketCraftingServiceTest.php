@@ -4,9 +4,11 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
 use App\Game\Character\CharacterInventory\Exceptions\BatchCraftingDestinationFullException;
 use App\Game\Character\Values\CharacterClass;
 use App\Game\Core\Currency\Services\CurrencyLimit;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -16,6 +18,7 @@ use App\Game\Skills\Services\ItemListCostTransformerService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
+use App\Game\Skills\Transformers\TrinketCraftingItemTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -130,6 +133,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         try {
@@ -163,6 +169,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $result = $trinketService->craftForBatch(
@@ -192,6 +201,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $result = $trinketService->craftForBatch($character->refresh(), $this->trinket, true);
@@ -216,6 +228,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $result = $trinketService->craftForBatch($character->refresh(), $this->trinket, true);
@@ -361,6 +376,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $trinketService->craft($character, $this->trinket);
@@ -414,6 +432,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $trinketService->craft($character, $this->trinket);
@@ -447,6 +468,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $trinketService->craft($character, $this->trinket);
@@ -484,6 +508,9 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(SkillCheckService::class),
             resolve(ItemListCostTransformerService::class),
             resolve(SkillService::class),
+            resolve(Pagination::class),
+            resolve(CraftingItemPreviewTransformer::class),
+            resolve(TrinketCraftingItemTransformer::class),
         );
 
         $trinketService->craft($character, $this->trinket);

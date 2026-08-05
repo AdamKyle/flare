@@ -12,7 +12,9 @@ use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Transformers\GemTransformer;
 use App\Game\Gems\Values\GemTierValue;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -26,6 +28,8 @@ class GemService
     public function __construct(
         private GemBuilder $gemBuilder,
         private readonly ChanceCalculator $chanceCalculator,
+        private readonly GemTransformer $gemTransformer,
+        private readonly ServerMessageBuilder $serverMessageBuilder,
     ) {}
 
     /**
@@ -37,11 +41,17 @@ class GemService
     {
 
         if (! $this->canAffordCost($character, $tier)) {
-            return $this->errorResult('You do not have the required currencies to craft this item.');
+            return $this->errorResult('You do not have the required currencies to craft this item.') + [
+                'craft_succeeded' => false,
+                'crafted_gem' => null,
+            ];
         }
 
         if (! $character->canAddToGemBag(1)) {
-            return $this->errorResult('Your Gem Bag is full. Use or remove gems before crafting more.');
+            return $this->errorResult('Your Gem Bag is full. Use or remove gems before crafting more.') + [
+                'craft_succeeded' => false,
+                'crafted_gem' => null,
+            ];
         }
 
         $character = $this->payForGem($character, $tier);
@@ -52,15 +62,27 @@ class GemService
 
         if ($this->skillLevelToHigh($characterSkill, $tier)) {
 
-            ServerMessageHandler::sendBasicMessage($character->user, 'This gem tier is too hard. You lost your investment and start to cry.');
+            $message = 'This gem tier is too hard. You lost your investment and start to cry.';
 
-            return $this->successResult();
+            ServerMessageHandler::sendBasicMessage($character->user, $message);
+
+            return $this->successResult([
+                'craft_succeeded' => false,
+                'crafted_gem' => null,
+                'message' => $message,
+            ]);
         }
 
         if (! $this->canCraft($characterSkill, (new GemTierValue($tier))->maxForTier()['chance'])) {
-            ServerMessageHandler::sendBasicMessage($character->user, 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.');
+            $message = 'You failed to craft the gem, the item explodes before you into a pile of wasted effort and time.';
 
-            return $this->successResult();
+            ServerMessageHandler::sendBasicMessage($character->user, $message);
+
+            return $this->successResult([
+                'craft_succeeded' => false,
+                'crafted_gem' => null,
+                'message' => $message,
+            ]);
         }
 
         $gemBagEntry = $this->giveGem($character, $tier);
@@ -71,7 +93,11 @@ class GemService
 
         ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::CRAFTED_GEM, $gemBagEntry->gem->name, $gemBagEntry->id);
 
-        return $this->successResult();
+        return $this->successResult([
+            'craft_succeeded' => true,
+            'crafted_gem' => $this->gemTransformer->transform($gemBagEntry->gem),
+            'message' => $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::CRAFTED_GEM, $gemBagEntry->gem->name),
+        ]);
     }
 
     /**

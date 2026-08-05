@@ -9,16 +9,18 @@ export default interface DropdownProps {
   items: DropdownItem[];
   on_select: (item: DropdownItem) => void;
   on_clear?: () => void;
-  is_in_modal?: boolean;
-  all_click_outside?: boolean;
-  use_pagination?: boolean;
-  use_portal?: boolean;
-  handle_scroll?: (e: React.UIEvent<HTMLDivElement>) => void;
   selection_placeholder?: string;
-  additional_scroll_css?: string;
   pre_selected_item?: DropdownItem;
   force_clear?: boolean;
   disabled?: boolean;
   focus_selected_on_open?: boolean;
   header_slot?: React.ReactNode;
+  searchable?: boolean;
+  search_value?: string;
+  on_search?: (value: string) => void;
+  can_load_more?: boolean;
+  is_loading_more?: boolean;
+  on_end_reached?: () => void;
+  empty_message?: string;
+  search_placeholder?: string;
 }

@@ -69,7 +69,6 @@ const MonsterExplorationConfiguration = () => {
         items={timeSelection}
         on_select={handleTimeSelection}
         selection_placeholder={'Select length of time'}
-        additional_scroll_css={'mb-4'}
       />
       <Dropdown
         items={attackTypes}

@@ -12,11 +12,14 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Transformers\GemTransformer;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Console\Commands\AssignNewSkillsToPlayers;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
@@ -38,9 +41,14 @@ use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
+use App\Game\Skills\Transformers\AlchemyItemTransformer;
 use App\Game\Skills\Transformers\BasicSkillsTransformer;
 use App\Game\Skills\Transformers\CraftableItemTransformer;
+use App\Game\Skills\Transformers\EnchantingAffixTransformer;
+use App\Game\Skills\Transformers\EnchantingItemTransformer;
+use App\Game\Skills\Transformers\EventEnchantingItemTransformer;
 use App\Game\Skills\Transformers\SkillsTransformer;
+use App\Game\Skills\Transformers\TrinketCraftingItemTransformer;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -113,7 +121,9 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(AlchemyService::class, function ($app) {
             return new AlchemyService(
                 $app->make(SkillCheckService::class),
-                $app->make(ItemListCostTransformerService::class)
+                $app->make(ItemListCostTransformerService::class),
+                $app->make(Pagination::class),
+                $app->make(AlchemyItemTransformer::class),
             );
         });
 
@@ -143,6 +153,9 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(SkillCheckService::class),
                 $app->make(ItemListCostTransformerService::class),
                 $app->make(SkillService::class),
+                $app->make(Pagination::class),
+                $app->make(CraftingItemPreviewTransformer::class),
+                $app->make(TrinketCraftingItemTransformer::class),
             );
         });
 
@@ -153,6 +166,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EnchantItemService::class),
                 $app->make(RandomEnchantmentService::class),
                 $app->make(GlobalEventGoalEligibilityService::class),
+                $app->make(Pagination::class),
+                $app->make(EnchantingItemTransformer::class),
+                $app->make(EventEnchantingItemTransformer::class),
+                $app->make(EnchantingAffixTransformer::class),
             );
         });
 
@@ -160,6 +177,8 @@ class ServiceProvider extends ApplicationServiceProvider
             return new GemService(
                 $app->make(GemBuilder::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(GemTransformer::class),
+                $app->make(ServerMessageBuilder::class),
             );
         });
 

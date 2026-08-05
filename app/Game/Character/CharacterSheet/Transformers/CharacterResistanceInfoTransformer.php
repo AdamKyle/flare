@@ -8,13 +8,17 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 
 class CharacterResistanceInfoTransformer extends BaseTransformer
 {
+    public function __construct(
+        private readonly CharacterStatBuilder $characterStatBuilder,
+    ) {}
+
     /**
      * Gets the response data for the character sheet
      */
     public function transform(Character $character): array
     {
 
-        $characterStatBuilder = resolve(CharacterStatBuilder::class)->setCharacter($character);
+        $characterStatBuilder = $this->characterStatBuilder->setCharacter($character);
 
         return [
             'spell_evasion' => $characterStatBuilder->reductionInfo()->getRingReduction('spell_evasion'),

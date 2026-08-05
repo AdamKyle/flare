@@ -2,13 +2,17 @@ import React, { ReactNode } from 'react';
 
 import AlchemyCostSummary from './alchemy-cost-summary';
 import AlchemyItemSelection from './alchemy-item-selection';
+import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
+import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
+import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useAlchemyFlow } from '../hooks/use-alchemy-flow';
 
+import { formatNumberWithCommas } from 'game-utils/format-number';
+
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
@@ -23,6 +27,12 @@ const AlchemyFlow = (): ReactNode => {
     selectedItem,
     transmuting,
     canTransmute,
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    itemsApi,
+    alchemyResult,
     selectItem,
     transmuteItem,
   } = useAlchemyFlow();
@@ -41,54 +51,89 @@ const AlchemyFlow = (): ReactNode => {
   );
 
   const renderAlerts = (): ReactNode => {
-    if (!error && !mutationError && !status) {
+    if (!error && !mutationError) {
       return null;
     }
 
     return (
-      <>
-        {(error || mutationError) && (
-          <Alert variant={AlertVariant.DANGER}>{error ?? mutationError}</Alert>
-        )}
-        {status && <Alert variant={AlertVariant.SUCCESS}>{status}</Alert>}
-      </>
+      <Alert variant={AlertVariant.DANGER}>{error ?? mutationError}</Alert>
     );
   };
 
-  const renderEmptyState = (): ReactNode => (
-    <p>No Alchemy items are currently available.</p>
+  const renderItemSelection = (): ReactNode => (
+    <AlchemyItemSelection
+      items={itemsApi.items}
+      selectedItemId={selectedItem?.id ?? null}
+      loading={itemsApi.loading}
+      isLoadingMore={itemsApi.isLoadingMore}
+      canLoadMore={itemsApi.canLoadMore}
+      searchText={itemsApi.searchText}
+      onSearch={itemsApi.setSearchText}
+      onEndReached={itemsApi.onEndReached}
+      onSelect={selectItem}
+    />
   );
 
-  const renderItemSelection = (
-    currentData: NonNullable<typeof data>
-  ): ReactNode => {
-    if (currentData.items.length === 0) {
-      return renderEmptyState();
-    }
-
-    return (
-      <AlchemyItemSelection
-        items={currentData.items}
-        selectedItemId={selectedItem?.id ?? null}
-        onSelect={selectItem}
-      />
-    );
-  };
-
-  const renderCostSummary = (): ReactNode => {
+  const renderPreview = (): ReactNode => {
     if (!selectedItem) {
       return null;
     }
 
-    return <AlchemyCostSummary item={selectedItem} />;
+    return (
+      <CraftingActionPreview
+        title="Item preview"
+        description="You will attempt to create one of this item."
+      >
+        <p className="font-semibold text-gray-900 dark:text-gray-100">
+          {selectedItem.name}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Type: {selectedItem.type} &bull; Quantity Attempted: 1
+        </p>
+        <AlchemyCostSummary item={selectedItem} />
+      </CraftingActionPreview>
+    );
+  };
+
+  const renderResult = (): ReactNode => {
+    if (!status && !alchemyResult) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.SUCCESS}>
+        {alchemyResult ? (
+          <span>
+            {'You created '}
+            <strong>
+              {formatNumberWithCommas(alchemyResult.amount_created)}
+            </strong>
+            {' x '}
+            {alchemyResult.name}
+            {'. You now own '}
+            {formatNumberWithCommas(alchemyResult.current_amount)}
+            {'.'}
+          </span>
+        ) : (
+          <span>{status}</span>
+        )}
+      </Alert>
+    );
   };
 
   const renderAction = (): ReactNode => (
-    <Button
-      label={transmuting ? 'Transmuting…' : 'Transmute'}
+    <CraftingProgressActionButton
+      idle_label="Transmute"
+      submitting_label="Transmuting…"
+      timeout_label="Transmute again"
+      submitting={transmuting}
+      is_timeout_active={isTimeoutActive}
+      progress={progress}
+      formatted_remaining={formattedRemaining}
+      disabled={!canTransmute || isCraftingDisabled}
       on_click={() => void transmuteItem()}
       variant={ButtonVariant.PRIMARY}
-      disabled={!canTransmute}
+      additional_css="w-full sm:w-auto"
     />
   );
 
@@ -103,22 +148,6 @@ const AlchemyFlow = (): ReactNode => {
     </a>
   );
 
-  const renderContent = (currentData: NonNullable<typeof data>): ReactNode => (
-    <>
-      <CraftingSkillXpProgress xp={currentData.skill_xp} />
-      <CraftingInventoryProgress
-        inventory_count={currentData.inventory_count}
-      />
-
-      {renderItemSelection(currentData)}
-      {renderCostSummary()}
-
-      {renderAction()}
-
-      {renderHelpLink()}
-    </>
-  );
-
   if (loading) {
     return renderLoadingState();
   }
@@ -128,12 +157,25 @@ const AlchemyFlow = (): ReactNode => {
   }
 
   return (
-    <div className="space-y-4 text-gray-900 dark:text-gray-100">
-      <h2 className="text-xl font-semibold">Alchemy</h2>
-
-      {renderAlerts()}
-      {renderContent(data)}
-    </div>
+    <CraftingActionLayout
+      heading={
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Alchemy
+        </h2>
+      }
+      status={renderAlerts()}
+      progress={
+        <div className="space-y-2">
+          <CraftingSkillXpProgress xp={data.skill_xp} />
+          <CraftingInventoryProgress inventory_count={data.inventory_count} />
+        </div>
+      }
+      form={renderItemSelection()}
+      preview={renderPreview()}
+      result={renderResult()}
+      action={renderAction()}
+      help_link={renderHelpLink()}
+    />
   );
 };
 

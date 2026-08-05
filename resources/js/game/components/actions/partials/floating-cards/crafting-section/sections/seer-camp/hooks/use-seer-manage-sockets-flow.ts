@@ -2,26 +2,27 @@ import { useMemo, useState } from 'react';
 
 import UseSeerManageSocketsFlowDefinition from './definitions/use-seer-manage-sockets-flow-definition';
 import UseSeerManageSocketsFlowParams from './definitions/use-seer-manage-sockets-flow-params';
+import CraftingItemPreviewDefinition from '../../../shared/api/definitions/crafting-item-preview-definition';
 import { SeerCampApiUrls } from '../api/enums/seer-camp-api-urls';
 import { useSeerActionApi } from '../api/hooks/use-seer-action-api';
-
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import { useSeerItemsApi } from '../api/hooks/use-seer-items-api';
 
 export const useSeerManageSocketsFlow = ({
   characterId,
-  items,
   onSuccess,
 }: UseSeerManageSocketsFlowParams): UseSeerManageSocketsFlowDefinition => {
   const [slotId, setSlotId] = useState<number | null>(null);
+  const [resultPreview, setResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
+
+  const itemsApi = useSeerItemsApi({
+    character_id: characterId,
+    purpose: 'sockets',
+  });
 
   const selectedItem = useMemo(
-    () => items.find((item) => item.slot_id === slotId) ?? null,
-    [items, slotId]
-  );
-
-  const options = useMemo<DropdownItem[]>(
-    () => items.map((item) => ({ label: item.name, value: item.slot_id })),
-    [items]
+    () => itemsApi.loadedItems.find((item) => item.slot_id === slotId) ?? null,
+    [itemsApi.loadedItems, slotId]
   );
 
   const {
@@ -38,22 +39,27 @@ export const useSeerManageSocketsFlow = ({
 
   const selectItem = (nextSlotId: number): void => {
     setSlotId(nextSlotId);
+    setResultPreview(null);
   };
 
   const submit = async (): Promise<void> => {
+    setResultPreview(null);
+
     const response = await submitAction();
 
     if (response) {
       onSuccess(response);
+      setResultPreview(response.result_preview ?? null);
     }
   };
 
   return {
     selectedItem,
-    options,
+    itemsApi,
     submitting,
     error,
     canSubmit,
+    resultPreview,
     selectItem,
     submit,
   };

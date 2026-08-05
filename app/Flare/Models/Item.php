@@ -238,8 +238,8 @@ class Item extends Model
 
     public function getAffixNameAttribute()
     {
-        $itemPrefix = ItemAffix::find($this->item_prefix_id);
-        $itemSuffix = ItemAffix::find($this->item_suffix_id);
+        $itemPrefix = $this->itemPrefix;
+        $itemSuffix = $this->itemSuffix;
         $itemName = '';
 
         if (! is_null($itemPrefix)) {

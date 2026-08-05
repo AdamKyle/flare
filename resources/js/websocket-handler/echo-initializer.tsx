@@ -11,6 +11,10 @@ export default class EchoInitializer implements EchoInitializerDefinition {
    * @throws Error - if csrf token is missing.
    */
   public initialize(): void {
+    if (this.echo) {
+      return;
+    }
+
     let token: HTMLMetaElement | null = document.head.querySelector(
       'meta[name="csrf-token"]'
     );

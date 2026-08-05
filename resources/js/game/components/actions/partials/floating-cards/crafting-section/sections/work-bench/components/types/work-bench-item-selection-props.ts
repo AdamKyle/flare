@@ -1,7 +1,13 @@
-import WorkBenchInventorySlotDefinition from '../../api/definitions/work-bench-inventory-slot-definition';
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 export default interface WorkBenchItemSelectionProps {
-  items: WorkBenchInventorySlotDefinition[];
+  items: DropdownItem[];
   selectedSlotId: number | null;
-  onSelect: (slotId: number) => void;
+  loading: boolean;
+  isLoadingMore: boolean;
+  canLoadMore: boolean;
+  searchText: string;
+  onSearch: (value: string) => void;
+  onEndReached: () => void;
+  onSelect: (itemId: number) => void;
 }

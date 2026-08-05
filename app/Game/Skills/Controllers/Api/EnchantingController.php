@@ -3,8 +3,13 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GlobalEventCraftingInventorySlot;
+use App\Flare\Models\InventorySlot;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Messages\Types\CraftingMessageTypes;
+use App\Game\Skills\Requests\EnchantingAffixesRequest;
+use App\Game\Skills\Requests\EnchantingItemsRequest;
 use App\Game\Skills\Requests\EnchantingValidation;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\EnchantingService;
@@ -20,7 +25,11 @@ class EnchantingController extends Controller
      *
      * @return void
      */
-    public function __construct(private EnchantingService $enchantingService, private CraftingService $craftingService) {}
+    public function __construct(
+        private EnchantingService $enchantingService,
+        private CraftingService $craftingService,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+    ) {}
 
     public function fetchAffixes(Character $character): JsonResponse
     {
@@ -29,6 +38,20 @@ class EnchantingController extends Controller
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
             'inventory_count' => $this->craftingService->getInventoryCount($character),
         ]);
+    }
+
+    public function items(EnchantingItemsRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->enchantingService->fetchPaginatedItems($character, $request->source, $request->per_page, $request->page, $request->search_text)
+        );
+    }
+
+    public function affixes(EnchantingAffixesRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->enchantingService->fetchPaginatedAffixes($character, $request->type, $request->per_page, $request->page, $request->search_text)
+        );
     }
 
     /**
@@ -59,6 +82,7 @@ class EnchantingController extends Controller
                 'affixes' => $this->enchantingService->fetchAffixes($character->refresh(), true, false),
                 'skill_xp' => $this->enchantingService->getEnchantingXP($character),
                 'enchant_succeeded' => false,
+                'result_preview' => null,
             ]);
         }
 
@@ -73,6 +97,22 @@ class EnchantingController extends Controller
             'skill_xp' => $this->enchantingService->getEnchantingXP($character),
             'inventory_count' => $this->craftingService->getInventoryCount($character),
             'enchant_succeeded' => $enchantSucceeded,
+            'result_preview' => $this->buildResultPreview($enchantSucceeded, $slot),
         ]);
+    }
+
+    private function buildResultPreview(bool $enchantSucceeded, InventorySlot|GlobalEventCraftingInventorySlot $slot): ?array
+    {
+        if (! $enchantSucceeded) {
+            return null;
+        }
+
+        $refreshedSlot = $slot->fresh(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks']);
+
+        if (is_null($refreshedSlot) || is_null($refreshedSlot->item)) {
+            return null;
+        }
+
+        return $this->craftingItemPreviewTransformer->transform($refreshedSlot->item, $refreshedSlot->id);
     }
 }

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import UseSeerAttachGemFlowDefinition from './definitions/use-seer-attach-gem-flow-definition';
 import UseSeerAttachGemFlowParams from './definitions/use-seer-attach-gem-flow-params';
@@ -8,13 +8,11 @@ import ReplaceGemOnItemRequestDefinition from '../api/definitions/replace-gem-on
 import { SeerCampApiUrls } from '../api/enums/seer-camp-api-urls';
 import { useGemComparisonApi } from '../api/hooks/use-gem-comparison-api';
 import { useSeerActionApi } from '../api/hooks/use-seer-action-api';
-
-import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import { useSeerGemsApi } from '../api/hooks/use-seer-gems-api';
+import { useSeerItemsApi } from '../api/hooks/use-seer-items-api';
 
 export const useSeerAttachGemFlow = ({
   characterId,
-  items,
-  gems,
   onSuccess,
 }: UseSeerAttachGemFlowParams): UseSeerAttachGemFlowDefinition => {
   const {
@@ -23,6 +21,12 @@ export const useSeerAttachGemFlow = ({
     compare,
   } = useGemComparisonApi({ characterId });
 
+  const itemsApi = useSeerItemsApi({
+    character_id: characterId,
+    purpose: 'attach',
+  });
+  const gemsApi = useSeerGemsApi({ character_id: characterId });
+
   const [slotId, setSlotId] = useState<number | null>(null);
   const [gemSlotId, setGemSlotId] = useState<number | null>(null);
   const [replaceId, setReplaceId] = useState<number | null>(null);
@@ -30,24 +34,6 @@ export const useSeerAttachGemFlow = ({
     useState<GemComparisonApiResponseDefinition | null>(null);
 
   const comparisonRequestIdRef = useRef(0);
-
-  const itemOptions = useMemo<DropdownItem[]>(
-    () =>
-      items.map((item) => ({
-        label: `${item.name} (${item.socket_amount} sockets)`,
-        value: item.slot_id,
-      })),
-    [items]
-  );
-
-  const gemOptions = useMemo<DropdownItem[]>(
-    () =>
-      gems.map((gem) => ({
-        label: `${gem.name} (Amount: ${gem.amount}, Tier: ${gem.tier})`,
-        value: gem.slot_id,
-      })),
-    [gems]
-  );
 
   const addRequest: AddGemToItemRequestDefinition | null =
     slotId !== null && gemSlotId !== null
@@ -151,8 +137,8 @@ export const useSeerAttachGemFlow = ({
     addSubmitting: addApi.submitting,
     replaceSubmitting: replaceApi.submitting,
     canReplace: replaceRequest !== null,
-    itemOptions,
-    gemOptions,
+    itemsApi,
+    gemsApi,
     selectSlot,
     selectGemSlot,
     selectReplaceGem,

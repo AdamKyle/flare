@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react';
 
 import UseAlchemyFlowDefinition from './definitions/use-alchemy-flow-definition';
 import { useCraftingTimeout } from '../../../shared/hooks/use-crafting-timeout';
+import AlchemyResultDefinition from '../api/definitions/alchemy-result-definition';
 import { useAlchemyApi } from '../api/hooks/use-alchemy-api';
+import { useAlchemyItemsApi } from '../api/hooks/use-alchemy-items-api';
 import { useTransmuteItemApi } from '../api/hooks/use-transmute-item-api';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -15,19 +17,22 @@ export const useAlchemyFlow = (): UseAlchemyFlowDefinition => {
 
   const { data, loading, error, replaceData } = useAlchemyApi({ characterId });
 
-  const { isCraftingDisabled } = useCraftingTimeout(character);
+  const itemsApi = useAlchemyItemsApi({ character_id: characterId });
+
+  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
+    useCraftingTimeout(character);
 
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [alchemyResult, setAlchemyResult] =
+    useState<AlchemyResultDefinition | null>(null);
 
   const selectedItem = useMemo(
     () =>
-      data
-        ? (data.items.find((item) => item.id === selectedItemId) ??
-          data.items[0] ??
-          null)
-        : null,
-    [data, selectedItemId]
+      itemsApi.loadedItems.find((item) => item.id === selectedItemId) ??
+      itemsApi.loadedItems[0] ??
+      null,
+    [itemsApi.loadedItems, selectedItemId]
   );
 
   const isFactionLoyaltyAutomationRunning =
@@ -51,9 +56,12 @@ export const useAlchemyFlow = (): UseAlchemyFlowDefinition => {
   const selectItem = (itemId: number): void => {
     setSelectedItemId(itemId);
     setStatus(null);
+    setAlchemyResult(null);
   };
 
   const transmuteItem = async (): Promise<void> => {
+    setAlchemyResult(null);
+
     const response = await transmute();
 
     if (!response) {
@@ -62,6 +70,7 @@ export const useAlchemyFlow = (): UseAlchemyFlowDefinition => {
 
     replaceData(response);
     setStatus(response.message ?? 'Your transmutation request was completed.');
+    setAlchemyResult(response.alchemy_result ?? null);
   };
 
   return {
@@ -73,6 +82,12 @@ export const useAlchemyFlow = (): UseAlchemyFlowDefinition => {
     selectedItem,
     transmuting,
     canTransmute,
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    itemsApi,
+    alchemyResult,
     selectItem,
     transmuteItem,
   };

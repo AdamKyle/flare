@@ -30,4 +30,24 @@ class GameAutomationChannelAuthorizationTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    public function test_user_can_authorize_their_own_automation_log_update_channel(): void
+    {
+        $user = $this->createUser();
+
+        $callback = Broadcast::driver()->getChannels()->get('automation-log-update-{userId}');
+        $result = $callback($user, $user->id);
+
+        $this->assertTrue($result);
+    }
+
+    public function test_user_cannot_authorize_another_users_automation_log_update_channel(): void
+    {
+        $user = $this->createUser();
+
+        $callback = Broadcast::driver()->getChannels()->get('automation-log-update-{userId}');
+        $result = $callback($user, $user->id + 1);
+
+        $this->assertFalse($result);
+    }
 }

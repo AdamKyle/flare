@@ -96,7 +96,7 @@
       to the raid boss
     </p>
     @livewire(
-      'info.items.raid-items-for-type',
+      'admin.items.raid-items-for-type',
       [
         'type' => $raid->item_specialty_reward_type,
       ]

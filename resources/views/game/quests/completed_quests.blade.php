@@ -9,6 +9,11 @@
       link="Game"
     ></x-core.page.title>
 
-    @livewire('character.completed-quests.completed-quests')
+    <x-core.tables.data-table
+      :paginator="$paginator"
+      :columns="$columns"
+      :searchable="true"
+      empty-message="No completed quests yet."
+    />
   </x-core.layout.info-container>
 @endsection

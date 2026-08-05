@@ -1,4 +1,4 @@
-import CraftableItemDefinition from '../../api/definitions/craftable-item-definition';
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 
 export default interface CraftResultAlertProps {
   characterId: number;
@@ -6,5 +6,5 @@ export default interface CraftResultAlertProps {
   error: string | null;
   successMessage: string | null;
   craftedInventorySlotId: number | null;
-  craftedItemDetails: CraftableItemDefinition | null;
+  resultPreview: CraftingItemPreviewDefinition | null;
 }

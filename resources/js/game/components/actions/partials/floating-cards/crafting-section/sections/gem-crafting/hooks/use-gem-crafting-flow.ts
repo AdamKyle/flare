@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import UseGemCraftingFlowDefinition from './definitions/use-gem-crafting-flow-definition';
+import CondensedGemDetails from '../../../../../../../../api-definitions/items/condensed-gem-details';
 import { useCraftingTimeout } from '../../../shared/hooks/use-crafting-timeout';
 import { useCraftGemApi } from '../api/hooks/use-craft-gem-api';
 import { useGemCraftingApi } from '../api/hooks/use-gem-crafting-api';
@@ -17,7 +18,8 @@ export const useGemCraftingFlow = (): UseGemCraftingFlowDefinition => {
     characterId,
   });
 
-  const { isCraftingDisabled } = useCraftingTimeout(character);
+  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
+    useCraftingTimeout(character);
 
   const {
     crafting,
@@ -27,6 +29,10 @@ export const useGemCraftingFlow = (): UseGemCraftingFlowDefinition => {
 
   const [selectedTier, setSelectedTier] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [craftSucceeded, setCraftSucceeded] = useState<boolean>(false);
+  const [craftedGem, setCraftedGem] = useState<CondensedGemDetails | null>(
+    null
+  );
 
   const effectiveSelectedTier =
     data && selectedTier !== null && selectedTier <= data.tiers.length
@@ -50,12 +56,17 @@ export const useGemCraftingFlow = (): UseGemCraftingFlowDefinition => {
   const selectTier = (tier: number): void => {
     setSelectedTier(tier);
     setStatus(null);
+    setCraftSucceeded(false);
+    setCraftedGem(null);
   };
 
   const craftGem = async (): Promise<void> => {
     if (effectiveSelectedTier === null) {
       return;
     }
+
+    setCraftSucceeded(false);
+    setCraftedGem(null);
 
     const response = await craft(effectiveSelectedTier);
 
@@ -65,6 +76,10 @@ export const useGemCraftingFlow = (): UseGemCraftingFlowDefinition => {
 
     replaceData(response);
     setStatus(response.message ?? 'Your Gem crafting request was completed.');
+    setCraftSucceeded(response.craft_succeeded === true);
+    setCraftedGem(
+      response.craft_succeeded === true ? (response.crafted_gem ?? null) : null
+    );
   };
 
   return {
@@ -77,6 +92,12 @@ export const useGemCraftingFlow = (): UseGemCraftingFlowDefinition => {
     selectedTierData,
     crafting,
     canCraft,
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    craftSucceeded,
+    craftedGem,
     selectTier,
     craftGem,
   };

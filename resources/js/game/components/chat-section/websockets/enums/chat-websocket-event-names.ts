@@ -1,6 +1,6 @@
 export enum ChatWebsocketEventNames {
   SERVER = 'Game.Messages.Events.ServerMessageEvent',
-  EXPLORATION = 'Game.Exploration.Events.ExplorationLogUpdate',
+  AUTOMATION_LOG = 'Game.Automation.Events.AutomationLogUpdate',
   ANNOUNCEMENT = 'Game.Messages.Events.AnnouncementMessageEvent',
   NPC_MESSAGE = 'Game.Messages.Events.NPCMessageEvent',
   PRIVATE_MESSAGE = 'Game.Messages.Events.PrivateMessageEvent',

@@ -1,6 +1,7 @@
+import CondensedGemDetails from '../../../../../../../../../api-definitions/items/condensed-gem-details';
+
 export default interface SeerGemDefinition {
-  name: string;
-  amount: number;
-  tier: number;
   slot_id: number;
+  amount: number;
+  gem: CondensedGemDetails;
 }

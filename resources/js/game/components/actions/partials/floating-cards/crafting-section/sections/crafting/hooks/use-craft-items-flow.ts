@@ -50,7 +50,7 @@ export const useCraftItemsFlow = ({
     successMessage,
     craftingResponse,
     craftedInventorySlotId,
-    craftedItemDetails,
+    resultPreview,
     craftItem,
     clearMessages,
   } = useCraftItemApi({ characterId, selectedItem });
@@ -191,7 +191,7 @@ export const useCraftItemsFlow = ({
       error,
       successMessage,
       craftedInventorySlotId,
-      craftedItemDetails,
+      resultPreview,
       isCrafting,
     },
     progress: {

@@ -17,7 +17,7 @@ const CraftResultAlert = ({
   error,
   successMessage,
   craftedInventorySlotId,
-  craftedItemDetails,
+  resultPreview,
 }: CraftResultAlertProps): ReactNode => {
   const { openServerMessageItem } = useOpenItemDetails();
 
@@ -30,22 +30,22 @@ const CraftResultAlert = ({
   };
 
   const renderSuccessContent = (): ReactNode => {
-    if (!craftedInventorySlotId || !craftedItemDetails) {
+    if (!craftedInventorySlotId || !resultPreview) {
       return <span>{successMessage}</span>;
     }
 
-    const itemColorClass = planeTextItemColors(craftedItemDetails);
+    const itemColorClass = planeTextItemColors(resultPreview);
 
     return (
       <span>
         {'You successfully crafted '}
         <button
           type="button"
-          aria-label={`View ${craftedItemDetails.name} details`}
+          aria-label={`View ${resultPreview.name} details`}
           className={clsx(baseStyles(), itemColorClass)}
           onClick={handleViewCraftedItem}
         >
-          {craftedItemDetails.name}
+          {resultPreview.name}
         </button>
         {'.'}
       </span>

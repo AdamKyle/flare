@@ -5,41 +5,38 @@ import ResistanceInfoDefinition from 'game-data/api-data-definitions/character/r
 
 export default interface CharacterSheetDefinition {
   id: number;
-  user_id?: number;
+  user_id: number;
   game_map_id: number;
   name: string;
   class: string;
   class_id: number;
-  class_bonus_chance: number;
   race: string;
   race_id: number;
+  to_hit_stat: string;
+  damage_stat: string;
   level: number;
   max_level: number;
   xp: number;
   xp_next: number;
-  to_hit_stat: string;
-  ac: number;
-  attack: number;
-  health: number;
-  resurrection_chance: number;
-  gold: number;
-  gold_dust: number;
-  shards: number;
-  copper_coins: number;
+  class_bonus_chance: number;
   str_raw: number;
-  dex_raw: number;
-  int_raw: number;
   dur_raw: number;
-  agi_raw: number;
+  dex_raw: number;
   chr_raw: number;
+  int_raw: number;
+  agi_raw: number;
   focus_raw: number;
   str_modded: number;
-  dex_modded: number;
-  int_modded: number;
   dur_modded: number;
-  agi_modded: number;
+  dex_modded: number;
   chr_modded: number;
+  int_modded: number;
+  agi_modded: number;
   focus_modded: number;
+  attack: number;
+  ac: number;
+  health: number;
+  resurrection_chance: number;
   weapon_attack: number;
   voided_weapon_attack: number;
   ring_damage: number;
@@ -47,7 +44,12 @@ export default interface CharacterSheetDefinition {
   voided_spell_damage: number;
   healing_amount: number;
   voided_healing_amount: number;
+  gold: number;
+  gold_dust: number;
+  shards: number;
+  copper_coins: number;
   gold_bars: number;
+  map_name: string;
   inventory_count: InventoryCountDefinition;
   resistance_info: ResistanceInfoDefinition;
   elemental_atonements: ElementalAtonementDefinition;
@@ -74,6 +76,4 @@ export default interface CharacterSheetDefinition {
     required_amount?: number;
     current_amount?: number;
   }>;
-
-  map_name: string;
 }

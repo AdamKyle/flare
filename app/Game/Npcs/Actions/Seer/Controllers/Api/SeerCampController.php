@@ -4,10 +4,12 @@ namespace App\Game\Npcs\Actions\Seer\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Npcs\Actions\Seer\Requests\AddGemToItemRequest;
 use App\Game\Npcs\Actions\Seer\Requests\RemoveGemFromItemRequest;
 use App\Game\Npcs\Actions\Seer\Requests\ReplaceGemOnItemRequest;
 use App\Game\Npcs\Actions\Seer\Requests\RollItemSocketsRequest;
+use App\Game\Npcs\Actions\Seer\Requests\SeerItemsRequest;
 use App\Game\Npcs\Actions\Seer\Services\SeerService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -28,6 +30,27 @@ class SeerCampController extends Controller
             'gems' => $this->seerService->getGems($character),
             'costs' => $this->seerService->getCosts(),
         ]);
+    }
+
+    public function items(SeerItemsRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->seerService->fetchPaginatedItems($character, $request->purpose, $request->per_page, $request->page, $request->search_text)
+        );
+    }
+
+    public function gems(PaginationRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->seerService->fetchPaginatedGems($character, $request->per_page, $request->page, $request->search_text)
+        );
+    }
+
+    public function itemsWithGems(PaginationRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->seerService->fetchPaginatedItemsWithGems($character, $request->per_page, $request->page, $request->search_text)
+        );
     }
 
     public function rollSockets(Character $character, RollItemSocketsRequest $request): JsonResponse

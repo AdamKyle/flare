@@ -4,11 +4,11 @@ import { useState } from 'react';
 
 import { normalizeCraftingType } from '../../utils/normalize-crafting-type';
 import CraftItemRequestDefinition from '../definitions/craft-item-request-definition';
-import CraftableItemDefinition from '../definitions/craftable-item-definition';
 import CraftingApiResponseDefinition from '../definitions/crafting-api-response-definition';
 import { CraftingApiUrls } from '../enums/crafting-api-urls';
 import UseCraftItemApiDefinition from './definitions/use-craft-item-api-definition';
 import UseCraftItemApiParams from './definitions/use-craft-item-api-params';
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -33,8 +33,8 @@ export const useCraftItemApi = ({
   const [craftedInventorySlotId, setCraftedInventorySlotId] = useState<
     number | null
   >(null);
-  const [craftedItemDetails, setCraftedItemDetails] =
-    useState<CraftableItemDefinition | null>(null);
+  const [resultPreview, setResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
 
   const craftItem = async (craftForNpc: boolean, craftForEvent: boolean) => {
     if (!selectedItem) {
@@ -46,7 +46,7 @@ export const useCraftItemApi = ({
     setSuccessMessage(null);
     setCraftingResponse(null);
     setCraftedInventorySlotId(null);
-    setCraftedItemDetails(null);
+    setResultPreview(null);
 
     const url = getUrl(CraftingApiUrls.CRAFT_ITEM, { character: characterId });
 
@@ -70,12 +70,14 @@ export const useCraftItemApi = ({
 
       setCraftingResponse(result);
       setCraftedInventorySlotId(result.crafted_inventory_slot_id ?? null);
-      setCraftedItemDetails(result.crafted_item_details ?? null);
+      setResultPreview(result.result_preview ?? null);
 
       if (result.crafted_item) {
-        setSuccessMessage(`You successfully crafted ${selectedItem.name}.`);
+        setSuccessMessage(
+          `You successfully crafted ${selectedItem.preview.name}.`
+        );
       } else {
-        setError(`You failed to craft ${selectedItem.name}.`);
+        setError(`You failed to craft ${selectedItem.preview.name}.`);
       }
     } catch (requestError) {
       setError(getErrorMessage(requestError));
@@ -89,7 +91,7 @@ export const useCraftItemApi = ({
     setSuccessMessage(null);
     setCraftingResponse(null);
     setCraftedInventorySlotId(null);
-    setCraftedItemDetails(null);
+    setResultPreview(null);
   };
 
   return {
@@ -98,7 +100,7 @@ export const useCraftItemApi = ({
     successMessage,
     craftingResponse,
     craftedInventorySlotId,
-    craftedItemDetails,
+    resultPreview,
     craftItem,
     clearMessages,
   };

@@ -2,6 +2,7 @@ import SeerGemRemovalItemDefinition, {
   SeerAtonementChangeDefinition,
 } from '../../api/definitions/seer-gem-removal-item-definition';
 import SeerItemDefinition from '../../api/definitions/seer-item-definition';
+import UseSeerItemsWithGemsApiDefinition from '../../api/hooks/definitions/use-seer-items-with-gems-api-definition';
 
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
@@ -11,7 +12,7 @@ export default interface UseSeerRemoveGemsFlowDefinition {
   selectedItem: SeerItemDefinition | null;
   selectedDetails: SeerGemRemovalItemDefinition | null;
   selectedChange: SeerAtonementChangeDefinition | null;
-  itemOptions: DropdownItem[];
+  itemsApi: UseSeerItemsWithGemsApiDefinition;
   gemOptions: DropdownItem[];
   isRemovingOne: boolean;
   isRemovingAll: boolean;

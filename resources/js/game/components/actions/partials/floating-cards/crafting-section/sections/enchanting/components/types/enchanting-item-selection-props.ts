@@ -1,10 +1,13 @@
-import EnchantingEventItemDefinition from '../../api/definitions/enchanting-event-item-definition';
-import EnchantingInventoryItemDefinition from '../../api/definitions/enchanting-inventory-item-definition';
-import { EnchantingItemSource } from '../../enums/enchanting-item-source';
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+
 export default interface EnchantingItemSelectionProps {
-  regularItems: EnchantingInventoryItemDefinition[];
-  eventItems: EnchantingEventItemDefinition[];
-  source: EnchantingItemSource;
+  items: DropdownItem[];
   selectedSlotId: number | null;
+  loading: boolean;
+  isLoadingMore: boolean;
+  canLoadMore: boolean;
+  searchText: string;
+  onSearch: (value: string) => void;
+  onEndReached: () => void;
   onSelect: (id: number) => void;
 }

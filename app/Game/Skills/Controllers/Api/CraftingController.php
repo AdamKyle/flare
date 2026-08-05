@@ -3,10 +3,11 @@
 namespace App\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Item;
+use App\Flare\Models\InventorySlot;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Events\Concerns\ShouldShowCraftingEventButton;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
@@ -17,12 +18,17 @@ use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class CraftingController extends Controller
 {
     use ChecksAutomationRestrictions, FactionLoyalty, ShouldShowCraftingEventButton;
 
-    public function __construct(private CraftingService $craftingService) {}
+    public function __construct(
+        private CraftingService $craftingService,
+        private readonly CraftableItemTransformer $craftableItemTransformer,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+    ) {}
 
     /**
      * @throws Exception
@@ -56,7 +62,7 @@ class CraftingController extends Controller
         }
 
         return response()->json([
-            'items' => $this->craftingService->fetchCraftableItems($character, $request->all()),
+            'items' => $this->transformCraftableItems($this->craftingService->fetchCraftableItems($character, $request->all())),
             'xp' => $this->craftingService->getCraftingXP($character, $request->crafting_type),
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->crafting_type),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
@@ -105,7 +111,7 @@ class CraftingController extends Controller
         }
 
         return response()->json([
-            'items' => $this->craftingService->fetchCraftableItems($character, $craftingParams),
+            'items' => $this->transformCraftableItems($this->craftingService->fetchCraftableItems($character, $craftingParams)),
             'xp' => $this->craftingService->getCraftingXP($character, $craftingTypeForClass),
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $craftingTypeForClass),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
@@ -133,8 +139,7 @@ class CraftingController extends Controller
         $crafted = $craftingService->craft($character, $request->all());
 
         $craftedInventorySlotId = $craftingService->getLastCraftedInventorySlotId();
-        $craftedItem = Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks'])->find($request->item_to_craft);
-        $craftedItemDetails = $craftedItem ? (new CraftableItemTransformer)->transform($craftedItem) : null;
+        $resultPreview = $this->buildResultPreview($craftedInventorySlotId);
 
         $perPage = $request->input('per_page');
 
@@ -161,19 +166,19 @@ class CraftingController extends Controller
                 'inventory_count' => $this->craftingService->getInventoryCount($character),
                 'crafted_item' => $crafted,
                 'crafted_inventory_slot_id' => $craftedInventorySlotId,
-                'crafted_item_details' => $craftedItemDetails,
+                'result_preview' => $resultPreview,
             ]), 200);
         }
 
         return response()->json([
-            'items' => $this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type], false),
+            'items' => $this->transformCraftableItems($this->craftingService->fetchCraftableItems($character->refresh(), ['crafting_type' => $request->type], false)),
             'xp' => $this->craftingService->getCraftingXP($character, $request->type),
             'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
             'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->type),
             'inventory_count' => $this->craftingService->getInventoryCount($character),
             'crafted_item' => $crafted,
             'crafted_inventory_slot_id' => $craftedInventorySlotId,
-            'crafted_item_details' => $craftedItemDetails,
+            'result_preview' => $resultPreview,
         ], 200);
     }
 
@@ -185,5 +190,28 @@ class CraftingController extends Controller
         $filteredWeapons = array_values(array_filter($craftingTypes, fn ($type) => in_array($type, $validWeapons)));
 
         return count($filteredWeapons) === 1 ? $filteredWeapons[0] : $filteredWeapons;
+    }
+
+    private function transformCraftableItems(iterable $items): array
+    {
+        return (new Collection($items))
+            ->map(fn ($item) => $this->craftableItemTransformer->transform($item))
+            ->values()
+            ->all();
+    }
+
+    private function buildResultPreview(?int $inventorySlotId): ?array
+    {
+        if (is_null($inventorySlotId)) {
+            return null;
+        }
+
+        $slot = InventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks'])->find($inventorySlotId);
+
+        if (is_null($slot) || is_null($slot->item)) {
+            return null;
+        }
+
+        return $this->craftingItemPreviewTransformer->transform($slot->item, $slot->id);
     }
 }

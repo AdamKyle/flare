@@ -57,6 +57,7 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ClassRanks
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
+use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
@@ -135,6 +136,7 @@ class ServiceProvider extends ApplicationServiceProvider
             return new CharacterSheetBaseInfoTransformer(
                 $app->make(CharacterStatBuilder::class),
                 $app->make(AttackTimerService::class),
+                $app->make(CharacterInventoryCountTransformer::class),
             );
         });
 

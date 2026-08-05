@@ -4,11 +4,13 @@ namespace Tests\Feature\Game\Skills\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
+use App\Flare\Models\ItemSkill;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Mockery;
@@ -66,6 +68,68 @@ class EnchantingControllerTest extends TestCase
 
         $this->assertEquals($jsonData['affixes']['affixes'][0]['id'], $affix->id);
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
+    }
+
+    public function test_paginated_items_endpoint_respects_per_page_search_and_source_filter()
+    {
+        $itemOne = $this->createItem(['type' => 'body', 'name' => 'Alpha Chestplate']);
+        $itemTwo = $this->createItem(['type' => 'body', 'name' => 'Beta Chestplate']);
+        $itemThree = $this->createItem(['type' => 'body', 'name' => 'Gamma Chestplate']);
+
+        foreach ([$itemOne, $itemTwo, $itemThree] as $item) {
+            $this->character->inventory->slots()->create([
+                'inventory_id' => $this->character->inventory->id,
+                'item_id' => $item->id,
+            ]);
+        }
+
+        $firstPage = $this->actingAs($this->character->user)
+            ->call('GET', '/api/enchanting/'.$this->character->id.'/items', [
+                'source' => 'regular',
+                'per_page' => 2,
+                'page' => 1,
+            ]);
+
+        $firstPageData = json_decode($firstPage->getContent(), true);
+
+        $searchResponse = $this->actingAs($this->character->user)
+            ->call('GET', '/api/enchanting/'.$this->character->id.'/items', [
+                'source' => 'regular',
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $searchData = json_decode($searchResponse->getContent(), true);
+
+        $this->assertEquals(200, $firstPage->status());
+        $this->assertCount(2, $firstPageData['data']);
+        $this->assertTrue($firstPageData['meta']['can_load_more']);
+        $this->assertCount(1, $searchData['data']);
+        $this->assertEquals($itemTwo->id, $searchData['data'][0]['item_id']);
+        $this->assertArrayHasKey('preview', $searchData['data'][0]);
+        $this->assertEquals($itemTwo->id, $searchData['data'][0]['preview']['item_id']);
+    }
+
+    public function test_paginated_affixes_endpoint_respects_type_filter_and_per_page()
+    {
+        $this->createItemAffix(['type' => 'prefix', 'skill_level_required' => 1, 'skill_level_trivial' => 25]);
+        $this->createItemAffix(['type' => 'prefix', 'skill_level_required' => 1, 'skill_level_trivial' => 25]);
+        $this->createItemAffix(['type' => 'suffix', 'skill_level_required' => 1, 'skill_level_trivial' => 25]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/enchanting/'.$this->character->id.'/affixes', [
+                'type' => 'prefix',
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(2, $jsonData['data']);
+        $this->assertSame('prefix', $jsonData['data'][0]['type']);
+        $this->assertFalse($jsonData['meta']['can_load_more']);
     }
 
     public function test_cannot_enchant_when_can_enchant_is_false()
@@ -221,6 +285,8 @@ class EnchantingControllerTest extends TestCase
         $this->assertGreaterThan(0, $jsonData['skill_xp']['current_xp']);
         $this->assertLessThan(CurrencyLimit::MAX_GOLD, $character->gold);
         $this->assertTrue($jsonData['enchant_succeeded']);
+        $this->assertNotNull($jsonData['result_preview']);
+        $this->assertIsInt($jsonData['result_preview']['inventory_slot_id']);
     }
 
     public function test_enchant_item_fails_the_roll_and_still_returns_a_successful_enchanting_response()
@@ -273,9 +339,74 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals(0, $jsonData['skill_xp']['current_xp']);
         $this->assertEquals(CurrencyLimit::MAX_GOLD - $expectedCost, $character->gold);
         $this->assertEquals(0, InventorySlot::where('id', $slot->id)->count());
+        $this->assertNull($jsonData['result_preview']);
 
         Event::assertDispatched(ServerMessageEvent::class, function ($event) {
             return str_contains($event->message, 'shatters before you');
         });
+    }
+
+    public function test_paginated_items_endpoint_with_populated_rows_does_not_lazy_load(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+
+        $itemSkill = ItemSkill::create([
+            'name' => 'Chestplate Mastery',
+            'description' => 'Increases chestplate proficiency.',
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+        ]);
+
+        $decoratedItem = $this->createItem([
+            'type' => 'body',
+            'name' => 'Decorated Chestplate',
+            'item_prefix_id' => $prefix->id,
+            'item_suffix_id' => $suffix->id,
+            'holy_stacks' => 5,
+        ]);
+
+        $decoratedItem->appliedHolyStacks()->create([
+            'item_id' => $decoratedItem->id,
+            'devouring_darkness_bonus' => 0.1,
+            'stat_increase_bonus' => 0.1,
+        ]);
+
+        $decoratedItem->itemSkillProgressions()->create([
+            'item_id' => $decoratedItem->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 1,
+            'current_kill' => 10,
+            'is_training' => false,
+        ]);
+
+        $plainItem = $this->createItem(['type' => 'body', 'name' => 'Plain Chestplate']);
+
+        foreach ([$decoratedItem, $plainItem] as $item) {
+            $this->character->inventory->slots()->create([
+                'inventory_id' => $this->character->inventory->id,
+                'item_id' => $item->id,
+            ]);
+        }
+
+        Model::preventLazyLoading();
+
+        try {
+            $response = $this->actingAs($this->character->user)
+                ->call('GET', '/api/enchanting/'.$this->character->id.'/items', [
+                    'source' => 'regular',
+                    'per_page' => 15,
+                    'page' => 1,
+                ]);
+
+            $response->assertOk();
+
+            $data = json_decode($response->getContent(), true);
+
+            $this->assertCount(2, $data['data']);
+            $this->assertArrayHasKey('preview', $data['data'][0]);
+        } finally {
+            Model::preventLazyLoading(false);
+        }
     }
 }

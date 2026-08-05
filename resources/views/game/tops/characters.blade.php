@@ -9,6 +9,11 @@
       color="primary"
     ></x-core.page.title>
 
-    @livewire('game.tops.characters')
+    <x-core.tables.data-table
+      :paginator="$paginator"
+      :columns="$columns"
+      :searchable="true"
+      empty-message="No characters found."
+    />
   </div>
 @endsection

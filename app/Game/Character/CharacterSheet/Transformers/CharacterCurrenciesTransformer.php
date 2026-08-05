@@ -13,10 +13,10 @@ class CharacterCurrenciesTransformer extends BaseTransformer
     public function transform(Character $character): array
     {
         return [
-            'gold' => number_format($character->gold),
-            'gold_dust' => number_format($character->gold_dust),
-            'shards' => number_format($character->shards),
-            'copper_coins' => number_format($character->copper_coins),
+            'gold' => $character->gold,
+            'gold_dust' => $character->gold_dust,
+            'shards' => $character->shards,
+            'copper_coins' => $character->copper_coins,
         ];
     }
 }

@@ -15,11 +15,23 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
         // Fetch Item Affixes
         Route::get('/enchanting/{character}', ['uses' => 'Api\EnchantingController@fetchAffixes']);
 
+        // Fetch Paginated Enchanting Items
+        Route::get('/enchanting/{character}/items', ['uses' => 'Api\EnchantingController@items']);
+
+        // Fetch Paginated Enchanting Affixes
+        Route::get('/enchanting/{character}/affixes', ['uses' => 'Api\EnchantingController@affixes']);
+
         // Fetch Alchemy Items
         Route::get('/alchemy/{character}', ['uses' => 'Api\AlchemyController@alchemyItems']);
 
+        // Fetch Paginated Alchemy Items
+        Route::get('/alchemy/{character}/items', ['uses' => 'Api\AlchemyController@items']);
+
         // Fetch Trinkets
         Route::get('/trinket-crafting/{character}', ['uses' => 'Api\TrinketCraftingController@fetchItemsToCraft']);
+
+        // Fetch Paginated Trinkets
+        Route::get('/trinket-crafting/{character}/items', ['uses' => 'Api\TrinketCraftingController@items']);
 
         // Fetch Gem Tiers
         Route::get('/gem-crafting/craftable-tiers/{character}', ['uses' => 'Api\GemCraftingController@getCraftableItems']);

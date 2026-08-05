@@ -84,12 +84,12 @@
         </div>
         <div>
           <h2 className="my-2">Equipped Items</h2>
-          @livewire(
-            'game.tops.character-equipped-inventory',
-            [
-              'characterId' => $character->id,
-            ]
-          )
+          <x-core.tables.data-table
+            :paginator="$equippedPaginator"
+            :columns="$equippedColumns"
+            :searchable="true"
+            empty-message="No equipped items."
+          />
         </div>
       </div>
     </x-core.cards.card>

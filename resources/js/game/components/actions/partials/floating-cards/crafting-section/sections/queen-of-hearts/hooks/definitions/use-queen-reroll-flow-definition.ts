@@ -1,5 +1,8 @@
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 import QueenCostDefinition from '../../api/definitions/queen-cost-definition';
+import QueenInventorySlotDefinition from '../../api/definitions/queen-inventory-slot-definition';
 import QueenOfHeartsApiResponseDefinition from '../../api/definitions/queen-of-hearts-api-response-definition';
+import UseQueenUniqueItemsApiDefinition from '../../api/hooks/definitions/use-queen-unique-items-api-definition';
 import { QueenAffixSelection } from '../../enums/queen-affix-selection';
 import { QueenRerollType } from '../../enums/queen-reroll-type';
 
@@ -14,13 +17,15 @@ export interface UseQueenRerollFlowParams {
 
 export default interface UseQueenRerollFlowDefinition {
   hasSlots: boolean;
-  slotOptions: DropdownItem[];
+  itemsApi: UseQueenUniqueItemsApiDefinition;
   affixOptions: DropdownItem[];
   rerollTypeOptions: DropdownItem[];
   selectedSlotId: number | null;
+  selectedSlot: QueenInventorySlotDefinition | null;
   selectedAffix: QueenAffixSelection | null;
   selectedRerollType: QueenRerollType | null;
   selectedCost: QueenCostDefinition | null;
+  resultPreview: CraftingItemPreviewDefinition | null;
   submitting: boolean;
   error: string | null;
   canSubmit: boolean;

@@ -33,8 +33,6 @@ const CraftTypeFilters = ({
           selection_placeholder="Select an armour type"
           pre_selected_item={selectedArmourTypeOption}
           force_clear={armourType === null}
-          all_click_outside
-          use_portal
         />
       </fieldset>
     );
@@ -56,8 +54,6 @@ const CraftTypeFilters = ({
           selection_placeholder="Select a craft type"
           pre_selected_item={selectedTypeOption}
           force_clear={selectedType === null}
-          all_click_outside
-          use_portal
         />
       </fieldset>
 

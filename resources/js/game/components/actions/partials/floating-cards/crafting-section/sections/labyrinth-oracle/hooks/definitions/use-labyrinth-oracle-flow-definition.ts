@@ -1,5 +1,7 @@
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 import LabyrinthInventoryItemDefinition from '../../api/definitions/labyrinth-inventory-item-definition';
 import LabyrinthOracleApiResponseDefinition from '../../api/definitions/labyrinth-oracle-api-response-definition';
+import UseLabyrinthOracleItemsApiDefinition from '../../api/hooks/definitions/use-labyrinth-oracle-items-api-definition';
 
 export default interface UseLabyrinthOracleFlowDefinition {
   characterId: number;
@@ -15,6 +17,9 @@ export default interface UseLabyrinthOracleFlowDefinition {
   hasEnoughItemsToTransfer: boolean;
   submitting: boolean;
   canSubmit: boolean;
+  sourceResultPreview: CraftingItemPreviewDefinition | null;
+  destinationResultPreview: CraftingItemPreviewDefinition | null;
+  itemsApi: UseLabyrinthOracleItemsApiDefinition;
   selectSource: (id: number) => void;
   selectDestination: (id: number) => void;
   submitTransfer: () => Promise<void>;

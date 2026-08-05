@@ -8,6 +8,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Flare\Pagination\Pagination;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -17,8 +18,11 @@ use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
+use App\Game\Skills\Transformers\AlchemyItemTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection as SupportCollection;
 
 class AlchemyService
 {
@@ -28,29 +32,74 @@ class AlchemyService
 
     private ItemListCostTransformerService $itemListCostTransformerService;
 
-    public function __construct(SkillCheckService $skillCheckService, ItemListCostTransformerService $itemListCostTransformerService)
-    {
+    private Pagination $pagination;
+
+    public function __construct(
+        SkillCheckService $skillCheckService,
+        ItemListCostTransformerService $itemListCostTransformerService,
+        Pagination $pagination,
+        private readonly AlchemyItemTransformer $alchemyItemTransformer,
+    ) {
         $this->skillCheckService = $skillCheckService;
         $this->itemListCostTransformerService = $itemListCostTransformerService;
+        $this->pagination = $pagination;
+    }
+
+    /**
+     * Fetches a paginated, searchable list of Alchemy items eligible for crafting.
+     */
+    public function fetchPaginatedAlchemistItems(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        $skill = $this->fetchAlchemySkill($character);
+
+        $query = $this->buildAlchemyItemsQuery($skill);
+
+        if ($search !== '') {
+            $query->where('name', 'LIKE', '%'.$search.'%');
+        }
+
+        $paginator = $query->orderBy('skill_level_required', 'asc')
+            ->orderBy('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $paginator->setCollection(
+            $this->attachOwnedAmounts($character, $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $paginator->getCollection(), false))
+        );
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->alchemyItemTransformer);
     }
 
     public function fetchAlchemistItems(Character $character, bool $showMerchantMessage = true)
     {
-        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
+        $skill = $this->fetchAlchemySkill($character);
 
-        $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
-
-        $items = Item::where('can_craft', true)
-            ->where('crafting_type', 'alchemy')
-            ->where('skill_level_required', '<=', $skill->level)
-            ->where('item_prefix_id', null)
-            ->where('item_suffix_id', null)
+        $items = $this->buildAlchemyItemsQuery($skill)
             ->orderBy('skill_level_required', 'asc')
-            ->select('id', 'name', 'gold_dust_cost', 'shards_cost', 'type')
             ->get();
 
         $items = $this->itemListCostTransformerService->reduceCostOfAlchemyItems($character, $items, $showMerchantMessage);
 
+        return $this->attachOwnedAmounts($character, $items);
+    }
+
+    private function fetchAlchemySkill(Character $character): Skill
+    {
+        $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
+
+        return Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
+    }
+
+    private function buildAlchemyItemsQuery(Skill $skill): Builder
+    {
+        return Item::where('can_craft', true)
+            ->where('crafting_type', 'alchemy')
+            ->where('skill_level_required', '<=', $skill->level)
+            ->where('item_prefix_id', null)
+            ->where('item_suffix_id', null);
+    }
+
+    private function attachOwnedAmounts(Character $character, SupportCollection $items): SupportCollection
+    {
         $alchemyBag = $character->alchemyBag;
         $ownedAmounts = [];
 
@@ -92,7 +141,7 @@ class AlchemyService
      * even when the Alchemy Bag is full, since the item never actually needs to
      * occupy a retained bag slot. Manual (non-batch) calls never pass this.
      */
-    public function transmute(Character $character, int $itemId, bool $isBatch = false, bool $bypassBagCapacity = false): void
+    public function transmute(Character $character, int $itemId, bool $isBatch = false, bool $bypassBagCapacity = false): ?array
     {
         $gameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
         $skill = Skill::where('game_skill_id', $gameSkill->id)->where('character_id', $character->id)->first();
@@ -101,7 +150,7 @@ class AlchemyService
         if (is_null($item)) {
             event(new ServerMessageEvent($character->user, 'Nope. Item does not exist.'));
 
-            return;
+            return null;
         }
 
         $setTime = null;
@@ -132,19 +181,19 @@ class AlchemyService
         if ($goldDustCost > $character->gold_dust) {
             ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_GOLD_DUST);
 
-            return;
+            return null;
         }
 
         if ($shardsCost > $character->shards) {
             ServerMessageHandler::handleMessage($character->user, CharacterMessageTypes::NOT_ENOUGH_SHARDS);
 
-            return;
+            return null;
         }
 
-        $this->attemptTransmute($character, $skill, $item, $bypassBagCapacity);
+        return $this->attemptTransmute($character, $skill, $item, $bypassBagCapacity);
     }
 
-    protected function attemptTransmute(Character $character, Skill $skill, Item $item, bool $bypassBagCapacity = false): void
+    protected function attemptTransmute(Character $character, Skill $skill, Item $item, bool $bypassBagCapacity = false): ?array
     {
         $this->updateAlchemyCost($character, $item);
 
@@ -152,42 +201,42 @@ class AlchemyService
 
             ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
-            $this->pickUpItem($character, $item, $skill, true, $bypassBagCapacity);
+            $result = $this->pickUpItem($character, $item, $skill, true, $bypassBagCapacity);
 
             $character = $character->refresh();
 
             event(new UpdateCharacterCurrenciesEvent($character));
             event(new UpdateCharacterInventoryCountEvent($character));
 
-            return;
+            return $result;
         }
 
         if ($skill->level > $item->skill_level_trivial) {
 
             ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_EASY_TO_CRAFT);
 
-            $this->pickUpItem($character, $item, $skill, true, $bypassBagCapacity);
+            $result = $this->pickUpItem($character, $item, $skill, true, $bypassBagCapacity);
 
             $character = $character->refresh();
 
             event(new UpdateCharacterCurrenciesEvent($character));
             event(new UpdateCharacterInventoryCountEvent($character));
 
-            return;
+            return $result;
         }
 
         $characterRoll = $this->skillCheckService->characterRoll($skill);
         $dcCheck = $this->skillCheckService->getDCCheck($skill);
 
         if ($dcCheck < $characterRoll) {
-            $this->pickUpItem($character, $item, $skill, false, $bypassBagCapacity);
+            $result = $this->pickUpItem($character, $item, $skill, false, $bypassBagCapacity);
 
             $character = $character->refresh();
 
             event(new UpdateCharacterCurrenciesEvent($character));
             event(new UpdateCharacterInventoryCountEvent($character));
 
-            return;
+            return $result;
         }
 
         ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::FAILED_TO_TRANSMUTE);
@@ -196,24 +245,37 @@ class AlchemyService
 
         event(new UpdateCharacterCurrenciesEvent($character));
         event(new UpdateCharacterInventoryCountEvent($character));
+
+        return null;
     }
 
-    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $bypassBagCapacity = false)
+    private function pickUpItem(Character $character, Item $item, Skill $skill, bool $tooEasy = false, bool $bypassBagCapacity = false): ?array
     {
-        if ($this->attemptToPickUpItem($character, $item, $bypassBagCapacity)) {
+        $alchemyBagSlot = $this->attemptToPickUpItem($character, $item, $bypassBagCapacity);
 
-            if (! $tooEasy) {
-                event(new UpdateSkillEvent($skill));
-            }
+        if (is_null($alchemyBagSlot)) {
+            return null;
         }
+
+        if (! $tooEasy) {
+            event(new UpdateSkillEvent($skill));
+        }
+
+        return [
+            'item_id' => $item->id,
+            'name' => $item->name,
+            'type' => $item->type,
+            'amount_created' => 1,
+            'current_amount' => $alchemyBagSlot->amount,
+        ];
     }
 
-    private function attemptToPickUpItem(Character $character, Item $item, bool $bypassBagCapacity = false): bool
+    private function attemptToPickUpItem(Character $character, Item $item, bool $bypassBagCapacity = false): ?AlchemyBagSlot
     {
         if (! $bypassBagCapacity && ! $character->canAddToAlchemyBag(1)) {
             event(new ServerMessageEvent($character->user, 'Your Alchemy Bag is full. Use or remove alchemy items before crafting more.'));
 
-            return false;
+            return null;
         }
 
         $alchemyBag = AlchemyBag::firstOrCreate(['character_id' => $character->id]);
@@ -244,6 +306,6 @@ class AlchemyService
             $item->name,
         ));
 
-        return true;
+        return $alchemyBagSlot;
     }
 }

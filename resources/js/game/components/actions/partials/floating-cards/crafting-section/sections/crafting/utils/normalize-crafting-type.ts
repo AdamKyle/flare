@@ -7,9 +7,12 @@ export const normalizeCraftingType = (
     return 'armour';
   }
 
-  if (item.type === 'spell-damage' || item.type === 'spell-healing') {
+  if (
+    item.preview.type === 'spell-damage' ||
+    item.preview.type === 'spell-healing'
+  ) {
     return 'spell';
   }
 
-  return item.type;
+  return item.preview.type;
 };

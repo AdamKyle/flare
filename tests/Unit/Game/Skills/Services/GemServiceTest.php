@@ -7,8 +7,10 @@ use App\Flare\Models\GemBagSlot;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gems\Builders\GemBuilder;
+use App\Game\Gems\Transformers\GemTransformer;
 use App\Game\Gems\Values\GemTierValue;
 use App\Game\Gems\Values\GemTypeValue;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Services\GemService;
@@ -146,7 +148,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -181,7 +183,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -220,7 +222,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -275,7 +277,7 @@ class GemServiceTest extends TestCase
     {
         Event::fake();
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(false);
         });
 
@@ -306,7 +308,7 @@ class GemServiceTest extends TestCase
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
-        $mock->__construct(resolve(GemBuilder::class), resolve(ChanceCalculator::class));
+        $mock->__construct(resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class));
 
         $this->instance(
             GemService::class,
@@ -384,7 +386,7 @@ class GemServiceTest extends TestCase
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
-        $gemService->__construct($gemBuilder, resolve(ChanceCalculator::class));
+        $gemService->__construct($gemBuilder, resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class));
 
         $character = $this->character->getCharacter();
 

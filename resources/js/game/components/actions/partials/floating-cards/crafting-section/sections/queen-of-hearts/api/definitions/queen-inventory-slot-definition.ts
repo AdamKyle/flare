@@ -1,7 +1,7 @@
-import QueenInventoryItemDefinition from './queen-inventory-item-definition';
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 
 export default interface QueenInventorySlotDefinition {
-  id: number;
+  slot_id: number;
   item_id: number;
-  item: QueenInventoryItemDefinition;
+  preview: CraftingItemPreviewDefinition;
 }

@@ -2,13 +2,16 @@ import React, { ReactNode } from 'react';
 
 import TrinketCostSummary from './trinket-cost-summary';
 import TrinketSelection from './trinket-selection';
+import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
+import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
+import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
+import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useTrinketryFlow } from '../hooks/use-trinketry-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
@@ -23,6 +26,12 @@ const TrinketryFlow = (): ReactNode => {
     selectedItem,
     crafting,
     canCraft,
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    itemsApi,
+    resultPreview,
     selectItem,
     craftItem,
   } = useTrinketryFlow();
@@ -41,54 +50,75 @@ const TrinketryFlow = (): ReactNode => {
   );
 
   const renderAlerts = (): ReactNode => {
-    if (!error && !mutationError && !status) {
+    if (!error && !mutationError) {
       return null;
     }
 
     return (
-      <>
-        {(error || mutationError) && (
-          <Alert variant={AlertVariant.DANGER}>{error ?? mutationError}</Alert>
-        )}
-        {status && <Alert variant={AlertVariant.SUCCESS}>{status}</Alert>}
-      </>
+      <Alert variant={AlertVariant.DANGER}>{error ?? mutationError}</Alert>
     );
   };
 
-  const renderEmptyState = (): ReactNode => (
-    <p>No Trinkets are currently available.</p>
+  const renderItemSelection = (): ReactNode => (
+    <TrinketSelection
+      items={itemsApi.items}
+      selectedItemId={selectedItem?.id ?? null}
+      loading={itemsApi.loading}
+      isLoadingMore={itemsApi.isLoadingMore}
+      canLoadMore={itemsApi.canLoadMore}
+      searchText={itemsApi.searchText}
+      onSearch={itemsApi.setSearchText}
+      onEndReached={itemsApi.onEndReached}
+      onSelect={selectItem}
+    />
   );
 
-  const renderItemSelection = (
-    currentData: NonNullable<typeof data>
-  ): ReactNode => {
-    if (currentData.items.length === 0) {
-      return renderEmptyState();
-    }
-
-    return (
-      <TrinketSelection
-        items={currentData.items}
-        selectedItemId={selectedItem?.id ?? null}
-        onSelect={selectItem}
-      />
-    );
-  };
-
-  const renderCostSummary = (): ReactNode => {
+  const renderPreview = (): ReactNode => {
     if (!selectedItem) {
       return null;
     }
 
-    return <TrinketCostSummary item={selectedItem} />;
+    return (
+      <CraftingActionPreview
+        title="Item preview"
+        description="The selected Trinket is the item that will be attempted."
+      >
+        <CraftingItemPreview item={selectedItem.preview} />
+        <TrinketCostSummary item={selectedItem} />
+      </CraftingActionPreview>
+    );
+  };
+
+  const renderResult = (): ReactNode => {
+    if (!status) {
+      return null;
+    }
+
+    return (
+      <Alert variant={AlertVariant.SUCCESS}>
+        <span>{status}</span>
+        {resultPreview && (
+          <div className="mt-2">
+            <CraftingItemPreview item={resultPreview} />
+          </div>
+        )}
+      </Alert>
+    );
   };
 
   const renderAction = (): ReactNode => (
-    <Button
-      label={crafting ? 'Crafting…' : 'Craft Trinket'}
+    <CraftingProgressActionButton
+      idle_label="Craft Trinket"
+      submitting_label="Crafting…"
+      timeout_label="Craft another Trinket"
+      submitting={crafting}
+      is_timeout_active={isTimeoutActive}
+      progress={progress}
+      formatted_remaining={formattedRemaining}
+      disabled={!canCraft || isCraftingDisabled}
       on_click={() => void craftItem()}
       variant={ButtonVariant.PRIMARY}
-      disabled={!canCraft}
+      additional_css="w-full sm:w-auto"
     />
   );
 
@@ -103,22 +133,6 @@ const TrinketryFlow = (): ReactNode => {
     </a>
   );
 
-  const renderContent = (currentData: NonNullable<typeof data>): ReactNode => (
-    <>
-      <CraftingSkillXpProgress xp={currentData.skill_xp} />
-      <CraftingInventoryProgress
-        inventory_count={currentData.inventory_count}
-      />
-
-      {renderItemSelection(currentData)}
-      {renderCostSummary()}
-
-      {renderAction()}
-
-      {renderHelpLink()}
-    </>
-  );
-
   if (loading) {
     return renderLoadingState();
   }
@@ -128,12 +142,25 @@ const TrinketryFlow = (): ReactNode => {
   }
 
   return (
-    <div className="space-y-4 text-gray-900 dark:text-gray-100">
-      <h2 className="text-xl font-semibold">Trinketry</h2>
-
-      {renderAlerts()}
-      {renderContent(data)}
-    </div>
+    <CraftingActionLayout
+      heading={
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Trinketry
+        </h2>
+      }
+      status={renderAlerts()}
+      progress={
+        <div className="space-y-2">
+          <CraftingSkillXpProgress xp={data.skill_xp} />
+          <CraftingInventoryProgress inventory_count={data.inventory_count} />
+        </div>
+      }
+      form={renderItemSelection()}
+      preview={renderPreview()}
+      result={renderResult()}
+      action={renderAction()}
+      help_link={renderHelpLink()}
+    />
   );
 };
 

@@ -187,7 +187,7 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
       icon.id,
       foundLocation.name,
       data.character_position.x_position,
-      data.character_position.x_position
+      data.character_position.y_position
     );
   };
 

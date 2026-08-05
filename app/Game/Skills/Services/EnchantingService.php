@@ -11,6 +11,7 @@ use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
 use App\Flare\Models\Skill;
+use App\Flare\Pagination\Pagination;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
@@ -23,9 +24,13 @@ use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
 use App\Game\Skills\Events\UpdateSkillEvent;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
 use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
+use App\Game\Skills\Transformers\EnchantingAffixTransformer;
+use App\Game\Skills\Transformers\EnchantingItemTransformer;
+use App\Game\Skills\Transformers\EventEnchantingItemTransformer;
 use App\Game\Skills\Values\SkillTypeValue;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class EnchantingService
@@ -44,6 +49,8 @@ class EnchantingService
 
     private GlobalEventGoalEligibilityService $globalEventGoalEligibilityService;
 
+    private Pagination $pagination;
+
     private bool $sentToEasyMessage = false;
 
     /**
@@ -60,6 +67,10 @@ class EnchantingService
         EnchantItemService $enchantItemService,
         RandomEnchantmentService $randomEnchantmentService,
         GlobalEventGoalEligibilityService $globalEventGoalEligibilityService,
+        Pagination $pagination,
+        private readonly EnchantingItemTransformer $enchantingItemTransformer,
+        private readonly EventEnchantingItemTransformer $eventEnchantingItemTransformer,
+        private readonly EnchantingAffixTransformer $enchantingAffixTransformer,
     ) {
 
         $this->characterStatBuilder = $characterStatBuilder;
@@ -67,6 +78,96 @@ class EnchantingService
         $this->enchantItemService = $enchantItemService;
         $this->randomEnchantmentService = $randomEnchantmentService;
         $this->globalEventGoalEligibilityService = $globalEventGoalEligibilityService;
+        $this->pagination = $pagination;
+    }
+
+    /**
+     * Fetches a paginated list of items eligible for enchanting for the given source.
+     */
+    public function fetchPaginatedItems(Character $character, string $source, int $perPage, int $page, string $search = ''): array
+    {
+        if ($source === 'event') {
+            return $this->fetchPaginatedEventItems($character, $perPage, $page, $search);
+        }
+
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $query = InventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks', 'item.itemSkillProgressions'])
+            ->where('inventory_id', $inventory->id)
+            ->where('equipped', false)
+            ->whereHas('item', function ($itemQuery) {
+                $itemQuery->whereNotIn('type', ['trinket', 'artifact']);
+            });
+
+        $this->applyItemSearch($query, $search);
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->enchantingItemTransformer);
+    }
+
+    /**
+     * Fetches a paginated list of available affixes of the given type for the character.
+     */
+    public function fetchPaginatedAffixes(Character $character, string $type, int $perPage, int $page, string $search = ''): array
+    {
+        $enchantingSkill = $this->getEnchantingSkill($character);
+
+        $query = ItemAffix::where('skill_level_required', '<=', $enchantingSkill->level)
+            ->where('randomly_generated', false)
+            ->where('type', $type);
+
+        if ($search !== '') {
+            $query->where('name', 'LIKE', '%'.$search.'%');
+        }
+
+        $paginator = $query->orderBy('skill_level_required', 'asc')
+            ->orderBy('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->enchantingAffixTransformer);
+    }
+
+    private function fetchPaginatedEventItems(Character $character, int $perPage, int $page, string $search): array
+    {
+        $globalEventGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
+
+        if (is_null($globalEventGoal)) {
+            return $this->pagination->paginateCollectionResponse(new Collection, $perPage, $page);
+        }
+
+        $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first();
+
+        if (is_null($eventInventory)) {
+            return $this->pagination->paginateCollectionResponse(new Collection, $perPage, $page);
+        }
+
+        $query = GlobalEventCraftingInventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks', 'item.itemSkillProgressions'])
+            ->where('global_event_crafting_inventory_id', $eventInventory->id);
+
+        $this->applyItemSearch($query, $search);
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->eventEnchantingItemTransformer);
+    }
+
+    /**
+     * Applies a name/prefix/suffix search to an item-bearing query.
+     */
+    private function applyItemSearch(Builder $query, string $search): void
+    {
+        if ($search === '') {
+            return;
+        }
+
+        $query->whereHas('item', function ($itemQuery) use ($search) {
+            $itemQuery->where('name', 'LIKE', '%'.$search.'%')
+                ->orWhereHas('itemPrefix', fn ($prefixQuery) => $prefixQuery->where('name', 'LIKE', '%'.$search.'%'))
+                ->orWhereHas('itemSuffix', fn ($suffixQuery) => $suffixQuery->where('name', 'LIKE', '%'.$search.'%'));
+        });
     }
 
     /**
@@ -430,25 +531,33 @@ class EnchantingService
 
     private function fetchEventItemsForEnchanting(Character $character): array
     {
+        return $this->fetchEventItemSlotsForEnchanting($character)
+            ->map(fn ($slot) => [
+                'slot_id' => $slot->id,
+                'item_name' => $slot->item->name,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * @return Collection<int, GlobalEventCraftingInventorySlot>
+     */
+    private function fetchEventItemSlotsForEnchanting(Character $character): Collection
+    {
         $globalEventGoal = $this->globalEventGoalEligibilityService->currentEnchantingGoalFor($character);
-        $itemsForEvent = [];
 
-        if (! is_null($globalEventGoal)) {
-
-            $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)
-                ->where('global_event_goal_id', $globalEventGoal->id)
-                ->first();
-
-            if (! is_null($eventInventory)) {
-                $itemsForEvent = $eventInventory->craftingSlots->map(function ($slot) {
-                    return [
-                        'slot_id' => $slot->id,
-                        'item_name' => $slot->item->name,
-                    ];
-                })->toArray();
-            }
+        if (is_null($globalEventGoal)) {
+            return new Collection;
         }
 
-        return $itemsForEvent;
+        $eventInventory = GlobalEventCraftingInventory::where('character_id', $character->id)
+            ->where('global_event_goal_id', $globalEventGoal->id)
+            ->first();
+
+        if (is_null($eventInventory)) {
+            return new Collection;
+        }
+
+        return $eventInventory->craftingSlots;
     }
 }

@@ -13,7 +13,7 @@ export const useWebsocket = <T>({
   onEvent,
   enabled = true,
 }: UseWebsocketParams<T>) => {
-  const echoInitializer = useEchoInitializer();
+  const { echoInitialization } = useEchoInitializer();
 
   const onEventRef = useRef(onEvent);
   onEventRef.current = onEvent;
@@ -29,29 +29,19 @@ export const useWebsocket = <T>({
       return;
     }
 
-    echoInitializer.echoInitialization.initialize();
+    echoInitialization.initialize();
 
-    const echo = echoInitializer.echoInitialization.getEcho();
+    const echo = echoInitialization.getEcho();
 
-    let channel = null;
+    const channel =
+      type === ChannelType.PRIVATE
+        ? echo.private(resolvedUrl)
+        : echo.channel(resolvedUrl);
 
-    if (type === ChannelType.PRIVATE) {
-      channel = echo.private(resolvedUrl);
-      channel.listen(channelName, listenerRef.current);
-    }
-
-    if (type === ChannelType.PUBLIC) {
-      channel = echo.join(resolvedUrl);
-      channel.listen(channelName, listenerRef.current);
-    }
+    channel.listen(channelName, listenerRef.current);
 
     return () => {
-      if (!channel) {
-        return;
-      }
-
-      channel.unsubscribe();
+      echo.leave(resolvedUrl);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, resolvedUrl, channelName, type]);
+  }, [enabled, resolvedUrl, channelName, type, echoInitialization]);
 };

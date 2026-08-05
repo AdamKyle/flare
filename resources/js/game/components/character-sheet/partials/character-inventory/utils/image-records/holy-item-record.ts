@@ -25,7 +25,7 @@ export const holyItemRecord: Partial<
   },
   [InventoryItemTypes.DAGGER]: `${EquipmentImagePaths.HOLY_ITEMS}/dagger-holy.png`,
   [InventoryItemTypes.BOW]: `${EquipmentImagePaths.HOLY_ITEMS}/bow-holy.png`,
-  [InventoryItemTypes.MACE]: `${EquipmentImagePaths.HOLY_ITEMS}/mac-holy.png`,
+  [InventoryItemTypes.MACE]: `${EquipmentImagePaths.HOLY_ITEMS}/mace-holy.png`,
   [InventoryItemTypes.SWORD]: `${EquipmentImagePaths.HOLY_ITEMS}/sword-holy.png`,
   [InventoryItemTypes.STAVE]: `${EquipmentImagePaths.HOLY_ITEMS}/stave-holy.png`,
   [InventoryItemTypes.HAMMER]: `${EquipmentImagePaths.HOLY_ITEMS}/hammer-holy.png`,

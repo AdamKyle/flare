@@ -1,3 +1,4 @@
+import CondensedGemDetails from '../../../../../../../../../api-definitions/items/condensed-gem-details';
 import GemCraftingApiResponseDefinition from '../../api/definitions/gem-crafting-api-response-definition';
 import GemTierDefinition from '../../api/definitions/gem-tier-definition';
 
@@ -11,6 +12,12 @@ export default interface UseGemCraftingFlowDefinition {
   selectedTierData: GemTierDefinition | null;
   crafting: boolean;
   canCraft: boolean;
+  isTimeoutActive: boolean;
+  isCraftingDisabled: boolean;
+  progress: number;
+  formattedRemaining: string;
+  craftSucceeded: boolean;
+  craftedGem: CondensedGemDetails | null;
   selectTier: (tier: number) => void;
   craftGem: () => Promise<void>;
 }

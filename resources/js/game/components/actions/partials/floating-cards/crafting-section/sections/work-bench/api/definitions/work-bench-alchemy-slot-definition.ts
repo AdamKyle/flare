@@ -1,5 +1,11 @@
 export default interface WorkBenchAlchemySlotDefinition {
   id: number;
-  amount: number;
-  item: { id: number; name: string; holy_level: number };
+  item_id: number;
+  name: string;
+  level: number;
+  stack_amount: number;
+  possible_stat_bonus_minimum: number;
+  possible_stat_bonus_maximum: number;
+  possible_devoidance_minimum: number;
+  possible_devoidance_maximum: number;
 }

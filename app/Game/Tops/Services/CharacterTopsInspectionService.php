@@ -184,7 +184,7 @@ class CharacterTopsInspectionService
                 'devouring_light_resistance' => $statDetails['devouring_light_res'],
                 'devouring_darkness_resistance' => $statDetails['devouring_darkness_res'],
             ],
-            'elemental_atonement' => $this->characterElementalAtonementTransformer->transform($character)['elemental_atonement'] ?? [],
+            'elemental_atonement' => $this->characterElementalAtonementTransformer->transform($character),
             'stat_breakdown' => $this->statBreakdownSummary($character, $statDetails),
             'stat_details' => $statDetails,
             'resistance_info' => $this->characterResistanceInfoTransformer->transform($character),

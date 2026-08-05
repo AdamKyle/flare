@@ -15,6 +15,7 @@ export default interface PaginatedApiHandlerDefinition<
   isLoadingMore: boolean;
   page: number;
   response: R | null;
+  searchText: string;
   setPage: StateSetter<number>;
   setSearchText: StateSetter<string>;
   setFilters: StateSetter<F>;

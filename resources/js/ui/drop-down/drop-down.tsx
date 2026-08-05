@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import React, {
-  FocusEvent,
   KeyboardEvent,
   MouseEvent,
   UIEvent,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -17,6 +17,12 @@ import { match } from 'ts-pattern';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import DropdownProps from 'ui/drop-down/types/drop-down-props';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+
+const MIN_MENU_HEIGHT = 200;
+const MAX_MENU_HEIGHT = 384;
+const VIEWPORT_MARGIN = 8;
+const FLOATING_Z_INDEX = 9999;
 
 const filterDropdownItems = (
   items: DropdownItem[],
@@ -48,22 +54,24 @@ const filterDropdownItems = (
 const Dropdown = ({
   items,
   on_select,
-  all_click_outside,
   on_clear,
   selection_placeholder,
-  use_pagination,
-  handle_scroll,
-  additional_scroll_css,
   pre_selected_item,
-  is_in_modal,
   force_clear,
   disabled,
   focus_selected_on_open,
-  use_portal,
   id,
   aria_label,
   aria_labelled_by,
   header_slot,
+  searchable,
+  search_value,
+  on_search,
+  can_load_more,
+  is_loading_more,
+  on_end_reached,
+  empty_message,
+  search_placeholder,
 }: DropdownProps) => {
   const generatedId = useId().replace(/:/g, '');
   const triggerId = id ?? `dropdown-trigger-${generatedId}`;
@@ -72,7 +80,7 @@ const Dropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState<string | number>('');
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [internalSearchTerm, setInternalSearchTerm] = useState('');
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({
     position: 'fixed',
     visibility: 'hidden',
@@ -81,29 +89,121 @@ const Dropdown = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const prevForceClearRef = useRef<boolean | undefined>(undefined);
-  const portalMenuRef = useRef<HTMLDivElement>(null);
 
-  const handlePortalOutsideClick = useRef<(event: Event) => void>((event) => {
-    const target = event.target as Node;
+  const isSearchControlled = typeof on_search === 'function';
+  const searchTerm = isSearchControlled
+    ? (search_value ?? '')
+    : internalSearchTerm;
+  const isSearchable = Boolean(searchable);
+  const isEndReachable = typeof on_end_reached === 'function';
 
-    if (containerRef.current?.contains(target)) {
+  const displayItems: DropdownItem[] = useMemo(() => {
+    if (isSearchControlled || !isSearchable) {
+      return items;
+    }
+
+    return filterDropdownItems(items, internalSearchTerm);
+  }, [items, isSearchControlled, isSearchable, internalSearchTerm]);
+
+  const recalculatePosition = useCallback(() => {
+    if (!containerRef.current) {
       return;
     }
 
-    if (portalMenuRef.current?.contains(target)) {
+    const rect = containerRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom - VIEWPORT_MARGIN;
+    const spaceAbove = rect.top - VIEWPORT_MARGIN;
+    const flipUp = spaceBelow < MIN_MENU_HEIGHT && spaceAbove > spaceBelow;
+    const availableSpace = flipUp ? spaceAbove : spaceBelow;
+    const maxHeight = Math.max(
+      Math.min(availableSpace, MAX_MENU_HEIGHT),
+      Math.min(availableSpace, MIN_MENU_HEIGHT)
+    );
+
+    if (flipUp) {
+      setMenuStyle({
+        position: 'fixed',
+        bottom: window.innerHeight - rect.top + VIEWPORT_MARGIN,
+        left: rect.left,
+        width: rect.width,
+        maxHeight,
+        zIndex: FLOATING_Z_INDEX,
+      });
+
       return;
     }
 
-    setIsOpen(false);
-    setFocusedIndex(null);
-    setSearchTerm('');
-  });
+    setMenuStyle({
+      position: 'fixed',
+      top: rect.bottom + VIEWPORT_MARGIN,
+      left: rect.left,
+      width: rect.width,
+      maxHeight,
+      zIndex: FLOATING_Z_INDEX,
+    });
+  }, []);
 
-  const displayItems: DropdownItem[] = useMemo(
-    () => filterDropdownItems(items, searchTerm),
-    [items, searchTerm]
-  );
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    recalculatePosition();
+  }, [isOpen, recalculatePosition]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handleReposition = () => recalculatePosition();
+
+    window.addEventListener('resize', handleReposition);
+    window.addEventListener('scroll', handleReposition, true);
+
+    let resizeObserver: ResizeObserver | undefined;
+
+    if (containerRef.current && typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(handleReposition);
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleReposition);
+      window.removeEventListener('scroll', handleReposition, true);
+      resizeObserver?.disconnect();
+    };
+  }, [isOpen, recalculatePosition]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+
+      if (containerRef.current?.contains(target)) {
+        return;
+      }
+
+      if (menuRef.current?.contains(target)) {
+        return;
+      }
+
+      setIsOpen(false);
+      setFocusedIndex(null);
+      setInternalSearchTerm('');
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && focusedIndex !== null && listRef.current) {
@@ -141,59 +241,10 @@ const Dropdown = ({
     displayItems.length,
   ]);
 
-  useLayoutEffect(() => {
-    if (!use_portal || !isOpen || !containerRef.current) {
-      return;
-    }
-
-    const rect = containerRef.current.getBoundingClientRect();
-    const estimatedMenuHeight = 320;
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const flipUp =
-      spaceBelow < estimatedMenuHeight && rect.top > estimatedMenuHeight;
-
-    if (flipUp) {
-      setMenuStyle({
-        position: 'fixed',
-        bottom: window.innerHeight - rect.top + 8,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 9999,
-      });
-    } else {
-      setMenuStyle({
-        position: 'fixed',
-        top: rect.bottom + 8,
-        left: rect.left,
-        width: rect.width,
-        zIndex: 9999,
-      });
-    }
-  }, [use_portal, isOpen]);
-
-  useEffect(() => {
-    if (!use_portal || !isOpen) {
-      return;
-    }
-
-    const handler = handlePortalOutsideClick.current;
-    document.addEventListener('mousedown', handler);
-
-    return () => {
-      document.removeEventListener('mousedown', handler);
-    };
-  }, [use_portal, isOpen]);
-
-  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (!all_click_outside || use_portal) {
-      return;
-    }
-
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      setIsOpen(false);
-      setFocusedIndex(null);
-      setSearchTerm('');
-    }
+  const closeMenu = () => {
+    setIsOpen(false);
+    setFocusedIndex(null);
+    setInternalSearchTerm('');
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -241,22 +292,33 @@ const Dropdown = ({
       })
       .with('Escape', () => {
         event.preventDefault();
-        setIsOpen(false);
-        setFocusedIndex(null);
-        setSearchTerm('');
+        closeMenu();
         triggerRef.current?.focus();
       })
       .with('Tab', () => {
-        setIsOpen(false);
-        setFocusedIndex(null);
-        setSearchTerm('');
+        closeMenu();
       })
       .otherwise(() => {});
   };
 
-  const onScroll = (event: UIEvent<HTMLDivElement>) => {
-    if (handle_scroll) {
-      handle_scroll(event);
+  const handleSearchChange = (value: string) => {
+    if (isSearchControlled) {
+      on_search?.(value);
+      return;
+    }
+
+    setInternalSearchTerm(value);
+  };
+
+  const handleEndReachedScroll = (event: UIEvent<HTMLDivElement>) => {
+    if (!isEndReachable || !can_load_more || is_loading_more) {
+      return;
+    }
+
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+
+    if (scrollTop + clientHeight >= scrollHeight - 10) {
+      on_end_reached?.();
     }
   };
 
@@ -267,7 +329,7 @@ const Dropdown = ({
 
     mouseEvent.stopPropagation();
     setSelectedValue('');
-    setIsOpen(false);
+    closeMenu();
 
     if (on_clear) {
       on_clear();
@@ -298,7 +360,7 @@ const Dropdown = ({
       }
 
       if (!nextOpen) {
-        setSearchTerm('');
+        setInternalSearchTerm('');
       }
 
       return nextOpen;
@@ -308,33 +370,20 @@ const Dropdown = ({
   const handleSelectItem = (item: DropdownItem) => {
     setSelectedValue(item.value);
     on_select(item);
-    setIsOpen(false);
-    setFocusedIndex(null);
-    setSearchTerm('');
+    closeMenu();
   };
 
-  const renderIcon = () => {
-    if (disabled) {
-      return (
-        <i
-          aria-hidden="true"
-          className="fas fa-chevron-down text-gray-400 dark:text-gray-500"
-        />
-      );
-    }
-
-    return selectedValue === '' ? (
-      <i
-        aria-hidden="true"
-        className="fas fa-chevron-down text-gray-500 dark:text-gray-300"
-      />
-    ) : (
-      <i
-        aria-hidden="true"
-        className="fas fa-chevron-down text-gray-500 dark:text-gray-300"
-      />
-    );
-  };
+  const renderIcon = () => (
+    <i
+      aria-hidden="true"
+      className={clsx(
+        'fas fa-chevron-down',
+        disabled
+          ? 'text-gray-400 dark:text-gray-500'
+          : 'text-gray-500 dark:text-gray-300'
+      )}
+    />
+  );
 
   const renderItems = () =>
     displayItems.map((item, index) => (
@@ -346,7 +395,7 @@ const Dropdown = ({
         tabIndex={-1}
         onClick={() => handleSelectItem(item)}
         className={clsx(
-          'mx-1 my-1 cursor-pointer rounded-lg px-4 py-4 transition-colors duration-100',
+          'mx-1 my-1 cursor-pointer rounded-lg px-4 py-3 break-words whitespace-normal transition-colors duration-100',
           focusedIndex === index
             ? 'bg-gray-300 dark:bg-gray-700'
             : 'hover:bg-gray-300 dark:hover:bg-gray-800'
@@ -364,17 +413,87 @@ const Dropdown = ({
 
     if (current) {
       return (
-        <div className="text-gray-900 dark:text-white">{current.label}</div>
+        <span className="text-gray-900 dark:text-white">{current.label}</span>
       );
     }
 
     return (
-      <div
+      <span
         className={clsx(
           disabled ? 'text-gray-400 dark:text-gray-500' : 'text-gray-400'
         )}
       >
         {selection_placeholder || 'Select an option'}
+      </span>
+    );
+  };
+
+  const renderSearchInput = () => {
+    if (!isSearchable) {
+      return null;
+    }
+
+    return (
+      <div className="border-b border-gray-200 p-2 dark:border-gray-700">
+        <input
+          id={searchId}
+          type="text"
+          value={searchTerm}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          placeholder={search_placeholder ?? 'Search...'}
+          aria-label={search_placeholder ?? 'Search'}
+          className="w-full rounded-md border border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
+        />
+      </div>
+    );
+  };
+
+  const renderLoadingMore = () => {
+    if (!is_loading_more) {
+      return null;
+    }
+
+    return (
+      <div className="px-2" role="status" aria-live="polite">
+        <InfiniteLoader />
+      </div>
+    );
+  };
+
+  const renderList = () => (
+    <ul
+      id={listboxId}
+      role="listbox"
+      ref={listRef}
+      className="w-full text-black dark:text-white"
+    >
+      {header_slot}
+      {displayItems.length === 0 ? (
+        <li className="px-4 py-3 text-gray-600 dark:text-gray-300">
+          {empty_message ?? 'No options available.'}
+        </li>
+      ) : (
+        renderItems()
+      )}
+    </ul>
+  );
+
+  const renderMenuBody = () => {
+    if (isEndReachable) {
+      return (
+        <InfiniteScroll
+          handle_scroll={handleEndReachedScroll}
+          additional_css="scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md"
+        >
+          {renderList()}
+          {renderLoadingMore()}
+        </InfiniteScroll>
+      );
+    }
+
+    return (
+      <div className="scrollbar-thumb-rounded-md max-h-60 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 overflow-auto dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+        {renderList()}
       </div>
     );
   };
@@ -384,141 +503,22 @@ const Dropdown = ({
       return null;
     }
 
-    const listMarkup = (
-      <ul
-        id={listboxId}
-        role="listbox"
-        ref={listRef}
-        className={clsx(
-          'w-full text-black dark:text-white',
-          !use_pagination && 'max-h-60 overflow-auto',
-          !use_pagination &&
-            'scrollbar-thumb-rounded-md scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800'
-        )}
+    return createPortal(
+      <div
+        ref={menuRef}
+        style={{ ...menuStyle, display: 'flex', flexDirection: 'column' }}
+        onKeyDown={handleKeyDown}
+        className="overflow-hidden rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
       >
-        {header_slot}
-        {displayItems.length === 0 ? (
-          <li className="px-4 py-3 text-gray-600 dark:text-gray-300">
-            No options available.
-          </li>
-        ) : (
-          renderItems()
-        )}
-      </ul>
-    );
-
-    if (use_portal) {
-      const portalContent = use_pagination ? (
-        <>
-          <div className="p-2">
-            <input
-              id={searchId}
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..."
-              aria-label="Search"
-              className="w-full rounded-sm border border-solid border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-300 dark:text-gray-100 dark:placeholder-gray-400"
-            />
-          </div>
-          <InfiniteScroll
-            handle_scroll={onScroll}
-            additional_css={clsx(
-              'max-h-60',
-              additional_scroll_css,
-              'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
-            )}
-          >
-            {listMarkup}
-          </InfiniteScroll>
-        </>
-      ) : (
-        <>
-          <div className="p-2">
-            <input
-              id={searchId}
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..."
-              aria-label="Search"
-              className="my-2 w-full rounded-md border-1 border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
-            />
-          </div>
-          {listMarkup}
-        </>
-      );
-
-      return createPortal(
-        <div
-          ref={portalMenuRef}
-          style={menuStyle}
-          onKeyDown={handleKeyDown}
-          className="rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
-        >
-          {portalContent}
-        </div>,
-        document.body
-      );
-    }
-
-    const wrapperClasses = clsx(
-      'absolute w-full mt-2 border border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-md',
-      is_in_modal ? 'z-[9999]' : 'z-50'
-    );
-
-    if (use_pagination) {
-      return (
-        <div className={wrapperClasses}>
-          <div className="p-2">
-            <input
-              id={searchId}
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search..."
-              aria-label="Search"
-              className="w-full rounded-sm border border-solid border-gray-500 bg-transparent px-3 py-2 text-sm text-gray-500 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-300 dark:text-gray-300"
-            />
-          </div>
-          <InfiniteScroll
-            handle_scroll={onScroll}
-            additional_css={clsx(
-              'max-h-60',
-              additional_scroll_css,
-              'scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md'
-            )}
-          >
-            {listMarkup}
-          </InfiniteScroll>
-        </div>
-      );
-    }
-
-    return (
-      <div className={wrapperClasses}>
-        <div className="p-2">
-          <input
-            id={searchId}
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search..."
-            aria-label="Search"
-            className="my-2 w-full rounded-md border-1 border-gray-500 bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-600"
-          />
-        </div>
-        {listMarkup}
-      </div>
+        {renderSearchInput()}
+        {renderMenuBody()}
+      </div>,
+      document.body
     );
   };
 
   return (
-    <div
-      ref={containerRef}
-      onBlur={handleBlur}
-      className={clsx('relative w-full', is_in_modal && 'overflow-visible')}
-    >
+    <div ref={containerRef} className="relative w-full min-w-0">
       <div className="relative flex w-full items-center">
         <button
           ref={triggerRef}
@@ -543,14 +543,16 @@ const Dropdown = ({
           onClick={disabled ? undefined : handleTriggerClick}
           onKeyDown={disabled ? undefined : handleKeyDown}
           className={clsx(
-            'relative flex w-full items-center rounded-md border p-2 pr-10 pl-3 text-left',
+            'relative flex w-full min-w-0 items-center rounded-md border p-2 pr-16 pl-3 text-left',
             disabled
               ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-80 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500'
               : 'border-gray-500 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800'
           )}
         >
-          <span className="flex-1 truncate">{renderSelectionText()}</span>
-          <span className="absolute top-1/2 right-3 -translate-y-1/2">
+          <span className="min-w-0 flex-1 truncate text-left">
+            {renderSelectionText()}
+          </span>
+          <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2">
             {renderIcon()}
           </span>
         </button>

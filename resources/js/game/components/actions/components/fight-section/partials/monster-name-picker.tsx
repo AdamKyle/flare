@@ -41,7 +41,6 @@ const MonsterNamePicker = ({
       on_select={handleSelect}
       pre_selected_item={preSelectedItem}
       selection_placeholder={display_name}
-      all_click_outside
       focus_selected_on_open
     />
   );

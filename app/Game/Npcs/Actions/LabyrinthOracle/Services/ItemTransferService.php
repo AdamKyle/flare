@@ -3,10 +3,15 @@
 namespace App\Game\Npcs\Actions\LabyrinthOracle\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Npcs\Actions\LabyrinthOracle\Transformers\LabyrinthInventoryItemTransformer;
 use Facades\App\Game\Core\Handlers\DuplicateItemHandler;
 
 class ItemTransferService
@@ -16,6 +21,12 @@ class ItemTransferService
     private Item $itemToTransferFromDuplicated;
 
     private Item $itemToTransferToDuplicated;
+
+    public function __construct(
+        private readonly Pagination $pagination,
+        private readonly LabyrinthInventoryItemTransformer $labyrinthInventoryItemTransformer,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+    ) {}
 
     /**
      * The Cost of the transfer.
@@ -39,16 +50,39 @@ class ItemTransferService
     public function fetchInventoryItems(Character $character): array
     {
 
-        return array_values($character->refresh()->inventory->slots->filter(function ($slot) {
+        return $character->refresh()->inventory->slots->filter(function ($slot) {
             return ! in_array($slot->item->type, [
                 'artifact', 'trinket', 'quest', 'alchemy', 'gem',
             ]);
-        })->map(function ($slot) {
-            return [
-                'affix_name' => $slot->item->affix_name,
-                'id' => $slot->item_id,
-            ];
-        })->toArray());
+        })->map(fn ($slot) => $this->labyrinthInventoryItemTransformer->transform($slot))->values()->toArray();
+    }
+
+    /**
+     * Fetches a paginated, searchable list of inventory items eligible for attribute transfer.
+     *
+     * Used for both source and destination selection.
+     */
+    public function fetchPaginatedInventoryItems(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $query = InventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks', 'item.itemSkillProgressions'])
+            ->where('inventory_id', $inventory->id)
+            ->whereHas('item', function ($itemQuery) {
+                $itemQuery->whereNotIn('type', ['artifact', 'trinket', 'quest', 'alchemy', 'gem']);
+            });
+
+        if ($search !== '') {
+            $query->whereHas('item', function ($itemQuery) use ($search) {
+                $itemQuery->where('name', 'LIKE', '%'.$search.'%')
+                    ->orWhereHas('itemPrefix', fn ($prefixQuery) => $prefixQuery->where('name', 'LIKE', '%'.$search.'%'))
+                    ->orWhereHas('itemSuffix', fn ($suffixQuery) => $suffixQuery->where('name', 'LIKE', '%'.$search.'%'));
+            });
+        }
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->labyrinthInventoryItemTransformer);
     }
 
     /**
@@ -131,6 +165,7 @@ class ItemTransferService
         ]);
 
         $itemSlotToTransferTo = $itemSlotToTransferTo->refresh();
+        $itemSlotToTransferFrom = $itemSlotToTransferFrom->refresh();
 
         $character = $character->refresh();
 
@@ -142,6 +177,8 @@ class ItemTransferService
             'message' => 'Transferred attributes (Enchantments, Holy Oils and Gems) from: '.$this->itemToTransferFromDuplicated->affix_name.' To: '.$this->itemToTransferToDuplicated->affix_name.'. Check Server Messages (Mobile: Chat Tabs Drop Down -> Server Messages) for link to new item!',
             'inventory' => $this->fetchInventoryItems($character),
             'costs' => $this->getCosts(),
+            'source_result_preview' => $this->craftingItemPreviewTransformer->transform($itemSlotToTransferFrom->item, $itemSlotToTransferFrom->id),
+            'destination_result_preview' => $this->craftingItemPreviewTransformer->transform($itemSlotToTransferTo->item, $itemSlotToTransferTo->id),
         ]);
     }
 

@@ -3,7 +3,9 @@ import { useMemo, useState } from 'react';
 import UseQueenRerollFlowDefinition, {
   UseQueenRerollFlowParams,
 } from './definitions/use-queen-reroll-flow-definition';
+import CraftingItemPreviewDefinition from '../../../shared/api/definitions/crafting-item-preview-definition';
 import QueenInventorySlotDefinition from '../api/definitions/queen-inventory-slot-definition';
+import { useQueenUniqueItemsApi } from '../api/hooks/use-queen-unique-items-api';
 import { useRerollQueenAffixApi } from '../api/hooks/use-reroll-queen-affix-api';
 import { QueenAffixSelection } from '../enums/queen-affix-selection';
 import { QueenRerollType } from '../enums/queen-reroll-type';
@@ -29,11 +31,11 @@ const buildAffixOptions = (
 
   const options: DropdownItem[] = [];
 
-  if (selectedSlot.item.item_prefix?.randomly_generated) {
+  if (selectedSlot.preview.item_prefix) {
     options.push({ label: 'Prefix', value: QueenAffixSelection.PREFIX });
   }
 
-  if (selectedSlot.item.item_suffix?.randomly_generated) {
+  if (selectedSlot.preview.item_suffix) {
     options.push({ label: 'Suffix', value: QueenAffixSelection.SUFFIX });
   }
 
@@ -56,19 +58,16 @@ export const useQueenRerollFlow = ({
   const [slotId, setSlotId] = useState<number | null>(null);
   const [affix, setAffix] = useState<QueenAffixSelection | null>(null);
   const [rerollType, setRerollType] = useState<QueenRerollType | null>(null);
+  const [resultPreview, setResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
 
-  const slots = data.unique_slots;
-  const hasSlots = slots.length > 0;
+  const itemsApi = useQueenUniqueItemsApi({ character_id: characterId });
+
+  const hasSlots = data.unique_slots.length > 0;
 
   const selectedSlot = useMemo(
-    () => slots.find((slot) => slot.id === slotId) ?? null,
-    [slots, slotId]
-  );
-
-  const slotOptions = useMemo<DropdownItem[]>(
-    () =>
-      slots.map((slot) => ({ label: slot.item.affix_name, value: slot.id })),
-    [slots]
+    () => itemsApi.loadedItems.find((slot) => slot.slot_id === slotId) ?? null,
+    [itemsApi.loadedItems, slotId]
   );
 
   const affixOptions = useMemo<DropdownItem[]>(
@@ -94,17 +93,22 @@ export const useQueenRerollFlow = ({
     setSlotId(Number(option.value));
     setAffix(null);
     setRerollType(null);
+    setResultPreview(null);
   };
 
   const handleSelectAffix = (option: DropdownItem): void => {
     setAffix(option.value as QueenAffixSelection);
+    setResultPreview(null);
   };
 
   const handleSelectRerollType = (option: DropdownItem): void => {
     setRerollType(option.value as QueenRerollType);
+    setResultPreview(null);
   };
 
   const handleSubmit = async (): Promise<void> => {
+    setResultPreview(null);
+
     const response = await reroll();
 
     if (!response) {
@@ -113,17 +117,20 @@ export const useQueenRerollFlow = ({
 
     onDataReplaced(response);
     onSuccess(response.message);
+    setResultPreview(response.result_preview ?? null);
   };
 
   return {
     hasSlots,
-    slotOptions,
+    itemsApi,
     affixOptions,
     rerollTypeOptions,
     selectedSlotId: slotId,
+    selectedSlot,
     selectedAffix: affix,
     selectedRerollType: rerollType,
     selectedCost,
+    resultPreview,
     submitting,
     error,
     canSubmit,

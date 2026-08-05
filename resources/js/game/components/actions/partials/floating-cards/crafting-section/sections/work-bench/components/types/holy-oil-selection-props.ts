@@ -1,7 +1,13 @@
-import WorkBenchAlchemySlotDefinition from '../../api/definitions/work-bench-alchemy-slot-definition';
+import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 export default interface HolyOilSelectionProps {
-  oils: WorkBenchAlchemySlotDefinition[];
+  items: DropdownItem[];
   selectedSlotId: number | null;
+  loading: boolean;
+  isLoadingMore: boolean;
+  canLoadMore: boolean;
+  searchText: string;
+  onSearch: (value: string) => void;
+  onEndReached: () => void;
   onSelect: (slotId: number) => void;
 }

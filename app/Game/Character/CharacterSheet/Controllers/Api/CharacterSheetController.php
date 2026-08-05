@@ -11,7 +11,7 @@ use App\Flare\Models\User;
 use App\Game\Character\Builders\StatDetailsBuilder\StatModifierDetails;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterSheet\Requests\SpecificDetailsRequest;
-use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use App\Game\Character\CharacterSheet\Transformers\CharacterStatDetailsTransformer;
 use App\Game\Core\Events\GlobalTimeOut;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
@@ -39,9 +39,9 @@ class CharacterSheetController extends Controller
         $this->statModifierDetails = $statModifierDetails;
     }
 
-    public function sheet(Character $character, CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer)
+    public function sheet(Character $character, CharacterSheetTransformer $characterSheetTransformer)
     {
-        $character = new Item($character, $characterSheetBaseInfoTransformer);
+        $character = new Item($character, $characterSheetTransformer);
         $sheet = $this->manager->createData($character)->toArray();
 
         return response()->json($sheet);

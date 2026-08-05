@@ -5,6 +5,7 @@ import UseSeerRemoveGemsFlowParams from './definitions/use-seer-remove-gems-flow
 import { SeerCampApiUrls } from '../api/enums/seer-camp-api-urls';
 import { useRemoveGemsApi } from '../api/hooks/use-remove-gems-api';
 import { useSeerActionApi } from '../api/hooks/use-seer-action-api';
+import { useSeerItemsWithGemsApi } from '../api/hooks/use-seer-items-with-gems-api';
 
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
@@ -15,6 +16,8 @@ export const useSeerRemoveGemsFlow = ({
 }: UseSeerRemoveGemsFlowParams): UseSeerRemoveGemsFlowDefinition => {
   const [slotId, setSlotId] = useState<number | null>(null);
   const [gemId, setGemId] = useState<number | null>(null);
+
+  const itemsApi = useSeerItemsWithGemsApi({ character_id: characterId });
 
   const selectedItem =
     removalData?.items.find((item) => item.slot_id === slotId) ?? null;
@@ -37,15 +40,6 @@ export const useSeerRemoveGemsFlow = ({
   });
 
   const allApi = useRemoveGemsApi({ characterId, inventorySlotId: slotId });
-
-  const itemOptions = useMemo<DropdownItem[]>(
-    () =>
-      (removalData?.items ?? []).map((item) => ({
-        label: item.name,
-        value: item.slot_id,
-      })),
-    [removalData]
-  );
 
   const gemOptions = useMemo<DropdownItem[]>(
     () =>
@@ -96,7 +90,7 @@ export const useSeerRemoveGemsFlow = ({
     selectedItem,
     selectedDetails,
     selectedChange,
-    itemOptions,
+    itemsApi,
     gemOptions,
     isRemovingOne: oneApi.submitting,
     isRemovingAll: allApi.submitting,

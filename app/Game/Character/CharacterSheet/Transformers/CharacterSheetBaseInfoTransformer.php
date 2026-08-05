@@ -33,6 +33,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
     public function __construct(
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly AttackTimerService $attackTimerService,
+        private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
     ) {}
 
     public function setIgnoreReductions(bool $ignoreReductions): void
@@ -65,8 +66,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'race_id' => $character->race->id,
             'to_hit_stat' => $character->class->to_hit_stat,
             'damage_stat' => $character->class->damage_stat,
-            'level' => number_format($character->level),
-            'max_level' => number_format($this->getMaxLevel($character)),
+            'level' => $character->level,
+            'max_level' => $this->getMaxLevel($character),
             'xp' => (int) $character->xp,
             'xp_next' => (int) $character->xp_next,
             'str_modded' => $characterStatBuilder->statMod('str'),
@@ -84,10 +85,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'extra_action_chance' => (new ClassAttackBuilder($character))->buildAttackData(),
             'fight_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('fight_time_out'),
             'movement_time_out_mod_bonus' => $characterStatBuilder->buildTimeOutModifier('move_time_out'),
-            'gold' => number_format($character->gold),
-            'gold_dust' => number_format($character->gold_dust),
-            'shards' => number_format($character->shards),
-            'copper_coins' => number_format($character->copper_coins),
+            'gold' => $character->gold,
+            'gold_dust' => $character->gold_dust,
+            'shards' => $character->shards,
+            'copper_coins' => $character->copper_coins,
             'is_dead' => $character->is_dead,
             'can_craft' => $character->can_craft,
             'can_attack' => $character->can_attack,
@@ -157,7 +158,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 
     public function includeInventoryCount(Character $character)
     {
-        return $this->item($character, new CharacterInventoryCountTransformer);
+        return $this->item($character, $this->characterInventoryCountTransformer);
     }
 
     private function getFactionTasks(?FactionLoyalty $factionLoyalty = null): ?array

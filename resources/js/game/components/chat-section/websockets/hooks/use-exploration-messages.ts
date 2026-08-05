@@ -24,10 +24,10 @@ export const useExplorationMessages = ({
   );
 
   useWebsocket<ExplorationMessageDefinition>({
-    url: ChatWebSocketChannels.EXPLORATION,
+    url: ChatWebSocketChannels.AUTOMATION_LOG,
     params: { userId: user_id },
     type: ChannelType.PRIVATE,
-    channelName: ChatWebsocketEventNames.EXPLORATION,
+    channelName: ChatWebsocketEventNames.AUTOMATION_LOG,
     onEvent: handleExplorationEvent,
   });
 

@@ -1,9 +1,13 @@
+import { ReactNode } from 'react';
+
 import SeerCampApiResponseDefinition from '../../api/definitions/seer-camp-api-response-definition';
 import SeerCampCostsDefinition from '../../api/definitions/seer-camp-costs-definition';
-import SeerItemDefinition from '../../api/definitions/seer-item-definition';
+
 export default interface SeerManageSocketsFormProps {
-  items: SeerItemDefinition[];
   costs: SeerCampCostsDefinition;
   characterId: number;
+  rootStatus?: ReactNode;
+  helpLink?: ReactNode;
   onSuccess: (data: SeerCampApiResponseDefinition) => void;
+  onChangeAction: () => void;
 }

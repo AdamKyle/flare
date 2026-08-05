@@ -3,8 +3,11 @@ import { useMemo, useState } from 'react';
 import UseQueenMoveAffixesFlowDefinition, {
   UseQueenMoveAffixesFlowParams,
 } from './definitions/use-queen-move-affixes-flow-definition';
+import CraftingItemPreviewDefinition from '../../../shared/api/definitions/crafting-item-preview-definition';
 import QueenInventorySlotDefinition from '../api/definitions/queen-inventory-slot-definition';
 import { useMoveQueenAffixesApi } from '../api/hooks/use-move-queen-affixes-api';
+import { useQueenDestinationItemsApi } from '../api/hooks/use-queen-destination-items-api';
+import { useQueenUniqueItemsApi } from '../api/hooks/use-queen-unique-items-api';
 import { QueenAffixSelection } from '../enums/queen-affix-selection';
 import { buildMoveQueenAffixesRequest } from '../utils/build-move-queen-affixes-request';
 
@@ -19,11 +22,11 @@ const buildAffixOptions = (
 
   const options: DropdownItem[] = [];
 
-  if (selectedSource.item.item_prefix) {
+  if (selectedSource.preview.item_prefix) {
     options.push({ label: 'Prefix', value: QueenAffixSelection.PREFIX });
   }
 
-  if (selectedSource.item.item_suffix) {
+  if (selectedSource.preview.item_suffix) {
     options.push({ label: 'Suffix', value: QueenAffixSelection.SUFFIX });
   }
 
@@ -46,31 +49,32 @@ export const useQueenMoveAffixesFlow = ({
   const [sourceId, setSourceId] = useState<number | null>(null);
   const [destinationId, setDestinationId] = useState<number | null>(null);
   const [affix, setAffix] = useState<QueenAffixSelection | null>(null);
+  const [sourceResultPreview, setSourceResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
+  const [destinationResultPreview, setDestinationResultPreview] =
+    useState<CraftingItemPreviewDefinition | null>(null);
 
-  const uniqueSlots = data.unique_slots;
-  const nonUniqueSlots = data.non_unique_slots;
-  const hasSourceSlots = uniqueSlots.length > 0;
+  const sourceItemsApi = useQueenUniqueItemsApi({ character_id: characterId });
+  const destinationItemsApi = useQueenDestinationItemsApi({
+    character_id: characterId,
+    source_slot_id: sourceId,
+  });
+
+  const hasSourceSlots = data.unique_slots.length > 0;
 
   const selectedSource = useMemo(
-    () => uniqueSlots.find((slot) => slot.id === sourceId) ?? null,
-    [uniqueSlots, sourceId]
+    () =>
+      sourceItemsApi.loadedItems.find((slot) => slot.slot_id === sourceId) ??
+      null,
+    [sourceItemsApi.loadedItems, sourceId]
   );
 
-  const sourceOptions = useMemo<DropdownItem[]>(
+  const selectedDestination = useMemo(
     () =>
-      uniqueSlots.map((slot) => ({
-        label: slot.item.affix_name,
-        value: slot.id,
-      })),
-    [uniqueSlots]
-  );
-
-  const destinationOptions = useMemo<DropdownItem[]>(
-    () =>
-      [...uniqueSlots, ...nonUniqueSlots]
-        .filter((slot) => slot.id !== sourceId)
-        .map((slot) => ({ label: slot.item.affix_name, value: slot.id })),
-    [uniqueSlots, nonUniqueSlots, sourceId]
+      destinationItemsApi.loadedItems.find(
+        (slot) => slot.slot_id === destinationId
+      ) ?? null,
+    [destinationItemsApi.loadedItems, destinationId]
   );
 
   const affixOptions = useMemo<DropdownItem[]>(
@@ -97,21 +101,28 @@ export const useQueenMoveAffixesFlow = ({
 
     setSourceId(nextSourceId);
     setAffix(null);
-
-    if (nextSourceId === destinationId) {
-      setDestinationId(null);
-    }
+    setDestinationId(null);
+    destinationItemsApi.setSearchText('');
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
   };
 
   const handleSelectAffix = (option: DropdownItem): void => {
     setAffix(option.value as QueenAffixSelection);
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
   };
 
   const handleSelectDestination = (option: DropdownItem): void => {
     setDestinationId(Number(option.value));
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
   };
 
   const handleSubmit = async (): Promise<void> => {
+    setSourceResultPreview(null);
+    setDestinationResultPreview(null);
+
     const response = await move();
 
     if (!response) {
@@ -120,20 +131,27 @@ export const useQueenMoveAffixesFlow = ({
 
     onDataReplaced(response);
     onSuccess(response.message);
+    setSourceResultPreview(response.source_result_preview ?? null);
+    setDestinationResultPreview(response.destination_result_preview ?? null);
     setSourceId(null);
     setDestinationId(null);
     setAffix(null);
+    sourceItemsApi.refresh();
   };
 
   return {
     hasSourceSlots,
-    sourceOptions,
-    destinationOptions,
+    sourceItemsApi,
+    destinationItemsApi,
+    selectedSource,
+    selectedDestination,
     affixOptions,
     selectedSourceId: sourceId,
     selectedDestinationId: destinationId,
     selectedAffix: affix,
     selectedCost,
+    sourceResultPreview,
+    destinationResultPreview,
     submitting,
     error,
     canSubmit,

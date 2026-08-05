@@ -34,8 +34,6 @@ const CoordinatesDropDown = ({
       on_clear={on_clear}
       selection_placeholder={'Select a coordinate'}
       pre_selected_item={default_position}
-      all_click_outside
-      is_in_modal
     />
   );
 };

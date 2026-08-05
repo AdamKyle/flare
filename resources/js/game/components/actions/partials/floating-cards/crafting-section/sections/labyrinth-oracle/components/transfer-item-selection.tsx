@@ -7,20 +7,26 @@ import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const TransferItemSelection = ({
-  inventory,
+  items,
   sourceId,
   destinationId,
+  loading,
+  isLoadingMore,
+  canLoadMore,
+  searchText,
+  onSearch,
+  onEndReached,
   onSource,
   onDestination,
 }: TransferItemSelectionProps): ReactNode => {
   const sourceOptions = useMemo(
-    () => buildTransferItemOptions(inventory, destinationId),
-    [inventory, destinationId]
+    () => buildTransferItemOptions(items, destinationId),
+    [items, destinationId]
   );
 
   const destinationOptions = useMemo(
-    () => buildTransferItemOptions(inventory, sourceId),
-    [inventory, sourceId]
+    () => buildTransferItemOptions(items, sourceId),
+    [items, sourceId]
   );
 
   const handleSourceSelect = (option: DropdownItem): void => {
@@ -47,9 +53,17 @@ const TransferItemSelection = ({
       <Dropdown
         aria_labelled_by={labelId}
         items={options}
-        selection_placeholder={placeholder}
+        selection_placeholder={loading ? 'Loading items…' : placeholder}
         on_select={onSelect}
         force_clear={shouldClearSelection}
+        searchable
+        search_value={searchText}
+        on_search={onSearch}
+        can_load_more={canLoadMore}
+        is_loading_more={isLoadingMore}
+        on_end_reached={onEndReached}
+        empty_message="No eligible items are available."
+        disabled={loading}
       />
     </div>
   );

@@ -1,5 +1,6 @@
 import { ChangeEvent, UIEvent } from 'react';
 
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 import CraftableItemDefinition from '../../api/definitions/craftable-item-definition';
 import CraftingApiResponseDefinition from '../../api/definitions/crafting-api-response-definition';
 import {
@@ -45,7 +46,7 @@ export interface CraftItemsFlowResult {
   error: string | null;
   successMessage: string | null;
   craftedInventorySlotId: number | null;
-  craftedItemDetails: CraftableItemDefinition | null;
+  resultPreview: CraftingItemPreviewDefinition | null;
   isCrafting: boolean;
 }
 

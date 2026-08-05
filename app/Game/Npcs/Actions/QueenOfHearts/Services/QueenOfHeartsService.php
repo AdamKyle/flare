@@ -3,11 +3,17 @@
 namespace App\Game\Npcs\Actions\QueenOfHearts\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Inventory;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
+use App\Game\Npcs\Actions\QueenOfHearts\Transformers\QueenInventorySlotTransformer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class QueenOfHeartsService
@@ -18,10 +24,77 @@ class QueenOfHeartsService
 
     private ReRollEnchantmentService $reRollEnchantmentService;
 
-    public function __construct(RandomEnchantmentService $randomEnchantmentService, ReRollEnchantmentService $reRollEnchantmentService)
-    {
+    private Pagination $pagination;
+
+    public function __construct(
+        RandomEnchantmentService $randomEnchantmentService,
+        ReRollEnchantmentService $reRollEnchantmentService,
+        Pagination $pagination,
+        private readonly QueenInventorySlotTransformer $queenInventorySlotTransformer,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+    ) {
         $this->randomEnchantmentService = $randomEnchantmentService;
         $this->reRollEnchantmentService = $reRollEnchantmentService;
+        $this->pagination = $pagination;
+    }
+
+    /**
+     * Fetches a paginated, searchable list of eligible unique source items.
+     */
+    public function fetchPaginatedUniqueItems(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        $query = $this->randomEnchantmentService->buildUniqueInventoryQuery($character);
+
+        $this->applyItemSearch($query, $search);
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->queenInventorySlotTransformer);
+    }
+
+    /**
+     * Fetches a paginated, searchable list of eligible Queen movement destination items.
+     *
+     * Uses the same authoritative unique and non-unique eligibility rules used to build
+     * the Queen summary response, excludes the given source slot, and requires the source
+     * slot to belong to the requested character.
+     */
+    public function fetchPaginatedDestinationItems(Character $character, int $sourceSlotId, int $perPage, int $page, string $search = ''): array
+    {
+        $inventory = Inventory::where('character_id', $character->id)->first();
+
+        $sourceSlot = InventorySlot::where('inventory_id', $inventory->id)->where('id', $sourceSlotId)->first();
+
+        if (is_null($sourceSlot)) {
+            return $this->errorResult('Where did you put that item, child? Ooooh hooo hooo hooo! Are you playing hide and seek with it? (Unique does not exist.)');
+        }
+
+        $query = $this->randomEnchantmentService->buildDestinationInventoryQuery($character)
+            ->where('id', '!=', $sourceSlotId);
+
+        $this->applyItemSearch($query, $search);
+
+        $paginator = $query->orderBy('id')->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->successResult(
+            $this->pagination->transformLengthAwarePaginator($paginator, $this->queenInventorySlotTransformer)
+        );
+    }
+
+    /**
+     * Applies a name/prefix/suffix search to an item-bearing inventory-slot query.
+     */
+    private function applyItemSearch(Builder $query, string $search): void
+    {
+        if ($search === '') {
+            return;
+        }
+
+        $query->whereHas('item', function ($itemQuery) use ($search) {
+            $itemQuery->where('name', 'LIKE', '%'.$search.'%')
+                ->orWhereHas('itemPrefix', fn ($prefixQuery) => $prefixQuery->where('name', 'LIKE', '%'.$search.'%'))
+                ->orWhereHas('itemSuffix', fn ($suffixQuery) => $suffixQuery->where('name', 'LIKE', '%'.$search.'%'));
+        });
     }
 
     /**
@@ -29,11 +102,14 @@ class QueenOfHeartsService
      */
     public function buildQueenResponse(Character $character): array
     {
-        $data = $this->randomEnchantmentService->fetchDataForApi($character);
+        $uniqueSlots = $this->randomEnchantmentService->fetchUniquesFromCharactersInventory($character);
+        $nonUniqueSlots = $this->randomEnchantmentService->fetchNonUniqueItems($character);
 
-        $data['costs'] = $this->buildCosts($data['unique_slots']);
-
-        return $data;
+        return [
+            'unique_slots' => $uniqueSlots->map(fn ($slot) => $this->queenInventorySlotTransformer->transform($slot))->values(),
+            'non_unique_slots' => $nonUniqueSlots->map(fn ($slot) => $this->queenInventorySlotTransformer->transform($slot))->values(),
+            'costs' => $this->buildCosts($uniqueSlots),
+        ];
     }
 
     /**
@@ -73,7 +149,11 @@ class QueenOfHeartsService
 
         event(new ServerMessageEvent($character->user, 'The Queen has re-rolled: '.$slot->item->affix_name, $slot->id));
 
-        return $this->successResult($this->buildQueenResponse($character));
+        $slot = $slot->refresh();
+
+        return $this->successResult(array_merge($this->buildQueenResponse($character), [
+            'result_preview' => $this->craftingItemPreviewTransformer->transform($slot->item, $slot->id),
+        ]));
     }
 
     /**
@@ -122,8 +202,13 @@ class QueenOfHeartsService
         );
 
         $character = $character->refresh();
+        $slot = $slot->refresh();
+        $secondSlot = $secondSlot->refresh();
 
-        return $this->successResult($this->buildQueenResponse($character));
+        return $this->successResult(array_merge($this->buildQueenResponse($character), [
+            'source_result_preview' => $this->craftingItemPreviewTransformer->transform($slot->item, $slot->id),
+            'destination_result_preview' => $this->craftingItemPreviewTransformer->transform($secondSlot->item, $secondSlot->id),
+        ]));
     }
 
     private function buildCosts(Collection $uniqueSlots): array

@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Game\Npcs\Actions\Seer\Controllers\Api;
 
+use App\Flare\Models\ItemSkill;
 use App\Game\Core\Chance\RandomNumberGenerator;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Mockery\MockInterface;
@@ -10,10 +12,11 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class SeerCampControllerTest extends TestCase
 {
-    use CreateGem, CreateItem, RefreshDatabase;
+    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -86,6 +89,189 @@ class SeerCampControllerTest extends TestCase
         $this->assertEquals(20, $jsonData['gems'][0]['remove_all_cost']);
     }
 
+    public function test_paginated_items_endpoint_respects_purpose_filter_and_search()
+    {
+        $socketableWithoutSockets = $this->createItem([
+            'type' => 'weapon',
+            'name' => 'Alpha Weapon',
+            'socket_count' => 0,
+        ]);
+
+        $socketableWithSockets = $this->createItem([
+            'type' => 'weapon',
+            'name' => 'Beta Weapon',
+            'socket_count' => 2,
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($socketableWithoutSockets)
+            ->giveItem($socketableWithSockets)
+            ->getCharacter();
+
+        $socketsResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/items', [
+                'purpose' => 'sockets',
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $socketsData = json_decode($socketsResponse->getContent(), true);
+
+        $attachResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/items', [
+                'purpose' => 'attach',
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $attachData = json_decode($attachResponse->getContent(), true);
+
+        $this->assertEquals(200, $socketsResponse->status());
+        $this->assertCount(2, $socketsData['data']);
+        $this->assertCount(1, $attachData['data']);
+        $this->assertEquals('Beta Weapon', $attachData['data'][0]['name']);
+    }
+
+    public function test_paginated_gems_endpoint_respects_per_page_and_search()
+    {
+        $character = $this->character->getCharacter();
+        $gemBag = $character->gemBag;
+
+        $gemOne = $this->createGem(['name' => 'Alpha Gem']);
+        $gemTwo = $this->createGem(['name' => 'Beta Gem']);
+
+        $gemBag->gemSlots()->create(['gem_bag_id' => $gemBag->id, 'gem_id' => $gemOne->id, 'amount' => 1]);
+        $gemBag->gemSlots()->create(['gem_bag_id' => $gemBag->id, 'gem_id' => $gemTwo->id, 'amount' => 1]);
+
+        $firstPage = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/gems', [
+                'per_page' => 1,
+                'page' => 1,
+            ]);
+
+        $firstPageData = json_decode($firstPage->getContent(), true);
+
+        $searchResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/gems', [
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $searchData = json_decode($searchResponse->getContent(), true);
+
+        $this->assertEquals(200, $firstPage->status());
+        $this->assertCount(1, $firstPageData['data']);
+        $this->assertTrue($firstPageData['meta']['can_load_more']);
+        $this->assertCount(1, $searchData['data']);
+        $this->assertEquals('Beta Gem', $searchData['data'][0]['gem']['name']);
+    }
+
+    public function test_paginated_items_with_gems_endpoint_returns_only_items_with_attached_gems()
+    {
+        $itemWithGem = $this->createItem(['type' => 'weapon', 'name' => 'Socketed Weapon', 'socket_count' => 1]);
+        $itemWithoutGem = $this->createItem(['type' => 'weapon', 'name' => 'Empty Weapon', 'socket_count' => 1]);
+
+        $itemWithGem->sockets()->create([
+            'item_id' => $itemWithGem->id,
+            'gem_id' => $this->createGem()->id,
+        ]);
+
+        $itemWithGem = $itemWithGem->refresh();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemWithGem)
+            ->giveItem($itemWithoutGem)
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/items-with-gems', [
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(200, $response->status());
+        $this->assertCount(1, $jsonData['data']);
+        $this->assertEquals('Socketed Weapon', $jsonData['data'][0]['name']);
+    }
+
+    public function test_paginated_items_with_gems_endpoint_respects_per_page_and_search()
+    {
+        $itemOne = $this->createItem(['type' => 'weapon', 'name' => 'Alpha Socketed', 'socket_count' => 1]);
+        $itemTwo = $this->createItem(['type' => 'weapon', 'name' => 'Beta Socketed', 'socket_count' => 1]);
+
+        $itemOne->sockets()->create(['item_id' => $itemOne->id, 'gem_id' => $this->createGem()->id]);
+        $itemTwo->sockets()->create(['item_id' => $itemTwo->id, 'gem_id' => $this->createGem()->id]);
+
+        $itemOne = $itemOne->refresh();
+        $itemTwo = $itemTwo->refresh();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemOne)
+            ->giveItem($itemTwo)
+            ->getCharacter();
+
+        $firstPage = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/items-with-gems', [
+                'per_page' => 1,
+                'page' => 1,
+            ]);
+
+        $firstPageData = json_decode($firstPage->getContent(), true);
+
+        $searchResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/items-with-gems', [
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $searchData = json_decode($searchResponse->getContent(), true);
+
+        $this->assertEquals(200, $firstPage->status());
+        $this->assertCount(1, $firstPageData['data']);
+        $this->assertTrue($firstPageData['meta']['can_load_more']);
+        $this->assertCount(1, $searchData['data']);
+        $this->assertEquals('Beta Socketed', $searchData['data'][0]['name']);
+    }
+
+    public function test_paginated_items_with_gems_endpoint_only_returns_requested_characters_items()
+    {
+        $ownItem = $this->createItem(['type' => 'weapon', 'name' => 'Own Socketed', 'socket_count' => 1]);
+        $ownItem->sockets()->create(['item_id' => $ownItem->id, 'gem_id' => $this->createGem()->id]);
+        $ownItem = $ownItem->refresh();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($ownItem)
+            ->getCharacter();
+
+        $foreignItem = $this->createItem(['type' => 'weapon', 'name' => 'Foreign Socketed', 'socket_count' => 1]);
+        $foreignItem->sockets()->create(['item_id' => $foreignItem->id, 'gem_id' => $this->createGem()->id]);
+        $foreignItem = $foreignItem->refresh();
+
+        (new CharacterFactory)->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($foreignItem);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/seer-camp/'.$character->id.'/items-with-gems', [
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertCount(1, $jsonData['data']);
+        $this->assertEquals('Own Socketed', $jsonData['data'][0]['name']);
+    }
+
     public function test_one_successful_mutation_response_retains_items_gems_costs_and_message()
     {
         $this->instance(
@@ -121,6 +307,8 @@ class SeerCampControllerTest extends TestCase
         $this->assertArrayHasKey('gems', $jsonData);
         $this->assertArrayHasKey('costs', $jsonData);
         $this->assertEquals('Attached sockets to item! (Old Socket Count: 0, New Count: 2).', $jsonData['message']);
+        $this->assertNotNull($jsonData['result_preview']);
+        $this->assertSame(2, $jsonData['result_preview']['socket_count']);
     }
 
     public function test_expected_validation_failure_does_not_change_gold_bars_or_item_state()
@@ -151,5 +339,77 @@ class SeerCampControllerTest extends TestCase
         $this->assertEquals('Error. Invalid Input.', $jsonData['errors']['slot_id'][0]);
         $this->assertEquals($goldBarsBefore, $character->refresh()->kingdoms->sum('gold_bars'));
         $this->assertEquals(0, $item->refresh()->socket_count);
+    }
+
+    public function test_paginated_items_endpoint_with_populated_rows_does_not_lazy_load()
+    {
+        $itemSkill = ItemSkill::create([
+            'name' => 'Weapon Mastery',
+            'description' => 'Increases weapon proficiency.',
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+        ]);
+
+        $decoratedItem = $this->createItem([
+            'type' => 'weapon',
+            'name' => 'Decorated Weapon',
+            'socket_count' => 2,
+            'item_prefix_id' => $this->createItemAffix(['type' => 'prefix'])->id,
+            'item_suffix_id' => $this->createItemAffix(['type' => 'suffix'])->id,
+            'holy_stacks' => 5,
+        ]);
+
+        $decoratedItem->sockets()->create(['item_id' => $decoratedItem->id, 'gem_id' => $this->createGem()->id]);
+        $decoratedItem->sockets()->create(['item_id' => $decoratedItem->id, 'gem_id' => $this->createGem()->id]);
+
+        $decoratedItem->appliedHolyStacks()->create([
+            'item_id' => $decoratedItem->id,
+            'devouring_darkness_bonus' => 0.1,
+            'stat_increase_bonus' => 0.1,
+        ]);
+
+        $decoratedItem->itemSkillProgressions()->create([
+            'item_id' => $decoratedItem->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 1,
+            'current_kill' => 10,
+            'is_training' => false,
+        ]);
+
+        $decoratedItem = $decoratedItem->refresh();
+        $decoratedItemName = $decoratedItem->affix_name;
+
+        $plainItem = $this->createItem(['type' => 'weapon', 'name' => 'Plain Weapon', 'socket_count' => 0]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($decoratedItem)
+            ->giveItem($plainItem)
+            ->getCharacter();
+
+        Model::preventLazyLoading();
+
+        try {
+            $response = $this->actingAs($character->user)
+                ->call('GET', '/api/seer-camp/'.$character->id.'/items', [
+                    'purpose' => 'sockets',
+                    'per_page' => 15,
+                    'page' => 1,
+                ]);
+
+            $response->assertOk();
+
+            $data = json_decode($response->getContent(), true);
+
+            $this->assertCount(2, $data['data']);
+
+            $decoratedRow = collect($data['data'])->firstWhere('name', $decoratedItemName);
+
+            $this->assertNotNull($decoratedRow);
+            $this->assertSame(2, $decoratedRow['current_sockets']);
+            $this->assertArrayHasKey('preview', $decoratedRow);
+        } finally {
+            Model::preventLazyLoading(false);
+        }
     }
 }

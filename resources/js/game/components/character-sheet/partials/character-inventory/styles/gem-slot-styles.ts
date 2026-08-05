@@ -1,8 +1,10 @@
 import { match } from 'ts-pattern';
 
-import BaseGemDetails from '../../../../../api-definitions/items/base-gem-details';
+interface TieredGem {
+  tier: number;
+}
 
-export const gemSlotFocusRingStyles = (gem: BaseGemDetails): string => {
+export const gemSlotFocusRingStyles = (gem: TieredGem): string => {
   return match(gem)
     .with({ tier: 2 }, () => 'focus:ring-green-800')
     .with({ tier: 3 }, () => 'focus:ring-amber-800')
@@ -10,7 +12,7 @@ export const gemSlotFocusRingStyles = (gem: BaseGemDetails): string => {
     .otherwise(() => 'focus:ring-gray-800');
 };
 
-export const gemSlotBorderStyles = (gem: BaseGemDetails): string => {
+export const gemSlotBorderStyles = (gem: TieredGem): string => {
   return match(gem)
     .with({ tier: 2 }, () => 'border-green-800 dark:border-green-500')
     .with({ tier: 3 }, () => 'border-amber-800 dark:border-amber-500')
@@ -18,7 +20,7 @@ export const gemSlotBorderStyles = (gem: BaseGemDetails): string => {
     .otherwise(() => 'border-gray-800 dark:border-gray-500');
 };
 
-export const gemSlotButtonBackgroundColor = (gem: BaseGemDetails): string => {
+export const gemSlotButtonBackgroundColor = (gem: TieredGem): string => {
   return match(gem)
     .with(
       { tier: 2 },
@@ -41,7 +43,7 @@ export const gemSlotButtonBackgroundColor = (gem: BaseGemDetails): string => {
     );
 };
 
-export const gemSlotTextColor = (gem: BaseGemDetails): string => {
+export const gemSlotTextColor = (gem: TieredGem): string => {
   return match(gem)
     .with({ tier: 2 }, () => 'text-green-700 dark:text-green-600')
     .with({ tier: 3 }, () => 'text-amber-600 dark:text-amber-500')
@@ -49,7 +51,7 @@ export const gemSlotTextColor = (gem: BaseGemDetails): string => {
     .otherwise(() => 'text-gray-600 dark:text-gray-700');
 };
 
-export const getGemSlotTitleTextColor = (gem: BaseGemDetails): string => {
+export const getGemSlotTitleTextColor = (gem: TieredGem): string => {
   return match(gem)
     .with({ tier: 2 }, () => 'text-green-700 dark:text-green-600')
     .with({ tier: 3 }, () => 'text-amber-600 dark:text-amber-500')

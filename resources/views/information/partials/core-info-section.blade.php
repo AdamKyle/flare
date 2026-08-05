@@ -55,11 +55,18 @@
       @endif
 
       @if (! is_null($section['live_wire_component']) && $section['live_wire_component'] !== 'null' && ($section['item_table_type'] === null || $section['item_table_type'] === 'null'))
-        <div
-          class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
-        ></div>
+        @php
+          $informationSection = app(\App\Flare\View\Information\InformationSectionRenderer::class)
+              ->render($section['live_wire_component'], request());
+        @endphp
 
-        @livewire($section['live_wire_component'])
+        @if (! is_null($informationSection))
+          <div
+            class="my-3 border-b-2 border-b-gray-300 dark:border-b-gray-600"
+          ></div>
+
+          {{ $informationSection }}
+        @endif
       @endif
 
       @if (! is_null($section['item_table_type']) && $section['item_table_type'] !== 'undefined')

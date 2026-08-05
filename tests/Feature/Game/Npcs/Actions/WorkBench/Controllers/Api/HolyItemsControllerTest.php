@@ -3,15 +3,18 @@
 namespace Tests\Feature\Game\Npcs\Actions\WorkBench\Controllers\Api;
 
 use App\Flare\Models\AlchemyBagSlot;
+use App\Flare\Models\ItemSkill;
 use App\Game\Core\Currency\Services\CurrencyLimit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class HolyItemsControllerTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -59,7 +62,8 @@ class HolyItemsControllerTest extends TestCase
 
         $this->assertCount(1, $jsonData['items']);
         $this->assertCount(1, $jsonData['alchemy_items']);
-        $this->assertEquals(1, $jsonData['alchemy_items'][0]['amount']);
+        $this->assertEquals(1, $jsonData['alchemy_items'][0]['stack_amount']);
+        $this->assertArrayHasKey('preview', $jsonData['items'][0]);
     }
 
     public function test_get_smithing_items_includes_cost_lookup()
@@ -93,6 +97,132 @@ class HolyItemsControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals(3000, $jsonData['costs'][$itemSlot->id][$alchemySlot->id]);
+    }
+
+    public function test_paginated_items_endpoint_respects_per_page_and_search()
+    {
+        $itemOne = $this->createItem(['name' => 'Alpha Sword', 'holy_stacks' => 20]);
+        $itemTwo = $this->createItem(['name' => 'Beta Sword', 'holy_stacks' => 20]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemOne)
+            ->giveItem($itemTwo)
+            ->getCharacter();
+
+        $firstPage = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/items', [
+                'per_page' => 1,
+                'page' => 1,
+            ]);
+
+        $firstPageData = json_decode($firstPage->getContent(), true);
+
+        $searchResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/items', [
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $searchData = json_decode($searchResponse->getContent(), true);
+
+        $this->assertEquals(200, $firstPage->status());
+        $this->assertCount(1, $firstPageData['data']);
+        $this->assertTrue($firstPageData['meta']['can_load_more']);
+        $this->assertCount(1, $searchData['data']);
+        $this->assertEquals($itemTwo->id, $searchData['data'][0]['item_id']);
+    }
+
+    public function test_paginated_items_endpoint_excludes_items_with_no_remaining_holy_stacks()
+    {
+        $eligibleItem = $this->createItem(['name' => 'Eligible Sword', 'holy_stacks' => 20]);
+        $fullyStackedItem = $this->createItem(['name' => 'Full Sword', 'holy_stacks' => 1]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($eligibleItem)
+            ->giveItem($fullyStackedItem)
+            ->getCharacter();
+
+        $fullyStackedSlot = $character->inventory->slots->firstWhere('item_id', $fullyStackedItem->id);
+
+        $fullyStackedSlot->item->appliedHolyStacks()->create([
+            'item_id' => $fullyStackedItem->id,
+            'devouring_darkness_bonus' => 0.1,
+            'stat_increase_bonus' => 0.1,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/items', [
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertCount(1, $jsonData['data']);
+        $this->assertEquals($eligibleItem->id, $jsonData['data'][0]['item_id']);
+    }
+
+    public function test_paginated_items_endpoint_only_returns_requested_characters_items()
+    {
+        $ownItem = $this->createItem(['name' => 'Own Sword', 'holy_stacks' => 20]);
+        $otherItem = $this->createItem(['name' => 'Other Sword', 'holy_stacks' => 20]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($ownItem)
+            ->getCharacter();
+
+        (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($otherItem);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/items', [
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertCount(1, $jsonData['data']);
+        $this->assertEquals($ownItem->id, $jsonData['data'][0]['item_id']);
+    }
+
+    public function test_paginated_oils_endpoint_respects_per_page_and_search()
+    {
+        $oilOne = $this->createItem(['type' => 'alchemy', 'name' => 'Alpha Oil', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+        $oilTwo = $this->createItem(['type' => 'alchemy', 'name' => 'Beta Oil', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $character->alchemyBag->slots()->create(['character_id' => $character->id, 'item_id' => $oilOne->id, 'amount' => 1]);
+        $character->alchemyBag->slots()->create(['character_id' => $character->id, 'item_id' => $oilTwo->id, 'amount' => 1]);
+
+        $firstPage = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/oils', [
+                'per_page' => 1,
+                'page' => 1,
+            ]);
+
+        $firstPageData = json_decode($firstPage->getContent(), true);
+
+        $searchResponse = $this->actingAs($character->user)
+            ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/oils', [
+                'per_page' => 15,
+                'page' => 1,
+                'search_text' => 'Beta',
+            ]);
+
+        $searchData = json_decode($searchResponse->getContent(), true);
+
+        $this->assertEquals(200, $firstPage->status());
+        $this->assertCount(1, $firstPageData['data']);
+        $this->assertTrue($firstPageData['meta']['can_load_more']);
+        $this->assertCount(1, $searchData['data']);
+        $this->assertEquals($oilTwo->id, $searchData['data'][0]['item_id']);
     }
 
     public function test_apply_oil()
@@ -149,6 +279,8 @@ class HolyItemsControllerTest extends TestCase
         $this->assertCount(1, $jsonData['items']);
         $this->assertCount(0, $jsonData['alchemy_items']);
         $this->assertEquals(0, $character->alchemyBag->slots()->where('id', $alchemySlot->id)->count());
+        $this->assertNotNull($jsonData['result_preview']);
+        $this->assertSame(1, $jsonData['result_preview']['holy_stacks_applied']);
     }
 
     public function test_apply_oil_returns_representative_validation_error_response()
@@ -179,5 +311,68 @@ class HolyItemsControllerTest extends TestCase
         $jsonData = json_decode($response->getContent(), true);
 
         $this->assertEquals('Error. Invalid Input.', $jsonData['errors']['item_id'][0]);
+    }
+
+    public function test_paginated_items_endpoint_with_populated_rows_does_not_lazy_load()
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $suffix = $this->createItemAffix(['type' => 'suffix']);
+
+        $itemSkill = ItemSkill::create([
+            'name' => 'Weapon Mastery',
+            'description' => 'Increases weapon proficiency.',
+            'max_level' => 10,
+            'total_kills_needed' => 100,
+        ]);
+
+        $decoratedItem = $this->createItem([
+            'name' => 'Decorated Sword',
+            'holy_stacks' => 5,
+            'item_prefix_id' => $prefix->id,
+            'item_suffix_id' => $suffix->id,
+        ]);
+
+        $decoratedItem->appliedHolyStacks()->create([
+            'item_id' => $decoratedItem->id,
+            'devouring_darkness_bonus' => 0.1,
+            'stat_increase_bonus' => 0.1,
+        ]);
+
+        $decoratedItem->itemSkillProgressions()->create([
+            'item_id' => $decoratedItem->id,
+            'item_skill_id' => $itemSkill->id,
+            'current_level' => 1,
+            'current_kill' => 10,
+            'is_training' => false,
+        ]);
+
+        $decoratedItem = $decoratedItem->refresh();
+
+        $plainItem = $this->createItem(['name' => 'Plain Sword', 'holy_stacks' => 20]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($decoratedItem)
+            ->giveItem($plainItem)
+            ->getCharacter();
+
+        Model::preventLazyLoading();
+
+        try {
+            $response = $this->actingAs($character->user)
+                ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/items', [
+                    'per_page' => 15,
+                    'page' => 1,
+                ]);
+
+            $response->assertOk();
+
+            $data = json_decode($response->getContent(), true);
+
+            $this->assertCount(2, $data['data']);
+            $this->assertArrayHasKey('preview', $data['data'][0]);
+        } finally {
+            Model::preventLazyLoading(false);
+        }
     }
 }

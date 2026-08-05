@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
     <x-core.page.title title="Location Templates" route="{{ route('home') }}" color="success" link="Home">

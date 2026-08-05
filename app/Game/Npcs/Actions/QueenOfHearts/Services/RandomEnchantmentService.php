@@ -3,12 +3,14 @@
 namespace App\Game\Npcs\Actions\QueenOfHearts\Services;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\RandomAffixTier;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class RandomEnchantmentService
@@ -43,26 +45,22 @@ class RandomEnchantmentService
     }
 
     /**
+     * Authoritative query for the character's unique-source inventory slots.
+     *
+     * Preserves the exact current eligibility rule: not equipped, and
+     * (mythic, unique, or cosmic) with at least one randomly generated affix.
+     */
+    public function buildUniqueInventoryQuery(Character $character): Builder
+    {
+        return $this->baseInventoryQuery($character)->whereHas('item', $this->uniqueItemEligibility());
+    }
+
+    /**
      * Fetch uniques from characters inventory.
      */
     public function fetchUniquesFromCharactersInventory(Character $character): Collection
     {
-        return $character->inventory->slots->filter(function ($slot) {
-            $item = $slot->item;
-
-            $item->load('itemPrefix', 'itemSuffix');
-
-            if (! $slot->equipped && ($item->is_mythic || $item->is_unique || $item->is_cosmic)) {
-                // Check if item has a prefix and it's randomly generated
-                if ($item->itemPrefix && $item->itemPrefix->randomly_generated) {
-                    return true;
-                }
-                // Check if item has a suffix and it's randomly generated
-                if ($item->itemSuffix && $item->itemSuffix->randomly_generated) {
-                    return true;
-                }
-            }
-        })->values();
+        return $this->buildUniqueInventoryQuery($character)->get();
     }
 
     /**
@@ -80,36 +78,92 @@ class RandomEnchantmentService
     }
 
     /**
+     * Authoritative query for the character's non-unique destination-eligible inventory slots.
+     *
+     * Preserves the exact current eligibility rule: not equipped, not a quest/alchemy/trinket/artifact
+     * item, not mythic or cosmic, and without any randomly generated affix (not unique).
+     */
+    public function buildNonUniqueInventoryQuery(Character $character): Builder
+    {
+        return $this->baseInventoryQuery($character)->whereHas('item', $this->nonUniqueItemEligibility());
+    }
+
+    /**
      * Fetch non unique items.
      */
     public function fetchNonUniqueItems(Character $character): Collection
     {
-        return $character->inventory->slots->filter(function ($slot) {
-            if (
-                ! $slot->equipped &&
-                $slot->item->type !== 'quest' &&
-                $slot->item->type !== 'alchemy' &&
-                $slot->item->type !== 'trinket' &&
-                $slot->item->type !== 'artifact' &&
-                ! $slot->item->is_mythic &&
-                ! $slot->item->is_cosmic &&
-                ! $slot->item->is_unique
-            ) {
-                if (! is_null($slot->item->itemPrefix)) {
-                    if (! $slot->item->itemPrefix->randomly_generated) {
-                        return $slot;
-                    }
-                }
+        return $this->buildNonUniqueInventoryQuery($character)->get();
+    }
 
-                if (! is_null($slot->item->itemSuffix)) {
-                    if (! $slot->item->itemSuffix->randomly_generated) {
-                        return $slot;
-                    }
-                }
+    /**
+     * Authoritative single query for every slot eligible as a Queen movement destination:
+     * the union of the unique-source and non-unique-destination eligibility rules.
+     */
+    public function buildDestinationInventoryQuery(Character $character): Builder
+    {
+        $uniqueEligibility = $this->uniqueItemEligibility();
+        $nonUniqueEligibility = $this->nonUniqueItemEligibility();
 
-                return $slot;
-            }
-        })->values();
+        return $this->baseInventoryQuery($character)
+            ->where(function ($eligibility) use ($uniqueEligibility, $nonUniqueEligibility) {
+                $eligibility->whereHas('item', $uniqueEligibility)
+                    ->orWhereHas('item', $nonUniqueEligibility);
+            });
+    }
+
+    /**
+     * Base inventory-slot query scoped to the character's own unequipped inventory.
+     */
+    private function baseInventoryQuery(Character $character): Builder
+    {
+        return InventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks', 'item.itemSkillProgressions'])
+            ->where('inventory_id', $character->inventory->id)
+            ->where('equipped', false);
+    }
+
+    /**
+     * Item-level eligibility for a Queen unique-source item: mythic, unique, or cosmic,
+     * with at least one randomly generated affix.
+     */
+    private function uniqueItemEligibility(): callable
+    {
+        return function ($itemQuery) {
+            $itemQuery->where(function ($eligibility) {
+                $eligibility->where('is_mythic', true)
+                    ->orWhere('is_cosmic', true)
+                    ->orWhereHas('itemPrefix', $this->randomlyGeneratedAffixQuery())
+                    ->orWhereHas('itemSuffix', $this->randomlyGeneratedAffixQuery());
+            })->where(function ($hasRandomlyGeneratedAffix) {
+                $hasRandomlyGeneratedAffix->whereHas('itemPrefix', $this->randomlyGeneratedAffixQuery())
+                    ->orWhereHas('itemSuffix', $this->randomlyGeneratedAffixQuery());
+            });
+        };
+    }
+
+    /**
+     * Item-level eligibility for a Queen non-unique destination item: not a
+     * quest/alchemy/trinket/artifact item, not mythic or cosmic, and not unique.
+     */
+    private function nonUniqueItemEligibility(): callable
+    {
+        return function ($itemQuery) {
+            $itemQuery->whereNotIn('type', ['quest', 'alchemy', 'trinket', 'artifact'])
+                ->where('is_mythic', false)
+                ->where('is_cosmic', false)
+                ->where(function ($notUnique) {
+                    $notUnique->whereDoesntHave('itemPrefix', $this->randomlyGeneratedAffixQuery())
+                        ->whereDoesntHave('itemSuffix', $this->randomlyGeneratedAffixQuery());
+                });
+        };
+    }
+
+    /**
+     * Reusable affix-eligibility closure: the affix exists and is randomly generated.
+     */
+    private function randomlyGeneratedAffixQuery(): callable
+    {
+        return fn ($affixQuery) => $affixQuery->where('randomly_generated', true);
     }
 
     /**

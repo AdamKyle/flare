@@ -24,6 +24,7 @@ use App\Game\Skills\Services\Traits\UpdateCharacterCurrency;
 use App\Game\Skills\Transformers\CraftableItemTransformer;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
 
@@ -107,42 +108,41 @@ class CraftingService
         string $armourSubtype = '',
         bool $merchantMessage = true
     ): array {
-        $reducedItems = $this->fetchCraftableItems($character, $craftingParams, $merchantMessage);
+        $craftingType = $craftingParams['crafting_type'];
+        $defaultToWeapon = ItemType::validWeapons();
 
-        $costMap = $reducedItems->pluck('cost', 'id')->all();
-        $orderedIds = $reducedItems->pluck('id')->all();
-        $orderMap = array_flip($orderedIds);
-
-        $fullItems = Item::whereIn('id', $orderedIds)->get();
-
-        foreach ($fullItems as $item) {
-            if (isset($costMap[$item->id])) {
-                $item->cost = $costMap[$item->id];
-            }
+        if (
+            (is_array($craftingType) && empty(array_diff($craftingType, $defaultToWeapon))) ||
+            (! is_array($craftingType) && in_array($craftingType, $defaultToWeapon))
+        ) {
+            $craftingType = 'weapon';
         }
 
-        $fullItems = $fullItems->sortBy(function (Item $item) use ($orderMap) {
-            return $orderMap[$item->id] ?? PHP_INT_MAX;
-        })->values();
+        $skill = $this->fetchCraftingSkill($character, $craftingType);
+
+        $query = $this->buildCraftableItemsQuery($skill, $craftingParams['crafting_type']);
 
         if ($searchText !== '') {
-            $lowerSearch = mb_strtolower($searchText);
-            $fullItems = $fullItems->filter(function (Item $item) use ($lowerSearch) {
-                return str_contains(mb_strtolower($item->name), $lowerSearch)
-                    || str_contains(mb_strtolower($item->type ?? ''), $lowerSearch)
-                    || str_contains(mb_strtolower($item->crafting_type ?? ''), $lowerSearch);
-            })->values();
+            $query->where(function ($subQuery) use ($searchText) {
+                $subQuery->where('name', 'LIKE', '%'.$searchText.'%')
+                    ->orWhere('type', 'LIKE', '%'.$searchText.'%')
+                    ->orWhere('crafting_type', 'LIKE', '%'.$searchText.'%');
+            });
         }
 
         if ($armourSubtype !== '') {
-            $fullItems = $fullItems->filter(function (Item $item) use ($armourSubtype) {
-                return $item->type === $armourSubtype;
-            })->values();
+            $query->where('type', $armourSubtype);
         }
 
-        $eloquentCollection = new Collection($fullItems->all());
+        $paginator = $query->orderBy('skill_level_required')
+            ->orderBy('id')
+            ->paginate($perPage, ['*'], 'page', $page);
 
-        return $this->pagination->buildPaginatedDate($eloquentCollection, $this->craftableItemTransformer, $perPage, $page);
+        $paginator->setCollection(
+            $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $paginator->getCollection(), $merchantMessage)
+        );
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->craftableItemTransformer);
     }
 
     /**
@@ -485,30 +485,40 @@ class CraftingService
      */
     protected function getItems(Character $character, Skill $skill, string|array $craftingType, bool $merchantMessage = true): SupportCollection
     {
+        $items = $this->buildCraftableItemsQuery($skill, $craftingType)
+            ->orderBy('skill_level_required', 'asc')
+            ->get();
+
+        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, $merchantMessage);
+    }
+
+    /**
+     * Build the base eligible-craftable-items query for a character's skill and requested crafting type(s).
+     */
+    private function buildCraftableItemsQuery(Skill $skill, string|array $craftingType): Builder
+    {
         $twoHandedWeapons = [ItemType::BOW->value, ItemType::HAMMER->value, ItemType::STAVE->value];
         $craftingTypes = ['armour', 'ring', 'spell'];
 
-        $items = Item::where('can_craft', true)
+        $query = Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
+            ->where('can_craft', true)
             ->where('skill_level_required', '<=', $skill->level)
             ->whereNull('item_prefix_id')
             ->whereNull('item_suffix_id')
             ->doesntHave('appliedHolyStacks')
-            ->doesnthave('sockets')
-            ->orderBy('skill_level_required', 'asc');
+            ->doesntHave('sockets');
 
         $craftingTypeArray = is_array($craftingType) ? $craftingType : [$craftingType];
 
         if (! empty(array_intersect($craftingTypeArray, $twoHandedWeapons))) {
-            $items->whereIn('default_position', array_map('strtolower', $craftingTypeArray));
+            $query->whereIn('default_position', array_map('strtolower', $craftingTypeArray));
         } elseif (! empty(array_intersect($craftingTypeArray, $craftingTypes))) {
-            $items->whereIn('crafting_type', array_map('strtolower', $craftingTypeArray));
+            $query->whereIn('crafting_type', array_map('strtolower', $craftingTypeArray));
         } else {
-            $items->whereIn('type', array_map('strtolower', $craftingTypeArray));
+            $query->whereIn('type', array_map('strtolower', $craftingTypeArray));
         }
 
-        $items = $items->select('name', 'cost', 'type', 'id')->get();
-
-        return $this->itemListCostTransformerService->reduceCostOfCraftingItems($character, $items, $merchantMessage);
+        return $query;
     }
 
     /**

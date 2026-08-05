@@ -50,8 +50,6 @@ const NpcKingdomDropDown = ({
       on_select={handleSelection}
       on_clear={handleOnClear}
       selection_placeholder={'Select an NPC kingdom'}
-      all_click_outside
-      is_in_modal
       force_clear={shouldForceClear()}
     />
   );

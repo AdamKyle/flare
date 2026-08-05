@@ -1,26 +1,22 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode } from 'react';
 
 import HolyOilSelectionProps from './types/holy-oil-selection-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-const buildHolyOilOptions = (
-  oils: HolyOilSelectionProps['oils']
-): DropdownItem[] =>
-  oils.map((slot) => ({
-    label: `${slot.item.name} (Amount: ${slot.amount})`,
-    value: slot.id,
-  }));
-
 const HolyOilSelection = ({
-  oils,
+  items,
   selectedSlotId,
+  loading,
+  isLoadingMore,
+  canLoadMore,
+  searchText,
+  onSearch,
+  onEndReached,
   onSelect,
 }: HolyOilSelectionProps): ReactNode => {
-  const options = useMemo(() => buildHolyOilOptions(oils), [oils]);
-
-  const preSelectedItem = options.find(
+  const preSelectedItem = items.find(
     (option) => option.value === selectedSlotId
   );
 
@@ -39,11 +35,21 @@ const HolyOilSelection = ({
 
       <Dropdown
         aria_labelled_by="work-bench-holy-oil-label"
-        items={options}
+        items={items}
         force_clear={selectedSlotId === null}
-        selection_placeholder="Select a Holy Oil"
+        selection_placeholder={
+          loading ? 'Loading Holy Oils…' : 'Select a Holy Oil'
+        }
         pre_selected_item={preSelectedItem}
         on_select={handleSelect}
+        searchable
+        search_value={searchText}
+        on_search={onSearch}
+        can_load_more={canLoadMore}
+        is_loading_more={isLoadingMore}
+        on_end_reached={onEndReached}
+        empty_message="No Holy Oils are available."
+        disabled={loading}
       />
     </div>
   );

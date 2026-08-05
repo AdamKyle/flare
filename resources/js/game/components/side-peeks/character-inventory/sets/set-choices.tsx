@@ -3,7 +3,6 @@ import React, { useMemo } from 'react';
 
 import SetOptionDefinition from './definitions/set-options-definition';
 import SetChoicesProps from './types/set-choices-props';
-import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 
 import { GameDataError } from 'game-data/components/game-data-error';
@@ -19,15 +18,11 @@ const SetChoices = ({
   set_equipped_set_name,
   dont_show_equipped_set,
 }: SetChoicesProps) => {
-  const { data, error, loading, onEndReached } =
+  const { data, error, loading, canLoadMore, isLoadingMore, onEndReached } =
     UsePaginatedApiHandler<SetOptionDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_SET_CHOICES,
       urlParams: { character: character_id },
     });
-
-  const { handleScroll: handleSetSelectionScroll } = useInfiniteScroll({
-    on_end_reached: onEndReached,
-  });
 
   const setOptions = useMemo((): DropdownItem[] => {
     if (dont_show_equipped_set) {
@@ -84,11 +79,11 @@ const SetChoices = ({
       items={setOptions}
       on_select={handleSetSelection}
       on_clear={handleClearSection}
-      handle_scroll={handleSetSelectionScroll}
+      on_end_reached={onEndReached}
+      can_load_more={canLoadMore}
+      is_loading_more={isLoadingMore}
       selection_placeholder="Select a set"
       pre_selected_item={setPreSelectedOption()}
-      use_pagination
-      all_click_outside
     />
   );
 };

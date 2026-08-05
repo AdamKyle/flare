@@ -9,6 +9,8 @@ interface InventoryCountDataDefinition {
   gem_bag_count: number;
   gem_bag_limit: number;
   is_gem_bag_full: boolean;
+  crafted_items_set_count: number;
+  crafted_items_set_max: number;
 }
 
 export default interface InventoryCountsDefinition {

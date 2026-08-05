@@ -3,6 +3,9 @@
 Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are', 'is.character.dead', 'is.character.exploring']], function () {
     Route::get('/visit-seer-camp/{character}', ['uses' => 'Api\SeerCampController@visitCamp']);
     Route::get('/seer-camp/gems-to-remove/{character}', ['uses' => 'Api\SeerCampController@fetchItemsWithGems']);
+    Route::get('/seer-camp/{character}/items', ['uses' => 'Api\SeerCampController@items']);
+    Route::get('/seer-camp/{character}/gems', ['uses' => 'Api\SeerCampController@gems']);
+    Route::get('/seer-camp/{character}/items-with-gems', ['uses' => 'Api\SeerCampController@itemsWithGems']);
     Route::post('/seer-camp/add-sockets/{character}', ['uses' => 'Api\SeerCampController@rollSockets']);
     Route::post('/seer-camp/add-gem/{character}', ['uses' => 'Api\SeerCampController@attachGemToItem']);
     Route::post('/seer-camp/replace-gem/{character}', ['uses' => 'Api\SeerCampController@replaceGemOnItem']);

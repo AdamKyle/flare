@@ -40,12 +40,6 @@
 
     @vite('resources/css/tailwind.css')
 
-    @livewireStyles
-
-    @vite('resources/js/vendor/livewire-data-tables.js')
-
-    @vite('resources/js/vendor/livewire.js')
-
     @vite('resources/vendor/theme/assets/js/dark-mode/dark-mode.js')
 
     <script src="https://cdn.jsdelivr.net/gh/mcstudios/glightbox/dist/js/glightbox.min.js"></script>
@@ -110,8 +104,6 @@
         @yield('content')
       @endauth
     </main>
-
-    @livewireScriptConfig
 
     @vite('resources/js/vendor/theme-script.js')
 

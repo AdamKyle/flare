@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
     <x-core.page.title title="Location Gems" route="{{ route('home') }}" color="success" link="Home">
@@ -7,5 +7,5 @@
         <x-core.buttons.link-buttons.primary-button href="{{ route('admin.location-gems.import-data') }}">Import</x-core.buttons.link-buttons.primary-button>
     </x-core.page.title>
 
-    @livewire('info.location-gems')
+    @livewire('admin.gems.location-gems-table')
 @endsection

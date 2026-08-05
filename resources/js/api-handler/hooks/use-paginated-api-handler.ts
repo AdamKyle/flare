@@ -18,6 +18,7 @@ const UsePaginatedApiHandler = <
   const url = getUrl(params.url, params.urlParams);
 
   const enabled = params.enabled !== false;
+  const additionalParams = params.additionalParams ?? {};
 
   const [data, setData] = useState<T[]>([]);
   const [error, setError] =
@@ -31,102 +32,128 @@ const UsePaginatedApiHandler = <
   const [refresh, setRefresh] = useState(false);
   const [response, setResponse] = useState<R | null>(null);
 
-  const previousSearchTextRef = useRef(searchText);
-  const previousFiltersRef = useRef<F>(filters);
-  const previousAdditionalParamsRef = useRef<Record<string, unknown>>(
-    params.additionalParams ?? {}
-  );
+  // Stable mirrors of `searchText` / `filters` / the caller-supplied `additionalParams`.
+  // `additionalParams` in particular is frequently a fresh object literal on every render, so it
+  // cannot be used directly as a dependency without recreating the fetch callback (and therefore
+  // refetching) on every render. These mirrors are only updated - via the React-recommended
+  // "adjust state while rendering" pattern - when their real content actually changes, which
+  // gives the fetch callback stable, honest dependencies and lets page-one resets happen in the
+  // same render pass as the value change, before any effect (and therefore any fetch) runs.
+  const [trackedSearchText, setTrackedSearchText] = useState(searchText);
+  const [trackedFilters, setTrackedFilters] = useState<F>(filters);
+  const [trackedAdditionalParams, setTrackedAdditionalParams] =
+    useState<Record<string, unknown>>(additionalParams);
 
-  const fetchPaginatedData = useCallback(
-    async () => {
-      if (!enabled) {
-        setData([]);
-        setError(null);
-        setLoading(false);
-        setCanLoadMore(false);
-        setIsLoadingMore(false);
-        setPage(1);
-        setResponse(null);
+  const requestGenerationRef = useRef(0);
 
+  const querySignatureChanged =
+    trackedSearchText !== searchText ||
+    !shallowEqual(trackedFilters, filters) ||
+    !shallowEqual(trackedAdditionalParams, additionalParams);
+
+  if (querySignatureChanged) {
+    setTrackedSearchText(searchText);
+    setTrackedFilters(filters);
+    setTrackedAdditionalParams(additionalParams);
+    setData([]);
+    requestGenerationRef.current += 1;
+
+    if (page !== 1) {
+      setPage(1);
+    }
+  }
+
+  const fetchPaginatedData = useCallback(async () => {
+    if (!enabled) {
+      setData([]);
+      setError(null);
+      setLoading(false);
+      setCanLoadMore(false);
+      setIsLoadingMore(false);
+      setPage(1);
+      setResponse(null);
+
+      return;
+    }
+
+    // `refresh` carries no value of its own; toggling it via `setRefresh` is how callers force a
+    // refetch of the current page/search/filters without changing any of them. Referencing it
+    // here keeps it an honest dependency instead of an unused one.
+    void refresh;
+
+    const requestGeneration = requestGenerationRef.current;
+
+    if (page > 1) {
+      setIsLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const result = await apiHandler.get<
+        PaginatedApiResponseDefinition<T[]>,
+        AxiosRequestConfig<PaginatedApiResponseDefinition<T[]>>
+      >(url, {
+        params: {
+          per_page: perPage,
+          page,
+          search_text: trackedSearchText,
+          filters: trackedFilters,
+          ...trackedAdditionalParams,
+        },
+      });
+
+      if (requestGenerationRef.current !== requestGeneration) {
+        // The search text, filters, or additional params changed while this request was in
+        // flight. Its results belong to a stale query and must not be applied.
         return;
       }
 
-      if (page > 1) {
-        setIsLoadingMore(true);
-      } else {
-        setLoading(true);
-      }
+      setData((previousData) =>
+        page === 1 ? result.data : [...previousData, ...result.data]
+      );
+      setCanLoadMore(result.meta.can_load_more);
+      setResponse(result as unknown as R);
+    } catch (errorInstance) {
+      if (errorInstance instanceof AxiosError) {
+        const axiosResponse = errorInstance.response;
 
-      try {
-        const result = await apiHandler.get<
-          PaginatedApiResponseDefinition<T[]>,
-          AxiosRequestConfig<PaginatedApiResponseDefinition<T[]>>
-        >(url, {
-          params: {
-            per_page: perPage,
-            page,
-            search_text: searchText,
-            filters,
-            ...(params.additionalParams ?? {}),
-          },
-        });
-
-        setData((previousData) =>
-          page === 1 ? result.data : [...previousData, ...result.data]
-        );
-        setCanLoadMore(result.meta.can_load_more);
-        setResponse(result as unknown as R);
-      } catch (errorInstance) {
-        if (errorInstance instanceof AxiosError) {
-          const axiosResponse = errorInstance.response;
-
-          if (!axiosResponse) {
-            return;
-          }
-
-          /**
-           * If we are not logged in, reload to put them back on the login screen.
-           */
-          if (axiosResponse.status === 401) {
-            window.location.reload();
-          }
-
-          setError(errorInstance.response?.data || null);
-        } else {
-          setError(null);
+        if (!axiosResponse) {
+          return;
         }
-      } finally {
+
+        /**
+         * If we are not logged in, reload to put them back on the login screen.
+         */
+        if (axiosResponse.status === 401) {
+          window.location.reload();
+        }
+
+        setError(errorInstance.response?.data || null);
+      } else {
+        setError(null);
+      }
+    } finally {
+      if (requestGenerationRef.current === requestGeneration) {
         setLoading(false);
         setIsLoadingMore(false);
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, url, page, perPage, refresh, enabled]
-  );
+    }
+  }, [
+    apiHandler,
+    url,
+    page,
+    perPage,
+    refresh,
+    enabled,
+    trackedSearchText,
+    trackedFilters,
+    trackedAdditionalParams,
+  ]);
 
   useEffect(() => {
     fetchPaginatedData().catch(console.error);
   }, [fetchPaginatedData]);
-
-  useEffect(() => {
-    const isSameSearch = previousSearchTextRef.current === searchText;
-    const isSameFilters = shallowEqual(previousFiltersRef.current, filters);
-    const isSameAdditionalParams = shallowEqual(
-      previousAdditionalParamsRef.current,
-      params.additionalParams ?? {}
-    );
-
-    if (isSameSearch && isSameFilters && isSameAdditionalParams) {
-      return;
-    }
-
-    previousSearchTextRef.current = searchText;
-    previousFiltersRef.current = filters;
-    previousAdditionalParamsRef.current = params.additionalParams ?? {};
-
-    setPage(1);
-    setRefresh((previousValue) => !previousValue);
-  }, [searchText, filters, params.additionalParams]);
 
   const onEndReached = () => {
     if (!canLoadMore || isLoadingMore) {
@@ -144,6 +171,7 @@ const UsePaginatedApiHandler = <
     isLoadingMore,
     page,
     response,
+    searchText,
     onEndReached,
     setSearchText,
     setFilters,

@@ -1,24 +1,22 @@
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode } from 'react';
 
-import { buildEnchantingItemOptions } from '../utils/build-enchanting-item-options';
 import EnchantingItemSelectionProps from './types/enchanting-item-selection-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
 const EnchantingItemSelection = ({
-  regularItems,
-  eventItems,
-  source,
+  items,
   selectedSlotId,
+  loading,
+  isLoadingMore,
+  canLoadMore,
+  searchText,
+  onSearch,
+  onEndReached,
   onSelect,
 }: EnchantingItemSelectionProps): ReactNode => {
-  const options = useMemo(
-    () => buildEnchantingItemOptions(source, regularItems, eventItems),
-    [source, regularItems, eventItems]
-  );
-
-  const preSelectedItem = options.find(
+  const preSelectedItem = items.find(
     (option) => option.value === selectedSlotId
   );
 
@@ -34,10 +32,18 @@ const EnchantingItemSelection = ({
 
       <Dropdown
         aria_labelled_by="enchanting-item-label"
-        items={options}
-        selection_placeholder="Select an item"
+        items={items}
+        selection_placeholder={loading ? 'Loading items…' : 'Select an item'}
         pre_selected_item={preSelectedItem}
         on_select={handleSelect}
+        searchable
+        search_value={searchText}
+        on_search={onSearch}
+        can_load_more={canLoadMore}
+        is_loading_more={isLoadingMore}
+        on_end_reached={onEndReached}
+        empty_message="No items are available to enchant."
+        disabled={loading}
       />
     </div>
   );

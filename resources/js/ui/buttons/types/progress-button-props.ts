@@ -8,4 +8,5 @@ export default interface ProgressButtonProps {
   additional_css?: string;
   disabled?: boolean;
   progress_fill_class?: string;
+  aria_busy?: boolean;
 }

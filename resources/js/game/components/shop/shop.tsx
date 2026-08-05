@@ -340,7 +340,6 @@ const Shop = ({ close_shop }: ShopProps) => {
               on_select={handleCostChange}
               on_clear={handleClearCost}
               selection_placeholder="Sort by cost"
-              all_click_outside
               disabled={purchaseLoading}
             />
           </div>
@@ -351,7 +350,6 @@ const Shop = ({ close_shop }: ShopProps) => {
               on_select={handleTypeChange}
               on_clear={handleClearType}
               selection_placeholder="Filter by type"
-              all_click_outside
               disabled={purchaseLoading}
             />
           </div>

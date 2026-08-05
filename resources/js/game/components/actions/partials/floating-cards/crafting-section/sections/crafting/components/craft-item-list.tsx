@@ -39,12 +39,12 @@ const CraftItemList = ({
                 : 'border-gray-400 bg-white hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-900'
             )}
           >
-            <span className="block font-semibold">{item.name}</span>
+            <span className="block font-semibold">{item.preview.name}</span>
             <span className="mt-1 block text-sm">
               Cost: {formatNumberWithCommas(item.cost)} gold
             </span>
             <span className="block text-xs text-gray-600 dark:text-gray-400">
-              Type: {item.type}
+              Type: {item.preview.type}
             </span>
           </button>
         ))}

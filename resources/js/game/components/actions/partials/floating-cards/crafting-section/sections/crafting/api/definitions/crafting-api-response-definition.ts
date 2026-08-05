@@ -2,6 +2,7 @@ import { PaginatedApiResponseDefinition } from 'api-handler/definitions/paginate
 
 import CraftableItemDefinition from './craftable-item-definition';
 import CraftingInventoryCountDefinition from '../../../../shared/api/definitions/crafting-inventory-count-definition';
+import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 import CraftingXpDefinition from '../../../../shared/api/definitions/crafting-xp-definition';
 
 export default interface CraftingApiResponseDefinition extends PaginatedApiResponseDefinition<
@@ -13,5 +14,5 @@ export default interface CraftingApiResponseDefinition extends PaginatedApiRespo
   inventory_count: CraftingInventoryCountDefinition;
   crafted_item?: boolean;
   crafted_inventory_slot_id?: number | null;
-  crafted_item_details?: CraftableItemDefinition | null;
+  result_preview?: CraftingItemPreviewDefinition | null;
 }

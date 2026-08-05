@@ -51,8 +51,6 @@ const PortLocationsDropDown = ({
       on_clear={handleOnClear}
       selection_placeholder={'Select a location'}
       force_clear={shouldForceClear()}
-      all_click_outside
-      is_in_modal
     />
   );
 };

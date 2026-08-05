@@ -27,11 +27,15 @@ const ProgressButton = (props: ProgressButtonProps): ReactNode => {
       aria-valuenow={props.progress}
       aria-valuemin={0}
       aria-valuemax={100}
+      aria-busy={props.aria_busy}
       disabled={props.disabled}
       type="button"
       style={{ position: 'relative' }}
     >
       <span className="relative z-10">{props.label}</span>
+      <span className="sr-only" role="status" aria-live="polite">
+        {props.label}
+      </span>
       <div className="absolute bottom-0 left-0 h-full w-full rounded-lg bg-white/20">
         <div
           className={clsx(

@@ -4,14 +4,19 @@ namespace App\Game\Skills\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
+use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\Skill;
+use App\Flare\Pagination\Pagination;
 use App\Game\Character\CharacterInventory\Exceptions\BatchCraftingDestinationFullException;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
+use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
+use App\Game\Skills\Transformers\TrinketCraftingItemTransformer;
 use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
+use Illuminate\Database\Eloquent\Builder;
 
 class TrinketCraftingService
 {
@@ -23,16 +28,48 @@ class TrinketCraftingService
 
     private SkillService $skillService;
 
+    private Pagination $pagination;
+
     public function __construct(
         CraftingService $craftingService,
         SkillCheckService $skillCheckService,
         ItemListCostTransformerService $itemListCostTransformerService,
         SkillService $skillService,
+        Pagination $pagination,
+        private readonly CraftingItemPreviewTransformer $craftingItemPreviewTransformer,
+        private readonly TrinketCraftingItemTransformer $trinketCraftingItemTransformer,
     ) {
         $this->craftingService = $craftingService;
         $this->skillCheckService = $skillCheckService;
         $this->itemListCostTransformerService = $itemListCostTransformerService;
         $this->skillService = $skillService;
+        $this->pagination = $pagination;
+    }
+
+    /**
+     * Fetches a paginated, searchable list of Trinkets eligible for crafting.
+     *
+     * @throws Exception
+     */
+    public function fetchPaginatedItemsToCraft(Character $character, int $perPage, int $page, string $search = ''): array
+    {
+        $trinketrySkill = $this->fetchCharacterSkill($character);
+
+        $query = $this->buildTrinketItemsQuery($trinketrySkill);
+
+        if ($search !== '') {
+            $query->where('name', 'LIKE', '%'.$search.'%');
+        }
+
+        $paginator = $query->orderBy('skill_level_required', 'asc')
+            ->orderBy('id')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        $paginator->setCollection(
+            $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $paginator->getCollection(), false)
+        );
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->trinketCraftingItemTransformer);
     }
 
     /**
@@ -44,13 +81,20 @@ class TrinketCraftingService
     {
         $trinkentrySkill = $this->fetchCharacterSkill($character);
 
-        $items = Item::where('type', 'trinket')
-            ->where('skill_level_required', '<=', $trinkentrySkill->level)
+        $items = $this->buildTrinketItemsQuery($trinkentrySkill)
             ->orderBy('skill_level_required', 'asc')
-            ->select('name', 'id', 'gold_dust_cost', 'copper_coin_cost', 'skill_level_required')
             ->get();
 
-        return $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage)->toArray();
+        $reducedItems = $this->itemListCostTransformerService->reduceCostForTrinketryItems($character, $items, $showMerchantMessage);
+
+        return $reducedItems->map(fn (Item $item) => $this->trinketCraftingItemTransformer->transform($item))->values()->toArray();
+    }
+
+    private function buildTrinketItemsQuery(Skill $trinketrySkill): Builder
+    {
+        return Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
+            ->where('type', 'trinket')
+            ->where('skill_level_required', '<=', $trinketrySkill->level);
     }
 
     public function fetchSkillXP(Character $character): array
@@ -81,13 +125,13 @@ class TrinketCraftingService
         if (! $this->canAfford($character, $item)) {
             event(new ServerMessageEvent($character->user, 'You do not have enough of the required currencies to craft this.'));
 
-            return $this->fetchItemsToCraft($character);
+            return ['items' => $this->fetchItemsToCraft($character), 'result_preview' => null];
         }
 
         if ($trinkentrySkill->level < $item->skill_level_required) {
             ServerMessageHandler::handlemessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
 
-            return $this->fetchItemsToCraft($character);
+            return ['items' => $this->fetchItemsToCraft($character), 'result_preview' => null];
         }
 
         if ($trinkentrySkill->level > $item->skill_level_trivial) {
@@ -97,7 +141,10 @@ class TrinketCraftingService
 
             $this->craftingService->pickUpItem($character, $item, $trinkentrySkill, true);
 
-            return $this->fetchItemsToCraft($character);
+            return [
+                'items' => $this->fetchItemsToCraft($character),
+                'result_preview' => $this->buildResultPreview(),
+            ];
         }
 
         $this->deductCraftingCost($character, $item);
@@ -105,12 +152,35 @@ class TrinketCraftingService
         if (! $this->canCraft($trinkentrySkill)) {
             event(new ServerMessageEvent($character->user, 'You failed to craft the trinket. All your efforts fall apart before your eyes!'));
 
-            return $this->fetchItemsToCraft($character);
+            return ['items' => $this->fetchItemsToCraft($character), 'result_preview' => null];
         }
 
         $this->craftingService->pickUpItem($character, $item, $trinkentrySkill);
 
-        return $this->fetchItemsToCraft($character->refresh(), false);
+        return [
+            'items' => $this->fetchItemsToCraft($character->refresh(), false),
+            'result_preview' => $this->buildResultPreview(),
+        ];
+    }
+
+    /**
+     * Build the preview for the trinket inventory slot created by the most recent pickUpItem() call.
+     */
+    private function buildResultPreview(): ?array
+    {
+        $inventorySlotId = $this->craftingService->getLastCraftedInventorySlotId();
+
+        if (is_null($inventorySlotId)) {
+            return null;
+        }
+
+        $slot = InventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks'])->find($inventorySlotId);
+
+        if (is_null($slot) || is_null($slot->item)) {
+            return null;
+        }
+
+        return $this->craftingItemPreviewTransformer->transform($slot->item, $slot->id);
     }
 
     /**

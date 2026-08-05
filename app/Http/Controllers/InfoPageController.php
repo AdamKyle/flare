@@ -24,6 +24,9 @@ use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
 use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Flare\Traits\Controllers\MonstersShowInformation;
+use App\Flare\View\Tables\Definitions\LocationGemsTableDefinition;
+use App\Flare\View\Tables\Definitions\MapGemsTableDefinition;
+use App\Flare\View\Tables\TableQueryBuilder;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use App\Game\Maps\Values\LocationType;
@@ -130,14 +133,24 @@ class InfoPageController extends Controller
         ]);
     }
 
-    public function viewMapGems(): View
+    public function viewMapGems(Request $request): View
     {
-        return view('information.map-gems.index');
+        $columns = MapGemsTableDefinition::columns();
+
+        return view('information.map-gems.index', [
+            'paginator' => TableQueryBuilder::paginate(MapGemsTableDefinition::builder(), $columns, $request),
+            'columns' => $columns,
+        ]);
     }
 
-    public function viewLocationGems(): View
+    public function viewLocationGems(Request $request): View
     {
-        return view('information.location-gems.index');
+        $columns = LocationGemsTableDefinition::columns();
+
+        return view('information.location-gems.index', [
+            'paginator' => TableQueryBuilder::paginate(LocationGemsTableDefinition::builder(), $columns, $request),
+            'columns' => $columns,
+        ]);
     }
 
     public function viewMapGem(GameMapGemParamter $gameMapGemParamter): View

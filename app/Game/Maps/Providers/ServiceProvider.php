@@ -25,6 +25,7 @@ use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\TraverseService;
 use App\Game\Maps\Services\UpdateRaidMonsters;
 use App\Game\Maps\Services\WalkingService;
+use App\Game\Maps\Transformers\CondensedKingdomTransformer;
 use App\Game\Maps\Transformers\LocationsTransformer;
 use App\Game\Maps\Transformers\LocationTransformer;
 use App\Game\Maps\Values\MapTileValue;
@@ -135,6 +136,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(QuestItemTransformer::class),
                 $app->make(LocationsTransformer::class),
+                $app->make(CondensedKingdomTransformer::class),
                 $app->make(PlainDataSerializer::class),
                 $app->make(Pagination::class),
                 $app->make(Manager::class)
@@ -153,6 +155,10 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(LocationService::class),
                 $app->make(Manager::class),
             );
+        });
+
+        $this->app->bind(CondensedKingdomTransformer::class, function () {
+            return new CondensedKingdomTransformer;
         });
 
         $this->app->bind(LocationsTransformer::class, function () {

@@ -1,7 +1,9 @@
 {
   "entry": [
     "resources/js/app.ts",
-    "resources/js/admin-apps.ts"
+    "resources/js/admin-apps.ts",
+    "resources/js/game.ts",
+    "resources/js/layouts/app-layout.ts"
   ],
   "extensions": [
     ".ts",
@@ -20,6 +22,7 @@
     "postcss-import",
     "postcss-nested",
     "postcss-nesting",
+    "pusher-js",
     "rpg-awesome",
     "tailwind-scrollbar",
     "tailwindcss-classnames",

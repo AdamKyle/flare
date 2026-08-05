@@ -4,6 +4,7 @@ import SeerActionSelection from './seer-action-selection';
 import SeerAttachGemForm from './seer-attach-gem-form';
 import SeerManageSocketsForm from './seer-manage-sockets-form';
 import SeerRemoveGemsForm from './seer-remove-gems-form';
+import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import { SeerAction } from '../enums/seer-action';
 import { useSeerCampFlow } from '../hooks/use-seer-camp-flow';
 
@@ -29,115 +30,32 @@ const SeerCampFlow = (): ReactNode => {
     handleActionSuccess,
   } = useSeerCampFlow();
 
-  const renderErrors = (): ReactNode => {
-    if (!error) {
-      return null;
-    }
-
-    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
-  };
-
   const renderStatus = (): ReactNode => {
-    if (!status) {
-      return null;
-    }
-
-    return <Alert variant={AlertVariant.INFO}>{status}</Alert>;
-  };
-
-  const renderActionSelection = (): ReactNode => {
-    if (action) {
-      return null;
-    }
-
-    return <SeerActionSelection onSelect={selectAction} />;
-  };
-
-  const renderManageSocketsAction = (): ReactNode => {
-    if (!data) {
+    if (!error && !status) {
       return null;
     }
 
     return (
-      <SeerManageSocketsForm
-        items={data.items}
-        costs={data.costs}
-        characterId={characterId}
-        onSuccess={handleActionSuccess}
-      />
+      <div className="space-y-2">
+        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
+        {status && <Alert variant={AlertVariant.SUCCESS}>{status}</Alert>}
+      </div>
     );
   };
 
-  const renderAttachGemAction = (): ReactNode => {
-    if (!data) {
+  const renderSelectionForm = (): ReactNode => {
+    if (data) {
+      return <SeerActionSelection onSelect={selectAction} />;
+    }
+
+    if (error) {
       return null;
     }
 
     return (
-      <SeerAttachGemForm
-        items={data.items}
-        gems={data.gems}
-        costs={data.costs}
-        characterId={characterId}
-        onSuccess={handleActionSuccess}
-      />
-    );
-  };
-
-  const renderRemoveGemsAction = (): ReactNode => {
-    if (removalError) {
-      return <Alert variant={AlertVariant.DANGER}>{removalError}</Alert>;
-    }
-
-    if (removalLoading) {
-      return (
-        <IndeterminateProgressBar
-          label="Loading Gems available to remove"
-          variant={ProgressBarVariant.PRIMARY}
-        />
-      );
-    }
-
-    if (!data) {
-      return null;
-    }
-
-    return (
-      <SeerRemoveGemsForm
-        removalData={data.removal_data}
-        characterId={characterId}
-        onSuccess={handleActionSuccess}
-      />
-    );
-  };
-
-  const renderCurrentAction = (): ReactNode => {
-    if (!action) {
-      return null;
-    }
-
-    if (action === SeerAction.MANAGE_SOCKETS) {
-      return renderManageSocketsAction();
-    }
-
-    if (action === SeerAction.ATTACH_GEM) {
-      return renderAttachGemAction();
-    }
-
-    return renderRemoveGemsAction();
-  };
-
-  const renderChangeActionButton = (): ReactNode => {
-    if (!action) {
-      return null;
-    }
-
-    return (
-      <Button
-        label="Change Action"
-        on_click={changeAction}
-        variant={ButtonVariant.PRIMARY}
-      />
+      <Alert variant={AlertVariant.INFO}>
+        Unable to load the Seer Camp right now.
+      </Alert>
     );
   };
 
@@ -152,6 +70,26 @@ const SeerCampFlow = (): ReactNode => {
     </a>
   );
 
+  const renderChangeActionOnlyLayout = (form: ReactNode): ReactNode => (
+    <CraftingActionLayout
+      heading={
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Seer Camp: Remove Gems
+        </h2>
+      }
+      status={renderStatus()}
+      form={form}
+      action={
+        <Button
+          label="Change Action"
+          on_click={changeAction}
+          variant={ButtonVariant.PRIMARY}
+        />
+      }
+      help_link={renderHelpLink()}
+    />
+  );
+
   if (loading) {
     return (
       <IndeterminateProgressBar
@@ -161,17 +99,71 @@ const SeerCampFlow = (): ReactNode => {
     );
   }
 
-  return (
-    <div className="space-y-4 text-gray-900 dark:text-gray-100">
-      <h2 className="text-xl font-semibold">Seer Camp</h2>
+  if (data && action === SeerAction.MANAGE_SOCKETS) {
+    return (
+      <SeerManageSocketsForm
+        costs={data.costs}
+        characterId={characterId}
+        rootStatus={renderStatus()}
+        helpLink={renderHelpLink()}
+        onSuccess={handleActionSuccess}
+        onChangeAction={changeAction}
+      />
+    );
+  }
 
-      {renderErrors()}
-      {renderStatus()}
-      {renderActionSelection()}
-      {renderCurrentAction()}
-      {renderChangeActionButton()}
-      {renderHelpLink()}
-    </div>
+  if (data && action === SeerAction.ATTACH_GEM) {
+    return (
+      <SeerAttachGemForm
+        costs={data.costs}
+        characterId={characterId}
+        rootStatus={renderStatus()}
+        helpLink={renderHelpLink()}
+        onSuccess={handleActionSuccess}
+        onChangeAction={changeAction}
+      />
+    );
+  }
+
+  if (action === SeerAction.REMOVE_GEM) {
+    if (removalError) {
+      return renderChangeActionOnlyLayout(
+        <Alert variant={AlertVariant.DANGER}>{removalError}</Alert>
+      );
+    }
+
+    if (removalLoading || !data) {
+      return (
+        <IndeterminateProgressBar
+          label="Loading Gems available to remove"
+          variant={ProgressBarVariant.PRIMARY}
+        />
+      );
+    }
+
+    return (
+      <SeerRemoveGemsForm
+        removalData={data.removal_data}
+        characterId={characterId}
+        rootStatus={renderStatus()}
+        helpLink={renderHelpLink()}
+        onSuccess={handleActionSuccess}
+        onChangeAction={changeAction}
+      />
+    );
+  }
+
+  return (
+    <CraftingActionLayout
+      heading={
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Seer Camp
+        </h2>
+      }
+      status={renderStatus()}
+      form={renderSelectionForm()}
+      help_link={renderHelpLink()}
+    />
   );
 };
 
