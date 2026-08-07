@@ -28,8 +28,8 @@ const CharacterCardDetails = ({
   const { openStatDetails } = useManageStatDetailsBreakdown();
 
   const rawProgress =
-    (characterData.inventory_count.data.inventory_count /
-      characterData.inventory_count.data.inventory_max) *
+    (characterData.inventory_count.inventory_count /
+      characterData.inventory_count.inventory_max) *
     100;
 
   const characterInventorProgress = Math.min(rawProgress, 100);
@@ -200,7 +200,7 @@ const CharacterCardDetails = ({
       <ProgressButton
         progress={characterInventorProgress}
         on_click={() => openCharacterInventory()}
-        label={`Manage Inventory (${characterData.inventory_count.data.inventory_count}/${characterData.inventory_count.data.inventory_max})`}
+        label={`Manage Inventory (${characterData.inventory_count.inventory_count}/${characterData.inventory_count.inventory_max})`}
         variant={ButtonVariant.SUCCESS}
         additional_css="w-full my-2"
       />

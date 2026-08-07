@@ -3,9 +3,10 @@
 use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Models\Role;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
-uses(CreateUser::class);
+uses(CreateRole::class, CreateUser::class);
 
 test('unban request page renders', function () {
     $response = $this->get(route('un.ban.request'));
@@ -125,6 +126,28 @@ test('valid find user token can only be used once', function () {
 
     $response->assertSessionHas('error', 'Unable to submit that request.');
     $this->assertSame('Please review.', $user->refresh()->un_ban_request);
+});
+
+test('submit notifies an existing admin user by real mail when eligible', function () {
+    $adminRole = $this->createAdminRole();
+    $adminUser = $this->createAdmin($adminRole);
+
+    $user = (new CharacterFactory)->createBaseCharacter(
+        assignBaseSkill: false,
+        assignPassiveSkills: false,
+        createClassRanks: false,
+    )->banCharacter('Reason')->getCharacter()->user;
+
+    $lookupResponse = $this->post(route('un.ban.request.email'), ['email' => $user->email]);
+    $token = session('unban_request_token');
+
+    $response = $this->post(route('un.ban.request.submit'), [
+        'unban_message' => 'Please review my ban.',
+        'token' => $token,
+    ]);
+
+    $response->assertSessionHas('success', 'Request submitted. We will contact you in the next 72 hours.');
+    $this->assertSame('Please review my ban.', $user->refresh()->un_ban_request);
 });
 
 test('issued ineligible token does not reveal account state', function () {

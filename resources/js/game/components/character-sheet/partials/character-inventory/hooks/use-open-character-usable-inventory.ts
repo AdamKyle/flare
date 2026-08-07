@@ -1,5 +1,6 @@
 import UseOpenCharacterUsableInventoryDefinition from './definition/use-open-character-usable-inventory-definition';
 import UseOpenCharacterUsableInventoryProps from './types/use-open-character-uable-inventory-props';
+import BaseUsableItemDefinition from '../../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
 import { SidePeekComponentRegistrationEnum } from '../../../../side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek } from '../../../../side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../../side-peeks/base/hooks/use-side-peek-emitter';
@@ -9,7 +10,7 @@ export const useOpenCharacterUsableInventory = (
 ): UseOpenCharacterUsableInventoryDefinition => {
   const sidePeekEmitter = useSidePeekEmitter();
 
-  const openUsableInventory = () => {
+  const openUsableInventory = (initialItem?: BaseUsableItemDefinition) => {
     sidePeekEmitter.emit(
       SidePeek.SIDE_PEEK,
       SidePeekComponentRegistrationEnum.USABLE_ITEMS,
@@ -18,6 +19,7 @@ export const useOpenCharacterUsableInventory = (
         title: 'Usable Items',
         character_id: props.character_id,
         allow_clicking_outside: true,
+        initial_item: initialItem,
       }
     );
   };

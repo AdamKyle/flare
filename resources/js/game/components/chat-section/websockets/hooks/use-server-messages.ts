@@ -29,6 +29,7 @@ export const useServerMessages = ({
     type: ChannelType.PRIVATE,
     channelName: ChatWebsocketEventNames.SERVER,
     onEvent: handleServerEvent,
+    enabled: user_id > 0,
   });
 
   return { serverMessages };

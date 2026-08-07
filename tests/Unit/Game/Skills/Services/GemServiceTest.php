@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Skills\Services;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Gems\Builders\GemBuilder;
@@ -148,7 +149,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -183,7 +184,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -222,7 +223,7 @@ class GemServiceTest extends TestCase
             'copper_coins' => CurrencyLimit::MAX_COPPER,
         ]);
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
             $mock->makePartial()
                 ->shouldAllowMockingProtectedMethods()
                 ->shouldReceive('canCraft')
@@ -277,7 +278,7 @@ class GemServiceTest extends TestCase
     {
         Event::fake();
 
-        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class)], function (MockInterface $mock) {
+        $gemService = Mockery::mock(GemService::class, [resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class)], function (MockInterface $mock) {
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(false);
         });
 
@@ -308,7 +309,7 @@ class GemServiceTest extends TestCase
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
-        $mock->__construct(resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class));
+        $mock->__construct(resolve(GemBuilder::class), resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class));
 
         $this->instance(
             GemService::class,
@@ -386,7 +387,7 @@ class GemServiceTest extends TestCase
             $mock->makePartial()->shouldAllowMockingProtectedMethods()->shouldReceive('canCraft')->once()->andReturn(true);
         });
 
-        $gemService->__construct($gemBuilder, resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class));
+        $gemService->__construct($gemBuilder, resolve(ChanceCalculator::class), resolve(GemTransformer::class), resolve(ServerMessageBuilder::class), resolve(CharacterGemSlotsTransformer::class));
 
         $character = $this->character->getCharacter();
 

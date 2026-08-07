@@ -2,10 +2,12 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
+use App\Flare\Models\GameMap;
+use App\Flare\Models\InfoPage;
+use App\Game\Maps\Values\MapName;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -29,14 +31,14 @@ class MassImportCustomData extends Command
      */
     public function handle()
     {
-        Artisan::call('import:game-data "World Gems"');
-        Artisan::call('import:game-data "Location Templates"');
-        Artisan::call('import:game-data Quests');
-        Artisan::call('batch-crafting:add-set-to-players --apply');
-        Artisan::call('backfill:completed-panel-dismissals --apply');
-        Artisan::call('cleanup:duplicate-quest-inventory-slots --apply');
+//        Artisan::call('import:game-data "World Gems"');
+//        Artisan::call('import:game-data "Location Templates"');
+//        Artisan::call('import:game-data Quests');
+//        Artisan::call('batch-crafting:add-set-to-players --apply');
+//        Artisan::call('backfill:completed-panel-dismissals --apply');
+//        Artisan::call('cleanup:duplicate-quest-inventory-slots --apply');
 
-        $this->importInformationSection();
+        // $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
             $this->importGameMaps();
@@ -90,22 +92,22 @@ class MassImportCustomData extends Command
     {
         $files = Storage::disk('data-maps')->allFiles();
 
-        $corectOrder = [
+        $correctOrder = [
             'Surface.png',
             'Labyrinth.png',
             'Dungeons.png',
             'Shadow Plane.png',
             'Hell.png',
             'Purgatory.png',
-            'IcePlane.png',
+            'The Ice Plane.png',
             'Twisted Memories.png',
             'Delusional Memories.png',
         ];
 
         // Sort the array such that the maps are in the correct order.
-        usort($files, function ($a, $b) use ($corectOrder) {
-            $indexA = array_search($a, $corectOrder);
-            $indexB = array_search($b, $corectOrder);
+        usort($files, function ($a, $b) use ($correctOrder) {
+            $indexA = array_search($a, $correctOrder);
+            $indexB = array_search($b, $correctOrder);
 
             return $indexA - $indexB;
         });

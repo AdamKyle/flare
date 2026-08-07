@@ -27,8 +27,8 @@ const GoblinShopProvider = ({
 
   const inventoryIsFull = useMemo(() => {
     return (
-      character.inventory_count.data.inventory_count >=
-      character.inventory_count.data.inventory_max
+      character.inventory_count.inventory_count >=
+      character.inventory_count.inventory_max
     );
   }, [character]);
 

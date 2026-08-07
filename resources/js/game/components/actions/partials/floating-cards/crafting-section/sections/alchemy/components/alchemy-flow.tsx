@@ -6,24 +6,27 @@ import CraftingActionLayout from '../../../shared/components/crafting-action-lay
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
+import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useAlchemyFlow } from '../hooks/use-alchemy-flow';
+import { planeTextItemColors } from '../../../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import { useOpenCharacterUsableInventory } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-usable-inventory';
+import UsableItemEffects from '../../../../../../../../reusable-components/usable-item/usable-item-effects';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const AlchemyFlow = (): ReactNode => {
   const {
+    characterId,
     data,
     loading,
     error,
     mutationError,
-    status,
     selectedItem,
     transmuting,
     canTransmute,
@@ -36,6 +39,18 @@ const AlchemyFlow = (): ReactNode => {
     selectItem,
     transmuteItem,
   } = useAlchemyFlow();
+
+  const { openUsableInventory } = useOpenCharacterUsableInventory({
+    character_id: characterId,
+  });
+
+  const handleViewResultItem = (): void => {
+    if (!alchemyResult) {
+      return;
+    }
+
+    openUsableInventory(alchemyResult.item_preview);
+  };
 
   const renderLoadingState = (): ReactNode => (
     <IndeterminateProgressBar
@@ -74,50 +89,81 @@ const AlchemyFlow = (): ReactNode => {
     />
   );
 
+  const renderResultMessage = (): ReactNode => {
+    if (!alchemyResult) {
+      return null;
+    }
+
+    return (
+      <p
+        role="status"
+        aria-live="polite"
+        className="text-sm text-emerald-700 dark:text-emerald-400"
+      >
+        {'You created '}
+        <strong>{formatNumberWithCommas(alchemyResult.amount_created)}</strong>
+        {' x '}
+        {alchemyResult.name}
+        {'. You now own '}
+        {formatNumberWithCommas(alchemyResult.current_amount)}
+        {'.'}
+      </p>
+    );
+  };
+
+  const renderPendingPreviewDetails = (): ReactNode => (
+    <>
+      <p className="font-semibold text-gray-900 dark:text-gray-100">
+        {selectedItem?.name}
+      </p>
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Type: {selectedItem?.type} &bull; Quantity Attempted: 1
+      </p>
+      {selectedItem && <AlchemyCostSummary item={selectedItem} />}
+    </>
+  );
+
+  const renderSuccessPreviewDetails = (): ReactNode => {
+    if (!alchemyResult) {
+      return null;
+    }
+
+    return (
+      <>
+        <CraftingResultNameButton
+          name={alchemyResult.item_preview.name}
+          class_name={planeTextItemColors(alchemyResult.item_preview)}
+          on_click={handleViewResultItem}
+        />
+        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+          {alchemyResult.item_preview.description}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Type: {alchemyResult.item_preview.type}
+        </p>
+        <UsableItemEffects item={alchemyResult.item_preview} />
+      </>
+    );
+  };
+
   const renderPreview = (): ReactNode => {
     if (!selectedItem) {
       return null;
     }
 
+    const isSuccess = alchemyResult !== null;
+
     return (
       <CraftingActionPreview
         title="Item preview"
-        description="You will attempt to create one of this item."
+        description={
+          isSuccess ? undefined : 'You will attempt to create one of this item.'
+        }
+        status={isSuccess ? 'success' : 'default'}
       >
-        <p className="font-semibold text-gray-900 dark:text-gray-100">
-          {selectedItem.name}
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          Type: {selectedItem.type} &bull; Quantity Attempted: 1
-        </p>
-        <AlchemyCostSummary item={selectedItem} />
+        {renderResultMessage()}
+        {isSuccess ? renderSuccessPreviewDetails() : renderPendingPreviewDetails()}
       </CraftingActionPreview>
-    );
-  };
-
-  const renderResult = (): ReactNode => {
-    if (!status && !alchemyResult) {
-      return null;
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        {alchemyResult ? (
-          <span>
-            {'You created '}
-            <strong>
-              {formatNumberWithCommas(alchemyResult.amount_created)}
-            </strong>
-            {' x '}
-            {alchemyResult.name}
-            {'. You now own '}
-            {formatNumberWithCommas(alchemyResult.current_amount)}
-            {'.'}
-          </span>
-        ) : (
-          <span>{status}</span>
-        )}
-      </Alert>
     );
   };
 
@@ -132,20 +178,7 @@ const AlchemyFlow = (): ReactNode => {
       formatted_remaining={formattedRemaining}
       disabled={!canTransmute || isCraftingDisabled}
       on_click={() => void transmuteItem()}
-      variant={ButtonVariant.PRIMARY}
-      additional_css="w-full sm:w-auto"
     />
-  );
-
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/alchemy"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Alchemy help (opens in a new tab)
-    </a>
   );
 
   if (loading) {
@@ -158,11 +191,7 @@ const AlchemyFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Alchemy
-        </h2>
-      }
+      title="Alchemy"
       status={renderAlerts()}
       progress={
         <div className="space-y-2">
@@ -172,9 +201,9 @@ const AlchemyFlow = (): ReactNode => {
       }
       form={renderItemSelection()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/alchemy"
+      help_label="Alchemy help"
     />
   );
 };

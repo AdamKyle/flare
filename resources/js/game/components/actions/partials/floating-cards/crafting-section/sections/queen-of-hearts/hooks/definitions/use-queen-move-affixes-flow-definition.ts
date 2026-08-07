@@ -12,7 +12,6 @@ export interface UseQueenMoveAffixesFlowParams {
   characterId: number;
   data: QueenOfHeartsApiResponseDefinition;
   onDataReplaced: (data: QueenOfHeartsApiResponseDefinition) => void;
-  onSuccess: (message: string | undefined) => void;
 }
 
 export default interface UseQueenMoveAffixesFlowDefinition {
@@ -28,6 +27,7 @@ export default interface UseQueenMoveAffixesFlowDefinition {
   selectedCost: QueenCostDefinition | null;
   sourceResultPreview: CraftingItemPreviewDefinition | null;
   destinationResultPreview: CraftingItemPreviewDefinition | null;
+  resultMessage: string | null;
   submitting: boolean;
   error: string | null;
   canSubmit: boolean;

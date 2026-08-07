@@ -1,13 +1,10 @@
-import { ReactNode } from 'react';
-
 import SeerCampApiResponseDefinition from '../../api/definitions/seer-camp-api-response-definition';
 import SeerCampCostsDefinition from '../../api/definitions/seer-camp-costs-definition';
 
 export default interface SeerAttachGemFormProps {
   costs: SeerCampCostsDefinition;
   characterId: number;
-  rootStatus?: ReactNode;
-  helpLink?: ReactNode;
+  status: string | null;
   onSuccess: (data: SeerCampApiResponseDefinition) => void;
   onChangeAction: () => void;
 }

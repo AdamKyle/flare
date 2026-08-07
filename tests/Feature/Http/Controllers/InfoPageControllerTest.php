@@ -309,6 +309,23 @@ test('location show page renders without a quest reward item', function () {
     $response->assertSee('Quiet Field');
 });
 
+test('location show page renders with a quest reward item', function () {
+    $item = $this->createItem(['name' => 'Tarnished Locket']);
+    $map = $this->createGameMap();
+    $location = $this->createLocation([
+        'name' => 'Forgotten Grove',
+        'game_map_id' => $map->id,
+        'quest_reward_item_id' => $item->id,
+        'type' => null,
+    ]);
+
+    $response = $this->actingAs((new CharacterFactory)->createBaseCharacter()->getCharacter()->user)->get(route('info.page.location', $location));
+
+    $response->assertOk();
+    $response->assertSee('Forgotten Grove');
+    $response->assertSee('Tarnished Locket');
+});
+
 test('location show page renders with a location type set', function () {
     $map = $this->createGameMap();
     $location = $this->createLocation([

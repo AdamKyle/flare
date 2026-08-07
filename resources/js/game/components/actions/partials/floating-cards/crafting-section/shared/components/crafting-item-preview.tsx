@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import CraftingItemPreviewProps from './types/crafting-item-preview-props';
+import CraftingResultNameButton from './crafting-result-name-button';
 import DefinitionRow from '../../../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../../../reusable-components/viewable-sections/section';
@@ -22,8 +23,29 @@ const STAT_FIELDS = [
   { key: 'focus_modifier' as const, label: 'Focus' },
 ] as const;
 
-const CraftingItemPreview = ({ item }: CraftingItemPreviewProps): ReactNode => {
+const CraftingItemPreview = ({
+  item,
+  display_name,
+  on_name_click,
+}: CraftingItemPreviewProps): ReactNode => {
   const itemColorClass = planeTextItemColors(item);
+  const displayName = display_name ?? item.name;
+
+  const renderName = () => {
+    if (!on_name_click) {
+      return (
+        <p className={clsx('font-semibold', itemColorClass)}>{displayName}</p>
+      );
+    }
+
+    return (
+      <CraftingResultNameButton
+        name={displayName}
+        class_name={itemColorClass}
+        on_click={on_name_click}
+      />
+    );
+  };
 
   const renderDescription = () => {
     if (!item.description) {
@@ -149,7 +171,7 @@ const CraftingItemPreview = ({ item }: CraftingItemPreviewProps): ReactNode => {
 
   return (
     <div className="space-y-2">
-      <p className={clsx('font-semibold', itemColorClass)}>{item.name}</p>
+      {renderName()}
       {renderDescription()}
       <p className="text-xs text-gray-500 dark:text-gray-400">
         Type: {item.type}

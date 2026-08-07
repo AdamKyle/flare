@@ -11,7 +11,6 @@ import { useWorkBenchFlow } from '../hooks/use-work-bench-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
@@ -131,6 +130,24 @@ const WorkBenchFlow = (): ReactNode => {
   };
 
   const renderPreview = (): ReactNode => {
+    if (resultPreview) {
+      return (
+        <CraftingActionPreview
+          title="Holy Oil application preview"
+          status="success"
+        >
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-emerald-700 dark:text-emerald-400"
+          >
+            {status ?? 'The Holy Oil was applied.'}
+          </p>
+          <CraftingItemPreview item={resultPreview} />
+        </CraftingActionPreview>
+      );
+    }
+
     if (!selectedTarget) {
       return null;
     }
@@ -150,23 +167,6 @@ const WorkBenchFlow = (): ReactNode => {
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!status) {
-      return null;
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>{status}</span>
-        {resultPreview && (
-          <div className="mt-2">
-            <CraftingItemPreview item={resultPreview} />
-          </div>
-        )}
-      </Alert>
-    );
-  };
-
   const renderAction = (): ReactNode => (
     <CraftingProgressActionButton
       idle_label="Apply Holy Oil"
@@ -178,20 +178,7 @@ const WorkBenchFlow = (): ReactNode => {
       formatted_remaining={formattedRemaining}
       disabled={!canSubmit || isCraftingDisabled}
       on_click={() => void submitApply()}
-      variant={ButtonVariant.PRIMARY}
-      additional_css="w-full sm:w-auto"
     />
-  );
-
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/holy-items"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Holy Items help (opens in a new tab)
-    </a>
   );
 
   if (loading) {
@@ -204,17 +191,13 @@ const WorkBenchFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Work Bench
-        </h2>
-      }
+      title="Work Bench"
       status={renderStatus()}
       form={renderForm()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/holy-items"
+      help_label="Holy Items help"
     />
   );
 };

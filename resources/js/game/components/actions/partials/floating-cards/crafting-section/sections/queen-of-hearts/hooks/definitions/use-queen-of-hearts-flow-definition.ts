@@ -6,12 +6,9 @@ export default interface UseQueenOfHeartsFlowDefinition {
   data: QueenOfHeartsApiResponseDefinition | null;
   loading: boolean;
   error: string | null;
-  status: string | null;
   action: QueenAction | null;
   hasData: boolean;
   replaceData: (data: QueenOfHeartsApiResponseDefinition) => void;
   selectAction: (action: QueenAction) => void;
   resetAction: () => void;
-  handleRerollSuccess: (message?: string) => void;
-  handleMoveSuccess: (message?: string) => void;
 }

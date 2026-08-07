@@ -24,8 +24,14 @@ export const useWorkBenchFlow = (): UseWorkBenchFlowDefinition => {
   const itemsApi = useWorkBenchItemsApi({ character_id: characterId });
   const oilsApi = useHolyOilsApi({ character_id: characterId });
 
-  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
-    useCraftingTimeout(character);
+  const {
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    beginCraftingAction,
+    completeCraftingRequest,
+  } = useCraftingTimeout(character);
 
   const [selectedTargetSlotId, setSelectedTargetSlotId] = useState<
     number | null
@@ -96,7 +102,13 @@ export const useWorkBenchFlow = (): UseWorkBenchFlowDefinition => {
   const submitApply = async (): Promise<void> => {
     setResultPreview(null);
 
+    if (!beginCraftingAction()) {
+      return;
+    }
+
     const response = await apply();
+
+    completeCraftingRequest();
 
     if (!response) {
       return;

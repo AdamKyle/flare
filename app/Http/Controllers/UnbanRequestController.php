@@ -7,7 +7,7 @@ use App\Flare\Models\User;
 use Cache;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Monolog\Handler\MailHandler;
+use Mail;
 
 class UnbanRequestController extends Controller
 {
@@ -79,7 +79,7 @@ class UnbanRequestController extends Controller
             ]);
 
             foreach (User::role('Admin')->get() as $adminUser) {
-                MailHandler::dispatch($adminUser->email, new UnBanRequestMail($user))->delay(now()->addMinutes(1));
+                Mail::to($adminUser->email)->later(now()->addMinutes(1), new UnBanRequestMail($user));
             }
         }
 

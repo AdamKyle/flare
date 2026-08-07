@@ -2,16 +2,18 @@ import React, { ReactNode } from 'react';
 
 import CraftActionPanel from './craft-action-panel';
 import CraftProgressSummary from './craft-progress-summary';
-import CraftResultAlert from './craft-result-alert';
 import CraftTargetOptions from './craft-target-options';
 import CraftTypeFilters from './craft-type-filters';
 import CraftableItemPicker from './craftable-item-picker';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSectionScreenProps from '../../../types/crafting-section-screen-props';
 import { useCraftItemsFlow } from '../hooks/use-craft-items-flow';
+import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 
-import Button from 'ui/buttons/button';
+import { Alert } from 'ui/alerts/alert';
+import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
 const CraftItemsFlow = ({
@@ -19,6 +21,18 @@ const CraftItemsFlow = ({
 }: CraftingSectionScreenProps): ReactNode => {
   const { filters, picker, targets, result, progress, action, navigation } =
     useCraftItemsFlow({ setActiveCraftingType });
+  const { openServerMessageItem } = useOpenItemDetails();
+
+  const canViewCraftedItem =
+    result.isCraftSuccessful && result.craftedInventorySlotId !== null;
+
+  const handleViewCraftedItem = (): void => {
+    if (!result.isCraftSuccessful || result.craftedInventorySlotId === null) {
+      return;
+    }
+
+    openServerMessageItem(result.characterId, result.craftedInventorySlotId);
+  };
 
   const renderForm = (): ReactNode => {
     return (
@@ -56,13 +70,13 @@ const CraftItemsFlow = ({
         )}
 
         <div className="grid grid-cols-2 gap-3">
-          <Button
+          <CraftingActionButton
             label="Change Type"
             on_click={filters.handleChangeType}
             variant={ButtonVariant.PRIMARY}
             disabled={filters.selectedType === null}
           />
-          <Button
+          <CraftingActionButton
             label="Close"
             on_click={navigation.handleClose}
             variant={ButtonVariant.DANGER}
@@ -81,25 +95,18 @@ const CraftItemsFlow = ({
       <CraftActionPanel
         selectedItem={picker.selectedItem}
         inventoryIsFull={action.inventoryIsFull}
+        isCraftSuccessful={result.isCraftSuccessful}
+        onViewCraftedItem={canViewCraftedItem ? handleViewCraftedItem : undefined}
       />
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!picker.canShowItems) {
+  const renderStatus = (): ReactNode => {
+    if (!result.error) {
       return null;
     }
 
-    return (
-      <CraftResultAlert
-        characterId={result.characterId}
-        isCrafting={result.isCrafting}
-        error={result.error}
-        successMessage={result.successMessage}
-        craftedInventorySlotId={result.craftedInventorySlotId}
-        resultPreview={result.resultPreview}
-      />
-    );
+    return <Alert variant={AlertVariant.DANGER}>{result.error}</Alert>;
   };
 
   const renderAction = (): ReactNode => {
@@ -118,30 +125,14 @@ const CraftItemsFlow = ({
         formatted_remaining={progress.formattedRemaining}
         disabled={action.isCraftingDisabled || action.inventoryIsFull}
         on_click={action.handleCraft}
-        variant={ButtonVariant.SUCCESS}
-        additional_css="w-full"
       />
     );
   };
 
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/crafting"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Crafting help (opens in a new tab)
-    </a>
-  );
-
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Craft an Item
-        </h2>
-      }
+      title="Crafting"
+      status={renderStatus()}
       form={renderForm()}
       progress={
         picker.canShowItems ? (
@@ -149,9 +140,9 @@ const CraftItemsFlow = ({
         ) : undefined
       }
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/crafting"
+      help_label="Crafting help"
     />
   );
 };

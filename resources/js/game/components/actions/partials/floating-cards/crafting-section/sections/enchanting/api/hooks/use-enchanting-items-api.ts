@@ -2,6 +2,7 @@ import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler'
 import { useMemo } from 'react';
 
 import EnchantingPaginatedItemDefinition from '../definitions/enchanting-paginated-item-definition';
+import { planeTextItemColors } from '../../../../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import { EnchantingApiUrls } from '../enums/enchanting-api-urls';
 import UseEnchantingItemsApiDefinition from './definitions/use-enchanting-items-api-definition';
 import UseEnchantingItemsApiParams from './definitions/use-enchanting-items-api-params';
@@ -18,6 +19,8 @@ export const useEnchantingItemsApi = ({
     searchText,
     setSearchText,
     onEndReached,
+    setPage,
+    setRefresh,
   } = UsePaginatedApiHandler<EnchantingPaginatedItemDefinition>({
     url: EnchantingApiUrls.ITEMS,
     urlParams: { character: character_id },
@@ -26,9 +29,21 @@ export const useEnchantingItemsApi = ({
   });
 
   const items = useMemo(
-    () => data.map((item) => ({ value: item.slot_id, label: item.name })),
+    () =>
+      data.map((item) => ({
+        value: item.slot_id,
+        label: item.name,
+        ...(item.preview.affix_count > 0
+          ? { class_name: planeTextItemColors(item.preview) }
+          : {}),
+      })),
     [data]
   );
+
+  const refreshItems = () => {
+    setPage(1);
+    setRefresh((previousRefresh) => !previousRefresh);
+  };
 
   return {
     items,
@@ -38,5 +53,6 @@ export const useEnchantingItemsApi = ({
     searchText,
     setSearchText,
     onEndReached,
+    refreshItems,
   };
 };

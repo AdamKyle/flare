@@ -29,6 +29,7 @@ export const useExplorationMessages = ({
     type: ChannelType.PRIVATE,
     channelName: ChatWebsocketEventNames.AUTOMATION_LOG,
     onEvent: handleExplorationEvent,
+    enabled: user_id > 0,
   });
 
   return { explorationMessages };

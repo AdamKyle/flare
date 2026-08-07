@@ -1,4 +1,4 @@
-interface InventoryCountDataDefinition {
+export default interface InventoryCountsDefinition {
   inventory_max: number;
   inventory_count: number;
   inventory_bag_count: number;
@@ -11,8 +11,4 @@ interface InventoryCountDataDefinition {
   is_gem_bag_full: boolean;
   crafted_items_set_count: number;
   crafted_items_set_max: number;
-}
-
-export default interface InventoryCountsDefinition {
-  data: InventoryCountDataDefinition;
 }

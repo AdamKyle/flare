@@ -21,8 +21,14 @@ export const useTrinketryFlow = (): UseTrinketryFlowDefinition => {
 
   const itemsApi = useTrinketryItemsApi({ character_id: characterId });
 
-  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
-    useCraftingTimeout(character);
+  const {
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    beginCraftingAction,
+    completeCraftingRequest,
+  } = useCraftingTimeout(character);
 
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
@@ -64,20 +70,25 @@ export const useTrinketryFlow = (): UseTrinketryFlowDefinition => {
   const craftItem = async (): Promise<void> => {
     setResultPreview(null);
 
+    if (!beginCraftingAction()) {
+      return;
+    }
+
     const response = await craft();
+
+    completeCraftingRequest();
 
     if (!response) {
       return;
     }
 
     replaceData(response);
-    setStatus(
-      response.message ?? 'Your Trinket crafting request was completed.'
-    );
+    setStatus(response.message ?? null);
     setResultPreview(response.result_preview ?? null);
   };
 
   return {
+    characterId,
     data,
     loading,
     error,

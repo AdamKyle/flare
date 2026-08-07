@@ -1,6 +1,6 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { debounce } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import GemDetails from './gem-details';
 import GemList from './gem-list';
@@ -15,14 +15,24 @@ import StackedCard from 'ui/cards/stacked-card';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const GemBag = ({ character_id }: GemBagProps) => {
-  const [gemToView, setGemToView] = useState<BaseGemDetails | null>(null);
+const GemBag = ({ character_id, initial_gem }: GemBagProps) => {
+  const [gemToView, setGemToView] = useState<BaseGemDetails | null>(
+    initial_gem ?? null
+  );
 
   const { data, error, loading, setSearchText, onEndReached } =
     UsePaginatedApiHandler<BaseGemDetails>({
       url: CharacterInventoryApiUrls.CHARACTER_GEM_BAG,
       urlParams: { character: character_id },
     });
+
+  useEffect(() => {
+    if (!initial_gem) {
+      return;
+    }
+
+    setGemToView(initial_gem);
+  }, [initial_gem]);
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),

@@ -163,13 +163,21 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     onEvent: handleUpdateAnnouncements,
   });
 
-  if (!announcementUpdateListening) {
-    startAnnouncementListening();
-  }
+  useEffect(() => {
+    if (announcementUpdateListening) {
+      return;
+    }
 
-  if (!characterUpdatesListening) {
+    startAnnouncementListening();
+  }, [announcementUpdateListening, startAnnouncementListening]);
+
+  useEffect(() => {
+    if (characterUpdatesListening) {
+      return;
+    }
+
     startCharacterUpdates();
-  }
+  }, [characterUpdatesListening, startCharacterUpdates]);
 
   const listenForMonsterUpdates = () => {
     if (!monsterListening) {

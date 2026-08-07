@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import UseEnchantingFlowDefinition from './definitions/use-enchanting-flow-definition';
+import EnchantingApiResponseDefinition from '../api/definitions/enchanting-api-response-definition';
 import CraftingItemPreviewDefinition from '../../../shared/api/definitions/crafting-item-preview-definition';
 import { useCraftingTimeout } from '../../../shared/hooks/use-crafting-timeout';
 import { useEnchantItemApi } from '../api/hooks/use-enchant-item-api';
@@ -8,6 +9,7 @@ import { useEnchantingAffixesApi } from '../api/hooks/use-enchanting-affixes-api
 import { useEnchantingApi } from '../api/hooks/use-enchanting-api';
 import { useEnchantingItemsApi } from '../api/hooks/use-enchanting-items-api';
 import { EnchantingItemSource } from '../enums/enchanting-item-source';
+import { buildDecoratedItemName } from '../utils/build-decorated-item-name';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -21,12 +23,22 @@ export const useEnchantingFlow = (): UseEnchantingFlowDefinition => {
     characterId,
   });
 
-  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
-    useCraftingTimeout(character);
+  const {
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    beginCraftingAction,
+    completeCraftingRequest,
+  } = useCraftingTimeout(character);
 
   const [selectedSource, setSelectedSource] =
     useState<EnchantingItemSource | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+  const [selectedItemName, setSelectedItemName] = useState<string | null>(
+    null
+  );
+  const [allItemsEnchanted, setAllItemsEnchanted] = useState<boolean>(false);
   const [prefixId, setPrefixId] = useState<number | null>(null);
   const [suffixId, setSuffixId] = useState<number | null>(null);
   const [lastEnchantSucceeded, setLastEnchantSucceeded] = useState<
@@ -92,12 +104,16 @@ export const useEnchantingFlow = (): UseEnchantingFlowDefinition => {
   const selectSource = (nextSource: EnchantingItemSource): void => {
     setSelectedSource(nextSource);
     setSelectedSlotId(null);
+    setSelectedItemName(null);
+    setAllItemsEnchanted(false);
     setLastEnchantSucceeded(null);
     setResultPreview(null);
   };
 
-  const selectSlot = (nextSlotId: number): void => {
+  const selectSlot = (nextSlotId: number, nextItemName: string): void => {
     setSelectedSlotId(nextSlotId);
+    setSelectedItemName(nextItemName);
+    setAllItemsEnchanted(false);
     setLastEnchantSucceeded(null);
     setResultPreview(null);
   };
@@ -114,11 +130,53 @@ export const useEnchantingFlow = (): UseEnchantingFlowDefinition => {
     setResultPreview(null);
   };
 
+  const advanceToNextEligibleItem = (
+    response: EnchantingApiResponseDefinition
+  ): void => {
+    if (effectiveSource === EnchantingItemSource.EVENT) {
+      const nextEventItem = response.affixes.items_for_event.find(
+        (item) => item.affix_count === 0
+      );
+
+      if (nextEventItem) {
+        setSelectedSlotId(nextEventItem.slot_id);
+        setSelectedItemName(nextEventItem.item_name);
+        setAllItemsEnchanted(false);
+
+        return;
+      }
+    } else {
+      const nextRegularItem = response.affixes.character_inventory.find(
+        (item) => item.item.affix_count === 0
+      );
+
+      if (nextRegularItem) {
+        setSelectedSlotId(nextRegularItem.id);
+        setSelectedItemName(nextRegularItem.item.affix_name);
+        setAllItemsEnchanted(false);
+
+        return;
+      }
+    }
+
+    setAllItemsEnchanted(true);
+
+    if (response.result_preview) {
+      setSelectedItemName(buildDecoratedItemName(response.result_preview));
+    }
+  };
+
   const submitEnchant = async (): Promise<void> => {
     setLastEnchantSucceeded(null);
     setResultPreview(null);
 
+    if (!beginCraftingAction()) {
+      return;
+    }
+
     const response = await enchant();
+
+    completeCraftingRequest();
 
     if (!response) {
       return;
@@ -130,11 +188,20 @@ export const useEnchantingFlow = (): UseEnchantingFlowDefinition => {
     });
     setLastEnchantSucceeded(response.enchant_succeeded ?? null);
     setResultPreview(response.result_preview ?? null);
-    setPrefixId(null);
-    setSuffixId(null);
+    itemsApi.refreshItems();
+
+    if (!response.enchant_succeeded) {
+      setPrefixId(null);
+      setSuffixId(null);
+
+      return;
+    }
+
+    advanceToNextEligibleItem(response);
   };
 
   return {
+    characterId,
     data,
     loading,
     error,
@@ -146,6 +213,8 @@ export const useEnchantingFlow = (): UseEnchantingFlowDefinition => {
     hasEventChoice,
     effectiveSource,
     effectiveSlotId,
+    selectedItemName,
+    allItemsEnchanted,
     selectedPrefixId: prefixId,
     selectedSuffixId: suffixId,
     totalCost,

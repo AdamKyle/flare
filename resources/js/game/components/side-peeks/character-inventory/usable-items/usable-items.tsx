@@ -1,7 +1,7 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import UsableItemsProps from './types/usable-items-props';
 import UsableItem from './usable-item';
@@ -18,9 +18,9 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const UsableItems = ({ character_id }: UsableItemsProps) => {
+const UsableItems = ({ character_id, initial_item }: UsableItemsProps) => {
   const [itemToView, setItemToView] = useState<BaseUsableItemDefinition | null>(
-    null
+    initial_item ?? null
   );
 
   const { data, error, loading, setSearchText, setFilters, onEndReached } =
@@ -28,6 +28,14 @@ const UsableItems = ({ character_id }: UsableItemsProps) => {
       url: CharacterInventoryApiUrls.CHARACTER_USABLE_ITEMS,
       urlParams: { character: character_id },
     });
+
+  useEffect(() => {
+    if (!initial_item) {
+      return;
+    }
+
+    setItemToView(initial_item);
+  }, [initial_item]);
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),

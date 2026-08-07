@@ -8,6 +8,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 const EnchantingItemSelection = ({
   items,
   selectedSlotId,
+  selectedItemName,
   loading,
   isLoadingMore,
   canLoadMore,
@@ -16,12 +17,25 @@ const EnchantingItemSelection = ({
   onEndReached,
   onSelect,
 }: EnchantingItemSelectionProps): ReactNode => {
-  const preSelectedItem = items.find(
+  const loadedSelectedOption: DropdownItem | undefined = items.find(
     (option) => option.value === selectedSlotId
   );
 
+  const selectedOption: DropdownItem | undefined =
+    loadedSelectedOption ??
+    (selectedSlotId !== null && selectedItemName !== null
+      ? { value: selectedSlotId, label: selectedItemName }
+      : undefined);
+
+  const isSelectedOptionLoaded = loadedSelectedOption !== undefined;
+
+  const dropdownItems: DropdownItem[] =
+    selectedOption && !isSelectedOptionLoaded
+      ? [selectedOption, ...items]
+      : items;
+
   const handleSelect = (option: DropdownItem): void => {
-    onSelect(Number(option.value));
+    onSelect(Number(option.value), String(option.label));
   };
 
   return (
@@ -31,10 +45,11 @@ const EnchantingItemSelection = ({
       </label>
 
       <Dropdown
+        key={selectedSlotId ?? 'none'}
         aria_labelled_by="enchanting-item-label"
-        items={items}
+        items={dropdownItems}
         selection_placeholder={loading ? 'Loading items…' : 'Select an item'}
-        pre_selected_item={preSelectedItem}
+        pre_selected_item={selectedOption}
         on_select={handleSelect}
         searchable
         search_value={searchText}

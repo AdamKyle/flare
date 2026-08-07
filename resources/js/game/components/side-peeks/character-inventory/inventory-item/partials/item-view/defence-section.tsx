@@ -3,10 +3,8 @@ import React from 'react';
 import DefinitionRow from '../../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../../reusable-components/viewable-sections/section';
-import {
-  formatIntWithPlus,
-  formatSignedPercent,
-} from '../../../../../../util/format-number';
+import StatRowInteger from '../../../../../../reusable-components/viewable-sections/stat-row-integer';
+import { formatSignedPercent } from '../../../../../../util/format-number';
 import DefenceSectionProps from '../../types/partials/item-view/defence-section-props';
 import {
   baseAcModToolTipDescription,
@@ -64,22 +62,11 @@ const DefenceSection = ({ ac, baseAcMod }: DefenceSectionProps) => {
 
   return (
     <Section title="Defence">
-      <DefinitionRow
-        left={
-          <InfoLabel
-            label="AC"
-            tooltip={baseDefenceToolTipDescription(ac)}
-            tooltipAlign="right"
-          />
-        }
-        right={
-          <span className="inline-flex items-center gap-2">
-            {renderUpIcon(ac)}
-            <span className="font-semibold tabular-nums">
-              {formatIntWithPlus(ac)}
-            </span>
-          </span>
-        }
+      <StatRowInteger
+        label="AC"
+        value={ac}
+        tooltip={baseDefenceToolTipDescription(ac)}
+        tooltipAlign="right"
       />
 
       {renderBaseModRow()}

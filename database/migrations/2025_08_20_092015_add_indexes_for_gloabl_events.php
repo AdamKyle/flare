@@ -25,23 +25,6 @@ return new class extends Migration
 
         Schema::table('global_event_participation', function (Blueprint $table) {
             $table->index('character_id', 'global_event_participation_character_id_idx');
-            $table->index(['global_event_goal_id', 'character_id'], 'global_event_participation_goal_char_idx');
-        });
-
-        Schema::table('event_goal_participation_kills', function (Blueprint $table) {
-            $table->index(['global_event_goal_id', 'character_id'], 'event_goal_kills_goal_char_idx');
-        });
-
-        Schema::table('event_goal_participation_crafts', function (Blueprint $table) {
-            $table->index(['global_event_goal_id', 'character_id'], 'event_goal_crafts_goal_char_idx');
-        });
-
-        Schema::table('event_goal_participation_enchants', function (Blueprint $table) {
-            $table->index(['global_event_goal_id', 'character_id'], 'event_goal_enchants_goal_char_idx');
-        });
-
-        Schema::table('global_event_crafting_inventories', function (Blueprint $table) {
-            $table->index(['global_event_id', 'character_id'], 'global_event_craft_inv_event_char_idx');
         });
 
         Schema::table('global_event_crafting_inventory_slots', function (Blueprint $table) {
@@ -68,23 +51,6 @@ return new class extends Migration
 
         Schema::table('global_event_participation', function (Blueprint $table) {
             $table->dropIndex('global_event_participation_character_id_idx');
-            $table->dropIndex('global_event_participation_goal_char_idx');
-        });
-
-        Schema::table('event_goal_participation_kills', function (Blueprint $table) {
-            $table->dropIndex('event_goal_kills_goal_char_idx');
-        });
-
-        Schema::table('event_goal_participation_crafts', function (Blueprint $table) {
-            $table->dropIndex('event_goal_crafts_goal_char_idx');
-        });
-
-        Schema::table('event_goal_participation_enchants', function (Blueprint $table) {
-            $table->dropIndex('event_goal_enchants_goal_char_idx');
-        });
-
-        Schema::table('global_event_crafting_inventories', function (Blueprint $table) {
-            $table->dropIndex('global_event_craft_inv_event_char_idx');
         });
 
         Schema::table('global_event_crafting_inventory_slots', function (Blueprint $table) {

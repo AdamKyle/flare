@@ -1,10 +1,13 @@
+import clsx from 'clsx';
 import React, { ReactNode, useId } from 'react';
 
+import { STATUS_BORDER_STYLES } from './styles/crafting-action-preview-status-styles';
 import CraftingActionPreviewProps from './types/crafting-action-preview-props';
 
 const CraftingActionPreview = ({
   title,
   description,
+  status = 'default',
   children,
 }: CraftingActionPreviewProps): ReactNode => {
   const headingId = useId();
@@ -24,7 +27,10 @@ const CraftingActionPreview = ({
   return (
     <section
       aria-labelledby={headingId}
-      className="space-y-2 rounded-md border border-gray-400 p-3 dark:border-gray-600"
+      className={clsx(
+        'space-y-2 rounded-md border p-3',
+        STATUS_BORDER_STYLES[status]
+      )}
     >
       <h3
         id={headingId}

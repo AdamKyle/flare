@@ -53,6 +53,142 @@ class CraftingControllerTest extends TestCase
         $this->assertArrayNotHasKey('name', $item);
     }
 
+    public function test_fetch_items_to_craft_returns_armour_item_with_stored_name_and_type(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Reinforced Plate Armour',
+            'cost' => 250,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'armour',
+            'type' => 'body',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, ['crafting_type' => 'armour']);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $row = $data['items'][0];
+        $this->assertIsInt($row['id']);
+        $this->assertIsNumeric($row['cost']);
+        $this->assertIsArray($row['preview']);
+        $this->assertSame('Reinforced Plate Armour', $row['preview']['name']);
+        $this->assertSame('body', $row['preview']['type']);
+    }
+
+    public function test_fetch_items_to_craft_returns_spell_item_with_stored_name_and_type(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Searing Bolt',
+            'cost' => 180,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-damage',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, ['crafting_type' => 'spell']);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $row = $data['items'][0];
+        $this->assertIsInt($row['id']);
+        $this->assertIsNumeric($row['cost']);
+        $this->assertIsArray($row['preview']);
+        $this->assertSame('Searing Bolt', $row['preview']['name']);
+        $this->assertSame('spell-damage', $row['preview']['type']);
+    }
+
+    public function test_fetch_items_to_craft_returns_ring_item_with_stored_name_and_type(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Ring Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Band of Fortitude',
+            'cost' => 300,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'ring',
+            'type' => 'ring',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, ['crafting_type' => 'ring']);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $row = $data['items'][0];
+        $this->assertIsInt($row['id']);
+        $this->assertIsNumeric($row['cost']);
+        $this->assertIsArray($row['preview']);
+        $this->assertSame('Band of Fortitude', $row['preview']['name']);
+        $this->assertSame('ring', $row['preview']['type']);
+    }
+
+    public function test_fetch_items_for_class_returns_class_specific_weapon_with_stored_name(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['name' => 'Fighter'])
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Gladius of the Fallen',
+            'cost' => 220,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+            'type' => 'sword',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/craft-for-class/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $row = $data['items'][0];
+        $this->assertIsInt($row['id']);
+        $this->assertIsNumeric($row['cost']);
+        $this->assertIsArray($row['preview']);
+        $this->assertSame('Gladius of the Fallen', $row['preview']['name']);
+        $this->assertSame('sword', $row['preview']['type']);
+    }
+
     public function test_fetch_items_to_craft_paginated_returns_canonical_pagination_envelope(): void
     {
         $craftingSkill = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value]);

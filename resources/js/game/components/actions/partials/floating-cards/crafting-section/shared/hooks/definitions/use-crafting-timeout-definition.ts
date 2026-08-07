@@ -3,4 +3,6 @@ export default interface UseCraftingTimeoutDefinition {
   isCraftingDisabled: boolean;
   progress: number;
   formattedRemaining: string;
+  beginCraftingAction: () => boolean;
+  completeCraftingRequest: () => void;
 }

@@ -10,6 +10,40 @@ use Auth;
 
 class WelcomeController extends Controller
 {
+    private const RAID_VIEWS = [
+        'jester-of-time-raid' => 'events.jester-of-time-raid.event-page',
+        'the-smugglers-are-back-raid' => 'events.the-smugglers-are-back-raid.event-page',
+        'ice-queen-raid' => 'events.ice-queen-raid.event-page',
+        'the-frozen-king-raid' => 'events.frozen-king-raid.event-page',
+        'corrupted-bishop-raid' => 'events.corrupted-bishop-raid.event-page',
+        'labyrinth-monster-raid' => 'events.labyrinth-monster-raid.event-page',
+    ];
+
+    private const RAID_TYPES = [
+        'jester-of-time-raid' => RaidType::JESTER_OF_TIME,
+        'the-smugglers-are-back-raid' => RaidType::PIRATE_LORD,
+        'ice-queen-raid' => RaidType::ICE_QUEEN,
+        'the-frozen-king-raid' => RaidType::FROZEN_KING,
+        'corrupted-bishop-raid' => RaidType::CORRUPTED_BISHOP,
+        'labyrinth-monster-raid' => RaidType::ENRAGED_LITTLE_GIRL,
+    ];
+
+    private const EVENT_VIEWS = [
+        'delusional-memories' => 'events.delusional-memories-event.event-page',
+        'the-winter-event' => 'events.the-winter-event.event-page',
+        'weekly-celestials' => 'events.weekly-celestials-event.event-page',
+        'weekly-currency-drops' => 'events.weekly-currency-drops-event.event-page',
+        'weekly-faction-loyalty' => 'events.weekly-faction-loyalty-event.event-page',
+    ];
+
+    private const EVENT_TYPES = [
+        'delusional-memories' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        'the-winter-event' => EventType::WINTER_EVENT,
+        'weekly-celestials' => EventType::WEEKLY_CELESTIALS,
+        'weekly-currency-drops' => EventType::WEEKLY_CURRENCY_DROPS,
+        'weekly-faction-loyalty' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
+    ];
+
     public function welcome()
     {
 
@@ -35,109 +69,36 @@ class WelcomeController extends Controller
 
     public function showEventPage(EventPageRequest $request)
     {
-
         $eventType = $request->event_type;
-        $raids = ['jester-of-time-raid', 'the-smugglers-are-back-raid', 'ice-queen-raid', 'the-frozen-king-raid', 'corrupted-bishop-raid', 'labyrinth-monster-raid'];
-        $events = ['delusional-memories', 'weekly-celestials', 'weekly-currency-drops', 'weekly-faction-loyalty', 'the-winter-event'];
 
-        if (in_array($eventType, $raids)) {
-
-            $raidType = match ($eventType) {
-                'jester-of-time-raid' => RaidType::JESTER_OF_TIME,
-                'the-smugglers-are-back-raid' => RaidType::PIRATE_LORD,
-                'ice-queen-raid' => RaidType::ICE_QUEEN,
-                'the-frozen-king-raid' => RaidType::FROZEN_KING,
-                'corrupted-bishop-raid' => RaidType::CORRUPTED_BISHOP,
-                'labyrinth-monster-raid' => RaidType::ENRAGED_LITTLE_GIRL,
-            };
-
-            $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->whereHas('raid', function ($query) use ($raidType) {
-                return $query->where('raid_type', $raidType);
-            })->first();
-
-            if (is_null($event)) {
-                $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('start_date', '>=', now())->whereHas('raid', function ($query) use ($raidType) {
-                    return $query->where('raid_type', $raidType);
-                })->orderBy('id')->first();
-            }
-
-            switch ($eventType) {
-                case 'jester-of-time-raid':
-                    return view('events.jester-of-time-raid.event-page', [
-                        'event' => $event,
-                    ]);
-                case 'the-smugglers-are-back-raid':
-                    return view('events.the-smugglers-are-back-raid.event-page', [
-                        'event' => $event,
-                    ]);
-                case 'ice-queen-raid':
-                    return view('events.ice-queen-raid.event-page', [
-                        'event' => $event,
-                    ]);
-                case 'the-frozen-king-raid':
-                    return view('events.frozen-king-raid.event-page', [
-                        'event' => $event,
-                    ]);
-                case 'corrupted-bishop-raid':
-                    return view('events.corrupted-bishop-raid.event-page', [
-                        'event' => $event,
-                    ]);
-                case 'labyrinth-monster-raid':
-                    return view('events.labyrinth-monster-raid.event-page', [
-                        'event' => $event,
-                    ]);
-                default:
-                    return redirect()->to(route('welcome'));
-            }
+        if (array_key_exists($eventType, self::RAID_VIEWS)) {
+            return view(self::RAID_VIEWS[$eventType], [
+                'event' => $this->findRaidEvent(self::RAID_TYPES[$eventType]),
+            ]);
         }
 
-        if (in_array($eventType, $events)) {
-
-            switch ($eventType) {
-                case 'delusional-memories':
-                    return view('events.delusional-memories-event.event-page', [
-                        'event' => $this->findScheduledEventForEventType($eventType),
-                    ]);
-                case 'the-winter-event':
-                    return view('events.the-winter-event.event-page', [
-                        'event' => $this->findScheduledEventForEventType($eventType),
-                    ]);
-                case 'weekly-celestials':
-                    return view('events.weekly-celestials-event.event-page', [
-                        'event' => $this->findScheduledEventForEventType($eventType),
-                    ]);
-                case 'weekly-currency-drops':
-                    return view('events.weekly-currency-drops-event.event-page', [
-                        'event' => $this->findScheduledEventForEventType($eventType),
-                    ]);
-                case 'weekly-faction-loyalty':
-                    return view('events.weekly-faction-loyalty-event.event-page', [
-                        'event' => $this->findScheduledEventForEventType($eventType),
-                    ]);
-                default:
-                    return redirect()->to(route('welcome'));
-            }
+        if (array_key_exists($eventType, self::EVENT_VIEWS)) {
+            return view(self::EVENT_VIEWS[$eventType], [
+                'event' => $this->findScheduledEvent(self::EVENT_TYPES[$eventType]),
+            ]);
         }
 
         return redirect()->to(route('welcome'));
     }
 
-    private function findScheduledEventForEventType(string $eventType): ?ScheduledEvent
+    private function findRaidEvent(string $raidType): ?ScheduledEvent
     {
-        switch ($eventType) {
-            case 'delusional-memories':
-                return $this->findScheduledEvent(EventType::DELUSIONAL_MEMORIES_EVENT);
-            case 'the-winter-event':
-                return $this->findScheduledEvent(EventType::WINTER_EVENT);
-            case 'weekly-celestials':
-                return $this->findScheduledEvent(EventType::WEEKLY_CELESTIALS);
-            case 'weekly-currency-drops':
-                return $this->findScheduledEvent(EventType::WEEKLY_CURRENCY_DROPS);
-            case 'weekly-faction-loyalty':
-                return $this->findScheduledEvent(EventType::WEEKLY_FACTION_LOYALTY_EVENT);
-            default:
-                return null;
+        $event = ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('currently_running', true)->whereHas('raid', function ($query) use ($raidType) {
+            return $query->where('raid_type', $raidType);
+        })->first();
+
+        if (! is_null($event)) {
+            return $event;
         }
+
+        return ScheduledEvent::where('event_type', EventType::RAID_EVENT)->where('start_date', '>=', now())->whereHas('raid', function ($query) use ($raidType) {
+            return $query->where('raid_type', $raidType);
+        })->orderBy('id')->first();
     }
 
     private function findScheduledEvent(int $eventType): ?ScheduledEvent

@@ -3,7 +3,7 @@ import React from 'react';
 import DefinitionRow from '../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../reusable-components/viewable-sections/section';
-import { formatPercent } from '../../../../../util/format-number';
+import StatRowPercent from '../../../../../reusable-components/viewable-sections/stat-row-percent';
 import SkillModifiersSectionProps from '../types/partials/skill-modifiers-section-props';
 
 const SkillModifiersSection = ({
@@ -17,22 +17,14 @@ const SkillModifiersSection = ({
       showSeparator={showSeparator}
       showTitleSeparator={showTitleSeparator}
     >
-      <DefinitionRow
-        left={<InfoLabel label="Skill" />}
-        right={
-          <span className="whitespace-nowrap text-gray-800 dark:text-gray-200">
-            +{formatPercent(item.increase_skill_bonus_by!)}
-          </span>
-        }
+      <StatRowPercent
+        label="Skill Bonus"
+        value={item.increase_skill_bonus_by!}
       />
 
-      <DefinitionRow
-        left={<InfoLabel label="Training" />}
-        right={
-          <span className="whitespace-nowrap text-gray-800 dark:text-gray-200">
-            +{formatPercent(item.increase_skill_training_bonus_by!)}
-          </span>
-        }
+      <StatRowPercent
+        label="Skill XP Bonus"
+        value={item.increase_skill_training_bonus_by!}
       />
 
       <DefinitionRow

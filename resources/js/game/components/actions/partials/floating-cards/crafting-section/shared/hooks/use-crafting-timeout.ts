@@ -15,6 +15,7 @@ let craftingTimeoutDuration = 0;
 let craftingCanCraft = true;
 let hasInitializedCharacterTimeout = false;
 let craftingTimeoutResolved = false;
+let craftingActionLocked = false;
 
 const getRemainingSeconds = (): number => {
   if (craftingTimeoutEndsAt === null) {
@@ -36,6 +37,7 @@ const initializeTimeoutState = (
     craftingCanCraft = characterData?.can_craft !== false;
     hasInitializedCharacterTimeout = false;
     craftingTimeoutResolved = false;
+    craftingActionLocked = false;
   }
 
   const storedRemainingSeconds = getRemainingSeconds();
@@ -84,7 +86,9 @@ export const useCraftingTimeout = (
   );
   const [totalSeconds, setTotalSeconds] = useState(initialState.totalSeconds);
   const [canCraft, setCanCraft] = useState(initialState.canCraft);
+  const [actionLocked, setActionLocked] = useState(craftingActionLocked);
   const intervalIdRef = useRef<number | null>(null);
+  const requestInFlightRef = useRef(false);
 
   const handleTimeoutUpdate = (timeout: number | null) => {
     const nextTimeout = Math.max(timeout ?? 0, 0);
@@ -98,6 +102,11 @@ export const useCraftingTimeout = (
       setRemainingSeconds(0);
       setTotalSeconds(0);
       setCanCraft(true);
+
+      if (!requestInFlightRef.current) {
+        craftingActionLocked = false;
+        setActionLocked(false);
+      }
 
       return;
     }
@@ -116,6 +125,34 @@ export const useCraftingTimeout = (
     setRemainingSeconds(nextTimeout);
     setTotalSeconds(craftingTimeoutDuration);
     setCanCraft(false);
+  };
+
+  const beginCraftingAction = (): boolean => {
+    if (requestInFlightRef.current || craftingActionLocked) {
+      return false;
+    }
+
+    requestInFlightRef.current = true;
+    craftingActionLocked = true;
+    setActionLocked(true);
+
+    return true;
+  };
+
+  const completeCraftingRequest = (): void => {
+    requestInFlightRef.current = false;
+
+    const characterId = characterData?.id ?? 0;
+
+    if (characterId <= 0) {
+      return;
+    }
+
+    const url = getUrl(CraftingApiUrls.UPDATE_CHARACTER_TIMERS, {
+      character: characterId,
+    });
+
+    void apiHandler.get<unknown, never>(url).catch(() => undefined);
   };
 
   useCraftingTimeoutWebsocket({
@@ -145,10 +182,7 @@ export const useCraftingTimeout = (
 
       craftingTimeoutEndsAt = null;
       craftingTimeoutDuration = 0;
-      craftingCanCraft = true;
-      craftingTimeoutResolved = true;
       setTotalSeconds(0);
-      setCanCraft(true);
     };
 
     intervalIdRef.current = window.setInterval(updateRemainingTime, 1000);
@@ -172,8 +206,10 @@ export const useCraftingTimeout = (
   return {
     isTimeoutActive,
     isCraftingDisabled:
-      !canCraft || characterPreventsCrafting || isTimeoutActive,
+      actionLocked || !canCraft || characterPreventsCrafting || isTimeoutActive,
     progress,
     formattedRemaining: formatCraftingTimeout(remainingSeconds),
+    beginCraftingAction,
+    completeCraftingRequest,
   };
 };

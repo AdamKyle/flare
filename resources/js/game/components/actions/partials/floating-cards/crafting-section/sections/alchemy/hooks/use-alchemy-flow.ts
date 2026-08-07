@@ -19,11 +19,16 @@ export const useAlchemyFlow = (): UseAlchemyFlowDefinition => {
 
   const itemsApi = useAlchemyItemsApi({ character_id: characterId });
 
-  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
-    useCraftingTimeout(character);
+  const {
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    beginCraftingAction,
+    completeCraftingRequest,
+  } = useCraftingTimeout(character);
 
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
   const [alchemyResult, setAlchemyResult] =
     useState<AlchemyResultDefinition | null>(null);
 
@@ -55,30 +60,34 @@ export const useAlchemyFlow = (): UseAlchemyFlowDefinition => {
 
   const selectItem = (itemId: number): void => {
     setSelectedItemId(itemId);
-    setStatus(null);
     setAlchemyResult(null);
   };
 
   const transmuteItem = async (): Promise<void> => {
     setAlchemyResult(null);
 
+    if (!beginCraftingAction()) {
+      return;
+    }
+
     const response = await transmute();
+
+    completeCraftingRequest();
 
     if (!response) {
       return;
     }
 
     replaceData(response);
-    setStatus(response.message ?? 'Your transmutation request was completed.');
     setAlchemyResult(response.alchemy_result ?? null);
   };
 
   return {
+    characterId,
     data,
     loading,
     error,
     mutationError,
-    status,
     selectedItem,
     transmuting,
     canTransmute,

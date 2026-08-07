@@ -145,6 +145,12 @@ const Dropdown = ({
     });
   }, []);
 
+  const closeMenu = useCallback(() => {
+    setIsOpen(false);
+    setFocusedIndex(null);
+    setInternalSearchTerm('');
+  }, []);
+
   useLayoutEffect(() => {
     if (!isOpen) {
       return;
@@ -158,24 +164,34 @@ const Dropdown = ({
       return;
     }
 
-    const handleReposition = () => recalculatePosition();
+    const handleResize = () => recalculatePosition();
 
-    window.addEventListener('resize', handleReposition);
-    window.addEventListener('scroll', handleReposition, true);
+    const handleScroll = (event: Event) => {
+      const target = event.target as Node | null;
+
+      if (target && menuRef.current?.contains(target)) {
+        return;
+      }
+
+      closeMenu();
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, true);
 
     let resizeObserver: ResizeObserver | undefined;
 
     if (containerRef.current && typeof ResizeObserver !== 'undefined') {
-      resizeObserver = new ResizeObserver(handleReposition);
+      resizeObserver = new ResizeObserver(handleResize);
       resizeObserver.observe(containerRef.current);
     }
 
     return () => {
-      window.removeEventListener('resize', handleReposition);
-      window.removeEventListener('scroll', handleReposition, true);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll, true);
       resizeObserver?.disconnect();
     };
-  }, [isOpen, recalculatePosition]);
+  }, [isOpen, recalculatePosition, closeMenu]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -193,9 +209,7 @@ const Dropdown = ({
         return;
       }
 
-      setIsOpen(false);
-      setFocusedIndex(null);
-      setInternalSearchTerm('');
+      closeMenu();
     };
 
     document.addEventListener('pointerdown', handlePointerDown);
@@ -203,7 +217,7 @@ const Dropdown = ({
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown);
     };
-  }, [isOpen]);
+  }, [isOpen, closeMenu]);
 
   useEffect(() => {
     if (isOpen && focusedIndex !== null && listRef.current) {
@@ -240,12 +254,6 @@ const Dropdown = ({
     on_clear,
     displayItems.length,
   ]);
-
-  const closeMenu = () => {
-    setIsOpen(false);
-    setFocusedIndex(null);
-    setInternalSearchTerm('');
-  };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if (disabled) {
@@ -398,7 +406,8 @@ const Dropdown = ({
           'mx-1 my-1 cursor-pointer rounded-lg px-4 py-3 break-words whitespace-normal transition-colors duration-100',
           focusedIndex === index
             ? 'bg-gray-300 dark:bg-gray-700'
-            : 'hover:bg-gray-300 dark:hover:bg-gray-800'
+            : 'hover:bg-gray-300 dark:hover:bg-gray-800',
+          item.class_name
         )}
       >
         {item.label}
@@ -413,7 +422,9 @@ const Dropdown = ({
 
     if (current) {
       return (
-        <span className="text-gray-900 dark:text-white">{current.label}</span>
+        <span className={current.class_name ?? 'text-gray-900 dark:text-white'}>
+          {current.label}
+        </span>
       );
     }
 

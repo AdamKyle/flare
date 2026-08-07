@@ -44,7 +44,6 @@ export const useQueenMoveAffixesFlow = ({
   characterId,
   data,
   onDataReplaced,
-  onSuccess,
 }: UseQueenMoveAffixesFlowParams): UseQueenMoveAffixesFlowDefinition => {
   const [sourceId, setSourceId] = useState<number | null>(null);
   const [destinationId, setDestinationId] = useState<number | null>(null);
@@ -53,6 +52,7 @@ export const useQueenMoveAffixesFlow = ({
     useState<CraftingItemPreviewDefinition | null>(null);
   const [destinationResultPreview, setDestinationResultPreview] =
     useState<CraftingItemPreviewDefinition | null>(null);
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
 
   const sourceItemsApi = useQueenUniqueItemsApi({ character_id: characterId });
   const destinationItemsApi = useQueenDestinationItemsApi({
@@ -105,23 +105,27 @@ export const useQueenMoveAffixesFlow = ({
     destinationItemsApi.setSearchText('');
     setSourceResultPreview(null);
     setDestinationResultPreview(null);
+    setResultMessage(null);
   };
 
   const handleSelectAffix = (option: DropdownItem): void => {
     setAffix(option.value as QueenAffixSelection);
     setSourceResultPreview(null);
     setDestinationResultPreview(null);
+    setResultMessage(null);
   };
 
   const handleSelectDestination = (option: DropdownItem): void => {
     setDestinationId(Number(option.value));
     setSourceResultPreview(null);
     setDestinationResultPreview(null);
+    setResultMessage(null);
   };
 
   const handleSubmit = async (): Promise<void> => {
     setSourceResultPreview(null);
     setDestinationResultPreview(null);
+    setResultMessage(null);
 
     const response = await move();
 
@@ -130,7 +134,7 @@ export const useQueenMoveAffixesFlow = ({
     }
 
     onDataReplaced(response);
-    onSuccess(response.message);
+    setResultMessage(response.message ?? null);
     setSourceResultPreview(response.source_result_preview ?? null);
     setDestinationResultPreview(response.destination_result_preview ?? null);
     setSourceId(null);
@@ -152,6 +156,7 @@ export const useQueenMoveAffixesFlow = ({
     selectedCost,
     sourceResultPreview,
     destinationResultPreview,
+    resultMessage,
     submitting,
     error,
     canSubmit,

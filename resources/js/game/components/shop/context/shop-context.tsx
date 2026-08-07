@@ -77,8 +77,8 @@ const ShopProvider = ({ children }: ShopProviderProps) => {
     }
 
     return (
-      gameData.character.inventory_count.data.inventory_count >=
-      gameData.character.inventory_count.data.inventory_max
+      gameData.character.inventory_count.inventory_count >=
+      gameData.character.inventory_count.inventory_max
     );
   }, [gameData]);
 

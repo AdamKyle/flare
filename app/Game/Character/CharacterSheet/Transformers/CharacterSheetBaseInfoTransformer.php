@@ -95,10 +95,10 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'can_spin' => $character->can_spin,
             'can_move' => $character->can_move,
             'can_engage_celestials' => $character->can_engage_celestials,
-            'can_engage_celestials_again_at' => now()->diffInSeconds($character->can_engage_celestials_again_at),
-            'can_attack_again_at' => now()->diffInSeconds($character->can_attack_again_at),
-            'can_craft_again_at' => now()->diffInSeconds($character->can_craft_again_at),
-            'can_spin_again_at' => now()->diffInSeconds($character->can_spin_again_at),
+            'can_engage_celestials_again_at' => $this->remainingSecondsUntil($character->can_engage_celestials_again_at),
+            'can_attack_again_at' => $this->remainingSecondsUntil($character->can_attack_again_at),
+            'can_craft_again_at' => $this->remainingSecondsUntil($character->can_craft_again_at),
+            'can_spin_again_at' => $this->remainingSecondsUntil($character->can_spin_again_at),
             'is_automation_running' => $character->currentAutomations()
                 ->where('character_id', $character->id)
                 ->where('completed_at', '>', now())
@@ -120,7 +120,7 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
             'is_silenced' => $character->user->is_silenced,
             'can_talk_again_at' => $character->user->can_talk_again_at,
-            'can_move_again_at' => now()->diffInSeconds($character->can_move_again_at),
+            'can_move_again_at' => $this->remainingSecondsUntil($character->can_move_again_at),
             'force_name_change' => $character->force_name_change,
             'is_alchemy_locked' => $this->isAlchemyLocked($character),
             'can_use_work_bench' => $locationBasedCraftingOptions->canUseWorkBench,
@@ -215,8 +215,17 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         return [
             'type' => $automation->type,
             'name' => $name,
-            'timer_seconds' => now()->diffInSeconds($automation->completed_at),
+            'timer_seconds' => $this->remainingSecondsUntil($automation->completed_at),
         ];
+    }
+
+    private function remainingSecondsUntil(?Carbon $timestamp): int
+    {
+        if (is_null($timestamp) || $timestamp->isPast()) {
+            return 0;
+        }
+
+        return now()->diffInSeconds($timestamp, false);
     }
 
     private function batchCraftingTimeOutSeconds(?BatchCrafting $batchCrafting): int

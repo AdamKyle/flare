@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import QueenCostSummary from './queen-cost-summary';
 import QueenMoveAffixesFormProps from './types/queen-move-affixes-form-props';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
@@ -11,7 +12,6 @@ import { useQueenMoveAffixesFlow } from '../hooks/use-queen-move-affixes-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 
@@ -47,9 +47,6 @@ const describeMovingAffixes = (
 const QueenMoveAffixesForm = ({
   data,
   characterId,
-  rootStatus,
-  helpLink,
-  onSuccess,
   onDataReplaced,
   onChangeAction,
 }: QueenMoveAffixesFormProps): ReactNode => {
@@ -65,6 +62,7 @@ const QueenMoveAffixesForm = ({
     selectedCost,
     sourceResultPreview,
     destinationResultPreview,
+    resultMessage,
     submitting,
     error,
     canSubmit,
@@ -72,19 +70,14 @@ const QueenMoveAffixesForm = ({
     handleSelectAffix,
     handleSelectDestination,
     handleSubmit,
-  } = useQueenMoveAffixesFlow({ characterId, data, onDataReplaced, onSuccess });
+  } = useQueenMoveAffixesFlow({ characterId, data, onDataReplaced });
 
   const renderStatus = (): ReactNode => {
-    if (!rootStatus && !error) {
+    if (!error) {
       return null;
     }
 
-    return (
-      <div className="space-y-2">
-        {rootStatus}
-        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-      </div>
-    );
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderForm = (): ReactNode => {
@@ -158,6 +151,38 @@ const QueenMoveAffixesForm = ({
   };
 
   const renderPreview = (): ReactNode => {
+    if (sourceResultPreview || destinationResultPreview) {
+      return (
+        <CraftingActionPreview title="Move preview" status="success">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-emerald-700 dark:text-emerald-400"
+          >
+            {resultMessage ?? 'The affixes were moved.'}
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {sourceResultPreview && (
+              <div>
+                <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">
+                  Source result
+                </p>
+                <CraftingItemPreview item={sourceResultPreview} />
+              </div>
+            )}
+            {destinationResultPreview && (
+              <div>
+                <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">
+                  Destination result
+                </p>
+                <CraftingItemPreview item={destinationResultPreview} />
+              </div>
+            )}
+          </div>
+        </CraftingActionPreview>
+      );
+    }
+
     if (!selectedSource || !selectedDestination) {
       return null;
     }
@@ -197,65 +222,32 @@ const QueenMoveAffixesForm = ({
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!sourceResultPreview && !destinationResultPreview) {
-      return null;
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>The affixes were moved.</span>
-        <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
-          {sourceResultPreview && (
-            <div>
-              <p className="mb-1 text-xs font-semibold">Source result</p>
-              <CraftingItemPreview item={sourceResultPreview} />
-            </div>
-          )}
-          {destinationResultPreview && (
-            <div>
-              <p className="mb-1 text-xs font-semibold">Destination result</p>
-              <CraftingItemPreview item={destinationResultPreview} />
-            </div>
-          )}
-        </div>
-      </Alert>
-    );
-  };
-
   const renderAction = (): ReactNode => (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <div className="space-y-2">
       {hasSourceSlots && (
-        <Button
+        <CraftingActionButton
           label={submitting ? 'Moving…' : 'Move Enchants'}
           on_click={() => void handleSubmit()}
-          variant={ButtonVariant.PRIMARY}
           disabled={!canSubmit}
-          additional_css="w-full sm:w-auto"
         />
       )}
-      <Button
+      <CraftingActionButton
         label="Change Action"
         on_click={onChangeAction}
         variant={ButtonVariant.PRIMARY}
-        additional_css="w-full sm:w-auto"
       />
     </div>
   );
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Queen of Hearts: Move Enchants
-        </h2>
-      }
+      title="Queen of Hearts: Move Enchants"
       status={renderStatus()}
       form={renderForm()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={helpLink}
+      help_href="/information/random-enchants"
+      help_label="Random enchant help"
     />
   );
 };

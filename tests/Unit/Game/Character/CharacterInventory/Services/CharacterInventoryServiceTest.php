@@ -128,6 +128,27 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertNotEmpty($result);
     }
 
+    public function test_fetch_character_usable_items_paginates_without_error()
+    {
+        $item = $this->createItem([
+            'type' => 'alchemy',
+            'usable' => true,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $character->alchemyBag->slots()->create([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->fetchCharacterUsableItems();
+
+        $this->assertNotEmpty($result['data']);
+        $this->assertSame($item->id, $result['data'][0]['item_id']);
+    }
+
     public function test_get_inventory_data_when_no_valid_type_passed_in()
     {
         $character = $this->character->inventorySetManagement()

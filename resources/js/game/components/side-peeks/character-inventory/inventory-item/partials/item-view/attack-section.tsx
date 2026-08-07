@@ -3,10 +3,8 @@ import React from 'react';
 import DefinitionRow from '../../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../../reusable-components/viewable-sections/section';
-import {
-  formatIntWithPlus,
-  formatSignedPercent,
-} from '../../../../../../util/format-number';
+import StatRowInteger from '../../../../../../reusable-components/viewable-sections/stat-row-integer';
+import { formatSignedPercent } from '../../../../../../util/format-number';
 import AttackSectionProps from '../../types/partials/item-view/attack-section-props';
 import {
   attackToolTipDescription,
@@ -63,22 +61,11 @@ const AttackSection = ({ attack, baseDamageMod }: AttackSectionProps) => {
 
   return (
     <Section title="Attack">
-      <DefinitionRow
-        left={
-          <InfoLabel
-            label="Attack"
-            tooltip={attackToolTipDescription(attack)}
-            tooltipAlign="right"
-          />
-        }
-        right={
-          <span className="inline-flex items-center gap-2">
-            {renderUpIcon(attack)}
-            <span className="font-semibold tabular-nums">
-              {formatIntWithPlus(attack)}
-            </span>
-          </span>
-        }
+      <StatRowInteger
+        label="Attack"
+        value={attack}
+        tooltip={attackToolTipDescription(attack)}
+        tooltipAlign="right"
       />
 
       {renderBaseModRow()}

@@ -193,6 +193,16 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
 
   const tiles = data.tiles;
 
+  const hasUsableTileGrid =
+    Array.isArray(tiles) &&
+    tiles.length > 0 &&
+    Array.isArray(tiles[0]) &&
+    tiles[0].length > 0;
+
+  if (!hasUsableTileGrid) {
+    return <GameDataError />;
+  }
+
   const characterKingdoms: MapIcon[] = data.character_kingdoms.map(
     (kingdom) => {
       return {

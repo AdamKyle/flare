@@ -11,18 +11,23 @@ import CraftingItemPreview from '../../../shared/components/crafting-item-previe
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useEnchantingFlow } from '../hooks/use-enchanting-flow';
+import { buildDecoratedItemName } from '../utils/build-decorated-item-name';
+import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const ENCHANT_FAILED_MESSAGE =
   'The enchantment failed. Check Server Messages for the full outcome.';
 
+const ALL_ITEMS_ENCHANTED_MESSAGE =
+  'All items are currently enchanted, be careful child - all choices carry consequences.';
+
 const EnchantingFlow = (): ReactNode => {
   const {
+    characterId,
     data,
     loading,
     error,
@@ -34,6 +39,8 @@ const EnchantingFlow = (): ReactNode => {
     hasEventChoice,
     effectiveSource,
     effectiveSlotId,
+    selectedItemName,
+    allItemsEnchanted,
     totalCost,
     submitting,
     canSubmit,
@@ -48,6 +55,16 @@ const EnchantingFlow = (): ReactNode => {
     selectSuffix,
     submitEnchant,
   } = useEnchantingFlow();
+
+  const { openServerMessageItem } = useOpenItemDetails();
+
+  const handleViewResultItem = (): void => {
+    if (!resultPreview || resultPreview.inventory_slot_id === null) {
+      return;
+    }
+
+    openServerMessageItem(characterId, resultPreview.inventory_slot_id);
+  };
 
   const renderLoadingState = (): ReactNode => (
     <IndeterminateProgressBar
@@ -111,8 +128,25 @@ const EnchantingFlow = (): ReactNode => {
         onSearch={itemsApi.setSearchText}
         onEndReached={itemsApi.onEndReached}
         selectedSlotId={effectiveSlotId}
+        selectedItemName={selectedItemName}
         onSelect={selectSlot}
       />
+    );
+  };
+
+  const renderAllItemsEnchantedMessage = (): ReactNode => {
+    if (!allItemsEnchanted) {
+      return null;
+    }
+
+    return (
+      <p
+        role="status"
+        aria-live="polite"
+        className="text-sm text-gray-700 dark:text-gray-300"
+      >
+        {ALL_ITEMS_ENCHANTED_MESSAGE}
+      </p>
     );
   };
 
@@ -151,45 +185,68 @@ const EnchantingFlow = (): ReactNode => {
     <div className="space-y-3">
       {renderSourceSelection()}
       {renderItemSelection()}
+      {renderAllItemsEnchantedMessage()}
       {renderAffixSelection()}
     </div>
   );
+
+  const renderPreviewContent = (): ReactNode => {
+    if (lastEnchantSucceeded === true) {
+      return (
+        <>
+          <p className="text-sm text-emerald-700 dark:text-emerald-400">
+            Your enchantment was applied.
+          </p>
+          {resultPreview && (
+            <CraftingItemPreview
+              item={resultPreview}
+              display_name={buildDecoratedItemName(resultPreview)}
+              on_name_click={
+                resultPreview.inventory_slot_id !== null
+                  ? handleViewResultItem
+                  : undefined
+              }
+            />
+          )}
+        </>
+      );
+    }
+
+    if (lastEnchantSucceeded === false) {
+      return (
+        <p className="text-sm text-rose-600 dark:text-rose-400">
+          {ENCHANT_FAILED_MESSAGE}
+        </p>
+      );
+    }
+
+    return <EnchantingCostSummary totalCost={totalCost} />;
+  };
 
   const renderPreview = (): ReactNode => {
     if (effectiveSource === null) {
       return null;
     }
 
+    const previewStatus =
+      lastEnchantSucceeded === true
+        ? 'success'
+        : lastEnchantSucceeded === false
+          ? 'danger'
+          : 'default';
+
     return (
       <CraftingActionPreview
-        title="Enchantment preview"
-        description="The final result depends on the enchanting roll and is not shown until the attempt completes."
+        title="Enchanting Preview"
+        description={
+          lastEnchantSucceeded === null
+            ? 'The final result depends on the enchanting roll and is not shown until the attempt completes.'
+            : undefined
+        }
+        status={previewStatus}
       >
-        <EnchantingCostSummary totalCost={totalCost} />
+        {renderPreviewContent()}
       </CraftingActionPreview>
-    );
-  };
-
-  const renderResult = (): ReactNode => {
-    if (lastEnchantSucceeded === null) {
-      return null;
-    }
-
-    if (!lastEnchantSucceeded) {
-      return (
-        <Alert variant={AlertVariant.DANGER}>{ENCHANT_FAILED_MESSAGE}</Alert>
-      );
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>Your enchantment was applied.</span>
-        {resultPreview && (
-          <div className="mt-2">
-            <CraftingItemPreview item={resultPreview} />
-          </div>
-        )}
-      </Alert>
     );
   };
 
@@ -209,22 +266,9 @@ const EnchantingFlow = (): ReactNode => {
         formatted_remaining={formattedRemaining}
         disabled={!canSubmit || isCraftingDisabled}
         on_click={() => void submitEnchant()}
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full sm:w-auto"
       />
     );
   };
-
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/enchanting"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Enchanting information (opens in a new tab)
-    </a>
-  );
 
   if (loading) {
     return renderLoadingState();
@@ -236,11 +280,7 @@ const EnchantingFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Enchanting
-        </h2>
-      }
+      title="Enchanting"
       status={renderError()}
       progress={
         <div className="space-y-2">
@@ -250,9 +290,9 @@ const EnchantingFlow = (): ReactNode => {
       }
       form={renderForm()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/enchanting"
+      help_label="Enchanting information"
     />
   );
 };

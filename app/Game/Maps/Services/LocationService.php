@@ -66,7 +66,7 @@ class LocationService
         $gameMap = $character->map->gameMap;
 
         return [
-            'tiles' => $gameMap->tile_map,
+            'tiles' => $gameMap->tile_map ?? [],
             'character_position' => $this->getCharacterPositionData($character->map),
             'time_out_details' => $this->getMapTimeOutDetails($character),
             'locations' => $this->fetchLocationData($character),

@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import SeerRemoveGemsFormProps from './types/seer-remove-gems-form-props';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import { ElementalAtonementDefinition } from '../api/definitions/gem-comparison-api-response-definition';
@@ -8,7 +9,6 @@ import { useSeerRemoveGemsFlow } from '../hooks/use-seer-remove-gems-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
@@ -35,8 +35,7 @@ const renderAtonement = (
 const SeerRemoveGemsForm = ({
   removalData,
   characterId,
-  rootStatus,
-  helpLink,
+  status,
   onSuccess,
   onChangeAction,
 }: SeerRemoveGemsFormProps): ReactNode => {
@@ -68,16 +67,11 @@ const SeerRemoveGemsForm = ({
   };
 
   const renderStatus = (): ReactNode => {
-    if (!rootStatus && !error) {
+    if (!error) {
       return null;
     }
 
-    return (
-      <div className="space-y-2">
-        {rootStatus}
-        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-      </div>
-    );
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderEmptyItemsState = (): ReactNode => {
@@ -149,68 +143,87 @@ const SeerRemoveGemsForm = ({
     );
   };
 
-  const renderPreview = (): ReactNode => {
-    if (!selectedItem || !selectedDetails) {
+  const renderSuccessText = (): ReactNode => {
+    if (!status) {
       return null;
     }
 
     return (
-      <CraftingActionPreview
-        title={selectedItem.preview.name}
-        description="Removal preview"
+      <p
+        role="status"
+        aria-live="polite"
+        className="text-sm text-emerald-700 dark:text-emerald-400"
       >
-        <h4 className="font-semibold">Original atonement</h4>
-        {renderAtonement(selectedDetails.comparison.original_atonement)}
-        <p>
-          Remove one cost: {selectedDetails.remove_one_cost} Gold Bars. Remove
-          all cost: {selectedDetails.remove_all_cost} Gold Bars.
-        </p>
-        {renderChangeResult()}
-      </CraftingActionPreview>
+        {status}
+      </p>
     );
   };
 
+  const renderPreview = (): ReactNode => {
+    if (selectedItem && selectedDetails) {
+      return (
+        <CraftingActionPreview
+          title={selectedItem.preview.name}
+          description="Removal preview"
+          status={status ? 'success' : 'default'}
+        >
+          {renderSuccessText()}
+          <h4 className="font-semibold">Original atonement</h4>
+          {renderAtonement(selectedDetails.comparison.original_atonement)}
+          <p>
+            Remove one cost: {selectedDetails.remove_one_cost} Gold Bars.
+            Remove all cost: {selectedDetails.remove_all_cost} Gold Bars.
+          </p>
+          {renderChangeResult()}
+        </CraftingActionPreview>
+      );
+    }
+
+    if (status) {
+      return (
+        <CraftingActionPreview title="Result" status="success">
+          {renderSuccessText()}
+        </CraftingActionPreview>
+      );
+    }
+
+    return null;
+  };
+
   const renderAction = (): ReactNode => (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <div className="space-y-2">
       {selectedItem && selectedDetails && (
         <>
-          <Button
+          <CraftingActionButton
             label={isRemovingOne ? 'Removing…' : 'Remove Gem'}
             on_click={() => void removeOne()}
-            variant={ButtonVariant.PRIMARY}
             disabled={!gemId || isSubmitting}
-            additional_css="w-full sm:w-auto"
           />
-          <Button
+          <CraftingActionButton
             label={isRemovingAll ? 'Removing all…' : 'Remove All Gems'}
             on_click={() => void removeAll()}
             variant={ButtonVariant.DANGER}
             disabled={selectedDetails.gems.length === 0 || isSubmitting}
-            additional_css="w-full sm:w-auto"
           />
         </>
       )}
-      <Button
+      <CraftingActionButton
         label="Change Action"
         on_click={onChangeAction}
         variant={ButtonVariant.PRIMARY}
-        additional_css="w-full sm:w-auto"
       />
     </div>
   );
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Seer Camp: Remove Gems
-        </h2>
-      }
+      title="Seer Camp: Remove Gems"
       status={renderStatus()}
       form={renderForm()}
       preview={renderPreview()}
       action={renderAction()}
-      help_link={helpLink}
+      help_href="/information/seer-camp"
+      help_label="Seer Camp help"
     />
   );
 };

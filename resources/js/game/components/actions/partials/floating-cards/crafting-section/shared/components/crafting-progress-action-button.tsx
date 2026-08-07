@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import CraftingProgressActionButtonProps from './types/crafting-progress-action-button-props';
 
 import ProgressButton from 'ui/buttons/button-progress';
+import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
 const clampProgress = (progress: number): number => {
   return Math.min(Math.max(progress, 0), 100);
@@ -61,8 +62,6 @@ const CraftingProgressActionButton = ({
   formatted_remaining,
   disabled,
   on_click,
-  variant,
-  additional_css,
 }: CraftingProgressActionButtonProps): ReactNode => {
   const label = getButtonLabel({
     idle_label,
@@ -85,10 +84,10 @@ const CraftingProgressActionButton = ({
     <ProgressButton
       label={label}
       on_click={on_click}
-      variant={variant}
+      variant={ButtonVariant.SUCCESS}
       progress={displayedProgress}
       disabled={isDisabled}
-      additional_css={additional_css}
+      additional_css="w-full"
       aria_busy={submitting}
     />
   );

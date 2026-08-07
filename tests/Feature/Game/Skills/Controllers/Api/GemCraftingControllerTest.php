@@ -78,6 +78,23 @@ class GemCraftingControllerTest extends TestCase
         $this->assertArrayHasKey('id', $data['crafted_gem']);
         $this->assertArrayHasKey('tier', $data['crafted_gem']);
         $this->assertIsString($data['message']);
+
+        $preview = $data['crafted_gem_preview'];
+
+        $this->assertNotNull($preview);
+        $this->assertTrue($character->gemBag->gemSlots()->whereKey($preview['slot_id'])->exists());
+        $this->assertSame($data['crafted_gem']['name'], $preview['name']);
+        $this->assertSame($data['crafted_gem']['tier'], $preview['tier']);
+        $this->assertArrayHasKey('weak_against', $preview);
+        $this->assertArrayHasKey('strong_against', $preview);
+        $this->assertArrayHasKey('element_atoned_to', $preview);
+        $this->assertArrayHasKey('element_atoned_to_amount', $preview);
+        $this->assertArrayHasKey('primary_atonement_type', $preview);
+        $this->assertArrayHasKey('primary_atonement_amount', $preview);
+        $this->assertArrayHasKey('secondary_atonement_type', $preview);
+        $this->assertArrayHasKey('secondary_atonement_amount', $preview);
+        $this->assertArrayHasKey('tertiary_atonement_type', $preview);
+        $this->assertArrayHasKey('tertiary_atonement_amount', $preview);
     }
 
     public function test_craft_gem_failure_returns_null_crafted_gem(): void
@@ -116,6 +133,7 @@ class GemCraftingControllerTest extends TestCase
         $response->assertOk();
         $this->assertFalse($data['craft_succeeded']);
         $this->assertNull($data['crafted_gem']);
+        $this->assertNull($data['crafted_gem_preview']);
     }
 
     public function test_craft_gem_cannot_afford_returns_error(): void
@@ -141,5 +159,6 @@ class GemCraftingControllerTest extends TestCase
         $response->assertStatus(422);
         $this->assertFalse($data['craft_succeeded']);
         $this->assertNull($data['crafted_gem']);
+        $this->assertNull($data['crafted_gem_preview']);
     }
 }

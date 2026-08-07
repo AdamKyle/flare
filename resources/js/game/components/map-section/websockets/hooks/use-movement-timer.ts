@@ -13,13 +13,16 @@ export const useMovementTimer = ({ characterData }: UseMovementTimerParams) => {
     onDataUpdate(data);
   };
 
+  const userId = characterData?.user_id || 0;
+
   useWebsocket({
     url: WebSocketChannels.MOVEMENT_TIME_OUT,
     params: {
-      userId: characterData?.user_id || 0,
+      userId,
     },
     type: ChannelType.PRIVATE,
     channelName: WebsocketEventNames.MOVEMENT_TIME_OUT,
     onEvent: handleEventData,
+    enabled: userId > 0,
   });
 };

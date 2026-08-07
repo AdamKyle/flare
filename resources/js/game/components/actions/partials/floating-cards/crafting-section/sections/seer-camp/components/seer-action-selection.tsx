@@ -1,9 +1,9 @@
 import React, { ReactNode } from 'react';
 
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import { SeerAction } from '../enums/seer-action';
 import SeerActionSelectionProps from './types/seer-action-selection-props';
 
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 
 const SeerActionSelection = ({
@@ -22,20 +22,20 @@ const SeerActionSelection = ({
   };
 
   return (
-    <fieldset className="space-y-3">
+    <fieldset className="space-y-2">
       <legend className="font-semibold">Choose a Seer Camp action</legend>
 
-      <Button
+      <CraftingActionButton
         label="Create/ReRoll Sockets"
         on_click={handleSelectManageSockets}
         variant={ButtonVariant.PRIMARY}
       />
-      <Button
+      <CraftingActionButton
         label="Attach Gems"
         on_click={handleSelectAttachGem}
         variant={ButtonVariant.PRIMARY}
       />
-      <Button
+      <CraftingActionButton
         label="Remove Gem"
         on_click={handleSelectRemoveGem}
         variant={ButtonVariant.PRIMARY}

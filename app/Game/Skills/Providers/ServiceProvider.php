@@ -9,9 +9,11 @@ use App\Game\BattleRewardProcessing\Services\FactionLoyaltyRewardRequestService;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Builders\RandomAffixGenerator;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
@@ -124,6 +126,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ItemListCostTransformerService::class),
                 $app->make(Pagination::class),
                 $app->make(AlchemyItemTransformer::class),
+                $app->make(UsableItemTransformer::class),
             );
         });
 
@@ -179,6 +182,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ChanceCalculator::class),
                 $app->make(GemTransformer::class),
                 $app->make(ServerMessageBuilder::class),
+                $app->make(CharacterGemSlotsTransformer::class),
             );
         });
 

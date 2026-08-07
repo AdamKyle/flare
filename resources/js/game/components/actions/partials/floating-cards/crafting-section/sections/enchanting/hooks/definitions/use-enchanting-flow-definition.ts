@@ -5,6 +5,7 @@ import UseEnchantingItemsApiDefinition from '../../api/hooks/definitions/use-enc
 import { EnchantingItemSource } from '../../enums/enchanting-item-source';
 
 export default interface UseEnchantingFlowDefinition {
+  characterId: number;
   data: EnchantingApiResponseDefinition | null;
   loading: boolean;
   error: string | null;
@@ -16,6 +17,8 @@ export default interface UseEnchantingFlowDefinition {
   hasEventChoice: boolean;
   effectiveSource: EnchantingItemSource | null;
   effectiveSlotId: number | null;
+  selectedItemName: string | null;
+  allItemsEnchanted: boolean;
   selectedPrefixId: number | null;
   selectedSuffixId: number | null;
   totalCost: number;
@@ -27,7 +30,7 @@ export default interface UseEnchantingFlowDefinition {
   prefixApi: UseEnchantingAffixesApiDefinition;
   suffixApi: UseEnchantingAffixesApiDefinition;
   selectSource: (source: EnchantingItemSource) => void;
-  selectSlot: (slotId: number) => void;
+  selectSlot: (slotId: number, itemName: string) => void;
   selectPrefix: (prefixId: number | null) => void;
   selectSuffix: (suffixId: number | null) => void;
   submitEnchant: () => Promise<void>;

@@ -190,20 +190,28 @@ class InfoPageController extends Controller
     {
         $locationType = null;
 
-        $questItemDetails = [];
+        $usedInQuest = null;
 
         if (! is_null($location->questRewardItem)) {
-            $questItemDetails = $this->itemShowDetails($location->questRewardItem);
+            $questItemId = $location->quest_reward_item_id;
+
+            $usedInQuest = Quest::where(function ($query) use ($questItemId) {
+                $query->where('item_id', $questItemId)
+                    ->orWhere('secondary_required_item', $questItemId);
+            })
+                ->orderByRaw('CASE WHEN item_id = ? THEN 0 ELSE 1 END', [$questItemId])
+                ->first();
         }
 
         if (! is_null($location->type)) {
             $locationType = LocationType::tryFrom($location->type);
         }
 
-        return view('information.locations.location', array_merge([
+        return view('information.locations.location', [
             'location' => $location,
             'locationType' => $locationType,
-        ], $questItemDetails));
+            'usedInQuest' => $usedInQuest,
+        ]);
     }
 
     public function viewUnit(Request $request, GameUnit $unit)

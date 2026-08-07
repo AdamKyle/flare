@@ -2,6 +2,7 @@
 
 namespace App\Game\Core\Items\Transformers\Api;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
@@ -13,7 +14,7 @@ class UsableItemTransformer extends TransformerAbstract
     /**
      * Gets the response data for the inventory sheet
      */
-    public function transform(InventorySlot|SetSlot|Item $slot): array
+    public function transform(InventorySlot|SetSlot|AlchemyBagSlot|Item $slot): array
     {
 
         $item = $slot;

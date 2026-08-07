@@ -117,11 +117,10 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
     }
 
     const totalQuantityForInventory =
-      quantity + characterInfo.inventory_count.data.inventory_count;
+      quantity + characterInfo.inventory_count.inventory_count;
 
     if (
-      totalQuantityForInventory >
-      characterInfo.inventory_count.data.inventory_max
+      totalQuantityForInventory > characterInfo.inventory_count.inventory_max
     ) {
       setCanBuyItems(false);
       setCannotBuyReason('You do not have enough inventory space.');
@@ -138,20 +137,18 @@ const ShopBuyMany = ({ item, on_close }: ShopBuyManyProps) => {
       return null;
     }
 
-    const currentCount =
-      gameData.character.inventory_count.data.inventory_count;
+    const currentCount = gameData.character.inventory_count.inventory_count;
 
-    const maxCount = gameData.character.inventory_count.data.inventory_max;
+    const maxCount = gameData.character.inventory_count.inventory_max;
 
     const gold = gameData.character.gold;
 
-    const bagCount =
-      gameData.character.inventory_count.data.inventory_bag_count;
+    const bagCount = gameData.character.inventory_count.inventory_bag_count;
 
     const usableItemsCount =
-      gameData.character.inventory_count.data.alchemy_item_count;
+      gameData.character.inventory_count.alchemy_item_count;
 
-    const gemBagCount = gameData.character.inventory_count.data.gem_bag_count;
+    const gemBagCount = gameData.character.inventory_count.gem_bag_count;
 
     return (
       <Section title="Character" showSeparator={false} showTitleSeparator>

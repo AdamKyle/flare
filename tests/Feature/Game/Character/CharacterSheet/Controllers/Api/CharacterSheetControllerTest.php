@@ -70,4 +70,35 @@ class CharacterSheetControllerTest extends TestCase
         $this->assertArrayHasKey('can_craft', $data);
         $this->assertArrayHasKey('is_automation_running', $data);
     }
+
+    public function test_character_sheet_inventory_count_is_a_flat_object_without_a_nested_data_key()
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/character-sheet/'.$character->id);
+
+        $inventoryCount = json_decode($response->getContent(), true)['data']['inventory_count'];
+
+        $this->assertArrayNotHasKey('data', $inventoryCount);
+        $this->assertIsNumeric($inventoryCount['inventory_count']);
+        $this->assertIsNumeric($inventoryCount['inventory_max']);
+        $this->assertSame([
+            'inventory_max',
+            'inventory_count',
+            'inventory_bag_count',
+            'alchemy_item_count',
+            'alchemy_bag_count',
+            'alchemy_bag_limit',
+            'is_alchemy_bag_full',
+            'gem_bag_count',
+            'gem_bag_limit',
+            'is_gem_bag_full',
+            'crafted_items_set_count',
+            'crafted_items_set_max',
+        ], array_keys($inventoryCount));
+    }
 }

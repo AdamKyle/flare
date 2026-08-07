@@ -9,15 +9,16 @@ import CraftingItemPreview from '../../../shared/components/crafting-item-previe
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useTrinketryFlow } from '../hooks/use-trinketry-flow';
+import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const TrinketryFlow = (): ReactNode => {
   const {
+    characterId,
     data,
     loading,
     error,
@@ -35,6 +36,16 @@ const TrinketryFlow = (): ReactNode => {
     selectItem,
     craftItem,
   } = useTrinketryFlow();
+
+  const { openServerMessageItem } = useOpenItemDetails();
+
+  const handleViewResultItem = (): void => {
+    if (!resultPreview || resultPreview.inventory_slot_id === null) {
+      return;
+    }
+
+    openServerMessageItem(characterId, resultPreview.inventory_slot_id);
+  };
 
   const renderLoadingState = (): ReactNode => (
     <IndeterminateProgressBar
@@ -74,6 +85,28 @@ const TrinketryFlow = (): ReactNode => {
   );
 
   const renderPreview = (): ReactNode => {
+    if (resultPreview) {
+      return (
+        <CraftingActionPreview title="Item preview" status="success">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-emerald-700 dark:text-emerald-400"
+          >
+            {status ?? 'The Trinket was crafted.'}
+          </p>
+          <CraftingItemPreview
+            item={resultPreview}
+            on_name_click={
+              resultPreview.inventory_slot_id !== null
+                ? handleViewResultItem
+                : undefined
+            }
+          />
+        </CraftingActionPreview>
+      );
+    }
+
     if (!selectedItem) {
       return null;
     }
@@ -89,23 +122,6 @@ const TrinketryFlow = (): ReactNode => {
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!status) {
-      return null;
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>{status}</span>
-        {resultPreview && (
-          <div className="mt-2">
-            <CraftingItemPreview item={resultPreview} />
-          </div>
-        )}
-      </Alert>
-    );
-  };
-
   const renderAction = (): ReactNode => (
     <CraftingProgressActionButton
       idle_label="Craft Trinket"
@@ -117,20 +133,7 @@ const TrinketryFlow = (): ReactNode => {
       formatted_remaining={formattedRemaining}
       disabled={!canCraft || isCraftingDisabled}
       on_click={() => void craftItem()}
-      variant={ButtonVariant.PRIMARY}
-      additional_css="w-full sm:w-auto"
     />
-  );
-
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/trinketry"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Trinketry help (opens in a new tab)
-    </a>
   );
 
   if (loading) {
@@ -143,11 +146,7 @@ const TrinketryFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Trinketry
-        </h2>
-      }
+      title="Trinketry"
       status={renderAlerts()}
       progress={
         <div className="space-y-2">
@@ -157,9 +156,9 @@ const TrinketryFlow = (): ReactNode => {
       }
       form={renderItemSelection()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/trinketry"
+      help_label="Trinketry help"
     />
   );
 };

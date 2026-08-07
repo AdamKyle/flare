@@ -18,27 +18,19 @@ const QueenOfHeartsFlow = (): ReactNode => {
     data,
     loading,
     error,
-    status,
     action,
     hasData,
     replaceData,
     selectAction,
     resetAction,
-    handleRerollSuccess,
-    handleMoveSuccess,
   } = useQueenOfHeartsFlow();
 
   const renderStatus = (): ReactNode => {
-    if (!error && !status) {
+    if (!error) {
       return null;
     }
 
-    return (
-      <div className="space-y-2">
-        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-        {status && <Alert variant={AlertVariant.SUCCESS}>{status}</Alert>}
-      </div>
-    );
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderSelectionForm = (): ReactNode => {
@@ -57,17 +49,6 @@ const QueenOfHeartsFlow = (): ReactNode => {
     );
   };
 
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/random-enchants"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Random enchant help (opens in a new tab)
-    </a>
-  );
-
   if (loading) {
     return (
       <IndeterminateProgressBar
@@ -82,10 +63,7 @@ const QueenOfHeartsFlow = (): ReactNode => {
       <QueenRerollForm
         data={data}
         characterId={characterId}
-        rootStatus={renderStatus()}
-        helpLink={renderHelpLink()}
         onDataReplaced={replaceData}
-        onSuccess={handleRerollSuccess}
         onChangeAction={resetAction}
       />
     );
@@ -96,10 +74,7 @@ const QueenOfHeartsFlow = (): ReactNode => {
       <QueenMoveAffixesForm
         data={data}
         characterId={characterId}
-        rootStatus={renderStatus()}
-        helpLink={renderHelpLink()}
         onDataReplaced={replaceData}
-        onSuccess={handleMoveSuccess}
         onChangeAction={resetAction}
       />
     );
@@ -107,14 +82,11 @@ const QueenOfHeartsFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Queen of Hearts
-        </h2>
-      }
+      title="Queen of Hearts"
       status={renderStatus()}
       form={renderSelectionForm()}
-      help_link={renderHelpLink()}
+      help_href="/information/random-enchants"
+      help_label="Random enchant help"
     />
   );
 };

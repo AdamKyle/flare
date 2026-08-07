@@ -5,11 +5,12 @@ namespace Tests\Feature\Game\Maps\Controllers\Api;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateKingdom;
 
 class MapControllerTest extends TestCase
 {
-    use CreateKingdom, RefreshDatabase;
+    use CreateGameMap, CreateKingdom, RefreshDatabase;
 
     public function test_map_information_returns_complete_top_level_shape(): void
     {
@@ -32,6 +33,49 @@ class MapControllerTest extends TestCase
         $this->assertIsArray($data['locations']);
         $this->assertIsArray($data['npc_kingdoms']);
         $this->assertIsArray($data['enemy_kingdoms']);
+    }
+
+    public function test_map_information_returns_the_stored_tile_grid_unchanged(): void
+    {
+        $tileGrid = [['tile-a.png', 'tile-b.png'], ['tile-c.png', 'tile-d.png']];
+
+        $gameMap = $this->createGameMap([
+            'name' => 'Surface',
+            'path' => 'path',
+            'default' => true,
+            'tile_map' => $tileGrid,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $gameMap)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/map/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame($tileGrid, $data['tiles']);
+    }
+
+    public function test_map_information_returns_an_empty_array_when_the_stored_tile_grid_is_null(): void
+    {
+        $gameMap = $this->createGameMap([
+            'name' => 'Surface',
+            'path' => 'path',
+            'default' => true,
+            'tile_map' => null,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $gameMap)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/map/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertArrayHasKey('tiles', $data);
+        $this->assertSame([], $data['tiles']);
     }
 
     public function test_map_information_returns_numeric_character_position(): void

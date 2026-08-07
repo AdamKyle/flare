@@ -3,10 +3,8 @@ import React from 'react';
 import DefinitionRow from '../../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../../reusable-components/viewable-sections/section';
-import {
-  formatIntWithPlus,
-  formatSignedPercent,
-} from '../../../../../../util/format-number';
+import StatRowInteger from '../../../../../../reusable-components/viewable-sections/stat-row-integer';
+import { formatSignedPercent } from '../../../../../../util/format-number';
 import HealingSectionProps from '../../types/partials/item-view/healing-section-props';
 import {
   baseHealingModifierToolTipDescription,
@@ -63,22 +61,11 @@ const HealingSection = ({ healing, baseHealingMod }: HealingSectionProps) => {
 
   return (
     <Section title="Healing">
-      <DefinitionRow
-        left={
-          <InfoLabel
-            label="Healing"
-            tooltip={baseHealingToolTipDescription(healing)}
-            tooltipAlign="right"
-          />
-        }
-        right={
-          <span className="inline-flex items-center gap-2">
-            {renderUpIcon(healing)}
-            <span className="font-semibold tabular-nums">
-              {formatIntWithPlus(healing)}
-            </span>
-          </span>
-        }
+      <StatRowInteger
+        label="Healing"
+        value={healing}
+        tooltip={baseHealingToolTipDescription(healing)}
+        tooltipAlign="right"
       />
 
       {renderBaseModRow()}

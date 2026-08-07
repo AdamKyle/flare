@@ -1,4 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { formatNumberWithCommas } from 'game-utils/format-number';
 import { useMemo } from 'react';
 
 import EnchantingAffixDefinition from '../definitions/enchanting-affix-definition';
@@ -29,7 +30,7 @@ export const useEnchantingAffixesApi = ({
     () =>
       data.map((affix) => ({
         value: affix.id,
-        label: `${affix.name} [Cost: ${affix.cost}, INT REQ: ${affix.int_required}]`,
+        label: `${affix.name} [Cost: ${formatNumberWithCommas(affix.cost)}, INT REQ: ${affix.int_required}]`,
       })),
     [data]
   );

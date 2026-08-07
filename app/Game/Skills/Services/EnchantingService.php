@@ -96,7 +96,7 @@ class EnchantingService
             ->where('inventory_id', $inventory->id)
             ->where('equipped', false)
             ->whereHas('item', function ($itemQuery) {
-                $itemQuery->whereNotIn('type', ['trinket', 'artifact']);
+                $itemQuery->whereNotIn('type', ['quest', 'alchemy', 'gem', 'trinket', 'artifact']);
             });
 
         $this->applyItemSearch($query, $search);
@@ -145,7 +145,10 @@ class EnchantingService
         }
 
         $query = GlobalEventCraftingInventorySlot::with(['item.itemPrefix', 'item.itemSuffix', 'item.appliedHolyStacks', 'item.itemSkillProgressions'])
-            ->where('global_event_crafting_inventory_id', $eventInventory->id);
+            ->where('global_event_crafting_inventory_id', $eventInventory->id)
+            ->whereHas('item', function ($itemQuery) {
+                $itemQuery->whereNotIn('type', ['quest', 'alchemy', 'gem', 'trinket', 'artifact']);
+            });
 
         $this->applyItemSearch($query, $search);
 
@@ -184,10 +187,10 @@ class EnchantingService
         $inventory = $characterInventoryService->getInventorySlotsCollection();
 
         if ($ignoreTrinkets) {
-            $inventory = $inventory->reject(fn ($item) => in_array($item['type'], ['trinket', 'artifact']));
+            $inventory = $inventory->reject(fn (InventorySlot $slot) => in_array($slot->item->type, ['trinket', 'artifact'], true));
         }
 
-        [$noAffix, $withAffix] = $inventory->partition(fn ($item) => $item['affix_count'] === 0);
+        [$noAffix, $withAffix] = $inventory->partition(fn (InventorySlot $slot) => $slot->item->affix_count === 0);
 
         $newInventory = $noAffix->merge($withAffix);
 
@@ -534,7 +537,8 @@ class EnchantingService
         return $this->fetchEventItemSlotsForEnchanting($character)
             ->map(fn ($slot) => [
                 'slot_id' => $slot->id,
-                'item_name' => $slot->item->name,
+                'item_name' => $slot->item->affix_name,
+                'affix_count' => $slot->item->affix_count,
             ])
             ->toArray();
     }
@@ -558,6 +562,10 @@ class EnchantingService
             return new Collection;
         }
 
-        return $eventInventory->craftingSlots;
+        return $eventInventory->craftingSlots()
+            ->whereHas('item', function ($itemQuery) {
+                $itemQuery->whereNotIn('type', ['quest', 'alchemy', 'gem', 'trinket', 'artifact']);
+            })
+            ->get();
     }
 }

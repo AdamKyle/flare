@@ -1,5 +1,6 @@
 import UseCharacterGemBagDefinition from './definition/use-character-gem-bag-definition';
 import UseOpenCharacterGemBagProps from './types/use-open-character-gem-bag-props';
+import BaseGemDetails from '../../../../../api-definitions/items/base-gem-details';
 import { SidePeekComponentRegistrationEnum } from '../../../../side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek } from '../../../../side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../../side-peeks/base/hooks/use-side-peek-emitter';
@@ -9,7 +10,7 @@ export const useOpenCharacterGemBag = (
 ): UseCharacterGemBagDefinition => {
   const sidePeekEmitter = useSidePeekEmitter();
 
-  const openGemBag = () => {
+  const openGemBag = (initialGem?: BaseGemDetails) => {
     sidePeekEmitter.emit(
       SidePeek.SIDE_PEEK,
       SidePeekComponentRegistrationEnum.GEM_BAG,
@@ -18,6 +19,7 @@ export const useOpenCharacterGemBag = (
         title: 'Gem Bag',
         character_id: props.character_id,
         allow_clicking_outside: true,
+        initial_gem: initialGem,
       }
     );
   };

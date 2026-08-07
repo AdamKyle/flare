@@ -179,6 +179,61 @@ class EnchantingServiceTest extends TestCase
         $this->assertNotEmpty($result['items_for_event']);
     }
 
+    public function test_event_items_for_enchanting_exclude_ineligible_item_types()
+    {
+        $character = $this->character->getCharacter();
+
+        $schedule = $this->createScheduledEvent(['event_type' => EventType::DELUSIONAL_MEMORIES_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
+        $event = $this->createEvent([
+            'type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'scheduled_event_id' => $schedule->id,
+            'current_event_goal_step' => GlobalEventSteps::ENCHANT,
+            'ends_at' => now()->addHour(),
+        ]);
+
+        $globalEventGoal = $this->createGlobalEventGoal([
+            'event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+            'event_id' => $event->id,
+            'max_enchants' => 100,
+            'reward_every' => 10,
+            'next_reward_at' => 10,
+            'item_specialty_type_reward' => ItemSpecialtyType::DELUSIONAL_SILVER->value,
+            'should_be_unique' => false,
+            'should_be_mythic' => true,
+        ]);
+
+        $gameMap = $this->createGameMap([
+            'only_during_event_type' => EventType::DELUSIONAL_MEMORIES_EVENT,
+        ]);
+
+        $character->map()->update(['game_map_id' => $gameMap->id]);
+
+        $character = $character->refresh();
+
+        $inventory = $this->createGlobalCraftingInventory([
+            'global_event_goal_id' => $globalEventGoal->id,
+            'character_id' => $character->id,
+        ]);
+
+        $eligibleItem = $this->createItem(['type' => 'body']);
+        $questItem = $this->createItem(['type' => 'quest']);
+
+        $this->createGlobalCraftingInventorySlot([
+            'global_event_crafting_inventory_id' => $inventory->id,
+            'item_id' => $eligibleItem->id,
+        ]);
+
+        $this->createGlobalCraftingInventorySlot([
+            'global_event_crafting_inventory_id' => $inventory->id,
+            'item_id' => $questItem->id,
+        ]);
+
+        $result = $this->enchantingService->fetchAffixes($character, true);
+
+        $this->assertCount(1, $result['items_for_event']);
+        $this->assertEquals($eligibleItem->name, $result['items_for_event'][0]['item_name']);
+    }
+
     public function test_fetch_affixes_as_merhcant()
     {
         Event::fake();
@@ -212,8 +267,8 @@ class EnchantingServiceTest extends TestCase
 
         $character = $this->character
             ->inventoryManagement()
-            ->giveItem($unenchanted)
             ->giveItem($enchanted)
+            ->giveItem($unenchanted)
             ->getCharacter();
 
         $result = $this->enchantingService->fetchAffixes($character, true);
@@ -222,9 +277,32 @@ class EnchantingServiceTest extends TestCase
         $this->assertNotEmpty($result['affixes']);
         $this->assertNotEmpty($inventory);
         $this->assertEquals(
+            $unenchanted->id,
+            $inventory->first()->item_id
+        );
+        $this->assertEquals(
             $enchanted->id,
             $inventory->last()->item_id
         );
+    }
+
+    public function test_fetch_affixes_ignore_trinkets_excludes_trinkets_and_artifacts_but_keeps_eligible_item()
+    {
+        $trinket = $this->createItem(['type' => 'trinket']);
+        $artifact = $this->createItem(['type' => 'artifact']);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($trinket)
+            ->giveItem($artifact)
+            ->giveItem($this->itemToEnchant)
+            ->getCharacter();
+
+        $result = $this->enchantingService->fetchAffixes($character, true);
+        $inventory = $result['character_inventory'];
+
+        $this->assertCount(1, $inventory);
+        $this->assertEquals($this->itemToEnchant->id, $inventory->first()->item_id);
     }
 
     public function test_get_cost_of_item_affixes_as_zero_when_affixes_do_not_exist()

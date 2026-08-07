@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Skills\Controllers\Api;
 
+use App\Flare\Models\AlchemyBagSlot;
 use App\Flare\Models\Character;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -77,6 +78,8 @@ class AlchemyControllerTest extends TestCase
             'skill_level_trivial' => 0,
             'gold_dust_cost' => 0,
             'shards_cost' => 0,
+            'description' => 'A potent alchemical elixir.',
+            'increase_stat_by' => 5,
         ]);
 
         $response = $this->actingAs($this->character->user)
@@ -92,6 +95,20 @@ class AlchemyControllerTest extends TestCase
         $this->assertSame($item->name, $data['alchemy_result']['name']);
         $this->assertSame(1, $data['alchemy_result']['amount_created']);
         $this->assertSame(1, $data['alchemy_result']['current_amount']);
+
+        $slotId = $data['alchemy_result']['slot_id'];
+
+        $this->assertNotNull($slotId);
+        $this->assertTrue(AlchemyBagSlot::where('id', $slotId)->exists());
+
+        $itemPreview = $data['alchemy_result']['item_preview'];
+
+        $this->assertNotNull($itemPreview);
+        $this->assertSame($item->id, $itemPreview['item_id']);
+        $this->assertSame($slotId, $itemPreview['slot_id']);
+        $this->assertSame($item->name, $itemPreview['name']);
+        $this->assertSame('A potent alchemical elixir.', $itemPreview['description']);
+        $this->assertEquals(5, $itemPreview['stat_increase']);
     }
 
     public function test_transmute_for_missing_item_returns_null_alchemy_result(): void

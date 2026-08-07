@@ -328,27 +328,86 @@ class CharacterInventoryService
      */
     public function getUsableItems(string $searchText = '', array $filters = []): array
     {
-        $alchemyBag = $this->character->alchemyBag;
-
-        if (is_null($alchemyBag)) {
-            return [];
-        }
-
-        return AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
-            ->where('character_id', $this->character->id)
-            ->with('item')
-            ->get()
+        return $this->getUsableItemsCollection($searchText, $filters)
             ->map(function (AlchemyBagSlot $slot) {
-                $item = $this->usableItemTransformer->transform($slot->item);
+                $item = $this->usableItemTransformer->transform($slot);
 
                 return array_merge($item, [
                     'id' => $slot->id,
-                    'item_id' => $slot->item_id,
-                    'slot_id' => $slot->id,
                     'amount' => $slot->amount,
                 ]);
             })
             ->toArray();
+    }
+
+    /**
+     * Returns the usable items as an Eloquent collection, filtered by search text and filters.
+     */
+    private function getUsableItemsCollection(string $searchText = '', array $filters = []): Collection
+    {
+        $alchemyBag = $this->character->alchemyBag;
+
+        if (is_null($alchemyBag)) {
+            return new Collection;
+        }
+
+        $slots = AlchemyBagSlot::where('alchemy_bag_id', $alchemyBag->id)
+            ->where('character_id', $this->character->id)
+            ->with('item')
+            ->get();
+
+        if ($searchText !== '') {
+            $search = Str::lower($searchText);
+
+            $slots = $slots->filter(function (AlchemyBagSlot $slot) use ($search) {
+                return Str::contains(Str::lower($slot->item->name), $search);
+            });
+        }
+
+        if (! empty($filters)) {
+            $slots = $slots->filter(function (AlchemyBagSlot $slot) use ($filters) {
+                return $this->usableItemMatchesFilters($slot->item, $filters);
+            });
+        }
+
+        return $slots->values();
+    }
+
+    /**
+     * Determines whether a usable item matches any of the selected usable-item filters.
+     */
+    private function usableItemMatchesFilters(Item $item, array $filters): bool
+    {
+        if (isset($filters['increase-stats']) && $item->increase_stat_by > 0) {
+            return true;
+        }
+
+        if (isset($filters['effects-skills']) && (
+            $item->increase_skill_bonus_by > 0 ||
+            $item->increase_skill_training_bonus_by > 0
+        )) {
+            return true;
+        }
+
+        if (isset($filters['effects-base-modifiers']) && (
+            $item->base_damage_mod > 0 ||
+            $item->base_ac_mod > 0 ||
+            $item->base_healing_mod > 0 ||
+            $item->fight_time_out_mod_bonus > 0 ||
+            $item->move_time_out_mod_bonus > 0
+        )) {
+            return true;
+        }
+
+        if (isset($filters['damages-kingdoms']) && $item->damages_kingdoms) {
+            return true;
+        }
+
+        if (isset($filters['holy-oils']) && ! is_null($item->holy_level)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -482,7 +541,7 @@ class CharacterInventoryService
      */
     public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array
     {
-        $slots = $this->getUsableItems($searchText, $filter);
+        $slots = $this->getUsableItemsCollection($searchText, $filter);
 
         return $this->pagination->buildPaginatedDate($slots, $this->usableItemTransformer, $perPage, $page);
     }

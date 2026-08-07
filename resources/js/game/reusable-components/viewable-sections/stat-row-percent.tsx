@@ -4,7 +4,7 @@ import React from 'react';
 import DefinitionRow from './definition-row';
 import InfoLabel from './info-label';
 import StatRowPercentProps from './types/stat-row-percent-props';
-import { formatPercent } from '../../util/format-number';
+import { formatPercent, formatSignedPercent } from '../../util/format-number';
 
 const StatRowPercent = ({
   label,
@@ -25,7 +25,7 @@ const StatRowPercent = ({
     : 'fas fa-chevron-up text-emerald-600';
   const valueClass = negative
     ? 'font-semibold text-rose-600 tabular-nums'
-    : 'font-semibold text-emerald-700 tabular-nums';
+    : 'font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums';
 
   return (
     <DefinitionRow
@@ -43,7 +43,7 @@ const StatRowPercent = ({
         <span className="inline-flex items-center gap-2 whitespace-nowrap">
           <i className={clsx(iconClass)} aria-hidden="true" />
           <span className={clsx(valueClass)}>
-            {negative ? `-${formatPercent(value)}` : formatPercent(value)}
+            {negative ? `-${formatPercent(value)}` : formatSignedPercent(value)}
           </span>
         </span>
       }

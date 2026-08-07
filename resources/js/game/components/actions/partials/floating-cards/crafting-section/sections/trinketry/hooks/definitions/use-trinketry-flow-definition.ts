@@ -4,6 +4,7 @@ import TrinketryApiResponseDefinition from '../../api/definitions/trinketry-api-
 import UseTrinketryItemsApiDefinition from '../../api/hooks/definitions/use-trinketry-items-api-definition';
 
 export default interface UseTrinketryFlowDefinition {
+  characterId: number;
   data: TrinketryApiResponseDefinition | null;
   loading: boolean;
   error: string | null;

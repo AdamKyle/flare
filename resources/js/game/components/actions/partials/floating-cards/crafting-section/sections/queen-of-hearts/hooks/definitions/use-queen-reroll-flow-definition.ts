@@ -12,7 +12,6 @@ export interface UseQueenRerollFlowParams {
   characterId: number;
   data: QueenOfHeartsApiResponseDefinition;
   onDataReplaced: (data: QueenOfHeartsApiResponseDefinition) => void;
-  onSuccess: (message: string | undefined) => void;
 }
 
 export default interface UseQueenRerollFlowDefinition {
@@ -26,6 +25,7 @@ export default interface UseQueenRerollFlowDefinition {
   selectedRerollType: QueenRerollType | null;
   selectedCost: QueenCostDefinition | null;
   resultPreview: CraftingItemPreviewDefinition | null;
+  resultMessage: string | null;
   submitting: boolean;
   error: string | null;
   canSubmit: boolean;

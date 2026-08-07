@@ -1,5 +1,3 @@
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-
 export default interface CraftingProgressActionButtonProps {
   idle_label: string;
   submitting_label: string;
@@ -10,6 +8,4 @@ export default interface CraftingProgressActionButtonProps {
   formatted_remaining: string;
   disabled: boolean;
   on_click: () => void;
-  variant: ButtonVariant;
-  additional_css?: string;
 }

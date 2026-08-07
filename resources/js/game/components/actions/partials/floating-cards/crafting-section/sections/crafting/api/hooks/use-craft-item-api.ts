@@ -8,7 +8,6 @@ import CraftingApiResponseDefinition from '../definitions/crafting-api-response-
 import { CraftingApiUrls } from '../enums/crafting-api-urls';
 import UseCraftItemApiDefinition from './definitions/use-craft-item-api-definition';
 import UseCraftItemApiParams from './definitions/use-craft-item-api-params';
-import CraftingItemPreviewDefinition from '../../../../shared/api/definitions/crafting-item-preview-definition';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,14 +26,11 @@ export const useCraftItemApi = ({
   const { apiHandler, getUrl } = useApiHandler();
   const [isCrafting, setIsCrafting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [craftingResponse, setCraftingResponse] =
     useState<CraftingApiResponseDefinition | null>(null);
   const [craftedInventorySlotId, setCraftedInventorySlotId] = useState<
     number | null
   >(null);
-  const [resultPreview, setResultPreview] =
-    useState<CraftingItemPreviewDefinition | null>(null);
 
   const craftItem = async (craftForNpc: boolean, craftForEvent: boolean) => {
     if (!selectedItem) {
@@ -43,10 +39,8 @@ export const useCraftItemApi = ({
 
     setIsCrafting(true);
     setError(null);
-    setSuccessMessage(null);
     setCraftingResponse(null);
     setCraftedInventorySlotId(null);
-    setResultPreview(null);
 
     const url = getUrl(CraftingApiUrls.CRAFT_ITEM, { character: characterId });
 
@@ -70,13 +64,8 @@ export const useCraftItemApi = ({
 
       setCraftingResponse(result);
       setCraftedInventorySlotId(result.crafted_inventory_slot_id ?? null);
-      setResultPreview(result.result_preview ?? null);
 
-      if (result.crafted_item) {
-        setSuccessMessage(
-          `You successfully crafted ${selectedItem.preview.name}.`
-        );
-      } else {
+      if (!result.crafted_item) {
         setError(`You failed to craft ${selectedItem.preview.name}.`);
       }
     } catch (requestError) {
@@ -86,22 +75,18 @@ export const useCraftItemApi = ({
     }
   };
 
-  const clearMessages = () => {
+  const clearResult = () => {
     setError(null);
-    setSuccessMessage(null);
     setCraftingResponse(null);
     setCraftedInventorySlotId(null);
-    setResultPreview(null);
   };
 
   return {
     isCrafting,
     error,
-    successMessage,
     craftingResponse,
     craftedInventorySlotId,
-    resultPreview,
     craftItem,
-    clearMessages,
+    clearResult,
   };
 };

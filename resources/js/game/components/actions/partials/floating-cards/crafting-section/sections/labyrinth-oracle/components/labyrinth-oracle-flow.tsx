@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import LabyrinthOracleCostSummary from './labyrinth-oracle-cost-summary';
 import TransferItemSelection from './transfer-item-selection';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
@@ -10,8 +11,6 @@ import { useLabyrinthOracleFlow } from '../hooks/use-labyrinth-oracle-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
@@ -89,7 +88,49 @@ const LabyrinthOracleFlow = (): ReactNode => {
     <LabyrinthOracleCostSummary costs={labyrinthOracleData.costs} />
   );
 
+  const renderResultPreview = (): ReactNode => {
+    if (!sourceResultPreview && !destinationResultPreview) {
+      return null;
+    }
+
+    return (
+      <CraftingActionPreview title="Transfer preview" status="success">
+        <p
+          role="status"
+          aria-live="polite"
+          className="text-sm text-emerald-700 dark:text-emerald-400"
+        >
+          {status}
+        </p>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {sourceResultPreview && (
+            <div>
+              <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">
+                Source result
+              </p>
+              <CraftingItemPreview item={sourceResultPreview} />
+            </div>
+          )}
+          {destinationResultPreview && (
+            <div>
+              <p className="mb-1 text-xs font-semibold text-gray-600 dark:text-gray-400">
+                Destination result
+              </p>
+              <CraftingItemPreview item={destinationResultPreview} />
+            </div>
+          )}
+        </div>
+      </CraftingActionPreview>
+    );
+  };
+
   const renderPreview = (): ReactNode => {
+    const resultPreview = renderResultPreview();
+
+    if (resultPreview) {
+      return resultPreview;
+    }
+
     if (!sourceItem || !destinationItem || !data) {
       return null;
     }
@@ -142,53 +183,12 @@ const LabyrinthOracleFlow = (): ReactNode => {
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!status) {
-      return null;
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>{status}</span>
-        {(sourceResultPreview || destinationResultPreview) && (
-          <div className="mt-2 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {sourceResultPreview && (
-              <div>
-                <p className="mb-1 text-xs font-semibold">Source result</p>
-                <CraftingItemPreview item={sourceResultPreview} />
-              </div>
-            )}
-            {destinationResultPreview && (
-              <div>
-                <p className="mb-1 text-xs font-semibold">Destination result</p>
-                <CraftingItemPreview item={destinationResultPreview} />
-              </div>
-            )}
-          </div>
-        )}
-      </Alert>
-    );
-  };
-
   const renderAction = (): ReactNode => (
-    <Button
+    <CraftingActionButton
       label={submitting ? 'Transferring…' : 'Transfer Attributes'}
       on_click={() => void submitTransfer()}
-      variant={ButtonVariant.PRIMARY}
       disabled={!canSubmit}
-      additional_css="w-full sm:w-auto"
     />
-  );
-
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/labyrinth-oracle"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Labyrinth Oracle help (opens in a new tab)
-    </a>
   );
 
   if (loading) {
@@ -205,17 +205,13 @@ const LabyrinthOracleFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Labyrinth Oracle
-        </h2>
-      }
+      title="Labyrinth Oracle"
       status={renderStatus()}
       form={renderItemSelection()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/labyrinth-oracle"
+      help_label="Labyrinth Oracle help"
     />
   );
 };

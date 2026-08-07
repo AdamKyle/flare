@@ -111,6 +111,46 @@ class EnchantingControllerTest extends TestCase
         $this->assertEquals($itemTwo->id, $searchData['data'][0]['preview']['item_id']);
     }
 
+    public function test_paginated_items_endpoint_excludes_ineligible_item_types_and_keeps_enchanted_equipment()
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+
+        $equipment = $this->createItem(['type' => 'body']);
+        $enchantedEquipment = $this->createItem(['type' => 'body', 'item_prefix_id' => $prefix->id]);
+        $questItem = $this->createItem(['type' => 'quest']);
+        $alchemyItem = $this->createItem(['type' => 'alchemy']);
+        $gemItem = $this->createItem(['type' => 'gem']);
+        $trinketItem = $this->createItem(['type' => 'trinket']);
+        $artifactItem = $this->createItem(['type' => 'artifact']);
+
+        foreach ([$equipment, $enchantedEquipment, $questItem, $alchemyItem, $gemItem, $trinketItem, $artifactItem] as $item) {
+            $this->character->inventory->slots()->create([
+                'inventory_id' => $this->character->inventory->id,
+                'item_id' => $item->id,
+            ]);
+        }
+
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/enchanting/'.$this->character->id.'/items', [
+                'source' => 'regular',
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $returnedItemIds = collect($jsonData['data'])->pluck('item_id')->all();
+
+        $this->assertEquals(200, $response->status());
+        $this->assertContains($equipment->id, $returnedItemIds);
+        $this->assertContains($enchantedEquipment->id, $returnedItemIds);
+        $this->assertNotContains($questItem->id, $returnedItemIds);
+        $this->assertNotContains($alchemyItem->id, $returnedItemIds);
+        $this->assertNotContains($gemItem->id, $returnedItemIds);
+        $this->assertNotContains($trinketItem->id, $returnedItemIds);
+        $this->assertNotContains($artifactItem->id, $returnedItemIds);
+    }
+
     public function test_paginated_affixes_endpoint_respects_type_filter_and_per_page()
     {
         $this->createItemAffix(['type' => 'prefix', 'skill_level_required' => 1, 'skill_level_trivial' => 25]);

@@ -9,6 +9,8 @@ import { formatNumberWithCommas } from 'game-utils/format-number';
 const CraftActionPanel = ({
   selectedItem,
   inventoryIsFull,
+  isCraftSuccessful,
+  onViewCraftedItem,
 }: CraftActionPanelProps): ReactNode => {
   if (!selectedItem) {
     return null;
@@ -27,7 +29,10 @@ const CraftActionPanel = ({
   };
 
   return (
-    <CraftingActionPreview title="Item preview">
+    <CraftingActionPreview
+      title="Item preview"
+      status={isCraftSuccessful ? 'success' : 'default'}
+    >
       <p className="text-xs text-gray-500 dark:text-gray-400">
         Cost: {formatNumberWithCommas(selectedItem.cost)} gold
       </p>
@@ -35,7 +40,10 @@ const CraftActionPanel = ({
         Skill Level Required: {selectedItem.skill_level_required} &bull; Trivial
         at: {selectedItem.skill_level_trivial}
       </p>
-      <CraftingItemPreview item={selectedItem.preview} />
+      <CraftingItemPreview
+        item={selectedItem.preview}
+        on_name_click={onViewCraftedItem}
+      />
       {renderInventoryFullMessage()}
     </CraftingActionPreview>
   );

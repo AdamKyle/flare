@@ -16,26 +16,15 @@ export const useQueenOfHeartsFlow = (): UseQueenOfHeartsFlowDefinition => {
   });
 
   const [action, setAction] = useState<QueenAction | null>(null);
-  const [status, setStatus] = useState<string | null>(null);
 
   const hasData = data !== null;
 
   const selectAction = (nextAction: QueenAction): void => {
     setAction(nextAction);
-    setStatus(null);
   };
 
   const resetAction = (): void => {
     setAction(null);
-    setStatus(null);
-  };
-
-  const handleRerollSuccess = (message?: string): void => {
-    setStatus(message ?? 'The Queen re-rolled your item.');
-  };
-
-  const handleMoveSuccess = (message?: string): void => {
-    setStatus(message ?? 'The Queen moved the enchantments.');
   };
 
   return {
@@ -43,13 +32,10 @@ export const useQueenOfHeartsFlow = (): UseQueenOfHeartsFlowDefinition => {
     data,
     loading,
     error,
-    status,
     action,
     hasData,
     replaceData,
     selectAction,
     resetAction,
-    handleRerollSuccess,
-    handleMoveSuccess,
   };
 };

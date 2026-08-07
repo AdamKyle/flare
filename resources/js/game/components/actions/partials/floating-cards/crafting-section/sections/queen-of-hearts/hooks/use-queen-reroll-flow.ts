@@ -53,13 +53,13 @@ export const useQueenRerollFlow = ({
   characterId,
   data,
   onDataReplaced,
-  onSuccess,
 }: UseQueenRerollFlowParams): UseQueenRerollFlowDefinition => {
   const [slotId, setSlotId] = useState<number | null>(null);
   const [affix, setAffix] = useState<QueenAffixSelection | null>(null);
   const [rerollType, setRerollType] = useState<QueenRerollType | null>(null);
   const [resultPreview, setResultPreview] =
     useState<CraftingItemPreviewDefinition | null>(null);
+  const [resultMessage, setResultMessage] = useState<string | null>(null);
 
   const itemsApi = useQueenUniqueItemsApi({ character_id: characterId });
 
@@ -94,20 +94,24 @@ export const useQueenRerollFlow = ({
     setAffix(null);
     setRerollType(null);
     setResultPreview(null);
+    setResultMessage(null);
   };
 
   const handleSelectAffix = (option: DropdownItem): void => {
     setAffix(option.value as QueenAffixSelection);
     setResultPreview(null);
+    setResultMessage(null);
   };
 
   const handleSelectRerollType = (option: DropdownItem): void => {
     setRerollType(option.value as QueenRerollType);
     setResultPreview(null);
+    setResultMessage(null);
   };
 
   const handleSubmit = async (): Promise<void> => {
     setResultPreview(null);
+    setResultMessage(null);
 
     const response = await reroll();
 
@@ -116,7 +120,7 @@ export const useQueenRerollFlow = ({
     }
 
     onDataReplaced(response);
-    onSuccess(response.message);
+    setResultMessage(response.message ?? null);
     setResultPreview(response.result_preview ?? null);
   };
 
@@ -131,6 +135,7 @@ export const useQueenRerollFlow = ({
     selectedRerollType: rerollType,
     selectedCost,
     resultPreview,
+    resultMessage,
     submitting,
     error,
     canSubmit,

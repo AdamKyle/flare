@@ -29,8 +29,14 @@ export const useCraftItemsFlow = ({
 
   const characterId = gameData?.character?.id ?? 0;
 
-  const { isTimeoutActive, isCraftingDisabled, progress, formattedRemaining } =
-    useCraftingTimeout(gameData?.character);
+  const {
+    isTimeoutActive,
+    isCraftingDisabled,
+    progress,
+    formattedRemaining,
+    beginCraftingAction,
+    completeCraftingRequest,
+  } = useCraftingTimeout(gameData?.character);
 
   const {
     items,
@@ -47,12 +53,10 @@ export const useCraftItemsFlow = ({
   const {
     isCrafting,
     error,
-    successMessage,
     craftingResponse,
     craftedInventorySlotId,
-    resultPreview,
     craftItem,
-    clearMessages,
+    clearResult,
   } = useCraftItemApi({ characterId, selectedItem });
 
   const { handleScroll } = useInfiniteScroll({ on_end_reached: onEndReached });
@@ -67,13 +71,13 @@ export const useCraftItemsFlow = ({
     setSearchText('');
     setCraftForNpc(false);
     setCraftForEvent(false);
-    clearMessages();
+    clearResult();
   };
 
   const handleArmourTypeChange = (item: DropdownItem) => {
     setArmourType(String(item.value));
     setSelectedItemId(null);
-    clearMessages();
+    clearResult();
   };
 
   const handleSearch = (value: string) => {
@@ -90,14 +94,14 @@ export const useCraftItemsFlow = ({
     setSearchText('');
     setCraftForNpc(false);
     setCraftForEvent(false);
-    clearMessages();
+    clearResult();
   };
 
   const handleSelectItem = (item: CraftableItemDefinition) => {
     setSelectedItemId(item.id);
     setCraftForNpc(false);
     setCraftForEvent(false);
-    clearMessages();
+    clearResult();
   };
 
   const handleCraftForNpcChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -112,12 +116,18 @@ export const useCraftItemsFlow = ({
     setActiveCraftingType(CraftingTypes.HOME);
   };
 
-  const handleCraft = () => {
+  const handleCraft = async () => {
     if (!selectedItem || isCraftingDisabled || isCrafting) {
       return;
     }
 
-    craftItem(craftForNpc, craftForEvent);
+    if (!beginCraftingAction()) {
+      return;
+    }
+
+    await craftItem(craftForNpc, craftForEvent);
+
+    completeCraftingRequest();
   };
 
   const handleCraftItemsScroll = (event: UIEvent<HTMLDivElement>) => {
@@ -157,6 +167,8 @@ export const useCraftItemsFlow = ({
     selectedItem && displayedCraftingData?.show_craft_for_event
   );
 
+  const isCraftSuccessful = craftingResponse?.crafted_item === true;
+
   return {
     filters: {
       selectedType,
@@ -189,10 +201,9 @@ export const useCraftItemsFlow = ({
     result: {
       characterId,
       error,
-      successMessage,
       craftedInventorySlotId,
-      resultPreview,
       isCrafting,
+      isCraftSuccessful,
     },
     progress: {
       displayedCraftingData,

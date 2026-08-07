@@ -3,21 +3,24 @@ import React, { ReactNode } from 'react';
 import GemTierCostSummary from './gem-tier-cost-summary';
 import GemTierSelection from './gem-tier-selection';
 import { getGemSlotTitleTextColor } from '../../../../../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
+import { useOpenCharacterGemBag } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-gem-bag';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
+import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useGemCraftingFlow } from '../hooks/use-gem-crafting-flow';
+import GemDetailsContent from '../../../../../../../../reusable-components/gem/gem-details-content';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const GemCraftingFlow = (): ReactNode => {
   const {
+    characterId,
     data,
     loading,
     error,
@@ -32,10 +35,22 @@ const GemCraftingFlow = (): ReactNode => {
     progress,
     formattedRemaining,
     craftSucceeded,
-    craftedGem,
+    craftedGemPreview,
     selectTier,
     craftGem,
   } = useGemCraftingFlow();
+
+  const { openGemBag } = useOpenCharacterGemBag({
+    character_id: characterId,
+  });
+
+  const handleViewCraftedGem = (): void => {
+    if (!craftedGemPreview) {
+      return;
+    }
+
+    openGemBag(craftedGemPreview);
+  };
 
   const renderLoadingState = (): ReactNode => (
     <IndeterminateProgressBar
@@ -61,6 +76,38 @@ const GemCraftingFlow = (): ReactNode => {
   };
 
   const renderPreview = (): ReactNode => {
+    if (status && craftSucceeded && craftedGemPreview) {
+      const gemColor = getGemSlotTitleTextColor(craftedGemPreview);
+
+      return (
+        <CraftingActionPreview title="Gem preview" status="success">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-emerald-700 dark:text-emerald-400"
+          >
+            {'You crafted '}
+            <span className={gemColor}>{craftedGemPreview.name}</span>
+            {` (Tier ${craftedGemPreview.tier}).`}
+          </p>
+          <CraftingResultNameButton
+            name={craftedGemPreview.name}
+            class_name={gemColor}
+            on_click={handleViewCraftedGem}
+          />
+          <GemDetailsContent gem={craftedGemPreview} />
+        </CraftingActionPreview>
+      );
+    }
+
+    if (status && !craftSucceeded) {
+      return (
+        <CraftingActionPreview title="Gem preview" status="danger">
+          <p className="text-sm text-rose-600 dark:text-rose-400">{status}</p>
+        </CraftingActionPreview>
+      );
+    }
+
     if (!selectedTierData) {
       return null;
     }
@@ -75,28 +122,6 @@ const GemCraftingFlow = (): ReactNode => {
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!status) {
-      return null;
-    }
-
-    if (!craftSucceeded || !craftedGem) {
-      return <Alert variant={AlertVariant.DANGER}>{status}</Alert>;
-    }
-
-    const gemColor = getGemSlotTitleTextColor(craftedGem);
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>
-          {'You crafted '}
-          <span className={gemColor}>{craftedGem.name}</span>
-          {` (Tier ${craftedGem.tier}).`}
-        </span>
-      </Alert>
-    );
-  };
-
   const renderAction = (): ReactNode => (
     <CraftingProgressActionButton
       idle_label="Craft Gem"
@@ -108,20 +133,7 @@ const GemCraftingFlow = (): ReactNode => {
       formatted_remaining={formattedRemaining}
       disabled={!canCraft || isCraftingDisabled}
       on_click={() => void craftGem()}
-      variant={ButtonVariant.PRIMARY}
-      additional_css="w-full sm:w-auto"
     />
-  );
-
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/gem-crafting"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Gem Crafting help (opens in a new tab)
-    </a>
   );
 
   if (loading) {
@@ -134,11 +146,7 @@ const GemCraftingFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Gem Crafting
-        </h2>
-      }
+      title="Gem Crafting"
       status={renderStatus()}
       progress={
         <div className="space-y-2">
@@ -154,9 +162,9 @@ const GemCraftingFlow = (): ReactNode => {
         />
       }
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={renderHelpLink()}
+      help_href="/information/gem-crafting"
+      help_label="Gem Crafting help"
     />
   );
 };

@@ -3,13 +3,13 @@ import React, { ReactNode } from 'react';
 import SeerGemComparison from './seer-gem-comparison';
 import SeerReplaceGemForm from './seer-replace-gem-form';
 import SeerAttachGemFormProps from './types/seer-attach-gem-form-props';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import { useSeerAttachGemFlow } from '../hooks/use-seer-attach-gem-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
@@ -17,8 +17,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 const SeerAttachGemForm = ({
   costs,
   characterId,
-  rootStatus,
-  helpLink,
+  status,
   onSuccess,
   onChangeAction,
 }: SeerAttachGemFormProps): ReactNode => {
@@ -51,16 +50,11 @@ const SeerAttachGemForm = ({
     comparison !== null && comparison.attached_gems.length > 0;
 
   const renderStatus = (): ReactNode => {
-    if (!rootStatus && !error) {
+    if (!error) {
       return null;
     }
 
-    return (
-      <div className="space-y-2">
-        {rootStatus}
-        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-      </div>
-    );
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderComparisonLoading = (): ReactNode => {
@@ -128,62 +122,68 @@ const SeerAttachGemForm = ({
       return renderComparisonLoading();
     }
 
-    if (!comparison) {
-      return null;
+    if (comparison) {
+      return (
+        <CraftingActionPreview title="Gem attachment preview">
+          <SeerGemComparison comparison={comparison} />
+          <p>Attach Gem cost: {costs.attach} Gold Bars.</p>
+          {hasAttachedGemsToReplace && (
+            <p>Replace Gem cost: {costs.replace} Gold Bars.</p>
+          )}
+        </CraftingActionPreview>
+      );
     }
 
-    return (
-      <CraftingActionPreview title="Gem attachment preview">
-        <SeerGemComparison comparison={comparison} />
-        <p>Attach Gem cost: {costs.attach} Gold Bars.</p>
-        {hasAttachedGemsToReplace && (
-          <p>Replace Gem cost: {costs.replace} Gold Bars.</p>
-        )}
-      </CraftingActionPreview>
-    );
+    if (status) {
+      return (
+        <CraftingActionPreview title="Result" status="success">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-emerald-700 dark:text-emerald-400"
+          >
+            {status}
+          </p>
+        </CraftingActionPreview>
+      );
+    }
+
+    return null;
   };
 
   const renderAction = (): ReactNode => (
-    <div className="flex flex-col gap-2 sm:flex-row">
+    <div className="space-y-2">
       {comparison && (
-        <Button
+        <CraftingActionButton
           label="Add Gem"
           on_click={() => void addGem()}
-          variant={ButtonVariant.PRIMARY}
           disabled={addSubmitting}
-          additional_css="w-full sm:w-auto"
         />
       )}
       {hasAttachedGemsToReplace && (
-        <Button
+        <CraftingActionButton
           label="Replace Gem"
           on_click={() => void replaceGem()}
-          variant={ButtonVariant.PRIMARY}
           disabled={!canReplace || replaceSubmitting}
-          additional_css="w-full sm:w-auto"
         />
       )}
-      <Button
+      <CraftingActionButton
         label="Change Action"
         on_click={onChangeAction}
         variant={ButtonVariant.PRIMARY}
-        additional_css="w-full sm:w-auto"
       />
     </div>
   );
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Seer Camp: Attach or Replace Gem
-        </h2>
-      }
+      title="Seer Camp: Attach or Replace Gem"
       status={renderStatus()}
       form={renderForm()}
       preview={renderPreview()}
       action={renderAction()}
-      help_link={helpLink}
+      help_href="/information/seer-camp"
+      help_label="Seer Camp help"
     />
   );
 };

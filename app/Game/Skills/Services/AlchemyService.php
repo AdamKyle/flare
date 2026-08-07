@@ -12,6 +12,7 @@ use App\Flare\Pagination\Pagination;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
 use App\Game\Core\Events\UpdateCharacterCurrenciesEvent;
 use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
+use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -39,6 +40,7 @@ class AlchemyService
         ItemListCostTransformerService $itemListCostTransformerService,
         Pagination $pagination,
         private readonly AlchemyItemTransformer $alchemyItemTransformer,
+        private readonly UsableItemTransformer $usableItemTransformer,
     ) {
         $this->skillCheckService = $skillCheckService;
         $this->itemListCostTransformerService = $itemListCostTransformerService;
@@ -261,12 +263,21 @@ class AlchemyService
             event(new UpdateSkillEvent($skill));
         }
 
+        $itemPreview = array_merge($this->usableItemTransformer->transform($item), [
+            'id' => $alchemyBagSlot->id,
+            'item_id' => $item->id,
+            'slot_id' => $alchemyBagSlot->id,
+            'amount' => $alchemyBagSlot->amount,
+        ]);
+
         return [
             'item_id' => $item->id,
             'name' => $item->name,
             'type' => $item->type,
             'amount_created' => 1,
             'current_amount' => $alchemyBagSlot->amount,
+            'slot_id' => $alchemyBagSlot->id,
+            'item_preview' => $itemPreview,
         ];
     }
 

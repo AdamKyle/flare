@@ -4,13 +4,13 @@ import SeerActionSelection from './seer-action-selection';
 import SeerAttachGemForm from './seer-attach-gem-form';
 import SeerManageSocketsForm from './seer-manage-sockets-form';
 import SeerRemoveGemsForm from './seer-remove-gems-form';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import { SeerAction } from '../enums/seer-action';
 import { useSeerCampFlow } from '../hooks/use-seer-camp-flow';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
@@ -31,16 +31,11 @@ const SeerCampFlow = (): ReactNode => {
   } = useSeerCampFlow();
 
   const renderStatus = (): ReactNode => {
-    if (!error && !status) {
+    if (!error) {
       return null;
     }
 
-    return (
-      <div className="space-y-2">
-        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-        {status && <Alert variant={AlertVariant.SUCCESS}>{status}</Alert>}
-      </div>
-    );
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderSelectionForm = (): ReactNode => {
@@ -59,34 +54,20 @@ const SeerCampFlow = (): ReactNode => {
     );
   };
 
-  const renderHelpLink = (): ReactNode => (
-    <a
-      href="/information/seer-camp"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-danube-700 focus:ring-danube-500 dark:text-danube-300 font-semibold underline focus:ring-2 focus:outline-none"
-    >
-      Seer Camp help (opens in a new tab)
-    </a>
-  );
-
   const renderChangeActionOnlyLayout = (form: ReactNode): ReactNode => (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Seer Camp: Remove Gems
-        </h2>
-      }
+      title="Seer Camp: Remove Gems"
       status={renderStatus()}
       form={form}
       action={
-        <Button
+        <CraftingActionButton
           label="Change Action"
           on_click={changeAction}
           variant={ButtonVariant.PRIMARY}
         />
       }
-      help_link={renderHelpLink()}
+      help_href="/information/seer-camp"
+      help_label="Seer Camp help"
     />
   );
 
@@ -104,8 +85,7 @@ const SeerCampFlow = (): ReactNode => {
       <SeerManageSocketsForm
         costs={data.costs}
         characterId={characterId}
-        rootStatus={renderStatus()}
-        helpLink={renderHelpLink()}
+        status={status}
         onSuccess={handleActionSuccess}
         onChangeAction={changeAction}
       />
@@ -117,8 +97,7 @@ const SeerCampFlow = (): ReactNode => {
       <SeerAttachGemForm
         costs={data.costs}
         characterId={characterId}
-        rootStatus={renderStatus()}
-        helpLink={renderHelpLink()}
+        status={status}
         onSuccess={handleActionSuccess}
         onChangeAction={changeAction}
       />
@@ -145,8 +124,7 @@ const SeerCampFlow = (): ReactNode => {
       <SeerRemoveGemsForm
         removalData={data.removal_data}
         characterId={characterId}
-        rootStatus={renderStatus()}
-        helpLink={renderHelpLink()}
+        status={status}
         onSuccess={handleActionSuccess}
         onChangeAction={changeAction}
       />
@@ -155,14 +133,11 @@ const SeerCampFlow = (): ReactNode => {
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Seer Camp
-        </h2>
-      }
+      title="Seer Camp"
       status={renderStatus()}
       form={renderSelectionForm()}
-      help_link={renderHelpLink()}
+      help_href="/information/seer-camp"
+      help_label="Seer Camp help"
     />
   );
 };

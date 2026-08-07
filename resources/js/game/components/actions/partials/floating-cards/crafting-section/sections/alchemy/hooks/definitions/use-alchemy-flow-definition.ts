@@ -4,11 +4,11 @@ import AlchemyResultDefinition from '../../api/definitions/alchemy-result-defini
 import UseAlchemyItemsApiDefinition from '../../api/hooks/definitions/use-alchemy-items-api-definition';
 
 export default interface UseAlchemyFlowDefinition {
+  characterId: number;
   data: AlchemyApiResponseDefinition | null;
   loading: boolean;
   error: string | null;
   mutationError: string | null;
-  status: string | null;
   selectedItem: AlchemyItemDefinition | null;
   transmuting: boolean;
   canTransmute: boolean;

@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import SeerManageSocketsFormProps from './types/seer-manage-sockets-form-props';
+import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
@@ -8,7 +9,6 @@ import { useSeerManageSocketsFlow } from '../hooks/use-seer-manage-sockets-flow'
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
@@ -16,8 +16,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 const SeerManageSocketsForm = ({
   costs,
   characterId,
-  rootStatus,
-  helpLink,
+  status,
   onSuccess,
   onChangeAction,
 }: SeerManageSocketsFormProps): ReactNode => {
@@ -37,16 +36,11 @@ const SeerManageSocketsForm = ({
   };
 
   const renderStatus = (): ReactNode => {
-    if (!rootStatus && !error) {
+    if (!error) {
       return null;
     }
 
-    return (
-      <div className="space-y-2">
-        {rootStatus}
-        {error && <Alert variant={AlertVariant.DANGER}>{error}</Alert>}
-      </div>
-    );
+    return <Alert variant={AlertVariant.DANGER}>{error}</Alert>;
   };
 
   const renderForm = (): ReactNode => (
@@ -74,6 +68,21 @@ const SeerManageSocketsForm = ({
   );
 
   const renderPreview = (): ReactNode => {
+    if (resultPreview) {
+      return (
+        <CraftingActionPreview title="Socket preview" status="success">
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-sm text-emerald-700 dark:text-emerald-400"
+          >
+            {status ?? 'The sockets were updated.'}
+          </p>
+          <CraftingItemPreview item={resultPreview} />
+        </CraftingActionPreview>
+      );
+    }
+
     if (!selectedItem) {
       return null;
     }
@@ -94,52 +103,30 @@ const SeerManageSocketsForm = ({
     );
   };
 
-  const renderResult = (): ReactNode => {
-    if (!resultPreview) {
-      return null;
-    }
-
-    return (
-      <Alert variant={AlertVariant.SUCCESS}>
-        <span>The sockets were updated.</span>
-        <div className="mt-2">
-          <CraftingItemPreview item={resultPreview} />
-        </div>
-      </Alert>
-    );
-  };
-
   const renderAction = (): ReactNode => (
-    <div className="flex flex-col gap-2 sm:flex-row">
-      <Button
+    <div className="space-y-2">
+      <CraftingActionButton
         label={submitting ? 'Creating…' : 'Create/ReRoll Sockets'}
         on_click={() => void submit()}
-        variant={ButtonVariant.PRIMARY}
         disabled={!canSubmit}
-        additional_css="w-full sm:w-auto"
       />
-      <Button
+      <CraftingActionButton
         label="Change Action"
         on_click={onChangeAction}
         variant={ButtonVariant.PRIMARY}
-        additional_css="w-full sm:w-auto"
       />
     </div>
   );
 
   return (
     <CraftingActionLayout
-      heading={
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-          Seer Camp: Manage Sockets
-        </h2>
-      }
+      title="Seer Camp: Manage Sockets"
       status={renderStatus()}
       form={renderForm()}
       preview={renderPreview()}
-      result={renderResult()}
       action={renderAction()}
-      help_link={helpLink}
+      help_href="/information/seer-camp"
+      help_label="Seer Camp help"
     />
   );
 };

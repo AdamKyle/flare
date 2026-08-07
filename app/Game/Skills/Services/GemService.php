@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\GemBagSlot;
 use App\Flare\Models\Skill;
+use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Events\CraftedItemTimeOutEvent;
@@ -30,6 +31,7 @@ class GemService
         private readonly ChanceCalculator $chanceCalculator,
         private readonly GemTransformer $gemTransformer,
         private readonly ServerMessageBuilder $serverMessageBuilder,
+        private readonly CharacterGemSlotsTransformer $characterGemSlotsTransformer,
     ) {}
 
     /**
@@ -44,6 +46,7 @@ class GemService
             return $this->errorResult('You do not have the required currencies to craft this item.') + [
                 'craft_succeeded' => false,
                 'crafted_gem' => null,
+                'crafted_gem_preview' => null,
             ];
         }
 
@@ -51,6 +54,7 @@ class GemService
             return $this->errorResult('Your Gem Bag is full. Use or remove gems before crafting more.') + [
                 'craft_succeeded' => false,
                 'crafted_gem' => null,
+                'crafted_gem_preview' => null,
             ];
         }
 
@@ -69,6 +73,7 @@ class GemService
             return $this->successResult([
                 'craft_succeeded' => false,
                 'crafted_gem' => null,
+                'crafted_gem_preview' => null,
                 'message' => $message,
             ]);
         }
@@ -81,6 +86,7 @@ class GemService
             return $this->successResult([
                 'craft_succeeded' => false,
                 'crafted_gem' => null,
+                'crafted_gem_preview' => null,
                 'message' => $message,
             ]);
         }
@@ -96,6 +102,7 @@ class GemService
         return $this->successResult([
             'craft_succeeded' => true,
             'crafted_gem' => $this->gemTransformer->transform($gemBagEntry->gem),
+            'crafted_gem_preview' => $this->characterGemSlotsTransformer->transform($gemBagEntry),
             'message' => $this->serverMessageBuilder->buildWithAdditionalInformation(CraftingMessageTypes::CRAFTED_GEM, $gemBagEntry->gem->name),
         ]);
     }

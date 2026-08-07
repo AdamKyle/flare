@@ -8,4 +8,5 @@ export default interface UseEnchantingItemsApiDefinition {
   searchText: string;
   setSearchText: (value: string) => void;
   onEndReached: () => void;
+  refreshItems: () => void;
 }

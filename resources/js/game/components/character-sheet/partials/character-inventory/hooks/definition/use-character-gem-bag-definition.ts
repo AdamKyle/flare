@@ -1,3 +1,5 @@
+import BaseGemDetails from '../../../../../../api-definitions/items/base-gem-details';
+
 export default interface UseCharacterGemBagDefinition {
-  openGemBag: () => void;
+  openGemBag: (initialGem?: BaseGemDetails) => void;
 }
