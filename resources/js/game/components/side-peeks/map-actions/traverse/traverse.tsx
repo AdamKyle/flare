@@ -180,7 +180,6 @@ export const Traverse = ({ character_data }: TraversePropsDefinition) => {
     return (
       <>
         <h3>{map.name}</h3>
-        <p>Some description</p>
         <Separator />
         {renderQuestItemForMap()}
       </>

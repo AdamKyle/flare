@@ -29,7 +29,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(EquipItemService::class),
                 $app->make(CharacterInventoryService::class),
                 $app->make(ItemTransformer::class),
-                $app->make(Manager::class)
+                $app->make(Manager::class),
+                $app->make(Pagination::class)
             );
         });
 

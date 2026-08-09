@@ -101,14 +101,6 @@ class AutomatedCraftingAttemptTracker
     }
 
     /**
-     * Has a training item been crafted?
-     */
-    public function hasCraftedTrainingItem(): bool
-    {
-        return $this->successfulTrainingCrafts > 0;
-    }
-
-    /**
      * Get successful target crafts.
      */
     public function getSuccessfulTargetCrafts(): int

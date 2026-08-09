@@ -126,27 +126,28 @@ class GameMap extends Model
         return $hasBonuses;
     }
 
-    public function getMapRequiredItemAttribute()
+    public function getMapRequiredItemAttribute(): ?array
     {
-        $questItemDataBuilder = resolve(QuestItemBuilder::class);
+        $requiredItem = $this->resolveMapRequiredItem();
 
-        switch ($this->effectiveGameMap()->name) {
-            case 'Labyrinth':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::LABYRINTH->value)->first());
-            case 'Dungeons':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::DUNGEON->value)->first());
-            case 'Shadow Plane':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::SHADOW_PLANE->value)->first());
-            case 'Hell':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::HELL->value)->first());
-            case 'Purgatory':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::PURGATORY->value)->first());
-            case 'Twisted Memories':
-                return $questItemDataBuilder->createDataObject(Item::where('effect', ItemEffectType::TWISTED_TREE_BRANCH->value)->first());
-            case 'Surface':
-            default:
-                return null;
+        if (is_null($requiredItem)) {
+            return null;
         }
+
+        return resolve(QuestItemBuilder::class)->createDataObject($requiredItem);
+    }
+
+    private function resolveMapRequiredItem(): ?Item
+    {
+        return match ($this->effectiveGameMap()->name) {
+            'Labyrinth' => Item::where('effect', ItemEffectType::LABYRINTH->value)->first(),
+            'Dungeons' => Item::where('effect', ItemEffectType::DUNGEON->value)->first(),
+            'Shadow Plane' => Item::where('effect', ItemEffectType::SHADOW_PLANE->value)->first(),
+            'Hell' => Item::where('effect', ItemEffectType::HELL->value)->first(),
+            'Purgatory' => Item::where('effect', ItemEffectType::PURGATORY->value)->first(),
+            'Twisted Memories' => Item::where('effect', ItemEffectType::TWISTED_TREE_BRANCH->value)->first(),
+            default => null,
+        };
     }
 
     protected static function newFactory()

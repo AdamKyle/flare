@@ -245,6 +245,7 @@ class AutomatedBountyFightHandlerTest extends TestCase
         $this->assertEquals(10, $result->getTotalXp());
         $this->assertEquals(5, $result->getTotalSkillXp());
         $this->assertEquals(0, $result->getTotalFactionPoints());
+        $this->assertSame(0, $result->getFightData()['health']['current_monster_health']);
     }
 
     public function test_handle_returns_invalid_state_when_fight_setup_returns_empty_data(): void

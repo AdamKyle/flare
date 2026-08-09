@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Game/Shop</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Game</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Shop</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/Api/GemShopController.php.html#11">App\Game\Shop\Controllers\Api\GemShopController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/GoblinShopController.php.html#11">App\Game\Shop\Controllers\Api\GoblinShopController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#19">App\Game\Shop\Controllers\Api\ShopController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/BuyItemEvent.php.html#9">App\Game\Shop\Events\BuyItemEvent</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/SellItemEvent.php.html#9">App\Game\Shop\Events\SellItemEvent</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/UpdateShopEvent.php.html#14">App\Game\Shop\Events\UpdateShopEvent</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Listeners/BuyItemListener.php.html#9">App\Game\Shop\Listeners\BuyItemListener</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Listeners/SellItemListener.php.html#12">App\Game\Shop\Listeners\SellItemListener</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopPurchaseMultipleValidation.php.html#7">App\Game\Shop\Requests\ShopPurchaseMultipleValidation</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopReplaceItemValidation.php.html#7">App\Game\Shop\Requests\ShopReplaceItemValidation</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#14">App\Game\Shop\Services\GemShopService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#15">App\Game\Shop\Services\GoblinShopService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#27">App\Game\Shop\Services\ShopService</a></td><td class="text-right">3%</td></tr>
+       <tr><td><a href="Providers/ServiceProvider.php.html#17">App\Game\Shop\Providers\ServiceProvider</a></td><td class="text-right">72%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Services/ShopService.php.html#27">App\Game\Shop\Services\ShopService</a></td><td class="text-right">3.9%</td><td class="text-right">33</td><td class="text-right">998</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#19">App\Game\Shop\Controllers\Api\ShopController</a></td><td class="text-right">0.0%</td><td class="text-right">20</td><td class="text-right">420</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#14">App\Game\Shop\Services\GemShopService</a></td><td class="text-right">0.0%</td><td class="text-right">12</td><td class="text-right">156</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#15">App\Game\Shop\Services\GoblinShopService</a></td><td class="text-right">0.0%</td><td class="text-right">8</td><td class="text-right">72</td></tr>
+       <tr><td><a href="Listeners/SellItemListener.php.html#12">App\Game\Shop\Listeners\SellItemListener</a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Listeners/BuyItemListener.php.html#9">App\Game\Shop\Listeners\BuyItemListener</a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/Api/GemShopController.php.html#13"><abbr title="App\Game\Shop\Controllers\Api\GemShopController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/GemShopController.php.html#15"><abbr title="App\Game\Shop\Controllers\Api\GemShopController::sellSingleGem">sellSingleGem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/GemShopController.php.html#25"><abbr title="App\Game\Shop\Controllers\Api\GemShopController::sellAllGems">sellAllGems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/GoblinShopController.php.html#13"><abbr title="App\Game\Shop\Controllers\Api\GoblinShopController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/GoblinShopController.php.html#15"><abbr title="App\Game\Shop\Controllers\Api\GoblinShopController::fetchItems">fetchItems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/GoblinShopController.php.html#22"><abbr title="App\Game\Shop\Controllers\Api\GoblinShopController::purchaseItem">purchaseItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#23"><abbr title="App\Game\Shop\Controllers\Api\ShopController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#28"><abbr title="App\Game\Shop\Controllers\Api\ShopController::fetchItemsForShop">fetchItemsForShop</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#40"><abbr title="App\Game\Shop\Controllers\Api\ShopController::shopCompare">shopCompare</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#51"><abbr title="App\Game\Shop\Controllers\Api\ShopController::buy">buy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#89"><abbr title="App\Game\Shop\Controllers\Api\ShopController::buyMultiple">buyMultiple</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#119"><abbr title="App\Game\Shop\Controllers\Api\ShopController::buyAndReplace">buyAndReplace</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/BuyItemEvent.php.html#28"><abbr title="App\Game\Shop\Events\BuyItemEvent::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/SellItemEvent.php.html#28"><abbr title="App\Game\Shop\Events\SellItemEvent::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/UpdateShopEvent.php.html#24"><abbr title="App\Game\Shop\Events\UpdateShopEvent::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/UpdateShopEvent.php.html#34"><abbr title="App\Game\Shop\Events\UpdateShopEvent::broadcastOn">broadcastOn</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Listeners/BuyItemListener.php.html#11"><abbr title="App\Game\Shop\Listeners\BuyItemListener::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Listeners/SellItemListener.php.html#16"><abbr title="App\Game\Shop\Listeners\SellItemListener::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Listeners/SellItemListener.php.html#21"><abbr title="App\Game\Shop\Listeners\SellItemListener::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopPurchaseMultipleValidation.php.html#14"><abbr title="App\Game\Shop\Requests\ShopPurchaseMultipleValidation::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopPurchaseMultipleValidation.php.html#24"><abbr title="App\Game\Shop\Requests\ShopPurchaseMultipleValidation::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopPurchaseMultipleValidation.php.html#32"><abbr title="App\Game\Shop\Requests\ShopPurchaseMultipleValidation::messages">messages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopReplaceItemValidation.php.html#14"><abbr title="App\Game\Shop\Requests\ShopReplaceItemValidation::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopReplaceItemValidation.php.html#24"><abbr title="App\Game\Shop\Requests\ShopReplaceItemValidation::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ShopReplaceItemValidation.php.html#34"><abbr title="App\Game\Shop\Requests\ShopReplaceItemValidation::messages">messages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#20"><abbr title="App\Game\Shop\Services\GemShopService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#25"><abbr title="App\Game\Shop\Services\GemShopService::sellGem">sellGem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#73"><abbr title="App\Game\Shop\Services\GemShopService::sellAllGems">sellAllGems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#126"><abbr title="App\Game\Shop\Services\GemShopService::getCurrencyBack">getCurrencyBack</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#19"><abbr title="App\Game\Shop\Services\GoblinShopService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#21"><abbr title="App\Game\Shop\Services\GoblinShopService::fetchItemsForShop">fetchItemsForShop</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#35"><abbr title="App\Game\Shop\Services\GoblinShopService::buyItem">buyItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#61"><abbr title="App\Game\Shop\Services\GoblinShopService::canBuyAlchemyItem">canBuyAlchemyItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#66"><abbr title="App\Game\Shop\Services\GoblinShopService::addToAlchemyBag">addToAlchemyBag</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#51"><abbr title="App\Game\Shop\Services\ShopService::getItemsForShop">getItemsForShop</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#58"><abbr title="App\Game\Shop\Services\ShopService::sellSpecificItem">sellSpecificItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#92"><abbr title="App\Game\Shop\Services\ShopService::sellAllItems">sellAllItems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#136"><abbr title="App\Game\Shop\Services\ShopService::buyAndReplace">buyAndReplace</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#179"><abbr title="App\Game\Shop\Services\ShopService::buyMultipleItems">buyMultipleItems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#202"><abbr title="App\Game\Shop\Services\ShopService::sellItem">sellItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#212"><abbr title="App\Game\Shop\Services\ShopService::autoSellItem">autoSellItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#238"><abbr title="App\Game\Shop\Services\ShopService::sellAllItemsInInventory">sellAllItemsInInventory</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#263"><abbr title="App\Game\Shop\Services\ShopService::fetchItemsForShopBasedOnCharacterClass">fetchItemsForShopBasedOnCharacterClass</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Providers/ServiceProvider.php.html#24"><abbr title="App\Game\Shop\Providers\ServiceProvider::register">register</abbr></a></td><td class="text-right">72%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Services/ShopService.php.html#263"><abbr title="App\Game\Shop\Services\ShopService::fetchItemsForShopBasedOnCharacterClass">fetchItemsForShopBasedOnCharacterClass</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#51"><abbr title="App\Game\Shop\Controllers\Api\ShopController::buy">buy</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#119"><abbr title="App\Game\Shop\Controllers\Api\ShopController::buyAndReplace">buyAndReplace</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#136"><abbr title="App\Game\Shop\Services\ShopService::buyAndReplace">buyAndReplace</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="Controllers/Api/ShopController.php.html#89"><abbr title="App\Game\Shop\Controllers\Api\ShopController::buyMultiple">buyMultiple</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#25"><abbr title="App\Game\Shop\Services\GemShopService::sellGem">sellGem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/GemShopService.php.html#73"><abbr title="App\Game\Shop\Services\GemShopService::sellAllGems">sellAllGems</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#58"><abbr title="App\Game\Shop\Services\ShopService::sellSpecificItem">sellSpecificItem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#238"><abbr title="App\Game\Shop\Services\ShopService::sellAllItemsInInventory">sellAllItemsInInventory</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#66"><abbr title="App\Game\Shop\Services\GoblinShopService::addToAlchemyBag">addToAlchemyBag</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#92"><abbr title="App\Game\Shop\Services\ShopService::sellAllItems">sellAllItems</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#179"><abbr title="App\Game\Shop\Services\ShopService::buyMultipleItems">buyMultipleItems</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Listeners/BuyItemListener.php.html#11"><abbr title="App\Game\Shop\Listeners\BuyItemListener::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Listeners/SellItemListener.php.html#21"><abbr title="App\Game\Shop\Listeners\SellItemListener::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/GoblinShopService.php.html#35"><abbr title="App\Game\Shop\Services\GoblinShopService::buyItem">buyItem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/ShopService.php.html#212"><abbr title="App\Game\Shop\Services\ShopService::autoSellItem">autoSellItem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:57:50 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[0,3,"Controllers\/Api\/GemShopController.php.html#11","App\\Game\\Shop\\Controllers\\Api\\GemShopController","12"],[0,3,"Controllers\/Api\/GoblinShopController.php.html#11","App\\Game\\Shop\\Controllers\\Api\\GoblinShopController","12"],[0,20,"Controllers\/Api\/ShopController.php.html#19","App\\Game\\Shop\\Controllers\\Api\\ShopController","420"],[0,1,"Events\/BuyItemEvent.php.html#9","App\\Game\\Shop\\Events\\BuyItemEvent","2"],[0,1,"Events\/SellItemEvent.php.html#9","App\\Game\\Shop\\Events\\SellItemEvent","2"],[0,2,"Events\/UpdateShopEvent.php.html#14","App\\Game\\Shop\\Events\\UpdateShopEvent","6"],[0,2,"Listeners\/BuyItemListener.php.html#9","App\\Game\\Shop\\Listeners\\BuyItemListener","6"],[0,3,"Listeners\/SellItemListener.php.html#12","App\\Game\\Shop\\Listeners\\SellItemListener","12"],[0,3,"Requests\/ShopPurchaseMultipleValidation.php.html#7","App\\Game\\Shop\\Requests\\ShopPurchaseMultipleValidation","12"],[0,3,"Requests\/ShopReplaceItemValidation.php.html#7","App\\Game\\Shop\\Requests\\ShopReplaceItemValidation","12"],[0,12,"Services\/GemShopService.php.html#14","App\\Game\\Shop\\Services\\GemShopService","156"],[0,8,"Services\/GoblinShopService.php.html#15","App\\Game\\Shop\\Services\\GoblinShopService","72"],[3.937007874015748,33,"Services\/ShopService.php.html#27","App\\Game\\Shop\\Services\\ShopService","998.38"],[72.22222222222221,1,"Providers\/ServiceProvider.php.html#17","App\\Game\\Shop\\Providers\\ServiceProvider","1.02"],[100,1,"Providers\/EventsProvider.php.html#11","App\\Game\\Shop\\Providers\\EventsProvider","1"]]</script>
+  <script type="application/json" id="complexity_method">[[0,1,"Controllers\/Api\/GemShopController.php.html#13","App\\Game\\Shop\\Controllers\\Api\\GemShopController::__construct","2"],[0,1,"Controllers\/Api\/GemShopController.php.html#15","App\\Game\\Shop\\Controllers\\Api\\GemShopController::sellSingleGem","2"],[0,1,"Controllers\/Api\/GemShopController.php.html#25","App\\Game\\Shop\\Controllers\\Api\\GemShopController::sellAllGems","2"],[0,1,"Controllers\/Api\/GoblinShopController.php.html#13","App\\Game\\Shop\\Controllers\\Api\\GoblinShopController::__construct","2"],[0,1,"Controllers\/Api\/GoblinShopController.php.html#15","App\\Game\\Shop\\Controllers\\Api\\GoblinShopController::fetchItems","2"],[0,1,"Controllers\/Api\/GoblinShopController.php.html#22","App\\Game\\Shop\\Controllers\\Api\\GoblinShopController::purchaseItem","2"],[0,1,"Controllers\/Api\/ShopController.php.html#23","App\\Game\\Shop\\Controllers\\Api\\ShopController::__construct","2"],[0,1,"Controllers\/Api\/ShopController.php.html#28","App\\Game\\Shop\\Controllers\\Api\\ShopController::fetchItemsForShop","2"],[0,1,"Controllers\/Api\/ShopController.php.html#40","App\\Game\\Shop\\Controllers\\Api\\ShopController::shopCompare","2"],[0,6,"Controllers\/Api\/ShopController.php.html#51","App\\Game\\Shop\\Controllers\\Api\\ShopController::buy","42"],[0,5,"Controllers\/Api\/ShopController.php.html#89","App\\Game\\Shop\\Controllers\\Api\\ShopController::buyMultiple","30"],[0,6,"Controllers\/Api\/ShopController.php.html#119","App\\Game\\Shop\\Controllers\\Api\\ShopController::buyAndReplace","42"],[0,1,"Events\/BuyItemEvent.php.html#28","App\\Game\\Shop\\Events\\BuyItemEvent::__construct","2"],[0,1,"Events\/SellItemEvent.php.html#28","App\\Game\\Shop\\Events\\SellItemEvent::__construct","2"],[0,1,"Events\/UpdateShopEvent.php.html#24","App\\Game\\Shop\\Events\\UpdateShopEvent::__construct","2"],[0,1,"Events\/UpdateShopEvent.php.html#34","App\\Game\\Shop\\Events\\UpdateShopEvent::broadcastOn","2"],[0,2,"Listeners\/BuyItemListener.php.html#11","App\\Game\\Shop\\Listeners\\BuyItemListener::handle","6"],[0,1,"Listeners\/SellItemListener.php.html#16","App\\Game\\Shop\\Listeners\\SellItemListener::__construct","2"],[0,2,"Listeners\/SellItemListener.php.html#21","App\\Game\\Shop\\Listeners\\SellItemListener::handle","6"],[0,1,"Requests\/ShopPurchaseMultipleValidation.php.html#14","App\\Game\\Shop\\Requests\\ShopPurchaseMultipleValidation::authorize","2"],[0,1,"Requests\/ShopPurchaseMultipleValidation.php.html#24","App\\Game\\Shop\\Requests\\ShopPurchaseMultipleValidation::rules","2"],[0,1,"Requests\/ShopPurchaseMultipleValidation.php.html#32","App\\Game\\Shop\\Requests\\ShopPurchaseMultipleValidation::messages","2"],[0,1,"Requests\/ShopReplaceItemValidation.php.html#14","App\\Game\\Shop\\Requests\\ShopReplaceItemValidation::authorize","2"],[0,1,"Requests\/ShopReplaceItemValidation.php.html#24","App\\Game\\Shop\\Requests\\ShopReplaceItemValidation::rules","2"],[0,1,"Requests\/ShopReplaceItemValidation.php.html#34","App\\Game\\Shop\\Requests\\ShopReplaceItemValidation::messages","2"],[0,1,"Services\/GemShopService.php.html#20","App\\Game\\Shop\\Services\\GemShopService::__construct","2"],[0,5,"Services\/GemShopService.php.html#25","App\\Game\\Shop\\Services\\GemShopService::sellGem","30"],[0,5,"Services\/GemShopService.php.html#73","App\\Game\\Shop\\Services\\GemShopService::sellAllGems","30"],[0,1,"Services\/GemShopService.php.html#126","App\\Game\\Shop\\Services\\GemShopService::getCurrencyBack","2"],[0,1,"Services\/GoblinShopService.php.html#19","App\\Game\\Shop\\Services\\GoblinShopService::__construct","2"],[0,1,"Services\/GoblinShopService.php.html#21","App\\Game\\Shop\\Services\\GoblinShopService::fetchItemsForShop","2"],[0,2,"Services\/GoblinShopService.php.html#35","App\\Game\\Shop\\Services\\GoblinShopService::buyItem","6"],[0,1,"Services\/GoblinShopService.php.html#61","App\\Game\\Shop\\Services\\GoblinShopService::canBuyAlchemyItem","2"],[0,3,"Services\/GoblinShopService.php.html#66","App\\Game\\Shop\\Services\\GoblinShopService::addToAlchemyBag","12"],[0,1,"Services\/ShopService.php.html#51","App\\Game\\Shop\\Services\\ShopService::getItemsForShop","2"],[0,5,"Services\/ShopService.php.html#58","App\\Game\\Shop\\Services\\ShopService::sellSpecificItem","30"],[0,3,"Services\/ShopService.php.html#92","App\\Game\\Shop\\Services\\ShopService::sellAllItems","12"],[0,6,"Services\/ShopService.php.html#136","App\\Game\\Shop\\Services\\ShopService::buyAndReplace","42"],[0,3,"Services\/ShopService.php.html#179","App\\Game\\Shop\\Services\\ShopService::buyMultipleItems","12"],[0,1,"Services\/ShopService.php.html#202","App\\Game\\Shop\\Services\\ShopService::sellItem","2"],[0,2,"Services\/ShopService.php.html#212","App\\Game\\Shop\\Services\\ShopService::autoSellItem","6"],[0,4,"Services\/ShopService.php.html#238","App\\Game\\Shop\\Services\\ShopService::sellAllItemsInInventory","20"],[0,7,"Services\/ShopService.php.html#263","App\\Game\\Shop\\Services\\ShopService::fetchItemsForShopBasedOnCharacterClass","56"],[72.22222222222221,1,"Providers\/ServiceProvider.php.html#24","App\\Game\\Shop\\Providers\\ServiceProvider::register","1.02"],[100,1,"Providers\/EventsProvider.php.html#31","App\\Game\\Shop\\Providers\\EventsProvider::boot","1"],[100,1,"Services\/ShopService.php.html#41","App\\Game\\Shop\\Services\\ShopService::__construct","1"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [12,1,0,0,0,0,0,0,1,0,0,1])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [43,0,0,0,0,0,0,0,1,0,0,2])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

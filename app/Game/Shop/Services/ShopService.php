@@ -6,6 +6,7 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Inventory;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Pagination;
 use App\Game\Character\Builders\AttackBuilders\Jobs\CharacterAttackTypesCacheBuilder;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
@@ -35,22 +36,23 @@ class ShopService
 
     private Manager $manager;
 
-    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager)
+    private Pagination $pagination;
+
+    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager, Pagination $pagination)
     {
         $this->equipItemService = $equipItemService;
         $this->itemTransformer = $itemTransformer;
         $this->manager = $manager;
+        $this->pagination = $pagination;
 
         $this->characterInventoryService = $characterInventoryService;
     }
 
-    public function getItemsForShop(Character $character, ?string $type, ?string $searchText): array
+    public function getItemsForShop(Character $character, ?string $type, ?string $searchText, ?string $sortCost = null, int $perPage = 10, int $page = 1): array
     {
-        $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $type, $searchText);
+        $items = $this->fetchItemsForShopBasedOnCharacterClass($character, $type, $searchText, $sortCost);
 
-        $items = new Collection($items, $this->itemTransformer);
-
-        return $this->manager->createData($items)->toArray();
+        return $this->pagination->buildPaginatedDate($items, $this->itemTransformer, $perPage, $page);
     }
 
     public function sellSpecificItem(Character $character, int $slotId): array
@@ -145,10 +147,6 @@ class ShopService
         }
 
         if (is_null($replacementSlot) || $character->gold < $cost || $character->isInventoryFull()) {
-            return;
-        }
-
-        if (! InventorySlot::whereKey($replacementSlot->id)->where('inventory_id', $character->inventory->id)->where('equipped', true)->exists()) {
             return;
         }
 
@@ -262,7 +260,7 @@ class ShopService
         return floor($cost - ($cost * 0.05));
     }
 
-    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $type, ?string $searchText): EloquentCollection
+    private function fetchItemsForShopBasedOnCharacterClass(Character $character, ?string $type, ?string $searchText, ?string $sortCost = null): EloquentCollection
     {
         $className = $character->class->name;
 
@@ -282,13 +280,15 @@ class ShopService
             }
         }
 
-        if (! is_null($searchText)) {
+        if (! is_null($searchText) && $searchText !== '') {
             $items = $items->whereRaw('LOWER(name) LIKE ?', ['%'.strtolower($searchText).'%']);
         }
 
+        $costDirection = $sortCost === 'desc' ? 'desc' : 'asc';
+
         return $items
             ->orderBy('type', 'desc')
-            ->orderBy('cost', 'asc')
+            ->orderBy('cost', $costDirection)
             ->get();
     }
 }

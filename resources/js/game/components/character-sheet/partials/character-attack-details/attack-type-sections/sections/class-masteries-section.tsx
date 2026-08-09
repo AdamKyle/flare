@@ -11,7 +11,7 @@ const ClassMasteriesSection = ({
 
   const listElements = class_masteries.map((classMastery) => {
     return (
-      <li>
+      <li key={classMastery.name}>
         <strong>{classMastery.name}</strong>{' '}
         <span className="text-green-700 dark:text-green-500">
           +{(classMastery.amount * 100).toFixed(2)}%

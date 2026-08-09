@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Game/PassiveSkills</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Game</a></li>
+         <li class="breadcrumb-item"><a href="index.html">PassiveSkills</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#14">App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/CharacterPassiveSkillController.php.html#10">App\Game\PassiveSkills\Controllers\CharacterPassiveSkillController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/UpdatePassiveTree.php.html#15">App\Game\PassiveSkills\Events\UpdatePassiveTree</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Jobs/TrainPassiveSkill.php.html#22">App\Game\PassiveSkills\Jobs\TrainPassiveSkill</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PassiveSkillTrainingService.php.html#12">App\Game\PassiveSkills\Services\PassiveSkillTrainingService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#7">App\Game\PassiveSkills\Values\PassiveSkillTypeValue</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Jobs/TrainPassiveSkill.php.html#22">App\Game\PassiveSkills\Jobs\TrainPassiveSkill</a></td><td class="text-right">0.0%</td><td class="text-right">16</td><td class="text-right">272</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#7">App\Game\PassiveSkills\Values\PassiveSkillTypeValue</a></td><td class="text-right">0.0%</td><td class="text-right">14</td><td class="text-right">210</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#14">App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController</a></td><td class="text-right">0.0%</td><td class="text-right">12</td><td class="text-right">156</td></tr>
+       <tr><td><a href="Controllers/CharacterPassiveSkillController.php.html#10">App\Game\PassiveSkills\Controllers\CharacterPassiveSkillController</a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Services/PassiveSkillTrainingService.php.html#12">App\Game\PassiveSkills\Services\PassiveSkillTrainingService</a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#16"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#22"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::getKingdomPassives">getKingdomPassives</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#30"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::trainSkill">trainSkill</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#67"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::stopTraining">stopTraining</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#96"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::automationRestrictionJsonResponse">automationRestrictionJsonResponse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/CharacterPassiveSkillController.php.html#12"><abbr title="App\Game\PassiveSkills\Controllers\CharacterPassiveSkillController::viewSkill">viewSkill</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/CharacterPassiveSkillController.php.html#24"><abbr title="App\Game\PassiveSkills\Controllers\CharacterPassiveSkillController::viewCharacterPassiveSkill">viewCharacterPassiveSkill</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/UpdatePassiveTree.php.html#29"><abbr title="App\Game\PassiveSkills\Events\UpdatePassiveTree::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Events/UpdatePassiveTree.php.html#40"><abbr title="App\Game\PassiveSkills\Events\UpdatePassiveTree::broadcastOn">broadcastOn</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Jobs/TrainPassiveSkill.php.html#30"><abbr title="App\Game\PassiveSkills\Jobs\TrainPassiveSkill::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Jobs/TrainPassiveSkill.php.html#41"><abbr title="App\Game\PassiveSkills\Jobs\TrainPassiveSkill::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PassiveSkillTrainingService.php.html#16"><abbr title="App\Game\PassiveSkills\Services\PassiveSkillTrainingService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/PassiveSkillTrainingService.php.html#26"><abbr title="App\Game\PassiveSkills\Services\PassiveSkillTrainingService::trainSkill">trainSkill</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#117"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#129"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isDefence">isDefence</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#137"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isResourceGain">isResourceGain</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#145"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isUnitCostReduction">isUnitCostReduction</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#153"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::unlocksBuilding">unlocksBuilding</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#161"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isIronCostReduction">isIronCostReduction</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#169"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isPopulationCostReduction">isPopulationCostReduction</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#177"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isBuildingCostReduction">isBuildingCostReduction</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#185"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isSteelSmeltingTimeReduction">isSteelSmeltingTimeReduction</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#193"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isResourceIncrease">isResourceIncrease</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#201"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::isSteelIncrease">isSteelIncrease</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#211"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::getNamedValue">getNamedValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#219"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::getNamedValues">getNamedValues</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Jobs/TrainPassiveSkill.php.html#41"><abbr title="App\Game\PassiveSkills\Jobs\TrainPassiveSkill::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">15</td><td class="text-right">240</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#30"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::trainSkill">trainSkill</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#67"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::stopTraining">stopTraining</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/Api/CharacterPassiveSkillController.php.html#96"><abbr title="App\Game\PassiveSkills\Controllers\Api\CharacterPassiveSkillController::automationRestrictionJsonResponse">automationRestrictionJsonResponse</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/CharacterPassiveSkillController.php.html#12"><abbr title="App\Game\PassiveSkills\Controllers\CharacterPassiveSkillController::viewSkill">viewSkill</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/PassiveSkillTrainingService.php.html#26"><abbr title="App\Game\PassiveSkills\Services\PassiveSkillTrainingService::trainSkill">trainSkill</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Values/PassiveSkillTypeValue.php.html#117"><abbr title="App\Game\PassiveSkills\Values\PassiveSkillTypeValue::__construct">__construct</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:57:50 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[0,12,"Controllers\/Api\/CharacterPassiveSkillController.php.html#14","App\\Game\\PassiveSkills\\Controllers\\Api\\CharacterPassiveSkillController","156"],[0,3,"Controllers\/CharacterPassiveSkillController.php.html#10","App\\Game\\PassiveSkills\\Controllers\\CharacterPassiveSkillController","12"],[0,2,"Events\/UpdatePassiveTree.php.html#15","App\\Game\\PassiveSkills\\Events\\UpdatePassiveTree","6"],[0,16,"Jobs\/TrainPassiveSkill.php.html#22","App\\Game\\PassiveSkills\\Jobs\\TrainPassiveSkill","272"],[0,3,"Services\/PassiveSkillTrainingService.php.html#12","App\\Game\\PassiveSkills\\Services\\PassiveSkillTrainingService","12"],[0,14,"Values\/PassiveSkillTypeValue.php.html#7","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue","210"],[100,1,"Providers\/ServiceProvider.php.html#10","App\\Game\\PassiveSkills\\Providers\\ServiceProvider","1"]]</script>
+  <script type="application/json" id="complexity_method">[[0,1,"Controllers\/Api\/CharacterPassiveSkillController.php.html#16","App\\Game\\PassiveSkills\\Controllers\\Api\\CharacterPassiveSkillController::__construct","2"],[0,1,"Controllers\/Api\/CharacterPassiveSkillController.php.html#22","App\\Game\\PassiveSkills\\Controllers\\Api\\CharacterPassiveSkillController::getKingdomPassives","2"],[0,5,"Controllers\/Api\/CharacterPassiveSkillController.php.html#30","App\\Game\\PassiveSkills\\Controllers\\Api\\CharacterPassiveSkillController::trainSkill","30"],[0,3,"Controllers\/Api\/CharacterPassiveSkillController.php.html#67","App\\Game\\PassiveSkills\\Controllers\\Api\\CharacterPassiveSkillController::stopTraining","12"],[0,2,"Controllers\/Api\/CharacterPassiveSkillController.php.html#96","App\\Game\\PassiveSkills\\Controllers\\Api\\CharacterPassiveSkillController::automationRestrictionJsonResponse","6"],[0,2,"Controllers\/CharacterPassiveSkillController.php.html#12","App\\Game\\PassiveSkills\\Controllers\\CharacterPassiveSkillController::viewSkill","6"],[0,1,"Controllers\/CharacterPassiveSkillController.php.html#24","App\\Game\\PassiveSkills\\Controllers\\CharacterPassiveSkillController::viewCharacterPassiveSkill","2"],[0,1,"Events\/UpdatePassiveTree.php.html#29","App\\Game\\PassiveSkills\\Events\\UpdatePassiveTree::__construct","2"],[0,1,"Events\/UpdatePassiveTree.php.html#40","App\\Game\\PassiveSkills\\Events\\UpdatePassiveTree::broadcastOn","2"],[0,1,"Jobs\/TrainPassiveSkill.php.html#30","App\\Game\\PassiveSkills\\Jobs\\TrainPassiveSkill::__construct","2"],[0,15,"Jobs\/TrainPassiveSkill.php.html#41","App\\Game\\PassiveSkills\\Jobs\\TrainPassiveSkill::handle","240"],[0,1,"Services\/PassiveSkillTrainingService.php.html#16","App\\Game\\PassiveSkills\\Services\\PassiveSkillTrainingService::__construct","2"],[0,2,"Services\/PassiveSkillTrainingService.php.html#26","App\\Game\\PassiveSkills\\Services\\PassiveSkillTrainingService::trainSkill","6"],[0,2,"Values\/PassiveSkillTypeValue.php.html#117","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::__construct","6"],[0,1,"Values\/PassiveSkillTypeValue.php.html#129","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isDefence","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#137","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isResourceGain","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#145","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isUnitCostReduction","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#153","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::unlocksBuilding","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#161","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isIronCostReduction","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#169","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isPopulationCostReduction","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#177","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isBuildingCostReduction","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#185","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isSteelSmeltingTimeReduction","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#193","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isResourceIncrease","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#201","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::isSteelIncrease","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#211","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::getNamedValue","2"],[0,1,"Values\/PassiveSkillTypeValue.php.html#219","App\\Game\\PassiveSkills\\Values\\PassiveSkillTypeValue::getNamedValues","2"],[100,1,"Providers\/ServiceProvider.php.html#17","App\\Game\\PassiveSkills\\Providers\\ServiceProvider::register","1"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [6,0,0,0,0,0,0,0,0,0,0,1])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [26,0,0,0,0,0,0,0,0,0,0,1])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

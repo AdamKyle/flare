@@ -93,13 +93,6 @@ class CharacterDeletion
         ]);
     }
 
-    protected function removeMercenaries(Collection $mercenaries): void
-    {
-        foreach ($mercenaries as $merc) {
-            $merc->delete();
-        }
-    }
-
     protected function deleteCharacterMarketListings(Character $character): void
     {
 
@@ -196,11 +189,9 @@ class CharacterDeletion
 
         $character->currentAutomations()->delete();
 
-        $character->factions()->delete();
-
         foreach ($character->factionLoyalties as $loyalty) {
 
-            foreach ($loyalty->factionLoyaltyNpcs() as $factionNpc) {
+            foreach ($loyalty->factionLoyaltyNpcs as $factionNpc) {
 
                 $factionNpc->factionLoyaltyNpcTasks()->delete();
             }
@@ -209,6 +200,8 @@ class CharacterDeletion
 
             $loyalty->delete();
         }
+
+        $character->factions()->delete();
 
         $character->passiveSkills()->delete();
 

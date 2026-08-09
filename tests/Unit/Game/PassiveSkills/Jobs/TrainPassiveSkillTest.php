@@ -8,11 +8,10 @@ use App\Game\PassiveSkills\Values\PassiveSkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreatePassiveSkill;
 
 class TrainPassiveSkillTest extends TestCase
 {
-    use CreatePassiveSkill, RefreshDatabase;
+    use RefreshDatabase;
 
     private ?Character $character;
 
@@ -78,9 +77,31 @@ class TrainPassiveSkillTest extends TestCase
         $this->assertEquals(5, $passive->current_level);
     }
 
+    public function test_leveling_to_max_level_sets_hours_to_next_to_zero()
+    {
+        $passive = $this->character->passiveSkills()->first();
+
+        $passive->passiveSkill()->update(['max_level' => 1]);
+
+        $passive->update([
+            'current_level' => 0,
+            'started_at' => now()->subMinute(),
+            'completed_at' => now()->subMinute(),
+        ]);
+
+        $passive = $passive->refresh();
+
+        TrainPassiveSkill::dispatch($this->character, $passive);
+
+        $passive = $passive->refresh();
+
+        $this->assertSame(1, $passive->current_level);
+        $this->assertSame(0, $passive->hours_to_next);
+    }
+
     public function test_passive_unlocks_kingdom_building()
     {
-        $character = (new CharacterFactory)->createBaseCharacter()
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->kingdomManagement()
             ->assignKingdom()
@@ -89,22 +110,23 @@ class TrainPassiveSkillTest extends TestCase
             ], [
                 'is_locked' => true,
             ])
-            ->getCharacter();
+            ->getCharacterFactory();
 
-        $passive = $character->passiveSkills()->create([
-            'character_id' => $character->id,
-            'passive_skill_id' => $this->createPassiveSkill(array_merge([
-                'effect_type' => PassiveSkillTypeValue::UNLOCKS_BUILDING,
-            ], [
-                'name' => $character->kingdoms->first()->buildings->first()->name,
-            ]))->id,
-            'parent_skill_id' => null,
-            'current_level' => 0,
-            'hours_to_next' => 1,
-            'is_locked' => false,
-            'started_at' => now()->subMinute(),
-            'completed_at' => now()->subMinute(),
-        ]);
+        $buildingName = $characterFactory->getCharacter()->kingdoms->first()->buildings->first()->name;
+
+        $characterFactory = $characterFactory->passiveSkillManagement()->assignPassiveSkill(
+            PassiveSkillTypeValue::UNLOCKS_BUILDING,
+            0,
+            ['name' => $buildingName],
+            [
+                'hours_to_next' => 1,
+                'started_at' => now()->subMinute(),
+                'completed_at' => now()->subMinute(),
+            ],
+        )->getCharacterFactory();
+
+        $character = $characterFactory->getCharacter();
+        $passive = $character->passiveSkills()->latest('id')->first();
 
         TrainPassiveSkill::dispatch($character, $passive);
 
@@ -116,7 +138,7 @@ class TrainPassiveSkillTest extends TestCase
 
     public function test_passive_training_recalculates_all_owned_kingdom_caps()
     {
-        $character = (new CharacterFactory)
+        $characterFactory = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation()
             ->kingdomManagement()
@@ -128,23 +150,24 @@ class TrainPassiveSkillTest extends TestCase
                 'max_population' => 100,
                 'current_population' => 100,
             ])
-            ->getCharacter();
+            ->getCharacterFactory();
 
-        $passiveSkill = $this->createPassiveSkill([
-            'effect_type' => PassiveSkillTypeValue::RESOURCE_INCREASE,
-            'resource_bonus_per_level' => 10,
-            'max_level' => 5,
-        ]);
-        $passive = $character->passiveSkills()->create([
-            'character_id' => $character->id,
-            'passive_skill_id' => $passiveSkill->id,
-            'parent_skill_id' => null,
-            'current_level' => 0,
-            'hours_to_next' => 1,
-            'started_at' => now()->subMinute(),
-            'completed_at' => now()->subMinute(),
-            'is_locked' => false,
-        ]);
+        $characterFactory = $characterFactory->passiveSkillManagement()->assignPassiveSkill(
+            PassiveSkillTypeValue::RESOURCE_INCREASE,
+            0,
+            [
+                'resource_bonus_per_level' => 10,
+                'max_level' => 5,
+            ],
+            [
+                'hours_to_next' => 1,
+                'started_at' => now()->subMinute(),
+                'completed_at' => now()->subMinute(),
+            ],
+        )->getCharacterFactory();
+
+        $character = $characterFactory->getCharacter();
+        $passive = $character->passiveSkills()->latest('id')->first();
 
         TrainPassiveSkill::dispatch($character, $passive);
 
@@ -155,5 +178,40 @@ class TrainPassiveSkillTest extends TestCase
         $this->assertSame(2010, $kingdom->max_clay);
         $this->assertSame(2010, $kingdom->max_iron);
         $this->assertSame(110, $kingdom->max_population);
+    }
+
+    public function test_passive_training_increases_max_steel_for_owned_kingdoms()
+    {
+        $characterFactory = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->kingdomManagement()
+            ->assignKingdom([
+                'max_steel' => 500,
+            ])
+            ->getCharacterFactory();
+
+        $characterFactory = $characterFactory->passiveSkillManagement()->assignPassiveSkill(
+            PassiveSkillTypeValue::STEEL_INCREASE,
+            0,
+            [
+                'resource_bonus_per_level' => 25,
+                'max_level' => 5,
+            ],
+            [
+                'hours_to_next' => 1,
+                'started_at' => now()->subMinute(),
+                'completed_at' => now()->subMinute(),
+            ],
+        )->getCharacterFactory();
+
+        $character = $characterFactory->getCharacter();
+        $passive = $character->passiveSkills()->latest('id')->first();
+
+        TrainPassiveSkill::dispatch($character, $passive);
+
+        $kingdom = $character->refresh()->kingdoms->first();
+
+        $this->assertSame(525, $kingdom->max_steel);
     }
 }

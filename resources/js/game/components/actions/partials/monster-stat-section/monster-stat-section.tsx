@@ -42,19 +42,6 @@ export const MonsterStatSection = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameData?.character, monster_id]);
 
-  if (isNil(data) || loading) {
-    return (
-      <ContainerWithTitle
-        manageSectionVisibility={() => toggle_monster_stat_visibility(0)}
-        title={'Fetching Monster'}
-      >
-        <Card>
-          <InfiniteLoader />
-        </Card>
-      </ContainerWithTitle>
-    );
-  }
-
   if (!isNil(error)) {
     return (
       <ContainerWithTitle
@@ -63,6 +50,19 @@ export const MonsterStatSection = ({
       >
         <Card>
           <ApiErrorAlert apiError={error.message} />
+        </Card>
+      </ContainerWithTitle>
+    );
+  }
+
+  if (isNil(data) || loading) {
+    return (
+      <ContainerWithTitle
+        manageSectionVisibility={() => toggle_monster_stat_visibility(0)}
+        title={'Fetching Monster'}
+      >
+        <Card>
+          <InfiniteLoader />
         </Card>
       </ContainerWithTitle>
     );

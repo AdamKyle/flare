@@ -145,6 +145,25 @@ class ExplorationWarningControllerTest extends TestCase
         });
     }
 
+    public function test_dismiss_ended_dismisses_the_ended_exploration_log(): void
+    {
+        Event::fake();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'ended_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/exploration/'.$this->character->id.'/dismiss', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertNotNull(ExplorationLog::find($log->id)->panel_dismissed_at);
+    }
+
     public function test_dismiss_rejects_wrong_character(): void
     {
         $otherCharacter = (new CharacterFactory)

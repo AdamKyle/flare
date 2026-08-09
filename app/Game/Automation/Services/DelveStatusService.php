@@ -50,7 +50,7 @@ class DelveStatusService
         }
 
         $latestLog = $delve->delveLogs()->latest()->first();
-        $elapsedSeconds = now()->diffInSeconds($delve->started_at);
+        $elapsedSeconds = $delve->started_at->diffInSeconds(now());
         $elapsedHours = $elapsedSeconds / 3600;
         $location = $this->caveLocation($character);
         $countdown = $this->questItemDropCountdown($delve, $location, $elapsedSeconds);

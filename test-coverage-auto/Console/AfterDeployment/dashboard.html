@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Console/AfterDeployment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Console</a></li>
+         <li class="breadcrumb-item"><a href="index.html">AfterDeployment</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AddBatchCraftingSetToPlayers.php.html#9">App\Console\AfterDeployment\AddBatchCraftingSetToPlayers</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#20">App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BackfillCompletedPanelDismissals.php.html#9">App\Console\AfterDeployment\BackfillCompletedPanelDismissals</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#49">App\Console\AfterDeployment\CleanDanglingCharacterData</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#12">App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanInvalidWeapons.php.html#8">App\Console\AfterDeployment\CleanInvalidWeapons</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#10">App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CreateMonsterCache.php.html#9">App\Console\AfterDeployment\CreateMonsterCache</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MoveAlchemyAndGemsToBags.php.html#12">App\Console\AfterDeployment\MoveAlchemyAndGemsToBags</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#11">App\Console\AfterDeployment\RepairQuestFeatureRewards</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairStuckExplorationLogs.php.html#11">App\Console\AfterDeployment\RepairStuckExplorationLogs</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResumeInterruptedRewardProcessing.php.html#8">App\Console\AfterDeployment\ResumeInterruptedRewardProcessing</a></td><td class="text-right">3%</td></tr>
+       <tr><td><a href="AddHolyStacksToItems.php.html#10">App\Console\AfterDeployment\AddHolyStacksToItems</a></td><td class="text-right">3%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#20">App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty</a></td><td class="text-right">0.0%</td><td class="text-right">31</td><td class="text-right">992</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#49">App\Console\AfterDeployment\CleanDanglingCharacterData</a></td><td class="text-right">0.0%</td><td class="text-right">25</td><td class="text-right">650</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#11">App\Console\AfterDeployment\RepairQuestFeatureRewards</a></td><td class="text-right">0.0%</td><td class="text-right">14</td><td class="text-right">210</td></tr>
+       <tr><td><a href="AddHolyStacksToItems.php.html#10">App\Console\AfterDeployment\AddHolyStacksToItems</a></td><td class="text-right">3.8%</td><td class="text-right">14</td><td class="text-right">188</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#12">App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots</a></td><td class="text-right">0.0%</td><td class="text-right">11</td><td class="text-right">132</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#10">App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons</a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="MoveAlchemyAndGemsToBags.php.html#12">App\Console\AfterDeployment\MoveAlchemyAndGemsToBags</a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="AddBatchCraftingSetToPlayers.php.html#9">App\Console\AfterDeployment\AddBatchCraftingSetToPlayers</a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="RepairStuckExplorationLogs.php.html#11">App\Console\AfterDeployment\RepairStuckExplorationLogs</a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="ResumeInterruptedRewardProcessing.php.html#8">App\Console\AfterDeployment\ResumeInterruptedRewardProcessing</a></td><td class="text-right">3.0%</td><td class="text-right">6</td><td class="text-right">38</td></tr>
+       <tr><td><a href="BackfillCompletedPanelDismissals.php.html#9">App\Console\AfterDeployment\BackfillCompletedPanelDismissals</a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AddBatchCraftingSetToPlayers.php.html#15"><abbr title="App\Console\AfterDeployment\AddBatchCraftingSetToPlayers::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AddHolyStacksToItems.php.html#41"><abbr title="App\Console\AfterDeployment\AddHolyStacksToItems::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#46"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#62"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::updateNpcsForFactionLOyalty">updateNpcsForFactionLOyalty</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#112"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::createCraftingTasks">createCraftingTasks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#153"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::createBountyTasks">createBountyTasks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#212"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::hasTaskAlready">hasTaskAlready</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#228"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::getItemForCraftingTask">getItemForCraftingTask</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BackfillCompletedPanelDismissals.php.html#15"><abbr title="App\Console\AfterDeployment\BackfillCompletedPanelDismissals::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#55"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#74"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanCharacterOwnedTables">cleanCharacterOwnedTables</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#122"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanUserOwnedTables">cleanUserOwnedTables</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#129"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedChildData">cleanOrphanedChildData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#155"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::nullSuggestionAndBugsForMissingCharacters">nullSuggestionAndBugsForMissingCharacters</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#178"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedRows">cleanOrphanedRows</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#194"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedChildRows">cleanOrphanedChildRows</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#215"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedDelveLogsAndChildData">cleanOrphanedDelveLogsAndChildData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#245"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedRaidParticipations">cleanOrphanedRaidParticipations</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#18"><abbr title="App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#42"><abbr title="App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots::runDryRun">runDryRun</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#60"><abbr title="App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots::runApply">runApply</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanInvalidWeapons.php.html#31"><abbr title="App\Console\AfterDeployment\CleanInvalidWeapons::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanInvalidWeapons.php.html#39"><abbr title="App\Console\AfterDeployment\CleanInvalidWeapons::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#33"><abbr title="App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#41"><abbr title="App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#47"><abbr title="App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons::cleanMarketListings">cleanMarketListings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#74"><abbr title="App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons::cleanMarketHistory">cleanMarketHistory</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="CreateMonsterCache.php.html#30"><abbr title="App\Console\AfterDeployment\CreateMonsterCache::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MoveAlchemyAndGemsToBags.php.html#18"><abbr title="App\Console\AfterDeployment\MoveAlchemyAndGemsToBags::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MoveAlchemyAndGemsToBags.php.html#83"><abbr title="App\Console\AfterDeployment\MoveAlchemyAndGemsToBags::moveAlchemySlots">moveAlchemySlots</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#17"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#24"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::repairExtraInventorySets">repairExtraInventorySets</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#71"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::repairExtendedBackpack">repairExtendedBackpack</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#108"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::reportQuestLogBasedUnlocks">reportQuestLogBasedUnlocks</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="RepairStuckExplorationLogs.php.html#17"><abbr title="App\Console\AfterDeployment\RepairStuckExplorationLogs::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="ResumeInterruptedRewardProcessing.php.html#23"><abbr title="App\Console\AfterDeployment\ResumeInterruptedRewardProcessing::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AddHolyStacksToItems.php.html#41"><abbr title="App\Console\AfterDeployment\AddHolyStacksToItems::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">13</td><td class="text-right">182</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#228"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::getItemForCraftingTask">getItemForCraftingTask</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#153"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::createBountyTasks">createBountyTasks</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">8</td><td class="text-right">72</td></tr>
+       <tr><td><a href="AddBatchCraftingSetToPlayers.php.html#15"><abbr title="App\Console\AfterDeployment\AddBatchCraftingSetToPlayers::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#215"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedDelveLogsAndChildData">cleanOrphanedDelveLogsAndChildData</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#60"><abbr title="App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots::runApply">runApply</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="RepairStuckExplorationLogs.php.html#17"><abbr title="App\Console\AfterDeployment\RepairStuckExplorationLogs::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="MoveAlchemyAndGemsToBags.php.html#18"><abbr title="App\Console\AfterDeployment\MoveAlchemyAndGemsToBags::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#24"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::repairExtraInventorySets">repairExtraInventorySets</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#112"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::createCraftingTasks">createCraftingTasks</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="BackfillCompletedPanelDismissals.php.html#15"><abbr title="App\Console\AfterDeployment\BackfillCompletedPanelDismissals::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#71"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::repairExtendedBackpack">repairExtendedBackpack</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="ResumeInterruptedRewardProcessing.php.html#23"><abbr title="App\Console\AfterDeployment\ResumeInterruptedRewardProcessing::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#62"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::updateNpcsForFactionLOyalty">updateNpcsForFactionLOyalty</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#47"><abbr title="App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons::cleanMarketListings">cleanMarketListings</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#212"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::hasTaskAlready">hasTaskAlready</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#155"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::nullSuggestionAndBugsForMissingCharacters">nullSuggestionAndBugsForMissingCharacters</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#178"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedRows">cleanOrphanedRows</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#194"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedChildRows">cleanOrphanedChildRows</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#245"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanOrphanedRaidParticipations">cleanOrphanedRaidParticipations</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="CleanMarketPlaceOfInvalidWeapons.php.html#74"><abbr title="App\Console\AfterDeployment\CleanMarketPlaceOfInvalidWeapons::cleanMarketHistory">cleanMarketHistory</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="MoveAlchemyAndGemsToBags.php.html#83"><abbr title="App\Console\AfterDeployment\MoveAlchemyAndGemsToBags::moveAlchemySlots">moveAlchemySlots</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="AssignNewNpcsToFactionLoyalty.php.html#46"><abbr title="App\Console\AfterDeployment\AssignNewNpcsToFactionLoyalty::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#55"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="CleanDanglingCharacterData.php.html#74"><abbr title="App\Console\AfterDeployment\CleanDanglingCharacterData::cleanCharacterOwnedTables">cleanCharacterOwnedTables</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#18"><abbr title="App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="CleanDuplicateQuestInventorySlots.php.html#42"><abbr title="App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots::runDryRun">runDryRun</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="RepairQuestFeatureRewards.php.html#108"><abbr title="App\Console\AfterDeployment\RepairQuestFeatureRewards::reportQuestLogBasedUnlocks">reportQuestLogBasedUnlocks</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:18:39 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[0,7,"AddBatchCraftingSetToPlayers.php.html#9","App\\Console\\AfterDeployment\\AddBatchCraftingSetToPlayers","56"],[0,31,"AssignNewNpcsToFactionLoyalty.php.html#20","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty","992"],[0,5,"BackfillCompletedPanelDismissals.php.html#9","App\\Console\\AfterDeployment\\BackfillCompletedPanelDismissals","30"],[0,25,"CleanDanglingCharacterData.php.html#49","App\\Console\\AfterDeployment\\CleanDanglingCharacterData","650"],[0,11,"CleanDuplicateQuestInventorySlots.php.html#12","App\\Console\\AfterDeployment\\CleanDuplicateQuestInventorySlots","132"],[0,2,"CleanInvalidWeapons.php.html#8","App\\Console\\AfterDeployment\\CleanInvalidWeapons","6"],[0,9,"CleanMarketPlaceOfInvalidWeapons.php.html#10","App\\Console\\AfterDeployment\\CleanMarketPlaceOfInvalidWeapons","90"],[0,1,"CreateMonsterCache.php.html#9","App\\Console\\AfterDeployment\\CreateMonsterCache","2"],[0,9,"MoveAlchemyAndGemsToBags.php.html#12","App\\Console\\AfterDeployment\\MoveAlchemyAndGemsToBags","90"],[0,14,"RepairQuestFeatureRewards.php.html#11","App\\Console\\AfterDeployment\\RepairQuestFeatureRewards","210"],[0,7,"RepairStuckExplorationLogs.php.html#11","App\\Console\\AfterDeployment\\RepairStuckExplorationLogs","56"],[3.0303030303030303,6,"ResumeInterruptedRewardProcessing.php.html#8","App\\Console\\AfterDeployment\\ResumeInterruptedRewardProcessing","38.83"],[3.8461538461538463,14,"AddHolyStacksToItems.php.html#10","App\\Console\\AfterDeployment\\AddHolyStacksToItems","188.24"]]</script>
+  <script type="application/json" id="complexity_method">[[0,7,"AddBatchCraftingSetToPlayers.php.html#15","App\\Console\\AfterDeployment\\AddBatchCraftingSetToPlayers::handle","56"],[0,13,"AddHolyStacksToItems.php.html#41","App\\Console\\AfterDeployment\\AddHolyStacksToItems::handle","182"],[0,2,"AssignNewNpcsToFactionLoyalty.php.html#46","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty::handle","6"],[0,4,"AssignNewNpcsToFactionLoyalty.php.html#62","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty::updateNpcsForFactionLOyalty","20"],[0,5,"AssignNewNpcsToFactionLoyalty.php.html#112","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty::createCraftingTasks","30"],[0,8,"AssignNewNpcsToFactionLoyalty.php.html#153","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty::createBountyTasks","72"],[0,3,"AssignNewNpcsToFactionLoyalty.php.html#212","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty::hasTaskAlready","12"],[0,9,"AssignNewNpcsToFactionLoyalty.php.html#228","App\\Console\\AfterDeployment\\AssignNewNpcsToFactionLoyalty::getItemForCraftingTask","90"],[0,5,"BackfillCompletedPanelDismissals.php.html#15","App\\Console\\AfterDeployment\\BackfillCompletedPanelDismissals::handle","30"],[0,2,"CleanDanglingCharacterData.php.html#55","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::handle","6"],[0,2,"CleanDanglingCharacterData.php.html#74","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanCharacterOwnedTables","6"],[0,1,"CleanDanglingCharacterData.php.html#122","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanUserOwnedTables","2"],[0,1,"CleanDanglingCharacterData.php.html#129","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanOrphanedChildData","2"],[0,3,"CleanDanglingCharacterData.php.html#155","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::nullSuggestionAndBugsForMissingCharacters","12"],[0,3,"CleanDanglingCharacterData.php.html#178","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanOrphanedRows","12"],[0,3,"CleanDanglingCharacterData.php.html#194","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanOrphanedChildRows","12"],[0,7,"CleanDanglingCharacterData.php.html#215","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanOrphanedDelveLogsAndChildData","56"],[0,3,"CleanDanglingCharacterData.php.html#245","App\\Console\\AfterDeployment\\CleanDanglingCharacterData::cleanOrphanedRaidParticipations","12"],[0,2,"CleanDuplicateQuestInventorySlots.php.html#18","App\\Console\\AfterDeployment\\CleanDuplicateQuestInventorySlots::handle","6"],[0,2,"CleanDuplicateQuestInventorySlots.php.html#42","App\\Console\\AfterDeployment\\CleanDuplicateQuestInventorySlots::runDryRun","6"],[0,7,"CleanDuplicateQuestInventorySlots.php.html#60","App\\Console\\AfterDeployment\\CleanDuplicateQuestInventorySlots::runApply","56"],[0,1,"CleanInvalidWeapons.php.html#31","App\\Console\\AfterDeployment\\CleanInvalidWeapons::__construct","2"],[0,1,"CleanInvalidWeapons.php.html#39","App\\Console\\AfterDeployment\\CleanInvalidWeapons::handle","2"],[0,1,"CleanMarketPlaceOfInvalidWeapons.php.html#33","App\\Console\\AfterDeployment\\CleanMarketPlaceOfInvalidWeapons::__construct","2"],[0,1,"CleanMarketPlaceOfInvalidWeapons.php.html#41","App\\Console\\AfterDeployment\\CleanMarketPlaceOfInvalidWeapons::handle","2"],[0,4,"CleanMarketPlaceOfInvalidWeapons.php.html#47","App\\Console\\AfterDeployment\\CleanMarketPlaceOfInvalidWeapons::cleanMarketListings","20"],[0,3,"CleanMarketPlaceOfInvalidWeapons.php.html#74","App\\Console\\AfterDeployment\\CleanMarketPlaceOfInvalidWeapons::cleanMarketHistory","12"],[0,1,"CreateMonsterCache.php.html#30","App\\Console\\AfterDeployment\\CreateMonsterCache::handle","2"],[0,6,"MoveAlchemyAndGemsToBags.php.html#18","App\\Console\\AfterDeployment\\MoveAlchemyAndGemsToBags::handle","42"],[0,3,"MoveAlchemyAndGemsToBags.php.html#83","App\\Console\\AfterDeployment\\MoveAlchemyAndGemsToBags::moveAlchemySlots","12"],[0,1,"RepairQuestFeatureRewards.php.html#17","App\\Console\\AfterDeployment\\RepairQuestFeatureRewards::handle","2"],[0,6,"RepairQuestFeatureRewards.php.html#24","App\\Console\\AfterDeployment\\RepairQuestFeatureRewards::repairExtraInventorySets","42"],[0,5,"RepairQuestFeatureRewards.php.html#71","App\\Console\\AfterDeployment\\RepairQuestFeatureRewards::repairExtendedBackpack","30"],[0,2,"RepairQuestFeatureRewards.php.html#108","App\\Console\\AfterDeployment\\RepairQuestFeatureRewards::reportQuestLogBasedUnlocks","6"],[0,7,"RepairStuckExplorationLogs.php.html#17","App\\Console\\AfterDeployment\\RepairStuckExplorationLogs::handle","56"],[0,5,"ResumeInterruptedRewardProcessing.php.html#23","App\\Console\\AfterDeployment\\ResumeInterruptedRewardProcessing::handle","30"],[100,1,"AddHolyStacksToItems.php.html#31","App\\Console\\AfterDeployment\\AddHolyStacksToItems::__construct","1"],[100,1,"ResumeInterruptedRewardProcessing.php.html#17","App\\Console\\AfterDeployment\\ResumeInterruptedRewardProcessing::__construct","1"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [11,2,0,0,0,0,0,0,0,0,0,0])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [36,0,0,0,0,0,0,0,0,0,0,2])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

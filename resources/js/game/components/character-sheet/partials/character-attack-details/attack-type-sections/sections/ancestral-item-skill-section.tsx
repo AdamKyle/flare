@@ -11,7 +11,7 @@ const AncestralItemSkillSection = ({
 
   const listElements = ancestral_item_skill_data.map((ancestralSkillInfo) => {
     return (
-      <li>
+      <li key={ancestralSkillInfo.name}>
         <strong>{ancestralSkillInfo.name}</strong>{' '}
         <span className="text-green-700 dark:text-green-500">
           +{(ancestralSkillInfo.increase_amount * 100).toFixed(2)}%

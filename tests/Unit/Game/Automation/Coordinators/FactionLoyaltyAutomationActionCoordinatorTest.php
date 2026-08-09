@@ -72,12 +72,13 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
     {
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
 
-        foreach ($fameTasks as $index => $fameTask) {
-            $fameTasks[$index]['current_amount'] = $fameTask['required_amount'];
-        }
+        $completedFameTasks = array_map(
+            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
+            $fameTasks
+        );
 
         $this->factionLoyaltyNpc->factionLoyaltyNpcTasks()->update([
-            'fame_tasks' => $fameTasks,
+            'fame_tasks' => $completedFameTasks,
         ]);
 
         $result = $this->coordinator
@@ -289,5 +290,31 @@ class FactionLoyaltyAutomationActionCoordinatorTest extends TestCase
             ->resolveAction();
 
         $this->assertEquals(FactionLoyaltyCoordinatorAction::FIGHT->value, $result['type']);
+    }
+
+    public function test_resolve_action_returns_null_when_incomplete_tasks_are_neither_crafting_nor_bounty(): void
+    {
+        $this->factionLoyaltyNpc->factionLoyaltyNpcTasks()->update([
+            'fame_tasks' => [
+                ['type' => 'unknown', 'current_amount' => 0, 'required_amount' => 1],
+            ],
+        ]);
+
+        $result = $this->coordinator
+            ->setUp($this->factionLoyaltyAutomation->refresh(), $this->factionLoyaltyNpc->refresh())
+            ->resolveAction();
+
+        $this->assertNull($result);
+    }
+
+    public function test_resolve_action_defaults_to_crafting_when_last_automation_action_is_unrecognized(): void
+    {
+        $this->factionLoyaltyAutomation->update(['last_automation_action' => 'not-a-real-action']);
+
+        $result = $this->coordinator
+            ->setUp($this->factionLoyaltyAutomation->refresh(), $this->factionLoyaltyNpc->refresh())
+            ->resolveAction();
+
+        $this->assertEquals(FactionLoyaltyCoordinatorAction::CRAFT->value, $result['type']);
     }
 }

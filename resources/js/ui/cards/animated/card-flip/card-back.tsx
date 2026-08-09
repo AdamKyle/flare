@@ -17,7 +17,10 @@ const CardBack = ({ children, link_title, on_click_link }: CardBackProps) => {
     >
       <div className="px-1">{children}</div>
 
-      <div className="mt-3 flex justify-center pb-1">
+      <div
+        className="pointer-events-auto mt-3 flex justify-center pb-1"
+        onClick={(event) => event.stopPropagation()}
+      >
         <LinkButton
           label={link_title}
           variant={ButtonVariant.PRIMARY}

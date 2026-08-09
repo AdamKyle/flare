@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Providers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Providers</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="HorizonServiceProvider.php.html#9">App\Providers\HorizonServiceProvider</a></td><td class="text-right">50%</td></tr>
+       <tr><td><a href="AuthServiceProvider.php.html#8">App\Providers\AuthServiceProvider</a></td><td class="text-right">75%</td></tr>
+       <tr><td><a href="AppServiceProvider.php.html#36">App\Providers\AppServiceProvider</a></td><td class="text-right">84%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AppServiceProvider.php.html#36">App\Providers\AppServiceProvider</a></td><td class="text-right">84.6%</td><td class="text-right">3</td><td class="text-right">3</td></tr>
+       <tr><td><a href="AuthServiceProvider.php.html#8">App\Providers\AuthServiceProvider</a></td><td class="text-right">75.0%</td><td class="text-right">2</td><td class="text-right">2</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AppServiceProvider.php.html#82"><abbr title="App\Providers\AppServiceProvider::boot">boot</abbr></a></td><td class="text-right">40%</td></tr>
+       <tr><td><a href="HorizonServiceProvider.php.html#34"><abbr title="App\Providers\HorizonServiceProvider::gate">gate</abbr></a></td><td class="text-right">40%</td></tr>
+       <tr><td><a href="RouteServiceProvider.php.html#37"><abbr title="App\Providers\RouteServiceProvider::configureRateLimiting">configureRateLimiting</abbr></a></td><td class="text-right">66%</td></tr>
+       <tr><td><a href="AuthServiceProvider.php.html#24"><abbr title="App\Providers\AuthServiceProvider::boot">boot</abbr></a></td><td class="text-right">75%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AppServiceProvider.php.html#82"><abbr title="App\Providers\AppServiceProvider::boot">boot</abbr></a></td><td class="text-right">40.0%</td><td class="text-right">2</td><td class="text-right">2</td></tr>
+       <tr><td><a href="AuthServiceProvider.php.html#24"><abbr title="App\Providers\AuthServiceProvider::boot">boot</abbr></a></td><td class="text-right">75.0%</td><td class="text-right">2</td><td class="text-right">2</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:18:39 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[50,2,"HorizonServiceProvider.php.html#9","App\\Providers\\HorizonServiceProvider","2.50"],[75,2,"AuthServiceProvider.php.html#8","App\\Providers\\AuthServiceProvider","2.06"],[84.61538461538461,3,"AppServiceProvider.php.html#36","App\\Providers\\AppServiceProvider","3.03"],[97.42268041237114,40,"RouteServiceProvider.php.html#11","App\\Providers\\RouteServiceProvider","40"],[100,1,"BroadcastServiceProvider.php.html#8","App\\Providers\\BroadcastServiceProvider","1"],[100,1,"EventServiceProvider.php.html#10","App\\Providers\\EventServiceProvider","1"]]</script>
+  <script type="application/json" id="complexity_method">[[40,2,"AppServiceProvider.php.html#82","App\\Providers\\AppServiceProvider::boot","2.86"],[40,1,"HorizonServiceProvider.php.html#34","App\\Providers\\HorizonServiceProvider::gate","1.22"],[66.66666666666666,1,"RouteServiceProvider.php.html#37","App\\Providers\\RouteServiceProvider::configureRateLimiting","1.04"],[75,2,"AuthServiceProvider.php.html#24","App\\Providers\\AuthServiceProvider::boot","2.06"],[100,1,"AppServiceProvider.php.html#41","App\\Providers\\AppServiceProvider::register","1"],[100,1,"BroadcastServiceProvider.php.html#15","App\\Providers\\BroadcastServiceProvider::boot","1"],[100,1,"EventServiceProvider.php.html#28","App\\Providers\\EventServiceProvider::boot","1"],[100,1,"HorizonServiceProvider.php.html#16","App\\Providers\\HorizonServiceProvider::boot","1"],[100,1,"RouteServiceProvider.php.html#27","App\\Providers\\RouteServiceProvider::boot","1"],[100,1,"RouteServiceProvider.php.html#71","App\\Providers\\RouteServiceProvider::map","1"],[100,1,"RouteServiceProvider.php.html#129","App\\Providers\\RouteServiceProvider::mapWebRoutes","1"],[100,1,"RouteServiceProvider.php.html#143","App\\Providers\\RouteServiceProvider::mapGemRoutes","1"],[100,1,"RouteServiceProvider.php.html#151","App\\Providers\\RouteServiceProvider::mapApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#159","App\\Providers\\RouteServiceProvider::mapMonstersApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#167","App\\Providers\\RouteServiceProvider::mapCharacterSheetRoutes","1"],[100,1,"RouteServiceProvider.php.html#175","App\\Providers\\RouteServiceProvider::mapCharacterInventoryRoutes","1"],[100,1,"RouteServiceProvider.php.html#183","App\\Providers\\RouteServiceProvider::mapAutomationApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#191","App\\Providers\\RouteServiceProvider::mapBatchCraftingApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#199","App\\Providers\\RouteServiceProvider::mapGameKingdomApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#207","App\\Providers\\RouteServiceProvider::mapGameSkillsApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#215","App\\Providers\\RouteServiceProvider::mapShopApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#223","App\\Providers\\RouteServiceProvider::mapAdminRoutes","1"],[100,1,"RouteServiceProvider.php.html#230","App\\Providers\\RouteServiceProvider::mapAdminApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#238","App\\Providers\\RouteServiceProvider::mapGameCoreRoutes","1"],[100,1,"RouteServiceProvider.php.html#245","App\\Providers\\RouteServiceProvider::mapGameMarketRoutes","1"],[100,1,"RouteServiceProvider.php.html#252","App\\Providers\\RouteServiceProvider::mapQuestRoutes","1"],[100,1,"RouteServiceProvider.php.html#259","App\\Providers\\RouteServiceProvider::mapGuideQuestsRoutes","1"],[100,1,"RouteServiceProvider.php.html#266","App\\Providers\\RouteServiceProvider::mapCharacterPassiveSkillsRoutes","1"],[100,1,"RouteServiceProvider.php.html#273","App\\Providers\\RouteServiceProvider::mapGamblingRoutes","1"],[100,1,"RouteServiceProvider.php.html#281","App\\Providers\\RouteServiceProvider::mapGameCoreApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#289","App\\Providers\\RouteServiceProvider::mapGameMessageApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#297","App\\Providers\\RouteServiceProvider::mapGameBattleApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#305","App\\Providers\\RouteServiceProvider::mapGameMapApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#313","App\\Providers\\RouteServiceProvider::mapGameMarketApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#321","App\\Providers\\RouteServiceProvider::mapQuestApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#328","App\\Providers\\RouteServiceProvider::mapGamePassiveSkillApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#336","App\\Providers\\RouteServiceProvider::mapGameGuideQuestsApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#344","App\\Providers\\RouteServiceProvider::mapSpecialtyShopApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#352","App\\Providers\\RouteServiceProvider::mapReincarnateApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#360","App\\Providers\\RouteServiceProvider::mapClassRanksApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#368","App\\Providers\\RouteServiceProvider::mapSeerActions","1"],[100,1,"RouteServiceProvider.php.html#376","App\\Providers\\RouteServiceProvider::mapQueenOfHeartsActions","1"],[100,1,"RouteServiceProvider.php.html#384","App\\Providers\\RouteServiceProvider::mapLabyrinthOracleRoutes","1"],[100,1,"RouteServiceProvider.php.html#392","App\\Providers\\RouteServiceProvider::mapWorkBenchActions","1"],[100,1,"RouteServiceProvider.php.html#400","App\\Providers\\RouteServiceProvider::mapEvents","1"],[100,1,"RouteServiceProvider.php.html#408","App\\Providers\\RouteServiceProvider::mapFactionLoyaltyApiRoutes","1"],[100,1,"RouteServiceProvider.php.html#416","App\\Providers\\RouteServiceProvider::mapTopsApiRoutes","1"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [0,0,0,0,0,0,1,0,1,1,1,2])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [0,0,0,0,0,2,0,1,1,0,0,43])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

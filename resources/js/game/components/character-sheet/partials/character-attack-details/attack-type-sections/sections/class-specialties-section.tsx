@@ -11,7 +11,7 @@ const ClassSpecialtiesSection = ({
 
   const listElements = class_specialties.map((classSpecialty) => {
     return (
-      <li>
+      <li key={classSpecialty.name}>
         <strong>{classSpecialty.name}</strong>{' '}
         <span className="text-green-700 dark:text-green-500">
           +{(classSpecialty.amount * 100).toFixed(2)}%

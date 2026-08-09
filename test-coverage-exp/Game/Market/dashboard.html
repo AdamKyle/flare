@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Game/Market</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Game</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Market</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#14">App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#26">App\Game\Market\Controllers\Api\MarketController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#22">App\Game\Market\Controllers\MarketController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Middleware/CanCharacterAccessMarket.php.html#9">App\Game\Market\Middleware\CanCharacterAccessMarket</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ChangeItemTypeRequest.php.html#7">App\Game\Market\Requests\ChangeItemTypeRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/HistoryRequest.php.html#7">App\Game\Market\Requests\HistoryRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ItemDetailsRequest.php.html#7">App\Game\Market\Requests\ItemDetailsRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ListPriceRequest.php.html#7">App\Game\Market\Requests\ListPriceRequest</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#17">App\Game\Market\Services\MarketBoard</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#9">App\Game\Market\Services\MarketSaleHistory</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Transformers/MarketItemsTransformer.php.html#9">App\Game\Market\Transformers\MarketItemsTransformer</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Providers/ServiceProvider.php.html#11">App\Game\Market\Providers\ServiceProvider</a></td><td class="text-right">75%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/MarketController.php.html#22">App\Game\Market\Controllers\MarketController</a></td><td class="text-right">0.0%</td><td class="text-right">37</td><td class="text-right">1406</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#14">App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder</a></td><td class="text-right">0.0%</td><td class="text-right">23</td><td class="text-right">552</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#26">App\Game\Market\Controllers\Api\MarketController</a></td><td class="text-right">0.0%</td><td class="text-right">11</td><td class="text-right">132</td></tr>
+       <tr><td><a href="Middleware/CanCharacterAccessMarket.php.html#9">App\Game\Market\Middleware\CanCharacterAccessMarket</a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#17">App\Game\Market\Services\MarketBoard</a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#9">App\Game\Market\Services\MarketSaleHistory</a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#27"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::setup">setup</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#46"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::baseQuery">baseQuery</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#76"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::clearFilters">clearFilters</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#83"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::addFilter">addFilter</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#97"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::fetchDataSet">fetchDataSet</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#119"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::applyFilters">applyFilters</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#152"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::formatAffixName">formatAffixName</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#30"><abbr title="App\Game\Market\Controllers\Api\MarketController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#37"><abbr title="App\Game\Market\Controllers\Api\MarketController::marketItems">marketItems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#53"><abbr title="App\Game\Market\Controllers\Api\MarketController::sellItem">sellItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#106"><abbr title="App\Game\Market\Controllers\Api\MarketController::fetchMarketHistoryForItem">fetchMarketHistoryForItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#34"><abbr title="App\Game\Market\Controllers\MarketController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#46"><abbr title="App\Game\Market\Controllers\MarketController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#53"><abbr title="App\Game\Market\Controllers\MarketController::marketCompare">marketCompare</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#67"><abbr title="App\Game\Market\Controllers\MarketController::viewItemComparison">viewItemComparison</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#83"><abbr title="App\Game\Market\Controllers\MarketController::buyAndReplace">buyAndReplace</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#139"><abbr title="App\Game\Market\Controllers\MarketController::buy">buy</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#188"><abbr title="App\Game\Market\Controllers\MarketController::currentListings">currentListings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#204"><abbr title="App\Game\Market\Controllers\MarketController::editCurrentListings">editCurrentListings</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#224"><abbr title="App\Game\Market\Controllers\MarketController::updateCurrentListing">updateCurrentListing</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#256"><abbr title="App\Game\Market\Controllers\MarketController::delist">delist</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Middleware/CanCharacterAccessMarket.php.html#18"><abbr title="App\Game\Market\Middleware\CanCharacterAccessMarket::handle">handle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ChangeItemTypeRequest.php.html#14"><abbr title="App\Game\Market\Requests\ChangeItemTypeRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ChangeItemTypeRequest.php.html#24"><abbr title="App\Game\Market\Requests\ChangeItemTypeRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/HistoryRequest.php.html#14"><abbr title="App\Game\Market\Requests\HistoryRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/HistoryRequest.php.html#24"><abbr title="App\Game\Market\Requests\HistoryRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ItemDetailsRequest.php.html#14"><abbr title="App\Game\Market\Requests\ItemDetailsRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ItemDetailsRequest.php.html#24"><abbr title="App\Game\Market\Requests\ItemDetailsRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ItemDetailsRequest.php.html#31"><abbr title="App\Game\Market\Requests\ItemDetailsRequest::messages">messages</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ListPriceRequest.php.html#14"><abbr title="App\Game\Market\Requests\ListPriceRequest::authorize">authorize</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Requests/ListPriceRequest.php.html#24"><abbr title="App\Game\Market\Requests\ListPriceRequest::rules">rules</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#21"><abbr title="App\Game\Market\Services\MarketBoard::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#29"><abbr title="App\Game\Market\Services\MarketBoard::buyAndReplaceItem">buyAndReplaceItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#51"><abbr title="App\Game\Market\Services\MarketBoard::buyItem">buyItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#81"><abbr title="App\Game\Market\Services\MarketBoard::giveGoldToSeller">giveGoldToSeller</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#105"><abbr title="App\Game\Market\Services\MarketBoard::updateCharacterAttackDataCache">updateCharacterAttackDataCache</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#14"><abbr title="App\Game\Market\Services\MarketSaleHistory::getSaleInformationForItem">getSaleInformationForItem</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#29"><abbr title="App\Game\Market\Services\MarketSaleHistory::getHistoricalListingData">getHistoricalListingData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#44"><abbr title="App\Game\Market\Services\MarketSaleHistory::createLabelsFromItemIds">createLabelsFromItemIds</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#60"><abbr title="App\Game\Market\Services\MarketSaleHistory::formatLabels">formatLabels</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Transformers/MarketItemsTransformer.php.html#16"><abbr title="App\Game\Market\Transformers\MarketItemsTransformer::transform">transform</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Providers/ServiceProvider.php.html#18"><abbr title="App\Game\Market\Providers\ServiceProvider::register">register</abbr></a></td><td class="text-right">66%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="Controllers/MarketController.php.html#83"><abbr title="App\Game\Market\Controllers\MarketController::buyAndReplace">buyAndReplace</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">10</td><td class="text-right">110</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#139"><abbr title="App\Game\Market\Controllers\MarketController::buy">buy</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#119"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::applyFilters">applyFilters</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#152"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::formatAffixName">formatAffixName</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#53"><abbr title="App\Game\Market\Controllers\Api\MarketController::sellItem">sellItem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Middleware/CanCharacterAccessMarket.php.html#18"><abbr title="App\Game\Market\Middleware\CanCharacterAccessMarket::handle">handle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#224"><abbr title="App\Game\Market\Controllers\MarketController::updateCurrentListing">updateCurrentListing</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#46"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::baseQuery">baseQuery</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Builders/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#97"><abbr title="App\Game\Market\Builders\MarketHistoryDailyPriceSeriesQueryBuilder::fetchDataSet">fetchDataSet</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#204"><abbr title="App\Game\Market\Controllers\MarketController::editCurrentListings">editCurrentListings</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#256"><abbr title="App\Game\Market\Controllers\MarketController::delist">delist</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Controllers/Api/MarketController.php.html#106"><abbr title="App\Game\Market\Controllers\Api\MarketController::fetchMarketHistoryForItem">fetchMarketHistoryForItem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#53"><abbr title="App\Game\Market\Controllers\MarketController::marketCompare">marketCompare</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#67"><abbr title="App\Game\Market\Controllers\MarketController::viewItemComparison">viewItemComparison</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Controllers/MarketController.php.html#188"><abbr title="App\Game\Market\Controllers\MarketController::currentListings">currentListings</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#51"><abbr title="App\Game\Market\Services\MarketBoard::buyItem">buyItem</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/MarketBoard.php.html#81"><abbr title="App\Game\Market\Services\MarketBoard::giveGoldToSeller">giveGoldToSeller</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#44"><abbr title="App\Game\Market\Services\MarketSaleHistory::createLabelsFromItemIds">createLabelsFromItemIds</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="Services/MarketSaleHistory.php.html#60"><abbr title="App\Game\Market\Services\MarketSaleHistory::formatLabels">formatLabels</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:57:50 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[0,23,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#14","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder","552"],[0,11,"Controllers\/Api\/MarketController.php.html#26","App\\Game\\Market\\Controllers\\Api\\MarketController","132"],[0,37,"Controllers\/MarketController.php.html#22","App\\Game\\Market\\Controllers\\MarketController","1406"],[0,7,"Middleware\/CanCharacterAccessMarket.php.html#9","App\\Game\\Market\\Middleware\\CanCharacterAccessMarket","56"],[0,2,"Requests\/ChangeItemTypeRequest.php.html#7","App\\Game\\Market\\Requests\\ChangeItemTypeRequest","6"],[0,2,"Requests\/HistoryRequest.php.html#7","App\\Game\\Market\\Requests\\HistoryRequest","6"],[0,3,"Requests\/ItemDetailsRequest.php.html#7","App\\Game\\Market\\Requests\\ItemDetailsRequest","12"],[0,2,"Requests\/ListPriceRequest.php.html#7","App\\Game\\Market\\Requests\\ListPriceRequest","6"],[0,7,"Services\/MarketBoard.php.html#17","App\\Game\\Market\\Services\\MarketBoard","56"],[0,6,"Services\/MarketSaleHistory.php.html#9","App\\Game\\Market\\Services\\MarketSaleHistory","42"],[0,1,"Transformers\/MarketItemsTransformer.php.html#9","App\\Game\\Market\\Transformers\\MarketItemsTransformer","2"],[75,2,"Providers\/ServiceProvider.php.html#11","App\\Game\\Market\\Providers\\ServiceProvider","2.06"],[100,0,"Enums\/MarketHistorySecondaryFilter.php.html#5","App\\Game\\Market\\Enums\\MarketHistorySecondaryFilter","0"]]</script>
+  <script type="application/json" id="complexity_method">[[0,1,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#27","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::setup","2"],[0,3,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#46","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::baseQuery","12"],[0,1,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#76","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::clearFilters","2"],[0,1,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#83","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::addFilter","2"],[0,3,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#97","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::fetchDataSet","12"],[0,7,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#119","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::applyFilters","56"],[0,7,"Builders\/MarketHistoryDailyPriceSeriesQueryBuilder.php.html#152","App\\Game\\Market\\Builders\\MarketHistoryDailyPriceSeriesQueryBuilder::formatAffixName","56"],[0,1,"Controllers\/Api\/MarketController.php.html#30","App\\Game\\Market\\Controllers\\Api\\MarketController::__construct","2"],[0,1,"Controllers\/Api\/MarketController.php.html#37","App\\Game\\Market\\Controllers\\Api\\MarketController::marketItems","2"],[0,7,"Controllers\/Api\/MarketController.php.html#53","App\\Game\\Market\\Controllers\\Api\\MarketController::sellItem","56"],[0,2,"Controllers\/Api\/MarketController.php.html#106","App\\Game\\Market\\Controllers\\Api\\MarketController::fetchMarketHistoryForItem","6"],[0,1,"Controllers\/MarketController.php.html#34","App\\Game\\Market\\Controllers\\MarketController::__construct","2"],[0,1,"Controllers\/MarketController.php.html#46","App\\Game\\Market\\Controllers\\MarketController::index","2"],[0,2,"Controllers\/MarketController.php.html#53","App\\Game\\Market\\Controllers\\MarketController::marketCompare","6"],[0,2,"Controllers\/MarketController.php.html#67","App\\Game\\Market\\Controllers\\MarketController::viewItemComparison","6"],[0,10,"Controllers\/MarketController.php.html#83","App\\Game\\Market\\Controllers\\MarketController::buyAndReplace","110"],[0,9,"Controllers\/MarketController.php.html#139","App\\Game\\Market\\Controllers\\MarketController::buy","90"],[0,2,"Controllers\/MarketController.php.html#188","App\\Game\\Market\\Controllers\\MarketController::currentListings","6"],[0,3,"Controllers\/MarketController.php.html#204","App\\Game\\Market\\Controllers\\MarketController::editCurrentListings","12"],[0,4,"Controllers\/MarketController.php.html#224","App\\Game\\Market\\Controllers\\MarketController::updateCurrentListing","20"],[0,3,"Controllers\/MarketController.php.html#256","App\\Game\\Market\\Controllers\\MarketController::delist","12"],[0,7,"Middleware\/CanCharacterAccessMarket.php.html#18","App\\Game\\Market\\Middleware\\CanCharacterAccessMarket::handle","56"],[0,1,"Requests\/ChangeItemTypeRequest.php.html#14","App\\Game\\Market\\Requests\\ChangeItemTypeRequest::authorize","2"],[0,1,"Requests\/ChangeItemTypeRequest.php.html#24","App\\Game\\Market\\Requests\\ChangeItemTypeRequest::rules","2"],[0,1,"Requests\/HistoryRequest.php.html#14","App\\Game\\Market\\Requests\\HistoryRequest::authorize","2"],[0,1,"Requests\/HistoryRequest.php.html#24","App\\Game\\Market\\Requests\\HistoryRequest::rules","2"],[0,1,"Requests\/ItemDetailsRequest.php.html#14","App\\Game\\Market\\Requests\\ItemDetailsRequest::authorize","2"],[0,1,"Requests\/ItemDetailsRequest.php.html#24","App\\Game\\Market\\Requests\\ItemDetailsRequest::rules","2"],[0,1,"Requests\/ItemDetailsRequest.php.html#31","App\\Game\\Market\\Requests\\ItemDetailsRequest::messages","2"],[0,1,"Requests\/ListPriceRequest.php.html#14","App\\Game\\Market\\Requests\\ListPriceRequest::authorize","2"],[0,1,"Requests\/ListPriceRequest.php.html#24","App\\Game\\Market\\Requests\\ListPriceRequest::rules","2"],[0,1,"Services\/MarketBoard.php.html#21","App\\Game\\Market\\Services\\MarketBoard::__construct","2"],[0,1,"Services\/MarketBoard.php.html#29","App\\Game\\Market\\Services\\MarketBoard::buyAndReplaceItem","2"],[0,2,"Services\/MarketBoard.php.html#51","App\\Game\\Market\\Services\\MarketBoard::buyItem","6"],[0,2,"Services\/MarketBoard.php.html#81","App\\Game\\Market\\Services\\MarketBoard::giveGoldToSeller","6"],[0,1,"Services\/MarketBoard.php.html#105","App\\Game\\Market\\Services\\MarketBoard::updateCharacterAttackDataCache","2"],[0,1,"Services\/MarketSaleHistory.php.html#14","App\\Game\\Market\\Services\\MarketSaleHistory::getSaleInformationForItem","2"],[0,1,"Services\/MarketSaleHistory.php.html#29","App\\Game\\Market\\Services\\MarketSaleHistory::getHistoricalListingData","2"],[0,2,"Services\/MarketSaleHistory.php.html#44","App\\Game\\Market\\Services\\MarketSaleHistory::createLabelsFromItemIds","6"],[0,2,"Services\/MarketSaleHistory.php.html#60","App\\Game\\Market\\Services\\MarketSaleHistory::formatLabels","6"],[0,1,"Transformers\/MarketItemsTransformer.php.html#16","App\\Game\\Market\\Transformers\\MarketItemsTransformer::transform","2"],[66.66666666666666,1,"Providers\/ServiceProvider.php.html#18","App\\Game\\Market\\Providers\\ServiceProvider::register","1.04"],[100,1,"Providers\/ServiceProvider.php.html#34","App\\Game\\Market\\Providers\\ServiceProvider::boot","1"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [11,0,0,0,0,0,0,0,1,0,0,1])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [41,0,0,0,0,0,0,1,0,0,0,1])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

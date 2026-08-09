@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Admin/Controllers/Api</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="../../index.html">Admin</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Controllers</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Api</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AdminLogsDashboardController.php.html#16">App\Admin\Controllers\Api\AdminLogsDashboardController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminMessagesController.php.html#10">App\Admin\Controllers\Api\AdminMessagesController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#19">App\Admin\Controllers\Api\BattleRewardQueueController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#14">App\Admin\Controllers\Api\EventScheduleController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GuideQuests/GuideQuestsController.php.html#24">App\Admin\Controllers\Api\GuideQuests\GuideQuestsController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#13">App\Admin\Controllers\Api\InformationController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MapManagerController.php.html#15">App\Admin\Controllers\Api\MapManagerController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#26">App\Admin\Controllers\Api\MonitoringController</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#18">App\Admin\Controllers\Api\SiteAccessStatisticsController</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#18">App\Admin\Controllers\Api\SiteAccessStatisticsController</a></td><td class="text-right">0.0%</td><td class="text-right">23</td><td class="text-right">552</td></tr>
+       <tr><td><a href="InformationController.php.html#13">App\Admin\Controllers\Api\InformationController</a></td><td class="text-right">0.0%</td><td class="text-right">10</td><td class="text-right">110</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#16">App\Admin\Controllers\Api\AdminLogsDashboardController</a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="MapManagerController.php.html#15">App\Admin\Controllers\Api\MapManagerController</a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="GuideQuests/GuideQuestsController.php.html#24">App\Admin\Controllers\Api\GuideQuests\GuideQuestsController</a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="AdminLogsDashboardController.php.html#18"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#27"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::files">files</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#35"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::entries">entries</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#57"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::entryDetail">entryDetail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#71"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::poll">poll</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#85"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::bugs">bugs</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#93"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::bugChart">bugChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminMessagesController.php.html#20"><abbr title="App\Admin\Controllers\Api\AdminMessagesController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="AdminMessagesController.php.html#25"><abbr title="App\Admin\Controllers\Api\AdminMessagesController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#21"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#34"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::summary">summary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#43"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::charts">charts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#52"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::characters">characters</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#62"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::characterDetail">characterDetail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#78"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::requests">requests</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#88"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::statusBreakdown">statusBreakdown</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#95"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::stale">stale</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#105"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::repairStale">repairStale</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#114"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::transformChartRows">transformChartRows</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BattleRewardQueueController.php.html#119"><abbr title="App\Admin\Controllers\Api\BattleRewardQueueController::transformStatusRows">transformStatusRows</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#18"><abbr title="App\Admin\Controllers\Api\EventScheduleController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#23"><abbr title="App\Admin\Controllers\Api\EventScheduleController::index">index</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#34"><abbr title="App\Admin\Controllers\Api\EventScheduleController::createEvent">createEvent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#44"><abbr title="App\Admin\Controllers\Api\EventScheduleController::updateEvent">updateEvent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#54"><abbr title="App\Admin\Controllers\Api\EventScheduleController::deleteEvent">deleteEvent</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="EventScheduleController.php.html#64"><abbr title="App\Admin\Controllers\Api\EventScheduleController::createMultipleEvents">createMultipleEvents</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GuideQuests/GuideQuestsController.php.html#26"><abbr title="App\Admin\Controllers\Api\GuideQuests\GuideQuestsController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GuideQuests/GuideQuestsController.php.html#33"><abbr title="App\Admin\Controllers\Api\GuideQuests\GuideQuestsController::guideQuest">guideQuest</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="GuideQuests/GuideQuestsController.php.html#63"><abbr title="App\Admin\Controllers\Api\GuideQuests\GuideQuestsController::storeFormResponse">storeFormResponse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#17"><abbr title="App\Admin\Controllers\Api\InformationController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#22"><abbr title="App\Admin\Controllers\Api\InformationController::getPage">getPage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#32"><abbr title="App\Admin\Controllers\Api\InformationController::storePage">storePage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#42"><abbr title="App\Admin\Controllers\Api\InformationController::updatePage">updatePage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#63"><abbr title="App\Admin\Controllers\Api\InformationController::addSection">addSection</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#83"><abbr title="App\Admin\Controllers\Api\InformationController::deleteSection">deleteSection</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="InformationController.php.html#94"><abbr title="App\Admin\Controllers\Api\InformationController::deletePage">deletePage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MapManagerController.php.html#17"><abbr title="App\Admin\Controllers\Api\MapManagerController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MapManagerController.php.html#19"><abbr title="App\Admin\Controllers\Api\MapManagerController::getMapData">getMapData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MapManagerController.php.html#33"><abbr title="App\Admin\Controllers\Api\MapManagerController::moveLocation">moveLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#28"><abbr title="App\Admin\Controllers\Api\MonitoringController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#48"><abbr title="App\Admin\Controllers\Api\MonitoringController::explorationActive">explorationActive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#56"><abbr title="App\Admin\Controllers\Api\MonitoringController::explorationLogs">explorationLogs</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#66"><abbr title="App\Admin\Controllers\Api\MonitoringController::explorationSummary">explorationSummary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#71"><abbr title="App\Admin\Controllers\Api\MonitoringController::explorationChart">explorationChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#79"><abbr title="App\Admin\Controllers\Api\MonitoringController::factionLoyaltyActive">factionLoyaltyActive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#87"><abbr title="App\Admin\Controllers\Api\MonitoringController::factionLoyaltyRuns">factionLoyaltyRuns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#97"><abbr title="App\Admin\Controllers\Api\MonitoringController::factionLoyaltySummary">factionLoyaltySummary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#102"><abbr title="App\Admin\Controllers\Api\MonitoringController::factionLoyaltyChart">factionLoyaltyChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#110"><abbr title="App\Admin\Controllers\Api\MonitoringController::delveActive">delveActive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#118"><abbr title="App\Admin\Controllers\Api\MonitoringController::delveRuns">delveRuns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#128"><abbr title="App\Admin\Controllers\Api\MonitoringController::delveSummary">delveSummary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#133"><abbr title="App\Admin\Controllers\Api\MonitoringController::delveChart">delveChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#141"><abbr title="App\Admin\Controllers\Api\MonitoringController::transformRows">transformRows</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#146"><abbr title="App\Admin\Controllers\Api\MonitoringController::batchCraftingActive">batchCraftingActive</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#151"><abbr title="App\Admin\Controllers\Api\MonitoringController::batchCraftingRuns">batchCraftingRuns</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#156"><abbr title="App\Admin\Controllers\Api\MonitoringController::batchCraftingSummary">batchCraftingSummary</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MonitoringController.php.html#161"><abbr title="App\Admin\Controllers\Api\MonitoringController::batchCraftingChart">batchCraftingChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#20"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#22"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::fetchLoggedInAllTime">fetchLoggedInAllTime</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#30"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::fetchRegisteredAllTime">fetchRegisteredAllTime</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#37"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::fetchCompletedQuests">fetchCompletedQuests</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#53"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::fetchReincarnationChart">fetchReincarnationChart</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#65"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::otherDetails">otherDetails</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#101"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::fetchKingdomHolders">fetchKingdomHolders</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#116"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::getTotalGoldIncludingKingdomsForCharacters">getTotalGoldIncludingKingdomsForCharacters</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#134"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::getLoginDurationDetails">getLoginDurationDetails</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#148"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::getUsersCurrentlyOnline">getUsersCurrentlyOnline</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#148"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::getUsersCurrentlyOnline">getUsersCurrentlyOnline</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">13</td><td class="text-right">182</td></tr>
+       <tr><td><a href="MapManagerController.php.html#33"><abbr title="App\Admin\Controllers\Api\MapManagerController::moveLocation">moveLocation</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#35"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::entries">entries</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="AdminLogsDashboardController.php.html#57"><abbr title="App\Admin\Controllers\Api\AdminLogsDashboardController::entryDetail">entryDetail</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="GuideQuests/GuideQuestsController.php.html#33"><abbr title="App\Admin\Controllers\Api\GuideQuests\GuideQuestsController::guideQuest">guideQuest</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="InformationController.php.html#42"><abbr title="App\Admin\Controllers\Api\InformationController::updatePage">updatePage</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="InformationController.php.html#63"><abbr title="App\Admin\Controllers\Api\InformationController::addSection">addSection</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="InformationController.php.html#94"><abbr title="App\Admin\Controllers\Api\InformationController::deletePage">deletePage</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="SiteAccessStatisticsController.php.html#101"><abbr title="App\Admin\Controllers\Api\SiteAccessStatisticsController::fetchKingdomHolders">fetchKingdomHolders</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:18:39 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[0,9,"AdminLogsDashboardController.php.html#16","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController","90"],[0,2,"AdminMessagesController.php.html#10","App\\Admin\\Controllers\\Api\\AdminMessagesController","6"],[0,11,"BattleRewardQueueController.php.html#19","App\\Admin\\Controllers\\Api\\BattleRewardQueueController","132"],[0,6,"EventScheduleController.php.html#14","App\\Admin\\Controllers\\Api\\EventScheduleController","42"],[0,4,"GuideQuests\/GuideQuestsController.php.html#24","App\\Admin\\Controllers\\Api\\GuideQuests\\GuideQuestsController","20"],[0,10,"InformationController.php.html#13","App\\Admin\\Controllers\\Api\\InformationController","110"],[0,5,"MapManagerController.php.html#15","App\\Admin\\Controllers\\Api\\MapManagerController","30"],[0,18,"MonitoringController.php.html#26","App\\Admin\\Controllers\\Api\\MonitoringController","342"],[0,23,"SiteAccessStatisticsController.php.html#18","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController","552"]]</script>
+  <script type="application/json" id="complexity_method">[[0,1,"AdminLogsDashboardController.php.html#18","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::__construct","2"],[0,1,"AdminLogsDashboardController.php.html#27","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::files","2"],[0,2,"AdminLogsDashboardController.php.html#35","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::entries","6"],[0,2,"AdminLogsDashboardController.php.html#57","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::entryDetail","6"],[0,1,"AdminLogsDashboardController.php.html#71","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::poll","2"],[0,1,"AdminLogsDashboardController.php.html#85","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::bugs","2"],[0,1,"AdminLogsDashboardController.php.html#93","App\\Admin\\Controllers\\Api\\AdminLogsDashboardController::bugChart","2"],[0,1,"AdminMessagesController.php.html#20","App\\Admin\\Controllers\\Api\\AdminMessagesController::__construct","2"],[0,1,"AdminMessagesController.php.html#25","App\\Admin\\Controllers\\Api\\AdminMessagesController::index","2"],[0,1,"BattleRewardQueueController.php.html#21","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::__construct","2"],[0,1,"BattleRewardQueueController.php.html#34","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::summary","2"],[0,1,"BattleRewardQueueController.php.html#43","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::charts","2"],[0,1,"BattleRewardQueueController.php.html#52","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::characters","2"],[0,1,"BattleRewardQueueController.php.html#62","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::characterDetail","2"],[0,1,"BattleRewardQueueController.php.html#78","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::requests","2"],[0,1,"BattleRewardQueueController.php.html#88","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::statusBreakdown","2"],[0,1,"BattleRewardQueueController.php.html#95","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::stale","2"],[0,1,"BattleRewardQueueController.php.html#105","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::repairStale","2"],[0,1,"BattleRewardQueueController.php.html#114","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::transformChartRows","2"],[0,1,"BattleRewardQueueController.php.html#119","App\\Admin\\Controllers\\Api\\BattleRewardQueueController::transformStatusRows","2"],[0,1,"EventScheduleController.php.html#18","App\\Admin\\Controllers\\Api\\EventScheduleController::__construct","2"],[0,1,"EventScheduleController.php.html#23","App\\Admin\\Controllers\\Api\\EventScheduleController::index","2"],[0,1,"EventScheduleController.php.html#34","App\\Admin\\Controllers\\Api\\EventScheduleController::createEvent","2"],[0,1,"EventScheduleController.php.html#44","App\\Admin\\Controllers\\Api\\EventScheduleController::updateEvent","2"],[0,1,"EventScheduleController.php.html#54","App\\Admin\\Controllers\\Api\\EventScheduleController::deleteEvent","2"],[0,1,"EventScheduleController.php.html#64","App\\Admin\\Controllers\\Api\\EventScheduleController::createMultipleEvents","2"],[0,1,"GuideQuests\/GuideQuestsController.php.html#26","App\\Admin\\Controllers\\Api\\GuideQuests\\GuideQuestsController::__construct","2"],[0,2,"GuideQuests\/GuideQuestsController.php.html#33","App\\Admin\\Controllers\\Api\\GuideQuests\\GuideQuestsController::guideQuest","6"],[0,1,"GuideQuests\/GuideQuestsController.php.html#63","App\\Admin\\Controllers\\Api\\GuideQuests\\GuideQuestsController::storeFormResponse","2"],[0,1,"InformationController.php.html#17","App\\Admin\\Controllers\\Api\\InformationController::__construct","2"],[0,1,"InformationController.php.html#22","App\\Admin\\Controllers\\Api\\InformationController::getPage","2"],[0,1,"InformationController.php.html#32","App\\Admin\\Controllers\\Api\\InformationController::storePage","2"],[0,2,"InformationController.php.html#42","App\\Admin\\Controllers\\Api\\InformationController::updatePage","6"],[0,2,"InformationController.php.html#63","App\\Admin\\Controllers\\Api\\InformationController::addSection","6"],[0,1,"InformationController.php.html#83","App\\Admin\\Controllers\\Api\\InformationController::deleteSection","2"],[0,2,"InformationController.php.html#94","App\\Admin\\Controllers\\Api\\InformationController::deletePage","6"],[0,1,"MapManagerController.php.html#17","App\\Admin\\Controllers\\Api\\MapManagerController::__construct","2"],[0,1,"MapManagerController.php.html#19","App\\Admin\\Controllers\\Api\\MapManagerController::getMapData","2"],[0,3,"MapManagerController.php.html#33","App\\Admin\\Controllers\\Api\\MapManagerController::moveLocation","12"],[0,1,"MonitoringController.php.html#28","App\\Admin\\Controllers\\Api\\MonitoringController::__construct","2"],[0,1,"MonitoringController.php.html#48","App\\Admin\\Controllers\\Api\\MonitoringController::explorationActive","2"],[0,1,"MonitoringController.php.html#56","App\\Admin\\Controllers\\Api\\MonitoringController::explorationLogs","2"],[0,1,"MonitoringController.php.html#66","App\\Admin\\Controllers\\Api\\MonitoringController::explorationSummary","2"],[0,1,"MonitoringController.php.html#71","App\\Admin\\Controllers\\Api\\MonitoringController::explorationChart","2"],[0,1,"MonitoringController.php.html#79","App\\Admin\\Controllers\\Api\\MonitoringController::factionLoyaltyActive","2"],[0,1,"MonitoringController.php.html#87","App\\Admin\\Controllers\\Api\\MonitoringController::factionLoyaltyRuns","2"],[0,1,"MonitoringController.php.html#97","App\\Admin\\Controllers\\Api\\MonitoringController::factionLoyaltySummary","2"],[0,1,"MonitoringController.php.html#102","App\\Admin\\Controllers\\Api\\MonitoringController::factionLoyaltyChart","2"],[0,1,"MonitoringController.php.html#110","App\\Admin\\Controllers\\Api\\MonitoringController::delveActive","2"],[0,1,"MonitoringController.php.html#118","App\\Admin\\Controllers\\Api\\MonitoringController::delveRuns","2"],[0,1,"MonitoringController.php.html#128","App\\Admin\\Controllers\\Api\\MonitoringController::delveSummary","2"],[0,1,"MonitoringController.php.html#133","App\\Admin\\Controllers\\Api\\MonitoringController::delveChart","2"],[0,1,"MonitoringController.php.html#141","App\\Admin\\Controllers\\Api\\MonitoringController::transformRows","2"],[0,1,"MonitoringController.php.html#146","App\\Admin\\Controllers\\Api\\MonitoringController::batchCraftingActive","2"],[0,1,"MonitoringController.php.html#151","App\\Admin\\Controllers\\Api\\MonitoringController::batchCraftingRuns","2"],[0,1,"MonitoringController.php.html#156","App\\Admin\\Controllers\\Api\\MonitoringController::batchCraftingSummary","2"],[0,1,"MonitoringController.php.html#161","App\\Admin\\Controllers\\Api\\MonitoringController::batchCraftingChart","2"],[0,1,"SiteAccessStatisticsController.php.html#20","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::__construct","2"],[0,1,"SiteAccessStatisticsController.php.html#22","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::fetchLoggedInAllTime","2"],[0,1,"SiteAccessStatisticsController.php.html#30","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::fetchRegisteredAllTime","2"],[0,1,"SiteAccessStatisticsController.php.html#37","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::fetchCompletedQuests","2"],[0,1,"SiteAccessStatisticsController.php.html#53","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::fetchReincarnationChart","2"],[0,1,"SiteAccessStatisticsController.php.html#65","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::otherDetails","2"],[0,2,"SiteAccessStatisticsController.php.html#101","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::fetchKingdomHolders","6"],[0,1,"SiteAccessStatisticsController.php.html#116","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::getTotalGoldIncludingKingdomsForCharacters","2"],[0,1,"SiteAccessStatisticsController.php.html#134","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::getLoginDurationDetails","2"],[0,13,"SiteAccessStatisticsController.php.html#148","App\\Admin\\Controllers\\Api\\SiteAccessStatisticsController::getUsersCurrentlyOnline","182"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [9,0,0,0,0,0,0,0,0,0,0,0])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [67,0,0,0,0,0,0,0,0,0,0,0])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

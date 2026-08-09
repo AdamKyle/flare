@@ -3,7 +3,9 @@
 namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Requests\MoveRequest;
@@ -98,6 +100,25 @@ class MapController extends Controller
     public function traverseMaps(): JsonResponse
     {
         return response()->json(array_values($this->movementService->getMapsToTraverse(auth()->user()->character)));
+    }
+
+    public function fetchTeleportCoordinates(Character $character, LocationService $locationService): JsonResponse
+    {
+        return response()->json($locationService->getTeleportLocations($character));
+    }
+
+    public function getLocationInformation(Location $location, LocationService $locationService): JsonResponse
+    {
+        return response()->json([
+            'data' => $locationService->getLocationDetails($location),
+        ]);
+    }
+
+    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location, LocationService $locationService): JsonResponse
+    {
+        return response()->json(
+            $locationService->getDroppableItems($location, $request->per_page, $request->page, $request->search_text)
+        );
     }
 
     public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse

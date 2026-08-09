@@ -4,46 +4,37 @@ namespace App\Game\Shop\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
+use App\Flare\Pagination\Requests\PaginationRequest;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
-use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Shop\Events\BuyItemEvent;
-use App\Game\Shop\Events\SellItemEvent;
 use App\Game\Shop\Events\UpdateShopEvent;
 use App\Game\Shop\Requests\ShopPurchaseMultipleValidation;
 use App\Game\Shop\Requests\ShopReplaceItemValidation;
-use App\Game\Shop\Requests\ShopSellValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
-use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
-    private CharacterInventoryService $characterInventoryService;
-
     private ShopService $shopService;
 
-    public function __construct(CharacterInventoryService $characterInventoryService, ShopService $shopService)
+    public function __construct(ShopService $shopService)
     {
-        $this->characterInventoryService = $characterInventoryService;
         $this->shopService = $shopService;
     }
 
-    public function fetchItemsForShop(Character $character, Request $request): JsonResponse
+    public function fetchItemsForShop(PaginationRequest $request, Character $character): JsonResponse
     {
+        $filters = $request->filters;
 
-        $type = $request->get('filter');
-        $searchText = $request->get('search_text');
+        $type = $filters['type'] ?? null;
+        $sortCost = $filters['sort_cost'] ?? null;
 
-        return response()->json([
-            'items' => $this->shopService->getItemsForShop($character, $type, $searchText),
-            'gold' => $character->gold,
-            'inventory_count' => $character->getInventoryCount(),
-            'inventory_max' => $character->inventory_max,
-            'is_merchant' => $character->classType()->isMerchant(),
-        ]);
+        return response()->json(
+            $this->shopService->getItemsForShop($character, $type, $request->search_text, $sortCost, $request->per_page, $request->page)
+        );
     }
 
     public function shopCompare(Request $request, Character $character,
@@ -99,12 +90,6 @@ class ShopController extends Controller
     {
         $item = Item::find($request->item_id);
         $amount = $request->amount;
-
-        if ($amount < 1) {
-            return response()->json([
-                'message' => 'Amount must be at least 1.',
-            ], 422);
-        }
 
         if ($amount > $character->inventory_max || $character->isInventoryFull()) {
             return redirect()->back()->with('error', 'You cannot purchase more then you have inventory space.');
@@ -175,47 +160,4 @@ class ShopController extends Controller
         ]);
     }
 
-    public function sellItem(ShopSellValidation $request, Character $character)
-    {
-
-        $inventorySlot = $character->inventory->slots->filter(function ($slot) use ($request) {
-            return $slot->id === (int) $request->slot_id && ! $slot->equipped;
-        })->first();
-
-        if (is_null($inventorySlot)) {
-            return response()->json(['message' => 'Item not found.']);
-        }
-
-        $item = $inventorySlot->item;
-
-        if ($item->type === 'trinket' || $item->type === 'artifact') {
-            return response()->json(['message' => 'The shop keeper will not accept this item (Trinkets/Artifacts cannot be sold to the shop).']);
-        }
-
-        $totalSoldFor = SellItemCalculator::fetchSalePriceWithAffixes($item);
-
-        $character = $character->refresh();
-
-        event(new SellItemEvent($inventorySlot, $character));
-
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
-        return response()->json([
-            'message' => 'Sold: '.$item->affix_name.' for: '.number_format($totalSoldFor).' gold.',
-            'inventory' => [
-                'inventory' => $inventory->getInventoryForType('inventory'),
-            ],
-        ]);
-    }
-
-    public function sellAll(Character $character)
-    {
-
-        $result = $this->shopService->sellAllItems($character);
-
-        $status = $result['status'];
-        unset($result['status']);
-
-        return response()->json($result, $status);
-    }
 }

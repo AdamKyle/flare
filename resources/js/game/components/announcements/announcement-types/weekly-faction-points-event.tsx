@@ -142,8 +142,8 @@ const WeeklyFactionPointsEvent = ({ announcement }: EventTypeProps) => {
                     <a
                       href="#"
                       target="_blank"
-                      rel="noreferrer"
-                      className="font-semibold underline"
+                      rel="noopener noreferrer"
+                      className="pointer-events-auto font-semibold underline"
                     >
                       unique items
                     </a>{' '}

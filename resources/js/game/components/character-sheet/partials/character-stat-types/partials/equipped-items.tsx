@@ -9,7 +9,16 @@ const EquippedItems = ({
   stat_type,
 }: EquippedItemProps): ReactNode => {
   return items_equipped.map((itemEquipped: BaseEquippedItemDetails) => {
-    return <EquippedItem equipped_item={itemEquipped} stat_type={stat_type} />;
+    const key =
+      itemEquipped.item_details.slot_id ?? itemEquipped.item_details.item_id;
+
+    return (
+      <EquippedItem
+        key={key}
+        equipped_item={itemEquipped}
+        stat_type={stat_type}
+      />
+    );
   });
 };
 

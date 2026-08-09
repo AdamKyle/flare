@@ -9,7 +9,7 @@ const ClassSkillsSection = ({ class_skills }: ClassSkillsSectionProps) => {
 
   const listElements = class_skills.map((classSkill) => {
     return (
-      <li>
+      <li key={classSkill.name}>
         <strong>{classSkill.name}</strong>{' '}
         <span className="text-green-700 dark:text-green-500">
           +{(classSkill.increase_amount * 100).toFixed(2)}%

@@ -37,6 +37,7 @@ const StatsSection = ({ item }: StatsSectionProps) => {
 
     return (
       <DefinitionRow
+        key={label}
         left={
           <InfoLabel
             label={label}

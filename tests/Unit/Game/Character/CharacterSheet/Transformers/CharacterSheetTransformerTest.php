@@ -20,7 +20,7 @@ class CharacterSheetTransformerTest extends TestCase
 
         $data = resolve(CharacterSheetTransformer::class)->transform($character);
 
-        foreach ([
+        $expectedKeys = [
             'id', 'user_id', 'name', 'class', 'class_id', 'race', 'race_id', 'game_map_id', 'map_name',
             'to_hit_stat', 'damage_stat', 'level', 'max_level', 'xp', 'xp_next', 'class_bonus_chance',
             'str_raw', 'dur_raw', 'dex_raw', 'chr_raw', 'int_raw', 'agi_raw', 'focus_raw',
@@ -29,9 +29,9 @@ class CharacterSheetTransformerTest extends TestCase
             'ring_damage', 'spell_damage', 'voided_spell_damage', 'healing_amount', 'voided_healing_amount',
             'gold', 'gold_dust', 'shards', 'copper_coins', 'gold_bars',
             'inventory_count', 'resistance_info', 'elemental_atonements', 'reincarnation_info',
-        ] as $expectedKey) {
-            $this->assertArrayHasKey($expectedKey, $data);
-        }
+        ];
+
+        $this->assertSame([], array_diff($expectedKeys, array_keys($data)));
     }
 
     public function test_transform_returns_numeric_gameplay_values_not_formatted_strings(): void

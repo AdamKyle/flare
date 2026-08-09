@@ -410,4 +410,183 @@ class ItemTransferServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('You do not have room in your Gem Bag to move the gems attached to: '.$itemToTransferTo->affix_name.'.', $result['message']);
     }
+
+    public function test_source_quest_item_type_rejects()
+    {
+        $itemToTransferFrom = $this->createItem(['type' => 'quest']);
+        $itemToTransferTo = $this->createItem();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo)
+            ->getCharacter();
+
+        $character->update([
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Not allowed to do this for this item type.', $result['message']);
+    }
+
+    public function test_destination_quest_item_type_rejects()
+    {
+        $itemToTransferFrom = $this->createItem();
+        $itemToTransferTo = $this->createItem(['type' => 'quest']);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo)
+            ->getCharacter();
+
+        $character->update([
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Not allowed to do this for this item type.', $result['message']);
+    }
+
+    public function test_source_item_with_nothing_to_transfer_rejects()
+    {
+        $itemToTransferFrom = $this->createItem();
+        $itemToTransferTo = $this->createItem();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo)
+            ->getCharacter();
+
+        $character->update([
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('This item has nothing on it to transfer from.', $result['message']);
+    }
+
+    public function test_successful_transfer_removes_existing_gems_from_destination_item()
+    {
+        Event::fake();
+
+        $attachedSuffix = $this->createItemAffix(['type' => 'suffix']);
+
+        $itemToTransferFrom = $this->createItem([
+            'item_suffix_id' => $attachedSuffix->id,
+        ]);
+
+        $itemToTransferTo = $this->createItem(['socket_count' => 1]);
+
+        $itemToTransferTo->sockets()->create([
+            'gem_id' => $this->createGem()->id,
+            'item_id' => $itemToTransferTo->id,
+        ]);
+
+        $itemToTransferTo = $itemToTransferTo->refresh();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo)
+            ->getCharacter();
+
+        $character->update([
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+        $gemBagCountBefore = $character->gemBag->gemSlots()->count();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $character = $character->refresh();
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame($gemBagCountBefore + 1, $character->gemBag->gemSlots()->count());
+    }
+
+    public function test_get_proper_item_from_after_transfer_keeps_the_emptied_duplicate_when_no_matching_item_exists()
+    {
+        Event::fake();
+
+        $uniqueName = 'Unique From Item '.uniqid();
+
+        $attachedSuffix = $this->createItemAffix(['type' => 'suffix']);
+
+        $itemToTransferFrom = $this->createItem([
+            'name' => $uniqueName,
+            'item_suffix_id' => $attachedSuffix->id,
+        ]);
+        $itemToTransferTo = $this->createItem();
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($itemToTransferFrom)
+            ->giveItem($itemToTransferTo);
+
+        $slotForItemToTransferFrom = $character->getSlotId(0);
+
+        $character = $character->getCharacter();
+
+        $character->update([
+            'gold' => CurrencyLimit::MAX_GOLD,
+            'gold_dust' => CurrencyLimit::MAX_GOLD_DUST,
+            'shards' => CurrencyLimit::MAX_SHARDS,
+        ]);
+
+        $character = $character->refresh();
+
+        $result = $this->itemTransferService->transferItemEnhancements(
+            $character,
+            $itemToTransferFrom->id,
+            $itemToTransferTo->id,
+        );
+
+        $character = $character->refresh();
+
+        $transferredFromItem = $character->inventory->slots->where('id', $slotForItemToTransferFrom)->first()->item;
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame($uniqueName, $transferredFromItem->name);
+        $this->assertNull($transferredFromItem->item_suffix_id);
+    }
 }

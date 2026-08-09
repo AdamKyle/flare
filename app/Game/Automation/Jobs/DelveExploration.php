@@ -185,6 +185,10 @@ class DelveExploration implements ShouldQueue
                 return;
             }
 
+            if (is_null(CharacterAutomation::where('character_id', $this->character->id)->where('type', AutomationType::DELVE->value)->first())) {
+                return;
+            }
+
             if ($this->attempts >= self::MAX_ATTEMPTS) {
                 $this->createDelveLog($delveAutomation, DelveOutcome::TIMEOUT, $this->lastFightData);
 
@@ -450,6 +454,10 @@ class DelveExploration implements ShouldQueue
     private function shouldAttackAgain(array $data): bool
     {
 
+        if ($data['health']['current_character_health'] <= 0) {
+            return false;
+        }
+
         if ($data['health']['current_monster_health'] > 0) {
             return true;
         }
@@ -626,14 +634,14 @@ class DelveExploration implements ShouldQueue
             $uniqueItem = $this->characterRewardService->getSpecialGearDrop(RandomAffixTier::LEGENDARY->value);
         }
 
-        $gold = 1_000;
+        $goldReward = 0;
 
         if (! is_null($cosmicItem)) {
             $slot = $character->inventory->slots()->create([
                 'item_id' => $cosmicItem->id,
             ]);
 
-            $gold = $character->gold + 1_000_000_000_000;
+            $goldReward += 1_000_000_000_000;
 
             $this->sendOutEventLogUpdate('Gained one trillion gold for completing the delve.', false, true);
 
@@ -647,7 +655,7 @@ class DelveExploration implements ShouldQueue
                 'item_id' => $mythicItem->id,
             ]);
 
-            $gold = $character->gold + 1_000_000_000;
+            $goldReward += 1_000_000_000;
 
             $this->sendOutEventLogUpdate('Gained one billion gold for completing the delve.', false, true);
 
@@ -661,7 +669,7 @@ class DelveExploration implements ShouldQueue
                 'item_id' => $uniqueItem->id,
             ]);
 
-            $gold = $character->gold + 1_000_000;
+            $goldReward += 1_000_000;
 
             $this->sendOutEventLogUpdate('Gained one million gold for completing the delve.', false, true);
 
@@ -670,11 +678,13 @@ class DelveExploration implements ShouldQueue
             $this->sendServerMessage('You were rewarded with a unique item: '.$uniqueItem->affix_name.' for surviving for more then 2 hours in a delve!', $slot->id);
         }
 
-        if ($gold === 1_000) {
-            $gold = $character->gold + $gold;
+        if ($goldReward === 0) {
+            $goldReward = 1_000;
 
             $this->sendOutEventLogUpdate('Gained one thousand gold for completing the delve.', false, true);
         }
+
+        $gold = $character->gold + $goldReward;
 
         if ($gold >= CurrencyLimit::MAX_GOLD) {
             $gold = CurrencyLimit::MAX_GOLD;

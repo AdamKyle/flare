@@ -5,8 +5,8 @@ export default interface LocationDetailsApi {
   id: number;
   name: string;
   description: string;
-  can_players_enter: false;
-  can_auto_battle: false;
+  can_players_enter: boolean;
+  can_auto_battle: boolean;
   location_type: LocationTypes;
   is_corrupted: boolean;
   quest_reward_item: { data: BaseQuestItemDefinition | null };

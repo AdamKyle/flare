@@ -2,15 +2,28 @@
 
 namespace Tests\Feature\Game\Maps\Controllers\Api;
 
+use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Maps\Values\MapTileValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
 use Tests\Traits\CreateKingdom;
+use Tests\Traits\CreateLocation;
 
 class MapControllerTest extends TestCase
 {
-    use CreateGameMap, CreateKingdom, RefreshDatabase;
+    use CreateGameMap, CreateItem, CreateKingdom, CreateLocation, RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        Mockery::close();
+
+        parent::tearDown();
+    }
 
     public function test_map_information_returns_complete_top_level_shape(): void
     {
@@ -208,5 +221,127 @@ class MapControllerTest extends TestCase
         $this->assertSame([], $data['character_kingdoms']);
         $this->assertSame([], $data['npc_kingdoms']);
         $this->assertSame([], $data['enemy_kingdoms']);
+    }
+
+    public function test_traverse_blocks_when_character_is_missing_required_item_for_destination_plane(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $hellMap = $this->createGameMap(['name' => 'Hell', 'path' => 'path']);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/map/traverse/'.$character->id, ['map_id' => $hellMap->id]);
+
+        $response->assertStatus(422);
+        $this->assertSame(
+            'You are missing a required item to travel to that plane.',
+            json_decode($response->getContent(), true)['message']
+        );
+    }
+
+    public function test_traverse_moves_character_to_new_plane_when_required_item_is_owned(): void
+    {
+        $this->instance(
+            MapTileValue::class,
+            Mockery::mock(MapTileValue::class, function (MockInterface $mock): void {
+                $mock->shouldReceive('setUp')->andReturnSelf();
+                $mock->shouldReceive('canWalk')->andReturn(true);
+            })
+        );
+
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+        $character = $characterFactory->getCharacter();
+
+        $hellMap = $this->createGameMap(['name' => 'Hell', 'path' => 'path']);
+
+        $hellPassItem = $this->createItem(['effect' => ItemEffectType::HELL->value]);
+
+        $characterFactory->inventoryManagement()->giveItem($hellPassItem);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/map/traverse/'.$character->id, ['map_id' => $hellMap->id]);
+
+        $response->assertOk();
+        $this->assertSame($hellMap->id, $character->refresh()->map->game_map_id);
+    }
+
+    public function test_fetch_teleport_coordinates_returns_teleport_location_shape(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/teleport-coordinates/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertArrayHasKey('character_kingdoms', $data);
+        $this->assertArrayHasKey('npc_kingdoms', $data);
+        $this->assertArrayHasKey('enemy_kingdoms', $data);
+        $this->assertArrayHasKey('locations', $data);
+        $this->assertArrayHasKey('coordinates', $data);
+    }
+
+    public function test_get_location_information_returns_wrapped_location_data(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->gameMap->id,
+            'name' => 'The Old Bridge',
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/location-details/'.$location->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame($location->id, $data['data']['id']);
+        $this->assertSame('The Old Bridge', $data['data']['name']);
+        $this->assertNull($data['data']['quest_reward_item']['data']);
+        $this->assertNull($data['data']['required_quest_item']);
+    }
+
+    public function test_get_location_information_includes_transformed_quest_reward_item(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $questItem = $this->createItem(['name' => 'Ancient Coin']);
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->gameMap->id,
+            'quest_reward_item_id' => $questItem->id,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/location-details/'.$location->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame($questItem->id, $data['data']['quest_reward_item']['data']['item_id']);
+        $this->assertSame('Ancient Coin', $data['data']['quest_reward_item']['data']['name']);
+    }
+
+    public function test_get_location_droppable_quest_items_returns_paginated_shape(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $location = $this->createLocation([
+            'game_map_id' => $character->map->gameMap->id,
+        ]);
+
+        $this->createItem(['name' => 'Rusty Key', 'drop_location_id' => $location->id]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/location-droppable-items/'.$location->id.'?per_page=10&page=1&search_text=');
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertArrayHasKey('data', $data);
+        $this->assertArrayHasKey('can_load_more', $data['meta']);
+        $this->assertSame('Rusty Key', $data['data'][0]['name']);
     }
 }

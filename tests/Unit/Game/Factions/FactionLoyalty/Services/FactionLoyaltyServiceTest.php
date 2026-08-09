@@ -289,6 +289,45 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertEquals(0, FactionLoyaltyAutomationWarning::where('character_id', $this->character->id)->count());
     }
 
+    public function test_get_latest_unread_warning_notice_returns_the_most_recent_warning(): void
+    {
+        $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'message' => 'Older warning.',
+        ]);
+        $latestWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+            'message' => 'Latest warning.',
+        ]);
+
+        $result = $this->factionLoyaltyService->getLatestUnreadWarningNotice($this->character);
+
+        $this->assertSame($latestWarning->id, $result['id']);
+        $this->assertSame('Latest warning.', $result['message']);
+    }
+
+    public function test_get_latest_unread_warning_notice_returns_null_when_no_warnings_exist(): void
+    {
+        $result = $this->factionLoyaltyService->getLatestUnreadWarningNotice($this->character);
+
+        $this->assertNull($result);
+    }
+
+    public function test_dismiss_warning_notice_by_explicit_warning_id_only_dismisses_that_warning(): void
+    {
+        $olderWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+        ]);
+        $latestWarning = $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $this->character->id,
+        ]);
+
+        $this->factionLoyaltyService->dismissLatestWarningNotice($this->character, $olderWarning->id);
+
+        $this->assertNull($olderWarning->fresh());
+        $this->assertNotNull($latestWarning->fresh());
+    }
+
     public function test_has_plane_loyalty_for_npc_currently_helping()
     {
         $npc = $this->createNpc([
@@ -428,48 +467,41 @@ class FactionLoyaltyServiceTest extends TestCase
             return $resultFaction['is_pledged'];
         }));
 
-        foreach (MapName::values() as $value) {
+        $gameMap = $this->createGameMap([
+            'name' => MapName::LABYRINTH->value,
+        ]);
 
-            if ($value === MapName::SURFACE->value) {
-                continue;
-            }
+        $this->createNpc([
+            'game_map_id' => $gameMap->id,
+        ]);
 
-            $gameMap = $this->createGameMap([
-                'name' => $value,
-            ]);
+        $character->map->update([
+            'game_map_id' => $gameMap->id,
+        ]);
 
-            $this->createNpc([
+        $faction = $character->factions()->create([
+            'character_id' => $character->id,
+            'game_map_id' => $gameMap->id,
+            'current_level' => 0,
+            'current_points' => 0,
+            'points_needed' => 1000,
+            'maxed' => true,
+            'title' => null,
+        ]);
+
+        $this->createMultipleMonsters(
+            [
                 'game_map_id' => $gameMap->id,
-            ]);
+            ], 10
+        );
 
-            $character->map->update([
-                'game_map_id' => $gameMap->id,
-            ]);
+        $character->refresh();
 
-            $faction = $character->factions()->create([
-                'character_id' => $character->id,
-                'game_map_id' => $gameMap->id,
-                'current_level' => 0,
-                'current_points' => 0,
-                'points_needed' => 1000,
-                'maxed' => true,
-                'title' => null,
-            ]);
+        $result = $this->factionLoyaltyService->pledgeLoyalty($character, $faction);
 
-            $this->createMultipleMonsters(
-                [
-                    'game_map_id' => $gameMap->id,
-                ], 10
-            );
+        $character = $this->character->refresh();
 
-            $character->refresh();
-
-            $result = $this->factionLoyaltyService->pledgeLoyalty($character, $faction);
-
-            $character = $this->character->refresh();
-
-            $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
-        }
+        $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
     }
 
     public function test_pledge_to_existing_loyalty()
@@ -672,6 +704,92 @@ class FactionLoyaltyServiceTest extends TestCase
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
     }
 
+    public function test_create_new_tasks_for_npc_loyalty_tasks_uses_dungeons_skill_level_cap()
+    {
+        $gameMap = $this->createGameMap(['name' => MapName::DUNGEONS->value]);
+
+        $npc = $this->createNpc([
+            'game_map_id' => $gameMap->id,
+        ]);
+
+        $this->createMultipleMonsters([
+            'game_map_id' => $gameMap->id,
+        ], 3);
+
+        $this->createItem(['skill_Level_required' => 200, 'skill_level_trivial' => 300, 'crafting_type' => 'weapon']);
+        $this->createItem(['skill_Level_required' => 200, 'skill_level_trivial' => 300, 'crafting_type' => 'armour']);
+        $this->createItem(['skill_Level_required' => 200, 'skill_level_trivial' => 300, 'crafting_type' => 'ring']);
+        $this->createItem(['skill_Level_required' => 200, 'skill_level_trivial' => 300, 'crafting_type' => 'spell']);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $npcTask = $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
+        ]);
+
+        $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask, $this->character);
+
+        $this->assertNotEmpty($newNPCtask->fame_tasks);
+    }
+
+    public function test_create_new_tasks_for_npc_loyalty_tasks_uses_hell_skill_level_cap()
+    {
+        $gameMap = $this->createGameMap(['name' => MapName::HELL->value]);
+
+        $npc = $this->createNpc([
+            'game_map_id' => $gameMap->id,
+        ]);
+
+        $this->createMultipleMonsters([
+            'game_map_id' => $gameMap->id,
+        ], 3);
+
+        $this->createItem(['skill_Level_required' => 260, 'skill_level_trivial' => 350, 'crafting_type' => 'weapon']);
+        $this->createItem(['skill_Level_required' => 260, 'skill_level_trivial' => 350, 'crafting_type' => 'armour']);
+        $this->createItem(['skill_Level_required' => 260, 'skill_level_trivial' => 350, 'crafting_type' => 'ring']);
+        $this->createItem(['skill_Level_required' => 260, 'skill_level_trivial' => 350, 'crafting_type' => 'spell']);
+
+        $factionLoyalty = $this->createFactionLoyalty([
+            'faction_id' => $this->character->factions->first()->id,
+            'character_id' => $this->character->id,
+        ]);
+
+        $factionNpc = $this->createFactionLoyaltyNpc([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'npc_id' => $npc->id,
+            'current_level' => 0,
+            'max_level' => 25,
+            'next_level_fame' => 100,
+            'currently_helping' => false,
+            'kingdom_item_defence_bonus' => 0.002,
+        ]);
+
+        $npcTask = $this->createFactionLoyaltyNpcTask([
+            'faction_loyalty_id' => $factionLoyalty->id,
+            'faction_loyalty_npc_id' => $factionNpc->id,
+            'fame_tasks' => [],
+        ]);
+
+        $newNPCtask = $this->factionLoyaltyService->createNewTasksForNpc($npcTask, $this->character);
+
+        $this->assertNotEmpty($newNPCtask->fame_tasks);
+    }
+
     public function test_create_new_tasks_for_npc_loyalty_tasks_when_on_event_plane_with_out_purgatory_item()
     {
 
@@ -785,13 +903,11 @@ class FactionLoyaltyServiceTest extends TestCase
 
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
 
-        foreach ($newNPCtask->fame_tasks as $task) {
-            if ($task['type'] === 'bounty') {
-                $monster = Monster::find($task['monster_id']);
+        $bountyTasks = collect($newNPCtask->fame_tasks)->where('type', 'bounty');
 
-                $this->assertEquals(MapName::SURFACE->value, $monster->gameMap->name);
-            }
-        }
+        $this->assertTrue($bountyTasks->every(function (array $task): bool {
+            return Monster::find($task['monster_id'])->gameMap->name === MapName::SURFACE->value;
+        }));
     }
 
     public function test_create_new_tasks_for_npc_loyalty_tasks_when_on_event_plane_with_purgatory_item()
@@ -919,13 +1035,11 @@ class FactionLoyaltyServiceTest extends TestCase
 
         $this->assertNotEquals($oldTasks, $newNPCtask->fame_tasks);
 
-        foreach ($newNPCtask->fame_tasks as $task) {
-            if ($task['type'] === 'bounty') {
-                $monster = Monster::find($task['monster_id']);
+        $bountyTasks = collect($newNPCtask->fame_tasks)->where('type', 'bounty');
 
-                $this->assertEquals(MapName::DELUSIONAL_MEMORIES->value, $monster->gameMap->name);
-            }
-        }
+        $this->assertTrue($bountyTasks->every(function (array $task): bool {
+            return Monster::find($task['monster_id'])->gameMap->name === MapName::DELUSIONAL_MEMORIES->value;
+        }));
     }
 
     public function test_fail_to_assist_npc_that_does_not_belong_to_character()

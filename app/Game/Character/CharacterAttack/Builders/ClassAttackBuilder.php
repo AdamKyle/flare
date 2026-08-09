@@ -488,18 +488,7 @@ class ClassAttackBuilder
 
     private function hasNoWeaponEquipped(): bool
     {
-        $itemTypes = array_map(fn ($case) => $case->value, ItemType::cases());
-        $typeIsNotEquipped = false;
-
-        foreach ($itemTypes as $type) {
-            if ($this->getItemCollection($type)->isNotEmpty()) {
-                $typeIsNotEquipped = true;
-            } else {
-                $typeIsNotEquipped = false;
-            }
-        }
-
-        return $typeIsNotEquipped;
+        return ! $this->hasAnyWeaponEquipped();
     }
 
     private function hasMultipleOfSameType(string $type, int $amountNeeded = 1): bool

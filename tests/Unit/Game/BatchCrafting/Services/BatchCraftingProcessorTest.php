@@ -3678,6 +3678,13 @@ class BatchCraftingProcessorTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Counted Key Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(100);
+            })
+        );
         $set = $this->createInventorySet(['character_id' => $character->id]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -3719,6 +3726,13 @@ class BatchCraftingProcessorTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Not Lost Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(100);
+            })
+        );
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
             'user_id' => $character->user_id,
@@ -3762,6 +3776,13 @@ class BatchCraftingProcessorTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Already Counted Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(100);
+            })
+        );
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
             'user_id' => $character->user_id,

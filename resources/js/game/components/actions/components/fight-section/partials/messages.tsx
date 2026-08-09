@@ -5,10 +5,14 @@ import { fetchAttackMessageColorForType } from '../helpers/fetch-attack-message-
 import AttackMessagesProps from '../types/attack-messages-props';
 
 const Messages = (props: AttackMessagesProps): ReactNode => {
-  return props.messages.map((message: AttackMessageDefinition) => {
+  return props.messages.map((message: AttackMessageDefinition, index) => {
     const messageColor = fetchAttackMessageColorForType(message.type);
 
-    return <div className={messageColor}>{message.message}</div>;
+    return (
+      <div key={`${index}-${message.type}-${message.message}`} className={messageColor}>
+        {message.message}
+      </div>
+    );
   });
 };
 

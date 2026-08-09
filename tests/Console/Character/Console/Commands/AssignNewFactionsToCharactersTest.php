@@ -2,15 +2,17 @@
 
 namespace Tests\Console\Character\Console\Commands;
 
+use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 
 class AssignNewFactionsToCharactersTest extends TestCase
 {
-    use CreateGameSkill, RefreshDatabase;
+    use CreateGameMap, CreateGameSkill, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -58,5 +60,20 @@ class AssignNewFactionsToCharactersTest extends TestCase
         $character = $character->refresh();
 
         $this->assertCount(1, $character->factions);
+    }
+
+    public function test_skips_purgatory_map()
+    {
+        $character = $this->character->getCharacter();
+
+        $this->createGameMap(['name' => MapName::PURGATORY->value]);
+
+        Artisan::call('assign:new-factions-to-characters');
+
+        $character = $character->refresh();
+
+        $this->assertNull(
+            $character->factions()->whereHas('gameMap', fn ($query) => $query->where('name', MapName::PURGATORY->value))->first()
+        );
     }
 }

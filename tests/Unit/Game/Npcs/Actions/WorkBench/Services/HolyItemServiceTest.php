@@ -463,4 +463,136 @@ class HolyItemServiceTest extends TestCase
         $this->assertEquals($goldDustBefore, $character->refresh()->gold_dust);
         $this->assertEquals(1, $oilSlot->refresh()->amount);
     }
+
+    public function test_fetch_paginated_holy_oils_returns_empty_response_when_character_has_no_alchemy_bag(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->alchemyBag()->delete();
+
+        $result = $this->holyItemService->fetchPaginatedHolyOils($character->refresh(), 10, 1);
+
+        $this->assertSame([], $result['data']);
+    }
+
+    public function test_fetch_smithing_items_returns_empty_alchemy_items_when_character_has_no_alchemy_bag(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->alchemyBag()->delete();
+
+        $result = $this->holyItemService->fetchSmithingItems($character->refresh());
+
+        $this->assertCount(0, $result['alchemy_items']);
+    }
+
+    public function test_apply_holy_oil_accepts_inventory_slot_id_param(): void
+    {
+        Event::fake([CraftedItemTimeOutEvent::class]);
+
+        $targetItem = $this->createItem([
+            'type' => 'weapon',
+            'holy_stacks' => 20,
+        ]);
+
+        $oil = $this->createItem([
+            'type' => 'alchemy',
+            'holy_level' => 1,
+            'can_use_on_other_items' => true,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+        $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
+        $character = $character->refresh();
+
+        $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
+
+        $oilSlot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOil($character->refresh(), [
+            'inventory_slot_id' => $targetSlot->id,
+            'alchemy_slot_id' => $oilSlot->id,
+        ]);
+
+        $this->assertEquals(200, $result['status']);
+    }
+
+    public function test_apply_holy_oil_accepts_alchemy_item_id_param(): void
+    {
+        Event::fake([CraftedItemTimeOutEvent::class]);
+
+        $targetItem = $this->createItem([
+            'type' => 'weapon',
+            'holy_stacks' => 20,
+        ]);
+
+        $oil = $this->createItem([
+            'type' => 'alchemy',
+            'holy_level' => 1,
+            'can_use_on_other_items' => true,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+        $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
+        $character = $character->refresh();
+
+        $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
+
+        AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOil($character->refresh(), [
+            'item_id' => $targetSlot->item_id,
+            'alchemy_item_id' => $oil->id,
+        ]);
+
+        $this->assertEquals(200, $result['status']);
+    }
+
+    public function test_apply_holy_oil_reports_max_stacks_reached_when_this_application_fills_the_item(): void
+    {
+        Event::fake([CraftedItemTimeOutEvent::class]);
+
+        $targetItem = $this->createItem([
+            'type' => 'weapon',
+            'holy_stacks' => 1,
+        ]);
+
+        $oil = $this->createItem([
+            'type' => 'alchemy',
+            'holy_level' => 1,
+            'can_use_on_other_items' => true,
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+        $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
+        $character = $character->refresh();
+
+        $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
+
+        $oilSlot = AlchemyBagSlot::create([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOil($character->refresh(), [
+            'item_id' => $targetSlot->item_id,
+            'alchemy_slot_id' => $oilSlot->id,
+        ]);
+
+        $character = $character->refresh();
+        $updatedItem = $character->inventory->slots->first()->item;
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(1, $updatedItem->holy_stacks_applied);
+    }
 }

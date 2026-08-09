@@ -288,12 +288,13 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
 
         $fameTasks = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks;
 
-        foreach ($fameTasks as $index => $fameTask) {
-            $fameTasks[$index]['current_amount'] = $fameTask['required_amount'];
-        }
+        $completedFameTasks = array_map(
+            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
+            $fameTasks
+        );
 
         $this->factionLoyaltyNpc->factionLoyaltyNpcTasks()->update([
-            'fame_tasks' => $fameTasks,
+            'fame_tasks' => $completedFameTasks,
         ]);
 
         $response = $this->actingAs($this->character->user)

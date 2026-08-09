@@ -584,4 +584,20 @@ class ExplorationAutomationServiceTest extends TestCase
 
         $this->assertEquals(0, ExplorationWarning::where('character_id', $this->character->id)->count());
     }
+
+    public function test_begin_automation_falls_back_to_a_map_monster_when_no_monster_is_selected(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        CharacterAutomation::where('character_id', $this->character->id)->delete();
+
+        $this->service->beginAutomation($this->character, [
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $automation = CharacterAutomation::where('character_id', $this->character->id)->first();
+
+        $this->assertSame($this->monster->id, $automation->monster_id);
+    }
 }

@@ -14,7 +14,7 @@ const AttachedAffixes = ({
 
     const modifierValue = Number(attachedAffix[modifierKey] ?? 0);
     return (
-      <li>
+      <li key={attachedAffix.id}>
         <span className="text-slate-700 dark:text-slate-400">
           {attachedAffix.name}
         </span>{' '}

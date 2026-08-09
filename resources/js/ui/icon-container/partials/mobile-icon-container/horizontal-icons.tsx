@@ -11,6 +11,7 @@ const HorizontalIcons = ({
     return icon_buttons.map((inventoryButton: IconButtonDefinition) => {
       return (
         <IconButton
+          key={inventoryButton.label}
           label={inventoryButton.label}
           icon={<i className={inventoryButton.icon} aria-hidden="true"></i>}
           variant={inventoryButton.variant}

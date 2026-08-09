@@ -45,11 +45,6 @@ Broadcast::channel('open-timeout-modal-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;
 });
 
-// When an NPC Wants a components to show.
-Broadcast::channel('component-show-{userId}', function ($user, $userId) {
-    return $user->id === (int) $userId;
-});
-
 // When the player levels up the top bar should reflect that.
 Broadcast::channel('update-character-base-details-{userId}', function ($user, $userId) {
     return $user->id === (int) $userId;

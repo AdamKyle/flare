@@ -3,6 +3,7 @@
 namespace App\Flare\Middleware;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -43,21 +44,17 @@ class IsCharacterWhoTheySayTheyAreMiddleware
         $user = $request->route('user');
         $canAccess = true;
 
-        // REMINDER: Chances are the method (on the controller) does not exist if you need to uncomment this.
-        // or, you forgot to pass character to the controller action
-        //        if (is_string($character)) {
-        //            $character = Character::find($character);
-        //            dump($character);
-        //        }
+        $characterId = $character instanceof Character ? $character->id : $character;
+        $userId = $user instanceof User ? $user->id : $user;
 
-        if (! is_null($character)) {
-            if (auth()->user()->character->id !== $character->id) {
+        if (! is_null($characterId)) {
+            if ((int) auth()->user()->character->id !== (int) $characterId) {
                 $canAccess = false;
             }
         }
 
-        if (! is_null($user)) {
-            if (auth()->user()->id !== $user->id) {
+        if (! is_null($userId)) {
+            if ((int) auth()->user()->id !== (int) $userId) {
                 $canAccess = false;
             }
         }

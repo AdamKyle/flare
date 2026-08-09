@@ -410,4 +410,114 @@ class SeerCampControllerTest extends TestCase
             Model::preventLazyLoading(false);
         }
     }
+
+    public function test_roll_sockets_endpoint_attaches_sockets_to_item(): void
+    {
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/seer-camp/add-sockets/'.$character->id, ['slot_id' => $slot->id]);
+
+        $response->assertOk();
+    }
+
+    public function test_attach_gem_to_item_endpoint_attaches_the_gem(): void
+    {
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+
+        $gem = $this->createGem();
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $character = $this->character->gemBagManagement()->assignGemToBag($gem->id)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/seer-camp/add-gem/'.$character->id, [
+                'slot_id' => $slot->id,
+                'gem_slot_id' => $gemSlot->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame('Attached gem to item!', $jsonData['message']);
+    }
+
+    public function test_replace_gem_on_item_endpoint_replaces_the_gem(): void
+    {
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+
+        $existingGem = $this->createGem();
+        $replacementGem = $this->createGem();
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
+        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $character = $this->character->gemBagManagement()->assignGemToBag($replacementGem->id)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+        $gemSlot = $character->gemBag->gemSlots->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/seer-camp/replace-gem/'.$character->id, [
+                'slot_id' => $slot->id,
+                'gem_slot_id' => $gemSlot->id,
+                'gem_slot_to_replace' => $existingGem->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame('Gem has been replaced!', $jsonData['message']);
+    }
+
+    public function test_remove_gem_from_item_endpoint_removes_the_gem(): void
+    {
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+
+        $gem = $this->createGem();
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
+        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/seer-camp/remove-gem/'.$character->id, [
+                'slot_id' => $slot->id,
+                'gem_id' => $gem->id,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame('Gem has been removed from the socket!', $jsonData['message']);
+    }
+
+    public function test_remove_all_gems_from_item_endpoint_removes_every_gem(): void
+    {
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+
+        $firstGem = $this->createGem();
+        $secondGem = $this->createGem();
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 2]);
+        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
+        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/seer-camp/remove-all-gems/'.$character->id.'/'.$slot->id);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame('All gems have been removed!', $jsonData['message']);
+    }
 }

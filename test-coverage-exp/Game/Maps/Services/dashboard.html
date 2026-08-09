@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /home/adam/Documents/flare/app/Game/Maps/Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../../_css/bootstrap.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../../_css/billboard.min.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../../_css/style.css?v=12.5.7" rel="stylesheet" type="text/css">
+  <link href="../../../_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="../../../index.html">/home/adam/Documents/flare/app</a></li>
+         <li class="breadcrumb-item"><a href="../../index.html">Game</a></li>
+         <li class="breadcrumb-item"><a href="../index.html">Maps</a></li>
+         <li class="breadcrumb-item"><a href="index.html">Services</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row">
+    <div class="col-md-12">
+     <h2>Classes</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="classesCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="classComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="BaseMovementService.php.html#23">App\Game\Maps\Services\BaseMovementService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#31">App\Game\Maps\Services\LocationService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#27">App\Game\Maps\Services\MovementService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#20">App\Game\Maps\Services\PctService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PortService.php.html#10">App\Game\Maps\Services\PortService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SetSailService.php.html#16">App\Game\Maps\Services\SetSailService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TeleportService.php.html#21">App\Game\Maps\Services\TeleportService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#35">App\Game\Maps\Services\TraverseService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UpdateRaidMonsters.php.html#12">App\Game\Maps\Services\UpdateRaidMonsters</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WalkingService.php.html#16">App\Game\Maps\Services\WalkingService</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/CanPlayerMassEmbezzle.php.html#8">App\Game\Maps\Services\Common\CanPlayerMassEmbezzle</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/LiveCharacterCount.php.html#7">App\Game\Maps\Services\Common\LiveCharacterCount</a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#14">App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation</a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Class</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="TraverseService.php.html#35">App\Game\Maps\Services\TraverseService</a></td><td class="text-right">0.0%</td><td class="text-right">47</td><td class="text-right">2256</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#23">App\Game\Maps\Services\BaseMovementService</a></td><td class="text-right">0.0%</td><td class="text-right">38</td><td class="text-right">1482</td></tr>
+       <tr><td><a href="PctService.php.html#20">App\Game\Maps\Services\PctService</a></td><td class="text-right">0.0%</td><td class="text-right">29</td><td class="text-right">870</td></tr>
+       <tr><td><a href="LocationService.php.html#31">App\Game\Maps\Services\LocationService</a></td><td class="text-right">0.0%</td><td class="text-right">26</td><td class="text-right">702</td></tr>
+       <tr><td><a href="MovementService.php.html#27">App\Game\Maps\Services\MovementService</a></td><td class="text-right">0.0%</td><td class="text-right">19</td><td class="text-right">380</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#14">App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation</a></td><td class="text-right">0.0%</td><td class="text-right">19</td><td class="text-right">380</td></tr>
+       <tr><td><a href="TeleportService.php.html#21">App\Game\Maps\Services\TeleportService</a></td><td class="text-right">0.0%</td><td class="text-right">17</td><td class="text-right">306</td></tr>
+       <tr><td><a href="WalkingService.php.html#16">App\Game\Maps\Services\WalkingService</a></td><td class="text-right">0.0%</td><td class="text-right">14</td><td class="text-right">210</td></tr>
+       <tr><td><a href="SetSailService.php.html#16">App\Game\Maps\Services\SetSailService</a></td><td class="text-right">0.0%</td><td class="text-right">12</td><td class="text-right">156</td></tr>
+       <tr><td><a href="PortService.php.html#10">App\Game\Maps\Services\PortService</a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="Common/CanPlayerMassEmbezzle.php.html#8">App\Game\Maps\Services\Common\CanPlayerMassEmbezzle</a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-12">
+     <h2 style="margin-top: 3rem;">Methods</h2>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3>Coverage Distribution</h3>
+     <div id="methodsCoverageDistribution" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3>Complexity</h3>
+     <div id="methodComplexity" style="height: 300px;">
+       <svg></svg>
+     </div>
+    </div>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Insufficient Coverage</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="BaseMovementService.php.html#37"><abbr title="App\Game\Maps\Services\BaseMovementService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#64"><abbr title="App\Game\Maps\Services\BaseMovementService::setCoordinatesToTravelTo">setCoordinatesToTravelTo</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#75"><abbr title="App\Game\Maps\Services\BaseMovementService::setCost">setCost</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#85"><abbr title="App\Game\Maps\Services\BaseMovementService::setTimeOutValue">setTimeOutValue</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#95"><abbr title="App\Game\Maps\Services\BaseMovementService::traversePlayer">traversePlayer</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#115"><abbr title="App\Game\Maps\Services\BaseMovementService::updateCharacterMapPosition">updateCharacterMapPosition</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#132"><abbr title="App\Game\Maps\Services\BaseMovementService::updateKingdomOwnedKingdom">updateKingdomOwnedKingdom</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#148"><abbr title="App\Game\Maps\Services\BaseMovementService::awakensCelestial">awakensCelestial</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#160"><abbr title="App\Game\Maps\Services\BaseMovementService::validateCoordinates">validateCoordinates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#176"><abbr title="App\Game\Maps\Services\BaseMovementService::getLocationForCoordinates">getLocationForCoordinates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#188"><abbr title="App\Game\Maps\Services\BaseMovementService::canPlayerEnterLocation">canPlayerEnterLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#219"><abbr title="App\Game\Maps\Services\BaseMovementService::canPlayerMoveToLocation">canPlayerMoveToLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#259"><abbr title="App\Game\Maps\Services\BaseMovementService::generateCannotWalkServerMessage">generateCannotWalkServerMessage</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#303"><abbr title="App\Game\Maps\Services\BaseMovementService::createServerMessageForCannotWalk">createServerMessageForCannotWalk</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#44"><abbr title="App\Game\Maps\Services\LocationService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#59"><abbr title="App\Game\Maps\Services\LocationService::getMapData">getMapData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#88"><abbr title="App\Game\Maps\Services\LocationService::getLocationData">getLocationData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#132"><abbr title="App\Game\Maps\Services\LocationService::getLockedLocation">getLockedLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#141"><abbr title="App\Game\Maps\Services\LocationService::getDroppableItems">getDroppableItems</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#148"><abbr title="App\Game\Maps\Services\LocationService::getLocationDetails">getLocationDetails</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#167"><abbr title="App\Game\Maps\Services\LocationService::getTeleportLocations">getTeleportLocations</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#178"><abbr title="App\Game\Maps\Services\LocationService::getNpcKingdoms">getNpcKingdoms</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#191"><abbr title="App\Game\Maps\Services\LocationService::getCondensedEnemyKingdoms">getCondensedEnemyKingdoms</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#202"><abbr title="App\Game\Maps\Services\LocationService::getCharacterPositionData">getCharacterPositionData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#210"><abbr title="App\Game\Maps\Services\LocationService::getMapTimeOutDetails">getMapTimeOutDetails</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#225"><abbr title="App\Game\Maps\Services\LocationService::locationBasedEvents">locationBasedEvents</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#248"><abbr title="App\Game\Maps\Services\LocationService::fetchLocationData">fetchLocationData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#265"><abbr title="App\Game\Maps\Services\LocationService::fetchCorruptedLocationData">fetchCorruptedLocationData</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#284"><abbr title="App\Game\Maps\Services\LocationService::getCelestialEntityId">getCelestialEntityId</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#308"><abbr title="App\Game\Maps\Services\LocationService::processLocation">processLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="LocationService.php.html#323"><abbr title="App\Game\Maps\Services\LocationService::kingdomManagement">kingdomManagement</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#78"><abbr title="App\Game\Maps\Services\MovementService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#103"><abbr title="App\Game\Maps\Services\MovementService::accessLocationService">accessLocationService</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#111"><abbr title="App\Game\Maps\Services\MovementService::getMapsToTraverse">getMapsToTraverse</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#128"><abbr title="App\Game\Maps\Services\MovementService::updateCharacterPlane">updateCharacterPlane</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#167"><abbr title="App\Game\Maps\Services\MovementService::giveLocationReward">giveLocationReward</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#178"><abbr title="App\Game\Maps\Services\MovementService::giveQuestReward">giveQuestReward</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="MovementService.php.html#217"><abbr title="App\Game\Maps\Services\MovementService::filterTraversableMaps">filterTraversableMaps</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#28"><abbr title="App\Game\Maps\Services\PctService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#37"><abbr title="App\Game\Maps\Services\PctService::usePCT">usePCT</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#102"><abbr title="App\Game\Maps\Services\PctService::handleNewPlaneUpdate">handleNewPlaneUpdate</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#123"><abbr title="App\Game\Maps\Services\PctService::moveToCelestialPlane">moveToCelestialPlane</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#149"><abbr title="App\Game\Maps\Services\PctService::teleportToCelestial">teleportToCelestial</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#166"><abbr title="App\Game\Maps\Services\PctService::rebuildCharacterStats">rebuildCharacterStats</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#190"><abbr title="App\Game\Maps\Services\PctService::getDirections">getDirections</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#211"><abbr title="App\Game\Maps\Services\PctService::findCelestialFight">findCelestialFight</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PctService.php.html#245"><abbr title="App\Game\Maps\Services\PctService::isCharacterOnTheSameMap">isCharacterOnTheSameMap</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PortService.php.html#27"><abbr title="App\Game\Maps\Services\PortService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PortService.php.html#35"><abbr title="App\Game\Maps\Services\PortService::getPortDetails">getPortDetails</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PortService.php.html#56"><abbr title="App\Game\Maps\Services\PortService::doesMatch">doesMatch</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PortService.php.html#70"><abbr title="App\Game\Maps\Services\PortService::setSail">setSail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="PortService.php.html#85"><abbr title="App\Game\Maps\Services\PortService::fetchOtherPorts">fetchOtherPorts</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SetSailService.php.html#22"><abbr title="App\Game\Maps\Services\SetSailService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SetSailService.php.html#46"><abbr title="App\Game\Maps\Services\SetSailService::setSail">setSail</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SetSailService.php.html#89"><abbr title="App\Game\Maps\Services\SetSailService::getToLocation">getToLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SetSailService.php.html#101"><abbr title="App\Game\Maps\Services\SetSailService::getFromLocation">getFromLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="SetSailService.php.html#113"><abbr title="App\Game\Maps\Services\SetSailService::moveCharacterToNewPort">moveCharacterToNewPort</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TeleportService.php.html#27"><abbr title="App\Game\Maps\Services\TeleportService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TeleportService.php.html#53"><abbr title="App\Game\Maps\Services\TeleportService::teleport">teleport</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TeleportService.php.html#102"><abbr title="App\Game\Maps\Services\TeleportService::getHasCharacterTraversed">getHasCharacterTraversed</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TeleportService.php.html#118"><abbr title="App\Game\Maps\Services\TeleportService::teleportCharacter">teleportCharacter</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#56"><abbr title="App\Game\Maps\Services\TraverseService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#78"><abbr title="App\Game\Maps\Services\TraverseService::canTravel">canTravel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#148"><abbr title="App\Game\Maps\Services\TraverseService::travel">travel</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#233"><abbr title="App\Game\Maps\Services\TraverseService::getLocationForCoordinates">getLocationForCoordinates</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#243"><abbr title="App\Game\Maps\Services\TraverseService::updateKingdomOwnedKingdom">updateKingdomOwnedKingdom</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#265"><abbr title="App\Game\Maps\Services\TraverseService::updateCharactersPosition">updateCharactersPosition</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#320"><abbr title="App\Game\Maps\Services\TraverseService::updateCharacterTimeOut">updateCharacterTimeOut</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#339"><abbr title="App\Game\Maps\Services\TraverseService::updateActions">updateActions</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#360"><abbr title="App\Game\Maps\Services\TraverseService::updateActionsForMap">updateActionsForMap</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#386"><abbr title="App\Game\Maps\Services\TraverseService::getMonstersForMap">getMonstersForMap</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#406"><abbr title="App\Game\Maps\Services\TraverseService::updateActionTypeCache">updateActionTypeCache</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="TraverseService.php.html#414"><abbr title="App\Game\Maps\Services\TraverseService::updateMap">updateMap</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UpdateRaidMonsters.php.html#14"><abbr title="App\Game\Maps\Services\UpdateRaidMonsters::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="UpdateRaidMonsters.php.html#32"><abbr title="App\Game\Maps\Services\UpdateRaidMonsters::updateMonstersForRaidLocations">updateMonstersForRaidLocations</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WalkingService.php.html#20"><abbr title="App\Game\Maps\Services\WalkingService::__construct">__construct</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="WalkingService.php.html#43"><abbr title="App\Game\Maps\Services\WalkingService::movePlayerToNewLocation">movePlayerToNewLocation</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/CanPlayerMassEmbezzle.php.html#13"><abbr title="App\Game\Maps\Services\Common\CanPlayerMassEmbezzle::canMassEmbezzle">canMassEmbezzle</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/LiveCharacterCount.php.html#12"><abbr title="App\Game\Maps\Services\Common\LiveCharacterCount::getActiveUsersCountForMap">getActiveUsersCountForMap</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#19"><abbr title="App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation::updateMonstersList">updateMonstersList</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#55"><abbr title="App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation::updateMonstersForRaid">updateMonstersForRaid</abbr></a></td><td class="text-right">0%</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#117"><abbr title="App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation::updateMonsterForLocationType">updateMonsterForLocationType</abbr></a></td><td class="text-right">0%</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+    <div class="col-md-6">
+     <h3 style="margin-top: 2rem;">Project Risks</h3>
+     <div class="scrollbox">
+      <table class="table">
+       <thead>
+        <tr>
+         <th>Method</th>
+         <th class="text-right">Coverage</th>
+         <th class="text-right">Complexity</th>
+         <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+        </tr>
+       </thead>
+       <tbody>
+       <tr><td><a href="TraverseService.php.html#360"><abbr title="App\Game\Maps\Services\TraverseService::updateActionsForMap">updateActionsForMap</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">13</td><td class="text-right">182</td></tr>
+       <tr><td><a href="WalkingService.php.html#43"><abbr title="App\Game\Maps\Services\WalkingService::movePlayerToNewLocation">movePlayerToNewLocation</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">13</td><td class="text-right">182</td></tr>
+       <tr><td><a href="PctService.php.html#37"><abbr title="App\Game\Maps\Services\PctService::usePCT">usePCT</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">10</td><td class="text-right">110</td></tr>
+       <tr><td><a href="TraverseService.php.html#78"><abbr title="App\Game\Maps\Services\TraverseService::canTravel">canTravel</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">10</td><td class="text-right">110</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#55"><abbr title="App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation::updateMonstersForRaid">updateMonstersForRaid</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">10</td><td class="text-right">110</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#219"><abbr title="App\Game\Maps\Services\BaseMovementService::canPlayerMoveToLocation">canPlayerMoveToLocation</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#259"><abbr title="App\Game\Maps\Services\BaseMovementService::generateCannotWalkServerMessage">generateCannotWalkServerMessage</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">9</td><td class="text-right">90</td></tr>
+       <tr><td><a href="SetSailService.php.html#46"><abbr title="App\Game\Maps\Services\SetSailService::setSail">setSail</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">8</td><td class="text-right">72</td></tr>
+       <tr><td><a href="TeleportService.php.html#53"><abbr title="App\Game\Maps\Services\TeleportService::teleport">teleport</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">8</td><td class="text-right">72</td></tr>
+       <tr><td><a href="MovementService.php.html#217"><abbr title="App\Game\Maps\Services\MovementService::filterTraversableMaps">filterTraversableMaps</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="TeleportService.php.html#118"><abbr title="App\Game\Maps\Services\TeleportService::teleportCharacter">teleportCharacter</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="TraverseService.php.html#148"><abbr title="App\Game\Maps\Services\TraverseService::travel">travel</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="TraverseService.php.html#265"><abbr title="App\Game\Maps\Services\TraverseService::updateCharactersPosition">updateCharactersPosition</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">7</td><td class="text-right">56</td></tr>
+       <tr><td><a href="PctService.php.html#211"><abbr title="App\Game\Maps\Services\PctService::findCelestialFight">findCelestialFight</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#19"><abbr title="App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation::updateMonstersList">updateMonstersList</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">6</td><td class="text-right">42</td></tr>
+       <tr><td><a href="PctService.php.html#166"><abbr title="App\Game\Maps\Services\PctService::rebuildCharacterStats">rebuildCharacterStats</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="Common/CanPlayerMassEmbezzle.php.html#13"><abbr title="App\Game\Maps\Services\Common\CanPlayerMassEmbezzle::canMassEmbezzle">canMassEmbezzle</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">5</td><td class="text-right">30</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#188"><abbr title="App\Game\Maps\Services\BaseMovementService::canPlayerEnterLocation">canPlayerEnterLocation</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="MovementService.php.html#128"><abbr title="App\Game\Maps\Services\MovementService::updateCharacterPlane">updateCharacterPlane</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="MovementService.php.html#178"><abbr title="App\Game\Maps\Services\MovementService::giveQuestReward">giveQuestReward</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">4</td><td class="text-right">20</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#95"><abbr title="App\Game\Maps\Services\BaseMovementService::traversePlayer">traversePlayer</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#160"><abbr title="App\Game\Maps\Services\BaseMovementService::validateCoordinates">validateCoordinates</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="LocationService.php.html#88"><abbr title="App\Game\Maps\Services\LocationService::getLocationData">getLocationData</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="LocationService.php.html#148"><abbr title="App\Game\Maps\Services\LocationService::getLocationDetails">getLocationDetails</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="TraverseService.php.html#386"><abbr title="App\Game\Maps\Services\TraverseService::getMonstersForMap">getMonstersForMap</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="Common/UpdateRaidMonstersForLocation.php.html#117"><abbr title="App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation::updateMonsterForLocationType">updateMonsterForLocationType</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">3</td><td class="text-right">12</td></tr>
+       <tr><td><a href="BaseMovementService.php.html#148"><abbr title="App\Game\Maps\Services\BaseMovementService::awakensCelestial">awakensCelestial</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="LocationService.php.html#210"><abbr title="App\Game\Maps\Services\LocationService::getMapTimeOutDetails">getMapTimeOutDetails</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="LocationService.php.html#225"><abbr title="App\Game\Maps\Services\LocationService::locationBasedEvents">locationBasedEvents</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="LocationService.php.html#265"><abbr title="App\Game\Maps\Services\LocationService::fetchCorruptedLocationData">fetchCorruptedLocationData</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="LocationService.php.html#284"><abbr title="App\Game\Maps\Services\LocationService::getCelestialEntityId">getCelestialEntityId</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="LocationService.php.html#323"><abbr title="App\Game\Maps\Services\LocationService::kingdomManagement">kingdomManagement</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="PctService.php.html#123"><abbr title="App\Game\Maps\Services\PctService::moveToCelestialPlane">moveToCelestialPlane</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="PctService.php.html#190"><abbr title="App\Game\Maps\Services\PctService::getDirections">getDirections</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="PortService.php.html#56"><abbr title="App\Game\Maps\Services\PortService::doesMatch">doesMatch</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+       <tr><td><a href="PortService.php.html#85"><abbr title="App\Game\Maps\Services\PortService::fetchOtherPorts">fetchOtherPorts</abbr></a></td><td class="text-right">0.0%</td><td class="text-right">2</td><td class="text-right">6</td></tr>
+
+       </tbody>
+      </table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 12.5.7</a> using <a href="https://www.php.net/" target="_top">PHP 8.4.24</a> and <a href="https://phpunit.de/">PHPUnit 12.5.29</a> at Sat Aug 8 17:57:50 MDT 2026.</small>
+    </p>
+   </footer>
+  </div>
+  <script src="../../../_js/billboard.pkgd.min.js?v=12.5.7" type="text/javascript"></script>
+  <script type="application/json" id="complexity_class">[[0,38,"BaseMovementService.php.html#23","App\\Game\\Maps\\Services\\BaseMovementService","1482"],[0,26,"LocationService.php.html#31","App\\Game\\Maps\\Services\\LocationService","702"],[0,19,"MovementService.php.html#27","App\\Game\\Maps\\Services\\MovementService","380"],[0,29,"PctService.php.html#20","App\\Game\\Maps\\Services\\PctService","870"],[0,7,"PortService.php.html#10","App\\Game\\Maps\\Services\\PortService","56"],[0,12,"SetSailService.php.html#16","App\\Game\\Maps\\Services\\SetSailService","156"],[0,17,"TeleportService.php.html#21","App\\Game\\Maps\\Services\\TeleportService","306"],[0,47,"TraverseService.php.html#35","App\\Game\\Maps\\Services\\TraverseService","2256"],[0,2,"UpdateRaidMonsters.php.html#12","App\\Game\\Maps\\Services\\UpdateRaidMonsters","6"],[0,14,"WalkingService.php.html#16","App\\Game\\Maps\\Services\\WalkingService","210"],[0,5,"Common\/CanPlayerMassEmbezzle.php.html#8","App\\Game\\Maps\\Services\\Common\\CanPlayerMassEmbezzle","30"],[0,1,"Common\/LiveCharacterCount.php.html#7","App\\Game\\Maps\\Services\\Common\\LiveCharacterCount","2"],[0,19,"Common\/UpdateRaidMonstersForLocation.php.html#14","App\\Game\\Maps\\Services\\Common\\UpdateRaidMonstersForLocation","380"]]</script>
+  <script type="application/json" id="complexity_method">[[0,1,"BaseMovementService.php.html#37","App\\Game\\Maps\\Services\\BaseMovementService::__construct","2"],[0,1,"BaseMovementService.php.html#64","App\\Game\\Maps\\Services\\BaseMovementService::setCoordinatesToTravelTo","2"],[0,1,"BaseMovementService.php.html#75","App\\Game\\Maps\\Services\\BaseMovementService::setCost","2"],[0,1,"BaseMovementService.php.html#85","App\\Game\\Maps\\Services\\BaseMovementService::setTimeOutValue","2"],[0,3,"BaseMovementService.php.html#95","App\\Game\\Maps\\Services\\BaseMovementService::traversePlayer","12"],[0,1,"BaseMovementService.php.html#115","App\\Game\\Maps\\Services\\BaseMovementService::updateCharacterMapPosition","2"],[0,1,"BaseMovementService.php.html#132","App\\Game\\Maps\\Services\\BaseMovementService::updateKingdomOwnedKingdom","2"],[0,2,"BaseMovementService.php.html#148","App\\Game\\Maps\\Services\\BaseMovementService::awakensCelestial","6"],[0,3,"BaseMovementService.php.html#160","App\\Game\\Maps\\Services\\BaseMovementService::validateCoordinates","12"],[0,1,"BaseMovementService.php.html#176","App\\Game\\Maps\\Services\\BaseMovementService::getLocationForCoordinates","2"],[0,4,"BaseMovementService.php.html#188","App\\Game\\Maps\\Services\\BaseMovementService::canPlayerEnterLocation","20"],[0,9,"BaseMovementService.php.html#219","App\\Game\\Maps\\Services\\BaseMovementService::canPlayerMoveToLocation","90"],[0,9,"BaseMovementService.php.html#259","App\\Game\\Maps\\Services\\BaseMovementService::generateCannotWalkServerMessage","90"],[0,1,"BaseMovementService.php.html#303","App\\Game\\Maps\\Services\\BaseMovementService::createServerMessageForCannotWalk","2"],[0,1,"LocationService.php.html#44","App\\Game\\Maps\\Services\\LocationService::__construct","2"],[0,1,"LocationService.php.html#59","App\\Game\\Maps\\Services\\LocationService::getMapData","2"],[0,3,"LocationService.php.html#88","App\\Game\\Maps\\Services\\LocationService::getLocationData","12"],[0,1,"LocationService.php.html#132","App\\Game\\Maps\\Services\\LocationService::getLockedLocation","2"],[0,1,"LocationService.php.html#141","App\\Game\\Maps\\Services\\LocationService::getDroppableItems","2"],[0,3,"LocationService.php.html#148","App\\Game\\Maps\\Services\\LocationService::getLocationDetails","12"],[0,1,"LocationService.php.html#167","App\\Game\\Maps\\Services\\LocationService::getTeleportLocations","2"],[0,1,"LocationService.php.html#178","App\\Game\\Maps\\Services\\LocationService::getNpcKingdoms","2"],[0,1,"LocationService.php.html#191","App\\Game\\Maps\\Services\\LocationService::getCondensedEnemyKingdoms","2"],[0,1,"LocationService.php.html#202","App\\Game\\Maps\\Services\\LocationService::getCharacterPositionData","2"],[0,2,"LocationService.php.html#210","App\\Game\\Maps\\Services\\LocationService::getMapTimeOutDetails","6"],[0,2,"LocationService.php.html#225","App\\Game\\Maps\\Services\\LocationService::locationBasedEvents","6"],[0,1,"LocationService.php.html#248","App\\Game\\Maps\\Services\\LocationService::fetchLocationData","2"],[0,2,"LocationService.php.html#265","App\\Game\\Maps\\Services\\LocationService::fetchCorruptedLocationData","6"],[0,2,"LocationService.php.html#284","App\\Game\\Maps\\Services\\LocationService::getCelestialEntityId","6"],[0,1,"LocationService.php.html#308","App\\Game\\Maps\\Services\\LocationService::processLocation","2"],[0,2,"LocationService.php.html#323","App\\Game\\Maps\\Services\\LocationService::kingdomManagement","6"],[0,1,"MovementService.php.html#78","App\\Game\\Maps\\Services\\MovementService::__construct","2"],[0,1,"MovementService.php.html#103","App\\Game\\Maps\\Services\\MovementService::accessLocationService","2"],[0,1,"MovementService.php.html#111","App\\Game\\Maps\\Services\\MovementService::getMapsToTraverse","2"],[0,4,"MovementService.php.html#128","App\\Game\\Maps\\Services\\MovementService::updateCharacterPlane","20"],[0,1,"MovementService.php.html#167","App\\Game\\Maps\\Services\\MovementService::giveLocationReward","2"],[0,4,"MovementService.php.html#178","App\\Game\\Maps\\Services\\MovementService::giveQuestReward","20"],[0,7,"MovementService.php.html#217","App\\Game\\Maps\\Services\\MovementService::filterTraversableMaps","56"],[0,1,"PctService.php.html#28","App\\Game\\Maps\\Services\\PctService::__construct","2"],[0,10,"PctService.php.html#37","App\\Game\\Maps\\Services\\PctService::usePCT","110"],[0,1,"PctService.php.html#102","App\\Game\\Maps\\Services\\PctService::handleNewPlaneUpdate","2"],[0,2,"PctService.php.html#123","App\\Game\\Maps\\Services\\PctService::moveToCelestialPlane","6"],[0,1,"PctService.php.html#149","App\\Game\\Maps\\Services\\PctService::teleportToCelestial","2"],[0,5,"PctService.php.html#166","App\\Game\\Maps\\Services\\PctService::rebuildCharacterStats","30"],[0,2,"PctService.php.html#190","App\\Game\\Maps\\Services\\PctService::getDirections","6"],[0,6,"PctService.php.html#211","App\\Game\\Maps\\Services\\PctService::findCelestialFight","42"],[0,1,"PctService.php.html#245","App\\Game\\Maps\\Services\\PctService::isCharacterOnTheSameMap","2"],[0,1,"PortService.php.html#27","App\\Game\\Maps\\Services\\PortService::__construct","2"],[0,1,"PortService.php.html#35","App\\Game\\Maps\\Services\\PortService::getPortDetails","2"],[0,2,"PortService.php.html#56","App\\Game\\Maps\\Services\\PortService::doesMatch","6"],[0,1,"PortService.php.html#70","App\\Game\\Maps\\Services\\PortService::setSail","2"],[0,2,"PortService.php.html#85","App\\Game\\Maps\\Services\\PortService::fetchOtherPorts","6"],[0,1,"SetSailService.php.html#22","App\\Game\\Maps\\Services\\SetSailService::__construct","2"],[0,8,"SetSailService.php.html#46","App\\Game\\Maps\\Services\\SetSailService::setSail","72"],[0,1,"SetSailService.php.html#89","App\\Game\\Maps\\Services\\SetSailService::getToLocation","2"],[0,1,"SetSailService.php.html#101","App\\Game\\Maps\\Services\\SetSailService::getFromLocation","2"],[0,1,"SetSailService.php.html#113","App\\Game\\Maps\\Services\\SetSailService::moveCharacterToNewPort","2"],[0,1,"TeleportService.php.html#27","App\\Game\\Maps\\Services\\TeleportService::__construct","2"],[0,8,"TeleportService.php.html#53","App\\Game\\Maps\\Services\\TeleportService::teleport","72"],[0,1,"TeleportService.php.html#102","App\\Game\\Maps\\Services\\TeleportService::getHasCharacterTraversed","2"],[0,7,"TeleportService.php.html#118","App\\Game\\Maps\\Services\\TeleportService::teleportCharacter","56"],[0,1,"TraverseService.php.html#56","App\\Game\\Maps\\Services\\TraverseService::__construct","2"],[0,10,"TraverseService.php.html#78","App\\Game\\Maps\\Services\\TraverseService::canTravel","110"],[0,7,"TraverseService.php.html#148","App\\Game\\Maps\\Services\\TraverseService::travel","56"],[0,1,"TraverseService.php.html#233","App\\Game\\Maps\\Services\\TraverseService::getLocationForCoordinates","2"],[0,1,"TraverseService.php.html#243","App\\Game\\Maps\\Services\\TraverseService::updateKingdomOwnedKingdom","2"],[0,7,"TraverseService.php.html#265","App\\Game\\Maps\\Services\\TraverseService::updateCharactersPosition","56"],[0,1,"TraverseService.php.html#320","App\\Game\\Maps\\Services\\TraverseService::updateCharacterTimeOut","2"],[0,1,"TraverseService.php.html#339","App\\Game\\Maps\\Services\\TraverseService::updateActions","2"],[0,13,"TraverseService.php.html#360","App\\Game\\Maps\\Services\\TraverseService::updateActionsForMap","182"],[0,3,"TraverseService.php.html#386","App\\Game\\Maps\\Services\\TraverseService::getMonstersForMap","12"],[0,1,"TraverseService.php.html#406","App\\Game\\Maps\\Services\\TraverseService::updateActionTypeCache","2"],[0,1,"TraverseService.php.html#414","App\\Game\\Maps\\Services\\TraverseService::updateMap","2"],[0,1,"UpdateRaidMonsters.php.html#14","App\\Game\\Maps\\Services\\UpdateRaidMonsters::__construct","2"],[0,1,"UpdateRaidMonsters.php.html#32","App\\Game\\Maps\\Services\\UpdateRaidMonsters::updateMonstersForRaidLocations","2"],[0,1,"WalkingService.php.html#20","App\\Game\\Maps\\Services\\WalkingService::__construct","2"],[0,13,"WalkingService.php.html#43","App\\Game\\Maps\\Services\\WalkingService::movePlayerToNewLocation","182"],[0,5,"Common\/CanPlayerMassEmbezzle.php.html#13","App\\Game\\Maps\\Services\\Common\\CanPlayerMassEmbezzle::canMassEmbezzle","30"],[0,1,"Common\/LiveCharacterCount.php.html#12","App\\Game\\Maps\\Services\\Common\\LiveCharacterCount::getActiveUsersCountForMap","2"],[0,6,"Common\/UpdateRaidMonstersForLocation.php.html#19","App\\Game\\Maps\\Services\\Common\\UpdateRaidMonstersForLocation::updateMonstersList","42"],[0,10,"Common\/UpdateRaidMonstersForLocation.php.html#55","App\\Game\\Maps\\Services\\Common\\UpdateRaidMonstersForLocation::updateMonstersForRaid","110"],[0,3,"Common\/UpdateRaidMonstersForLocation.php.html#117","App\\Game\\Maps\\Services\\Common\\UpdateRaidMonstersForLocation::updateMonsterForLocationType","12"]]</script>
+  <script type="text/javascript" defer>
+  const barLabels = [
+    '0%',
+    '0-10%',
+    '10-20%',
+    '20-30%',
+    '30-40%',
+    '40-50%',
+    '50-60%',
+    '60-70%',
+    '70-80%',
+    '80-90%',
+    '90-100%',
+    '100%'
+  ];
+  const barConfig = (name, fullName, values) => ({
+    axis: {
+      x: {
+        type: "category",
+        categories: barLabels,
+      },
+      y: {
+        label: {
+          text: `#${name}`,
+          position: 'outer-top',
+        },
+      },
+    },
+    bindto: `#${name}CoverageDistribution`,
+    data: {
+      columns: [
+        [fullName].concat(values),
+      ],
+      colors: {
+        [fullName]: "rgba(69, 114, 167, 0.75)",
+      },
+      type: "bar",
+    },
+    bar: {
+      width: {
+        ratio: 0.9,
+      },
+    },
+    grid: {
+      focus: {
+        show: false,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">Coverage ${barLabels[data[0].x]}</th></tr>
+            <tr><td class="value">${data[0].value} ${name}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  bb.generate(
+    barConfig('classes', "Class Coverage", [13,0,0,0,0,0,0,0,0,0,0,0])
+  );
+  bb.generate(
+    barConfig('methods', "Method Coverage", [82,0,0,0,0,0,0,0,0,0,0,0])
+  );
+
+  const scatterConfig = (name, complexityData) => ({
+    axis: {
+      x: {
+        label: {
+          text: 'Code Coverage (in percent)',
+          position: 'outer-right',
+        },
+        tick: {
+          values: [0, 20, 40, 60, 80, 100],
+        },
+      },
+      y: {
+        label: {
+          text: 'Cyclomatic Complexity',
+          position: 'outer-top',
+        },
+        min: 0,
+        padding: {
+          bottom: 0,
+          top: 5,
+        },
+      },
+    },
+    bindto: `#${name}Complexity`,
+    data: {
+      columns: [
+        ["complexity_x"].concat(complexityData.map(d => d[0])),
+        ["complexity"].concat(complexityData.map(d => d[1])),
+      ],
+      onclick: function(data, element) {
+        window.location = complexityData[data.index][2];
+      },
+      type: "scatter",
+      xs: {
+        "complexity": "complexity_x",
+      },
+    },
+    grid: {
+      focus: {
+        show: true,
+        y: true,
+      },
+      x: {
+        show: true,
+      },
+      y: {
+        show: true,
+      },
+    },
+    legend: {
+      show: false,
+    },
+    tooltip: {
+      contents: function (data) {
+        const coverage = Math.round(data[0].x);
+        const complexity = data[0].value;
+        const targetName = complexityData[data[0].index][3];
+        const crap = complexityData[data[0].index][4];
+        return `<table class="bb-tooltip"><tbody>
+            <tr><th colspan="2">${targetName}</th></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Coverage</td><td class="name">${coverage}%</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Complexity</td><td class="value">${complexity}</td></tr>
+            <tr class="bb-tooltip-name-complexity"><td>Crap</td><td class="value">${crap}</td></tr>
+          </tbody></table>`;
+      },
+      grouped: false,
+    },
+  });
+  const classComplexityData = JSON.parse(document.getElementById('complexity_class').textContent);
+  bb.generate(
+    scatterConfig("class", classComplexityData)
+  );
+  const methodComplexityData = JSON.parse(document.getElementById('complexity_method').textContent);
+  bb.generate(
+    scatterConfig("method", methodComplexityData),
+  );
+  </script>
+ </body>
+</html>

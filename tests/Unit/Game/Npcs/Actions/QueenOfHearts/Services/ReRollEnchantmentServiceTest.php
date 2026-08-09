@@ -594,4 +594,15 @@ class ReRollEnchantmentServiceTest extends TestCase
 
         $this->assertCount(1, $character->inventory->slots);
     }
+
+    public function test_get_supported_movement_affix_selections_includes_suffix_when_item_has_a_suffix(): void
+    {
+        $item = $this->createItem([
+            'item_suffix_id' => $this->createItemAffix(['type' => 'suffix'])->id,
+        ]);
+
+        $selections = $this->reRollEnchantmentService->getSupportedMovementAffixSelections($item);
+
+        $this->assertContains('suffix', $selections);
+    }
 }

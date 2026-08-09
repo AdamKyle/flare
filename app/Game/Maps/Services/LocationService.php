@@ -145,6 +145,25 @@ class LocationService
         return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
     }
 
+    public function getLocationDetails(Location $location): array
+    {
+        return [
+            'id' => $location->id,
+            'name' => $location->name,
+            'description' => $location->description,
+            'can_players_enter' => $location->can_players_enter,
+            'can_auto_battle' => $location->can_auto_battle,
+            'location_type' => 'location',
+            'is_corrupted' => $location->is_corrupted,
+            'quest_reward_item' => [
+                'data' => is_null($location->questRewardItem) ? null : $this->questItemTransformer->transform($location->questRewardItem),
+            ],
+            'required_quest_item' => is_null($location->requiredQuestItem) ? null : $this->questItemTransformer->transform($location->requiredQuestItem),
+            'x' => $location->x,
+            'y' => $location->y,
+        ];
+    }
+
     public function getTeleportLocations(Character $character): array
     {
         return [

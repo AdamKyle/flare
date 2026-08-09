@@ -5,6 +5,7 @@ namespace App\Game\PassiveSkills\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterPassiveSkill;
 use App\Game\Automation\Services\AutomationRestrictionService;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Services\CharacterPassiveSkills;
 use App\Game\PassiveSkills\Services\PassiveSkillTrainingService;
 use App\Http\Controllers\Controller;
@@ -52,9 +53,7 @@ class CharacterPassiveSkillController extends Controller
             return response()->json(['message' => 'Only one passive allowed to train at a time.'], 422);
         }
 
-        if (! $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character)) {
-            return response()->json(['message' => 'This passive skill is already maxed and cannot be trained.'], 422);
-        }
+        $this->passiveSkillTrainingService->trainSkill($characterPassiveSkill, $character);
 
         $character = $character->refresh();
 
@@ -65,7 +64,7 @@ class CharacterPassiveSkillController extends Controller
         ]);
     }
 
-    public function stopTraining(CharacterPassiveSkill $characterPassiveSkill, Character $character, CharacterPassiveSkills $characterPassiveSkills)
+    public function stopTraining(CharacterPassiveSkill $characterPassiveSkill, Character $character)
     {
         $restriction = $this->automationRestrictionJsonResponse($character);
 

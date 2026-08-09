@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { GameDataContext } from '../game-data-context';
 import GameDataProviderProps from './types/game-data-provider-props';
@@ -179,11 +179,11 @@ const GameDataProvider = (props: GameDataProviderProps) => {
     startCharacterUpdates();
   }, [characterUpdatesListening, startCharacterUpdates]);
 
-  const listenForMonsterUpdates = () => {
+  const listenForMonsterUpdates = useCallback(() => {
     if (!monsterListening) {
       startMonsterUpdates();
     }
-  };
+  }, [monsterListening, startMonsterUpdates]);
 
   return (
     <GameDataContext.Provider

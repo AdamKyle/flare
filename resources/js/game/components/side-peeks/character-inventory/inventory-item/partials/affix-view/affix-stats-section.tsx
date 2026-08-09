@@ -35,6 +35,7 @@ const AffixStatsSection = ({ affix }: AffixStatsSectionProps) => {
 
     return (
       <DefinitionRow
+        key={label}
         left={
           <InfoLabel
             label={label}

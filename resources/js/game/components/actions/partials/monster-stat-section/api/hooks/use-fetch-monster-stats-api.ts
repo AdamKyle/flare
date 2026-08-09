@@ -39,6 +39,9 @@ export const useFetchMonsterStatsApi =
         return;
       }
 
+      setLoading(true);
+      setError(null);
+
       try {
         const result = await apiHandler.get<
           MonsterDefinition,
@@ -47,6 +50,8 @@ export const useFetchMonsterStatsApi =
 
         setData(result);
       } catch (err) {
+        setData(null);
+
         if (err instanceof AxiosError) {
           setError(err.response?.data || null);
         }

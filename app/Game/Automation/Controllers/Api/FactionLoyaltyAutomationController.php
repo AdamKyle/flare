@@ -9,7 +9,6 @@ use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Automation\Services\FactionLoyaltyAutomationService;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Factions\FactionLoyalty\Concerns\FactionLoyalty;
-use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
 use Illuminate\Http\JsonResponse;
 
 class FactionLoyaltyAutomationController
@@ -18,7 +17,6 @@ class FactionLoyaltyAutomationController
 
     public function __construct(
         private readonly FactionLoyaltyAutomationService $factionLoyaltyAutomationService,
-        private readonly FactionLoyaltyService $factionLoyaltyService,
     ) {}
 
     public function begin(FactionLoyaltyAutomationRequest $request, Character $character): JsonResponse
@@ -80,10 +78,4 @@ class FactionLoyaltyAutomationController
         return response()->json($result, $status);
     }
 
-    public function markWarningNoticeRead(Character $character): JsonResponse
-    {
-        $this->factionLoyaltyService->markLatestWarningNoticeRead($character);
-
-        return response()->json();
-    }
 }

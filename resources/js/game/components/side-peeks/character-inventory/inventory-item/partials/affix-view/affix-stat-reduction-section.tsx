@@ -42,6 +42,7 @@ const AffixStatsReductionSection = ({
 
     return (
       <DefinitionRow
+        key={label}
         left={
           <InfoLabel
             label={label}

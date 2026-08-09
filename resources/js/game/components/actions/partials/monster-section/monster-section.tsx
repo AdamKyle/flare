@@ -55,7 +55,9 @@ const MonsterSection = ({
     setMonsterName(monsters[0].name);
   }, [monsters]);
 
-  listenForMonsterUpdates();
+  useEffect(() => {
+    listenForMonsterUpdates();
+  }, [listenForMonsterUpdates]);
 
   const handelMonsterSelection = (shouldFightAgain?: boolean) => {
     if (!monsters || !monsters[currentIndex] || !gameData.character) {
@@ -140,9 +142,18 @@ const MonsterSection = ({
     setMonsterToFight(null);
   };
 
+  const handleCloseExplorationConfiguration = () => {
+    setShowExplorationConfiguration(false);
+  };
+
   const renderMonsterFightSection = () => {
     if (showExplorationConfiguration) {
-      return <MonsterExplorationConfiguration />;
+      return (
+        <MonsterExplorationConfiguration
+          character_id={gameData?.character?.id || 0}
+          on_close={handleCloseExplorationConfiguration}
+        />
+      );
     }
 
     if (loading) {
@@ -184,7 +195,7 @@ const MonsterSection = ({
               label="Reset fight"
               variant={ButtonVariant.DANGER}
               additional_css="w-full lg:w-1/3 mt-2"
-              on_click={() => {}}
+              on_click={handleClearBattleResults}
             />
           </div>
         );
