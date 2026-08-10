@@ -28,24 +28,13 @@ class ShopService
 {
     use ResponseBuilder;
 
-    private EquipItemService $equipItemService;
-
-    private ItemTransformer $itemTransformer;
-
-    private CharacterInventoryService $characterInventoryService;
-
-    private Manager $manager;
-
-    private Pagination $pagination;
-
-    public function __construct(EquipItemService $equipItemService, CharacterInventoryService $characterInventoryService, ItemTransformer $itemTransformer, Manager $manager, Pagination $pagination)
-    {
-        $this->equipItemService = $equipItemService;
-        $this->itemTransformer = $itemTransformer;
-        $this->manager = $manager;
-        $this->pagination = $pagination;
-
-        $this->characterInventoryService = $characterInventoryService;
+    public function __construct(
+        private readonly EquipItemService $equipItemService,
+        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly ItemTransformer $itemTransformer,
+        private readonly Manager $manager,
+        private readonly Pagination $pagination
+    ) {
     }
 
     public function getItemsForShop(Character $character, ?string $type, ?string $searchText, ?string $sortCost = null, int $perPage = 10, int $page = 1): array

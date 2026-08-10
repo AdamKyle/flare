@@ -7,7 +7,7 @@ import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-intr
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
 const ALCHEMY_INTRODUCTION_DESCRIPTION =
-  "Alchemy unlocks later in your progression through the 'I Dream of Alchemy' quest chain and uses Shards and Gold Dust to create potions that boost your stats, kingdom-destruction items, and Holy Oils for upgrading your gear.";
+  "Alchemy unlocks later in your progression after completing the one-off 'I Dream of Alchemy' quest on Surface, and uses Shards and Gold Dust to create potions that boost your stats, kingdom-destruction items, and Holy Oils for upgrading your gear.";
 
 const AlchemySection = (): ReactNode => {
   const { introductionAcknowledged, acknowledgeIntroduction } =

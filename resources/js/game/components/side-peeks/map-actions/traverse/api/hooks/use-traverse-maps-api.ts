@@ -4,14 +4,14 @@ import { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
 import { TraversalApiUrls } from '../enums/traversal-api-urls';
-import UseTraverseMapsApiDefinition from './deffinitions/use-traverse-maps-api-definition';
-import UseTraverseMapsApiParamsDefinition from './deffinitions/use-traverse-maps-api-params-definition';
-import UseTraverseMapsApiResponse from './deffinitions/use-traverse-maps-api-response';
-import UseTraverseMapsRequestParamsDefinition from './deffinitions/use-traverse-maps-request-params-definition';
+import UseTraverseMapsApiDefinition from './definitions/use-traverse-maps-api-definition';
+import UseTraverseMapsApiParamsDefinition from './definitions/use-traverse-maps-api-params-definition';
+import UseTraverseMapsApiResponse from './definitions/use-traverse-maps-api-response';
+import UseTraverseMapsRequestParamsDefinition from './definitions/use-traverse-maps-request-params-definition';
 import { useCloseSidePeekEmitter } from '../../../../base/hooks/use-close-side-peek-emitter';
 import { useEmitMapRefresh } from '../../hooks/use-emit-map-refresh';
 
-const UseTraverseMapsApi = ({
+const useTraverseMapsApi = ({
   character_id,
 }: UseTraverseMapsApiParamsDefinition): UseTraverseMapsApiDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
@@ -63,8 +63,14 @@ const UseTraverseMapsApi = ({
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, url, requestParams]);
+  }, [
+    apiHandler,
+    url,
+    requestParams,
+    emitShouldRefreshMap,
+    closeSidePeek,
+    handleInactivity,
+  ]);
 
   useEffect(() => {
     traversePlayer().catch(() => {});
@@ -77,4 +83,4 @@ const UseTraverseMapsApi = ({
     setRequestParams,
   };
 };
-export default UseTraverseMapsApi;
+export default useTraverseMapsApi;

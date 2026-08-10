@@ -1779,9 +1779,7 @@ class BatchCraftingProcessorTest extends TestCase
         // whichever item it receives directly (no clone), so a single reused item
         // would stop matching "craftable" after its first enchant and starve later
         // chunk attempts. Distinct items keep every attempt finding a fresh target.
-        for ($i = 0; $i < 15; $i++) {
-            $this->createItem(['name' => 'Craft And Enchant Capacity Dagger '.$i, 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
-        }
+        $this->createDistinctlyNamedItems(15, 'Craft And Enchant Capacity Dagger', ['type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Capacity Chunk Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
             EnchantingService::class,

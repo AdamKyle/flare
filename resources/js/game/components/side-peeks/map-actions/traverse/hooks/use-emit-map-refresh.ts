@@ -1,7 +1,7 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { Traverse } from '../enum/traverse';
+import { Traverse } from '../enums/traverse';
 import UseEmitMapRefreshDefinition from './definitions/use-emit-map-refresh-definition';
 
 export const useEmitMapRefresh = (): UseEmitMapRefreshDefinition => {
@@ -24,9 +24,12 @@ export const useEmitMapRefresh = (): UseEmitMapRefreshDefinition => {
     };
   }, [mapRefresherEmitter]);
 
-  const emitShouldRefreshMap = (shouldRefresh: boolean) => {
-    mapRefresherEmitter.emit(Traverse.REFRESH_MAP, shouldRefresh);
-  };
+  const emitShouldRefreshMap = useCallback(
+    (shouldRefresh: boolean) => {
+      mapRefresherEmitter.emit(Traverse.REFRESH_MAP, shouldRefresh);
+    },
+    [mapRefresherEmitter]
+  );
 
   return { shouldRefreshMap, emitShouldRefreshMap };
 };

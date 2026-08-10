@@ -9,7 +9,10 @@ const Messages = (props: AttackMessagesProps): ReactNode => {
     const messageColor = fetchAttackMessageColorForType(message.type);
 
     return (
-      <div key={`${index}-${message.type}-${message.message}`} className={messageColor}>
+      <div
+        key={`${index}-${message.type}-${message.message}`}
+        className={messageColor}
+      >
         {message.message}
       </div>
     );

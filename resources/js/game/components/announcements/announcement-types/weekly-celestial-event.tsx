@@ -72,10 +72,7 @@ const WeeklyCelestialEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'Spawn By Moving')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-gem mr-2 text-lg" />
                     Spawn By Moving
@@ -105,10 +102,7 @@ const WeeklyCelestialEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'Earn Shards')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-scroll-unfurled mr-2 text-lg" />
                     Earn Shards
@@ -138,12 +132,7 @@ const WeeklyCelestialEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() =>
-                    console.log('view', 'One-Hit Or It Flees')
-                  }
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-users mr-2 text-lg" />
                     One-Hit Or It Flees

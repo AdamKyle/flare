@@ -535,34 +535,17 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertFalse($character->refresh()->can_craft);
     }
 
-    public function test_job_tries_once(): void
-    {
-        $job = new AutomatedFactionLoyalty(1, 2, 3, 1);
-
-        $this->assertEquals(1, $job->tries);
-    }
-
-    public function test_job_times_out_after_one_hundred_twenty_seconds(): void
-    {
-        $job = new AutomatedFactionLoyalty(1, 2, 3, 1);
-
-        $this->assertEquals(120, $job->timeout);
-    }
-
-    public function test_job_fails_on_timeout(): void
-    {
-        $job = new AutomatedFactionLoyalty(1, 2, 3, 1);
-
-        $this->assertTrue($job->failOnTimeout);
-    }
-
     public function test_handle_bails_when_character_is_missing(): void
     {
         Event::fake();
 
         AutomatedFactionLoyalty::dispatch(999999, 1, 1, 3);
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+        Event::assertNotDispatched(AutomationTimeOut::class);
+        Event::assertNotDispatched(UpdateCharacterStatus::class);
+        $this->assertSame(0, CharacterAutomation::count());
+        $this->assertSame(0, FactionLoyaltyAutomation::count());
     }
 
     public function test_handle_ends_automation_when_npc_cannot_be_resolved(): void
@@ -717,7 +700,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function test_handle_recalls_job_and_reaches_action_completed_phase_when_target_item_is_crafted(): void
+    public function test_handle_continues_automation_and_reaches_action_completed_phase_when_target_item_is_crafted(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);
@@ -763,7 +746,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($automation->id));
     }
 
-    public function test_handle_recalls_job_and_sets_failed_crafting_item_when_started_below_target_level(): void
+    public function test_handle_continues_automation_and_sets_failed_crafting_item_when_started_below_target_level(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);
@@ -810,7 +793,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertSame($item->id, $factionLoyaltyAutomation->fresh()->failed_crafting_item_id);
     }
 
-    public function test_handle_recalls_job_when_crafting_max_attempts_reached(): void
+    public function test_handle_continues_automation_when_crafting_max_attempts_reached(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);
@@ -1061,7 +1044,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNull(CharacterAutomation::find($automation->id));
     }
 
-    public function test_handle_recalls_job_when_bounty_completed(): void
+    public function test_handle_continues_automation_when_bounty_completed(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);
@@ -1103,7 +1086,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($automation->id));
     }
 
-    public function test_handle_recalls_job_when_training_batch_completed(): void
+    public function test_handle_continues_automation_when_training_batch_completed(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);
@@ -1145,7 +1128,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($automation->id));
     }
 
-    public function test_handle_recalls_job_when_died_to_bounty_started_training(): void
+    public function test_handle_continues_automation_when_died_to_bounty_started_training(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);
@@ -1187,7 +1170,7 @@ class AutomatedFactionLoyaltyTest extends TestCase
         $this->assertNotNull(CharacterAutomation::find($automation->id));
     }
 
-    public function test_handle_recalls_job_when_bounty_stalled_retry(): void
+    public function test_handle_continues_automation_when_bounty_stalled_retry(): void
     {
         Event::fake();
         config(['queue.connections.long_running.driver' => 'null']);

@@ -19,7 +19,7 @@ class CharacterPassiveSkillController extends Controller
         private readonly AutomationRestrictionService $automationRestrictionService,
     ) {}
 
-    public function getKingdomPassives(Character $character)
+    public function getKingdomPassives(Character $character): JsonResponse
     {
         return response()->json([
             'kingdom_passives' => $this->characterPassiveSkills->getPassiveSkills($character),
@@ -27,7 +27,7 @@ class CharacterPassiveSkillController extends Controller
         ]);
     }
 
-    public function trainSkill(CharacterPassiveSkill $characterPassiveSkill, Character $character)
+    public function trainSkill(CharacterPassiveSkill $characterPassiveSkill, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character);
 
@@ -64,7 +64,7 @@ class CharacterPassiveSkillController extends Controller
         ]);
     }
 
-    public function stopTraining(CharacterPassiveSkill $characterPassiveSkill, Character $character)
+    public function stopTraining(CharacterPassiveSkill $characterPassiveSkill, Character $character): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character);
 

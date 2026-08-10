@@ -4,6 +4,7 @@ import EnchantingAffixSelection from './enchanting-affix-selection';
 import EnchantingCostSummary from './enchanting-cost-summary';
 import EnchantingItemSelection from './enchanting-item-selection';
 import EnchantingSourceSelection from './enchanting-source-selection';
+import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
@@ -12,7 +13,6 @@ import CraftingProgressActionButton from '../../../shared/components/crafting-pr
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useEnchantingFlow } from '../hooks/use-enchanting-flow';
 import { buildDecoratedItemName } from '../utils/build-decorated-item-name';
-import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';

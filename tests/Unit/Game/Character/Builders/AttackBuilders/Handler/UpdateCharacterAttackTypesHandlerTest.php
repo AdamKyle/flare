@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Handlers;
+namespace Tests\Unit\Game\Character\Builders\AttackBuilders\Handler;
 
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;

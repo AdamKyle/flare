@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import React from 'react';
 
 import GemDetailsProps from './types/gem-details-props';
-import { getGemSlotTitleTextColor } from '../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 import GemDetailsContent from '../../../../reusable-components/gem/gem-details-content';
+import { getGemSlotTitleTextColor } from '../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 
 import Separator from 'ui/separator/separator';
 

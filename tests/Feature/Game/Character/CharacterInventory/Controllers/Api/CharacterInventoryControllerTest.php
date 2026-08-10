@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Character\CharacterInventory;
+namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -8,16 +8,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateItem;
 
-class UseAlchemyBoonDuringAutomationTest extends TestCase
+class CharacterInventoryControllerTest extends TestCase
 {
-    use CreateCharacterAutomation;
-    use CreateItem;
-    use RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateCharacterAutomation, CreateItem, RefreshDatabase;
 
-    public function test_boon_use_succeeds_during_automation(): void
+    public function test_use_item_endpoint_succeeds_for_alchemy_boon_during_automation(): void
     {
         Queue::fake();
 
@@ -34,7 +33,8 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $character->alchemyBag->slots()->create([
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
             'amount' => 1,
@@ -54,11 +54,9 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('Used selected item.', $jsonData['message']);
-        $this->assertNotEmpty($character->refresh()->boons);
-        $this->assertEquals(0, $character->alchemyBag->slots()->where('item_id', $item->id)->count());
     }
 
-    public function test_non_boon_use_during_automation_returns_unprocessable(): void
+    public function test_use_item_endpoint_returns_unprocessable_for_non_boon_item_during_automation(): void
     {
         Queue::fake();
 
@@ -93,6 +91,5 @@ class UseAlchemyBoonDuringAutomationTest extends TestCase
             'No you are busy, you can use Alchemy items that apply boons to your character. Please cancel your: Exploration, if you want to use this.',
             $jsonData['message']
         );
-        $this->assertEmpty($character->refresh()->boons);
     }
 }

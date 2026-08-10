@@ -28,10 +28,13 @@ export const useFetchMonsterStatsApi =
       });
     }
 
-    const setRequestParams = (requestParams: SetMonsterPartsDefinition) => {
-      setCharacterId(requestParams.character_id);
-      setMonsterId(requestParams.monster_id);
-    };
+    const setRequestParams = useCallback(
+      (requestParams: SetMonsterPartsDefinition) => {
+        setCharacterId(requestParams.character_id);
+        setMonsterId(requestParams.monster_id);
+      },
+      []
+    );
 
     const fetchMonsterStats = useCallback(async () => {
       if (!characterId || !monsterId || !url) {

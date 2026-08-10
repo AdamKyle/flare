@@ -12,6 +12,14 @@ trait CreateItem
         return Item::factory()->create($options);
     }
 
+    public function createDistinctlyNamedItems(int $count, string $namePrefix, array $options = []): Collection
+    {
+        return Item::factory()
+            ->count($count)
+            ->sequence(fn ($sequence) => ['name' => $namePrefix.' '.$sequence->index])
+            ->create($options);
+    }
+
     public function createCraftableEquipmentItems(array $options = []): Collection
     {
         return Item::factory()

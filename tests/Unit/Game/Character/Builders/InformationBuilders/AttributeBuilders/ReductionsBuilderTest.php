@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Character\Builders\CharacterInformation\AttributeBuilder;
+namespace Tests\Unit\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,7 +13,7 @@ use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
-class ReductionBuilderTest extends TestCase
+class ReductionsBuilderTest extends TestCase
 {
     use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 

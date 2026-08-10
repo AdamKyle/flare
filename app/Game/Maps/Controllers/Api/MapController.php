@@ -25,40 +25,25 @@ use Illuminate\Support\Facades\Cache;
 
 class MapController extends Controller
 {
-    private MovementService $movementService;
-
-    private SetSailService $setSail;
-
-    private TeleportService $teleportService;
-
-    private WalkingService $walkingService;
-
-    private DistanceCalculation $distanceCalculation;
-
     public function __construct(
-        MovementService $movementService,
-        TeleportService $teleportService,
-        WalkingService $walkingService,
-        SetSailService $setSail,
-        DistanceCalculation $distanceCalculation
+        private readonly MovementService $movementService,
+        private readonly TeleportService $teleportService,
+        private readonly WalkingService $walkingService,
+        private readonly SetSailService $setSail,
+        private readonly DistanceCalculation $distanceCalculation,
+        private readonly LocationService $locationService
     ) {
-        $this->movementService = $movementService;
-        $this->teleportService = $teleportService;
-        $this->walkingService = $walkingService;
-        $this->setSail = $setSail;
-        $this->distanceCalculation = $distanceCalculation;
-
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
 
-    public function mapInformation(Character $character, LocationService $locationService): JsonResponse
+    public function mapInformation(Character $character): JsonResponse
     {
-        return response()->json($locationService->getMapData($character));
+        return response()->json($this->locationService->getMapData($character));
     }
 
-    public function updateLocationActions(Character $character, LocationService $locationService): JsonResponse
+    public function updateLocationActions(Character $character): JsonResponse
     {
-        return response()->json($locationService->locationBasedEvents($character));
+        return response()->json($this->locationService->locationBasedEvents($character));
     }
 
     /**
@@ -102,32 +87,32 @@ class MapController extends Controller
         return response()->json(array_values($this->movementService->getMapsToTraverse(auth()->user()->character)));
     }
 
-    public function fetchTeleportCoordinates(Character $character, LocationService $locationService): JsonResponse
+    public function fetchTeleportCoordinates(Character $character): JsonResponse
     {
-        return response()->json($locationService->getTeleportLocations($character));
+        return response()->json($this->locationService->getTeleportLocations($character));
     }
 
-    public function getLocationInformation(Location $location, LocationService $locationService): JsonResponse
+    public function getLocationInformation(Location $location): JsonResponse
     {
         return response()->json([
-            'data' => $locationService->getLocationDetails($location),
+            'data' => $this->locationService->getLocationDetails($location),
         ]);
     }
 
-    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location, LocationService $locationService): JsonResponse
+    public function getLocationDroppableQuestItems(PaginationRequest $request, Location $location): JsonResponse
     {
         return response()->json(
-            $locationService->getDroppableItems($location, $request->per_page, $request->page, $request->search_text)
+            $this->locationService->getDroppableItems($location, $request->per_page, $request->page, $request->search_text)
         );
     }
 
-    public function traverse(TraverseRequest $request, Character $character, MovementService $movementService): JsonResponse
+    public function traverse(TraverseRequest $request, Character $character): JsonResponse
     {
         if (! $character->can_move) {
             return response()->json(['invalid input'], 422);
         }
 
-        $response = $movementService->updateCharacterPlane($request->map_id, $character);
+        $response = $this->movementService->updateCharacterPlane($request->map_id, $character);
 
         $status = $response['status'];
 

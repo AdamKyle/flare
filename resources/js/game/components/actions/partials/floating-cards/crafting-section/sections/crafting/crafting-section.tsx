@@ -8,7 +8,7 @@ import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafti
 import CraftingSectionScreenProps from '../../types/crafting-section-screen-props';
 
 const CRAFTING_INTRODUCTION_DESCRIPTION =
-  'Crafting lets you make your own weapons and armour instead of relying only on what the shop sells. As you level your crafting skill you unlock stronger gear, and high-level crafted items can later be traded for something even more powerful.';
+  'Crafting lets you make your own weapons and armour instead of relying only on what the shop sells. The shop is capped at how much it can offer, so crafting is a core part of gearing up your character beyond that cap as you level your crafting skill.';
 
 const CraftingSection = ({
   setActiveCraftingType,

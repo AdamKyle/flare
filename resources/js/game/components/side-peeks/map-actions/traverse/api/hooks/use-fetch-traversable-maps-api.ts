@@ -3,10 +3,10 @@ import { AxiosError, AxiosRequestConfig } from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 
 import { TraversalApiUrls } from '../enums/traversal-api-urls';
-import UseFetchTraversableMapsDefinition from './deffinitions/use-fetch-traversable-maps-definition';
-import UseFetchTraversableMapsResponse from './deffinitions/use-fetch-traversable-maps-response';
+import UseFetchTraversableMapsDefinition from './definitions/use-fetch-traversable-maps-definition';
+import UseFetchTraversableMapsResponse from './definitions/use-fetch-traversable-maps-response';
 
-export const useOpenTraverseModalApi =
+export const useFetchTraversableMapsApi =
   (): UseFetchTraversableMapsDefinition => {
     const { apiHandler, getUrl } = useApiHandler();
 
@@ -19,7 +19,7 @@ export const useOpenTraverseModalApi =
 
     const url = getUrl(TraversalApiUrls.TRAVERSABLE_MAPS);
 
-    const teleportPlayer = useCallback(async () => {
+    const fetchTraversableMaps = useCallback(async () => {
       try {
         const result = await apiHandler.get<
           UseFetchTraversableMapsResponse[],
@@ -37,8 +37,8 @@ export const useOpenTraverseModalApi =
     }, [apiHandler, url]);
 
     useEffect(() => {
-      teleportPlayer().catch(() => {});
-    }, [teleportPlayer, url]);
+      fetchTraversableMaps().catch(() => {});
+    }, [fetchTraversableMaps, url]);
 
     return {
       data,

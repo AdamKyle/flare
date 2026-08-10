@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Game\Character\Builders\CharacterInformation\AttributeBuilder;
+namespace Tests\Unit\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use App\Flare\Models\ItemSkill;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;

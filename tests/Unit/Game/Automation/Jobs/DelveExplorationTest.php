@@ -64,7 +64,9 @@ class DelveExplorationTest extends TestCase
 
         DelveExploration::dispatch(999999, $location->id, 1, 1, ['attack_type' => AttackType::ATTACK->value], 3);
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+        Event::assertNotDispatched(ServerMessageEvent::class);
+        $this->assertSame(0, CharacterAutomation::count());
     }
 
     public function test_handle_ends_automation_when_location_is_missing(): void
@@ -122,7 +124,9 @@ class DelveExplorationTest extends TestCase
 
         DelveExploration::dispatch($character->id, $location->id, 999999, 1, ['attack_type' => AttackType::ATTACK->value], 3);
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+        Event::assertNotDispatched(ServerMessageEvent::class);
+        $this->assertSame(0, CharacterAutomation::count());
     }
 
     public function test_handle_ends_automation_when_delve_automation_record_is_missing(): void

@@ -5,12 +5,12 @@ import CraftProgressSummary from './craft-progress-summary';
 import CraftTargetOptions from './craft-target-options';
 import CraftTypeFilters from './craft-type-filters';
 import CraftableItemPicker from './craftable-item-picker';
+import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSectionScreenProps from '../../../types/crafting-section-screen-props';
 import { useCraftItemsFlow } from '../hooks/use-craft-items-flow';
-import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
@@ -96,7 +96,9 @@ const CraftItemsFlow = ({
         selectedItem={picker.selectedItem}
         inventoryIsFull={action.inventoryIsFull}
         isCraftSuccessful={result.isCraftSuccessful}
-        onViewCraftedItem={canViewCraftedItem ? handleViewCraftedItem : undefined}
+        onViewCraftedItem={
+          canViewCraftedItem ? handleViewCraftedItem : undefined
+        }
       />
     );
   };

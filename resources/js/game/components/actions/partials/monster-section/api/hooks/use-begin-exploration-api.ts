@@ -6,9 +6,9 @@ import { useCallback, useEffect, useState } from 'react';
 import UseBeginExplorationApiDefinition from './definitions/use-begin-exploration-api-definition';
 import UseBeginExplorationApiParams from './definitions/use-begin-exploration-api-params';
 import UseBeginExplorationRequestParamsDefinition from './definitions/use-begin-exploration-request-params-definition';
-import { ExplorationApiUrls } from '../enums/exploration-api-urls';
 import BeginExplorationRequestDefinition from '../definitions/begin-exploration-request-definition';
 import BeginExplorationResponseDefinition from '../definitions/begin-exploration-response-definition';
+import { ExplorationApiUrls } from '../enums/exploration-api-urls';
 
 const useBeginExplorationApi = (
   params: UseBeginExplorationApiParams
@@ -64,8 +64,7 @@ const useBeginExplorationApi = (
     } finally {
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, url, requestParams]);
+  }, [apiHandler, url, requestParams, handleInactivity]);
 
   useEffect(() => {
     beginExploration().catch(() => {});

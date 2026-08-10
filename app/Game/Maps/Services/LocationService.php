@@ -5,6 +5,7 @@ namespace App\Game\Maps\Services;
 use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
@@ -143,6 +144,17 @@ class LocationService
         $items = ItemModel::where('drop_location_id', $location->id)->where('name', 'LIKE', '%'.$searchText.'%')->get();
 
         return $this->pagination->buildPaginatedDate($items, $this->questItemTransformer, $perPage, $page);
+    }
+
+    public function getMapRequiredItem(GameMap $gameMap): ?array
+    {
+        $requiredItem = $gameMap->requiredItem();
+
+        if (is_null($requiredItem)) {
+            return null;
+        }
+
+        return $this->questItemTransformer->transform($requiredItem);
     }
 
     public function getLocationDetails(Location $location): array

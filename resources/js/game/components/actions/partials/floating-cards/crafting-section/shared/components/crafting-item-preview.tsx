@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
-import CraftingItemPreviewProps from './types/crafting-item-preview-props';
 import CraftingResultNameButton from './crafting-result-name-button';
+import CraftingItemPreviewProps from './types/crafting-item-preview-props';
 import DefinitionRow from '../../../../../../../reusable-components/viewable-sections/definition-row';
 import InfoLabel from '../../../../../../../reusable-components/viewable-sections/info-label';
 import Section from '../../../../../../../reusable-components/viewable-sections/section';

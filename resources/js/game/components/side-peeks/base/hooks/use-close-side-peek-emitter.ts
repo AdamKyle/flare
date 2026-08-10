@@ -1,5 +1,5 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { SidePeek } from '../event-types/side-peek';
 import UseCloseSidePeekEmitterDefinition from './deffinitions/use-close-side-peek-emitter-definition';
@@ -26,9 +26,9 @@ export const useCloseSidePeekEmitter =
       };
     }, [emitter]);
 
-    const closeSidePeek = () => {
+    const closeSidePeek = useCallback(() => {
       emitter.emit(SidePeek.CLOSE_SIDE_PEEK, true);
-    };
+    }, [emitter]);
 
     return {
       shouldClose,

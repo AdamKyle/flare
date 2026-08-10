@@ -743,7 +743,7 @@ class CharacterTopsInspectionService
             return null;
         }
 
-        $requiredItem = $depth >= 4 ? null : $gameMap->map_required_item;
+        $requiredItem = $depth >= 4 ? null : $gameMap->requiredItem();
 
         return [
             'id' => $gameMap->id,

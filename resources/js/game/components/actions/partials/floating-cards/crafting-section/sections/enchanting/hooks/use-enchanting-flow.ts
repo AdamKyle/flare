@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 
 import UseEnchantingFlowDefinition from './definitions/use-enchanting-flow-definition';
-import EnchantingApiResponseDefinition from '../api/definitions/enchanting-api-response-definition';
 import CraftingItemPreviewDefinition from '../../../shared/api/definitions/crafting-item-preview-definition';
 import { useCraftingTimeout } from '../../../shared/hooks/use-crafting-timeout';
+import EnchantingApiResponseDefinition from '../api/definitions/enchanting-api-response-definition';
 import { useEnchantItemApi } from '../api/hooks/use-enchant-item-api';
 import { useEnchantingAffixesApi } from '../api/hooks/use-enchanting-affixes-api';
 import { useEnchantingApi } from '../api/hooks/use-enchanting-api';
@@ -35,9 +35,7 @@ export const useEnchantingFlow = (): UseEnchantingFlowDefinition => {
   const [selectedSource, setSelectedSource] =
     useState<EnchantingItemSource | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
-  const [selectedItemName, setSelectedItemName] = useState<string | null>(
-    null
-  );
+  const [selectedItemName, setSelectedItemName] = useState<string | null>(null);
   const [allItemsEnchanted, setAllItemsEnchanted] = useState<boolean>(false);
   const [prefixId, setPrefixId] = useState<number | null>(null);
   const [suffixId, setSuffixId] = useState<number | null>(null);

@@ -7,11 +7,12 @@ use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 
 class BatchCraftingSetServiceTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateInventorySets, CreateItem, RefreshDatabase;
 
     private ?BatchCraftingSetService $batchCraftingSetService;
 
@@ -54,7 +55,7 @@ class BatchCraftingSetServiceTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $item = $this->createItem();
-        $set->slots()->create(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
 
         $remaining = $this->batchCraftingSetService->remainingSlots($character);
 
@@ -74,9 +75,7 @@ class BatchCraftingSetServiceTest extends TestCase
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $item = $this->createItem();
 
-        for ($i = 0; $i < InventorySet::BATCH_CRAFTING_MAX_SLOTS; $i++) {
-            $set->slots()->create(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
-        }
+        $this->fillInventorySetSlots($set, InventorySet::BATCH_CRAFTING_MAX_SLOTS, $item->id);
 
         $this->assertFalse($this->batchCraftingSetService->canAccept($character, 1));
     }
@@ -110,9 +109,7 @@ class BatchCraftingSetServiceTest extends TestCase
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $filler = $this->createItem();
 
-        for ($i = 0; $i < InventorySet::BATCH_CRAFTING_MAX_SLOTS; $i++) {
-            $set->slots()->create(['inventory_set_id' => $set->id, 'item_id' => $filler->id]);
-        }
+        $this->fillInventorySetSlots($set, InventorySet::BATCH_CRAFTING_MAX_SLOTS, $filler->id);
 
         $result = $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $this->createItem());
 

@@ -171,8 +171,8 @@ const SeerRemoveGemsForm = ({
           <h4 className="font-semibold">Original atonement</h4>
           {renderAtonement(selectedDetails.comparison.original_atonement)}
           <p>
-            Remove one cost: {selectedDetails.remove_one_cost} Gold Bars.
-            Remove all cost: {selectedDetails.remove_all_cost} Gold Bars.
+            Remove one cost: {selectedDetails.remove_one_cost} Gold Bars. Remove
+            all cost: {selectedDetails.remove_all_cost} Gold Bars.
           </p>
           {renderChangeResult()}
         </CraftingActionPreview>

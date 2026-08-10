@@ -1,6 +1,6 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import { useAttackMonster } from './api/hooks/use-attack-monster';
 import { AttackType } from './enums/attack-type';
@@ -116,6 +116,10 @@ const MonsterSection = ({
     });
   };
 
+  const handleCloseExplorationConfiguration = useCallback(() => {
+    setShowExplorationConfiguration(false);
+  }, []);
+
   if (!monsters) {
     return <GameDataError />;
   }
@@ -140,10 +144,6 @@ const MonsterSection = ({
 
   const handleClearBattleResults = () => {
     setMonsterToFight(null);
-  };
-
-  const handleCloseExplorationConfiguration = () => {
-    setShowExplorationConfiguration(false);
   };
 
   const renderMonsterFightSection = () => {

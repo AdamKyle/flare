@@ -73,10 +73,7 @@ const WeeklyFactionPointsEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'Bonus Rewards')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-gem mr-2 text-lg" />
                     Bonus Rewards
@@ -108,10 +105,7 @@ const WeeklyFactionPointsEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'Faction Tasks')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-scroll-unfurled mr-2 text-lg" />
                     Faction Tasks
@@ -151,12 +145,7 @@ const WeeklyFactionPointsEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() =>
-                    console.log('view', 'Pledge And Help NPCs')
-                  }
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-users mr-2 text-lg" />
                     Pledge And Help NPCs

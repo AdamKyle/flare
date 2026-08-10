@@ -72,10 +72,7 @@ const PurgatorySmithsHouseEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'End-Game Gearing')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-gem mr-2 text-lg" />
                     End-Game Gearing
@@ -106,10 +103,7 @@ const PurgatorySmithsHouseEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'Three Currencies')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-scroll-unfurled mr-2 text-lg" />
                     Three Currencies
@@ -140,10 +134,7 @@ const PurgatorySmithsHouseEvent = ({ announcement }: EventTypeProps) => {
                   </p>
                 </CardFront>
 
-                <CardBack
-                  link_title="view"
-                  on_click_link={() => console.log('view', 'Drops And Surge')}
-                >
+                <CardBack>
                   <h4 className="mb-2 flex items-center justify-center text-sm font-semibold">
                     <i className="ra ra-users mr-2 text-lg" />
                     Drops And Surge

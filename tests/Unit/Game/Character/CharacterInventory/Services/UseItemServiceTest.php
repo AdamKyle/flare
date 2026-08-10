@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\AlchemyBagSlot;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
@@ -16,12 +17,14 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateItem;
 
 class UseItemServiceTest extends TestCase
 {
-    use CreateCharacterBoon, CreateItem, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateCharacterAutomation, CreateCharacterBoon, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -1403,5 +1406,76 @@ class UseItemServiceTest extends TestCase
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
         $this->assertEquals(5, $slot->refresh()->amount);
+    }
+
+    public function test_alchemy_boon_item_can_be_used_while_automation_is_active(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING->value,
+            'damages_kingdoms' => false,
+            'can_use_on_other_items' => false,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertNotEmpty($character->refresh()->boons);
+    }
+
+    public function test_non_boon_item_use_is_blocked_while_automation_is_active(): void
+    {
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'weapon',
+            'damages_kingdoms' => false,
+            'can_use_on_other_items' => false,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals(
+            'No you are busy, you can use Alchemy items that apply boons to your character. Please cancel your: Exploration, if you want to use this.',
+            $result['message']
+        );
+        $this->assertEmpty($character->refresh()->boons);
     }
 }

@@ -1,8 +1,8 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { useMemo } from 'react';
 
-import EnchantingPaginatedItemDefinition from '../definitions/enchanting-paginated-item-definition';
 import { planeTextItemColors } from '../../../../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
+import EnchantingPaginatedItemDefinition from '../definitions/enchanting-paginated-item-definition';
 import { EnchantingApiUrls } from '../enums/enchanting-api-urls';
 import UseEnchantingItemsApiDefinition from './definitions/use-enchanting-items-api-definition';
 import UseEnchantingItemsApiParams from './definitions/use-enchanting-items-api-params';

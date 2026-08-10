@@ -31,8 +31,7 @@ const MonsterExplorationConfiguration = ({
     }
 
     on_close();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [successMessage]);
+  }, [successMessage, on_close]);
 
   const timeSelection = [
     {

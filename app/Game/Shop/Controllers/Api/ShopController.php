@@ -14,15 +14,15 @@ use App\Game\Shop\Requests\ShopReplaceItemValidation;
 use App\Game\Shop\Services\ShopService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class ShopController extends Controller
 {
-    private ShopService $shopService;
-
-    public function __construct(ShopService $shopService)
-    {
-        $this->shopService = $shopService;
+    public function __construct(
+        private readonly ShopService $shopService,
+        private readonly ComparisonService $comparisonService
+    ) {
     }
 
     public function fetchItemsForShop(PaginationRequest $request, Character $character): JsonResponse
@@ -37,18 +37,17 @@ class ShopController extends Controller
         );
     }
 
-    public function shopCompare(Request $request, Character $character,
-        ComparisonService $comparisonService)
+    public function shopCompare(Request $request, Character $character): JsonResponse
     {
 
-        $viewData = $comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
+        $viewData = $this->comparisonService->buildShopData($character, Item::where('name', $request->item_name)->first(), $request->item_type);
 
         return response()->json([
             'comparison_data' => $viewData,
         ]);
     }
 
-    public function buy(Request $request, Character $character)
+    public function buy(Request $request, Character $character): JsonResponse|RedirectResponse
     {
 
         if ($character->gold === 0) {
@@ -86,7 +85,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character)
+    public function buyMultiple(ShopPurchaseMultipleValidation $request, Character $character): JsonResponse|RedirectResponse
     {
         $item = Item::find($request->item_id);
         $amount = $request->amount;
@@ -116,7 +115,7 @@ class ShopController extends Controller
         ]);
     }
 
-    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character)
+    public function buyAndReplace(ShopReplaceItemValidation $request, Character $character): JsonResponse|RedirectResponse
     {
 
         $item = Item::find($request->item_id_to_buy);

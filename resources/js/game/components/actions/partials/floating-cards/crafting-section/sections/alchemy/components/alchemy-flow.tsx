@@ -2,6 +2,9 @@ import React, { ReactNode } from 'react';
 
 import AlchemyCostSummary from './alchemy-cost-summary';
 import AlchemyItemSelection from './alchemy-item-selection';
+import UsableItemEffects from '../../../../../../../../reusable-components/usable-item/usable-item-effects';
+import { useOpenCharacterUsableInventory } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-usable-inventory';
+import { planeTextItemColors } from '../../../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
@@ -9,9 +12,6 @@ import CraftingProgressActionButton from '../../../shared/components/crafting-pr
 import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useAlchemyFlow } from '../hooks/use-alchemy-flow';
-import { planeTextItemColors } from '../../../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
-import { useOpenCharacterUsableInventory } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-usable-inventory';
-import UsableItemEffects from '../../../../../../../../reusable-components/usable-item/usable-item-effects';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
 
@@ -162,7 +162,9 @@ const AlchemyFlow = (): ReactNode => {
         status={isSuccess ? 'success' : 'default'}
       >
         {renderResultMessage()}
-        {isSuccess ? renderSuccessPreviewDetails() : renderPendingPreviewDetails()}
+        {isSuccess
+          ? renderSuccessPreviewDetails()
+          : renderPendingPreviewDetails()}
       </CraftingActionPreview>
     );
   };

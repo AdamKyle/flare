@@ -6,17 +6,14 @@ use App\Flare\Models\Character;
 use App\Flare\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class IsCharacterWhoTheySayTheyAreMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  Request  $request
-     * @param  string|null  $guard
-     * @return mixed
      */
-    public function handle($request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, ?string $guard = null): Response
     {
         if (is_null(auth()->user())) {
             return redirect()->route('game')->with('error', 'You don\'t have permission to do that.');

@@ -1,11 +1,12 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
-import { formatNumberWithCommas } from 'game-utils/format-number';
 import { useMemo } from 'react';
 
 import EnchantingAffixDefinition from '../definitions/enchanting-affix-definition';
 import { EnchantingApiUrls } from '../enums/enchanting-api-urls';
 import UseEnchantingAffixesApiDefinition from './definitions/use-enchanting-affixes-api-definition';
 import UseEnchantingAffixesApiParams from './definitions/use-enchanting-affixes-api-params';
+
+import { formatNumberWithCommas } from 'game-utils/format-number';
 
 export const useEnchantingAffixesApi = ({
   character_id,

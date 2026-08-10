@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Game\Automation\Controllers\Api;
+namespace Tests\Feature\Game\Automation;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Broadcast;

@@ -2,7 +2,6 @@
 
 namespace App\Flare\Models;
 
-use App\Game\Core\Items\DataBuilders\QuestItem\QuestItemBuilder;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\MapName;
 use Database\Factories\GameMapFactory;
@@ -53,10 +52,6 @@ class GameMap extends Model
         'generated_parent_game_map_id' => 'integer',
         'game_map_gem_paramter_id' => 'integer',
         'game_location_gem_paramter_id' => 'integer',
-    ];
-
-    protected $appends = [
-        'map_required_item',
     ];
 
     public function maps()
@@ -126,18 +121,7 @@ class GameMap extends Model
         return $hasBonuses;
     }
 
-    public function getMapRequiredItemAttribute(): ?array
-    {
-        $requiredItem = $this->resolveMapRequiredItem();
-
-        if (is_null($requiredItem)) {
-            return null;
-        }
-
-        return resolve(QuestItemBuilder::class)->createDataObject($requiredItem);
-    }
-
-    private function resolveMapRequiredItem(): ?Item
+    public function requiredItem(): ?Item
     {
         return match ($this->effectiveGameMap()->name) {
             'Labyrinth' => Item::where('effect', ItemEffectType::LABYRINTH->value)->first(),

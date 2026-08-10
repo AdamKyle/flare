@@ -2,8 +2,9 @@ import React, { ReactNode } from 'react';
 
 import GemTierCostSummary from './gem-tier-cost-summary';
 import GemTierSelection from './gem-tier-selection';
-import { getGemSlotTitleTextColor } from '../../../../../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
+import GemDetailsContent from '../../../../../../../../reusable-components/gem/gem-details-content';
 import { useOpenCharacterGemBag } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-gem-bag';
+import { getGemSlotTitleTextColor } from '../../../../../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
@@ -11,7 +12,6 @@ import CraftingProgressActionButton from '../../../shared/components/crafting-pr
 import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useGemCraftingFlow } from '../hooks/use-gem-crafting-flow';
-import GemDetailsContent from '../../../../../../../../reusable-components/gem/gem-details-content';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';

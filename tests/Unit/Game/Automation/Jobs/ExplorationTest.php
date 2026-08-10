@@ -59,7 +59,8 @@ class ExplorationTest extends TestCase
 
         Exploration::dispatch($character, 999999, AttackType::ATTACK->value, 3);
 
-        $this->assertTrue(true);
+        Event::assertNotDispatched(AutomationLogUpdate::class);
+        $this->assertSame(0, ExplorationWarning::where('character_id', $character->id)->count());
     }
 
     public function test_handle_repairs_and_finalizes_log_when_automation_is_missing_but_log_exists(): void

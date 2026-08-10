@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import TrinketCostSummary from './trinket-cost-summary';
 import TrinketSelection from './trinket-selection';
+import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
@@ -9,7 +10,6 @@ import CraftingItemPreview from '../../../shared/components/crafting-item-previe
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
 import { useTrinketryFlow } from '../hooks/use-trinketry-flow';
-import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';

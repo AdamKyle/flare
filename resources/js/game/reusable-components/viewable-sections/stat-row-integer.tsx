@@ -30,8 +30,11 @@ const StatRowInteger = ({
       }
       right={
         <span className="inline-flex items-center gap-2 whitespace-nowrap">
-          <i className="fas fa-chevron-up text-emerald-600" aria-hidden="true" />
-          <span className="font-semibold text-emerald-700 dark:text-emerald-400 tabular-nums">
+          <i
+            className="fas fa-chevron-up text-emerald-600"
+            aria-hidden="true"
+          />
+          <span className="font-semibold text-emerald-700 tabular-nums dark:text-emerald-400">
             {formatIntWithPlus(value)}
           </span>
         </span>

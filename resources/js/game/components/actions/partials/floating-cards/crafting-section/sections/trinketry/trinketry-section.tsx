@@ -7,13 +7,11 @@ import { CraftingIntroductionStorageKey } from '../../shared/enums/crafting-intr
 import { useCraftingDisciplineIntroduction } from '../../shared/hooks/use-crafting-discipline-introduction';
 
 const TRINKETRY_INTRODUCTION_DESCRIPTION =
-  'Trinketry unlocks once you reach Purgatory and lets you craft trinkets using currencies such as Copper Coins and Gold Dust. You can only wear one trinket at a time, and they grant Ambush and Counter stats that help you land or resist extra attacks in combat.';
+  'Trinketry unlocks once you reach Purgatory and lets you craft trinkets using currencies such as Copper Coins and Gold Dust. Trinkets grant Ambush and Counter stats that help you land or resist extra attacks in combat, and wearing two trinkets stacks their chance and resistance bonuses.';
 
 const TrinketrySection = (): ReactNode => {
   const { introductionAcknowledged, acknowledgeIntroduction } =
-    useCraftingDisciplineIntroduction(
-      CraftingIntroductionStorageKey.TRINKETRY
-    );
+    useCraftingDisciplineIntroduction(CraftingIntroductionStorageKey.TRINKETRY);
 
   const renderContent = (): ReactNode => {
     if (!introductionAcknowledged) {

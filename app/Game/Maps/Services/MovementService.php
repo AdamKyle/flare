@@ -233,6 +233,10 @@ class MovementService
             }
 
             return ! $gameMap->can_traverse;
+        })->map(function (GameMap $gameMap) {
+            return array_merge($gameMap->toArray(), [
+                'map_required_item' => $this->locationService->getMapRequiredItem($gameMap),
+            ]);
         })->values()->toArray();
     }
 }

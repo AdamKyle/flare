@@ -103,7 +103,7 @@ trait QuestDetails
 
     protected function hasPlaneAccess(Quest $quest, Character $character): bool
     {
-        $itemNeeded = $quest->requiredPlane->map_required_item;
+        $itemNeeded = $quest->requiredPlane->requiredItem();
 
         $planeAccessItem = $character->inventory->slots->filter(function ($slot) use ($itemNeeded) {
             return $slot->item->effect === $itemNeeded->effect;

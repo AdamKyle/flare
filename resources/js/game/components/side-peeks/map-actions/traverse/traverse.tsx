@@ -2,8 +2,8 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { AnimatePresence } from 'framer-motion';
 import React, { useMemo, useState } from 'react';
 
-import UseFetchTraversableMapsResponse from './api/hooks/deffinitions/use-fetch-traversable-maps-response';
-import { useOpenTraverseModalApi } from './api/hooks/use-fetch-traversable-maps-api';
+import UseFetchTraversableMapsResponse from './api/hooks/definitions/use-fetch-traversable-maps-response';
+import { useFetchTraversableMapsApi } from './api/hooks/use-fetch-traversable-maps-api';
 import useTraverseMapsApi from './api/hooks/use-traverse-maps-api';
 import TraversePropsDefinition from './definitions/traverse-props-definition';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
@@ -22,7 +22,7 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import Separator from 'ui/separator/separator';
 
 export const Traverse = ({ character_data }: TraversePropsDefinition) => {
-  const { data, loading, error } = useOpenTraverseModalApi();
+  const { data, loading, error } = useFetchTraversableMapsApi();
   const { setRequestParams, loading: isTraversing } = useTraverseMapsApi({
     character_id: character_data.id,
   });
