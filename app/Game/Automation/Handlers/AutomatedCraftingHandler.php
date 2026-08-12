@@ -292,10 +292,6 @@ class AutomatedCraftingHandler
      */
     private function isBelowTargetLevel(): bool
     {
-        if (is_null($this->targetItem) || is_null($this->craftingSkill)) {
-            return false;
-        }
-
         return $this->craftingSkill->level < $this->targetItem->skill_level_required;
     }
 
@@ -358,10 +354,6 @@ class AutomatedCraftingHandler
      */
     private function isTargetItem(Item $item): bool
     {
-        if (is_null($this->targetItem)) {
-            return false;
-        }
-
         return $item->id === $this->targetItem->id;
     }
 
@@ -370,10 +362,6 @@ class AutomatedCraftingHandler
      */
     private function getTrainingItem(): ?Item
     {
-        if (is_null($this->targetItem) || is_null($this->craftingSkill)) {
-            return null;
-        }
-
         $items = Item::where('can_craft', true)
             ->where('skill_level_required', '<=', $this->craftingSkill->level)
             ->where('skill_level_trivial', '>=', $this->craftingSkill->level)

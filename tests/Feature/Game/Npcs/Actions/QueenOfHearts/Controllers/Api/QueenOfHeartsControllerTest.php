@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Npcs\Actions\QueenOfHearts\Controllers\Api;
 
-use App\Flare\Models\ItemSkill;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\RandomAffixTier;
 use Illuminate\Database\Eloquent\Model;
@@ -10,12 +9,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
 
 class QueenOfHeartsControllerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGameMap, CreateHolyStack, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -405,7 +407,7 @@ class QueenOfHeartsControllerTest extends TestCase
     {
         $this->character->givePlayerLocation();
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'Weapon Mastery',
             'description' => 'Increases weapon proficiency.',
             'max_level' => 10,
@@ -420,13 +422,13 @@ class QueenOfHeartsControllerTest extends TestCase
             'holy_stacks' => 5,
         ]);
 
-        $decoratedUnique->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $decoratedUnique->id,
             'devouring_darkness_bonus' => 0.1,
             'stat_increase_bonus' => 0.1,
         ]);
 
-        $decoratedUnique->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $decoratedUnique->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 1,

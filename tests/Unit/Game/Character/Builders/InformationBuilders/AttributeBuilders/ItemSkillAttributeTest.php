@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
-use App\Flare\Models\ItemSkill;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -12,10 +11,12 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
 
 class ItemSkillAttributeTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -44,15 +45,9 @@ class ItemSkillAttributeTest extends TestCase
             'type' => 'artifact',
         ]);
 
-        $itemSkill = ItemSkill::create([
-            'name' => 'Sample',
-            'description' => 'Test',
-            'str_mod' => 0.01,
-            'max_level' => 100,
-            'total_kills_needed' => 1000,
-        ]);
+        $itemSkill = $this->createItemSkill();
 
-        $item->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 20,

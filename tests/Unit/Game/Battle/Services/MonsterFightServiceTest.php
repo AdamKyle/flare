@@ -5,19 +5,22 @@ namespace Tests\Unit\Game\Battle\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
+use App\Game\Core\Combat\Values\AttackType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 
 class MonsterFightServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateCharacterAutomation, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -90,5 +93,23 @@ class MonsterFightServiceTest extends TestCase
         $service->setupMonster($this->character, ['selected_monster_id' => $this->monster->id], true, false, true);
 
         $this->assertTrue(Cache::has('character-sheet-'.$this->character->id));
+    }
+
+    public function test_setup_monster_returns_automation_restriction_error_when_delve_automation_is_running(): void
+    {
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $service = resolve(MonsterFightService::class);
+
+        $result = $service->setupMonster($this->character, ['selected_monster_id' => $this->monster->id]);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('You cannot do that while Delve automation is running. Cancel it first.', $result['message']);
     }
 }

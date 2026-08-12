@@ -3,7 +3,6 @@
 namespace Tests\Unit\Game\Factions\FactionLoyalty\Services;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Monster;
@@ -16,17 +15,20 @@ use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateEvent;
+use Tests\Traits\CreateFaction;
 use Tests\Traits\CreateFactionLoyalty;
 use Tests\Traits\CreateFactionLoyaltyAutomation;
 use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
+use Tests\Traits\CreateInventorySlot;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateNpc;
 
 class FactionLoyaltyServiceTest extends TestCase
 {
-    use CreateEvent, CreateFactionLoyalty, CreateFactionLoyaltyAutomation, CreateFactionLoyaltyAutomationWarning, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
+    use CreateCharacterAutomation, CreateEvent, CreateFaction, CreateFactionLoyalty, CreateFactionLoyaltyAutomation, CreateFactionLoyaltyAutomationWarning, CreateInventorySlot, CreateItem, CreateMonster, CreateNpc, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -120,7 +122,7 @@ class FactionLoyaltyServiceTest extends TestCase
             'faction_loyalty_npc_id' => $factionNpc->id,
             'fame_tasks' => [],
         ]);
-        $characterAutomation = CharacterAutomation::create([
+        $characterAutomation = $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
@@ -207,7 +209,7 @@ class FactionLoyaltyServiceTest extends TestCase
             'currently_helping' => true,
             'kingdom_item_defence_bonus' => 0.002,
         ]);
-        $characterAutomation = CharacterAutomation::create([
+        $characterAutomation = $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
@@ -479,7 +481,7 @@ class FactionLoyaltyServiceTest extends TestCase
             'game_map_id' => $gameMap->id,
         ]);
 
-        $faction = $character->factions()->create([
+        $faction = $this->createFaction([
             'character_id' => $character->id,
             'game_map_id' => $gameMap->id,
             'current_level' => 0,
@@ -502,6 +504,63 @@ class FactionLoyaltyServiceTest extends TestCase
         $character = $this->character->refresh();
 
         $this->assertEquals('Pledged to: '.$character->map->gameMap->name.'.', $result['message']);
+    }
+
+    public function test_pledge_loyalty_halves_task_amounts_during_weekly_faction_loyalty_event()
+    {
+        $this->character->factions()->update(['maxed' => true]);
+
+        $this->character = $this->character->refresh();
+
+        $this->createNpc([
+            'game_map_id' => $this->character->map->game_map_id,
+        ]);
+
+        $this->createMultipleMonsters(
+            [
+                'game_map_id' => $this->character->map->game_map_id,
+            ], 10
+        );
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'weapon',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'armour',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'ring',
+        ]);
+
+        $this->createItem([
+            'skill_Level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+        ]);
+
+        $this->createEvent([
+            'type' => EventType::WEEKLY_FACTION_LOYALTY_EVENT,
+        ]);
+
+        $this->factionLoyaltyService->pledgeLoyalty($this->character, $this->character->factions->first());
+
+        $character = $this->character->refresh();
+
+        $tasks = $character->factionLoyalties->first()->factionLoyaltyNpcs->first()->factionLoyaltyNpcTasks->fame_tasks;
+
+        $this->assertNotEmpty($tasks);
+
+        foreach ($tasks as $task) {
+            $this->assertLessThanOrEqual(25, $task['required_amount']);
+        }
     }
 
     public function test_pledge_to_existing_loyalty()
@@ -933,7 +992,7 @@ class FactionLoyaltyServiceTest extends TestCase
             'effect' => ItemEffectType::PURGATORY->value,
         ]);
 
-        $this->character->inventory->slots()->create([
+        $this->createInventorySlot([
             'inventory_id' => $this->character->inventory->id,
             'item_id' => $item->id,
         ]);

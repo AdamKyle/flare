@@ -12,13 +12,13 @@ class DelveMonsterServiceTest extends TestCase
 {
     use RefreshDatabase;
 
-    private DelveMonsterService $service;
+    private ?DelveMonsterService $service;
 
-    private CharacterFactory $characterFactory;
+    private ?CharacterFactory $characterFactory;
 
-    private Character $character;
+    private ?Character $character;
 
-    private array $monster;
+    private ?array $monster;
 
     protected function setUp(): void
     {
@@ -62,6 +62,16 @@ class DelveMonsterServiceTest extends TestCase
             'health_range' => '10-20',
             'attack_range' => '5-15',
         ];
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->service = null;
+        $this->characterFactory = null;
+        $this->character = null;
+        $this->monster = null;
     }
 
     public function test_create_monster_returns_monster_unchanged_when_no_active_delve_exists(): void

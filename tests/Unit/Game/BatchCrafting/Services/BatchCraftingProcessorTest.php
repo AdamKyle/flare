@@ -39,6 +39,7 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateEvent;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGameSkill;
@@ -53,7 +54,23 @@ use Tests\Traits\CreateScheduledEvent;
 
 class BatchCraftingProcessorTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateScheduledEvent, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateBatchCrafting, CreateCharacterBoon, CreateEvent, CreateGameMap, CreateGameSkill, CreateGlobalCraftingInventory, CreateGlobalCraftingInventorySlot, CreateGlobalEventGoal, CreateInventorySets, CreateInventorySlot, CreateItem, CreateItemAffix, CreateScheduledEvent, MockeryPHPUnitIntegration, RefreshDatabase;
+
+    private ?CharacterFactory $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
 
     public function test_unexpected_xp_eligible_item_lookup_exception_fails_batch_instead_of_skipping(): void
     {
@@ -62,7 +79,7 @@ class BatchCraftingProcessorTest extends TestCase
             'type' => SkillTypeValue::CRAFTING->value,
             'max_level' => 400,
         ]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 1, false)->getCharacter();
         $craftingService = Mockery::mock(CraftingService::class);
         $craftingService->shouldReceive('fetchCraftableItems')
             ->once()
@@ -88,7 +105,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake();
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 9, 'copper_coins' => 100, 'shards' => 1000000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Dusty Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batch = $this->createBatchCrafting([
@@ -112,7 +129,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake();
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 100, 'copper_coins' => 9, 'shards' => 1000000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Copper Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batch = $this->createBatchCrafting([
@@ -136,7 +153,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake();
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 1, 'copper_coins' => 2, 'shards' => 999999999, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Dual Cost Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batch = $this->createBatchCrafting([
@@ -161,7 +178,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake();
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 100, 'copper_coins' => 100, 'inventory_max' => 30]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 10]);
         $item = $this->createItem(['name' => 'Racing Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -200,7 +217,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake();
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 100, 'copper_coins' => 100, 'shards' => 1000000, 'inventory_max' => 30]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 10]);
         $item = $this->createItem(['name' => 'Affordability Race Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -248,7 +265,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake();
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 100, 'copper_coins' => 100, 'inventory_max' => 30]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 10]);
         $item = $this->createItem(['name' => 'Failed Roll Trinket', 'type' => 'trinket', 'gold_dust_cost' => 10, 'copper_coin_cost' => 20, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -285,7 +302,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_craft_phase_crafts_selected_item_id_instead_of_highest_craftable_item(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Processor Selected High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
         $lowDagger = $this->createItem(['name' => 'Processor Selected Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -323,7 +340,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_craft_phase_falls_back_to_highest_craftable_item_when_no_selection_stored(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Processor Fallback High Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
         $this->createItem(['name' => 'Processor Fallback Low Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -362,7 +379,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_enchant_phase_hard_stops_with_int_too_low_end_reason_when_planned_affix_requires_more_int_than_character_has(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 100, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $item = $this->createItem(['name' => 'Enchant Phase Int Block Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -399,7 +416,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_craft_phase_failed_attempt_does_not_advance_index_or_work_units(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Craft Fail Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
@@ -442,7 +459,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_craft_phase_successful_entry_advances_index_and_work_units_by_one_each(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Craft Success Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
@@ -485,7 +502,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_enchant_phase_attempt_not_made_when_gold_insufficient_does_not_advance_index_or_work_units(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 0, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Enchant Gold Block Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -523,7 +540,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_enchant_phase_successful_completion_advances_index_and_work_units_by_one_not_two(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Enchant Success Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -569,7 +586,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_enchant_phase_shattered_item_does_not_advance_index_decreases_surviving_count_and_switches_to_replacement_crafting(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Enchant Shatter Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -627,7 +644,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_three_entry_fixture_reaches_full_work_unit_completion(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $itemA = $this->createItem(['name' => 'Full Cycle Dagger A', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -680,7 +697,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_enchant_phase_prefix_and_suffix_applied_counts_and_disposition_remain_unchanged(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Prefix Suffix Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -735,7 +752,7 @@ class BatchCraftingProcessorTest extends TestCase
             })
         );
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Auto Affix Resolve Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -756,7 +773,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_persists_and_returns_exact_automatically_resolved_int_stop_affixes(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Exact Auto INT Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -782,7 +799,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_does_not_fall_back_to_lower_int_affix_when_highest_eligible_affix_is_too_high(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'No Fallback Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -804,7 +821,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_int_hard_stop_does_not_create_monitored_bug_report(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Bug Report Guard Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -827,7 +844,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_normal_non_int_enchant_failure_still_continues_as_before(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Normal Enchant Failure Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -847,7 +864,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_try_enchant_slot_cannot_bypass_int_check_when_used_by_standalone_enchant_set_path(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $item = $this->createItem(['name' => 'Enchant Set Bypass Guard Dagger', 'type' => 'dagger']);
@@ -878,7 +895,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_set_processor_crafts_manually_selected_item_instead_of_highest(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Craft Set Selected High Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
         $lowDagger = $this->createItem(['name' => 'Craft Set Selected Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -910,7 +927,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_set_processor_stops_without_fallback_when_persisted_selected_item_is_unavailable(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $fallbackDagger = $this->createItem(['name' => 'Craft Set Forbidden Fallback Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 5, 'skill_level_trivial' => 5]);
         $selectedDagger = $this->createItem(['name' => 'Craft Set Unavailable Selected Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -956,7 +973,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_set_processor_resolves_the_same_selected_item_for_both_hand_keys(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $dagger = $this->createItem(['name' => 'Shared Hand Selection Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
@@ -996,7 +1013,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_processes_at_most_six_workflows_per_tick(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Six Workflow Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1015,7 +1032,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_reaches_twenty_three_actions_across_four_chunked_six_six_six_five_ticks(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 200]);
         $this->createItem(['name' => 'Chunked Cycle Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
@@ -1046,7 +1063,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_auto_selects_one_eligible_prefix_and_one_eligible_suffix(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Double Affix Select Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1072,7 +1089,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_enchanted_item_receives_both_prefix_and_suffix_ids(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Double Affix Ids Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1097,7 +1114,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_action_log_lists_affix_names_in_prefix_then_suffix_order(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Affix Order Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1121,7 +1138,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake([ServerMessageEvent::class]);
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Server Message Affix Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1144,7 +1161,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_applies_only_one_affix_when_only_one_type_is_eligible(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Single Type Eligible Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1166,7 +1183,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_never_selects_two_prefixes_when_no_suffix_exists(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Two Prefixes No Suffix Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1189,7 +1206,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_never_selects_two_suffixes_when_no_prefix_exists(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Two Suffixes No Prefix Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1212,7 +1229,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_explicit_single_affix_selection_overrides_automatic_double_selection(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Explicit Single Affix Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1236,7 +1253,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_int_check_evaluates_both_automatically_selected_affixes(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Int Checks Both Affixes Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1258,7 +1275,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_for_experience_total_cost_includes_both_automatically_selected_affixes(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 15000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Combined Cost Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1283,7 +1300,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_enchant_for_event_enchants_existing_event_items_before_crafting_fallback_set(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
@@ -1313,8 +1330,7 @@ class BatchCraftingProcessorTest extends TestCase
         $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $ringCrafting = $this->createGameSkill(['name' => 'Ring Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $spellCrafting = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)
-            ->createBaseCharacter()
+        $character = $this->character
             ->givePlayerLocation()
             ->assignSkill($weaponCrafting, 10, false)
             ->assignSkill($armourCrafting, 10, false)
@@ -1355,7 +1371,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_retained_alchemy_action_exposes_live_alchemy_bag_slot_and_specialized_details(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 20]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         Item::where('type', 'alchemy')->update(['can_craft' => false]);
@@ -1400,7 +1416,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_removed_alchemy_action_keeps_specialized_snapshot_without_live_slot(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000, 'shards' => 1000, 'alchemy_bag_limit' => 20]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         Item::where('type', 'alchemy')->update(['can_craft' => false]);
@@ -1451,7 +1467,7 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake([ServerMessageEvent::class]);
         Bus::fake([CharacterBoonJob::class]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
         $item = $this->createItem([
@@ -1491,7 +1507,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_alchemy_use_now_emits_aggregate_kept_message_for_kingdom_bomb_item(): void
     {
         Event::fake([ServerMessageEvent::class]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
         $item = $this->createItem([
@@ -1532,7 +1548,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_alchemy_use_now_kept_message_includes_link_metadata_when_item_remains_in_bag(): void
     {
         Event::fake([ServerMessageEvent::class]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
         $item = $this->createItem([
@@ -1579,11 +1595,11 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake([ServerMessageEvent::class]);
         Bus::fake([CharacterBoonJob::class]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
         $existingBoonItem = $this->createItem(['name' => 'Existing Boon Item', 'type' => 'alchemy', 'usable' => true, 'lasts_for' => 60, 'can_stack' => true]);
-        $character->boons()->create([
+        $this->createCharacterBoon([
             'character_id' => $character->id,
             'item_id' => $existingBoonItem->id,
             'last_for_minutes' => 60,
@@ -1633,11 +1649,11 @@ class BatchCraftingProcessorTest extends TestCase
     {
         Event::fake([ServerMessageEvent::class]);
         Bus::fake([CharacterBoonJob::class]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 1000]);
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 50, 'xp' => 0, 'xp_max' => 100]);
         $existingBoonItem = $this->createItem(['name' => 'Action Log Existing Boon', 'type' => 'alchemy', 'usable' => true, 'lasts_for' => 60, 'can_stack' => true]);
-        $character->boons()->create([
+        $this->createCharacterBoon([
             'character_id' => $character->id,
             'item_id' => $existingBoonItem->id,
             'last_for_minutes' => 60,
@@ -1687,7 +1703,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_experience_keep_disposition_checks_decreasing_crafed_items_set_capacity_across_six_six_six_five_chunks(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 200]);
         $this->createItem(['name' => 'Capacity Cycle Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 23]);
@@ -1726,7 +1742,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_experience_keep_disposition_stops_before_crafting_when_crafted_items_set_has_insufficient_capacity_for_a_new_cycle(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 200]);
         $this->createItem(['name' => 'Insufficient Capacity Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 22]);
@@ -1747,7 +1763,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_experience_keep_disposition_stops_next_chunk_when_capacity_is_consumed_between_chunks(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 200]);
         $fillerItem = $this->createItem(['name' => 'Between Chunks Filler Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 23]);
@@ -1772,7 +1788,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_keep_disposition_correctly_allows_second_chunk_when_seventeen_slots_remain(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400, 'skill_bonus_per_level' => 1.0]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 200]);
         // Fifteen distinct catalog items: the EnchantingService mock below mutates
@@ -1819,7 +1835,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_enchant_phase_partial_affix_result_is_discarded_not_completed_and_switches_to_replacement_crafting(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Partial Result Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Partial Result Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -1883,7 +1899,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_replacement_crafting_failure_keeps_same_replacement_key_and_phase(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
         $batchCrafting = $this->createBatchCrafting([
@@ -1924,7 +1940,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_replacement_crafting_success_restores_surviving_count_and_returns_to_enchanting_at_same_index(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Replacement Success Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -1973,12 +1989,12 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_shattered_item_does_not_increment_completed_count_and_returns_to_craft_phase(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Shatter Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
-        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
+        $outputSlot = $this->createInventorySetSlot(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Shatter Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
             SkillCheckService::class,
@@ -2021,11 +2037,11 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_partial_affix_result_is_discarded_and_does_not_increment_completed_count(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Partial Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
-        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
+        $outputSlot = $this->createInventorySetSlot(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Partial Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $suffix = $this->createItemAffix(['name' => 'Amount Partial Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $item->update(['item_prefix_id' => $prefix->id]);
@@ -2072,7 +2088,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_partial_affix_result_does_not_keep_the_item(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $craftableItem = $this->createItem(['name' => 'Experience Partial Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Partial Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -2112,7 +2128,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_with_inventory_destination_succeeds_when_crafted_items_set_is_full(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Inventory Destination Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
@@ -2135,7 +2151,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_with_inventory_set_destination_succeeds_when_crafted_items_set_is_full(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Inventory Set Destination Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 5]);
@@ -2157,7 +2173,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_set_with_inventory_destination_is_not_blocked_by_full_crafted_items_set(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $this->createItem(['name' => 'Craft Set Inventory Destination Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
@@ -2187,7 +2203,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_craft_step_with_inventory_destination_is_not_blocked_by_full_crafted_items_set(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Craft And Enchant Amount Inventory Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
@@ -2214,7 +2230,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_with_crafted_items_set_destination_remains_blocked_when_full(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Crafted Items Set Blocked Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
@@ -2236,7 +2252,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_with_inventory_destination_returns_no_inventory_space_when_inventory_is_full(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 0]);
         $item = $this->createItem(['name' => 'Inventory Full Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -2257,7 +2273,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_with_inventory_set_destination_returns_craft_set_full_when_selected_set_is_full(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Set Full Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 0]);
@@ -2279,7 +2295,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_with_equipped_output_set_returns_target_set_changed(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Equipped Output Set Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true, 'max_slots' => 23]);
@@ -2301,7 +2317,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_enchant_not_attempted_keeps_pending_item_and_phase(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 0, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Gold Block Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -2335,12 +2351,12 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_exact_prefix_success_commits_and_advances_index_once(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Amount Exact Success Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
-        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
+        $outputSlot = $this->createInventorySetSlot(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Exact Success Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
             EnchantingService::class,
@@ -2387,12 +2403,12 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_int_too_low_preserves_pending_item_and_enchant_phase(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 1]);
         $item = $this->createItem(['name' => 'Amount Int Too Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE]);
-        $outputSlot = SetSlot::create(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
+        $outputSlot = $this->createInventorySetSlot(['inventory_set_id' => $outputSet->id, 'item_id' => $item->id]);
         $prefix = $this->createItemAffix(['name' => 'Amount Int Too Low Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 999, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -2424,7 +2440,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_and_enchant_amount_missing_pending_item_returns_to_craft_phase_without_incrementing_progress(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $batchCrafting = $this->createBatchCrafting([
             'character_id' => $character->id,
@@ -2453,7 +2469,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_enchant_phase_null_stored_item_enters_replacement_crafting_without_advancing(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $prefix = $this->createItemAffix(['name' => 'Null Stored Item Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -2493,7 +2509,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_enchant_phase_missing_item_model_enters_replacement_crafting_without_advancing(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $prefix = $this->createItemAffix(['name' => 'Missing Item Model Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -2534,7 +2550,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_enchant_phase_empty_affix_plan_ends_failed_without_advancing(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $item = $this->createItem(['name' => 'Empty Plan Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger']);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -2572,7 +2588,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_commit_fails_when_item_model_is_missing(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Ghost Craft Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->instance(
@@ -2600,7 +2616,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_crafted_items_set_non_set_full_failure_returns_false_and_does_not_advance(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Non Set Full Failure Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->instance(
@@ -2628,7 +2644,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_inventory_commit_creates_exactly_one_slot_on_success(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Single Slot Inventory Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -2648,7 +2664,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_inventory_set_commit_creates_exactly_one_slot_on_success(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Single Slot Set Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 5]);
@@ -2669,7 +2685,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_crafted_items_set_commit_creates_exactly_one_slot_on_success(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Single Slot Crafted Items Set Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -2690,7 +2706,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_missing_retained_destination_fails_and_cleans_orphan_item(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Commit Failure Regression Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -2741,7 +2757,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_cannot_assign_inventory_destination_after_crafting_returns(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 100000, 'inventory_max' => 0, 'int' => 100]);
         $item = $this->createItem(['name' => 'Inventory Full Commit Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -2789,7 +2805,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_replacement_success_removes_lost_key_and_restores_progress_once(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Lost Key Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -2830,7 +2846,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_inventory_failure_leaves_kept_count_at_zero(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 0]);
         $item = $this->createItem(['name' => 'Kept Count Inventory Full Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -2852,7 +2868,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_inventory_set_failure_leaves_kept_count_at_zero(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Kept Count Output Set Full Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 0]);
@@ -2875,7 +2891,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_crafted_items_set_full_failure_leaves_kept_count_at_zero(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Kept Count Crafted Set Full Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
@@ -2897,7 +2913,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_crafted_items_set_non_full_failure_leaves_kept_count_at_zero(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Kept Count Non Set Full Failure Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $this->instance(
@@ -2928,7 +2944,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_mixed_success_then_capacity_failure_across_two_ticks_keeps_exactly_one_kept_count(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $item = $this->createItem(['name' => 'Mixed Result Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $outputSet = $this->createInventorySet(['character_id' => $character->id, 'max_slots' => 1]);
@@ -2950,7 +2966,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_set_commit_failure_leaves_kept_count_at_zero(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 5]);
-        $character = (new CharacterFactory)->createBaseCharacter()->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
+        $character = $this->character->assignSkill($weaponCrafting, 5, false, ['xp' => 100, 'xp_max' => 100])->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 0]);
         $this->createItem(['name' => 'Craft Set Commit Failure Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -2978,7 +2994,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_experience_commit_failure_leaves_kept_count_at_zero(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 0]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
         $this->createItem(['name' => 'Experience Commit Failure Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -2999,7 +3015,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_trinketry_commit_failure_leaves_kept_count_at_zero(): void
     {
         $trinketry = $this->createGameSkill(['name' => 'Trinketry', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($trinketry, 1, false)->getCharacter();
         $character->update(['gold_dust' => 1000000, 'shards' => 1000000, 'copper_coins' => 1000000, 'inventory_max' => 0]);
         $this->createInventorySet(['character_id' => $character->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'max_slots' => 0]);
         $this->createItem(['name' => 'Trinketry Commit Failure Trinket', 'type' => 'trinket', 'crafting_type' => 'trinketry', 'can_craft' => true, 'gold_dust_cost' => 1, 'copper_coin_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3020,7 +3036,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_successful_keep_applies_disposition_exactly_once_with_exactly_one_kept_count(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Experience Success Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Success Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3083,7 +3099,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_enchant_not_attempted_discards_item_without_disposition_or_destination_write(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 5, 'inventory_max' => 30, 'int' => 100]);
         $this->createItem(['name' => 'Experience No Gold Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience No Gold Prefix', 'type' => 'prefix', 'cost' => 1000000, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3119,7 +3135,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_int_too_low_stops_without_disposition_or_destination_write(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 1]);
         $this->createItem(['name' => 'Experience INT Low Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience INT Low Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 999999, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3149,7 +3165,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_shattered_destroys_item_without_disposition_or_destination_write(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $this->createItem(['name' => 'Experience Shatter Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Shatter Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3187,7 +3203,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_partial_prefix_only_discards_item_and_requires_replacement_without_disposition(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $this->createItem(['name' => 'Experience Partial Prefix Only Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Partial Prefix Only Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3230,7 +3246,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_partial_suffix_only_discards_item_and_requires_replacement_without_disposition(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $this->createItem(['name' => 'Experience Partial Suffix Only Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Partial Suffix Only Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3273,7 +3289,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_exact_success_with_failed_commit_zeroes_enchanted_and_kept_counts(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Experience Commit Fail Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Commit Fail Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3333,7 +3349,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_experience_non_retained_sell_disposition_succeeds_without_commit_or_kept_count(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30, 'int' => 100]);
         $item = $this->createItem(['name' => 'Experience Sell Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $prefix = $this->createItemAffix(['name' => 'Experience Sell Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
@@ -3395,7 +3411,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_craft_phase_initial_craft_adds_counted_key_and_increments_surviving_count(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Counted Key Initial Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -3431,7 +3447,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_craft_phase_duplicate_key_does_not_double_count_and_discards_duplicate_item(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->createItem(['name' => 'Counted Key Duplicate Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $set = $this->createInventorySet(['character_id' => $character->id]);
@@ -3467,7 +3483,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_null_stored_item_loss_does_not_decrement_when_key_was_never_counted(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $prefix = $this->createItemAffix(['name' => 'Null Stored Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -3503,7 +3519,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_missing_item_model_loss_decrements_counted_key_exactly_once(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $prefix = $this->createItemAffix(['name' => 'Missing Item Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -3541,7 +3557,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_shattered_loss_decrements_counted_key_exactly_once(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 100]);
         $prefix = $this->createItemAffix(['name' => 'Shatter Counted Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $item = $this->createItem(['name' => 'Shatter Counted Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon']);
@@ -3587,7 +3603,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_partial_affix_discarded_loss_decrements_counted_key_exactly_once(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30, 'int' => 100]);
         $prefix = $this->createItemAffix(['name' => 'Partial Discard Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $suffix = $this->createItemAffix(['name' => 'Partial Discard Suffix', 'type' => 'suffix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
@@ -3637,7 +3653,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_craft_enchant_set_loss_is_idempotent_and_does_not_double_decrement_already_lost_key(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 30]);
         $prefix = $this->createItemAffix(['name' => 'Idempotent Loss Prefix', 'type' => 'prefix', 'cost' => 1, 'int_required' => 0, 'skill_level_required' => 1]);
         $batchCrafting = $this->createBatchCrafting([
@@ -3673,7 +3689,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_replacement_valid_lost_state_restores_counted_key_exactly_once(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Counted Key Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
@@ -3721,7 +3737,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_replacement_rejects_key_not_in_lost_state(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Not Lost Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
@@ -3771,7 +3787,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_enchant_set_replacement_rejects_already_counted_key_preventing_double_restoration(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 100000, 'inventory_max' => 30]);
         $replacementItem = $this->createItem(['name' => 'Already Counted Replacement Dagger', 'type' => 'dagger', 'crafting_type' => 'dagger', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 400]);
         $this->instance(
@@ -3817,7 +3833,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_amount_produces_no_more_than_six_actions_in_one_process_call_and_continues_on_next_call(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 200]);
         $this->instance(
             SkillCheckService::class,
@@ -3857,7 +3873,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_craft_and_enchant_amount_produces_no_more_than_six_phase_operation_actions_and_does_not_count_them_as_completed_items(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
+        $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 10, false)->getCharacter();
         $character->update(['gold' => 1000, 'inventory_max' => 200]);
         $this->instance(
             SkillCheckService::class,
@@ -3892,7 +3908,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_alchemy_amount_produces_no_more_than_six_actions_and_failed_attempts_do_not_advance_completion(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 5, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold_dust' => 100000, 'shards' => 100000, 'alchemy_bag_limit' => 50, 'inventory_max' => 10]);
         $this->instance(
@@ -3926,7 +3942,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_holy_oils_selected_produces_no_more_than_six_application_actions_and_persists_selected_items_across_calls(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->update(['gold_dust' => 100000, 'inventory_max' => 20]);
         $item = $this->createItem(['name' => 'Processor Bounded Holy Oil Item', 'type' => 'dagger', 'crafting_type' => 'weapon', 'holy_stacks' => 1, 'cost' => 1]);
         $slotOne = $this->createInventorySlot(['inventory_id' => $character->inventory->id, 'item_id' => $item->id]);
@@ -3984,7 +4000,7 @@ class BatchCraftingProcessorTest extends TestCase
                 $mock->shouldReceive('characterRoll')->andReturn(100);
             })
         );
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
@@ -4022,7 +4038,7 @@ class BatchCraftingProcessorTest extends TestCase
                 $mock->shouldReceive('characterRoll')->andReturn(100);
             })
         );
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
@@ -4062,7 +4078,7 @@ class BatchCraftingProcessorTest extends TestCase
                 $mock->shouldReceive('characterRoll')->andReturn(100, 1);
             })
         );
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
@@ -4093,7 +4109,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_event_enchant_surviving_item_missing_one_selected_affix_is_reported_failed_and_left_available(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);
         $character->update(['gold' => 1000, 'inventory_max' => 10]);
         $schedule = $this->createScheduledEvent(['event_type' => EventType::WINTER_EVENT, 'status' => ScheduledEventStatus::RUNNING, 'currently_running' => true]);
@@ -4147,8 +4163,7 @@ class BatchCraftingProcessorTest extends TestCase
     public function test_missing_craft_and_enchant_experience_item_is_reported_as_failed_not_silently_dropped(): void
     {
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
-        $character = (new CharacterFactory)
-            ->createBaseCharacter()
+        $character = $this->character
             ->givePlayerLocation()
             ->assignSkill($weaponCrafting, 10, false, ['xp' => 0, 'xp_max' => 100])
             ->getCharacter();
@@ -4158,20 +4173,23 @@ class BatchCraftingProcessorTest extends TestCase
         $this->instance(
             CraftingService::class,
             Mockery::mock(CraftingService::class, function ($mock) use (&$craftForBatchCalls, $craftableItem) {
-                $mock->makePartial()->shouldReceive('fetchCraftableItems')->andReturn(collect([$craftableItem]));
-                $mock->makePartial()->shouldReceive('craftForBatch')->andReturnUsing(function ($character, $item, $craftingType, $suppress = false) use (&$craftForBatchCalls) {
+                $mock->makePartial()->shouldReceive('fetchCraftableItems')->andReturn(new \Illuminate\Database\Eloquent\Collection([$craftableItem]));
+                $mock->makePartial()->shouldReceive('craftForBatch')->andReturnUsing(function ($character, $item, $craftingType, $suppress = false, $destinationCreator = null) use (&$craftForBatchCalls) {
                     $craftForBatchCalls++;
 
                     if ($craftForBatchCalls === 1) {
                         $clone = $item->replicate();
                         $clone->name = 'Missing Item Clone';
                         $clone->save();
+
+                        $destination = $destinationCreator ? $destinationCreator($clone) : null;
+
                         $clone->delete();
 
-                        return ['success' => true, 'item' => $clone];
+                        return ['success' => true, 'item' => $clone, 'destination' => $destination];
                     }
 
-                    return ['success' => false, 'item' => null];
+                    return ['success' => false, 'item' => null, 'destination' => null];
                 });
             })
         );
@@ -4189,17 +4207,6 @@ class BatchCraftingProcessorTest extends TestCase
                 'enchant_affix_ids' => [$prefix->id],
             ],
         ]);
-        $processor = Mockery::mock(BatchCraftingProcessor::class);
-        $processor->shouldReceive('processOneTick')->once()->andReturn([
-            'counts' => ['failed_count' => 1],
-            'actions' => [[
-                'action' => 'craft_and_enchant',
-                'status' => 'failed',
-                'failure' => 'The crafted item could not be found before enchanting. Another item will be crafted on a later attempt.',
-            ]],
-        ]);
-        $this->instance(BatchCraftingProcessor::class, $processor);
-
         $result = resolve(BatchCraftingService::class)->process($batchCrafting);
 
         $this->assertGreaterThan(0, $result->failed_count);
@@ -4208,7 +4215,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_alchemy_amount_returns_amount_reached_on_final_successful_item(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
         $character->update(['gold_dust' => 10, 'shards' => 10, 'alchemy_bag_limit' => 10]);
         $item = $this->createItem(['name' => 'Final Amount Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -4223,7 +4230,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_alchemy_amount_final_item_may_consume_remaining_gold_dust_and_end_amount_reached(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
         $character->update(['gold_dust' => 1, 'shards' => 10, 'alchemy_bag_limit' => 10]);
         $item = $this->createItem(['name' => 'Remaining Dust Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);
@@ -4238,7 +4245,7 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_alchemy_amount_running_out_of_gold_dust_before_requested_amount_returns_currency_reason(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ALCHEMY->value)->update(['level' => 2]);
         $character->update(['gold_dust' => 1, 'shards' => 10, 'alchemy_bag_limit' => 10]);
         $item = $this->createItem(['name' => 'Insufficient Dust Alchemy Item', 'type' => 'alchemy', 'crafting_type' => 'alchemy', 'can_craft' => true, 'gold_dust_cost' => 1, 'shards_cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 1]);

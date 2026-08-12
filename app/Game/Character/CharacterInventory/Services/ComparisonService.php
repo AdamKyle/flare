@@ -9,7 +9,6 @@ use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
-use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
 use League\Fractal\Manager;
@@ -30,7 +29,6 @@ class ComparisonService
         CharacterInventoryService $characterInventoryService,
         EquipItemService $equipItemService,
         ItemAtonements $itemAtonements,
-        private readonly ItemTransformer $itemTransformer,
     ) {
         $this->validEquipPositionsValue = $validEquipPositionsValue;
         $this->characterInventoryService = $characterInventoryService;
@@ -159,13 +157,6 @@ class ComparisonService
     protected function buildUsableItemDetails(InventorySlot $slot): array
     {
         return $this->transformSlotWithEquippableTransformer($slot);
-    }
-
-    protected function itemDetails(Item $item): array
-    {
-        $resource = new FractalItem($item, $this->itemTransformer);
-
-        return (new Manager)->createData($resource)->toArray()['data'];
     }
 
     private function transformSlotWithEquippableTransformer(InventorySlot $slot): array

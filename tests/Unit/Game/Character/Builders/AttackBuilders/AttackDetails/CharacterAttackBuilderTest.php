@@ -7,6 +7,7 @@ use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
@@ -16,7 +17,7 @@ use Tests\Traits\CreateItemAffix;
 
 class CharacterAttackBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -141,7 +142,7 @@ class CharacterAttackBuilderTest extends TestCase
             'specialty_damage_uses_damage_stat_amount' => 0.10,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 0,
@@ -181,7 +182,7 @@ class CharacterAttackBuilderTest extends TestCase
             'specialty_damage_uses_damage_stat_amount' => 1.0,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 0,
@@ -208,7 +209,7 @@ class CharacterAttackBuilderTest extends TestCase
             'specialty_damage_uses_damage_stat_amount' => 1.0,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 0,

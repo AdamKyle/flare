@@ -139,7 +139,7 @@ class DisenchantManyService
             $excludeIds = $params['exclude'];
 
             if (! empty($excludeIds)) {
-                $query->whereNotIn('item_id', $excludeIds);
+                $query->whereNotIn('id', $excludeIds);
             }
 
             return;
@@ -149,7 +149,7 @@ class DisenchantManyService
             $includeIds = $params['ids'];
 
             if (! empty($includeIds)) {
-                $query->whereIn('item_id', $includeIds);
+                $query->whereIn('id', $includeIds);
             }
         }
     }

@@ -639,7 +639,7 @@ class CharacterStatBuilder
             $itemDevouring = $this->questItems->sum('item.'.$type);
         }
 
-        if (empty($this->equippedItems)) {
+        if (is_null($this->equippedItems) || $this->equippedItems->isEmpty()) {
             if ($this->character->map?->gameMap?->mapType()->isPurgatory()) {
                 if ($itemDevouring >= 0.45) {
                     $itemDevouring -= 0.45;
@@ -876,10 +876,6 @@ class CharacterStatBuilder
 
             $totalPercent = $this->characterBoons->sum(function ($boon) use ($attribute): float {
                 $itemUsed = $boon->itemUsed;
-
-                if (is_null($itemUsed)) {
-                    return 0.0;
-                }
 
                 $value = $itemUsed->{$attribute};
 

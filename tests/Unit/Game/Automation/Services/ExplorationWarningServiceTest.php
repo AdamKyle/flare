@@ -22,9 +22,9 @@ class ExplorationWarningServiceTest extends TestCase
     use CreateExplorationWarning;
     use RefreshDatabase;
 
-    private Character $character;
+    private ?Character $character;
 
-    private ExplorationWarningService $service;
+    private ?ExplorationWarningService $service;
 
     protected function setUp(): void
     {
@@ -41,6 +41,9 @@ class ExplorationWarningServiceTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        $this->character = null;
+        $this->service = null;
     }
 
     public function test_create_warning_returns_state(): void
@@ -90,6 +93,22 @@ class ExplorationWarningServiceTest extends TestCase
         $this->assertCount(1, $result['warnings']);
         $this->assertEquals($existingWarning->id, $result['warnings'][0]['id']);
         $this->assertEquals(1, ExplorationWarning::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_create_warning_rethrows_non_retryable_query_exception(): void
+    {
+        $log = $this->createExplorationLog([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+        ]);
+
+        ExplorationWarning::creating(function (): void {
+            throw new QueryException('mysql', 'insert into exploration_warnings', [], new PDOException('Column not found', 1054));
+        });
+
+        $this->expectException(QueryException::class);
+
+        $this->service->createWarning($this->character, $log, 'fight', 'Something went wrong.');
     }
 
     public function test_get_state_returns_only_the_newest_warning(): void

@@ -81,10 +81,6 @@ class EquipManyBuilder
                 continue;
             }
 
-            if (count($this->itemsByType[$type]) === 1 && $this->hasPosition($equippableItems, $this->itemsByType[$type][0])) {
-                continue;
-            }
-
             $equippableItems[] = [
                 'equip_type' => $type,
                 'position' => $position,

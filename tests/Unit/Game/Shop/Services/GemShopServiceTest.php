@@ -22,17 +22,11 @@ class GemShopServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
 
-        $this->character->gemBag()->create(['character_id' => $this->character->id]);
+        $characterFactory->gemBagManagement()->assignGemToBag($this->createGem()->id);
 
-        $this->character->gemBag->gemSlots()->create([
-            'gem_bag_id' => $this->character->gemBag->id,
-            'gem_id' => $this->createGem()->id,
-            'amount' => 1,
-        ]);
-
-        $this->character = $this->character->refresh();
+        $this->character = $characterFactory->getCharacter();
 
         $this->shopService = resolve(GemShopService::class);
     }

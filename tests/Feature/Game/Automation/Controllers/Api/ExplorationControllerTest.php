@@ -3,7 +3,6 @@
 namespace Tests\Feature\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\Monster;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Combat\Values\AttackType;
@@ -14,15 +13,16 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateLocation;
 
 class ExplorationControllerTest extends TestCase
 {
-    use CreateLocation, RefreshDatabase;
+    use CreateCharacterAutomation, CreateLocation, RefreshDatabase;
 
-    private Character $character;
+    private ?Character $character;
 
-    private Monster $monster;
+    private ?Monster $monster;
 
     protected function setUp(): void
     {
@@ -39,6 +39,14 @@ class ExplorationControllerTest extends TestCase
                 'game_map_id' => $this->character->map->game_map_id,
             ])
             ->getMonster();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+        $this->monster = null;
     }
 
     public function test_begin_starts_exploration(): void
@@ -67,7 +75,7 @@ class ExplorationControllerTest extends TestCase
     {
         Event::fake();
 
-        CharacterAutomation::create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'type' => AutomationType::EXPLORING->value,
@@ -112,7 +120,7 @@ class ExplorationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        CharacterAutomation::create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'monster_id' => $this->monster->id,
             'type' => AutomationType::EXPLORING->value,

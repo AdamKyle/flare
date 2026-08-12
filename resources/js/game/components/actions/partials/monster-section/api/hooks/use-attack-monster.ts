@@ -73,8 +73,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         setError(err.response?.data || null);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, urlToUse, reinitializeFight]);
+  }, [apiHandler, urlToUse, requestData, handleInactivity]);
 
   const handleAttackMonster = useCallback(async () => {
     if (!requestData.attack_type || requestData.monster_id === 0) {
@@ -101,8 +100,7 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         setError(err.response?.data || null);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiHandler, urlToUse]);
+  }, [apiHandler, urlToUse, requestData, handleInactivity]);
 
   const fetchBattleResults = useCallback(
     async () => {
@@ -127,8 +125,16 @@ export const useAttackMonster = (): UseAttackMonsterDefinition => {
         return;
       }
     },
+    // `reinitializeFight` is intentionally included though unread: toggling it
+    // (Reset Fight / Attack Again) must force a fresh fight request even when
+    // requestData is otherwise unchanged.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, urlToUse, reinitializeFight]
+    [
+      requestData,
+      reinitializeFight,
+      handleInitiateFightRequest,
+      handleAttackMonster,
+    ]
   );
 
   useEffect(() => {

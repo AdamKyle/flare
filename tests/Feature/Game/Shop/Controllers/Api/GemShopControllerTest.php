@@ -10,11 +10,26 @@ class GemShopControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private ?CharacterFactory $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
     public function test_sell_single_gem_returns_success_and_updates_currencies(): void
     {
-        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $characterFactory->gemBagManagement()->assignGemsToBag(1, 1);
-        $character = $characterFactory->getCharacter();
+        $this->character->gemBagManagement()->assignGemsToBag(1, 1);
+        $character = $this->character->getCharacter();
         $gemSlot = $character->gemBag->gemSlots->first();
 
         $response = $this->actingAs($character->user)
@@ -29,7 +44,7 @@ class GemShopControllerTest extends TestCase
 
     public function test_sell_single_gem_returns_error_when_gem_does_not_belong_to_the_character(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->getCharacter();
 
         $otherCharacterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $otherCharacterFactory->gemBagManagement()->assignGemsToBag(1, 1);
@@ -46,9 +61,8 @@ class GemShopControllerTest extends TestCase
 
     public function test_sell_all_gems_returns_success_and_clears_gem_bag(): void
     {
-        $characterFactory = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
-        $characterFactory->gemBagManagement()->assignGemsToBag(2, 1);
-        $character = $characterFactory->getCharacter();
+        $this->character->gemBagManagement()->assignGemsToBag(2, 1);
+        $character = $this->character->getCharacter();
 
         $response = $this->actingAs($character->user)
             ->postJson('/api/character/'.$character->id.'/sell-all-gems');

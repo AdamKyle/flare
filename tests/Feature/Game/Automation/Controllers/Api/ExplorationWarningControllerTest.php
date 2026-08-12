@@ -19,7 +19,7 @@ class ExplorationWarningControllerTest extends TestCase
     use CreateExplorationWarning;
     use RefreshDatabase;
 
-    private Character $character;
+    private ?Character $character;
 
     protected function setUp(): void
     {
@@ -34,6 +34,8 @@ class ExplorationWarningControllerTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        $this->character = null;
     }
 
     public function test_dismiss_soft_dismisses_latest_warning(): void

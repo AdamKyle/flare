@@ -10,9 +10,25 @@ class CharacterPassiveSkillControllerTest extends TestCase
 {
     use RefreshDatabase;
 
+    private ?CharacterFactory $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
     public function test_cannot_view_another_characters_passive_skill(): void
     {
-        $owner = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $owner = $this->character->getCharacter();
         $ownerSkill = $owner->passiveSkills()->first();
 
         $other = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
@@ -28,7 +44,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
 
     public function test_can_view_owned_passive_skill(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->getCharacter();
         $skill = $character->passiveSkills()->first();
 
         $response = $this->actingAs($character->user)
@@ -43,7 +59,7 @@ class CharacterPassiveSkillControllerTest extends TestCase
 
     public function test_view_character_passive_skill_redirects_to_the_owned_passive_skill(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->getCharacter();
         $skill = $character->passiveSkills()->first();
 
         $response = $this->actingAs($character->user)

@@ -78,8 +78,6 @@ class DelveExploration implements ShouldQueue
 
     private array $lastFightData = [];
 
-    private bool $logCreated = false;
-
     private BroadcastTopsUpdateService $broadcastTopsUpdateService;
 
     public function __construct(int $characterId, int $locationId, int $automationId, int $delveExplorationId, array $params, int $timeDelay)
@@ -189,41 +187,27 @@ class DelveExploration implements ShouldQueue
                 return;
             }
 
-            if ($this->attempts >= self::MAX_ATTEMPTS) {
-                $this->createDelveLog($delveAutomation, DelveOutcome::TIMEOUT, $this->lastFightData);
-
-                $automation->delete();
-
-                $delveAutomation->update([
-                    'completed_at' => now(),
-                    'ended_reason' => DelveOutcome::TIMEOUT->value,
-                    'panel_dismissed_at' => null,
-                ]);
-
-                $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
-
-                $character = $this->character->refresh();
-
-                $this->rewardPlayer($character, $delveAutomation->refresh());
-
-                $this->deletePackCache();
-
-                event(new UpdateCharacterStatus($character));
-
-                event(new AutomationTimeOut($character->user, 0));
-
-                return;
-            }
+            $this->createDelveLog($delveAutomation, DelveOutcome::TIMEOUT, $this->lastFightData);
 
             $automation->delete();
 
             $delveAutomation->update([
                 'completed_at' => now(),
-                'ended_reason' => 'fight_failed',
+                'ended_reason' => DelveOutcome::TIMEOUT->value,
                 'panel_dismissed_at' => null,
             ]);
 
-            event(new AutomationTimeOut($this->character->user, 0));
+            $this->sendOutEventLogUpdate('Seems the fight went on too long child. You are exhausted. Best to flee with what you managed to gain!');
+
+            $character = $this->character->refresh();
+
+            $this->rewardPlayer($character, $delveAutomation->refresh());
+
+            $this->deletePackCache();
+
+            event(new UpdateCharacterStatus($character));
+
+            event(new AutomationTimeOut($character->user, 0));
         } catch (MissingInventoryException $exception) {
             $this->character->user()->update(['will_be_deleted' => true]);
             Log::warning('Delve exploration stopped for a character with missing inventory.', [
@@ -567,10 +551,6 @@ class DelveExploration implements ShouldQueue
 
     private function createDelveLog(DelveExplorationModel $delveExploration, DelveOutcome $outcome, array $fightData): void
     {
-        if ($this->logCreated) {
-            return;
-        }
-
         $delveExploration->delveLogs()->create([
             'character_id' => $this->character->id,
             'increased_enemy_strength' => $delveExploration->increase_enemy_strength,
@@ -579,8 +559,6 @@ class DelveExploration implements ShouldQueue
             'outcome' => $outcome->value,
             'fight_data' => $fightData,
         ]);
-
-        $this->logCreated = true;
         event(new DelveMonitoringUpdated($this->character->id));
         event(new DelveStatusUpdated($this->character->user->id));
         $this->broadcastTopsUpdateService->broadcastDelveCurrentMonth();

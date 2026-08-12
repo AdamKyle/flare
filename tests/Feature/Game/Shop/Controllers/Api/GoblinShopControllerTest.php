@@ -11,11 +11,27 @@ class GoblinShopControllerTest extends TestCase
 {
     use CreateItem, RefreshDatabase;
 
+    private ?CharacterFactory $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
     public function test_fetch_items_returns_paginated_goblin_shop_items(): void
     {
         $this->createItem(['gold_bars_cost' => 500]);
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->getCharacter();
 
         $response = $this->actingAs($character->user)
             ->getJson('/api/goblin-shop/list-items/'.$character->id);
@@ -31,9 +47,7 @@ class GoblinShopControllerTest extends TestCase
     {
         $item = $this->createItem(['gold_bars_cost' => 500, 'type' => 'shield']);
 
-        $character = (new CharacterFactory)
-            ->createBaseCharacter()
-            ->givePlayerLocation()
+        $character = $this->character
             ->kingdomManagement()
             ->assignKingdom(['gold_bars' => 1000])
             ->getCharacter();

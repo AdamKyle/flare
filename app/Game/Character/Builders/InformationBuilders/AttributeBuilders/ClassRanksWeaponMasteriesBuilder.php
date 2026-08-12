@@ -12,6 +12,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
     public function determineBonusForWeapon(string $position = 'both'): float
     {
 
+        if (is_null($this->inventory)) {
+            return 0.0;
+        }
+
         if ($position !== 'both') {
             $slot = $this->inventory->where('position', $position)->first();
 
@@ -53,6 +57,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
 
     public function determineBonusForSpellDamage(string $position = 'both'): float
     {
+        if (is_null($this->inventory)) {
+            return 0.0;
+        }
+
         if ($position !== 'both') {
             $slot = $this->inventory->where('position', $position)->where('item.type', 'spell-damage')->first();
 
@@ -74,6 +82,10 @@ class ClassRanksWeaponMasteriesBuilder extends BaseAttribute
 
     public function determineBonusForSpellHealing(string $position = 'both'): float
     {
+        if (is_null($this->inventory)) {
+            return 0.0;
+        }
+
         if ($position !== 'both') {
             $slot = $this->inventory->where('position', $position)->where('item.type', 'spell-healing')->first();
 

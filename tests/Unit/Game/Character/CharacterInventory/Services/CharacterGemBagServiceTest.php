@@ -6,10 +6,11 @@ use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGem;
 
 class CharacterGemBagServiceTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -51,6 +52,38 @@ class CharacterGemBagServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertNotEmpty($result['gem']);
+    }
+
+    public function test_get_character_gems_filters_by_search_text()
+    {
+        $matchingGem = $this->createGem(['name' => 'Firestone']);
+        $otherGem = $this->createGem(['name' => 'Icestone']);
+        $character = $this->character
+            ->gemBagManagement()->assignGemToBag($matchingGem->id)
+            ->getCharacterFactory()
+            ->gemBagManagement()->assignGemToBag($otherGem->id)
+            ->getCharacter();
+
+        $result = $this->characterGemBagService->getGems($character, searchText: 'Fire');
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertCount(1, $result['data']);
+    }
+
+    public function test_get_character_gems_filters_by_tier()
+    {
+        $tierOneGem = $this->createGem(['tier' => 1]);
+        $tierTwoGem = $this->createGem(['tier' => 2]);
+        $character = $this->character
+            ->gemBagManagement()->assignGemToBag($tierOneGem->id)
+            ->getCharacterFactory()
+            ->gemBagManagement()->assignGemToBag($tierTwoGem->id)
+            ->getCharacter();
+
+        $result = $this->characterGemBagService->getGems($character, filters: ['tier' => 2]);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertCount(1, $result['data']);
     }
 
     public function test_cannot_get_gem_data()

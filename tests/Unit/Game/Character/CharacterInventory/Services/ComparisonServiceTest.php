@@ -159,6 +159,29 @@ class ComparisonServiceTest extends TestCase
         $this->assertEmpty($comparisonData['details']);
     }
 
+    public function test_item_comparison_uses_equipped_set_index_when_comparing_against_an_equipped_set()
+    {
+        $item = $this->createItem(['type' => ItemType::SWORD->value]);
+
+        $manager = $this->character->inventorySetManagement()
+            ->createInventorySets(2)
+            ->putItemInSet($this->createItem([
+                'type' => ItemType::SWORD->value,
+                'base_damage' => 25,
+                'str_mod' => 0.10,
+            ]), 1, 'left-hand', true);
+
+        $character = $manager->getCharacterFactory()->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $slot = $character->inventory->slots->first();
+
+        $comparisonData = $this->comparisonService->buildComparisonData($character, $slot, ItemType::SWORD->value);
+
+        $this->assertNotEmpty($comparisonData['details']);
+        $this->assertTrue($comparisonData['setEquipped']);
+        $this->assertSame(2, $comparisonData['setIndex']);
+    }
+
     public function test_build_shop_data_for_bow()
     {
         $item = $this->createItem(['type' => ItemType::BOW->value]);

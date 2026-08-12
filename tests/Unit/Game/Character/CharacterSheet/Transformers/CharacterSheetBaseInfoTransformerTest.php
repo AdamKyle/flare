@@ -2,22 +2,46 @@
 
 namespace Tests\Unit\Game\Character\CharacterSheet\Transformers;
 
+use App\Game\Automation\Values\AutomationType;
+use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
+use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\LocationBasedCraftingOptions;
 use App\Game\Maps\Values\MapName;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateDelveExploration;
+use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateItem;
 
 class CharacterSheetBaseInfoTransformerTest extends TestCase
 {
-    use CreateGameMap, RefreshDatabase;
+    use CreateBatchCrafting, CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, RefreshDatabase;
+
+    private ?CharacterFactory $character;
+
+    private ?CharacterSheetBaseInfoTransformer $transformer;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter();
+        $this->transformer = resolve(CharacterSheetBaseInfoTransformer::class);
+    }
 
     protected function tearDown(): void
     {
         Carbon::setTestNow();
+
+        $this->character = null;
+        $this->transformer = null;
 
         parent::tearDown();
     }
@@ -26,9 +50,9 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
     {
         $gameMap = $this->createGameMap(['name' => MapName::PURGATORY->value, 'default' => false]);
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16, $gameMap)->getCharacter();
+        $character = $this->character->givePlayerLocation(16, 16, $gameMap)->getCharacter();
 
-        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($character);
+        $data = $this->transformer->transform($character);
 
         $locationBasedCraftingOptions = LocationBasedCraftingOptions::fromCharacter($character);
 
@@ -42,22 +66,22 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
     public function test_null_crafting_timestamp_produces_zero_remaining_timeout(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
 
         $character->update(['can_craft_again_at' => null]);
 
-        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($character->refresh());
+        $data = $this->transformer->transform($character->refresh());
 
         $this->assertSame(0, $data['can_craft_again_at']);
     }
 
     public function test_expired_crafting_timestamp_produces_zero_remaining_timeout(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
 
         $character->update(['can_craft_again_at' => now()->subMinutes(5)]);
 
-        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($character->refresh());
+        $data = $this->transformer->transform($character->refresh());
 
         $this->assertSame(0, $data['can_craft_again_at']);
     }
@@ -66,12 +90,349 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
     {
         Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
 
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $character = $this->character->givePlayerLocation()->getCharacter();
 
         $character->update(['can_craft_again_at' => now()->addSeconds(120)]);
 
-        $data = resolve(CharacterSheetBaseInfoTransformer::class)->transform($character->refresh());
+        $data = $this->transformer->transform($character->refresh());
 
         $this->assertSame(120, $data['can_craft_again_at']);
+    }
+
+    public function test_active_exploration_automation_is_reported_with_its_name_and_timer(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(90),
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame('Exploration', $data['active_automation']['name']);
+        $this->assertSame(90, $data['automation_completed_at']);
+        $this->assertFalse($data['is_delve_running']);
+    }
+
+    public function test_active_delve_automation_is_reported_and_marks_delve_as_running(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame('Delve', $data['active_automation']['name']);
+        $this->assertTrue($data['is_delve_running']);
+    }
+
+    public function test_active_faction_loyalty_automation_is_reported_and_marks_it_as_running(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame('Faction Loyalty', $data['active_automation']['name']);
+        $this->assertTrue($data['is_faction_loyalty_automation_running']);
+    }
+
+    public function test_no_active_automation_reports_zero_time_left_and_a_null_active_automation(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertNull($data['active_automation']);
+        $this->assertSame(0, $data['automation_completed_at']);
+    }
+
+    public function test_is_delve_visible_when_a_completed_and_undismissed_delve_exploration_exists(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createDelveExploration([
+            'character_id' => $character->id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertTrue($data['is_delve_visible']);
+    }
+
+    public function test_is_delve_visible_is_false_when_no_delve_exploration_exists(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertFalse($data['is_delve_visible']);
+    }
+
+    public function test_batch_crafting_uses_the_eight_hour_timer_when_the_type_does_not_pend(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'ends_at' => now()->addMinutes(30),
+            'progress' => [],
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertTrue($data['is_batch_crafting_running']);
+        $this->assertTrue($data['is_batch_crafting_visible']);
+        $this->assertSame(1800, $data['batch_crafting_time_out']);
+        $this->assertTrue($data['is_batch_crafting_experience_mode']);
+    }
+
+    public function test_batch_crafting_time_out_is_zero_while_continuation_is_processing(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'progress' => ['continuation_state' => 'processing'],
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame(0, $data['batch_crafting_time_out']);
+    }
+
+    public function test_batch_crafting_time_out_is_computed_from_the_next_attempt_timestamp(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
+
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'progress' => ['next_attempt_at' => now()->addMinutes(5)->toDateTimeString()],
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame(300, $data['batch_crafting_time_out']);
+    }
+
+    public function test_batch_crafting_time_out_is_zero_for_an_unparsable_next_attempt_timestamp(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'progress' => ['next_attempt_at' => 'not-a-real-timestamp'],
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame(0, $data['batch_crafting_time_out']);
+    }
+
+    public function test_batch_crafting_time_out_is_zero_when_next_attempt_at_is_missing(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::HOLY_OILS->value,
+            'progress' => [],
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertSame(0, $data['batch_crafting_time_out']);
+    }
+
+    public function test_is_batch_crafting_retry_mode_is_true_when_tick_delay_is_below_the_recurring_delay(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'progress' => ['tick_delay_seconds' => 10],
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertTrue($data['is_batch_crafting_retry_mode']);
+    }
+
+    public function test_batch_crafting_is_visible_after_completion_when_not_dismissed(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'completed_at' => now(),
+            'panel_dismissed_at' => null,
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertFalse($data['is_batch_crafting_running']);
+        $this->assertTrue($data['is_batch_crafting_visible']);
+    }
+
+    public function test_can_set_delve_pack_is_true_when_the_character_holds_the_delve_pack_choice_item(): void
+    {
+        $item = $this->createItem(['effect' => ItemEffectType::DELVE_PACK_CHOICE->value]);
+
+        $character = $this->character->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertTrue($data['can_set_delve_pack']);
+    }
+
+    public function test_can_set_delve_pack_is_false_when_the_character_does_not_hold_the_item(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertFalse($data['can_set_delve_pack']);
+    }
+
+    public function test_faction_loyalty_warning_notices_are_included_when_present(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createFactionLoyaltyAutomationWarning([
+            'character_id' => $character->id,
+            'type' => 'bounty',
+            'message' => 'Sample warning message.',
+        ]);
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertTrue($data['has_faction_loyalty_warning']);
+        $this->assertCount(1, $data['faction_loyalty_warning_notices']);
+        $this->assertSame('Sample warning message.', $data['faction_loyalty_warning_notices'][0]['message']);
+    }
+
+    public function test_no_faction_loyalty_warning_notices_when_none_exist(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertFalse($data['has_faction_loyalty_warning']);
+        $this->assertSame([], $data['faction_loyalty_warning_notices']);
+    }
+
+    public function test_pledged_faction_current_fame_tasks_exclude_bounty_tasks(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $character = (new FactionLoyaltyFactory)->setUp($character)->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertTrue($data['can_see_pledge_tab']);
+        $this->assertNotNull($data['pledged_to_faction_id']);
+        $this->assertNotEmpty($data['current_fame_tasks']);
+
+        foreach ($data['current_fame_tasks'] as $task) {
+            $this->assertNotSame('bounty', $task['type']);
+        }
+    }
+
+    public function test_no_pledged_faction_reports_no_pledge_tab_and_no_fame_tasks(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertFalse($data['can_see_pledge_tab']);
+        $this->assertNull($data['pledged_to_faction_id']);
+        $this->assertNull($data['current_fame_tasks']);
+    }
+
+    public function test_pledged_faction_with_no_actively_helped_npc_reports_no_fame_tasks(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $factionLoyaltyFactory = (new FactionLoyaltyFactory)->setUp($character);
+        $character = $factionLoyaltyFactory->getCharacter();
+
+        $factionLoyaltyFactory->getPledgedFactionLoyalty()->factionLoyaltyNpcs()->update(['currently_helping' => false]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertTrue($data['can_see_pledge_tab']);
+        $this->assertNull($data['current_fame_tasks']);
+    }
+
+    public function test_ignore_reductions_removes_map_based_stat_reduction(): void
+    {
+        $purgatoryMap = $this->createGameMap([
+            'name' => MapName::PURGATORY->value,
+            'character_attack_reduction' => 0.5,
+        ]);
+
+        $character = $this->character->givePlayerLocation(16, 16, $purgatoryMap)->getCharacter();
+
+        $withReduction = $this->transformer->transform($character);
+
+        $this->transformer->setIgnoreReductions(true);
+
+        $withoutReduction = $this->transformer->transform($character);
+
+        $this->assertGreaterThan($withReduction['str_modded'], $withoutReduction['str_modded']);
+    }
+
+    public function test_active_automation_of_an_unrecognized_type_is_reported_as_not_running(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => 999,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertNull($data['active_automation']);
+        $this->assertSame(0, $data['automation_completed_at']);
     }
 }

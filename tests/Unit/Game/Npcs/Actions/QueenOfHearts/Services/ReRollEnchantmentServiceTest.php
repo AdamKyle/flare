@@ -15,10 +15,11 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSocket;
 
 class ReRollEnchantmentServiceTest extends TestCase
 {
-    use CreateGameMap, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGameMap, CreateGem, CreateItem, CreateItemAffix, CreateItemSocket, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -371,7 +372,7 @@ class ReRollEnchantmentServiceTest extends TestCase
             ])->id,
         ]);
 
-        $item->sockets()->create([
+        $this->createItemSocket([
             'item_id' => $item->id,
             'gem_id' => $this->createGem()->id,
         ]);

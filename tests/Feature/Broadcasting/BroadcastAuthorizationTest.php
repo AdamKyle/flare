@@ -81,6 +81,29 @@ test('a different authenticated user is rejected for another users private movem
     $response->assertForbidden();
 });
 
+test('the authenticated owner is authorized for their private delve status channel', function () {
+    $user = $this->createUser();
+
+    $response = $this->actingAs($user)->post('/broadcasting/auth', [
+        'channel_name' => 'private-delve-status-updated-'.$user->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertOk();
+});
+
+test('a different authenticated user is rejected for another users private delve status channel', function () {
+    $owner = $this->createUser();
+    $otherUser = $this->createUser();
+
+    $response = $this->actingAs($otherUser)->post('/broadcasting/auth', [
+        'channel_name' => 'private-delve-status-updated-'.$owner->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertForbidden();
+});
+
 test('an unauthenticated request is rejected for a private user channel', function () {
     $user = $this->createUser();
 

@@ -182,6 +182,35 @@ class FactionLoyaltyFactory
     }
 
     /**
+     * Mark every fame task for a faction loyalty NPC as complete.
+     */
+    public function completeTasksForNpc(FactionLoyaltyNpc $factionLoyaltyNpc): FactionLoyaltyFactory
+    {
+        $task = $factionLoyaltyNpc->factionLoyaltyNpcTasks;
+
+        $completedTasks = array_map(
+            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
+            $task->fame_tasks
+        );
+
+        $task->update(['fame_tasks' => $completedTasks]);
+
+        return $this;
+    }
+
+    /**
+     * Mark every fame task for every faction loyalty NPC as complete.
+     */
+    public function completeAllNpcTasks(): FactionLoyaltyFactory
+    {
+        foreach ($this->factionLoyaltyNpcs as $factionLoyaltyNpc) {
+            $this->completeTasksForNpc($factionLoyaltyNpc);
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the character.
      */
     public function getCharacter(): Character

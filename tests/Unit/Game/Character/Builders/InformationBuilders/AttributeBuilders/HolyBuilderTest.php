@@ -2,276 +2,204 @@
 
 namespace Tests\Unit\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Character\Values\CharacterClass;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
-use Tests\Traits\CreateGameMap;
-use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateItemAffix;
 
 class HolyBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
-
-    private ?CharacterFactory $character;
+    use CreateClass, CreateHolyStack, CreateItem, RefreshDatabase;
 
     private ?CharacterStatBuilder $characterStatBuilder;
+
+    private ?HolyBuilder $holyBuilder;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
+        $this->holyBuilder = resolve(HolyBuilder::class);
     }
 
     protected function tearDown(): void
     {
         parent::tearDown();
 
-        $this->character = null;
         $this->characterStatBuilder = null;
+        $this->holyBuilder = null;
     }
 
-    public function test_holy_bonus_with_no_inventory()
+    public function test_fetch_holy_bonus_returns_zero_with_nothing_equipped(): void
     {
-        $character = $this->character->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $holyBonus = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchHolyBonus();
-
-        $this->assertEquals(0, $holyBonus);
+        $this->assertSame(0.0, $this->holyBuilder->fetchHolyBonus());
     }
 
-    public function test_holy_bonus_with_inventory()
+    public function test_fetch_holy_bonus_divides_stacks_by_total_for_non_special_class(): void
     {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
+        $item = $this->createItem(['type' => 'body']);
+        $this->createHolyStacks(120, ['item_id' => $item->id]);
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['name' => CharacterClass::FIGHTER->value]))
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
-
-        $holyBonus = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchHolyBonus();
-
-        $this->assertGreaterThan(0, $holyBonus);
+        $this->assertSame(0.5, $this->holyBuilder->fetchHolyBonus());
     }
 
-    public function test_holy_bonus_with_inventory_for_two_handed_class()
+    public function test_fetch_total_stacks_for_character_is_lower_for_ranger(): void
     {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['name' => CharacterClass::RANGER->value]))
+            ->givePlayerLocation()
+            ->getCharacter();
 
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
+        $this->holyBuilder->initialize($character, $character->skills, null);
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
-
-        $class = $this->createClass(['name' => 'Ranger']);
-
-        $character->update([
-            'game_class_id' => $class->id,
-        ]);
-
-        $character = $character->refresh();
-
-        $holyBonus = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchHolyBonus();
-
-        $this->assertGreaterThan(0, $holyBonus);
+        $this->assertSame(220, $this->holyBuilder->fetchTotalStacksForCharacter());
     }
 
-    public function test_get_total_stack_applied_with_no_inventory()
+    public function test_fetch_total_stacks_for_character_is_higher_for_default_class(): void
     {
-        $character = $this->character->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['name' => CharacterClass::FIGHTER->value]))
+            ->givePlayerLocation()
+            ->getCharacter();
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->getTotalAppliedStacks();
+        $this->holyBuilder->initialize($character, $character->skills, null);
 
-        $this->assertEquals(0, $stacks);
+        $this->assertSame(240, $this->holyBuilder->fetchTotalStacksForCharacter());
     }
 
-    public function test_get_total_stacks_applied_with_inventory()
+    public function test_fetch_devouring_resistance_bonus_returns_zero_with_nothing_equipped(): void
     {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
-
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->getTotalAppliedStacks();
-
-        $this->assertEquals(1, $stacks);
+        $this->assertSame(0.0, $this->holyBuilder->fetchDevouringResistanceBonus());
     }
 
-    public function test_get_devouring_resistance_for_no_inventory()
+    public function test_fetch_devouring_resistance_bonus_sums_holy_stack_bonuses(): void
     {
-        $character = $this->character->getCharacter();
+        $item = $this->createItem(['type' => 'body']);
+        $this->createHolyStack(['item_id' => $item->id, 'devouring_darkness_bonus' => 0.3, 'stat_increase_bonus' => 0.1]);
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchDevouringResistanceBonus();
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $this->assertEquals(0, $stacks);
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
+
+        $this->assertSame(0.3, $this->holyBuilder->fetchDevouringResistanceBonus());
     }
 
-    public function test_get_devouring_resistance_for_inventory()
+    public function test_fetch_devouring_resistance_bonus_excludes_trinkets_and_caps_at_one(): void
     {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
+        $item = $this->createItem(['type' => 'body']);
+        $trinket = $this->createItem(['type' => 'trinket']);
+        $this->createHolyStack(['item_id' => $item->id, 'devouring_darkness_bonus' => 1.5, 'stat_increase_bonus' => 0.1]);
+        $this->createHolyStack(['item_id' => $trinket->id, 'devouring_darkness_bonus' => 5.0, 'stat_increase_bonus' => 0.1]);
 
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->giveItem($trinket, true, 'trinket')
+            ->getCharacter();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchDevouringResistanceBonus();
-
-        $this->assertEquals(0.10, $stacks);
+        $this->assertSame(1.0, $this->holyBuilder->fetchDevouringResistanceBonus());
     }
 
-    public function test_get_stat_increase_for_no_inventory()
+    public function test_fetch_stat_increase_returns_zero_with_nothing_equipped(): void
     {
-        $character = $this->character->getCharacter();
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchStatIncrease();
-
-        $this->assertEquals(0, $stacks);
+        $this->assertSame(0.0, $this->holyBuilder->fetchStatIncrease());
     }
 
-    public function test_get_stat_increase_for_inventory()
+    public function test_fetch_stat_increase_sums_stat_increase_bonuses(): void
     {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
+        $item = $this->createItem(['type' => 'body']);
+        $this->createHolyStack(['item_id' => $item->id, 'devouring_darkness_bonus' => 0.1, 'stat_increase_bonus' => 0.25]);
 
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchStatIncrease();
-
-        $this->assertEquals(0.10, $stacks);
+        $this->assertSame(0.25, $this->holyBuilder->fetchStatIncrease());
     }
 
-    public function test_fetch_attack_bonus_no_inventory()
+    public function test_fetch_attack_bonus_is_capped_at_ninety_percent(): void
     {
-        $character = $this->character->getCharacter();
+        $item = $this->createItem(['type' => 'body']);
+        $this->createHolyStacks(240, ['item_id' => $item->id]);
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['name' => CharacterClass::FIGHTER->value]))
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchAttackBonus();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $this->assertEquals(0, $stacks);
+        $this->assertSame(0.90, $this->holyBuilder->fetchAttackBonus());
     }
 
-    public function test_fetch_attack_bonus_with_inventory()
+    public function test_fetch_defence_bonus_is_capped_at_seventy_five_percent(): void
     {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
+        $item = $this->createItem(['type' => 'body']);
+        $this->createHolyStacks(240, ['item_id' => $item->id]);
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['name' => CharacterClass::FIGHTER->value]))
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
-
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchAttackBonus();
-
-        $this->assertGreaterThan(0, $stacks);
+        $this->assertSame(0.75, $this->holyBuilder->fetchDefenceBonus());
     }
 
-    public function test_fetch_defence_bonus_no_inventory()
+    public function test_fetch_healing_bonus_is_capped_at_one_hundred_percent(): void
     {
-        $character = $this->character->getCharacter();
+        $item = $this->createItem(['type' => 'body']);
+        $this->createHolyStacks(150, ['item_id' => $item->id]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchDefenceBonus();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->holyBuilder->initialize($character, $character->skills, $equipped);
 
-        $this->assertEquals(0, $stacks);
-    }
-
-    public function test_fetch_defence_bonus_with_inventory()
-    {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
-
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
-
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchDefenceBonus();
-
-        $this->assertGreaterThan(0, $stacks);
-    }
-
-    public function test_fetch_healing_bonus_no_inventory()
-    {
-        $character = $this->character->getCharacter();
-
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchHealingBonus();
-
-        $this->assertEquals(0, $stacks);
-    }
-
-    public function test_fetch_healing_bonus_with_inventory()
-    {
-        $item = $this->createItem([
-            'name' => 'Weapon',
-            'type' => 'weapon',
-            'base_damage' => 100,
-        ]);
-
-        $item->appliedHolyStacks()->create([
-            'item_id' => 0.10,
-            'devouring_darkness_bonus' => 0.10,
-            'stat_increase_bonus' => 0.10,
-        ]);
-
-        $character = $this->character->inventoryManagement()->giveItem($item, true, 'left-hand')->getCharacter();
-
-        $stacks = $this->characterStatBuilder->setCharacter($character)->holyInfo()->fetchHealingBonus();
-
-        $this->assertGreaterThan(0, $stacks);
+        $this->assertSame(1.0, $this->holyBuilder->fetchHealingBonus());
     }
 }

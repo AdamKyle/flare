@@ -78,4 +78,22 @@ class GemBagManagement
 
         return $this;
     }
+
+    /**
+     * Assign a single gem slot with a specific stacked amount to the character.
+     *
+     * @return $this
+     */
+    public function assignGemStackToBag(int $gemId, int $amount): GemBagManagement
+    {
+        $this->character->gemBag->gemSlots()->create([
+            'gem_bag_id' => $this->character->gemBag->id,
+            'gem_id' => $gemId,
+            'amount' => $amount,
+        ]);
+
+        $this->character = $this->character->refresh();
+
+        return $this;
+    }
 }

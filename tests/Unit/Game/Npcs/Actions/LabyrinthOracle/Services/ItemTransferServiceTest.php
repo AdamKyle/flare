@@ -9,12 +9,14 @@ use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSocket;
 
 class ItemTransferServiceTest extends TestCase
 {
-    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGem, CreateHolyStack, CreateItem, CreateItemAffix, CreateItemSocket, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -256,7 +258,7 @@ class ItemTransferServiceTest extends TestCase
             'holy_stacks' => 1,
         ]);
 
-        $itemToTransferFrom->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $itemToTransferFrom->id,
             'devouring_darkness_bonus' => 0.10,
             'stat_increase_bonus' => 0.10,
@@ -319,7 +321,7 @@ class ItemTransferServiceTest extends TestCase
 
         $gemToAttach = $this->createGem();
 
-        $itemToTransferFrom->sockets()->create([
+        $this->createItemSocket([
             'item_id' => $itemToTransferFrom->id,
             'gem_id' => $gemToAttach->id,
         ]);
@@ -365,7 +367,7 @@ class ItemTransferServiceTest extends TestCase
         $itemToTransferFrom = $this->createItem();
         $itemToTransferTo = $this->createItem();
 
-        $itemToTransferFrom->sockets()->create([
+        $this->createItemSocket([
             'gem_id' => $this->createGem()->id,
             'item_id' => $itemToTransferFrom->id,
         ]);
@@ -374,7 +376,7 @@ class ItemTransferServiceTest extends TestCase
             'socket_count' => 1,
         ]);
 
-        $itemToTransferTo->sockets()->create([
+        $this->createItemSocket([
             'gem_id' => $this->createGem()->id,
             'item_id' => $itemToTransferTo->id,
         ]);
@@ -510,7 +512,7 @@ class ItemTransferServiceTest extends TestCase
 
         $itemToTransferTo = $this->createItem(['socket_count' => 1]);
 
-        $itemToTransferTo->sockets()->create([
+        $this->createItemSocket([
             'gem_id' => $this->createGem()->id,
             'item_id' => $itemToTransferTo->id,
         ]);

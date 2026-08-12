@@ -1,7 +1,11 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { isValidElement, useState } from 'react';
 
 import AnimatedCardProps from './types/animated-card-props';
+
+interface CardFaceProps {
+  is_active?: boolean;
+}
 
 const AnimatedCard = ({
   aria_label,
@@ -24,6 +28,19 @@ const AnimatedCard = ({
     setInternalIsFlipped((previousIsFlipped) => !previousIsFlipped);
   };
 
+  const renderFaces = () => {
+    return React.Children.map(children, (face, index) => {
+      if (!isValidElement<CardFaceProps>(face)) {
+        return face;
+      }
+
+      const isBackFace = index === 1;
+      const isActiveFace = isBackFace ? resolvedIsFlipped : !resolvedIsFlipped;
+
+      return React.cloneElement(face, { is_active: isActiveFace });
+    });
+  };
+
   return (
     <div
       className="group relative mx-auto h-44 w-full max-w-xs md:h-56"
@@ -43,7 +60,7 @@ const AnimatedCard = ({
         animate={{ rotateY: resolvedIsFlipped ? 180 : 0 }}
         transition={{ duration: 0.45 }}
       >
-        {children}
+        {renderFaces()}
       </motion.div>
     </div>
   );

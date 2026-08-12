@@ -8,11 +8,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateItem;
 
 class CharacterBoonJobTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateCharacterBoon, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -43,7 +44,7 @@ class CharacterBoonJobTest extends TestCase
     {
         $character = $this->character->getCharacter();
 
-        $character->boons()->create([
+        $this->createCharacterBoon([
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
             'started' => now(),

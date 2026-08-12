@@ -7,11 +7,12 @@ use Cache;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateGameClassSpecial;
 
 class BuildCharacterAttackTypesTest extends TestCase
 {
-    use CreateGameClassSpecial, RefreshDatabase;
+    use CreateCharacterClassSpecialitiesEquipped, CreateGameClassSpecial, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -60,7 +61,7 @@ class BuildCharacterAttackTypesTest extends TestCase
             'specialty_damage_uses_damage_stat_amount' => 1.0,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 0,
@@ -97,7 +98,7 @@ class BuildCharacterAttackTypesTest extends TestCase
             'specialty_damage_uses_damage_stat_amount' => 1.0,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 0,

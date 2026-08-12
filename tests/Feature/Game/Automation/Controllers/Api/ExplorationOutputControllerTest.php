@@ -18,7 +18,7 @@ class ExplorationOutputControllerTest extends TestCase
     use CreateExplorationWarning;
     use RefreshDatabase;
 
-    private Character $character;
+    private ?Character $character;
 
     protected function setUp(): void
     {
@@ -33,6 +33,8 @@ class ExplorationOutputControllerTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+
+        $this->character = null;
     }
 
     public function test_output_returns_active_exploration_log(): void

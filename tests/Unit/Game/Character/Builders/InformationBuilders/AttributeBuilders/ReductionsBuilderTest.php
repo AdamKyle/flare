@@ -6,6 +6,7 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
@@ -15,7 +16,7 @@ use Tests\Traits\CreateItemAffix;
 
 class ReductionsBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -107,7 +108,7 @@ class ReductionsBuilderTest extends TestCase
             'spell_evasion' => 0.20,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 1,
@@ -137,7 +138,7 @@ class ReductionsBuilderTest extends TestCase
             'spell_evasion' => 0.20,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 1,
@@ -171,7 +172,7 @@ class ReductionsBuilderTest extends TestCase
             'skill_reduction' => 0.20,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 1,
@@ -205,7 +206,7 @@ class ReductionsBuilderTest extends TestCase
             'skill_reduction' => 0.20,
         ]);
 
-        $character->classSpecialsEquipped()->create([
+        $this->createCharacterClassRankSpecial([
             'character_id' => $character->id,
             'game_class_special_id' => $classSpecial->id,
             'level' => 1,

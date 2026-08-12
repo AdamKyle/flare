@@ -88,7 +88,7 @@ class DamageBuilder extends BaseAttribute
 
             $details['percentage_of_stat_used'] = 0.08;
         } elseif ($this->character->class->type()->isArcaneAlchemist()) {
-            $hasStaveEquipped = $this->inventory->filter(function ($slot) {
+            $hasStaveEquipped = ! is_null($this->inventory) && $this->inventory->filter(function ($slot) {
                 return $slot->item->type === ItemType::STAVE->value;
             })->isNotEmpty();
 
@@ -127,11 +127,6 @@ class DamageBuilder extends BaseAttribute
         });
 
         foreach ($slots as $slot) {
-
-            if (is_null($slot->item->type) || is_null($slot->position)) {
-                dd($slot->item);
-            }
-
             $details['masteries'][] = $this->classRanksWeaponMasteriesBuilder->fetchClassMasteryBreakDownForPosition($slot->item->type, $slot->position);
         }
 
@@ -203,9 +198,9 @@ class DamageBuilder extends BaseAttribute
     {
         $details['attached_affixes'] = $this->getAttributeBonusFromAllItemAffixesDetails('base_damage', false, ItemType::RING->value);
         $details['base_damage'] = $this->getDamageFromItems('ring', 'both');
-        $details['spell_evasion'] = $this->getAttributeFromItems('ring', 'spell_evasion', 'both');
-        $details['affix_damage_reduction'] = $this->getAttributeFromItems('ring', 'affix_damage_reduction', 'both');
-        $details['healing_reduction'] = $this->getAttributeFromItems('ring', 'healing_reduction', 'both');
+        $details['spell_evasion'] = $this->getAttributeFromItems('ring', 'spell_evasion');
+        $details['affix_damage_reduction'] = $this->getAttributeFromItems('ring', 'affix_damage_reduction');
+        $details['healing_reduction'] = $this->getAttributeFromItems('ring', 'healing_reduction');
         $details['skills_effecting_damage'] = null;
         $details['masteries'] = [];
 

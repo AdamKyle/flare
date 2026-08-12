@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Npcs\Actions\LabyrinthOracle\Controllers\Api;
 
-use App\Flare\Models\ItemSkill;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Database\Eloquent\Model;
@@ -11,12 +10,16 @@ use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
+use Tests\Traits\CreateItemSocket;
 
 class LabyrinthOracleControllerTest extends TestCase
 {
-    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGem, CreateHolyStack, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, CreateItemSocket, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -95,7 +98,7 @@ class LabyrinthOracleControllerTest extends TestCase
             'socket_count' => 1,
         ]);
 
-        $gemItem->sockets()->create([
+        $this->createItemSocket([
             'gem_id' => $this->createGem()->id,
             'item_id' => $gemItem->id,
         ]);
@@ -106,7 +109,7 @@ class LabyrinthOracleControllerTest extends TestCase
             'name' => 'holy item',
         ]);
 
-        $holyItem->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $holyItem->id,
             'devouring_darkness_bonus' => 0.10,
             'stat_increase_bonus' => 0.10,
@@ -207,7 +210,7 @@ class LabyrinthOracleControllerTest extends TestCase
             'socket_count' => 2,
         ]);
 
-        $itemToTransferFrom->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $itemToTransferFrom->id,
             'devouring_darkness_bonus' => 0.10,
             'stat_increase_bonus' => 0.10,
@@ -217,7 +220,7 @@ class LabyrinthOracleControllerTest extends TestCase
 
         $gemToAttach = $this->createGem();
 
-        $itemToTransferFrom->sockets()->create([
+        $this->createItemSocket([
             'item_id' => $itemToTransferFrom->id,
             'gem_id' => $gemToAttach->id,
         ]);
@@ -263,7 +266,7 @@ class LabyrinthOracleControllerTest extends TestCase
         $prefix = $this->createItemAffix(['type' => 'prefix']);
         $suffix = $this->createItemAffix(['type' => 'suffix']);
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'Item Mastery',
             'description' => 'Increases item proficiency.',
             'max_level' => 10,
@@ -277,13 +280,13 @@ class LabyrinthOracleControllerTest extends TestCase
             'holy_stacks' => 5,
         ]);
 
-        $decoratedItem->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $decoratedItem->id,
             'devouring_darkness_bonus' => 0.1,
             'stat_increase_bonus' => 0.1,
         ]);
 
-        $decoratedItem->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $decoratedItem->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 1,

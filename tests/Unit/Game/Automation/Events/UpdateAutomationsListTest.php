@@ -12,24 +12,6 @@ class UpdateAutomationsListTest extends TestCase
 {
     use CreateAutomationEventUser;
 
-    public function test_constructor_sets_user(): void
-    {
-        $user = $this->createAutomationEventUser();
-
-        $event = new UpdateAutomationsList($user, new Collection());
-
-        $this->assertEquals($user, $event->user);
-    }
-
-    public function test_constructor_sets_automations(): void
-    {
-        $automations = new Collection();
-
-        $event = new UpdateAutomationsList($this->createAutomationEventUser(), $automations);
-
-        $this->assertEquals($automations, $event->automations);
-    }
-
     public function test_broadcast_on_returns_private_automations_list_channel(): void
     {
         $event = new UpdateAutomationsList($this->createAutomationEventUser(), new Collection());

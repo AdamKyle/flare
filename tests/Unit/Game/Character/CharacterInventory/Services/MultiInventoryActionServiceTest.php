@@ -2,20 +2,42 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
+use App\Flare\Models\MarketBoard;
+use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Jobs\DisenchantMany;
 use App\Game\Character\CharacterInventory\Services\MultiInventoryActionService;
+use Exception;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class MultiInventoryActionServiceTest extends TestCase
 {
-    use CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateInventorySets, CreateItem, CreateItemAffix, RefreshDatabase;
+
+    private ?Character $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
 
     public function test_bulk_inventory_selling_updates_gold_and_deletes_selected_slots(): void
     {
@@ -35,21 +57,52 @@ class MultiInventoryActionServiceTest extends TestCase
         $this->assertSame(295, $character->refresh()->gold);
     }
 
+    public function test_bulk_inventory_selling_with_exclude_keeps_the_excluded_slot(): void
+    {
+        $keepItem = $this->createItem(['cost' => 100]);
+        $sellItem = $this->createItem(['cost' => 200]);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($keepItem)
+            ->giveItem($sellItem)
+            ->getCharacter();
+        $keepSlotId = $character->inventory->slots->firstWhere('item_id', $keepItem->id)->id;
+
+        resolve(MultiInventoryActionService::class)->sellManyItems($character, ['exclude' => [$keepSlotId]]);
+
+        $this->assertSame(1, $character->refresh()->inventory->slots()->count());
+        $this->assertSame($keepSlotId, $character->inventory->slots->first()->id);
+    }
+
+    public function test_bulk_set_slot_selling_rejects_a_set_not_owned_by_the_character(): void
+    {
+        $character = $this->character;
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $otherSet = $this->createInventorySet(['character_id' => $otherCharacter->id]);
+
+        $result = resolve(MultiInventoryActionService::class)->sellManySetSlots($character, $otherSet, []);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Cannot do that.', $result['message']);
+    }
+
     public function test_bulk_set_slot_selling_updates_gold_and_deletes_selected_set_slots(): void
     {
         $firstItem = $this->createItem(['cost' => 100]);
         $secondItem = $this->createItem(['cost' => 200]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $character->update(['inventory_max' => 0]);
-        $set = $character->inventorySets()->create([
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $firstSlot = $set->slots()->create(['item_id' => $firstItem->id]);
-        $secondSlot = $set->slots()->create(['item_id' => $secondItem->id]);
+        $firstSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $firstItem->id]);
+        $secondSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $secondItem->id]);
 
         resolve(MultiInventoryActionService::class)->sellManySetSlots($character, $set, [$firstSlot->id, $secondSlot->id]);
 
@@ -64,16 +117,17 @@ class MultiInventoryActionServiceTest extends TestCase
 
         $prefix = $this->createItemAffix(['name' => 'Bulk Disenchant Prefix', 'type' => 'prefix']);
         $item = $this->createItem(['cost' => 100, 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $character->update(['inventory_max' => 0]);
-        $set = $character->inventorySets()->create([
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $slot = $set->slots()->create(['item_id' => $item->id]);
+        $slot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantManySetSlots($character, $set, [$slot->id]);
 
@@ -82,31 +136,57 @@ class MultiInventoryActionServiceTest extends TestCase
         Bus::assertDispatched(DisenchantMany::class);
     }
 
+    public function test_bulk_set_slot_disenchanting_rejects_a_set_not_owned_by_the_character(): void
+    {
+        $character = $this->character;
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $otherSet = $this->createInventorySet(['character_id' => $otherCharacter->id]);
+
+        $result = resolve(MultiInventoryActionService::class)->disenchantManySetSlots($character, $otherSet, []);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Cannot do that.', $result['message']);
+    }
+
+    public function test_bulk_set_slot_destroying_rejects_a_set_not_owned_by_the_character(): void
+    {
+        $character = $this->character;
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $otherSet = $this->createInventorySet(['character_id' => $otherCharacter->id]);
+
+        $result = resolve(MultiInventoryActionService::class)->destroyManySetSlots($character, $otherSet, []);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Cannot do that.', $result['message']);
+    }
+
     public function test_bulk_set_slot_destroying_deletes_only_selected_owned_set_slots(): void
     {
         $firstItem = $this->createItem(['type' => 'trinket']);
         $secondItem = $this->createItem();
         $thirdItem = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $otherSet = $otherCharacter->inventorySets()->create([
+        $otherSet = $this->createInventorySet([
+            'character_id' => $otherCharacter->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $selectedTrinketSlot = $set->slots()->create(['item_id' => $firstItem->id]);
-        $selectedItemSlot = $set->slots()->create(['item_id' => $secondItem->id]);
-        $unselectedSlot = $set->slots()->create(['item_id' => $thirdItem->id]);
-        $otherSlot = $otherSet->slots()->create(['item_id' => $thirdItem->id]);
+        $selectedTrinketSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $firstItem->id]);
+        $selectedItemSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $secondItem->id]);
+        $unselectedSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $thirdItem->id]);
+        $otherSlot = $this->createInventorySetSlot(['inventory_set_id' => $otherSet->id, 'item_id' => $thirdItem->id]);
 
         resolve(MultiInventoryActionService::class)->destroyManySetSlots($character, $set, [
             $selectedTrinketSlot->id,
@@ -124,16 +204,17 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $trinket = $this->createItem(['type' => 'trinket']);
         $nonTrinket = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $set->slots()->create(['item_id' => $trinket->id]);
-        $set->slots()->create(['item_id' => $nonTrinket->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $trinket->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $nonTrinket->id]);
 
         resolve(MultiInventoryActionService::class)->destroyAllCraftedItemsSetSlots($character, $set);
 
@@ -143,20 +224,22 @@ class MultiInventoryActionServiceTest extends TestCase
     public function test_destroy_all_crafted_items_set_slots_does_not_remove_normal_set_slots(): void
     {
         $item = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $craftedSet = $character->inventorySets()->create([
+        $character = $this->character;
+        $craftedSet = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $normalSet = $character->inventorySets()->create([
+        $normalSet = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => 'Set 1',
             'is_equipped' => false,
             'can_be_equipped' => true,
         ]);
-        $normalSetSlot = $normalSet->slots()->create(['item_id' => $item->id]);
+        $normalSetSlot = $this->createInventorySetSlot(['inventory_set_id' => $normalSet->id, 'item_id' => $item->id]);
 
         resolve(MultiInventoryActionService::class)->destroyAllCraftedItemsSetSlots($character, $craftedSet);
 
@@ -166,23 +249,25 @@ class MultiInventoryActionServiceTest extends TestCase
     public function test_destroy_all_crafted_items_set_slots_does_not_remove_another_characters_set_slots(): void
     {
         $item = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $otherSet = $otherCharacter->inventorySets()->create([
+        $otherSet = $this->createInventorySet([
+            'character_id' => $otherCharacter->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $otherSlot = $otherSet->slots()->create(['item_id' => $item->id]);
+        $otherSlot = $this->createInventorySetSlot(['inventory_set_id' => $otherSet->id, 'item_id' => $item->id]);
 
         $result = resolve(MultiInventoryActionService::class)->destroyAllCraftedItemsSetSlots($character, $otherSet);
 
@@ -193,13 +278,14 @@ class MultiInventoryActionServiceTest extends TestCase
     public function test_destroy_all_crafted_items_set_slots_rejects_normal_set_target(): void
     {
         $item = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $normalSet = $character->inventorySets()->create([
+        $character = $this->character;
+        $normalSet = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => 'Set 1',
             'is_equipped' => false,
             'can_be_equipped' => true,
         ]);
-        $normalSetSlot = $normalSet->slots()->create(['item_id' => $item->id]);
+        $normalSetSlot = $this->createInventorySetSlot(['inventory_set_id' => $normalSet->id, 'item_id' => $item->id]);
 
         $result = resolve(MultiInventoryActionService::class)->destroyAllCraftedItemsSetSlots($character, $normalSet);
 
@@ -211,17 +297,18 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $weapon = $this->createItem(['type' => 'weapon', 'cost' => 100]);
         $armour = $this->createItem(['type' => 'armour', 'cost' => 200]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $character->update(['gold' => 0]);
-        $set = $character->inventorySets()->create([
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $set->slots()->create(['item_id' => $weapon->id]);
-        $set->slots()->create(['item_id' => $armour->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $weapon->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $armour->id]);
 
         $expectedGold = SellItemCalculator::fetchSalePriceWithAffixes($weapon) + SellItemCalculator::fetchSalePriceWithAffixes($armour);
 
@@ -235,16 +322,17 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $trinket = $this->createItem(['type' => 'trinket']);
         $weapon = $this->createItem(['type' => 'weapon']);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $trinketSlot = $set->slots()->create(['item_id' => $trinket->id]);
-        $set->slots()->create(['item_id' => $weapon->id]);
+        $trinketSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $trinket->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $weapon->id]);
 
         resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $set);
 
@@ -256,16 +344,17 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $artifact = $this->createItem(['type' => 'artifact']);
         $weapon = $this->createItem(['type' => 'weapon']);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $artifactSlot = $set->slots()->create(['item_id' => $artifact->id]);
-        $set->slots()->create(['item_id' => $weapon->id]);
+        $artifactSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $artifact->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $weapon->id]);
 
         resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $set);
 
@@ -277,16 +366,17 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $questItem = $this->createItem(['type' => 'quest']);
         $weapon = $this->createItem(['type' => 'weapon']);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $questSlot = $set->slots()->create(['item_id' => $questItem->id]);
-        $set->slots()->create(['item_id' => $weapon->id]);
+        $questSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $questItem->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $weapon->id]);
 
         resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $set);
 
@@ -298,16 +388,17 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $gem = $this->createItem(['type' => 'gem']);
         $weapon = $this->createItem(['type' => 'weapon']);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $gemSlot = $set->slots()->create(['item_id' => $gem->id]);
-        $set->slots()->create(['item_id' => $weapon->id]);
+        $gemSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $gem->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $weapon->id]);
 
         resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $set);
 
@@ -319,16 +410,17 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $alchemyItem = $this->createItem(['type' => 'alchemy']);
         $weapon = $this->createItem(['type' => 'weapon']);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $alchemySlot = $set->slots()->create(['item_id' => $alchemyItem->id]);
-        $set->slots()->create(['item_id' => $weapon->id]);
+        $alchemySlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $alchemyItem->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $weapon->id]);
 
         resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $set);
 
@@ -339,13 +431,14 @@ class MultiInventoryActionServiceTest extends TestCase
     public function test_sell_all_crafted_items_set_slots_rejects_normal_set_target(): void
     {
         $item = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $normalSet = $character->inventorySets()->create([
+        $character = $this->character;
+        $normalSet = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => 'Set 1',
             'is_equipped' => false,
             'can_be_equipped' => true,
         ]);
-        $normalSetSlot = $normalSet->slots()->create(['item_id' => $item->id]);
+        $normalSetSlot = $this->createInventorySetSlot(['inventory_set_id' => $normalSet->id, 'item_id' => $item->id]);
 
         $result = resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $normalSet);
 
@@ -356,16 +449,17 @@ class MultiInventoryActionServiceTest extends TestCase
     public function test_sell_all_crafted_items_set_slots_does_not_sell_another_characters_set_slots(): void
     {
         $item = $this->createItem();
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $otherSet = $otherCharacter->inventorySets()->create([
+        $otherSet = $this->createInventorySet([
+            'character_id' => $otherCharacter->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $otherSlot = $otherSet->slots()->create(['item_id' => $item->id]);
+        $otherSlot = $this->createInventorySetSlot(['inventory_set_id' => $otherSet->id, 'item_id' => $item->id]);
 
         $result = resolve(MultiInventoryActionService::class)->sellAllCraftedItemsSetSlots($character, $otherSet);
 
@@ -379,15 +473,16 @@ class MultiInventoryActionServiceTest extends TestCase
 
         $prefix = $this->createItemAffix(['name' => 'Disenchant All Prefix', 'type' => 'prefix']);
         $enchantedWeapon = $this->createItem(['type' => 'weapon', 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $enchantedSlot = $set->slots()->create(['item_id' => $enchantedWeapon->id]);
+        $enchantedSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $enchantedWeapon->id]);
 
         $result = resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -399,15 +494,16 @@ class MultiInventoryActionServiceTest extends TestCase
     public function test_disenchant_all_crafted_items_set_slots_keeps_unenchanted_items(): void
     {
         $unenchantedWeapon = $this->createItem(['type' => 'weapon', 'item_prefix_id' => null, 'item_suffix_id' => null]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $unenchantedSlot = $set->slots()->create(['item_id' => $unenchantedWeapon->id]);
+        $unenchantedSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $unenchantedWeapon->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -418,15 +514,16 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Alchemy Prefix', 'type' => 'prefix']);
         $alchemyItem = $this->createItem(['type' => 'alchemy', 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $alchemySlot = $set->slots()->create(['item_id' => $alchemyItem->id]);
+        $alchemySlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $alchemyItem->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -437,15 +534,16 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Gem Prefix', 'type' => 'prefix']);
         $gem = $this->createItem(['type' => 'gem', 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $gemSlot = $set->slots()->create(['item_id' => $gem->id]);
+        $gemSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $gem->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -456,15 +554,16 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Quest Prefix', 'type' => 'prefix']);
         $questItem = $this->createItem(['type' => 'quest', 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $questSlot = $set->slots()->create(['item_id' => $questItem->id]);
+        $questSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $questItem->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -475,15 +574,16 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Artifact Prefix', 'type' => 'prefix']);
         $artifact = $this->createItem(['type' => 'artifact', 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $artifactSlot = $set->slots()->create(['item_id' => $artifact->id]);
+        $artifactSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $artifact->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -494,15 +594,16 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Trinket Prefix', 'type' => 'prefix']);
         $trinket = $this->createItem(['type' => 'trinket', 'item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $set = $character->inventorySets()->create([
+        $character = $this->character;
+        $set = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $trinketSlot = $set->slots()->create(['item_id' => $trinket->id]);
+        $trinketSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $trinket->id]);
 
         resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $set);
 
@@ -513,13 +614,14 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Normal Set Prefix', 'type' => 'prefix']);
         $item = $this->createItem(['item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $normalSet = $character->inventorySets()->create([
+        $character = $this->character;
+        $normalSet = $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => 'Set 1',
             'is_equipped' => false,
             'can_be_equipped' => true,
         ]);
-        $normalSetSlot = $normalSet->slots()->create(['item_id' => $item->id]);
+        $normalSetSlot = $this->createInventorySetSlot(['inventory_set_id' => $normalSet->id, 'item_id' => $item->id]);
 
         $result = resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $normalSet);
 
@@ -531,20 +633,168 @@ class MultiInventoryActionServiceTest extends TestCase
     {
         $prefix = $this->createItemAffix(['name' => 'Disenchant Other Character Prefix', 'type' => 'prefix']);
         $item = $this->createItem(['item_prefix_id' => $prefix->id]);
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
-        $otherSet = $otherCharacter->inventorySets()->create([
+        $otherSet = $this->createInventorySet([
+            'character_id' => $otherCharacter->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
             'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
             'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
         ]);
-        $otherSlot = $otherSet->slots()->create(['item_id' => $item->id]);
+        $otherSlot = $this->createInventorySetSlot(['inventory_set_id' => $otherSet->id, 'item_id' => $item->id]);
 
         $result = resolve(MultiInventoryActionService::class)->disenchantAllCraftedItemsSetSlots($character, $otherSet);
 
         $this->assertSame(422, $result['status']);
         $this->assertTrue($otherSet->slots()->where('id', $otherSlot->id)->exists());
+    }
+
+    public function test_destroy_many_items_removes_only_the_selected_slots(): void
+    {
+        $keepItem = $this->createItem();
+        $destroyItem = $this->createItem();
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($keepItem)
+            ->giveItem($destroyItem)
+            ->getCharacter();
+        $destroySlotId = $character->inventory->slots()->where('item_id', $destroyItem->id)->first()->id;
+        $keepSlotId = $character->inventory->slots()->where('item_id', $keepItem->id)->first()->id;
+
+        resolve(MultiInventoryActionService::class)->destroyManyItems($character, ['ids' => [$destroySlotId]]);
+
+        $this->assertSame(0, $character->inventory->slots()->where('id', $destroySlotId)->count());
+        $this->assertSame(1, $character->inventory->slots()->where('id', $keepSlotId)->count());
+    }
+
+    public function test_destroy_many_items_with_exclude_keeps_only_the_excluded_slots(): void
+    {
+        $keepItem = $this->createItem();
+        $destroyItem = $this->createItem();
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($keepItem)
+            ->giveItem($destroyItem)
+            ->getCharacter();
+        $destroySlotId = $character->inventory->slots()->where('item_id', $destroyItem->id)->first()->id;
+        $keepSlotId = $character->inventory->slots()->where('item_id', $keepItem->id)->first()->id;
+
+        resolve(MultiInventoryActionService::class)->destroyManyItems($character, ['exclude' => [$keepSlotId]]);
+
+        $this->assertSame(0, $character->inventory->slots()->where('id', $destroySlotId)->count());
+        $this->assertSame(1, $character->inventory->slots()->where('id', $keepSlotId)->count());
+    }
+
+    public function test_move_many_items_to_selected_set_moves_all_selected_items_and_reports_the_destination_set(): void
+    {
+        $firstItem = $this->createItem();
+        $secondItem = $this->createItem();
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($firstItem)
+            ->giveItem($secondItem)
+            ->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $slotIds = $character->inventory->slots->pluck('id')->all();
+
+        $result = resolve(MultiInventoryActionService::class)->moveManyItemsToSelectedSet($character, $set->id, $slotIds);
+
+        $this->assertSame(200, $result['status']);
+        $this->assertSame('Moved all selected items to: Set 0.', $result['message']);
+        $this->assertSame(2, $set->refresh()->slots()->count());
+        $this->assertSame(0, $character->inventory->slots()->count());
+    }
+
+    public function test_move_many_items_to_selected_set_stops_and_returns_error_when_a_move_fails(): void
+    {
+        $item = $this->createItem();
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $validSlotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $result = resolve(MultiInventoryActionService::class)->moveManyItemsToSelectedSet($character, $set->id, [999999, $validSlotId]);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Either the slot or the inventory set does not exist.', $result['message']);
+        $this->assertSame(1, $character->inventory->slots()->where('id', $validSlotId)->count());
+        $this->assertSame(0, $set->refresh()->slots()->count());
+    }
+
+    public function test_equip_many_items_equips_matching_items(): void
+    {
+        $item = $this->createItem(['type' => 'body']);
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $result = resolve(MultiInventoryActionService::class)->equipManyItems($character, [$slotId]);
+
+        $this->assertSame(200, $result['status']);
+        $this->assertSame('Equipped valid items to your character.', $result['message']);
+        $this->assertTrue($character->inventory->slots()->where('id', $slotId)->first()->equipped);
+    }
+
+    public function test_equip_many_items_returns_error_result_when_equip_many_builder_throws(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $equipManyBuilder = Mockery::mock(EquipManyBuilder::class);
+        $equipManyBuilder->shouldReceive('buildEquipmentArray')->once()->andThrow(new Exception('Something went wrong building the equipment array.'));
+
+        $this->app->instance(EquipManyBuilder::class, $equipManyBuilder);
+
+        $result = resolve(MultiInventoryActionService::class)->equipManyItems($character, [123]);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Something went wrong building the equipment array.', $result['message']);
+    }
+
+    public function test_list_many_set_slots_lists_eligible_items_on_the_market_board_and_removes_them_from_the_set(): void
+    {
+        $item = $this->createItem(['type' => 'weapon']);
+        $character = $this->character;
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $slot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
+
+        $result = resolve(MultiInventoryActionService::class)->listManySetSlots($character, $set, [$slot->id], 500);
+
+        $this->assertSame(200, $result['status']);
+        $this->assertSame(1, MarketBoard::where('character_id', $character->id)->where('item_id', $item->id)->where('listed_price', 500)->count());
+        $this->assertSame(0, $set->refresh()->slots()->count());
+    }
+
+    public function test_list_many_set_slots_rejects_a_set_not_owned_by_the_character(): void
+    {
+        $character = $this->character;
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $otherSet = $this->createInventorySet(['character_id' => $otherCharacter->id]);
+
+        $result = resolve(MultiInventoryActionService::class)->listManySetSlots($character, $otherSet, [], 100);
+
+        $this->assertSame(422, $result['status']);
+        $this->assertSame('Cannot do that.', $result['message']);
+    }
+
+    public function test_disenchant_many_items_returns_no_eligible_items_message_when_nothing_matches(): void
+    {
+        $character = $this->character;
+
+        $result = resolve(MultiInventoryActionService::class)->disenchantManyItems($character, []);
+
+        $this->assertSame(200, $result['status']);
+        $this->assertSame('No eligible items to disenchant.', $result['message']);
     }
 }

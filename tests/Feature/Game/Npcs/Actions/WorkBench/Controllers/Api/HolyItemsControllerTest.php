@@ -2,19 +2,21 @@
 
 namespace Tests\Feature\Game\Npcs\Actions\WorkBench\Controllers\Api;
 
-use App\Flare\Models\AlchemyBagSlot;
-use App\Flare\Models\ItemSkill;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
 
 class HolyItemsControllerTest extends TestCase
 {
-    use CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateHolyStack, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -49,7 +51,8 @@ class HolyItemsControllerTest extends TestCase
             )
             ->getCharacter();
 
-        $character->alchemyBag->slots()->create([
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
             'amount' => 1,
@@ -83,7 +86,8 @@ class HolyItemsControllerTest extends TestCase
             ->giveItem($item)
             ->getCharacter();
 
-        $alchemySlot = $character->alchemyBag->slots()->create([
+        $alchemySlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
             'amount' => 1,
@@ -145,9 +149,7 @@ class HolyItemsControllerTest extends TestCase
             ->giveItem($fullyStackedItem)
             ->getCharacter();
 
-        $fullyStackedSlot = $character->inventory->slots->firstWhere('item_id', $fullyStackedItem->id);
-
-        $fullyStackedSlot->item->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $fullyStackedItem->id,
             'devouring_darkness_bonus' => 0.1,
             'stat_increase_bonus' => 0.1,
@@ -198,8 +200,8 @@ class HolyItemsControllerTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $character->alchemyBag->slots()->create(['character_id' => $character->id, 'item_id' => $oilOne->id, 'amount' => 1]);
-        $character->alchemyBag->slots()->create(['character_id' => $character->id, 'item_id' => $oilTwo->id, 'amount' => 1]);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oilOne->id, 'amount' => 1]);
+        $this->createAlchemyBagSlot(['alchemy_bag_id' => $character->alchemyBag->id, 'character_id' => $character->id, 'item_id' => $oilTwo->id, 'amount' => 1]);
 
         $firstPage = $this->actingAs($character->user)
             ->call('GET', '/api/character/'.$character->id.'/inventory/smiths-workbench/oils', [
@@ -245,7 +247,8 @@ class HolyItemsControllerTest extends TestCase
             $item
         )->getCharacter();
 
-        $alchemySlot = $character->alchemyBag->slots()->create([
+        $alchemySlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
             'amount' => 1,
@@ -292,7 +295,7 @@ class HolyItemsControllerTest extends TestCase
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
 
-        $alchemySlot = AlchemyBagSlot::create([
+        $alchemySlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -316,7 +319,7 @@ class HolyItemsControllerTest extends TestCase
         $prefix = $this->createItemAffix(['type' => 'prefix']);
         $suffix = $this->createItemAffix(['type' => 'suffix']);
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'Weapon Mastery',
             'description' => 'Increases weapon proficiency.',
             'max_level' => 10,
@@ -330,13 +333,13 @@ class HolyItemsControllerTest extends TestCase
             'item_suffix_id' => $suffix->id,
         ]);
 
-        $decoratedItem->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $decoratedItem->id,
             'devouring_darkness_bonus' => 0.1,
             'stat_increase_bonus' => 0.1,
         ]);
 
-        $decoratedItem->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $decoratedItem->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 1,

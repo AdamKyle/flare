@@ -26,4 +26,14 @@ trait CreateInventorySets
                 'item_id' => $itemId,
             ]);
     }
+
+    public function createInventorySetSlotsForItems(InventorySet $set, array $itemIds): void
+    {
+        foreach ($itemIds as $itemId) {
+            $this->createInventorySetSlot([
+                'inventory_set_id' => $set->id,
+                'item_id' => $itemId,
+            ]);
+        }
+    }
 }

@@ -32,11 +32,15 @@ class BaseAttribute
      */
     protected function getAttributeBonusFromAllItemAffixes(string $attribute): float
     {
+        if (is_null($this->inventory)) {
+            return 0.0;
+        }
+
         return $this->inventory->sum('item.itemPrefix.'.$attribute.'_mod') +
             $this->inventory->sum('item.itemSuffix.'.$attribute.'_mod');
     }
 
-    protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false, string|array|null $onlyForType = null): array
+    protected function getAttributeBonusFromAllItemAffixesDetails(string $attribute, bool $voided = false, ?string $onlyForType = null): array
     {
         $details = [];
 
@@ -46,26 +50,8 @@ class BaseAttribute
 
         foreach ($this->inventory as $slot) {
 
-            if (! is_null($onlyForType)) {
-
-                if (! is_array($onlyForType)) {
-
-                    if ($onlyForType === ItemType::RING->value && $slot->item->type !== $onlyForType) {
-                        continue;
-                    }
-
-                    if ($slot->item->type !== $onlyForType) {
-
-                        if (! $this->hasAffixesAffectingStat($slot->item, $attribute)) {
-                            continue;
-                        }
-                    }
-                } else {
-                    if (! in_array($slot->item->type, $onlyForType)) {
-                        continue;
-                    }
-                }
-
+            if (! is_null($onlyForType) && $slot->item->type !== $onlyForType) {
+                continue;
             }
 
             $details[] = [
@@ -76,23 +62,6 @@ class BaseAttribute
         }
 
         return $details;
-    }
-
-    private function hasAffixesAffectingStat(Item $item, string $attribute): bool
-    {
-        if (! is_null($item->item_prefix_id)) {
-            if ($item->itemPrefix->{$attribute.'_mod'} > 0) {
-                return true;
-            }
-        }
-
-        if (! is_null($item->item_suffix_id)) {
-            if ($item->itemSuffix->{$attribute.'_mod'} > 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function fetchAffixes(Item $item, string $attribute): array
@@ -160,18 +129,11 @@ class BaseAttribute
      */
     protected function shouldIncludeSkillDamage(GameClass $class, string $type): bool
     {
-        switch ($type) {
-            case 'weapon':
-                return $class->type()->isNonCaster();
-            case 'spell':
-                return $class->type()->isCaster();
-            case 'healing':
-                return $class->type()->isHealer();
-            default:
-                false;
-        }
-
-        return false;
+        return match ($type) {
+            'weapon' => $class->type()->isNonCaster(),
+            'spell' => $class->type()->isCaster(),
+            'healing' => $class->type()->isHealer(),
+        };
     }
 
     /**
@@ -179,6 +141,10 @@ class BaseAttribute
      */
     protected function getDamageFromWeapons(string $position): int
     {
+
+        if (is_null($this->inventory)) {
+            return 0;
+        }
 
         $itemTypes = ItemType::validWeapons();
 
@@ -206,19 +172,13 @@ class BaseAttribute
             ->sum('item.base_damage');
     }
 
-    protected function getAttributeFromItems(string $type, string $attribute, string $position): mixed
+    protected function getAttributeFromItems(string $type, string $attribute): mixed
     {
         if (is_null($this->inventory)) {
             return 0;
         }
 
-        if ($position === 'both') {
-            return $this->inventory->whereIn('item.type', $type)->sum('item.'.$attribute);
-        }
-
-        return $this->inventory->where('item.type', $type)
-            ->where('position', $position)
-            ->sum('item.'.$attribute);
+        return $this->inventory->whereIn('item.type', $type)->sum('item.'.$attribute);
     }
 
     /**
@@ -226,6 +186,10 @@ class BaseAttribute
      */
     protected function getHealingFromItems(string $type, string $position): int
     {
+
+        if (is_null($this->inventory)) {
+            return 0;
+        }
 
         if ($position === 'both') {
             return $this->inventory->where('item.type', $type)->sum('item.base_healing');

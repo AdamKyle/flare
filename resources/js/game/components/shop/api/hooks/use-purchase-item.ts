@@ -1,6 +1,6 @@
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError, AxiosRequestConfig } from 'axios';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import UsePurchaseItemDefinition from './definitions/use-purchase-item-definition';
 import UsePurchaseItemParams from './definitions/use-purchase-item-params';
@@ -25,40 +25,46 @@ export const usePurchaseItem = (
     character: params.character_id,
   });
 
-  const purchaseItem = useCallback(
-    async () => {
-      setLoading(true);
-      setError(null);
-      setSuccessMessage(null);
+  // `params.on_success` is recreated by the caller on every render. Reading it
+  // through a ref keeps `purchaseItem` stable across renders (avoiding a
+  // re-purchase loop from the effect below) while still calling the latest
+  // callback instead of a stale closure.
+  const onSuccessRef = useRef(params.on_success);
 
-      try {
-        const result = await apiHandler.post<
-          PurchaseResponse,
-          AxiosRequestConfig<PurchaseResponse>,
-          UsePurchaseItemRequestDefinition
-        >(url, {
-          item_id: requestParams.item_id,
-        });
+  useEffect(() => {
+    onSuccessRef.current = params.on_success;
+  }, [params.on_success]);
 
-        setSuccessMessage(result.message);
+  const purchaseItem = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
 
-        params.on_success({
-          gold: result.gold,
-          inventory_count: result.inventory_count,
-        });
+    try {
+      const result = await apiHandler.post<
+        PurchaseResponse,
+        AxiosRequestConfig<PurchaseResponse>,
+        UsePurchaseItemRequestDefinition
+      >(url, {
+        item_id: requestParams.item_id,
+      });
 
-        setLoading(false);
-      } catch (err) {
-        if (err instanceof AxiosError) {
-          setError(err.response?.data || null);
-        }
-      } finally {
-        setLoading(false);
+      setSuccessMessage(result.message);
+
+      onSuccessRef.current({
+        gold: result.gold,
+        inventory_count: result.inventory_count,
+      });
+
+      setLoading(false);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data || null);
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, url, requestParams]
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, [apiHandler, url, requestParams]);
 
   useEffect(() => {
     if (requestParams.item_id <= 0) {

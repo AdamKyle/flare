@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\Concerns;
 
+use App\Flare\Models\Character;
 use App\Game\Character\Concerns\Boons;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -13,9 +14,25 @@ class BoonsTest extends TestCase
 {
     use CreateCharacterBoon, CreateItem, RefreshDatabase;
 
+    private ?Character $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
     public function test_fetch_character_boons_returns_only_active_boons_with_their_item(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $activeItem = $this->createItem();
         $this->createCharacterBoon([
@@ -48,7 +65,7 @@ class BoonsTest extends TestCase
 
     public function test_gains_additional_level_on_level_up_is_true_when_active_boon_item_grants_it(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $item = $this->createItem(['gains_additional_level' => true]);
         $this->createCharacterBoon([
@@ -70,7 +87,7 @@ class BoonsTest extends TestCase
 
     public function test_gains_additional_level_on_level_up_is_false_without_a_qualifying_boon(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $gainsAdditionalLevel = (new class
         {
@@ -82,7 +99,7 @@ class BoonsTest extends TestCase
 
     public function test_additional_levels_to_gain_sums_amount_used_and_adds_one(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $item = $this->createItem(['gains_additional_level' => true]);
         $this->createCharacterBoon([
@@ -104,7 +121,7 @@ class BoonsTest extends TestCase
 
     public function test_fetch_xp_bonus_multiplies_by_amount_used_when_item_can_stack(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $item = $this->createItem(['xp_bonus' => 2.5, 'can_stack' => true]);
         $this->createCharacterBoon([
@@ -126,7 +143,7 @@ class BoonsTest extends TestCase
 
     public function test_fetch_fight_time_out_modifier_ignores_amount_used_when_item_cannot_stack(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $item = $this->createItem(['fight_time_out_mod_bonus' => 0.5, 'can_stack' => false]);
         $this->createCharacterBoon([
@@ -148,7 +165,7 @@ class BoonsTest extends TestCase
 
     public function test_fetch_move_time_out_modifier_returns_zero_without_a_boon(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $modifier = (new class
         {

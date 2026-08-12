@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\CharacterSheet\Transformers;
 
+use App\Flare\Models\Character;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
@@ -11,14 +12,34 @@ class CharacterSheetTransformerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_transform_returns_complete_character_sheet_contract(): void
+    private ?CharacterSheetTransformer $transformer;
+
+    private ?Character $character;
+
+    protected function setUp(): void
     {
-        $character = (new CharacterFactory)
+        parent::setUp();
+
+        $this->transformer = resolve(CharacterSheetTransformer::class);
+        $this->character = (new CharacterFactory)
             ->createBaseCharacter()
             ->givePlayerLocation()
             ->getCharacter();
+    }
 
-        $data = resolve(CharacterSheetTransformer::class)->transform($character);
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->transformer = null;
+        $this->character = null;
+    }
+
+    public function test_transform_returns_complete_character_sheet_contract(): void
+    {
+        $character = $this->character;
+
+        $data = $this->transformer->transform($character);
 
         $expectedKeys = [
             'id', 'user_id', 'name', 'class', 'class_id', 'race', 'race_id', 'game_map_id', 'map_name',
@@ -36,12 +57,9 @@ class CharacterSheetTransformerTest extends TestCase
 
     public function test_transform_returns_numeric_gameplay_values_not_formatted_strings(): void
     {
-        $character = (new CharacterFactory)
-            ->createBaseCharacter()
-            ->givePlayerLocation()
-            ->getCharacter();
+        $character = $this->character;
 
-        $data = resolve(CharacterSheetTransformer::class)->transform($character);
+        $data = $this->transformer->transform($character);
 
         $this->assertIsInt($data['level']);
         $this->assertIsInt($data['gold']);
@@ -54,12 +72,9 @@ class CharacterSheetTransformerTest extends TestCase
 
     public function test_transform_preserves_runtime_and_access_state_from_base_info_transformer(): void
     {
-        $character = (new CharacterFactory)
-            ->createBaseCharacter()
-            ->givePlayerLocation()
-            ->getCharacter();
+        $character = $this->character;
 
-        $data = resolve(CharacterSheetTransformer::class)->transform($character);
+        $data = $this->transformer->transform($character);
 
         $this->assertArrayHasKey('can_craft', $data);
         $this->assertArrayHasKey('can_attack', $data);
@@ -74,12 +89,9 @@ class CharacterSheetTransformerTest extends TestCase
 
     public function test_transform_returns_elemental_atonements_with_consistent_shape_when_no_items_equipped(): void
     {
-        $character = (new CharacterFactory)
-            ->createBaseCharacter()
-            ->givePlayerLocation()
-            ->getCharacter();
+        $character = $this->character;
 
-        $data = resolve(CharacterSheetTransformer::class)->transform($character);
+        $data = $this->transformer->transform($character);
 
         $this->assertSame([
             'atonements' => [],

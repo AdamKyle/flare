@@ -6,7 +6,7 @@ class ReductionsBuilder extends BaseAttribute
 {
     public function getRingReduction(string $type): float
     {
-        if (empty($this->inventory)) {
+        if (is_null($this->inventory) || $this->inventory->isEmpty()) {
             return 0;
         }
 
@@ -23,7 +23,7 @@ class ReductionsBuilder extends BaseAttribute
 
     public function getAffixReduction($type): float
     {
-        if (empty($this->inventory)) {
+        if (is_null($this->inventory) || $this->inventory->isEmpty()) {
             return 0;
         }
 

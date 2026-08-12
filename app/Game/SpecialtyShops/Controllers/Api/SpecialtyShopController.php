@@ -15,12 +15,7 @@ use Illuminate\Http\JsonResponse;
 
 class SpecialtyShopController extends Controller
 {
-    private SpecialtyShop $specialtyShop;
-
-    public function __construct(SpecialtyShop $specialtyShop)
-    {
-        $this->specialtyShop = $specialtyShop;
-    }
+    public function __construct(private readonly SpecialtyShop $specialtyShop) {}
 
     /**
      * @throws Exception
@@ -41,7 +36,7 @@ class SpecialtyShopController extends Controller
 
             $items = $items->transform(function ($item) {
                 $goldCost = $item->cost;
-                $goldDustCost = $item->gold_gold_dust_cost;
+                $goldDustCost = $item->gold_dust_cost;
                 $shardsCost = $item->shards_cost;
                 $copperCoinCost = $item->copper_coin_cost;
 

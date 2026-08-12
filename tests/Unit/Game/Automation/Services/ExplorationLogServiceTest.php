@@ -2,21 +2,30 @@
 
 namespace Tests\Unit\Game\Automation\Services;
 
-use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\ExplorationLog;
+use App\Flare\Models\ExplorationWarning;
+use App\Game\Automation\Events\ExplorationOutputUpdated;
+use App\Game\Automation\Events\ExplorationWarningState;
 use App\Game\Automation\Services\ExplorationLogService;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Combat\Values\AttackType;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
+use Mockery;
+use PDOException;
+use RuntimeException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateExplorationLog;
 use Tests\Traits\CreateExplorationWarning;
 use Tests\Traits\CreateMonster;
 
 class ExplorationLogServiceTest extends TestCase
 {
-    use CreateExplorationLog, CreateExplorationWarning, CreateMonster, RefreshDatabase;
+    use CreateCharacterAutomation, CreateExplorationLog, CreateExplorationWarning, CreateMonster, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -43,7 +52,7 @@ class ExplorationLogServiceTest extends TestCase
         $character = $this->character->getCharacter();
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
-        $automation = CharacterAutomation::create([
+        $automation = $this->createCharacterAutomation([
             'character_id' => $character->id,
             'monster_id' => $monster->id,
             'type' => AutomationType::EXPLORING->value,
@@ -251,6 +260,56 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertSame(5, $log->faction_points_gained);
     }
 
+    public function test_apply_reward_context_logs_a_warning_when_broadcasting_warning_state_fails(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+        ]);
+
+        Event::listen(ExplorationWarningState::class, function (): void {
+            throw new RuntimeException('Broadcast connection failed.');
+        });
+
+        Log::spy();
+
+        ExplorationLogService::applyRewardContext($log, $character, [], ['total_xp' => 42]);
+
+        $this->assertSame(42, $log->fresh()->xp_gained);
+        Log::shouldHaveReceived('warning')
+            ->once()
+            ->with('ExplorationLogService::applyRewardContext failed to broadcast ExplorationWarningState.', Mockery::on(
+                fn (array $context): bool => $context['character_id'] === $character->id
+            ));
+    }
+
+    public function test_apply_reward_context_logs_a_warning_when_broadcasting_exploration_output_fails(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+        ]);
+
+        Event::listen(ExplorationOutputUpdated::class, function (): void {
+            throw new RuntimeException('Broadcast connection failed.');
+        });
+
+        Log::spy();
+
+        ExplorationLogService::applyRewardContext($log, $character, [], ['total_skill_xp' => 7]);
+
+        $this->assertSame(7, $log->fresh()->skill_xp_gained);
+        Log::shouldHaveReceived('warning')
+            ->once()
+            ->with('ExplorationLogService::applyRewardContext failed to broadcast exploration output.', Mockery::on(
+                fn (array $context): bool => $context['character_id'] === $character->id
+            ));
+    }
+
     public function test_clear_without_warning_deletes_the_active_log(): void
     {
         $character = $this->character->getCharacter();
@@ -325,6 +384,51 @@ class ExplorationLogServiceTest extends TestCase
         $this->assertNotNull($log->ended_at);
         $this->assertSame('missing_automation', $log->stopped_reason);
         $this->assertSame('warning', $result['type']);
+    }
+
+    public function test_output_for_character_repairs_active_log_and_skips_warning_after_retryable_lock_error(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $log = $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'character_automation_id' => 999999,
+            'ended_at' => null,
+        ]);
+
+        ExplorationWarning::creating(function (): void {
+            throw new QueryException('mysql', 'insert into exploration_warnings', [], new PDOException('Lock wait timeout exceeded', 1205));
+        });
+
+        $result = $this->explorationLogService->outputForCharacter($character);
+
+        $log = $log->fresh();
+
+        $this->assertNotNull($log->ended_at);
+        $this->assertSame('missing_automation', $log->stopped_reason);
+        $this->assertSame(0, ExplorationWarning::where('exploration_log_id', $log->id)->count());
+        $this->assertNotSame('warning', $result['type']);
+    }
+
+    public function test_output_for_character_rethrows_non_retryable_query_exception_during_repair(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $this->createExplorationLog([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'character_automation_id' => 999999,
+            'ended_at' => null,
+        ]);
+
+        ExplorationWarning::creating(function (): void {
+            throw new QueryException('mysql', 'insert into exploration_warnings', [], new PDOException('Column not found', 1054));
+        });
+
+        $this->expectException(QueryException::class);
+
+        $this->explorationLogService->outputForCharacter($character);
     }
 
     public function test_output_for_character_returns_warning_type_when_undismissed_warning_exists(): void

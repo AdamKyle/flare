@@ -113,7 +113,6 @@ class StatModifierDetails
 
     public function buildDamageBreakDown(string|array $type, bool $isVoided): array
     {
-        $types = $this->normalizeDamageTypes($types);
         $details = [];
         $types = is_array($type) ? $type : [$type];
         $isWeaponDamage = ! empty(array_intersect($types, ItemType::validWeapons()));
@@ -136,7 +135,7 @@ class StatModifierDetails
 
         $details = $this->setNonEquippedDamageDetails($details, $types, $damageStatAmount);
 
-        if (is_null($equipped)) {
+        if (is_null($this->equipped)) {
             if ($isWeaponDamage) {
                 if ($this->character->classType()->isAlcoholic()) {
                     $value = $damageStatAmount * 0.25;
@@ -184,15 +183,6 @@ class StatModifierDetails
         };
 
         return array_merge($details, $typeAttributes);
-    }
-
-    private function normalizeDamageTypes(string|array $types): array
-    {
-        if (is_array($types)) {
-            return $types;
-        }
-
-        return [$types];
     }
 
     private function setNonEquippedDamageDetails(array $details, array $types, float $damageStatAmount): array
@@ -425,7 +415,7 @@ class StatModifierDetails
 
             $boonDetails['increases_single_stat'] = [];
 
-            foreach ($applyToAllStats as $boon) {
+            foreach ($applyToSpecificStat as $boon) {
 
                 $boonDetails['increases_single_stat'][] = [
                     'item_details' => $this->getBasicDetailsOfItem($boon->itemUsed),

@@ -478,10 +478,6 @@ class ExplorationLogService
 
     private function duration(ExplorationLog $log): int
     {
-        if (is_null($log->started_at)) {
-            return 0;
-        }
-
         return (int) $log->started_at->diffInSeconds($log->ended_at ?? now());
     }
 }

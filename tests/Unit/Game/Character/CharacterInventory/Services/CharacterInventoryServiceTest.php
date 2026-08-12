@@ -3,20 +3,24 @@
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
 use App\Flare\Models\InventorySet;
-use App\Flare\Models\ItemSkill;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
 
 class CharacterInventoryServiceTest extends TestCase
 {
-    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateGem, CreateInventorySets, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -117,7 +121,8 @@ class CharacterInventoryServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $character->alchemyBag->slots()->create([
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
             'amount' => 1,
@@ -137,7 +142,8 @@ class CharacterInventoryServiceTest extends TestCase
 
         $character = $this->character->getCharacter();
 
-        $character->alchemyBag->slots()->create([
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
             'amount' => 1,
@@ -196,6 +202,20 @@ class CharacterInventoryServiceTest extends TestCase
         $character = $this->character->inventorySetManagement()->createInventorySets()->putItemInSet($item, 0)->getCharacter();
 
         $this->assertEquals($item->id, $this->characterInventoryService->getSlotForItemDetails($character, $item)->item_id);
+    }
+
+    public function test_get_set_slot_for_item_details_resolves_the_exact_set_slot()
+    {
+        $item = $this->createItem();
+
+        $character = $this->character->inventorySetManagement()->createInventorySets()->putItemInSet($item, 0)->getCharacter();
+
+        $setSlot = $character->inventorySets()->first()->slots()->where('item_id', $item->id)->first();
+
+        $result = $this->characterInventoryService->getSetSlotForItemDetails($character, $item, $setSlot->id);
+
+        $this->assertNotNull($result);
+        $this->assertSame($setSlot->id, $result->id);
     }
 
     public function test_include_named_sets()
@@ -334,7 +354,7 @@ class CharacterInventoryServiceTest extends TestCase
     {
         $item = $this->createItem(['type' => 'artifact']);
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -342,12 +362,9 @@ class CharacterInventoryServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $item->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $item->id,
             'item_skill_id' => $itemSkill->id,
-            'current_level' => 0,
-            'current_kill' => 0,
-            'is_training' => false,
         ]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -362,7 +379,7 @@ class CharacterInventoryServiceTest extends TestCase
     {
         $artifact = $this->createItem(['type' => 'artifact']);
 
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'parent',
             'description' => 'sample',
             'base_damage_mod' => 0.10,
@@ -370,12 +387,9 @@ class CharacterInventoryServiceTest extends TestCase
             'total_kills_needed' => 100,
         ]);
 
-        $artifact->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $artifact->id,
             'item_skill_id' => $itemSkill->id,
-            'current_level' => 0,
-            'current_kill' => 0,
-            'is_training' => false,
         ]);
 
         $regularItem = $this->createItem();
@@ -512,6 +526,18 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals('No alchemy item found to destroy.', $result['message']);
     }
 
+    public function test_cannot_destroy_alchemy_item_when_character_has_no_alchemy_bag()
+    {
+        $character = $this->character->getCharacter();
+
+        $character->alchemyBag()->delete();
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->destroyAlchemyItem(1);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No alchemy item found to destroy.', $result['message']);
+    }
+
     public function test_can_delete_alchemy_item()
     {
         $alchemyItem = $this->createItem([
@@ -519,7 +545,8 @@ class CharacterInventoryServiceTest extends TestCase
         ]);
 
         $character = $this->character->getCharacter();
-        $slot = $character->alchemyBag->slots()->create([
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $alchemyItem->id,
             'amount' => 2,
@@ -545,17 +572,20 @@ class CharacterInventoryServiceTest extends TestCase
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()
             ->givePlayerLocation()
             ->getCharacter();
-        $character->alchemyBag->slots()->create([
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $firstAlchemyItem->id,
             'amount' => 2,
         ]);
-        $character->alchemyBag->slots()->create([
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $secondAlchemyItem->id,
             'amount' => 3,
         ]);
-        $otherSlot = $otherCharacter->alchemyBag->slots()->create([
+        $otherSlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $otherCharacter->alchemyBag->id,
             'character_id' => $otherCharacter->id,
             'item_id' => $firstAlchemyItem->id,
             'amount' => 4,
@@ -591,12 +621,8 @@ class CharacterInventoryServiceTest extends TestCase
     public function test_destroy_all_alchemy_items_does_not_touch_gem_bag_slots(): void
     {
         $gem = $this->createGem();
-        $character = $this->character->getCharacter();
-        $gemSlot = $character->gemBag->gemSlots()->create([
-            'gem_bag_id' => $character->gemBag->id,
-            'gem_id' => $gem->id,
-            'amount' => 2,
-        ]);
+        $character = $this->character->gemBagManagement()->assignGemStackToBag($gem->id, 2)->getCharacter();
+        $gemSlot = $character->gemBag->gemSlots()->where('gem_id', $gem->id)->first();
 
         $this->characterInventoryService->setCharacter($character)->destroyAllAlchemyItems();
 
@@ -606,7 +632,8 @@ class CharacterInventoryServiceTest extends TestCase
     public function test_batch_crafting_set_appears_last_in_set_payload(): void
     {
         $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
-        $character->inventorySets()->create([
+        $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
@@ -625,7 +652,8 @@ class CharacterInventoryServiceTest extends TestCase
     public function test_batch_crafting_set_is_excluded_from_usable_sets(): void
     {
         $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
-        $character->inventorySets()->create([
+        $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
@@ -642,7 +670,8 @@ class CharacterInventoryServiceTest extends TestCase
     public function test_batch_crafting_set_excluded_from_savable_sets(): void
     {
         $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
-        $character->inventorySets()->create([
+        $this->createInventorySet([
+            'character_id' => $character->id,
             'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
             'is_equipped' => false,
             'can_be_equipped' => false,
@@ -655,5 +684,505 @@ class CharacterInventoryServiceTest extends TestCase
         $batchCraftingSetIncluded = collect($savableSets)->contains(fn ($set) => ($set['name'] ?? null) === InventorySet::BATCH_CRAFTING_SET_NAME);
 
         $this->assertFalse($batchCraftingSetIncluded);
+    }
+
+    public function test_set_inventory_returns_regular_inventory_slots_matching_the_configured_positions(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character->inventoryManagement()->giveItem($item, false, 'left-hand')->getCharacter();
+
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        $inventory = $this->characterInventoryService
+            ->setCharacter($character)
+            ->setInventorySlot($slot)
+            ->setPositions(['left-hand'])
+            ->setInventory()
+            ->inventory();
+
+        $this->assertCount(1, $inventory);
+        $this->assertTrue($inventory->contains('id', $slot->id));
+    }
+
+    public function test_set_inventory_falls_back_to_equipped_set_slots_matching_the_configured_positions(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($item, 0, 'left-hand', true)
+            ->getCharacter();
+
+        $inventory = $this->characterInventoryService
+            ->setCharacter($character)
+            ->setPositions(['left-hand'])
+            ->setInventory()
+            ->inventory();
+
+        $this->assertCount(1, $inventory);
+        $this->assertSame($item->id, $inventory->first()->item_id);
+    }
+
+    public function test_get_type_normalizes_armour_positions_to_armour(): void
+    {
+        $item = $this->createItem(['type' => 'body']);
+
+        $character = $this->character->getCharacter();
+
+        $type = $this->characterInventoryService->setCharacter($character)->getType($item);
+
+        $this->assertSame('armour', $type);
+    }
+
+    public function test_get_type_normalizes_spell_damage_to_spell(): void
+    {
+        $item = $this->createItem(['type' => 'spell-damage']);
+
+        $character = $this->character->getCharacter();
+
+        $type = $this->characterInventoryService->setCharacter($character)->getType($item);
+
+        $this->assertSame('spell', $type);
+    }
+
+    public function test_get_type_returns_accepted_type_unchanged(): void
+    {
+        $item = $this->createItem(['type' => 'ring']);
+
+        $character = $this->character->getCharacter();
+
+        $type = $this->characterInventoryService->setCharacter($character)->getType($item);
+
+        $this->assertSame('ring', $type);
+    }
+
+    public function test_get_type_throws_exception_for_unknown_item_type(): void
+    {
+        $item = $this->createItem(['type' => 'not-a-real-type']);
+
+        $character = $this->character->getCharacter();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Unknown Item type: not-a-real-type');
+
+        $this->characterInventoryService->setCharacter($character)->getType($item);
+    }
+
+    public function test_get_set_items_filters_by_provided_set_id(): void
+    {
+        $matchingItem = $this->createItem();
+        $otherItem = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets(2)
+            ->putItemInSet($matchingItem, 0)
+            ->putItemInSet($otherItem, 1)
+            ->getCharacter();
+
+        $matchingSetId = $character->inventorySets()->orderBy('id')->first()->id;
+
+        $result = $this->characterInventoryService
+            ->setCharacter($character)
+            ->getSetItems(10, 1, '', ['set_id' => $matchingSetId]);
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_set_items_defaults_to_the_equipped_set_when_no_set_id_filter_given(): void
+    {
+        $item = $this->createItem();
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($item, 0, 'left-hand', true)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService
+            ->setCharacter($character)
+            ->getSetItems();
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($item->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_set_items_filters_by_search_text_matching_item_name(): void
+    {
+        $matchingItem = $this->createItem(['name' => 'Sunfire Blade']);
+        $otherItem = $this->createItem(['name' => 'Moonshadow Bow']);
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($matchingItem, 0, null, true)
+            ->putItemInSet($otherItem, 0)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService
+            ->setCharacter($character)
+            ->getSetItems(10, 1, 'sunfire');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_set_items_filters_by_search_text_matching_item_prefix(): void
+    {
+        $prefix = $this->createItemAffix(['name' => 'Blazing', 'type' => 'prefix']);
+        $matchingItem = $this->createItem(['name' => 'Sword', 'item_prefix_id' => $prefix->id]);
+        $otherItem = $this->createItem(['name' => 'Axe']);
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($matchingItem, 0, null, true)
+            ->putItemInSet($otherItem, 0)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService
+            ->setCharacter($character)
+            ->getSetItems(10, 1, 'blazing');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_set_items_filters_by_search_text_matching_item_suffix(): void
+    {
+        $suffix = $this->createItemAffix(['name' => 'of the Fox', 'type' => 'suffix']);
+        $matchingItem = $this->createItem(['name' => 'Sword', 'item_suffix_id' => $suffix->id]);
+        $otherItem = $this->createItem(['name' => 'Axe']);
+
+        $character = $this->character
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($matchingItem, 0, null, true)
+            ->putItemInSet($otherItem, 0)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService
+            ->setCharacter($character)
+            ->getSetItems(10, 1, 'fox');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_usable_items_returns_empty_when_character_has_no_alchemy_bag(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $character->alchemyBag()->delete();
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getUsableItems();
+
+        $this->assertSame([], $result);
+    }
+
+    public function test_get_usable_items_filters_by_search_text(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'name' => 'Healing Draught']);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'name' => 'Poison Vial']);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('healing');
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_increase_stats(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'increase_stat_by' => 5]);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['increase-stats' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_effects_skills(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'increase_skill_bonus_by' => 5]);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['effects-skills' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_effects_base_modifiers(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'base_damage_mod' => 0.1]);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['effects-base-modifiers' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_damages_kingdoms(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'damages_kingdoms' => true]);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['damages-kingdoms' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_usable_items_filters_by_holy_oils(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'alchemy', 'usable' => true, 'holy_level' => 1]);
+        $otherItem = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+
+        $character = $this->character->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $matchingItem->id,
+            'amount' => 1,
+        ]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $otherItem->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character)->getUsableItems('', ['holy-oils' => true]);
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result[0]['item_id']);
+    }
+
+    public function test_get_quest_items_filters_by_search_text(): void
+    {
+        $matchingItem = $this->createItem(['type' => 'quest', 'name' => 'ancient key']);
+        $otherItem = $this->createItem(['type' => 'quest', 'name' => 'rusty coin']);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($matchingItem)
+            ->giveItem($otherItem)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->getQuestItems('ancient');
+
+        $this->assertCount(1, $result);
+        $this->assertSame($matchingItem->id, $result->first()->id);
+    }
+
+    public function test_fetch_character_quest_items_paginates_quest_items(): void
+    {
+        $item = $this->createItem(['type' => 'quest']);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->fetchCharacterQuestItems();
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($item->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_inventory_collection_filters_by_search_text_matching_item_name(): void
+    {
+        $matchingItem = $this->createItem(['name' => 'Sunfire Blade']);
+        $otherItem = $this->createItem(['name' => 'Moonshadow Bow']);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($matchingItem)
+            ->giveItem($otherItem)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory(10, 1, 'sunfire');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_inventory_collection_filters_by_search_text_matching_item_prefix(): void
+    {
+        $prefix = $this->createItemAffix(['name' => 'Blazing', 'type' => 'prefix']);
+        $matchingItem = $this->createItem(['name' => 'Sword', 'item_prefix_id' => $prefix->id]);
+        $otherItem = $this->createItem(['name' => 'Axe']);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($matchingItem)
+            ->giveItem($otherItem)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory(10, 1, 'blazing');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_get_inventory_collection_filters_by_search_text_matching_item_suffix(): void
+    {
+        $suffix = $this->createItemAffix(['name' => 'of the Fox', 'type' => 'suffix']);
+        $matchingItem = $this->createItem(['name' => 'Sword', 'item_suffix_id' => $suffix->id]);
+        $otherItem = $this->createItem(['name' => 'Axe']);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($matchingItem)
+            ->giveItem($otherItem)
+            ->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->fetchCharacterInventory(10, 1, 'fox');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($matchingItem->id, $result['data'][0]['item_id']);
+    }
+
+    public function test_disenchant_all_items_in_inventory_ignores_items_that_are_not_eligible_for_disenchanting(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $eligibleItem = $this->createItem(['item_prefix_id' => $prefix->id]);
+        $questItem = $this->createItem(['type' => 'quest', 'item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->inventoryManagement()
+            ->giveItem($eligibleItem)
+            ->giveItem($questItem)
+            ->getCharacter();
+
+        $this->characterInventoryService->setCharacter($character)->disenchantAllItemsInInventory();
+
+        $character = $character->refresh();
+
+        $this->assertCount(1, $character->inventory->slots->where('item.type', 'quest'));
+        $this->assertCount(0, $character->inventory->slots->where('item_id', $eligibleItem->id));
+    }
+
+    public function test_cannot_sell_item_that_does_not_exist(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->sellItem(56788);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No item found to be sell.', $result['message']);
+    }
+
+    public function test_can_sell_item_from_inventory(): void
+    {
+        $item = $this->createItem(['type' => 'weapon', 'cost' => 100]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $result = $this->characterInventoryService->setCharacter($character)->sellItem($item->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertTrue(str_contains($result['message'], 'Sold '.$item->affix_name.' for a total of'));
+        $this->assertSame(0, $character->inventory->slots()->where('id', $slotId)->count());
+    }
+
+    public function test_cannot_disenchant_item_that_does_not_exist(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->disenchantItem(56788);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('No item found to disenchant.', $result['message']);
+    }
+
+    public function test_can_disenchant_item_from_inventory(): void
+    {
+        $prefix = $this->createItemAffix(['type' => 'prefix']);
+        $item = $this->createItem(['item_prefix_id' => $prefix->id]);
+
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $result = $this->characterInventoryService->setCharacter($character)->disenchantItem($item->id);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertSame(0, $character->inventory->slots()->where('id', $slotId)->count());
     }
 }

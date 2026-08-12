@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\CharacterInventory\Services;
 
+use App\Flare\Models\Character;
 use App\Flare\Models\InventorySet;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,11 +17,14 @@ class BatchCraftingSetServiceTest extends TestCase
 
     private ?BatchCraftingSetService $batchCraftingSetService;
 
+    private ?Character $character;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->batchCraftingSetService = resolve(BatchCraftingSetService::class);
+        $this->character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
     }
 
     protected function tearDown(): void
@@ -28,11 +32,12 @@ class BatchCraftingSetServiceTest extends TestCase
         parent::tearDown();
 
         $this->batchCraftingSetService = null;
+        $this->character = null;
     }
 
     public function test_get_or_create_returns_same_set_on_subsequent_calls(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $first = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $second = $this->batchCraftingSetService->getOrCreateForCharacter($character);
@@ -42,7 +47,7 @@ class BatchCraftingSetServiceTest extends TestCase
 
     public function test_get_or_create_creates_set_with_batch_crafting_special_type(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
 
@@ -52,7 +57,7 @@ class BatchCraftingSetServiceTest extends TestCase
 
     public function test_remaining_slots_declines_as_items_are_added(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $item = $this->createItem();
         $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
@@ -64,14 +69,14 @@ class BatchCraftingSetServiceTest extends TestCase
 
     public function test_can_accept_returns_true_when_space_exists(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $this->assertTrue($this->batchCraftingSetService->canAccept($character, 1));
     }
 
     public function test_can_accept_returns_false_when_set_is_full(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $item = $this->createItem();
 
@@ -82,7 +87,7 @@ class BatchCraftingSetServiceTest extends TestCase
 
     public function test_create_item_in_batch_crafting_set_returns_success_true_on_success(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
 
         $result = $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $item);
@@ -95,7 +100,7 @@ class BatchCraftingSetServiceTest extends TestCase
 
     public function test_create_item_in_batch_crafting_set_never_creates_an_inventory_slot(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
 
         $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $item);
@@ -105,7 +110,7 @@ class BatchCraftingSetServiceTest extends TestCase
 
     public function test_create_item_in_batch_crafting_set_returns_set_full_when_no_remaining_slots(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
         $filler = $this->createItem();
 

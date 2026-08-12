@@ -10,11 +10,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
 
 class HolyItemServiceTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateHolyStack, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -48,7 +50,7 @@ class HolyItemServiceTest extends TestCase
             'can_use_on_other_items' => true,
         ]);
         $character = $this->character->inventoryManagement()->giveItem($equipment)->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -76,7 +78,7 @@ class HolyItemServiceTest extends TestCase
         ]);
         $character = $this->character->inventoryManagement()->giveItem($equipment)->getCharacter();
         $itemSlot = $character->inventory->slots()->where('item_id', $equipment->id)->first();
-        $alchemySlot = AlchemyBagSlot::create([
+        $alchemySlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -102,7 +104,7 @@ class HolyItemServiceTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($equipment)->getCharacter();
         $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
         $equipmentSlot = $character->inventory->slots()->where('item_id', $equipment->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -132,7 +134,7 @@ class HolyItemServiceTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($equipment)->getCharacter();
         $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
         $equipmentSlot = $character->inventory->slots()->where('item_id', $equipment->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -163,7 +165,7 @@ class HolyItemServiceTest extends TestCase
         $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $equipmentSlot = $character->inventory->slots()->where('item_id', $equipment->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $otherCharacter->alchemyBag->id,
             'character_id' => $otherCharacter->id,
             'item_id' => $oil->id,
@@ -194,7 +196,7 @@ class HolyItemServiceTest extends TestCase
         $character = $this->character->inventoryManagement()->giveItem($equipment)->getCharacter();
         $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
         $equipmentSlot = $character->inventory->slots()->where('item_id', $equipment->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $invalidOil->id,
@@ -219,7 +221,7 @@ class HolyItemServiceTest extends TestCase
             'holy_stacks' => 20,
         ]);
 
-        $targetItem->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $targetItem->id,
             'devouring_darkness_bonus' => 0.10,
             'stat_increase_bonus' => 0.10,
@@ -252,7 +254,7 @@ class HolyItemServiceTest extends TestCase
         $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
         $untouchedSlot = $character->inventory->slots()->where('item_id', $untouchedItem->id)->first();
 
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -294,7 +296,7 @@ class HolyItemServiceTest extends TestCase
         $character = $character->refresh();
 
         $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -320,7 +322,7 @@ class HolyItemServiceTest extends TestCase
             'holy_stacks' => 1,
         ]);
 
-        $targetItem->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $targetItem->id,
             'devouring_darkness_bonus' => 0.10,
             'stat_increase_bonus' => 0.10,
@@ -341,7 +343,7 @@ class HolyItemServiceTest extends TestCase
         $goldDustBefore = $character->gold_dust;
 
         $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -378,7 +380,7 @@ class HolyItemServiceTest extends TestCase
         $goldDustBefore = $character->gold_dust;
 
         $targetSlot = $character->inventory->slots()->where('item_id', $trinketItem->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -415,7 +417,7 @@ class HolyItemServiceTest extends TestCase
         $goldDustBefore = $character->gold_dust;
 
         $targetSlot = $character->inventory->slots()->where('item_id', $artifactItem->id)->first();
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -447,7 +449,7 @@ class HolyItemServiceTest extends TestCase
 
         $goldDustBefore = $character->gold_dust;
 
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -505,7 +507,7 @@ class HolyItemServiceTest extends TestCase
 
         $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
 
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -541,7 +543,7 @@ class HolyItemServiceTest extends TestCase
 
         $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,
@@ -577,7 +579,7 @@ class HolyItemServiceTest extends TestCase
 
         $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
 
-        $oilSlot = AlchemyBagSlot::create([
+        $oilSlot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $oil->id,

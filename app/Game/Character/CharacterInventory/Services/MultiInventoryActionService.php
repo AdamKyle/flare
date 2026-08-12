@@ -63,9 +63,11 @@ class MultiInventoryActionService
             }
         }
 
+        $character = $character->refresh();
+
         return $this->successResult([
             'message' => 'Moved all selected items to: '.$result['moved_to_set_name'].'.',
-            'inventory' => $result['inventory'],
+            'inventory' => $this->characterInventoryService->setCharacter($character)->getInventoryForApi(),
         ]);
     }
 
@@ -189,10 +191,6 @@ class MultiInventoryActionService
 
         $result = $this->sellManySetSlots($character, $set, $setSlotIds);
 
-        if ($result['status'] !== 200) {
-            return $result;
-        }
-
         $result['message'] = str_replace('Sold selected set items', 'Sold all set items', $result['message']);
 
         return $result;
@@ -245,10 +243,6 @@ class MultiInventoryActionService
         $setSlotIds = $set->slots()->pluck('id')->all();
 
         $result = $this->disenchantManySetSlots($character, $set, $setSlotIds);
-
-        if ($result['status'] !== 200) {
-            return $result;
-        }
 
         $result['message'] = str_replace('Set items are queued', 'All eligible set items are queued', $result['message']);
 
@@ -365,11 +359,11 @@ class MultiInventoryActionService
             ->where('equipped', false);
 
         if (isset($params['exclude'])) {
-            $excludeIds = $params['exclude'];
-            $slotsQuery->whereNotIn('item_id', $excludeIds);
+            $excludeIds = array_map(static fn ($id): int => (int) $id, (array) $params['exclude']);
+            $slotsQuery->whereNotIn('id', $excludeIds);
         } elseif (isset($params['ids'])) {
-            $includeIds = $params['ids'];
-            $slotsQuery->whereIn('item_id', $includeIds);
+            $includeIds = array_map(static fn ($id): int => (int) $id, (array) $params['ids']);
+            $slotsQuery->whereIn('id', $includeIds);
         }
 
         $slotsQuery->delete();

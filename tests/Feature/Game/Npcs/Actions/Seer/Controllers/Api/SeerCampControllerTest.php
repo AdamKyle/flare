@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Game\Npcs\Actions\Seer\Controllers\Api;
 
-use App\Flare\Models\ItemSkill;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,12 +10,16 @@ use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
+use Tests\Traits\CreateHolyStack;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
+use Tests\Traits\CreateItemSkill;
+use Tests\Traits\CreateItemSkillProgression;
+use Tests\Traits\CreateItemSocket;
 
 class SeerCampControllerTest extends TestCase
 {
-    use CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateGem, CreateHolyStack, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, CreateItemSocket, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -63,12 +66,12 @@ class SeerCampControllerTest extends TestCase
         $firstGem = $this->createGem();
         $secondGem = $this->createGem();
 
-        $item->sockets()->create([
+        $this->createItemSocket([
             'item_id' => $item->id,
             'gem_id' => $firstGem->id,
         ]);
 
-        $item->sockets()->create([
+        $this->createItemSocket([
             'item_id' => $item->id,
             'gem_id' => $secondGem->id,
         ]);
@@ -136,14 +139,11 @@ class SeerCampControllerTest extends TestCase
 
     public function test_paginated_gems_endpoint_respects_per_page_and_search()
     {
-        $character = $this->character->getCharacter();
-        $gemBag = $character->gemBag;
-
         $gemOne = $this->createGem(['name' => 'Alpha Gem']);
         $gemTwo = $this->createGem(['name' => 'Beta Gem']);
 
-        $gemBag->gemSlots()->create(['gem_bag_id' => $gemBag->id, 'gem_id' => $gemOne->id, 'amount' => 1]);
-        $gemBag->gemSlots()->create(['gem_bag_id' => $gemBag->id, 'gem_id' => $gemTwo->id, 'amount' => 1]);
+        $this->character->gemBagManagement()->assignGemToBag($gemOne->id);
+        $character = $this->character->gemBagManagement()->assignGemToBag($gemTwo->id)->getCharacter();
 
         $firstPage = $this->actingAs($character->user)
             ->call('GET', '/api/seer-camp/'.$character->id.'/gems', [
@@ -174,7 +174,7 @@ class SeerCampControllerTest extends TestCase
         $itemWithGem = $this->createItem(['type' => 'weapon', 'name' => 'Socketed Weapon', 'socket_count' => 1]);
         $itemWithoutGem = $this->createItem(['type' => 'weapon', 'name' => 'Empty Weapon', 'socket_count' => 1]);
 
-        $itemWithGem->sockets()->create([
+        $this->createItemSocket([
             'item_id' => $itemWithGem->id,
             'gem_id' => $this->createGem()->id,
         ]);
@@ -205,8 +205,8 @@ class SeerCampControllerTest extends TestCase
         $itemOne = $this->createItem(['type' => 'weapon', 'name' => 'Alpha Socketed', 'socket_count' => 1]);
         $itemTwo = $this->createItem(['type' => 'weapon', 'name' => 'Beta Socketed', 'socket_count' => 1]);
 
-        $itemOne->sockets()->create(['item_id' => $itemOne->id, 'gem_id' => $this->createGem()->id]);
-        $itemTwo->sockets()->create(['item_id' => $itemTwo->id, 'gem_id' => $this->createGem()->id]);
+        $this->createItemSocket(['item_id' => $itemOne->id, 'gem_id' => $this->createGem()->id]);
+        $this->createItemSocket(['item_id' => $itemTwo->id, 'gem_id' => $this->createGem()->id]);
 
         $itemOne = $itemOne->refresh();
         $itemTwo = $itemTwo->refresh();
@@ -244,7 +244,7 @@ class SeerCampControllerTest extends TestCase
     public function test_paginated_items_with_gems_endpoint_only_returns_requested_characters_items()
     {
         $ownItem = $this->createItem(['type' => 'weapon', 'name' => 'Own Socketed', 'socket_count' => 1]);
-        $ownItem->sockets()->create(['item_id' => $ownItem->id, 'gem_id' => $this->createGem()->id]);
+        $this->createItemSocket(['item_id' => $ownItem->id, 'gem_id' => $this->createGem()->id]);
         $ownItem = $ownItem->refresh();
 
         $character = $this->character
@@ -253,7 +253,7 @@ class SeerCampControllerTest extends TestCase
             ->getCharacter();
 
         $foreignItem = $this->createItem(['type' => 'weapon', 'name' => 'Foreign Socketed', 'socket_count' => 1]);
-        $foreignItem->sockets()->create(['item_id' => $foreignItem->id, 'gem_id' => $this->createGem()->id]);
+        $this->createItemSocket(['item_id' => $foreignItem->id, 'gem_id' => $this->createGem()->id]);
         $foreignItem = $foreignItem->refresh();
 
         (new CharacterFactory)->createBaseCharacter()
@@ -341,7 +341,7 @@ class SeerCampControllerTest extends TestCase
 
     public function test_paginated_items_endpoint_with_populated_rows_does_not_lazy_load()
     {
-        $itemSkill = ItemSkill::create([
+        $itemSkill = $this->createItemSkill([
             'name' => 'Weapon Mastery',
             'description' => 'Increases weapon proficiency.',
             'max_level' => 10,
@@ -357,16 +357,16 @@ class SeerCampControllerTest extends TestCase
             'holy_stacks' => 5,
         ]);
 
-        $decoratedItem->sockets()->create(['item_id' => $decoratedItem->id, 'gem_id' => $this->createGem()->id]);
-        $decoratedItem->sockets()->create(['item_id' => $decoratedItem->id, 'gem_id' => $this->createGem()->id]);
+        $this->createItemSocket(['item_id' => $decoratedItem->id, 'gem_id' => $this->createGem()->id]);
+        $this->createItemSocket(['item_id' => $decoratedItem->id, 'gem_id' => $this->createGem()->id]);
 
-        $decoratedItem->appliedHolyStacks()->create([
+        $this->createHolyStack([
             'item_id' => $decoratedItem->id,
             'devouring_darkness_bonus' => 0.1,
             'stat_increase_bonus' => 0.1,
         ]);
 
-        $decoratedItem->itemSkillProgressions()->create([
+        $this->createItemSkillProgression([
             'item_id' => $decoratedItem->id,
             'item_skill_id' => $itemSkill->id,
             'current_level' => 1,
@@ -456,7 +456,7 @@ class SeerCampControllerTest extends TestCase
         $existingGem = $this->createGem();
         $replacementGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $character = $this->character->gemBagManagement()->assignGemToBag($replacementGem->id)->getCharacter();
@@ -482,7 +482,7 @@ class SeerCampControllerTest extends TestCase
 
         $gem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
@@ -506,8 +506,8 @@ class SeerCampControllerTest extends TestCase
         $firstGem = $this->createGem();
         $secondGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 2]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();

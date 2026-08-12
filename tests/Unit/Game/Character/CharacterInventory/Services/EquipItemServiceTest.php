@@ -112,6 +112,26 @@ class EquipItemServiceTest extends TestCase
         $equipItemService->replaceItem();
     }
 
+    public function test_cannot_equip_a_second_trinket_into_an_equipped_set(): void
+    {
+        $character = $this->character->inventoryManagement()
+            ->giveItem($this->createItem(['type' => 'trinket']))
+            ->getCharacterFactory()
+            ->inventorySetManagement()
+            ->createInventorySets()
+            ->putItemInSet($this->createItem(['type' => 'trinket']), 0, 'trinket', true)
+            ->getCharacter();
+
+        $equipItemService = $this->equipItemService->setCharacter($character)->setRequest([
+            'slot_id' => $character->inventory->slots->first()->id,
+            'position' => 'trinket',
+        ]);
+
+        $this->expectException(EquipItemException::class);
+
+        $equipItemService->replaceItem();
+    }
+
     public function test_replace_item_in_set()
     {
         $character = $this->character->inventoryManagement()
@@ -379,6 +399,35 @@ class EquipItemServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertFalse($character->inventory->slots->first()->equipped);
+    }
+
+    public function test_equip_item_returns_error_result_when_the_slot_does_not_exist()
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->equipItemService->equipItem($character, [
+            'slot_id' => 87753,
+            'position' => 'left-hand',
+        ]);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('The item you are trying to equip as a replacement, does not exist.', $result['message']);
+    }
+
+    public function test_equip_item_equips_the_item_and_returns_a_success_result()
+    {
+        $item = $this->createItem(['type' => ItemType::WEAPON->value]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slotId = $character->inventory->slots()->where('item_id', $item->id)->first()->id;
+
+        $result = $this->equipItemService->equipItem($character, [
+            'slot_id' => $slotId,
+            'position' => 'left-hand',
+        ]);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Item has been equipped.', $result['message']);
+        $this->assertTrue($character->inventory->slots()->where('id', $slotId)->first()->equipped);
     }
 
     public function test_unequip_stave_from_set()

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Character\Concerns;
 
+use App\Flare\Models\Character;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Character\Exceptions\MissingInventoryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,9 +16,25 @@ class FetchEquippedTest extends TestCase
 {
     use CreateInventorySets, CreateInventorySlot, CreateItem, RefreshDatabase;
 
+    private ?Character $character;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+    }
+
     public function test_missing_inventory_flags_user_and_immediately_throws_explicit_exception(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $character->inventory()->delete();
         $fetcher = new class
         {
@@ -36,7 +53,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_missing_inventory_does_not_re_flag_a_user_already_marked_for_deletion(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $character->inventory()->delete();
         $character->user()->update(['will_be_deleted' => true]);
 
@@ -57,7 +74,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_returns_equipped_inventory_slots_via_direct_query_when_relations_are_not_loaded(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
         $slot = $this->createInventorySlot([
             'inventory_id' => $character->inventory->id,
@@ -76,7 +93,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_returns_equipped_inventory_slots_from_loaded_relation_when_item_relations_are_loaded(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
         $this->createInventorySlot([
             'inventory_id' => $character->inventory->id,
@@ -97,7 +114,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_returns_equipped_inventory_slots_via_query_when_loaded_slots_are_missing_item_relations(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
         $this->createInventorySlot([
             'inventory_id' => $character->inventory->id,
@@ -118,7 +135,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_falls_back_to_equipped_inventory_set_slots_via_direct_query_when_no_equipped_inventory_slots(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
         $inventorySet = $this->createInventorySet([
             'character_id' => $character->id,
@@ -140,7 +157,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_falls_back_to_equipped_inventory_set_from_loaded_relation_when_no_equipped_inventory_slots(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
         $inventorySet = $this->createInventorySet([
             'character_id' => $character->id,
@@ -164,7 +181,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_returns_equipped_set_slots_from_loaded_relation_when_item_relations_are_loaded(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $item = $this->createItem();
         $inventorySet = $this->createInventorySet([
             'character_id' => $character->id,
@@ -188,7 +205,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_returns_empty_equipped_set_slots_from_loaded_relation_when_set_has_no_slots(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
         $this->createInventorySet([
             'character_id' => $character->id,
             'is_equipped' => true,
@@ -207,7 +224,7 @@ class FetchEquippedTest extends TestCase
 
     public function test_returns_null_when_no_equipped_inventory_slots_or_inventory_set_exist(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $character = $this->character;
 
         $result = (new class
         {

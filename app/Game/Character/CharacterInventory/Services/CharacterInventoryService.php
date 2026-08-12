@@ -699,19 +699,7 @@ class CharacterInventoryService
 
         $name = $slot->item->affix_name;
 
-        $item = null;
-
-        if ($slot->item->type === 'artifact' && $slot->item->itemSkillProgressions->isNotEmpty()) {
-            $item = $slot->item;
-        }
-
         $slot->delete();
-
-        if (! is_null($item)) {
-            $item->itemSkillProgressions()->delete();
-
-            $item->delete();
-        }
 
         $this->character = $this->character->refresh();
 
@@ -750,10 +738,6 @@ class CharacterInventoryService
         $slots = $this->character->inventory->slots
             ->where('equipped', false)
             ->filter(function ($slot) {
-                if (! $slot->item) {
-                    return false;
-                }
-
                 if (in_array($slot->item->type, ['quest', 'alchemy', 'artifact'], true)) {
                     return false;
                 }

@@ -81,19 +81,27 @@ class UpdateFactionLoyaltyService
      */
     private function fetchNewMonster(array $tasks, int $gameMapId): Monster
     {
-        $monster = Monster::where('game_map_id', $gameMapId)
-            ->where('is_raid_monster', false)
-            ->where('is_raid_boss', false)
-            ->where('is_celestial_entity', false)
-            ->whereNull('only_for_location_type')
-            ->inRandomOrder()
-            ->first();
+        $monster = $this->pickRandomMonsterForMap($gameMapId);
 
         if ($this->hasTaskAlready($tasks, 'monster_id', $monster->id)) {
             return $this->fetchNewMonster($tasks, $gameMapId);
         }
 
         return $monster;
+    }
+
+    /**
+     * Random-selection boundary kept protected as a deterministic test seam.
+     */
+    protected function pickRandomMonsterForMap(int $gameMapId): Monster
+    {
+        return Monster::where('game_map_id', $gameMapId)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->where('is_celestial_entity', false)
+            ->whereNull('only_for_location_type')
+            ->inRandomOrder()
+            ->first();
     }
 
     /**

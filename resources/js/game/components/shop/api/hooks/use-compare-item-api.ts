@@ -17,41 +17,42 @@ export const useCompareItemApi = (
   const [error, setError] =
     useState<UseCompareItemApiDefinition['error']>(null);
 
+  // Depend on the character id (a stable primitive) rather than the whole
+  // `characterData` object, which is replaced on every unrelated character
+  // update and would otherwise re-trigger this fetch constantly.
+  const characterId = params.characterData?.id;
+
   let url = '';
 
-  if (params.characterData) {
-    url = getUrl(params.url, { character: params.characterData.id });
+  if (characterId) {
+    url = getUrl(params.url, { character: characterId });
   }
 
-  const fetchComparisonData = useCallback(
-    async () => {
-      if (!params.characterData) {
-        setLoading(false);
-      }
+  const fetchComparisonData = useCallback(async () => {
+    if (!characterId) {
+      setLoading(false);
+    }
 
-      try {
-        const result = await apiHandler.get<
-          UseCompareItemApiResponseDefinition,
-          AxiosRequestConfig<AxiosResponse<UseCompareItemApiResponseDefinition>>
-        >(url, {
-          params: {
-            item_type: params.item_type,
-            item_name: params.item_name,
-          },
-        });
+    try {
+      const result = await apiHandler.get<
+        UseCompareItemApiResponseDefinition,
+        AxiosRequestConfig<AxiosResponse<UseCompareItemApiResponseDefinition>>
+      >(url, {
+        params: {
+          item_type: params.item_type,
+          item_name: params.item_name,
+        },
+      });
 
-        setData(result);
-      } catch (err) {
-        if (err instanceof AxiosError) {
-          setError(err.response?.data || null);
-        }
-      } finally {
-        setLoading(false);
+      setData(result);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        setError(err.response?.data || null);
       }
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [apiHandler, url]
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, [apiHandler, url, characterId, params.item_type, params.item_name]);
 
   useEffect(() => {
     fetchComparisonData().catch(() => {});

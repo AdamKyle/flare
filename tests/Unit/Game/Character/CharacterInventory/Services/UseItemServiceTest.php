@@ -64,7 +64,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -102,7 +102,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -152,7 +152,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -203,7 +203,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -252,7 +252,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -411,7 +411,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -448,7 +448,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -489,7 +489,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -530,7 +530,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -583,7 +583,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -612,6 +612,21 @@ class UseItemServiceTest extends TestCase
         Event::assertNotDispatched(UpdateTopBarEvent::class);
 
         $this->assertEquals(10, $character->boons->sum('amount_used'));
+    }
+
+    public function test_use_many_items_returns_error_when_character_has_no_alchemy_bag(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $character->alchemyBag()->delete();
+
+        $result = $this->useItemService->useManyItemsFromInventory($character->refresh(), [1]);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?', $result['message']);
     }
 
     public function test_cannot_apply_boons_that_do_not_exist()
@@ -657,14 +672,14 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slotOne = AlchemyBagSlot::create([
+        $slotOne = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $itemOne->id,
             'amount' => 2,
         ]);
 
-        $slotTwo = AlchemyBagSlot::create([
+        $slotTwo = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $itemTwo->id,
@@ -711,7 +726,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -738,7 +753,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -766,7 +781,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -794,7 +809,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -823,7 +838,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -867,7 +882,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -910,7 +925,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -954,7 +969,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -998,7 +1013,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1041,7 +1056,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1081,7 +1096,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1121,7 +1136,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1161,7 +1176,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1199,7 +1214,7 @@ class UseItemServiceTest extends TestCase
             ->givePlayerLocation()
             ->getCharacter();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1252,7 +1267,7 @@ class UseItemServiceTest extends TestCase
             'can_stack' => true,
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1278,7 +1293,7 @@ class UseItemServiceTest extends TestCase
             'can_stack' => true,
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1304,7 +1319,7 @@ class UseItemServiceTest extends TestCase
             'can_stack' => true,
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1330,7 +1345,7 @@ class UseItemServiceTest extends TestCase
             'can_stack' => true,
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1357,7 +1372,7 @@ class UseItemServiceTest extends TestCase
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $otherCharacter->alchemyBag->id,
             'character_id' => $otherCharacter->id,
             'item_id' => $item->id,
@@ -1384,7 +1399,7 @@ class UseItemServiceTest extends TestCase
             'can_stack' => true,
         ]);
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $slot = AlchemyBagSlot::create([
+        $slot = $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -1477,5 +1492,325 @@ class UseItemServiceTest extends TestCase
             $result['message']
         );
         $this->assertEmpty($character->refresh()->boons);
+    }
+
+    public function test_use_many_items_from_inventory_is_blocked_by_automation_for_non_boon_item(): void
+    {
+        Queue::fake();
+
+        $alchemyItem = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'damages_kingdoms' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $alchemyItem->id,
+            'amount' => 1,
+        ]);
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = $this->useItemService->useManyItemsFromInventory($character->refresh(), [$slot->id]);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertStringContainsString('Exploration', $result['message']);
+    }
+
+    public function test_use_single_alchemy_item_rejects_a_slot_not_owned_by_the_character(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $otherCharacter->alchemyBag->id,
+            'character_id' => $otherCharacter->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->useItemService->useSingleAlchemyItem($character, $slot);
+
+        $this->assertEquals(422, $result['status']);
+    }
+
+    public function test_use_all_alchemy_items_rejects_a_non_boon_item(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy', 'can_stack' => false]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 5,
+        ]);
+
+        $result = $this->useItemService->useAllAlchemyItems($character, $slot);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals(5, $slot->refresh()->amount);
+    }
+
+    public function test_use_single_item_from_inventory_returns_error_when_plain_item_not_owned(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'weapon']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $result = $this->useItemService->useSingleItemFromInventory($character, $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Could not find the selected items you wanted to use in your inventory. Are you sure you have them?', $result['message']);
+    }
+
+    public function test_use_single_item_from_inventory_returns_error_when_non_stackable_item_already_has_active_boon(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'weapon', 'can_stack' => false]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 1,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
+    }
+
+    public function test_automation_use_message_uses_delve_label(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'weapon']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::DELVE->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertStringContainsString('Delve', $result['message']);
+    }
+
+    public function test_automation_use_message_uses_faction_loyalty_label(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'weapon']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createCharacterAutomation([
+            'character_id' => $character->id,
+            'type' => AutomationType::FACTION_LOYALTY->value,
+            'started_at' => now(),
+            'completed_at' => now()->addHour(),
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertStringContainsString('Faction Loyalty', $result['message']);
+    }
+
+    public function test_use_single_alchemy_item_succeeds_for_an_owned_slot(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $slot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->useItemService->useSingleAlchemyItem($character, $slot);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertNotEmpty($character->refresh()->boons);
+    }
+
+    public function test_use_item_stacks_onto_an_existing_boon_for_a_plain_item(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'weapon', 'can_stack' => true]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 1,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals(2, $boon->fresh()->amount_used);
+    }
+
+    public function test_fill_up_boon_returns_error_when_boon_is_no_longer_active(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now()->subHour(),
+            'complete' => now()->subMinutes(5),
+            'amount_used' => 1,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character, $boon);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('This boon is no longer active.', $result['message']);
+    }
+
+    public function test_fill_up_boon_returns_error_when_no_alchemy_bag_slot_exists(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy']);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 1,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character, $boon);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You do not have any more of that item.', $result['message']);
+    }
+
+    public function test_fill_up_boon_returns_error_when_alchemy_bag_slot_has_zero_amount(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 60, 'type' => 'alchemy', 'can_stack' => true]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 0,
+        ]);
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 1,
+            'last_for_minutes' => 60,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('You do not have any more of that item.', $result['message']);
+    }
+
+    public function test_fill_up_boon_returns_error_for_non_stackable_item_used_more_than_once(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy', 'can_stack' => false]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 2,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
+    }
+
+    public function test_use_item_does_not_extend_duration_past_the_maximum_for_a_plain_item(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'weapon', 'can_stack' => true]);
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(480),
+            'amount_used' => 1,
+            'last_for_minutes' => 480,
+        ]);
+
+        $result = $this->useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
+    }
+
+    public function test_fill_up_boon_returns_error_when_boon_is_already_at_maximum_duration(): void
+    {
+        $item = $this->createItem(['usable' => true, 'lasts_for' => 30, 'type' => 'alchemy', 'can_stack' => true]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+            'amount_used' => 1,
+            'last_for_minutes' => 30,
+        ]);
+
+        $result = $this->useItemService->fillUpBoon($character->refresh(), $boon);
+
+        $this->assertEquals(422, $result['status']);
+        $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
     }
 }

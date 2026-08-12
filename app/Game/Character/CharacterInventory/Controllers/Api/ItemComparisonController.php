@@ -14,23 +14,17 @@ use App\Game\Character\CharacterInventory\Services\CharacterGemBagService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 
 class ItemComparisonController extends Controller
 {
-    private ComparisonService $comparisonService;
+    public function __construct(
+        private readonly ComparisonService $comparisonService,
+        private readonly CharacterInventoryService $characterInventoryService,
+        private readonly CharacterGemBagService $gemBagService,
+    ) {}
 
-    private CharacterInventoryService $characterInventoryService;
-
-    private $gemBagService;
-
-    public function __construct(ComparisonService $comparisonService, CharacterInventoryService $characterInventoryService, CharacterGemBagService $gemBagService)
-    {
-        $this->comparisonService = $comparisonService;
-        $this->characterInventoryService = $characterInventoryService;
-        $this->gemBagService = $gemBagService;
-    }
-
-    public function compareItem(ComparisonValidation $request, Character $character)
+    public function compareItem(ComparisonValidation $request, Character $character): JsonResponse
     {
         $inventory = Inventory::where('character_id', $character->id)->first();
         $itemToEquip = InventorySlot::where('inventory_id', $inventory->id)->where('id', $request->slot_id)->first();
@@ -39,7 +33,7 @@ class ItemComparisonController extends Controller
             return response()->json(['message' => 'Item not found in your inventory.'], 422);
         }
 
-        $type = $request->item_to_equip_type;
+        $type = $request->item_to_equip_type ?? $itemToEquip->item->type;
 
         if ($type === 'spell-healing' || $type === 'spell-damage') {
             $type = 'spell';
@@ -50,7 +44,7 @@ class ItemComparisonController extends Controller
         return response()->json($data);
     }
 
-    public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character)
+    public function compareItemFromChat(ComparisonFromChatValidate $request, Character $character): JsonResponse
     {
         if ($request->source === 'alchemy_bag') {
             $alchemyBagSlot = AlchemyBagSlot::where('id', $request->id)

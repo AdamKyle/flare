@@ -12,10 +12,11 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemSocket;
 
 class SeerServiceTest extends TestCase
 {
-    use CreateGem, CreateItem, MockeryPHPUnitIntegration, RefreshDatabase;
+    use CreateGem, CreateItem, CreateItemSocket, MockeryPHPUnitIntegration, RefreshDatabase;
 
     private ?CharacterFactory $character = null;
 
@@ -140,7 +141,7 @@ class SeerServiceTest extends TestCase
     {
         $gem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $character->update(['gem_bag_limit' => 0]);
@@ -155,7 +156,7 @@ class SeerServiceTest extends TestCase
     {
         $gem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
@@ -170,7 +171,7 @@ class SeerServiceTest extends TestCase
         $gem = $this->createGem();
         $otherGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
 
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -185,7 +186,7 @@ class SeerServiceTest extends TestCase
     {
         $gem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
 
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -201,8 +202,8 @@ class SeerServiceTest extends TestCase
         $firstGem = $this->createGem();
         $secondGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 2]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
 
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -218,7 +219,7 @@ class SeerServiceTest extends TestCase
     {
         $gem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $gem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $gem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
@@ -233,8 +234,8 @@ class SeerServiceTest extends TestCase
         $firstGem = $this->createGem();
         $secondGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 2]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $firstGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $secondGem->id]);
 
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -284,7 +285,7 @@ class SeerServiceTest extends TestCase
         $existingGem = $this->createGem();
         $replacementGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $character = $this->character->gemBagManagement()->assignGemToBag($replacementGem->id)->getCharacter();
@@ -303,7 +304,7 @@ class SeerServiceTest extends TestCase
         $existingGem = $this->createGem();
         $replacementGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $character = $this->character->gemBagManagement()->assignGemToBag($replacementGem->id)->getCharacter();
@@ -321,7 +322,7 @@ class SeerServiceTest extends TestCase
         $unrelatedGem = $this->createGem();
         $replacementGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
 
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -339,7 +340,7 @@ class SeerServiceTest extends TestCase
         $existingGem = $this->createGem();
         $replacementGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
 
         $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
@@ -391,7 +392,7 @@ class SeerServiceTest extends TestCase
         $existingGem = $this->createGem();
         $newGem = $this->createGem();
         $item = $this->createItem(['type' => 'weapon', 'socket_count' => 1]);
-        $item->sockets()->create(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
+        $this->createItemSocket(['item_id' => $item->id, 'gem_id' => $existingGem->id]);
 
         $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
         $character = $this->character->gemBagManagement()->assignGemToBag($newGem->id)->getCharacter();
@@ -480,6 +481,44 @@ class SeerServiceTest extends TestCase
         resolve(SeerService::class)->createSockets($character, $slot->id);
 
         $this->assertSame(5, $slot->refresh()->item->socket_count);
+    }
+
+    public function test_create_sockets_assigns_four_sockets_when_roll_is_in_the_upper_mid_tier(): void
+    {
+        $this->instance(
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock) {
+                $mock->shouldReceive('numberBetween')->with(1, 100)->once()->andReturn(85);
+            })
+        );
+
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        resolve(SeerService::class)->createSockets($character, $slot->id);
+
+        $this->assertSame(4, $slot->refresh()->item->socket_count);
+    }
+
+    public function test_create_sockets_assigns_two_sockets_when_roll_is_in_the_lower_mid_tier(): void
+    {
+        $this->instance(
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock) {
+                $mock->shouldReceive('numberBetween')->with(1, 100)->once()->andReturn(55);
+            })
+        );
+
+        $item = $this->createItem(['type' => 'weapon', 'socket_count' => 0]);
+        $this->character->kingdomManagement()->assignKingdom(['gold_bars' => 5000]);
+        $character = $this->character->inventoryManagement()->giveItem($item)->getCharacter();
+        $slot = $character->inventory->slots()->where('item_id', $item->id)->first();
+
+        resolve(SeerService::class)->createSockets($character, $slot->id);
+
+        $this->assertSame(2, $slot->refresh()->item->socket_count);
     }
 
     public function test_create_sockets_assigns_three_sockets_when_roll_is_in_the_mid_tier(): void

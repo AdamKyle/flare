@@ -155,30 +155,16 @@ class DelveStatusService
 
         if (! is_null($delve->monster)) {
             $monster = $delve->monster;
-            $normalizedStats = $this->normalizeMonsterModelStats($monster);
-
-            if (! empty($normalizedStats)) {
-                return [
-                    'id' => $monster->id,
-                    'name' => $monster->name,
-                    'pack_size' => 1,
-                    'enemy_strength_boost' => $delve->increase_enemy_strength ?? 0,
-                    'stats_available' => true,
-                    'stats' => $normalizedStats,
-                    'source' => 'active_delve',
-                    'message' => 'Showing selected monster base stats. Combat-adjusted stats update after each Delve round.',
-                ];
-            }
 
             return [
                 'id' => $monster->id,
                 'name' => $monster->name,
                 'pack_size' => 1,
                 'enemy_strength_boost' => $delve->increase_enemy_strength ?? 0,
-                'stats_available' => false,
-                'stats' => [],
+                'stats_available' => true,
+                'stats' => $this->normalizeMonsterModelStats($monster),
                 'source' => 'active_delve',
-                'message' => 'Selected monster found, but base stats are not available from existing data.',
+                'message' => 'Showing selected monster base stats. Combat-adjusted stats update after each Delve round.',
             ];
         }
 

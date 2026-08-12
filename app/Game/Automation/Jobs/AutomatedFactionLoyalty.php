@@ -936,20 +936,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
      */
     private function endAutomation(CharacterCacheData $characterCacheData, bool $sendCompletionMessages = true): void
     {
-        if (
-            is_null($this->character)
-            || is_null($this->characterAutomation)
-            || $this->characterAutomation->id !== $this->automationId
-            || $this->characterAutomation->character_id !== $this->characterId
-            || $this->characterAutomation->type !== AutomationType::FACTION_LOYALTY->value
-            || is_null($this->factionLoyaltyAutomation)
-            || $this->factionLoyaltyAutomation->id !== $this->factionLoyaltyAutomationId
-            || $this->factionLoyaltyAutomation->character_id !== $this->characterId
-            || $this->factionLoyaltyAutomation->character_automation_id !== $this->automationId
-        ) {
-            return;
-        }
-
         if ($this->hasNewerActiveFactionLoyaltyAutomation($newerActiveAutomationId)) {
             Log::channel('faction_loyalty')->warning('Faction loyalty stale automation cleanup skipped because a newer active automation exists.', [
                 'character_id' => $this->characterId,
@@ -1089,10 +1075,6 @@ class AutomatedFactionLoyalty implements ShouldQueue
 
     private function createFailureWarning(string $type): void
     {
-        if (is_null($this->character) || is_null($this->factionLoyaltyAutomation)) {
-            return;
-        }
-
         FactionLoyaltyAutomationWarning::firstOrCreate(
             [
                 'character_id' => $this->character->id,

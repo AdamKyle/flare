@@ -2,11 +2,14 @@
 
 namespace Tests\Unit\Game\Character\CharacterCreation\Pipeline\Steps;
 
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterCreation\Jobs\BuildCharacterCacheData;
+use App\Game\Character\CharacterCreation\Pipeline\Steps\BuildCache;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Mockery;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateClass;
@@ -61,5 +64,17 @@ class BuildCacheTest extends TestCase
         BuildCharacterCacheData::dispatch(0);
 
         $this->assertNull(Cache::get('character-attack-data-0'));
+    }
+
+    public function test_process_does_not_build_the_attack_cache_when_given_a_null_character(): void
+    {
+        $buildCharacterAttackTypes = Mockery::mock(BuildCharacterAttackTypes::class);
+        $buildCharacterAttackTypes->shouldNotReceive('buildCache');
+
+        (new BuildCache($buildCharacterAttackTypes))->process(null);
+
+        $this->addToAssertionCount(1);
+
+        Mockery::close();
     }
 }

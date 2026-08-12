@@ -5,7 +5,12 @@ import CardBackProps from './types/card-back-props';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 
-const CardBack = ({ children, link_title, on_click_link }: CardBackProps) => {
+const CardBack = ({
+  children,
+  link_title,
+  on_click_link,
+  is_active = true,
+}: CardBackProps) => {
   const renderSecondaryAction = () => {
     if (!on_click_link) {
       return null;
@@ -33,6 +38,8 @@ const CardBack = ({ children, link_title, on_click_link }: CardBackProps) => {
         WebkitBackfaceVisibility: 'hidden',
         transform: 'rotateY(180deg)',
       }}
+      aria-hidden={!is_active}
+      inert={!is_active}
     >
       <div className="px-1">{children}</div>
 

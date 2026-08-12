@@ -24,7 +24,6 @@ use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransfo
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
 use App\Game\Core\Items\Transformers\Api\UsableItemTransformer;
 use App\Game\Core\Items\Transformers\EquippableItemTransformer;
-use App\Game\Core\Items\Transformers\ItemTransformer;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Values\ValidEquipPositionsValue;
 use App\Game\Gems\Services\ItemAtonements;
@@ -45,10 +44,6 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-
-        $this->app->bind(Manager::class, function () {
-            return new Manager;
-        });
 
         $this->app->bind(SetHandsValidation::class, function () {
             return new SetHandsValidation;
@@ -106,7 +101,6 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterInventoryService::class),
                 $app->make(EquipItemService::class),
                 $app->make(ItemAtonements::class),
-                $app->make(ItemTransformer::class),
             );
         });
 

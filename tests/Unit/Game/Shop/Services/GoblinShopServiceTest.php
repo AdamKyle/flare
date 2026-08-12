@@ -8,11 +8,12 @@ use App\Game\Shop\Services\GoblinShopService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateItem;
 
 class GoblinShopServiceTest extends TestCase
 {
-    use CreateItem, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -277,7 +278,7 @@ class GoblinShopServiceTest extends TestCase
         $character->update(['alchemy_bag_limit' => 1]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,
@@ -312,7 +313,7 @@ class GoblinShopServiceTest extends TestCase
         $character->update(['alchemy_bag_limit' => 5]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -333,7 +334,7 @@ class GoblinShopServiceTest extends TestCase
         $character->update(['alchemy_bag_limit' => 5]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $this->createItem(['type' => 'alchemy'])->id,
@@ -354,7 +355,7 @@ class GoblinShopServiceTest extends TestCase
         $character->update(['alchemy_bag_limit' => 5]);
         $character = $character->refresh();
 
-        AlchemyBagSlot::create([
+        $this->createAlchemyBagSlot([
             'alchemy_bag_id' => $character->alchemyBag->id,
             'character_id' => $character->id,
             'item_id' => $item->id,

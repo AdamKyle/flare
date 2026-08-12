@@ -2,34 +2,30 @@
 
 namespace Tests\Unit\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateClass;
-use Tests\Traits\CreateGameMap;
-use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateItem;
-use Tests\Traits\CreateItemAffix;
 
 class DefenceBuilderTest extends TestCase
 {
-    use CreateClass, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
+    private ?DefenceBuilder $defenceBuilder;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter()->assignSkill(
-            $this->createGameSkill([
-                'class_bonus' => 0.01,
-            ]), 5
-        )->givePlayerLocation();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
         $this->characterStatBuilder = resolve(CharacterStatBuilder::class);
+        $this->defenceBuilder = resolve(DefenceBuilder::class);
     }
 
     protected function tearDown(): void
@@ -38,50 +34,92 @@ class DefenceBuilderTest extends TestCase
 
         $this->character = null;
         $this->characterStatBuilder = null;
+        $this->defenceBuilder = null;
     }
 
-    public function test_build_defence_with_no_armour()
+    public function test_build_defence_returns_base_ac_with_nothing_equipped(): void
     {
-        $character = $this->character->equipStartingEquipment()->getCharacter();
+        $character = $this->character->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->defenceBuilder->initialize($character, $character->skills, $equipped);
 
-        $defence = $this->characterStatBuilder->setCharacter($character)->buildDefence();
-
-        $this->assertEquals($character->ac, $defence);
+        $this->assertSame($character->ac, $this->defenceBuilder->buildDefence(0.10));
     }
 
-    public function test_build_defence_with_armour()
+    public function test_build_defence_ignores_class_bonus_without_a_shield(): void
     {
-        $item = $this->createItem([
-            'type' => 'armour',
-            'name' => 'body',
-            'base_ac' => 10,
-        ]);
+        $item = $this->createItem(['type' => 'body', 'base_ac' => 20]);
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
 
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('body', 'body')->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->defenceBuilder->initialize($character, $character->skills, $equipped);
 
-        $defence = $this->characterStatBuilder->setCharacter($character)->buildDefence();
+        $withBonus = $this->defenceBuilder->buildDefence(0.50);
+        $withoutBonus = $this->defenceBuilder->buildDefence(0.0);
 
-        $this->assertEquals($character->ac + 10, $defence);
+        $this->assertSame($withoutBonus, $withBonus);
     }
 
-    public function test_build_defence_with_armour_voided()
+    public function test_build_defence_includes_class_bonus_with_a_shield(): void
     {
-        $itemPrefix = $this->createItemAffix([
-            'name' => 'Sample',
-            'base_ac_mod' => 0.15,
-        ]);
+        $item = $this->createItem(['type' => 'shield', 'base_ac' => 20]);
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'left-hand')
+            ->getCharacter();
 
-        $item = $this->createItem([
-            'type' => 'armour',
-            'name' => 'body',
-            'base_ac' => 10,
-            'item_prefix_id' => $itemPrefix->id,
-        ]);
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->defenceBuilder->initialize($character, $character->skills, $equipped);
 
-        $character = $this->character->inventoryManagement()->giveItem($item)->equipItem('body', 'body')->getCharacter();
+        $withBonus = $this->defenceBuilder->buildDefence(0.50);
+        $withoutBonus = $this->defenceBuilder->buildDefence(0.0);
 
-        $defence = $this->characterStatBuilder->setCharacter($character)->buildDefence(true);
+        $this->assertGreaterThan($withoutBonus, $withBonus);
+    }
 
-        $this->assertGreaterThan(0, $defence);
+    public function test_build_defence_voided_excludes_affix_bonus(): void
+    {
+        $item = $this->createItem(['type' => 'body', 'base_ac' => 20]);
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
+
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->defenceBuilder->initialize($character, $character->skills, $equipped);
+
+        $this->assertIsInt($this->defenceBuilder->buildDefence(0.10, true));
+    }
+
+    public function test_build_defence_break_down_details_returns_all_keys(): void
+    {
+        $item = $this->createItem(['type' => 'body', 'base_ac' => 20]);
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
+
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->defenceBuilder->initialize($character, $character->skills, $equipped);
+
+        $details = $this->defenceBuilder->buildDefenceBreakDownDetails();
+
+        $this->assertSame($character->ac, $details['base_ac']);
+        $this->assertSame(20, $details['ac_from_items']);
+        $this->assertIsArray($details['skill_effecting_ac']);
+    }
+
+    public function test_build_defence_break_down_details_with_nothing_equipped(): void
+    {
+        $character = $this->character->getCharacter();
+        $equipped = $this->characterStatBuilder->fetchEquipped($character);
+        $this->defenceBuilder->initialize($character, $character->skills, $equipped);
+
+        $details = $this->defenceBuilder->buildDefenceBreakDownDetails();
+
+        $this->assertSame(0, $details['ac_from_items']);
     }
 }

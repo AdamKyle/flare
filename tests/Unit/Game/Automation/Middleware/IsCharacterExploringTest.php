@@ -20,9 +20,9 @@ class IsCharacterExploringTest extends TestCase
     }
     use RefreshDatabase;
 
-    private Character $character;
+    private ?Character $character;
 
-    private IsCharacterExploring $middleware;
+    private ?IsCharacterExploring $middleware;
 
     protected function setUp(): void
     {
@@ -35,6 +35,14 @@ class IsCharacterExploringTest extends TestCase
         $this->middleware = new IsCharacterExploring();
 
         $this->actingAs($this->character->user);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+        $this->middleware = null;
     }
 
     public function test_handle_continues_json_request_when_character_is_not_exploring(): void

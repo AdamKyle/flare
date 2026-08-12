@@ -41,113 +41,26 @@ class ClassAttackBuilder
 
     public function buildAttackData(): array
     {
-        if ($this->classType->isFighter()) {
-            $this->buildFighterChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isProphet()) {
-            $this->buildProphetChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isThief()) {
-            $this->buildThiefChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isRanger()) {
-            $this->buildRangersChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isHeretic()) {
-            $this->buildHereticChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isVampire()) {
-            $this->buildVampiresChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isBlacksmith()) {
-            $this->buildBlacksmithsChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isArcaneAlchemist()) {
-            $this->buildArcaneAlchemistChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isPrisoner()) {
-            $this->buildPrisonerChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isAlcoholic()) {
-            $this->buildAlcoholicsChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isMerchant()) {
-            $this->buildMerchantsPlace();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isGunslinger()) {
-            $this->buildGunSlingersChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isDancer()) {
-            $this->buildSensualDance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isBookBinder()) {
-            $this->buildBookBindersFear();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isCleric()) {
-            $this->buildHolySmite();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isApothecary()) {
-            $this->buildPlagueSurge();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isBuccaneer()) {
-            $this->buildBuccaneersChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
-
-        if ($this->classType->isBeastmaster()) {
-            $this->buildBeastmasterChance();
-
-            return $this->addDisplayOnlyClassData();
-        }
+        match (true) {
+            $this->classType->isFighter() => $this->buildFighterChance(),
+            $this->classType->isProphet() => $this->buildProphetChance(),
+            $this->classType->isThief() => $this->buildThiefChance(),
+            $this->classType->isRanger() => $this->buildRangersChance(),
+            $this->classType->isHeretic() => $this->buildHereticChance(),
+            $this->classType->isVampire() => $this->buildVampiresChance(),
+            $this->classType->isBlacksmith() => $this->buildBlacksmithsChance(),
+            $this->classType->isArcaneAlchemist() => $this->buildArcaneAlchemistChance(),
+            $this->classType->isPrisoner() => $this->buildPrisonerChance(),
+            $this->classType->isAlcoholic() => $this->buildAlcoholicsChance(),
+            $this->classType->isMerchant() => $this->buildMerchantsPlace(),
+            $this->classType->isGunslinger() => $this->buildGunSlingersChance(),
+            $this->classType->isDancer() => $this->buildSensualDance(),
+            $this->classType->isBookBinder() => $this->buildBookBindersFear(),
+            $this->classType->isCleric() => $this->buildHolySmite(),
+            $this->classType->isApothecary() => $this->buildPlagueSurge(),
+            $this->classType->isBuccaneer() => $this->buildBuccaneersChance(),
+            $this->classType->isBeastmaster() => $this->buildBeastmasterChance(),
+        };
 
         return $this->addDisplayOnlyClassData();
     }
@@ -385,10 +298,6 @@ class ClassAttackBuilder
     {
         $classWeapons = ItemTypeMapping::getForClass($this->character->class->name);
 
-        if (is_null($classWeapons)) {
-            return [];
-        }
-
         if (is_array($classWeapons)) {
             return $classWeapons;
         }
@@ -414,18 +323,12 @@ class ClassAttackBuilder
         return match ($attackType) {
             AttackType::ATTACK->value => 'Attack',
             AttackType::CAST->value => 'Cast',
-            AttackType::ATTACK_AND_CAST->value => 'Attack and Cast',
-            AttackType::CAST_AND_ATTACK->value => 'Cast and Attack',
             AttackType::DEFEND->value => 'Defend',
         };
     }
 
     private function getEquippedClassItems(array $classWeapons): array
     {
-        if (empty($classWeapons)) {
-            return [];
-        }
-
         $inventory = Inventory::where('character_id', $this->character->id)->first();
 
         $inventoryItems = InventorySlot::where('inventory_id', $inventory->id)

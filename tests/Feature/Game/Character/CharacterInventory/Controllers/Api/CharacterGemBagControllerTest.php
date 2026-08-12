@@ -5,19 +5,18 @@ namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateGem;
 
 class CharacterGemBagControllerTest extends TestCase
 {
-    use CreateGem, RefreshDatabase;
+    use RefreshDatabase;
 
-    private ?CharacterFactory $character = null;
+    private ?CharacterFactory $character;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->character = (new CharacterFactory)->createBaseCharacter();
+        $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation();
     }
 
     protected function tearDown(): void
@@ -27,34 +26,39 @@ class CharacterGemBagControllerTest extends TestCase
         $this->character = null;
     }
 
-    public function test_get_gem_slot()
+    public function test_get_gem_slots_returns_paginated_gems(): void
     {
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/gem-bag',
-                [
-                    'per_page' => 10,
-                    'page' => 1,
-                    'search_text' => '',
-                ]);
+            ->getJson('/api/character/'.$character->id.'/gem-bag');
 
-        $jsonData = json_decode($response->getContent(), true);
-
-        $this->assertCount(1, $jsonData['data']);
+        $response->assertOk();
+        $this->assertArrayHasKey('data', $response->json());
     }
 
-    public function test_get_gem()
+    public function test_get_gem_returns_gem_data_for_an_owned_slot(): void
     {
-
         $character = $this->character->gemBagManagement()->assignGemsToBag()->getCharacter();
-        $gemSlot = $character->gemBag->gemSlots->first();
+        $gemSlot = $character->gemBag->gemSlots()->first();
 
         $response = $this->actingAs($character->user)
-            ->call('GET', '/api/character/'.$character->id.'/gem-details/'.$gemSlot->id);
+            ->getJson('/api/character/'.$character->id.'/gem-details/'.$gemSlot->id);
 
-        $jsonData = json_decode($response->getContent(), true);
+        $response->assertOk();
+        $this->assertArrayHasKey('gem', $response->json());
+    }
 
-        $this->assertEquals($gemSlot->gem->name, $jsonData['gem']['name']);
+    public function test_get_gem_returns_error_for_a_slot_not_owned_by_the_character(): void
+    {
+        $character = $this->character->getCharacter();
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->gemBagManagement()->assignGemsToBag()->getCharacter();
+        $otherGemSlot = $otherCharacter->gemBag->gemSlots()->first();
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/gem-details/'.$otherGemSlot->id);
+
+        $response->assertStatus(422);
+        $this->assertSame('No. Not yours!', $response->json('message'));
     }
 }

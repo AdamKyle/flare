@@ -94,10 +94,6 @@ class PassiveSkillAssigner
                     ->values()
                     ->all();
 
-                if (empty($childCharacterPassiveSkillIds)) {
-                    return;
-                }
-
                 CharacterPassiveSkill::whereIn('id', $childCharacterPassiveSkillIds)
                     ->update(['parent_skill_id' => $parentCharacterPassiveSkillId]);
             });

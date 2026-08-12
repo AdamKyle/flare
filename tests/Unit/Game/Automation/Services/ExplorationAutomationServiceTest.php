@@ -36,13 +36,13 @@ class ExplorationAutomationServiceTest extends TestCase
     use CreateExplorationWarning;
     use RefreshDatabase;
 
-    private ExplorationAutomationService $service;
+    private ?ExplorationAutomationService $service;
 
-    private Character $character;
+    private ?Character $character;
 
-    private Monster $monster;
+    private ?Monster $monster;
 
-    private CharacterAutomation $automation;
+    private ?CharacterAutomation $automation;
 
     protected function setUp(): void
     {
@@ -74,6 +74,11 @@ class ExplorationAutomationServiceTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
+
+        $this->service = null;
+        $this->character = null;
+        $this->monster = null;
+        $this->automation = null;
 
         parent::tearDown();
     }

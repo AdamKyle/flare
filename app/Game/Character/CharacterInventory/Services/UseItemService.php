@@ -245,10 +245,6 @@ class UseItemService
                 return false;
             }
 
-            if ($foundBoon->amount_used >= self::MAX_AMOUNT) {
-                return false;
-            }
-
             $minutesLeft = $foundBoon->complete->lessThanOrEqualTo(now()) ? 0 : (int) ceil(now()->diffInSeconds($foundBoon->complete) / 60);
             $newLastsForMinutes = min(self::MAX_TIME, $minutesLeft + $slot->item->lasts_for);
 
@@ -307,10 +303,6 @@ class UseItemService
 
         $item = Item::find($boon->item_id);
 
-        if (is_null($item)) {
-            return $this->errorResult('You do not have any more of that item.');
-        }
-
         if (! $item->can_stack && $boon->amount_used !== 1) {
             return $this->errorResult(
                 'Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.'
@@ -337,10 +329,6 @@ class UseItemService
         }
 
         $used = min($needed, $available);
-
-        if ($used <= 0) {
-            return $this->errorResult('You do not have any more of that item.');
-        }
 
         $timeAdded = min($missing, $used * $item->lasts_for);
 
@@ -373,10 +361,6 @@ class UseItemService
 
         if (! is_null($foundBoon)) {
             if (! $slot->item->can_stack) {
-                return false;
-            }
-
-            if ($foundBoon->amount_used >= self::MAX_AMOUNT) {
                 return false;
             }
 

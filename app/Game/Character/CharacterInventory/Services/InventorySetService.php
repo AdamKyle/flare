@@ -163,6 +163,7 @@ class InventorySetService
 
             return $this->successResult([
                 'message' => $itemName.' Has been moved to: '.$setName,
+                'moved_to_set_name' => $setName,
             ]);
         }
 

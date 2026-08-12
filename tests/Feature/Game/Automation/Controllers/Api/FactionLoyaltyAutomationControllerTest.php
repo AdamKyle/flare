@@ -3,9 +3,7 @@
 namespace Tests\Feature\Game\Automation\Controllers\Api;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\CharacterAutomation;
 use App\Flare\Models\FactionLoyaltyAutomation;
-use App\Flare\Models\FactionLoyaltyAutomationWarning;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Combat\Values\AttackType;
@@ -16,12 +14,14 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
+use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateFactionLoyaltyAutomation;
+use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateGameMap;
 
 class FactionLoyaltyAutomationControllerTest extends TestCase
 {
-    use CreateBatchCrafting, CreateFactionLoyaltyAutomation, CreateGameMap, RefreshDatabase;
+    use CreateBatchCrafting, CreateCharacterAutomation, CreateFactionLoyaltyAutomation, CreateFactionLoyaltyAutomationWarning, CreateGameMap, RefreshDatabase;
 
     private ?Character $character = null;
 
@@ -117,7 +117,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        CharacterAutomation::create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
@@ -142,7 +142,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        CharacterAutomation::create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::EXPLORING->value,
             'started_at' => now(),
@@ -168,7 +168,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
         Queue::fake();
         Event::fake();
 
-        CharacterAutomation::create([
+        $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::DELVE->value,
             'started_at' => now(),
@@ -346,7 +346,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
     {
         Event::fake();
 
-        $characterAutomation = CharacterAutomation::create([
+        $characterAutomation = $this->createCharacterAutomation([
             'character_id' => $this->character->id,
             'type' => AutomationType::FACTION_LOYALTY->value,
             'started_at' => now(),
@@ -373,7 +373,7 @@ class FactionLoyaltyAutomationControllerTest extends TestCase
                 ],
             ],
         ]);
-        $warning = FactionLoyaltyAutomationWarning::create([
+        $warning = $this->createFactionLoyaltyAutomationWarning([
             'character_id' => $this->character->id,
             'faction_loyalty_automation_id' => $factionLoyaltyAutomation->id,
             'faction_loyalty_automation_log_id' => $factionLoyaltyAutomationLog->id,

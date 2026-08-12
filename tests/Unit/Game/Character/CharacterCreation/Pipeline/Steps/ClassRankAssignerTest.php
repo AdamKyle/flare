@@ -93,6 +93,117 @@ class ClassRankAssignerTest extends TestCase
         $this->assertSame(5, (int) $fighterPrimary->level);
     }
 
+    public function test_grants_prisoner_full_level_only_for_the_first_mapped_type(): void
+    {
+        $user = $this->createUser();
+        $race = $this->createRace();
+        $prisoner = $this->createClass(['name' => 'Prisoner']);
+
+        $character = $this->createCharacter([
+            'damage_stat' => $prisoner->damage_stat,
+            'name' => Str::random(10),
+            'user_id' => $user->id,
+            'level' => 1,
+            'xp' => 0,
+            'can_attack' => true,
+            'can_move' => true,
+            'inventory_max' => 75,
+            'gold' => 10,
+            'game_class_id' => $prisoner->id,
+            'game_race_id' => $race->id,
+        ]);
+
+        $state = app(CharacterBuildState::class)
+            ->setUser($user)
+            ->setRace($race)
+            ->setClass($prisoner)
+            ->setCharacter($character)
+            ->setNow(now());
+
+        app(ClassRankAssigner::class)->process($state, function (CharacterBuildState $s) {
+            return $s;
+        });
+
+        $rank = CharacterClassRank::query()->where('character_id', $character->id)->where('game_class_id', $prisoner->id)->first();
+
+        $this->assertSame(5, (int) CharacterClassRankWeaponMastery::query()->where('character_class_rank_id', $rank->id)->where('weapon_type', 'weapon')->first()->level);
+        $this->assertSame(0, (int) CharacterClassRankWeaponMastery::query()->where('character_class_rank_id', $rank->id)->where('weapon_type', 'stave')->first()->level);
+    }
+
+    public function test_grants_merchant_specific_levels_for_mapped_types(): void
+    {
+        $user = $this->createUser();
+        $race = $this->createRace();
+        $merchant = $this->createClass(['name' => 'Merchant']);
+
+        $character = $this->createCharacter([
+            'damage_stat' => $merchant->damage_stat,
+            'name' => Str::random(10),
+            'user_id' => $user->id,
+            'level' => 1,
+            'xp' => 0,
+            'can_attack' => true,
+            'can_move' => true,
+            'inventory_max' => 75,
+            'gold' => 10,
+            'game_class_id' => $merchant->id,
+            'game_race_id' => $race->id,
+        ]);
+
+        $state = app(CharacterBuildState::class)
+            ->setUser($user)
+            ->setRace($race)
+            ->setClass($merchant)
+            ->setCharacter($character)
+            ->setNow(now());
+
+        app(ClassRankAssigner::class)->process($state, function (CharacterBuildState $s) {
+            return $s;
+        });
+
+        $rank = CharacterClassRank::query()->where('character_id', $character->id)->where('game_class_id', $merchant->id)->first();
+
+        $this->assertSame(2, (int) CharacterClassRankWeaponMastery::query()->where('character_class_rank_id', $rank->id)->where('weapon_type', 'bow')->first()->level);
+        $this->assertSame(3, (int) CharacterClassRankWeaponMastery::query()->where('character_class_rank_id', $rank->id)->where('weapon_type', 'stave')->first()->level);
+    }
+
+    public function test_grants_default_level_for_a_non_special_mapped_class(): void
+    {
+        $user = $this->createUser();
+        $race = $this->createRace();
+        $thief = $this->createClass(['name' => 'Thief']);
+
+        $character = $this->createCharacter([
+            'damage_stat' => $thief->damage_stat,
+            'name' => Str::random(10),
+            'user_id' => $user->id,
+            'level' => 1,
+            'xp' => 0,
+            'can_attack' => true,
+            'can_move' => true,
+            'inventory_max' => 75,
+            'gold' => 10,
+            'game_class_id' => $thief->id,
+            'game_race_id' => $race->id,
+        ]);
+
+        $state = app(CharacterBuildState::class)
+            ->setUser($user)
+            ->setRace($race)
+            ->setClass($thief)
+            ->setCharacter($character)
+            ->setNow(now());
+
+        app(ClassRankAssigner::class)->process($state, function (CharacterBuildState $s) {
+            return $s;
+        });
+
+        $rank = CharacterClassRank::query()->where('character_id', $character->id)->where('game_class_id', $thief->id)->first();
+
+        $this->assertSame(5, (int) CharacterClassRankWeaponMastery::query()->where('character_class_rank_id', $rank->id)->where('weapon_type', 'dagger')->first()->level);
+        $this->assertSame(5, (int) CharacterClassRankWeaponMastery::query()->where('character_class_rank_id', $rank->id)->where('weapon_type', 'bow')->first()->level);
+    }
+
     public function test_no_op_when_state_has_no_character(): void
     {
         $this->createClass(['name' => 'Fighter']);

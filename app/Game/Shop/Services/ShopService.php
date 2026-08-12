@@ -21,8 +21,6 @@ use App\Game\Shop\Events\BuyItemEvent;
 use App\Game\Shop\Events\SellItemEvent;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use League\Fractal\Manager;
-use League\Fractal\Resource\Collection;
 
 class ShopService
 {
@@ -32,7 +30,6 @@ class ShopService
         private readonly EquipItemService $equipItemService,
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly ItemTransformer $itemTransformer,
-        private readonly Manager $manager,
         private readonly Pagination $pagination
     ) {
     }

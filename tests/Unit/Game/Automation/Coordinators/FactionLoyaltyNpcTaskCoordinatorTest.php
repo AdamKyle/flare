@@ -4,6 +4,7 @@ namespace Tests\Unit\Game\Automation\Coordinators;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Faction;
+use App\Flare\Models\FactionLoyalty as FactionLoyaltyModel;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;
 use App\Flare\Models\Session;
@@ -86,12 +87,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
 
@@ -114,12 +110,260 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
+
+        $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
+
+        $result = $this->coordinator
+            ->setUp($this->character->refresh(), $this->factionLoyaltyAutomation)
+            ->resolveNpc();
+
+        $this->assertNull($result);
+        $this->assertTrue($this->coordinator->shouldEndAutomation());
+    }
+
+    public function test_resolve_npc_skips_existing_faction_with_no_incomplete_tasks(): void
+    {
+        $this->factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($this->character, 2, 1)
+            ->createAutomation();
+
+        $this->character = $this->factionLoyaltyFactory->getCharacter();
+        $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
+
+        $this->factionLoyaltyFactory->completeAllNpcTasks();
+
+        $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
+
+        $result = $this->coordinator
+            ->setUp($this->character->refresh(), $this->factionLoyaltyAutomation)
+            ->resolveNpc();
+
+        $this->assertNull($result);
+        $this->assertTrue($this->coordinator->shouldEndAutomation());
+    }
+
+    public function test_resolve_npc_travels_pledges_and_finds_npc_for_a_brand_new_unpledged_faction(): void
+    {
+        $this->factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($this->character, 2, 1)
+            ->createAutomation();
+
+        $this->character = $this->factionLoyaltyFactory->getCharacter();
+        $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
+
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
+
+        $otherFactionLoyalty = collect($this->factionLoyaltyFactory->getFactionLoyalties())
+            ->first(fn (FactionLoyaltyModel $factionLoyalty): bool => $factionLoyalty->faction_id !== $this->factionLoyaltyNpc->factionLoyalty->faction_id);
+        $otherFaction = $otherFactionLoyalty->faction;
+        $otherFactionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $npc): void {
+            $npc->factionLoyaltyNpcTasks->delete();
+            $npc->delete();
+        });
+        $otherFactionLoyalty->delete();
+
+        $this->instance(
+            TraverseService::class,
+            Mockery::mock(TraverseService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canTravel')->andReturn(true);
+            })
         );
-        $task->update(['fame_tasks' => $completedTasks]);
+
+        $this->instance(
+            MovementService::class,
+            Mockery::mock(MovementService::class, function (MockInterface $mock) use ($otherFaction) {
+                $mock->shouldReceive('updateCharacterPlane')
+                    ->with($otherFaction->game_map_id, Mockery::type(Character::class))
+                    ->andReturn(['status' => 200]);
+            })
+        );
+
+        $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
+
+        $result = $this->coordinator
+            ->setUp($this->character->refresh(), $this->factionLoyaltyAutomation)
+            ->resolveNpc();
+
+        $this->assertNotNull($result);
+        $this->assertSame($otherFaction->id, $result->factionLoyalty->faction_id);
+        $this->assertTrue(FactionLoyaltyModel::where('faction_id', $otherFaction->id)->latest('id')->first()->is_pledged);
+    }
+
+    public function test_resolve_npc_skips_new_faction_when_travel_is_not_possible(): void
+    {
+        $this->factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($this->character, 2, 1)
+            ->createAutomation();
+
+        $this->character = $this->factionLoyaltyFactory->getCharacter();
+        $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
+
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
+
+        $otherFactionLoyalty = collect($this->factionLoyaltyFactory->getFactionLoyalties())
+            ->first(fn (FactionLoyaltyModel $factionLoyalty): bool => $factionLoyalty->faction_id !== $this->factionLoyaltyNpc->factionLoyalty->faction_id);
+        $otherFactionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $npc): void {
+            $npc->factionLoyaltyNpcTasks->delete();
+            $npc->delete();
+        });
+        $otherFactionLoyalty->delete();
+
+        $this->instance(
+            TraverseService::class,
+            Mockery::mock(TraverseService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canTravel')->andReturn(false);
+            })
+        );
+
+        $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
+
+        $result = $this->coordinator
+            ->setUp($this->character->refresh(), $this->factionLoyaltyAutomation)
+            ->resolveNpc();
+
+        $this->assertNull($result);
+        $this->assertTrue($this->coordinator->shouldEndAutomation());
+    }
+
+    public function test_resolve_npc_finds_no_npc_for_a_new_faction_when_map_change_fails(): void
+    {
+        $this->factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($this->character, 2, 1)
+            ->createAutomation();
+
+        $this->character = $this->factionLoyaltyFactory->getCharacter();
+        $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
+
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
+
+        $otherFactionLoyalty = collect($this->factionLoyaltyFactory->getFactionLoyalties())
+            ->first(fn (FactionLoyaltyModel $factionLoyalty): bool => $factionLoyalty->faction_id !== $this->factionLoyaltyNpc->factionLoyalty->faction_id);
+        $otherFactionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $npc): void {
+            $npc->factionLoyaltyNpcTasks->delete();
+            $npc->delete();
+        });
+        $otherFactionLoyalty->delete();
+
+        $this->instance(
+            TraverseService::class,
+            Mockery::mock(TraverseService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canTravel')->andReturn(true);
+            })
+        );
+
+        $this->instance(
+            MovementService::class,
+            Mockery::mock(MovementService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('updateCharacterPlane')->andReturn(['status' => 422]);
+            })
+        );
+
+        $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
+
+        $result = $this->coordinator
+            ->setUp($this->character->refresh(), $this->factionLoyaltyAutomation)
+            ->resolveNpc();
+
+        $this->assertNull($result);
+        $this->assertTrue($this->coordinator->shouldEndAutomation());
+    }
+
+    public function test_resolve_npc_finds_no_npc_for_a_new_faction_when_pledge_fails(): void
+    {
+        $this->factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($this->character, 2, 1)
+            ->createAutomation();
+
+        $this->character = $this->factionLoyaltyFactory->getCharacter();
+        $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
+
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
+
+        $otherFactionLoyalty = collect($this->factionLoyaltyFactory->getFactionLoyalties())
+            ->first(fn (FactionLoyaltyModel $factionLoyalty): bool => $factionLoyalty->faction_id !== $this->factionLoyaltyNpc->factionLoyalty->faction_id);
+        $otherFactionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $npc): void {
+            $npc->factionLoyaltyNpcTasks->delete();
+            $npc->delete();
+        });
+        $otherFactionLoyalty->delete();
+
+        $this->instance(
+            TraverseService::class,
+            Mockery::mock(TraverseService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canTravel')->andReturn(true);
+            })
+        );
+
+        $this->instance(
+            MovementService::class,
+            Mockery::mock(MovementService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('updateCharacterPlane')->andReturn(['status' => 200]);
+            })
+        );
+
+        $this->instance(
+            FactionLoyaltyService::class,
+            Mockery::mock(FactionLoyaltyService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('pledgeLoyalty')->andReturn(['status' => 422, 'message' => 'Nope.']);
+            })
+        );
+
+        $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
+
+        $result = $this->coordinator
+            ->setUp($this->character->refresh(), $this->factionLoyaltyAutomation)
+            ->resolveNpc();
+
+        $this->assertNull($result);
+        $this->assertTrue($this->coordinator->shouldEndAutomation());
+    }
+
+    public function test_resolve_npc_finds_no_npc_for_a_new_faction_when_pledged_loyalty_record_is_missing(): void
+    {
+        $this->factionLoyaltyFactory = (new FactionLoyaltyFactory)
+            ->setUp($this->character, 2, 1)
+            ->createAutomation();
+
+        $this->character = $this->factionLoyaltyFactory->getCharacter();
+        $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
+        $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
+
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
+
+        $otherFactionLoyalty = collect($this->factionLoyaltyFactory->getFactionLoyalties())
+            ->first(fn (FactionLoyaltyModel $factionLoyalty): bool => $factionLoyalty->faction_id !== $this->factionLoyaltyNpc->factionLoyalty->faction_id);
+        $otherFactionLoyalty->factionLoyaltyNpcs->each(function (FactionLoyaltyNpc $npc): void {
+            $npc->factionLoyaltyNpcTasks->delete();
+            $npc->delete();
+        });
+        $otherFactionLoyalty->delete();
+
+        $this->instance(
+            TraverseService::class,
+            Mockery::mock(TraverseService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('canTravel')->andReturn(true);
+            })
+        );
+
+        $this->instance(
+            MovementService::class,
+            Mockery::mock(MovementService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('updateCharacterPlane')->andReturn(['status' => 200]);
+            })
+        );
+
+        $this->instance(
+            FactionLoyaltyService::class,
+            Mockery::mock(FactionLoyaltyService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('pledgeLoyalty')->andReturn(['status' => 200, 'message' => 'Pledged.']);
+            })
+        );
 
         $this->coordinator = resolve(FactionLoyaltyNpcTaskCoordinator::class);
 
@@ -141,12 +385,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $otherFactionLoyaltyNpc = collect($this->factionLoyaltyFactory->getFactionLoyaltyNpcs())
             ->first(fn (FactionLoyaltyNpc $npc): bool => $npc->id !== $this->factionLoyaltyNpc->id);
@@ -190,12 +429,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $this->instance(
             TraverseService::class,
@@ -224,12 +458,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $this->instance(
             TraverseService::class,
@@ -265,12 +494,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $this->instance(
             TraverseService::class,
@@ -313,12 +537,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $otherFactionLoyaltyNpc = collect($this->factionLoyaltyFactory->getFactionLoyaltyNpcs())
             ->first(fn (FactionLoyaltyNpc $npc): bool => $npc->id !== $this->factionLoyaltyNpc->id);
@@ -345,12 +564,7 @@ class FactionLoyaltyNpcTaskCoordinatorTest extends TestCase
         $this->factionLoyaltyNpc = $this->factionLoyaltyFactory->getAssistingFactionLoyaltyNpc();
         $this->factionLoyaltyAutomation = $this->factionLoyaltyFactory->getFactionLoyaltyAutomation();
 
-        $task = $this->factionLoyaltyNpc->factionLoyaltyNpcTasks;
-        $completedTasks = array_map(
-            static fn (array $fameTask): array => array_merge($fameTask, ['current_amount' => $fameTask['required_amount']]),
-            $task->fame_tasks
-        );
-        $task->update(['fame_tasks' => $completedTasks]);
+        $this->factionLoyaltyFactory->completeTasksForNpc($this->factionLoyaltyNpc);
 
         $session = new Session;
         $session->timestamps = false;
