@@ -5,10 +5,10 @@ import CraftProgressSummary from './craft-progress-summary';
 import CraftTargetOptions from './craft-target-options';
 import CraftTypeFilters from './craft-type-filters';
 import CraftableItemPicker from './craftable-item-picker';
-import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 import CraftingActionButton from '../../../shared/components/crafting-action-button';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
+import { useOpenCraftedItem } from '../../../shared/hooks/use-open-crafted-item';
 import CraftingSectionScreenProps from '../../../types/crafting-section-screen-props';
 import { useCraftItemsFlow } from '../hooks/use-craft-items-flow';
 
@@ -21,7 +21,7 @@ const CraftItemsFlow = ({
 }: CraftingSectionScreenProps): ReactNode => {
   const { filters, picker, targets, result, progress, action, navigation } =
     useCraftItemsFlow({ setActiveCraftingType });
-  const { openServerMessageItem } = useOpenItemDetails();
+  const { openCraftedInventoryItem } = useOpenCraftedItem();
 
   const canViewCraftedItem =
     result.isCraftSuccessful && result.craftedInventorySlotId !== null;
@@ -31,7 +31,10 @@ const CraftItemsFlow = ({
       return;
     }
 
-    openServerMessageItem(result.characterId, result.craftedInventorySlotId);
+    openCraftedInventoryItem(
+      result.characterId,
+      result.craftedInventorySlotId
+    );
   };
 
   const renderForm = (): ReactNode => {

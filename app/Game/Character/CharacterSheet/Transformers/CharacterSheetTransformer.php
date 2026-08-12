@@ -29,9 +29,9 @@ class CharacterSheetTransformer extends BaseTransformer
 
         return array_merge($baseInfo, $baseDetails, $currencies, [
             'inventory_count' => $this->characterInventoryCountTransformer->transform($character),
-            'resistance_info' => $this->characterResistanceInfoTransformer->transform($character),
+            'resistance_info' => ['data' => $this->characterResistanceInfoTransformer->transform($character)],
             'elemental_atonements' => $this->characterElementalAtonementTransformer->transform($character),
-            'reincarnation_info' => $this->characterReincarnationInfoTransformer->transform($character),
+            'reincarnation_info' => ['data' => $this->characterReincarnationInfoTransformer->transform($character)],
         ]);
     }
 }

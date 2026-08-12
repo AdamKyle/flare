@@ -15,6 +15,7 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
+use App\Game\Maps\Values\LocationType;
 use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
 use Exception;

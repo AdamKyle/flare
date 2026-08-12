@@ -128,7 +128,7 @@ class StatModifierDetails
         $details['non_equipped_percentage_of_stat_used'] = 0;
         $details['spell_damage_stat_amount_to_use'] = 0;
         $details['percentage_of_stat_used'] = 0;
-        $details['total_damage_for_type'] = number_format($this->character->getInformation()->buildDamage($types, $isVoided));
+        $details['total_damage_for_type'] = $this->character->getInformation()->buildDamage($types, $isVoided);
         $details['base_damage'] = 0;
         $details['items_equipped'] = $this->fetchDamageOrHealingEquipmentBreakDown($types);
         $details['map_reduction'] = $this->getMapCharacterReductionsDetails();
@@ -140,17 +140,17 @@ class StatModifierDetails
                 if ($this->character->classType()->isAlcoholic()) {
                     $value = $damageStatAmount * 0.25;
 
-                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_damage_amount'] = max($value, 5);
                     $details['non_equipped_percentage_of_stat_used'] = 0.25;
                 } elseif ($this->character->classType()->isFighter()) {
                     $value = $damageStatAmount * 0.05;
 
-                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_damage_amount'] = max($value, 5);
                     $details['non_equipped_percentage_of_stat_used'] = 0.05;
                 } else {
                     $value = $damageStatAmount * 0.02;
 
-                    $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+                    $details['non_equipped_damage_amount'] = max($value, 5);
                     $details['non_equipped_percentage_of_stat_used'] = 0.02;
                 }
             }
@@ -158,7 +158,7 @@ class StatModifierDetails
             if ($isSpellDamage && $this->character->classType()->isHeretic()) {
                 $value = $damageStatAmount * 0.15;
 
-                $details['spell_damage_stat_amount_to_use'] = number_format(max($value, 5));
+                $details['spell_damage_stat_amount_to_use'] = max($value, 5);
                 $details['percentage_of_stat_used'] = 0.15;
             }
         }
@@ -172,7 +172,7 @@ class StatModifierDetails
         $details['class_bonus_details'] = $isRingDamage ? null : $this->fetchClassBonusesEffecting('base_damage');
         $details['boon_details'] = $isRingDamage ? null : $this->fetchBoonDetails('base_damage');
         $details['class_specialties'] = $isRingDamage ? null : $this->fetchClassRankSpecialtiesDetails($classSpecialtyStat);
-        $details['ancestral_item_skill_data'] = $isRingDamage ? null : $this->fetchAncestralItemSkills('base_damage');
+        $details['ancestral_item_skill_data'] = $isRingDamage ? [] : $this->fetchAncestralItemSkills('base_damage');
 
         $typeAttributes = match (true) {
             $isWeaponDamage => $this->character->getInformation()->getDamageBuilder()->buildWeaponDamageBreakDown($damageStatAmount, $isVoided),
@@ -199,7 +199,7 @@ class StatModifierDetails
 
         $value = $damageStatAmount * $percentage;
 
-        $details['non_equipped_damage_amount'] = number_format(max($value, 5));
+        $details['non_equipped_damage_amount'] = max($value, 5);
         $details['non_equipped_percentage_of_stat_used'] = $percentage;
 
         return $details;
@@ -278,18 +278,18 @@ class StatModifierDetails
     /**
      * Fetch Ancestral Item Skill Details that effect the stat.
      */
-    private function fetchAncestralItemSkills($stat): ?array
+    private function fetchAncestralItemSkills($stat): array
     {
         $artifact = ItemSkillAttribute::fetchArtifactItemEquipped($this->character);
 
         if (is_null($artifact)) {
-            return null;
+            return [];
         }
 
         $itemSkills = ItemSkillAttribute::fetchItemSkillsThatEffectStat($artifact, $stat);
 
         if ($itemSkills->isEmpty()) {
-            return null;
+            return [];
         }
 
         $details = [];
@@ -307,7 +307,7 @@ class StatModifierDetails
     /**
      * Fetch class ranks specialties details.
      */
-    private function fetchClassRankSpecialtiesDetails(string $stat): ?array
+    private function fetchClassRankSpecialtiesDetails(string $stat): array
     {
         $details = [];
 
@@ -321,10 +321,6 @@ class StatModifierDetails
                     'name' => $classSpecialty->gameClassSpecial->name,
                     'amount' => $classSpecialty->base_damage_stat_increase,
                 ];
-            }
-
-            if (empty($details)) {
-                return null;
             }
 
             return $details;
@@ -343,17 +339,13 @@ class StatModifierDetails
             ];
         }
 
-        if (empty($details)) {
-            return null;
-        }
-
         return $details;
     }
 
     /**
      * Fetch class rank specialties that can effect your health.
      */
-    private function fetchClassRankSpecialtiesForHealth(): ?array
+    private function fetchClassRankSpecialtiesForHealth(): array
     {
         $details = [];
 
@@ -377,10 +369,6 @@ class StatModifierDetails
                 'name' => $classSpecialty->gameClassSpecial->name,
                 'amount' => $classSpecialty->health_mod,
             ];
-        }
-
-        if (empty($details)) {
-            return null;
         }
 
         return $details;

@@ -61,10 +61,10 @@ class HealingBuilder extends BaseAttribute
         $details = [];
 
         $details['base_healing'] = $this->getHealingFromItems('spell-healing', 'both');
-        $details['skills_effecting_healing'] = null;
+        $details['skill_affecting_healing'] = null;
 
         if ($this->shouldIncludeSkillDamage($this->character->class, 'healing')) {
-            $details['skills_effecting_healing'] = $this->fetchBaseAttributeFromSkillsDetails('base_healing');
+            $details['skill_affecting_healing'] = $this->fetchBaseAttributeFromSkillsDetails('base_healing');
         }
 
         $details['masteries'] = [];

@@ -26,10 +26,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
 {
     private bool $ignoreReductions = false;
 
-    protected array $defaultIncludes = [
-        'inventory_count',
-    ];
-
     public function __construct(
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly AttackTimerService $attackTimerService,
@@ -137,6 +133,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'has_faction_loyalty_warning' => count($factionLoyaltyWarningNotices) > 0,
             'faction_loyalty_warning_notices' => $factionLoyaltyWarningNotices,
             'resurrection_chance' => $characterStatBuilder->buildResurrectionChance(),
+            'is_admin' => $character->user->hasRole('Admin'),
+            'inventory_count' => $this->characterInventoryCountTransformer->transform($character),
         ];
     }
 
@@ -156,22 +154,17 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             ->toArray();
     }
 
-    public function includeInventoryCount(Character $character)
-    {
-        return $this->item($character, $this->characterInventoryCountTransformer);
-    }
-
-    private function getFactionTasks(?FactionLoyalty $factionLoyalty = null): ?array
+    private function getFactionTasks(?FactionLoyalty $factionLoyalty = null): array
     {
 
         if (is_null($factionLoyalty)) {
-            return null;
+            return [];
         }
 
         $factionLoyaltyNpc = $factionLoyalty->factionLoyaltyNpcs->where('currently_helping', true)->first();
 
         if (is_null($factionLoyaltyNpc)) {
-            return null;
+            return [];
         }
 
         return array_values(collect($factionLoyaltyNpc->factionLoyaltyNpcTasks->fame_tasks)->filter(function ($task) {

@@ -188,6 +188,7 @@ const CharacterSheetDetails = (
               {(
                 characterData.resistance_info.data.healing_reduction * 100
               ).toFixed(2)}
+              %
             </Dd>
           </Dl>
         </div>

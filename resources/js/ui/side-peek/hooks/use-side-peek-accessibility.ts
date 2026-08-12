@@ -1,8 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 
 interface SidePeekAccessibilityProps {
-  is_open: boolean;
+  active: boolean;
   allow_clicking_outside?: boolean;
   on_close?: () => void;
 }
@@ -14,15 +14,36 @@ interface SidePeekAccessibilityDefinition {
 }
 
 export const useSidePeekAccessibility = ({
-  is_open,
+  active,
   allow_clicking_outside,
   on_close,
 }: SidePeekAccessibilityProps): SidePeekAccessibilityDefinition => {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
 
-  if (is_open && dialogRef.current) {
-    dialogRef.current.focus();
-  }
+  useEffect(() => {
+    if (!active) {
+      return;
+    }
+
+    previouslyFocusedElementRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    dialogRef.current?.focus();
+
+    return () => {
+      const previouslyFocusedElement = previouslyFocusedElementRef.current;
+
+      if (
+        previouslyFocusedElement &&
+        document.contains(previouslyFocusedElement)
+      ) {
+        previouslyFocusedElement.focus();
+      }
+    };
+  }, [active]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Escape' && on_close) {

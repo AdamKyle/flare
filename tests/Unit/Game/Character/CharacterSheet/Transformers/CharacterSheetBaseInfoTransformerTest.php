@@ -19,10 +19,11 @@ use Tests\Traits\CreateDelveExploration;
 use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
 use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateRole;
 
 class CharacterSheetBaseInfoTransformerTest extends TestCase
 {
-    use CreateBatchCrafting, CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, RefreshDatabase;
+    use CreateBatchCrafting, CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, CreateRole, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -383,7 +384,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
         $this->assertFalse($data['can_see_pledge_tab']);
         $this->assertNull($data['pledged_to_faction_id']);
-        $this->assertNull($data['current_fame_tasks']);
+        $this->assertSame([], $data['current_fame_tasks']);
     }
 
     public function test_pledged_faction_with_no_actively_helped_npc_reports_no_fame_tasks(): void
@@ -398,7 +399,7 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $data = $this->transformer->transform($character->refresh());
 
         $this->assertTrue($data['can_see_pledge_tab']);
-        $this->assertNull($data['current_fame_tasks']);
+        $this->assertSame([], $data['current_fame_tasks']);
     }
 
     public function test_ignore_reductions_removes_map_based_stat_reduction(): void
@@ -434,5 +435,37 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
 
         $this->assertNull($data['active_automation']);
         $this->assertSame(0, $data['automation_completed_at']);
+    }
+
+    public function test_is_admin_is_true_for_a_character_owned_by_an_admin_user(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $role = $this->createAdminRole();
+        $character->user->assignRole($role->name);
+
+        $data = $this->transformer->transform($character->refresh());
+
+        $this->assertTrue($data['is_admin']);
+    }
+
+    public function test_is_admin_is_false_for_a_character_owned_by_a_non_admin_user(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertFalse($data['is_admin']);
+    }
+
+    public function test_inventory_count_is_a_flat_object_without_a_data_envelope(): void
+    {
+        $character = $this->character->givePlayerLocation()->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertArrayNotHasKey('data', $data['inventory_count']);
+        $this->assertArrayHasKey('inventory_count', $data['inventory_count']);
+        $this->assertArrayHasKey('inventory_max', $data['inventory_count']);
     }
 }

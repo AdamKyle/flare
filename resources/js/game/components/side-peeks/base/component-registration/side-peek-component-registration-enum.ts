@@ -25,6 +25,11 @@ export enum SidePeekComponentRegistrationEnum {
   SERVER_CHAT_ITEM = 'SERVER_CHAT_ITEM',
 
   /**
+   * Crafting
+   */
+  CRAFTED_ITEM = 'CRAFTED_ITEM',
+
+  /**
    * Admin Monitoring
    */
   ADMIN_LOG_ENTRY = 'ADMIN_LOG_ENTRY',

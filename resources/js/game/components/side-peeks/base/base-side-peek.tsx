@@ -1,3 +1,4 @@
+import { AnimatePresence } from 'framer-motion';
 import React, { useEffect } from 'react';
 
 import { useCloseSidePeekEmitter } from './hooks/use-close-side-peek-emitter';
@@ -70,24 +71,25 @@ const BaseSidePeek = () => {
     );
   };
 
-  if (!componentProps.is_open) {
-    return null;
-  }
-
   return (
-    <SidePeek
-      title={componentProps.title}
-      is_open={componentProps.is_open}
-      on_close={closeSidePeek}
-      allow_clicking_outside={componentProps.allow_clicking_outside}
-    >
-      <div className="flex h-full min-h-0 flex-col pb-4">
-        <div className="flex-1 overflow-auto">
-          {ComponentToRender && <ComponentToRender {...componentProps} />}
-        </div>
-        {renderFooter()}
-      </div>
-    </SidePeek>
+    <AnimatePresence>
+      {componentProps.is_open && (
+        <SidePeek
+          key="side-peek"
+          title={componentProps.title}
+          is_open={componentProps.is_open}
+          on_close={closeSidePeek}
+          allow_clicking_outside={componentProps.allow_clicking_outside}
+        >
+          <div className="flex h-full min-h-0 flex-col pb-4">
+            <div className="flex-1 overflow-auto">
+              {ComponentToRender && <ComponentToRender {...componentProps} />}
+            </div>
+            {renderFooter()}
+          </div>
+        </SidePeek>
+      )}
+    </AnimatePresence>
   );
 };
 

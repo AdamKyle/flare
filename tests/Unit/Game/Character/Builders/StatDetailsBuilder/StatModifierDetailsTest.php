@@ -136,16 +136,16 @@ class StatModifierDetailsTest extends TestCase
         $this->assertSame($itemSkill->name, $details['ancestral_item_skill_data'][0]['name']);
     }
 
-    public function test_for_stat_returns_null_ancestral_item_skill_data_without_an_artifact(): void
+    public function test_for_stat_returns_empty_ancestral_item_skill_data_without_an_artifact(): void
     {
         $character = $this->character->getCharacter();
 
         $details = $this->statModifierDetails->setCharacter($character)->forStat('str');
 
-        $this->assertNull($details['ancestral_item_skill_data']);
+        $this->assertSame([], $details['ancestral_item_skill_data']);
     }
 
-    public function test_for_stat_returns_null_ancestral_item_skill_data_when_artifact_skill_does_not_affect_the_stat(): void
+    public function test_for_stat_returns_empty_ancestral_item_skill_data_when_artifact_skill_does_not_affect_the_stat(): void
     {
         $itemSkill = $this->createItemSkill(['str_mod' => 2]);
         $artifact = $this->createItem(['type' => 'artifact']);
@@ -160,7 +160,7 @@ class StatModifierDetailsTest extends TestCase
 
         $details = $this->statModifierDetails->setCharacter($character)->forStat('dur');
 
-        $this->assertNull($details['ancestral_item_skill_data']);
+        $this->assertSame([], $details['ancestral_item_skill_data']);
     }
 
     public function test_for_stat_includes_class_specialty_details_for_damage_stat(): void
@@ -322,6 +322,8 @@ class StatModifierDetailsTest extends TestCase
 
         $this->assertSame($character->damage_stat, $details['damage_stat_name']);
         $this->assertArrayHasKey('non_equipped_damage_amount', $details);
+        $this->assertIsNotString($details['total_damage_for_type']);
+        $this->assertIsNotString($details['non_equipped_damage_amount']);
     }
 
     public function test_build_specific_break_down_returns_spell_damage_break_down(): void
@@ -407,5 +409,6 @@ class StatModifierDetailsTest extends TestCase
         $details = $this->statModifierDetails->setCharacter($character->refresh())->buildSpecificBreakDown('spell_damage');
 
         $this->assertSame(0.15, $details['percentage_of_stat_used']);
+        $this->assertIsNotString($details['spell_damage_stat_amount_to_use']);
     }
 }

@@ -112,6 +112,7 @@ class HealingBuilderTest extends TestCase
 
         $this->assertSame(100, $details['base_healing']);
         $this->assertIsArray($details['masteries']);
+        $this->assertArrayHasKey('skill_affecting_healing', $details);
     }
 
     public function test_get_healing_builder_returns_zero_base_healing_with_nothing_equipped(): void

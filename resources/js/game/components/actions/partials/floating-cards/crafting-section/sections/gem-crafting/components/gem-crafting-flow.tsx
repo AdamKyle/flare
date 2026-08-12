@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import GemTierCostSummary from './gem-tier-cost-summary';
 import GemTierSelection from './gem-tier-selection';
 import GemDetailsContent from '../../../../../../../../reusable-components/gem/gem-details-content';
-import { useOpenCharacterGemBag } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-gem-bag';
 import { getGemSlotTitleTextColor } from '../../../../../../../character-sheet/partials/character-inventory/styles/gem-slot-styles';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
@@ -11,6 +10,7 @@ import CraftingInventoryProgress from '../../../shared/components/crafting-inven
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
+import { useOpenCraftedItem } from '../../../shared/hooks/use-open-crafted-item';
 import { useGemCraftingFlow } from '../hooks/use-gem-crafting-flow';
 
 import { Alert } from 'ui/alerts/alert';
@@ -20,7 +20,6 @@ import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const GemCraftingFlow = (): ReactNode => {
   const {
-    characterId,
     data,
     loading,
     error,
@@ -40,16 +39,14 @@ const GemCraftingFlow = (): ReactNode => {
     craftGem,
   } = useGemCraftingFlow();
 
-  const { openGemBag } = useOpenCharacterGemBag({
-    character_id: characterId,
-  });
+  const { openCraftedGem } = useOpenCraftedItem();
 
   const handleViewCraftedGem = (): void => {
     if (!craftedGemPreview) {
       return;
     }
 
-    openGemBag(craftedGemPreview);
+    openCraftedGem(craftedGemPreview);
   };
 
   const renderLoadingState = (): ReactNode => (

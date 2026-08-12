@@ -36,8 +36,8 @@ const CharacterReincarnation = ({
             )}
           </Dd>
           <Dt>Base Stat Mod:</Dt>
-          <Dd>{(reincarnation_info.base_damage_stat_mod * 100).toFixed(2)}%</Dd>
-          <Dt>base Damage Mod:</Dt>
+          <Dd>{(reincarnation_info.base_stat_mod * 100).toFixed(2)}%</Dd>
+          <Dt>Base Damage Mod:</Dt>
           <Dd>{(reincarnation_info.base_damage_stat_mod * 100).toFixed(2)}%</Dd>
           <Dt>XP Penalty:</Dt>
           <Dd>{(reincarnation_info.xp_penalty * 100).toFixed(2)}%</Dd>

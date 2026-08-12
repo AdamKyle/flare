@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import AlchemyCostSummary from './alchemy-cost-summary';
 import AlchemyItemSelection from './alchemy-item-selection';
 import UsableItemEffects from '../../../../../../../../reusable-components/usable-item/usable-item-effects';
-import { useOpenCharacterUsableInventory } from '../../../../../../../character-sheet/partials/character-inventory/hooks/use-open-character-usable-inventory';
 import { planeTextItemColors } from '../../../../../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
@@ -11,6 +10,7 @@ import CraftingInventoryProgress from '../../../shared/components/crafting-inven
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingResultNameButton from '../../../shared/components/crafting-result-name-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
+import { useOpenCraftedItem } from '../../../shared/hooks/use-open-crafted-item';
 import { useAlchemyFlow } from '../hooks/use-alchemy-flow';
 
 import { formatNumberWithCommas } from 'game-utils/format-number';
@@ -22,7 +22,6 @@ import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const AlchemyFlow = (): ReactNode => {
   const {
-    characterId,
     data,
     loading,
     error,
@@ -40,16 +39,14 @@ const AlchemyFlow = (): ReactNode => {
     transmuteItem,
   } = useAlchemyFlow();
 
-  const { openUsableInventory } = useOpenCharacterUsableInventory({
-    character_id: characterId,
-  });
+  const { openCraftedUsableItem } = useOpenCraftedItem();
 
   const handleViewResultItem = (): void => {
     if (!alchemyResult) {
       return;
     }
 
-    openUsableInventory(alchemyResult.item_preview);
+    openCraftedUsableItem(alchemyResult.item_preview);
   };
 
   const renderLoadingState = (): ReactNode => (

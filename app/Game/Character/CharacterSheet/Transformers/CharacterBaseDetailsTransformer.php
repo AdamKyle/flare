@@ -9,14 +9,9 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Builders\ClassAttackBuilder;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
 use App\Game\Core\Items\Values\ItemType;
-use League\Fractal\Resource\Item;
 
 class CharacterBaseDetailsTransformer extends BaseTransformer
 {
-    protected array $defaultIncludes = [
-        'inventory_count',
-    ];
-
     public function __construct(
         private readonly CharacterStatBuilder $characterStatBuilder,
         private readonly CharacterInventoryCountTransformer $characterInventoryCountTransformer,
@@ -82,17 +77,8 @@ class CharacterBaseDetailsTransformer extends BaseTransformer
             'voided_healing_amount' => $characterStatBuilder->buildHealing(true),
             'gold_bars' => $this->fetchGoldBarsAmount($character),
             'map_name' => $character->map->gameMap->name,
+            'inventory_count' => $this->characterInventoryCountTransformer->transform($character),
         ];
-    }
-
-    /**
-     * Includes the inventory count.
-     *
-     * @return Item
-     */
-    public function includeInventoryCount(Character $character)
-    {
-        return $this->item($character, $this->characterInventoryCountTransformer);
     }
 
     /**

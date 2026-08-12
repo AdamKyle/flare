@@ -38,9 +38,14 @@
       integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr"
       crossorigin="anonymous"
     />
+    @vite('resources/js/layouts/app-layout.ts')
     @stack('head')
   </head>
   <body class="bg-gray-100 transition-colors duration-200 dark:bg-gray-800">
+    @include('layouts.partials.plain-header', [
+      'isLoggedIn' => true,
+      'user' => auth()->user(),
+    ])
     <main>
       @yield('content')
     </main>

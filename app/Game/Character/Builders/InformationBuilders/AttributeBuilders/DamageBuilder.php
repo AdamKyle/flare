@@ -84,7 +84,7 @@ class DamageBuilder extends BaseAttribute
         if ($this->character->class->type()->isFighter()) {
             $baseDamage = $damageStat * 0.08;
 
-            $details['base_damage'] = number_format($baseDamage);
+            $details['base_damage'] = $baseDamage;
 
             $details['percentage_of_stat_used'] = 0.08;
         } elseif ($this->character->class->type()->isArcaneAlchemist()) {
@@ -95,18 +95,18 @@ class DamageBuilder extends BaseAttribute
             if ($hasStaveEquipped) {
                 $baseDamage = $damageStat * 0.15;
 
-                $details['base_damage'] = number_format($baseDamage);
+                $details['base_damage'] = $baseDamage;
                 $details['percentage_of_stat_used'] = 0.15;
             } else {
                 $baseDamage = $damageStat * 0.05;
 
-                $details['base_damage'] = number_format($baseDamage);
+                $details['base_damage'] = $baseDamage;
                 $details['percentage_of_stat_used'] = 0.05;
             }
         } else {
             $baseDamage = $damageStat * 0.05;
 
-            $details['base_damage'] = number_format($baseDamage);
+            $details['base_damage'] = $baseDamage;
             $details['percentage_of_stat_used'] = 0.05;
         }
 

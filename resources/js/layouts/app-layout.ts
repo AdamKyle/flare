@@ -1,5 +1,6 @@
 /**
- * Plain-JavaScript behavior for the ordinary (non-admin, non-game) Blade shell header.
+ * Plain-JavaScript behavior for the shared player header used by both the ordinary
+ * (non-admin) Blade shell and the dedicated game layout.
  *
  * Replaces the Alpine-driven mobile menu toggle and dark-mode toggle that previously lived in
  * `resources/js/vendor/alpine.js` + `x-data`/`x-init`/`@click` directives in the Blade templates.

@@ -126,7 +126,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             handBasedItems,
             InventoryPositionDefinition.RING_TWO
           )}
-          positionName={'Ring (Ring One)'}
+          positionName={'Ring (Ring Two)'}
           position={Position.RING_TWO}
         />
         <EquippedSlot
@@ -154,7 +154,7 @@ const EquippedSlots = ({ equipped_items }: EquippedSlotsProps) => {
             InventoryPositionDefinition.SPELL_TWO
           )}
           positionName={'Spell (Spell Two)'}
-          position={Position.SPELL_ONE}
+          position={Position.SPELL_TWO}
         />
         <EquippedSlot
           equipped_item={fetchEquippedItemForSlot(

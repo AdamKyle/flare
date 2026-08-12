@@ -3,6 +3,7 @@
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
 use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Items\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -159,6 +160,38 @@ class CharacterInventoryControllerTest extends TestCase
         $this->assertArrayHasKey('equipped', $response->json());
         $this->assertArrayHasKey('weapon_damage', $response->json());
         $this->assertArrayHasKey('set_name', $response->json());
+    }
+
+    public function test_equipped_items_returns_the_real_healing_amount_for_an_equipped_healing_spell(): void
+    {
+        $item = $this->createItem([
+            'name' => 'sample',
+            'type' => ItemType::SPELL_HEALING->value,
+            'base_healing' => 100,
+        ]);
+
+        $character = $this->character
+            ->inventoryManagement()
+            ->giveItem($item, true, 'spell-one')
+            ->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/equipped_items');
+
+        $response->assertOk();
+        $this->assertGreaterThan(0, $response->json('healing_amount'));
+    }
+
+    public function test_equipped_items_returns_an_empty_data_array_when_nothing_is_equipped(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/equipped_items');
+
+        $response->assertOk();
+        $this->assertArrayHasKey('data', $response->json('equipped'));
+        $this->assertSame([], $response->json('equipped.data'));
     }
 
     public function test_current_sets_returns_paginated_inventory_sets(): void

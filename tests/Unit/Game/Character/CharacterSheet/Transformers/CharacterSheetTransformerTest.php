@@ -7,10 +7,11 @@ use App\Game\Character\CharacterSheet\Transformers\CharacterSheetTransformer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateItem;
 
 class CharacterSheetTransformerTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateItem, RefreshDatabase;
 
     private ?CharacterSheetTransformer $transformer;
 
@@ -94,11 +95,74 @@ class CharacterSheetTransformerTest extends TestCase
         $data = $this->transformer->transform($character);
 
         $this->assertSame([
-            'atonements' => [],
+            'atonements' => [
+                'fire' => 0,
+                'ice' => 0,
+                'water' => 0,
+            ],
             'highest_element' => [
                 'name' => 'N/A',
                 'damage' => 0,
             ],
         ], $data['elemental_atonements']);
+    }
+
+    public function test_transform_returns_zeroed_atonements_when_equipped_items_produce_no_atonement(): void
+    {
+        $item = $this->createItem(['type' => 'body', 'socket_count' => 0]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item, true, 'body')
+            ->getCharacter();
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertSame([
+            'fire' => 0,
+            'ice' => 0,
+            'water' => 0,
+        ], $data['elemental_atonements']['atonements']);
+        $this->assertSame('N/A', $data['elemental_atonements']['highest_element']['name']);
+        $this->assertSame(0.0, $data['elemental_atonements']['highest_element']['damage']);
+    }
+
+    public function test_transform_wraps_resistance_info_in_a_data_envelope(): void
+    {
+        $character = $this->character;
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertArrayHasKey('data', $data['resistance_info']);
+        $this->assertArrayHasKey('spell_evasion', $data['resistance_info']['data']);
+        $this->assertArrayHasKey('affix_damage_reduction', $data['resistance_info']['data']);
+        $this->assertArrayHasKey('healing_reduction', $data['resistance_info']['data']);
+    }
+
+    public function test_transform_wraps_reincarnation_info_in_a_data_envelope(): void
+    {
+        $character = $this->character;
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertArrayHasKey('data', $data['reincarnation_info']);
+        $this->assertArrayHasKey('reincarnated_times', $data['reincarnation_info']['data']);
+        $this->assertArrayHasKey('reincarnated_stat_increase', $data['reincarnation_info']['data']);
+        $this->assertArrayHasKey('xp_penalty', $data['reincarnation_info']['data']);
+        $this->assertArrayHasKey('base_stat_mod', $data['reincarnation_info']['data']);
+        $this->assertArrayHasKey('base_damage_stat_mod', $data['reincarnation_info']['data']);
+    }
+
+    public function test_transform_keeps_inventory_count_flat_without_a_data_envelope(): void
+    {
+        $character = $this->character;
+
+        $data = $this->transformer->transform($character);
+
+        $this->assertArrayNotHasKey('data', $data['inventory_count']);
+        $this->assertArrayHasKey('inventory_count', $data['inventory_count']);
+        $this->assertArrayHasKey('inventory_max', $data['inventory_count']);
     }
 }

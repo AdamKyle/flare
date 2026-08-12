@@ -348,6 +348,7 @@ class DamageBuilderTest extends TestCase
         $details = $this->damageBuilder->buildWeaponDamageBreakDown(100, false);
 
         $this->assertSame(0.08, $details['percentage_of_stat_used']);
+        $this->assertIsNotString($details['base_damage']);
     }
 
     public function test_build_weapon_damage_break_down_for_arcane_alchemist_with_stave(): void

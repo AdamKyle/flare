@@ -4,13 +4,13 @@ import EnchantingAffixSelection from './enchanting-affix-selection';
 import EnchantingCostSummary from './enchanting-cost-summary';
 import EnchantingItemSelection from './enchanting-item-selection';
 import EnchantingSourceSelection from './enchanting-source-selection';
-import { useOpenItemDetails } from '../../../../../../../chat-section/hooks/use-open-item-details';
 import CraftingActionLayout from '../../../shared/components/crafting-action-layout';
 import CraftingActionPreview from '../../../shared/components/crafting-action-preview';
 import CraftingInventoryProgress from '../../../shared/components/crafting-inventory-progress';
 import CraftingItemPreview from '../../../shared/components/crafting-item-preview';
 import CraftingProgressActionButton from '../../../shared/components/crafting-progress-action-button';
 import CraftingSkillXpProgress from '../../../shared/components/crafting-skill-xp-progress';
+import { useOpenCraftedItem } from '../../../shared/hooks/use-open-crafted-item';
 import { useEnchantingFlow } from '../hooks/use-enchanting-flow';
 import { buildDecoratedItemName } from '../utils/build-decorated-item-name';
 
@@ -56,14 +56,14 @@ const EnchantingFlow = (): ReactNode => {
     submitEnchant,
   } = useEnchantingFlow();
 
-  const { openServerMessageItem } = useOpenItemDetails();
+  const { openCraftedInventoryItem } = useOpenCraftedItem();
 
   const handleViewResultItem = (): void => {
     if (!resultPreview || resultPreview.inventory_slot_id === null) {
       return;
     }
 
-    openServerMessageItem(characterId, resultPreview.inventory_slot_id);
+    openCraftedInventoryItem(characterId, resultPreview.inventory_slot_id);
   };
 
   const renderLoadingState = (): ReactNode => (

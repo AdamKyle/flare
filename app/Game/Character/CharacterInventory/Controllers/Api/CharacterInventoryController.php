@@ -63,11 +63,13 @@ class CharacterInventoryController extends Controller
     {
         $characterInventoryService = $this->characterInventoryService->setCharacter($character);
 
+        $equipped = $characterInventoryService->fetchEquipped();
+
         return response()->json([
-            'equipped' => $characterInventoryService->fetchEquipped(),
+            'equipped' => ['data' => $equipped['data'] ?? []],
             'weapon_damage' => $character->getInformation()->buildDamage(ItemType::validWeapons()),
             'spell_damage' => $character->getInformation()->buildDamage(ItemType::SPELL_DAMAGE->value),
-            'healing_amount' => $character->getInformation()->buildDamage(ItemType::SPELL_HEALING->value),
+            'healing_amount' => $character->getInformation()->buildHealing(),
             'defence_amount' => $character->getInformation()->buildDefence(),
             'set_name' => $characterInventoryService->getSetName(),
         ]);

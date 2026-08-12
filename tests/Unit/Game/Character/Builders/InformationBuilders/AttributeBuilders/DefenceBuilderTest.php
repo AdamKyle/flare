@@ -109,7 +109,7 @@ class DefenceBuilderTest extends TestCase
 
         $this->assertSame($character->ac, $details['base_ac']);
         $this->assertSame(20, $details['ac_from_items']);
-        $this->assertIsArray($details['skill_effecting_ac']);
+        $this->assertIsArray($details['skills_effecting_ac']);
     }
 
     public function test_build_defence_break_down_details_with_nothing_equipped(): void

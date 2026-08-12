@@ -10,6 +10,8 @@ import Sets from '../../character-inventory/sets/sets';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
 import UsableItems from '../../character-inventory/usable-items/usable-items';
+import CraftedItem from '../../crafted-item/crafted-item';
+import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
 import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetails from '../../map-actions/location-details/location-details';
@@ -59,6 +61,10 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
     component: ServerChatItem,
     props: {} as ServerChatItemProps,
+  },
+  [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: {
+    component: CraftedItem,
+    props: {} as CraftedItemProps,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: {
     component: LogEntrySidePeek,
