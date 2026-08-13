@@ -820,6 +820,13 @@ class BatchCraftingProcessorTest extends TestCase
 
     public function test_int_hard_stop_does_not_create_monitored_bug_report(): void
     {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function ($mock) {
+                $mock->shouldReceive('getDCCheck')->andReturn(1);
+                $mock->shouldReceive('characterRoll')->andReturn(400);
+            })
+        );
         $weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $character = $this->character->givePlayerLocation()->assignSkill($weaponCrafting, 5, false)->getCharacter();
         $character->skills->first(fn ($skill) => $skill->baseSkill->type === SkillTypeValue::ENCHANTING->value)->update(['level' => 10, 'xp' => 0, 'xp_max' => 100]);

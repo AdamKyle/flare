@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 
 import { useDirectionallyMoveCharacter } from './hooks/use-directionally-move-character';
 import { useFetchMovementTimeoutData } from './hooks/use-fetch-movement-timeout-data';
+import { useManageConjureButtonState } from './hooks/use-manage-conjure-button-state';
 import { useManageMapMovementErrorState } from './hooks/use-manage-map-movement-error-state';
 import { useManageMapSectionVisibility } from './hooks/use-manage-map-section-visibility';
 import { useManagePlayerKingdomManagementVisibility } from './hooks/use-manage-player-kingdom-management-visibility';
@@ -12,7 +13,9 @@ import { useManageViewLocationState } from './hooks/use-manage-view-location-sta
 import { MapMovementTypes } from './map-movement-types/map-movement-types';
 import { CharacterPosition } from '../../../../map-section/api/hooks/definitions/base-map-api-definition';
 import { useEmitCharacterPosition } from '../../../../map-section/hooks/use-emit-character-position';
+import { useOpenConjureSidePeek } from '../../../../map-section/hooks/use-open-conjure-side-peek';
 import { useOpenLocationInfoSidePeek } from '../../../../map-section/hooks/use-open-location-info-side-peek';
+import { useOpenSetSailSidePeek } from '../../../../map-section/hooks/use-open-set-sail-side-peek';
 import { UseOpenTeleportSidePeek } from '../../../../map-section/hooks/use-open-teleport-side-peek';
 import { UseOpenTraverseSidePeek } from '../../../../map-section/hooks/use-open-traverse-side-peek';
 import Map from '../../../../map-section/map';
@@ -40,6 +43,7 @@ const MapCard = () => {
   const { moveCharacterDirectionally } = useDirectionallyMoveCharacter();
   const { canMove, showTimerBar, lengthOfTime } = useFetchMovementTimeoutData();
   const { isSetSailEnabled } = useManageSetSailButtonState();
+  const { isConjureEnabled } = useManageConjureButtonState();
   const { gameData } = useGameData();
   const { openTeleport } = UseOpenTeleportSidePeek();
   const { errorMessage, resetErrorMessage } = useManageMapMovementErrorState();
@@ -50,6 +54,8 @@ const MapCard = () => {
   });
   const { openPlayerKingdoms } = useManagePlayerKingdomManagementVisibility();
   const { openTraverse } = UseOpenTraverseSidePeek();
+  const { openSetSail } = useOpenSetSailSidePeek();
+  const { openConjure } = useOpenConjureSidePeek();
 
   useEffect(() => {
     if (isNil(gameData)) {
@@ -97,6 +103,22 @@ const MapCard = () => {
     }
 
     openTraverse(gameData.character);
+  };
+
+  const handleOpenSetSailSidePeek = () => {
+    if (!gameData?.character) {
+      return;
+    }
+
+    openSetSail(gameData.character);
+  };
+
+  const handleOpenConjureSidePeek = () => {
+    if (!gameData?.character) {
+      return;
+    }
+
+    openConjure(gameData.character);
   };
 
   const renderTimerBar = () => {
@@ -200,7 +222,7 @@ const MapCard = () => {
           disabled={!canMove}
         />
         <Button
-          on_click={() => {}}
+          on_click={handleOpenSetSailSidePeek}
           label={'Set Sail'}
           variant={ButtonVariant.PRIMARY}
           disabled={isSetSailDisabled()}
@@ -212,9 +234,10 @@ const MapCard = () => {
           disabled={!canMove}
         />
         <Button
-          on_click={() => {}}
+          on_click={handleOpenConjureSidePeek}
           label={'Conjure'}
           variant={ButtonVariant.PRIMARY}
+          disabled={!isConjureEnabled}
         />
       </div>
       <div className="my-2 w-full p-2">

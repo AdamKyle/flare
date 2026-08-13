@@ -14,6 +14,8 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
     Route::get('/map/teleport-coordinates/{character}', ['uses' => 'Api\MapController@fetchTeleportCoordinates']);
 
+    Route::get('/map/set-sail-ports/{character}', ['uses' => 'Api\MapController@fetchSetSailPorts']);
+
     Route::get('/map/location-details/{location}', ['uses' => 'Api\MapController@getLocationInformation']);
 
     Route::get('/map/location-droppable-items/{location}', ['uses' => 'Api\MapController@getLocationDroppableQuestItems']);

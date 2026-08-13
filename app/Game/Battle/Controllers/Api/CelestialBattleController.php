@@ -16,6 +16,7 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\NpcMessageTypes;
+use App\Game\Monsters\Transformers\MonsterTransformer;
 use App\Game\Npcs\Values\NpcType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
@@ -30,24 +31,45 @@ class CelestialBattleController extends Controller
 
     private $celestialFightService;
 
-    public function __construct(ConjureService $conjureService, NpcServerMessageBuilder $npcServerMessageBuilder, CelestialFightService $celestialFightService)
-    {
+    public function __construct(
+        ConjureService $conjureService,
+        NpcServerMessageBuilder $npcServerMessageBuilder,
+        CelestialFightService $celestialFightService,
+        private readonly MonsterTransformer $monsterTransformer
+    ) {
         $this->conjureService = $conjureService;
         $this->npcServerMessage = $npcServerMessageBuilder;
         $this->celestialFightService = $celestialFightService;
     }
 
-    public function celestialMonsters(Character $character)
+    public function celestialMonsters(Character $character): JsonResponse
     {
-        $celestialBeings = Monster::select('name', 'gold_cost', 'gold_dust_cost', 'id')
-            ->where('is_celestial_entity', true)
-            ->whereNull('celestial_type')
-            ->where('game_map_id', $character->map->game_map_id)
+        $celestialBeings = Monster::conjurableOnMap($character->map->game_map_id)
             ->orderBy('max_level', 'asc')
-            ->get();
+            ->get(['id', 'name']);
 
         return response()->json([
             'celestial_monsters' => $celestialBeings,
+        ], 200);
+    }
+
+    public function celestialMonsterStats(Character $character, int $monsterId): JsonResponse
+    {
+        $monster = Monster::conjurableOnMap($character->map->game_map_id)
+            ->whereKey($monsterId)
+            ->first();
+
+        if (is_null($monster)) {
+            return response()->json([
+                'message' => 'Invalid celestial selection.',
+            ], 422);
+        }
+
+        $monsterData = $this->monsterTransformer->setIsMonsterSpecial(true)->transform($monster);
+
+        return response()->json([
+            'monster' => $monsterData,
+            'can_afford' => $this->conjureService->canAfford($monster, $character),
         ], 200);
     }
 
@@ -67,23 +89,39 @@ class CelestialBattleController extends Controller
             ], 422);
         }
 
-        $monster = Monster::find($request->monster_id);
+        $monster = Monster::conjurableOnMap($character->map->game_map_id)
+            ->whereKey($request->monster_id)
+            ->first();
 
-        if ($this->conjureService->canAfford($monster, $character)) {
-            $this->conjureService->handleCost($monster, $character);
+        if (is_null($monster)) {
+            return response()->json([
+                'message' => 'Invalid celestial selection.',
+            ], 422);
+        }
 
-            $this->conjureService->conjure($monster, $character, $request->type);
-        } else {
+        if (! $this->conjureService->canAfford($monster, $character)) {
             event(new ServerMessageEvent($character->user, $this->npcServerMessage->build(NpcMessageTypes::CANT_AFFORD_CONJURATION, $npc)));
 
-            return response()->json([], 200);
+            return response()->json([
+                'message' => 'You cannot afford to conjure this celestial.',
+            ], 422);
         }
+
+        $this->conjureService->handleCost($monster, $character);
+
+        $this->conjureService->conjure($monster, $character, $request->type);
 
         return response()->json([], 200);
     }
 
-    public function fetchCelestialFight(Character $character, CelestialFight $celestialFight)
+    public function fetchCelestialFight(Character $character, CelestialFight $celestialFight): JsonResponse
     {
+        if (! CelestialFight::accessibleToCharacter($character)->whereKey($celestialFight->id)->exists()) {
+            return response()->json([
+                'message' => 'Celestial fight not found.',
+            ], 404);
+        }
+
         if ($character->is_dead) {
             event(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
 
@@ -112,8 +150,14 @@ class CelestialBattleController extends Controller
         ], 200);
     }
 
-    public function attack(CelestialFightRequest $request, Character $character, CelestialFight $celestialFight)
+    public function attack(CelestialFightRequest $request, Character $character, CelestialFight $celestialFight): JsonResponse
     {
+        if (! CelestialFight::accessibleToCharacter($character)->whereKey($celestialFight->id)->exists()) {
+            return response()->json([
+                'message' => 'Celestial fight not found.',
+            ], 404);
+        }
+
         if ($character->is_dead) {
             event(new ServerMessageEvent($character->user, 'You are dead and cannot participate.'));
 

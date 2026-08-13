@@ -12,10 +12,14 @@ import UsableItemsProps from '../../character-inventory/usable-items/types/usabl
 import UsableItems from '../../character-inventory/usable-items/usable-items';
 import CraftedItem from '../../crafted-item/crafted-item';
 import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
+import Conjure from '../../map-actions/conjure/conjure';
+import ConjureProps from '../../map-actions/conjure/types/conjure-props';
 import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetails from '../../map-actions/location-details/location-details';
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
+import SetSail from '../../map-actions/set-sail/set-sail';
+import SetSailProps from '../../map-actions/set-sail/types/set-sail-props';
 import Teleport from '../../map-actions/teleport/teleport';
 import TeleportProps from '../../map-actions/teleport/types/teleport-props';
 import TraversePropsDefinition from '../../map-actions/traverse/definitions/traverse-props-definition';
@@ -57,6 +61,14 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: {
     component: Traverse,
     props: {} as TraversePropsDefinition,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_SET_SAIL]: {
+    component: SetSail,
+    props: {} as SetSailProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_CONJURE]: {
+    component: Conjure,
+    props: {} as ConjureProps,
   },
   [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
     component: ServerChatItem,

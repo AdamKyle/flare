@@ -22,7 +22,7 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 const MIN_MENU_HEIGHT = 200;
 const MAX_MENU_HEIGHT = 384;
 const VIEWPORT_MARGIN = 8;
-const FLOATING_Z_INDEX = 100000;
+const FLOATING_Z_INDEX = 100001;
 
 const filterDropdownItems = (
   items: DropdownItem[],

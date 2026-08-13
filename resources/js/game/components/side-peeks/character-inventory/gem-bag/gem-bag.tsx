@@ -1,4 +1,5 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -78,13 +79,17 @@ const GemBag = ({ character_id, initial_gem }: GemBagProps) => {
     );
   }
 
-  if (gemToView) {
+  const renderGemView = () => {
+    if (!gemToView) {
+      return null;
+    }
+
     return (
       <StackedCard on_close={handleCloseGemView}>
         <GemDetails gem={gemToView} />
       </StackedCard>
     );
-  }
+  };
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -98,6 +103,7 @@ const GemBag = ({ character_id, initial_gem }: GemBagProps) => {
           on_view_gem={handleViewGem}
         />
       </div>
+      <AnimatePresence mode="wait">{renderGemView()}</AnimatePresence>
     </div>
   );
 };

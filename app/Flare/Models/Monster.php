@@ -3,6 +3,7 @@
 namespace App\Flare\Models;
 
 use Database\Factories\MonsterFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -125,6 +126,14 @@ class Monster extends Model
     public function gameMap()
     {
         return $this->belongsTo(GameMap::class, 'game_map_id', 'id');
+    }
+
+    public function scopeConjurableOnMap(Builder $query, int $gameMapId): Builder
+    {
+        return $query
+            ->where('is_celestial_entity', true)
+            ->whereNull('celestial_type')
+            ->where('game_map_id', $gameMapId);
     }
 
     protected static function newFactory()

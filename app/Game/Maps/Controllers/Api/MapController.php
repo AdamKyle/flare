@@ -15,6 +15,7 @@ use App\Game\Maps\Requests\TeleportRequest;
 use App\Game\Maps\Requests\TraverseRequest;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
+use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\WalkingService;
@@ -31,7 +32,8 @@ class MapController extends Controller
         private readonly WalkingService $walkingService,
         private readonly SetSailService $setSail,
         private readonly DistanceCalculation $distanceCalculation,
-        private readonly LocationService $locationService
+        private readonly LocationService $locationService,
+        private readonly PortService $portService
     ) {
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
     }
@@ -90,6 +92,17 @@ class MapController extends Controller
     public function fetchTeleportCoordinates(Character $character): JsonResponse
     {
         return response()->json($this->locationService->getTeleportLocations($character));
+    }
+
+    public function fetchSetSailPorts(Character $character): JsonResponse
+    {
+        $portDetails = $this->portService->getPortDetails($character);
+
+        if (is_null($portDetails)) {
+            return response()->json(['message' => 'Invalid port location.'], 422);
+        }
+
+        return response()->json($portDetails);
     }
 
     public function getLocationInformation(Location $location): JsonResponse

@@ -15,11 +15,6 @@ class PortService
     private $distanceCalculator;
 
     /**
-     * @var array
-     */
-    private $portDetails = [];
-
-    /**
      * Constructor
      *
      * @return void
@@ -29,30 +24,42 @@ class PortService
         $this->distanceCalculator = $distanceCalculation;
     }
 
-    /**
-     * Get the port details
-     */
-    public function getPortDetails(Character $character, Location $location): array
+    public function getPortDetails(Character $character): ?array
     {
+        $currentPort = Location::where('x', $character->map->character_position_x)
+            ->where('y', $character->map->character_position_y)
+            ->where('is_port', true)
+            ->where('game_map_id', $character->map->game_map_id)
+            ->first();
 
-        $this->portDetails['current_port'] = $location->getAttributes();
+        if (is_null($currentPort)) {
+            return null;
+        }
 
-        $this->portDetails['port_list'] = $this->fetchOtherPorts($character, $location);
+        $portList = $this->fetchOtherPorts($character, $currentPort);
 
-        return $this->portDetails;
+        return [
+            'current_port' => [
+                'id' => $currentPort->id,
+                'name' => $currentPort->name,
+                'x' => $currentPort->x,
+                'y' => $currentPort->y,
+            ],
+            'port_list' => $portList->map(function (Location $portLocation) {
+                return [
+                    'id' => $portLocation->id,
+                    'name' => $portLocation->name,
+                    'x' => $portLocation->x,
+                    'y' => $portLocation->y,
+                    'distance' => $portLocation->distance,
+                    'time' => $portLocation->time,
+                    'cost' => $portLocation->cost,
+                    'can_afford' => $portLocation->can_afford,
+                ];
+            })->values()->all(),
+        ];
     }
 
-    /**
-     * Does the port match?
-     *
-     * First we need the other ports that don't match the current one.
-     *
-     * next we need to filter out the ports till we find the one that matches by id, based on
-     * where you are going to.
-     *
-     * Next we return a boolean based on if the timeout and the cost matches
-     * that of where you are going.
-     */
     public function doesMatch(Character $character, Location $from, Location $to, int $timeOut, int $cost): bool
     {
         $ports = $this->fetchOtherPorts($character, $from);
@@ -61,22 +68,11 @@ class PortService
             return $port->id === $to->id;
         })->first();
 
+        if (is_null($foundPort)) {
+            return false;
+        }
+
         return $foundPort->time === $timeOut && $foundPort->cost === $cost;
-    }
-
-    /**
-     * Set sail
-     */
-    public function setSail(Character $character, Location $newPort): Character
-    {
-        $character->map()->update([
-            'character_position_x' => $newPort->x,
-            'character_position_y' => $newPort->y,
-            'position_x' => $this->mapPositionValue->fetchXPosition($character->map->character_position_x, $character->map->position_x),
-            'position_y' => $this->mapPositionValue->fetchYPosition($character->map->character_position_y),
-        ]);
-
-        return $character->refresh();
     }
 
     /**

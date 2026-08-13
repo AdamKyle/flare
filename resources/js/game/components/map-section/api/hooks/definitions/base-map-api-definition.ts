@@ -20,4 +20,5 @@ export default interface BaseMapApiDefinition {
   enemy_kingdoms: CharacterKingdomsPositionDefinitions[];
   character_position: CharacterPosition;
   time_out_details: TimeOutDetails;
+  has_conjurable_celestials: boolean;
 }

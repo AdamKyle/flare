@@ -2,7 +2,9 @@
 
 namespace App\Flare\Models;
 
+use App\Game\Battle\Values\CelestialConjureType;
 use Database\Factories\CelestialFightFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -63,6 +65,17 @@ class CelestialFight extends Model
     public function gameMapName(): string
     {
         return $this->monster->gameMap->name;
+    }
+
+    public function scopeAccessibleToCharacter(Builder $query, Character $character): Builder
+    {
+        return $query->where(function (Builder $query) use ($character) {
+            $query->where('celestial_fights.type', CelestialConjureType::PUBLIC)
+                ->orWhere(function (Builder $query) use ($character) {
+                    $query->where('celestial_fights.type', CelestialConjureType::PRIVATE)
+                        ->where('celestial_fights.character_id', $character->id);
+                });
+        });
     }
 
     protected static function newFactory()

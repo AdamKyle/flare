@@ -18,6 +18,7 @@ import MapIcon from './types/map-icon';
 import MapProps from './types/map-props';
 import { useMovementTimer } from './websockets/hooks/use-movement-timer';
 import { useFetchMovementTimeoutData } from '../actions/partials/floating-cards/map-section/hooks/use-fetch-movement-timeout-data';
+import { useManageConjureButtonState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-conjure-button-state';
 import { useManageSetSailButtonState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-set-sail-button-state';
 import { useManageViewLocationState } from '../actions/partials/floating-cards/map-section/hooks/use-manage-view-location-state';
 import { useEmitMapRefresh } from '../side-peeks/map-actions/traverse/hooks/use-emit-map-refresh';
@@ -34,6 +35,7 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
   const { handleEventData } = useFetchMovementTimeoutData();
 
   const { manageSetSailButtonState } = useManageSetSailButtonState();
+  const { manageConjureButtonState } = useManageConjureButtonState();
   const { canViewLocationData } = useManageViewLocationState();
   const { shouldRefreshMap, emitShouldRefreshMap } = useEmitMapRefresh();
 
@@ -83,6 +85,15 @@ const Map = ({ additional_css, zoom = 1 }: MapProps) => {
   useMovementTimer({
     characterData,
   });
+
+  useEffect(() => {
+    if (isNil(data)) {
+      return;
+    }
+
+    manageConjureButtonState(data.has_conjurable_celestials);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   useEffect(() => {
     if (shouldRefreshMap) {

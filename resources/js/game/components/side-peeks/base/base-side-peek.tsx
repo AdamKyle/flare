@@ -1,7 +1,10 @@
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect } from 'react';
 
-import { useCloseSidePeekEmitter } from './hooks/use-close-side-peek-emitter';
+import { useEventSystem } from 'event-system/hooks/use-event-system';
+
+import { SidePeek as SidePeekEventType } from './event-types/side-peek';
+import { CloseSidePeekEventMap } from './event-map/side-peek-event-map';
 import { useDynamicComponentVisibility } from './hooks/use-manage-side-peek-visibility';
 
 import Button from 'ui/buttons/button';
@@ -9,22 +12,26 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import SidePeek from 'ui/side-peek/side-peek';
 
 const BaseSidePeek = () => {
+  const eventSystem = useEventSystem();
+
   const { ComponentToRender, componentProps, closeSidePeek } =
     useDynamicComponentVisibility();
 
-  const { shouldClose } = useCloseSidePeekEmitter();
+  useEffect(() => {
+    const emitter = eventSystem.fetchOrCreateEventEmitter<CloseSidePeekEventMap>(
+      SidePeekEventType.CLOSE_SIDE_PEEK
+    );
 
-  useEffect(
-    () => {
-      if (!shouldClose) {
-        return;
-      }
-
+    const handleCloseSidePeek = () => {
       closeSidePeek();
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [shouldClose]
-  );
+    };
+
+    emitter.on(SidePeekEventType.CLOSE_SIDE_PEEK, handleCloseSidePeek);
+
+    return () => {
+      emitter.off(SidePeekEventType.CLOSE_SIDE_PEEK, handleCloseSidePeek);
+    };
+  }, [eventSystem, closeSidePeek]);
 
   const handleSecondaryActionClick = () => {
     closeSidePeek();

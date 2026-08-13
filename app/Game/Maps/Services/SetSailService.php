@@ -66,7 +66,7 @@ class SetSailService extends BaseMovementService
             return $this->errorResult('Nice try. The details do not match.');
         }
 
-        $character = $this->moveCharacterToNewPort($character, $toPort);
+        $character = $this->moveCharacterToNewPort($character);
 
         if ($this->awakensCelestial()) {
             $this->conjureService->movementConjure($character);
@@ -74,13 +74,16 @@ class SetSailService extends BaseMovementService
 
         $this->movementService->giveLocationReward($character, $toPort);
 
-        if ($this->traversePlayer($toPort, $character)) {
-            return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+        $hasTraversed = $this->traversePlayer($toPort, $character);
+
+        if (! $hasTraversed) {
+            $this->updateMonstersList($character, $toPort);
         }
 
-        $this->updateMonstersList($character, $toPort);
-
-        return $this->successResult($this->movementService->accessLocationService()->getLocationData($character));
+        return $this->successResult([
+            'character_position_data' => $this->movementService->accessLocationService()->getCharacterPositionData($character->map),
+            'has_traversed' => $hasTraversed,
+        ]);
     }
 
     /**
@@ -107,16 +110,19 @@ class SetSailService extends BaseMovementService
             ->first();
     }
 
-    /**
-     * Move the character to the new port.
-     */
-    protected function moveCharacterToNewPort(Character $character, Location $location): Character
+    protected function moveCharacterToNewPort(Character $character): Character
     {
-        $character = $this->portService->setSail($character, $location);
+        $character = $this->updateCharacterMapPosition($character);
+
+        $character->update([
+            'gold' => $character->gold - $this->cost,
+        ]);
 
         $character = $character->refresh();
 
         event(new MoveTimeOutEvent($character, $this->timeout, true));
+
+        $character = $character->refresh();
 
         event(new UpdateCharacterBaseDetailsEvent($character));
 

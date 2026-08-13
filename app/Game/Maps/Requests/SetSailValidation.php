@@ -21,13 +21,13 @@ class SetSailValidation extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'x' => 'required',
-            'y' => 'required',
-            'cost' => 'required',
-            'timeout' => 'required',
+            'x' => 'required|integer',
+            'y' => 'required|integer',
+            'cost' => 'required|integer',
+            'timeout' => 'required|integer',
         ];
     }
 

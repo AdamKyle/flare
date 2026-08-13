@@ -13,10 +13,11 @@ use Tests\Traits\CreateGameMap;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateKingdom;
 use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
 
 class MapControllerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateKingdom, CreateLocation, RefreshDatabase;
+    use CreateGameMap, CreateItem, CreateKingdom, CreateLocation, CreateMonster, RefreshDatabase;
 
     protected function tearDown(): void
     {
@@ -42,10 +43,67 @@ class MapControllerTest extends TestCase
         $this->assertArrayHasKey('enemy_kingdoms', $data);
         $this->assertArrayHasKey('character_position', $data);
         $this->assertArrayHasKey('time_out_details', $data);
+        $this->assertArrayHasKey('has_conjurable_celestials', $data);
         $this->assertIsArray($data['character_kingdoms']);
         $this->assertIsArray($data['locations']);
         $this->assertIsArray($data['npc_kingdoms']);
         $this->assertIsArray($data['enemy_kingdoms']);
+        $this->assertIsBool($data['has_conjurable_celestials']);
+    }
+
+    public function test_map_information_has_conjurable_celestials_is_false_when_current_map_has_no_eligible_celestial(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => false,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/map/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertFalse($data['has_conjurable_celestials']);
+    }
+
+    public function test_map_information_has_conjurable_celestials_is_true_when_current_map_has_eligible_celestial(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $this->createMonster([
+            'game_map_id' => $character->map->game_map_id,
+            'is_celestial_entity' => true,
+            'celestial_type' => null,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/map/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertTrue($data['has_conjurable_celestials']);
+    }
+
+    public function test_map_information_has_conjurable_celestials_is_false_when_eligible_celestial_only_on_another_map(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+
+        $otherMap = $this->createGameMap(['name' => 'Other Map', 'path' => 'path']);
+
+        $this->createMonster([
+            'game_map_id' => $otherMap->id,
+            'is_celestial_entity' => true,
+            'celestial_type' => null,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/map/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertFalse($data['has_conjurable_celestials']);
     }
 
     public function test_map_information_returns_the_stored_tile_grid_unchanged(): void
@@ -280,6 +338,123 @@ class MapControllerTest extends TestCase
         $this->assertArrayHasKey('enemy_kingdoms', $data);
         $this->assertArrayHasKey('locations', $data);
         $this->assertArrayHasKey('coordinates', $data);
+    }
+
+    public function test_fetch_set_sail_ports_returns_condensed_current_port_and_destination_list(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation(16, 16)
+            ->updateCharacter(['gold' => 5000])
+            ->getCharacter();
+
+        $currentPort = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'name' => 'Current Port',
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+        ]);
+
+        $destinationPort = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'name' => 'Destination Port',
+            'x' => 80,
+            'y' => 16,
+            'is_port' => true,
+        ]);
+
+        $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'name' => 'Not A Port',
+            'x' => 50,
+            'y' => 50,
+            'is_port' => false,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/set-sail-ports/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertSame([
+            'id' => $currentPort->id,
+            'name' => 'Current Port',
+            'x' => 16,
+            'y' => 16,
+        ], $data['current_port']);
+
+        $this->assertCount(1, $data['port_list']);
+        $this->assertSame([
+            'id' => $destinationPort->id,
+            'name' => 'Destination Port',
+            'x' => 80,
+            'y' => 16,
+            'distance' => 64,
+            'time' => 1,
+            'cost' => 1000,
+            'can_afford' => true,
+        ], $data['port_list'][0]);
+        $this->assertFalse(collect($data['port_list'])->contains('id', $currentPort->id));
+    }
+
+    public function test_fetch_set_sail_ports_excludes_ports_on_a_different_map(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation(16, 16)
+            ->updateCharacter(['gold' => 5000])
+            ->getCharacter();
+
+        $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'name' => 'Current Port',
+            'x' => 16,
+            'y' => 16,
+            'is_port' => true,
+        ]);
+
+        $destinationPort = $this->createLocation([
+            'game_map_id' => $character->map->game_map_id,
+            'name' => 'Destination Port',
+            'x' => 80,
+            'y' => 16,
+            'is_port' => true,
+        ]);
+
+        $otherMap = $this->createGameMap(['name' => 'Other Map', 'path' => 'path']);
+
+        $otherMapPort = $this->createLocation([
+            'game_map_id' => $otherMap->id,
+            'name' => 'Other Map Port',
+            'x' => 80,
+            'y' => 16,
+            'is_port' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/set-sail-ports/'.$character->id);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertTrue(collect($data['port_list'])->contains('id', $destinationPort->id));
+        $this->assertFalse(collect($data['port_list'])->contains('id', $otherMapPort->id));
+    }
+
+    public function test_fetch_set_sail_ports_returns_422_when_character_is_not_standing_on_a_port(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation(16, 16)->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/map/set-sail-ports/'.$character->id);
+
+        $response->assertStatus(422);
+        $this->assertSame(
+            'Invalid port location.',
+            json_decode($response->getContent(), true)['message']
+        );
     }
 
     public function test_get_location_information_returns_wrapped_location_data(): void

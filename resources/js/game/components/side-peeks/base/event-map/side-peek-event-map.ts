@@ -4,3 +4,7 @@ import { SidePeekEventPayload } from '../payload/side-peek-event-payload';
 export type SidePeekEventMap = {
   [SidePeek.SIDE_PEEK]: SidePeekEventPayload;
 };
+
+export type CloseSidePeekEventMap = {
+  [SidePeek.CLOSE_SIDE_PEEK]: true;
+};

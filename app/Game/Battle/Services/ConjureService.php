@@ -89,7 +89,7 @@ class ConjureService
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build(NpcMessageTypes::LOCATION_OF_CONJURE, $npc, $celestialFight)));
 
         if ($type->isPublic()) {
-            event(new GlobalMessageEvent($monster->name.' has been conjured to the '.$plane.' plane.'));
+            event(new GlobalMessageEvent($monster->name.' has been conjured to the '.$plane.' plane at (X/Y): '.$x.'/'.$y.'.'));
         }
 
         event(new UpdateMap($character->user));

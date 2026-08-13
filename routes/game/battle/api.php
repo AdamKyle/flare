@@ -18,6 +18,7 @@ Route::middleware(['auth', 'is.character.who.they.say.they.are', 'throttle:150,2
         });
 
         Route::get('/celestial-beings/{character}', ['uses' => 'Api\CelestialBattleController@celestialMonsters']);
+        Route::get('/celestial-beings/{character}/{monsterId}', ['uses' => 'Api\CelestialBattleController@celestialMonsterStats']);
 
         Route::post('/celestial-revive/{character}', ['uses' => 'Api\CelestialBattleController@revive']);
     });

@@ -10,6 +10,7 @@ use App\Flare\Models\Item as ItemModel;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
 use App\Flare\Models\Map;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Raid;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
@@ -77,6 +78,7 @@ class LocationService
             'character_kingdoms' => $this->getKingdoms($character),
             'npc_kingdoms' => $this->getNpcKingdoms($character),
             'enemy_kingdoms' => $this->getCondensedEnemyKingdoms($character),
+            'has_conjurable_celestials' => Monster::conjurableOnMap($character->map->game_map_id)->exists(),
             //            'characters_on_map' => $this->getActiveUsersCountForMap($character),
             //            'lockedLocationType' => is_null($lockedLocation) ? null : $lockedLocation->type,
             //            'is_event_based' => $this->isEventBasedUpdate,
@@ -296,7 +298,7 @@ class LocationService
     private function getCelestialEntityId(Character $character): ?int
     {
 
-        $fight = CelestialFight::with('monster')->join('monsters', function ($join) use ($character) {
+        $fight = CelestialFight::with('monster')->accessibleToCharacter($character)->join('monsters', function ($join) use ($character) {
             $join->on('monsters.id', 'celestial_fights.monster_id')
                 ->where('celestial_fights.x_position', $character->map->character_position_x)
                 ->where('celestial_fights.y_position', $character->map->character_position_y)

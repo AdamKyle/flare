@@ -113,10 +113,10 @@ const MonsterBasicStatsSection = ({ monster }: MonsterSectionProps) => {
           {renderLabel(
             'Max Spell Damage',
             'Max Spell Damage',
-            'When the monster casts a spell during its attack phase, this percentage of its total damage is dealt as spell damage to you. Spell Evasion and Armour can reduce this damage.'
+            'When the monster casts a damage spell, this is the maximum spell damage it can deal before applicable character mitigation.'
           )}
         </Dt>
-        <Dd>{formatPercent(monster.spell_damage)}</Dd>
+        <Dd>{formatNumberWithCommas(monster.spell_damage)}</Dd>
       </>
     );
   };
@@ -132,10 +132,10 @@ const MonsterBasicStatsSection = ({ monster }: MonsterSectionProps) => {
           {renderLabel(
             'Max Affix Damage',
             'Max Affix Damage',
-            "One of the monster's damage components is affix damage. This percentage of its total damage is dealt as affix damage. Gear affixes can reduce this to 0, and Armour may also mitigate some or all of it."
+            'This is the maximum affix damage the monster can deal before applicable character mitigation.'
           )}
         </Dt>
-        <Dd>{formatPercent(monster.max_affix_damage)}</Dd>
+        <Dd>{formatNumberWithCommas(monster.max_affix_damage)}</Dd>
       </>
     );
   };
