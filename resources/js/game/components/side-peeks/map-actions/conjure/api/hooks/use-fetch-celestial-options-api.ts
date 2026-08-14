@@ -3,12 +3,13 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ConjureApiUrls } from '../enums/conjure-api-urls';
 import FetchCelestialOptionsResponseDefinition from '../definitions/fetch-celestial-options-response-definition';
+import { ConjureApiUrls } from '../enums/conjure-api-urls';
 import UseFetchCelestialOptionsApiDefinition from './definitions/use-fetch-celestial-options-api-definition';
 import UseFetchCelestialOptionsApiParams from './definitions/use-fetch-celestial-options-api-params';
 
-const UNABLE_TO_LOAD_CELESTIALS_MESSAGE = 'Unable to load conjurable celestials.';
+const UNABLE_TO_LOAD_CELESTIALS_MESSAGE =
+  'Unable to load conjurable celestials.';
 
 export const useFetchCelestialOptionsApi = (
   params: UseFetchCelestialOptionsApiParams

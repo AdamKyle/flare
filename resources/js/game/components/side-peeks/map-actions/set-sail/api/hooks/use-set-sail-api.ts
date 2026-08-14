@@ -3,14 +3,14 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { SetSailApiUrls } from '../enums/set-sail-api-urls';
+import { useEmitCharacterPosition } from '../../../../../map-section/hooks/use-emit-character-position';
+import { useCloseSidePeekEmitter } from '../../../../base/hooks/use-close-side-peek-emitter';
+import { useEmitMapRefresh } from '../../../traverse/hooks/use-emit-map-refresh';
 import SetSailRequestDefinition from '../definitions/set-sail-request-definition';
 import SetSailResponseDefinition from '../definitions/set-sail-response-definition';
+import { SetSailApiUrls } from '../enums/set-sail-api-urls';
 import UseSetSailApiDefinition from './definitions/use-set-sail-api-definition';
 import UseSetSailApiParams from './definitions/use-set-sail-api-params';
-import { useCloseSidePeekEmitter } from '../../../../base/hooks/use-close-side-peek-emitter';
-import { useEmitCharacterPosition } from '../../../../../map-section/hooks/use-emit-character-position';
-import { useEmitMapRefresh } from '../../../traverse/hooks/use-emit-map-refresh';
 
 const UNABLE_TO_SET_SAIL_MESSAGE = 'Unable to set sail.';
 

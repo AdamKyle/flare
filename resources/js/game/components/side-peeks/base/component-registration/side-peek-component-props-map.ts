@@ -1,10 +1,10 @@
 import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
 import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
 import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
-import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
 import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
+import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
 import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
 import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';

@@ -77,5 +77,4 @@ class FactionLoyaltyAutomationController
 
         return response()->json($result, $status);
     }
-
 }

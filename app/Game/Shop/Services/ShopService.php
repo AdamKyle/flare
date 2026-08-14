@@ -31,8 +31,7 @@ class ShopService
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly ItemTransformer $itemTransformer,
         private readonly Pagination $pagination
-    ) {
-    }
+    ) {}
 
     public function getItemsForShop(Character $character, ?string $type, ?string $searchText, ?string $sortCost = null, int $perPage = 10, int $page = 1): array
     {

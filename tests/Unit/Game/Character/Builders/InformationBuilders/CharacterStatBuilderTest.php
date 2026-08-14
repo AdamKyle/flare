@@ -2,6 +2,11 @@
 
 namespace Tests\Unit\Game\Character\Builders\InformationBuilders;
 
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder;
+use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Values\CharacterClass;
 use App\Game\Maps\Values\MapName;
@@ -90,7 +95,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $holyBuilder = $this->characterStatBuilder->setCharacter($character)->holyInfo();
 
-        $this->assertInstanceOf(\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilder::class, $holyBuilder);
+        $this->assertInstanceOf(HolyBuilder::class, $holyBuilder);
     }
 
     public function test_reduction_info_returns_reductions_builder(): void
@@ -99,7 +104,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $reductionsBuilder = $this->characterStatBuilder->setCharacter($character)->reductionInfo();
 
-        $this->assertInstanceOf(\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder::class, $reductionsBuilder);
+        $this->assertInstanceOf(ReductionsBuilder::class, $reductionsBuilder);
     }
 
     public function test_can_affixes_be_resisted_is_false_without_quest_items(): void
@@ -343,7 +348,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $defenceBuilder = $this->characterStatBuilder->setCharacter($character)->getDefenceBuilder();
 
-        $this->assertInstanceOf(\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder::class, $defenceBuilder);
+        $this->assertInstanceOf(DefenceBuilder::class, $defenceBuilder);
     }
 
     public function test_get_damage_builder_returns_damage_builder(): void
@@ -352,7 +357,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $damageBuilder = $this->characterStatBuilder->setCharacter($character)->getDamageBuilder();
 
-        $this->assertInstanceOf(\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder::class, $damageBuilder);
+        $this->assertInstanceOf(DamageBuilder::class, $damageBuilder);
     }
 
     public function test_get_healing_builder_returns_healing_builder(): void
@@ -361,7 +366,7 @@ class CharacterStatBuilderTest extends TestCase
 
         $healingBuilder = $this->characterStatBuilder->setCharacter($character)->getHealingBuilder();
 
-        $this->assertInstanceOf(\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HealingBuilder::class, $healingBuilder);
+        $this->assertInstanceOf(HealingBuilder::class, $healingBuilder);
     }
 
     public function test_build_defence_includes_item_skill_bonus_when_equipped_items_present(): void

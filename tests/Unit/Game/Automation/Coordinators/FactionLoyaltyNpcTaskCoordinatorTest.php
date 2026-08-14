@@ -3,7 +3,6 @@
 namespace Tests\Unit\Game\Automation\Coordinators;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Faction;
 use App\Flare\Models\FactionLoyalty as FactionLoyaltyModel;
 use App\Flare\Models\FactionLoyaltyAutomation;
 use App\Flare\Models\FactionLoyaltyNpc;

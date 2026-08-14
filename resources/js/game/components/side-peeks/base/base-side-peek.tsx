@@ -1,10 +1,9 @@
+import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { AnimatePresence } from 'framer-motion';
 import React, { useEffect } from 'react';
 
-import { useEventSystem } from 'event-system/hooks/use-event-system';
-
-import { SidePeek as SidePeekEventType } from './event-types/side-peek';
 import { CloseSidePeekEventMap } from './event-map/side-peek-event-map';
+import { SidePeek as SidePeekEventType } from './event-types/side-peek';
 import { useDynamicComponentVisibility } from './hooks/use-manage-side-peek-visibility';
 
 import Button from 'ui/buttons/button';
@@ -18,9 +17,10 @@ const BaseSidePeek = () => {
     useDynamicComponentVisibility();
 
   useEffect(() => {
-    const emitter = eventSystem.fetchOrCreateEventEmitter<CloseSidePeekEventMap>(
-      SidePeekEventType.CLOSE_SIDE_PEEK
-    );
+    const emitter =
+      eventSystem.fetchOrCreateEventEmitter<CloseSidePeekEventMap>(
+        SidePeekEventType.CLOSE_SIDE_PEEK
+      );
 
     const handleCloseSidePeek = () => {
       closeSidePeek();

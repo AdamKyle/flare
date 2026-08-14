@@ -3,8 +3,8 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ConjureApiUrls } from '../enums/conjure-api-urls';
 import CelestialStatsResponseDefinition from '../definitions/celestial-stats-response-definition';
+import { ConjureApiUrls } from '../enums/conjure-api-urls';
 import UseFetchCelestialStatsApiDefinition from './definitions/use-fetch-celestial-stats-api-definition';
 import UseFetchCelestialStatsApiParams from './definitions/use-fetch-celestial-stats-api-params';
 

@@ -2,15 +2,12 @@
 
 namespace Tests\Unit\Game\Automation\Jobs;
 
-use App\Flare\Models\Character;
 use App\Flare\Models\CharacterAutomation;
-use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\ExplorationWarning;
 use App\Flare\Models\Session;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Jobs\Exploration;
 use App\Game\Automation\Services\ExplorationCreatureCountCalculator;
-use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Handlers\FactionHandler;

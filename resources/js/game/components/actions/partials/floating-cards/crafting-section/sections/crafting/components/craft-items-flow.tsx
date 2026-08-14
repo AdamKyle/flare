@@ -31,10 +31,7 @@ const CraftItemsFlow = ({
       return;
     }
 
-    openCraftedInventoryItem(
-      result.characterId,
-      result.craftedInventorySlotId
-    );
+    openCraftedInventoryItem(result.characterId, result.craftedInventorySlotId);
   };
 
   const renderForm = (): ReactNode => {

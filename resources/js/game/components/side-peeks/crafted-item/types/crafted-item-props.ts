@@ -1,6 +1,6 @@
-import { CraftedItemKind } from '../enums/crafted-item-kind';
 import BaseGemDetails from '../../../../api-definitions/items/base-gem-details';
 import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
+import { CraftedItemKind } from '../enums/crafted-item-kind';
 
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 

@@ -22,8 +22,7 @@ class ShopController extends Controller
     public function __construct(
         private readonly ShopService $shopService,
         private readonly ComparisonService $comparisonService
-    ) {
-    }
+    ) {}
 
     public function fetchItemsForShop(PaginationRequest $request, Character $character): JsonResponse
     {
@@ -158,5 +157,4 @@ class ShopController extends Controller
             'message' => 'Purchased and equipped: '.$item->affix_name.'.',
         ]);
     }
-
 }

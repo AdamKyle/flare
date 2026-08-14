@@ -2,9 +2,9 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isEmpty, isNil } from 'lodash';
 import React, { useState } from 'react';
 
+import SetSailPortDefinition from './api/definitions/set-sail-port-definition';
 import { useFetchSetSailPortsApi } from './api/hooks/use-fetch-set-sail-ports-api';
 import { useSetSailApi } from './api/hooks/use-set-sail-api';
-import SetSailPortDefinition from './api/definitions/set-sail-port-definition';
 import PortLocationsDropDown from './partials/port-locations-drop-down';
 import SetSailSection from './partials/set-sail-section';
 import SetSailProps from './types/set-sail-props';
@@ -144,8 +144,7 @@ const SetSail = ({ character_data }: SetSailProps) => {
     <div className="bg-white p-4 text-gray-900 dark:bg-gray-800 dark:text-gray-100">
       <div className="text-sm text-gray-700 dark:text-gray-300">
         <span className="font-semibold">Current Port:</span>{' '}
-        {data.current_port.name} ({data.current_port.x} /{' '}
-        {data.current_port.y})
+        {data.current_port.name} ({data.current_port.x} / {data.current_port.y})
       </div>
 
       <Separator />

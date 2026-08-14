@@ -30,6 +30,7 @@ use App\Game\Skills\Services\EnchantingService;
 use App\Game\Skills\Services\SkillCheckService;
 use App\Game\Skills\Services\TrinketCraftingService;
 use App\Game\Skills\Values\SkillTypeValue;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
@@ -4180,7 +4181,7 @@ class BatchCraftingProcessorTest extends TestCase
         $this->instance(
             CraftingService::class,
             Mockery::mock(CraftingService::class, function ($mock) use (&$craftForBatchCalls, $craftableItem) {
-                $mock->makePartial()->shouldReceive('fetchCraftableItems')->andReturn(new \Illuminate\Database\Eloquent\Collection([$craftableItem]));
+                $mock->makePartial()->shouldReceive('fetchCraftableItems')->andReturn(new Collection([$craftableItem]));
                 $mock->makePartial()->shouldReceive('craftForBatch')->andReturnUsing(function ($character, $item, $craftingType, $suppress = false, $destinationCreator = null) use (&$craftForBatchCalls) {
                     $craftForBatchCalls++;
 

@@ -4,7 +4,6 @@ namespace Tests\Unit\Game\Character\CharacterAttack\Builders;
 
 use App\Game\Character\CharacterAttack\Builders\ClassAttackBuilder;
 use App\Game\Character\CharacterAttack\Values\ClassSpecialAttackType;
-use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;

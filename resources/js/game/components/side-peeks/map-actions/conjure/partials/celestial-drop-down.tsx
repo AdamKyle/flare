@@ -1,7 +1,7 @@
 import React from 'react';
 
-import CelestialOptionDefinition from '../api/definitions/celestial-option-definition';
 import CelestialDropDownProps from './types/celestial-drop-down-props';
+import CelestialOptionDefinition from '../api/definitions/celestial-option-definition';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';

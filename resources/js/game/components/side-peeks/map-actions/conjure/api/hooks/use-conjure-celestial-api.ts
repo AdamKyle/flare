@@ -3,8 +3,8 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ConjureApiUrls } from '../enums/conjure-api-urls';
 import ConjureCelestialRequestDefinition from '../definitions/conjure-celestial-request-definition';
+import { ConjureApiUrls } from '../enums/conjure-api-urls';
 import UseConjureCelestialApiDefinition from './definitions/use-conjure-celestial-api-definition';
 import UseConjureCelestialApiParams from './definitions/use-conjure-celestial-api-params';
 import { useCloseSidePeekEmitter } from '../../../../base/hooks/use-close-side-peek-emitter';
