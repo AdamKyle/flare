@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 
 import StepProps from 'ui/form-wizard/types/step-props';
 
@@ -16,7 +16,7 @@ const Step = ({ step_title, children }: StepProps) => {
       return null;
     }
 
-    return <div>{children as ReactNode}</div>;
+    return <div>{children}</div>;
   };
 
   return (

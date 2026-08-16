@@ -9,7 +9,7 @@ use App\Flare\Models\CharacterBattleRewardRequestStep;
 use App\Flare\Models\ExplorationLog;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
-use App\Game\Automation\Services\ExplorationLogService;
+use App\Game\Automation\Exploration\Services\ExplorationLogService;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepName;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardStepStatus;

@@ -66,17 +66,11 @@ If a third-party boundary forces unknown data, parse or narrow it before use.
 
 ## Type assertions
 
-Avoid type assertions when TypeScript can infer the type.
+Do not add forced type assertions in application/feature code to make an incompatible value compile. This includes `as string`, `as number`, `as SomeEnum`, non-null assertions, and especially double assertions such as `as unknown as Something`.
 
-Be careful with:
+Narrow unknown or broad values with runtime checks, discriminated unions, generic constraints, typed mappers, or an owning API definition. Fix the contract instead of asserting around it.
 
-```ts
-as unknown as Something
-```
-
-Only use this pattern at framework boundaries where the project already needs it, such as generic component registries, and keep it isolated.
-
-Do not use assertions to hide real contract mismatches.
+An existing assertion at an unavoidable framework/third-party bridge may remain only when the bridge is not being redesigned and the assertion is already isolated there. Do not spread that assertion into feature code. If touched bridge code can be made correctly generic without unrelated churn, remove the assertion.
 
 ## API definitions
 
@@ -224,9 +218,9 @@ Do not accidentally turn empty string into zero.
 
 Use clear parsing utilities or validation functions.
 
-Use `parseInt(value, 10)` when parsing integers.
+When an input must be a true integer, do not use `parseInt()` because values such as `1.5` or `12abc` can be silently truncated/accepted. Convert with `Number(value)` and then require `Number.isFinite(parsedValue)` and `Number.isInteger(parsedValue)`, plus the domain bounds.
 
-Check `Number.isNaN(parsedValue)`.
+Use `parseInt(value, 10)` only at an existing boundary where truncating/parsing an integer prefix is intentionally the established contract, such as specific bootstrapping metadata.
 
 ## Registry map typing
 
@@ -259,5 +253,11 @@ A TypeScript change is acceptable when:
 - props/hook definitions live in local definition files;
 - optional fields are truly optional;
 - null handling is explicit;
-- assertions are rare and justified;
+- no forced assertion hides an application contract mismatch;
 - derived values make component logic easier to read.
+
+## Closed frontend values
+
+When the backend exposes a closed enum/domain value, define the matching feature-owned frontend enum or typed constant map and explicitly map it to presentation text.
+
+Do not display closed backend values by generic string manipulation such as replacing underscores, title-casing arbitrary strings, or relying on backend `*_label` fields. Explicit mappings make missing cases visible during development.

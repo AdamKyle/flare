@@ -80,7 +80,6 @@ class CharacterSheetTransformerTest extends TestCase
         $this->assertArrayHasKey('can_craft', $data);
         $this->assertArrayHasKey('can_attack', $data);
         $this->assertArrayHasKey('is_automation_running', $data);
-        $this->assertArrayHasKey('is_batch_crafting_running', $data);
         $this->assertArrayHasKey('is_silenced', $data);
         $this->assertArrayHasKey('is_in_timeout', $data);
         $this->assertArrayHasKey('can_use_work_bench', $data);

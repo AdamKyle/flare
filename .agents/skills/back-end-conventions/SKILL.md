@@ -19,9 +19,10 @@ Before changing code, inspect the existing implementation, nearby files, related
 * Follow the Laravel way before inventing custom patterns.
 * Prefer existing project conventions over generic advice.
 * Use PHP 8.4-compatible code.
-* Keep changes minimal and scoped to the requested behavior.
+* Keep changes scoped to the requested behavior and directly related cleanup.
 * Do not rewrite unrelated code.
-* Do not rename or move files unless explicitly required.
+* Existing violations in touched code are not precedent. Apply `repository-code-quality-and-clean-as-you-go` and bring the touched area into compliance.
+* Do not rename or move files unless the behavior/structure being changed requires it.
 * Do not add new architecture unless the current code cannot support the change cleanly.
 * Do not create a new folder, provider, route file, service style, controller style, or request style when the target module already has an existing pattern.
 
@@ -40,13 +41,19 @@ Before changing code, inspect the existing implementation, nearby files, related
 * Never use single-letter variables.
 * Use camelCase for methods, variables, and properties.
 * Use PascalCase for class names, enums, traits, and interfaces.
-* Do not add `declare(strict_types=1);`.
-* Do not make classes `final`.
+* Do not add `declare(strict_types=1);`; remove it from a touched file.
+* Never make classes `final`; remove `final` from a touched class.
+* Never use manual scalar cast operators such as `(int)`, `(float)`, `(bool)`, `(string)`, `(array)`, or `(object)` without explicit user permission. Trace and fix the real type contract instead.
+* Eloquent `casts()` definitions remain valid and should be inspected before using model values. Do not manually re-cast values that the model/request/DTO already types.
 * Use constructor property promotion with `private readonly` for injected dependencies when appropriate.
 * Prefer small, focused methods with one clear responsibility.
 * Keep parameter lists short.
 * Avoid deeply nested conditionals.
-* Prefer clear early returns.
+* Structure PHP methods around guard clauses and early returns. Invalid, unavailable, failed, skipped, or no-op paths should exit as soon as their outcome is known so the successful path remains linear.
+* Do not add `elseif` ladders. When several branches represent guard/failure paths, use separate early-return `if` statements. When one closed value selects one result, prefer an enum-backed `match`. When branches represent distinct workflows, use the owning handler/orchestrator/polymorphic structure instead of growing a conditional ladder.
+* A simple `if`/`else` is acceptable only when both mutually exclusive branches are genuinely required and an early return would not make the method clearer.
+* Never use nested ternary expressions.
+* Prefer readable, explicit code over dense one-liners or clever abstractions.
 * Always use braces for `if`, `foreach`, `for`, `while`, and similar control structures.
 * Do not use one-line `if` statements.
 * Keep imports explicit.
@@ -54,18 +61,82 @@ Before changing code, inspect the existing implementation, nearby files, related
 * Remove unused imports when editing a file unless project tooling intentionally leaves them.
 * Keep methods small and focused; avoid deeply nested conditionals by returning early instead of nesting another branch.
 * Add a blank line between a setup/assignment block and the control-flow statement that follows it (`if`, `foreach`, `try`, `return`, etc.). Do not put an assignment line immediately followed by control flow with no blank line between them.
+* Add a blank line after a completed control-flow block before the next independent statement/block. Logical blocks must be visually separated; do not jam assignments, conditions, loops, returns, and subsequent work together.
 * Use a single space before the opening brace/parenthesis of `if`, `foreach`, `try`, and other control-flow keywords, matching existing formatting in the file.
 * Prefer `public` and `private` method/property visibility.
 * Do not add `protected` methods or properties unless there is a narrow, documented reason (for example, a random-number-generator extension point the project already relies on for test seams). Note the reason in a short comment or PR description when it is used.
 
+## No Debug Or Direct Output
+
+Production PHP and PHPUnit code must never use temporary or direct debug/output statements.
+
+Do not add or preserve in touched code:
+
+* `fwrite()` to STDOUT/STDERR;
+* `echo`;
+* `print`;
+* `print_r()`;
+* `var_dump()`;
+* `dump()`;
+* `dd()`;
+* `ray()`;
+* test-only `DEBUG_*` environment branches;
+* temporary timer/status diagnostics written to process output.
+
+Use assertions, exceptions, structured application logging that is part of real product behavior, PHPUnit diagnostic flags, and proper response/view mechanisms instead. Debug output is never an acceptable implementation or test seam.
+
+## Domain Types And Control Flow
+
+Finite domain concepts must be represented by an existing or new enum in the owning domain. Do not scatter raw string collections to model statuses, modes, types, outcomes, end reasons, dispositions, or other closed sets.
+
+Do not add code such as:
+
+* `in_array($status, ['failed', 'skipped', ...], true)` for a closed domain set;
+* loops over literal status/type strings to discover what an action/result represents;
+* dynamically constructed discriminator keys such as `$status.'_item'` or `$status.'_count'`;
+* repeated arrays of magic strings representing the same domain concept;
+* giant one-line conditions containing a closed list of literal domain values.
+
+Prefer:
+
+* backed enums;
+* typed enum parameters/properties;
+* `tryFrom()`/validated enum inputs at boundaries;
+* small semantic enum methods for classification when the classification belongs to the enum;
+* an enum-backed `match` for a short value mapping;
+* handlers/orchestrators when each enum case represents a distinct workflow.
+
+Do not infer an object's/action's type by probing which keys happen to exist in an associative array. The type/status should be explicit.
+
+When structured domain data crosses multiple methods/classes or has status-dependent fields, prefer a small typed value/result object with explicit properties over an associative-array pseudo-object. If legacy/API compatibility requires an old array shape, translate at the boundary rather than making internal code continue to infer meaning from dynamic keys.
+
+## ResponseBuilder Service Results
+
+Flare's existing operation-result convention is `App\Game\Core\Traits\ResponseBuilder`.
+
+When a service method represents an application operation that can succeed/fail and its result is consumed directly by an API controller, use `ResponseBuilder` when that matches the surrounding module pattern instead of inventing a new response envelope.
+
+The service owns the operation outcome and returns `successResult(...)` or `errorResult(...)` with the standard `status` field.
+
+The controller stays thin:
+
+* call the service;
+* read `$result['status']`;
+* remove `status` from the payload;
+* return `response()->json($result, $status)`.
+
+Do not duplicate service/business response construction inside the controller. Do not force query/list methods, transformers, or pure domain calculations through `ResponseBuilder` when they do not represent an API operation result.
+
 ## Comments And Docblocks
 
-* Do not add inline comments.
-* Do not add narrative comments.
-* Do not remove existing comments unless explicitly requested.
-* Add docblocks only when they match existing project style or are needed for complex array shapes/generics.
-* Do not add class-level docblocks unless the nearby project style requires them.
-* When adding a controller, request, service, command, job, event, listener, provider, or model method to an existing file, match the docblock style already used in that file.
+* Do not add inline comments that narrate obvious code.
+* Do not add narrative comments in method bodies.
+* Keep inline comments only when they explain a non-obvious domain constraint or integration requirement that cannot be made clear through naming and structure.
+* Every PHP application class method in a touched file must have a proper method docblock. Follow `back-end-method-documentation` exactly.
+* Constructors are the exception to descriptive method documentation: constructor docblocks contain only `@param` tags for their parameters and no summary/description text.
+* Non-constructor method docblocks must describe the method's responsibility and document parameters/return values as required by `back-end-method-documentation`.
+* Remove stale or incorrect docblocks in touched code and replace them with accurate documentation.
+* Do not add class-level narrative docblocks unless the class itself requires non-obvious contract documentation.
 
 ## App Game Module Structure
 
@@ -128,15 +199,18 @@ Controllers, requests, services, values, events, tests, factories, imports, and 
 * Prefer value objects, enums, and constants already present in the codebase over raw strings or magic numbers.
 * Do not add public setters/getters unless they are needed by the existing pattern.
 * Avoid large private methods that mix validation, persistence, side effects, and response building.
+* When a touched service coordinates distinct workflow phases and also implements every phase, extract the touched phase and its related rules into a focused module collaborator; keep orchestration visible.
+* Follow `code-structure-and-size` for large touched classes and methods.
 
 ## Dependency Injection
 
 * Do not use `resolve()`, `app()`, or container lookups inside production classes, services, handlers, jobs, commands, value objects, or domain code.
 * Dependencies must be injected through the constructor using constructor property promotion.
 * Constructor dependencies must use `private readonly ClassName $className` whenever possible.
-* If the class is manually bound in a module service provider, update that provider when adding constructor dependencies.
-* If the class is not manually bound and no relevant binding exists, create/register the binding in the appropriate module service provider.
-* Controllers must use constructor injection, but do not require service-provider binding updates solely for controller dependencies.
+* Concrete classes with resolvable concrete dependencies use Laravel's zero-configuration container resolution; do not add service-provider bindings solely because a concrete dependency was added.
+* If a class/interface is already manually bound, or the dependency requires an interface binding, contextual binding, lifecycle choice, primitive/config value, or other explicit container configuration, update the owning module provider or use an appropriate Laravel attribute only when that is the clearer established pattern.
+* Do not configure the same binding redundantly in both a provider and an attribute.
+* Controllers must use constructor injection.
 
 ## Providers
 
@@ -244,16 +318,19 @@ If model setup is needed in tests, the PHPUnit skill owns the test trait and tes
 
 ## Error Handling And Validation
 
-* Fail early when required state is missing.
+* Fail early when required domain state is missing.
 * Prefer explicit null checks when null is a valid possible state.
 * Do not hide invalid state behind broad catches.
-* Catch exceptions only when the code can handle them meaningfully.
-* Preserve existing exception behavior unless the requested change requires otherwise.
+* Application services do not intentionally throw or rethrow exceptions as part of their public contract. Follow `back-end-service-boundaries-and-failures`.
+* Expected service failures return the project's normal `ResponseBuilder` result or the service's established typed result.
+* Unexpected failures at a service boundary are logged/reported through the existing project error infrastructure, converted into the service's safe failure outcome, and returned; do not catch an exception, mutate state, and then rethrow it from the service.
+* Jobs/commands may let the framework own an exception only when the exception has not already been handled by a service and the framework retry/failure behavior is the intended contract.
 * Return Laravel JSON responses consistently from API controllers.
 * Keep validation messages and rules in Form Requests when applicable.
+* Do not repeat scalar-type validation downstream after a value has already crossed a validated/typed boundary. Follow `back-end-service-boundaries-and-failures`.
 * Backend logs and player-facing error messages must be specific about what happened, not generic strings like `Failed`.
-* Any unexpected/unhandled exception in a background or long-running process must be logged with full context (identifying ids, current state/progress, exception class, message, and stack trace) and must feed the existing monitored bug-report system so it is surfaced immediately, not only through later manual log review.
-* When a server exception is found, fix the root cause; keep exception logging and monitored bug-report creation as a safety net, not as a substitute for the fix.
+* Any unexpected failure in a background or long-running workflow must be logged with full context (identifying ids, current state/progress, exception class, message, and stack trace where available) and must feed the existing monitored bug-report system so it is surfaced immediately.
+* When a server exception is found, fix the root cause; logging/reporting is a safety net, not a substitute for the fix.
 * Do not leave raw SQL/database exception details as a player-facing message. Admin logs and bug reports get the raw exception; the player gets plain, direct language describing what happened.
 
 ## Diagnosing UI Bugs
@@ -274,14 +351,16 @@ If model setup is needed in tests, the PHPUnit skill owns the test trait and tes
 
 ## Refactoring Rules
 
-* Make the smallest safe change that solves the requested problem.
-* Preserve public APIs unless explicitly asked to change them.
+* Make the smallest coherent change that solves the requested problem and brings the touched area into skill compliance.
+* Preserve public APIs unless the requested behavior requires an intentional change.
 * Preserve existing behavior unless explicitly asked to change it.
-* Do not opportunistically rewrite legacy files.
-* When touching old untyped code, add types only to the changed method if safe and consistent.
+* Existing skill violations in touched code must be cleaned up; they are not protected legacy patterns.
+* Do not expand that cleanup into unrelated modules or repository-wide rewriting.
+* When touching old untyped code, type the changed path where the real contract can be proven.
 * Do not mass-format unrelated code.
 * Do not change unrelated whitespace.
 * Do not introduce new packages unless explicitly requested.
+* Run `back-end-laravel-simplification` after backend changes.
 
 ## Long-Running Process And Player-Facing Payload Conventions
 
@@ -319,6 +398,13 @@ These conventions apply to frontend TSX/React changes in this project's game cli
 * Links that open in a new tab must use `target="_blank"` and `rel="noopener noreferrer"`.
 * Panels must use shared status/tone styling components instead of hardcoding one-off status colors per panel.
 
+## PHP Attributes
+
+* Follow `back-end-php-attributes` whenever PHP attributes are added, consumed, reviewed, or changed.
+* An attribute must have a known framework or application consumer; do not add decorative/dead metadata.
+* Keep custom attribute classes small and typed; keep behavior in the consumer/domain services.
+* Do not scatter reflection across application code.
+
 ## Output Rules
 
 * Show full file code when asked for full code.
@@ -326,3 +412,31 @@ These conventions apply to frontend TSX/React changes in this project's game cli
 * Do not claim commands were run unless they were actually run.
 * If a command cannot be run, say exactly why.
 * Keep explanations focused on the code.
+
+## Backend and frontend responsibility boundary
+
+Game/API backends return domain facts, identifiers, enum values, authoritative validation, costs, counts, limits, status, and player-facing messages when the message itself is part of the game behavior.
+
+Do not build frontend control metadata in backend services or transformers when the frontend can map a closed domain value itself. Prohibited examples include dropdown `{value, label}` lists, humanized enum labels, `*_label` presentation fields, button text, screen names, icon names, CSS classes, or presentation-only state.
+
+Frontend code owns presentation labels for closed enum values. Backend enum `label()` methods must not be added solely to support game UI controls.
+
+Admin/reporting/chart endpoints may include explicit presentation labels only when that endpoint contract genuinely owns human-readable report output.
+
+## Laravel enum validation
+
+When a FormRequest validates a PHP backed enum, use Laravel's enum validation rule supported by this repository, such as `Rule::enum(EnumClass::class)`, instead of rebuilding enum values with `Enum::cases()`, `array_column()`, `array_map()`, or literal arrays.
+
+Do not duplicate a closed enum's legal values inside request validation.
+
+## Module migration ownership
+
+When feature ownership moves from one game module to another, keep ownership coherent. Controllers, requests, services, jobs, events, providers, route files, broadcast channel files, tests, and imports that belong to the migrated feature must end in the owning module required by the task.
+
+Do not leave a feature half-migrated across old and new modules unless the task explicitly defines a temporary split. Do not preserve an old module route/provider/channel solely because moving it is inconvenient.
+
+## Existing domain service stability
+
+A feature coordinator/orchestrator should glue together existing domain services. Do not modify Crafting, Enchanting, Alchemy, Inventory, Battle, or another owning-domain service just to create a convenience method for the new feature.
+
+If the requested behavior can be implemented by the existing public contract, use it as-is. If a required capability is genuinely missing, prove the gap by inspecting the owner, add the smallest domain-owned capability, and add focused tests in that domain. Do not leak feature-specific terminology into a general domain service.

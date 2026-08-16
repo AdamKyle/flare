@@ -1,6 +1,7 @@
 import { CraftingTypes } from '../enums/crafting-types';
 import ScreenRegistryDefinition from './definitions/screen-registry-definition';
 import AlchemySection from '../sections/alchemy/alchemy-section';
+import BatchCraftingSection from '../sections/batch-crafting/batch-crafting-section';
 import CraftingSection from '../sections/crafting/crafting-section';
 import EnchantingSection from '../sections/enchanting/enchanting-section';
 import GemCraftingSection from '../sections/gem-crafting/gem-crafting-section';
@@ -13,6 +14,7 @@ import WorkBenchSection from '../sections/work-bench/work-bench-section';
 
 export const ScreenMapper: ScreenRegistryDefinition['screens'] = {
   [CraftingTypes.HOME]: MenuSection,
+  [CraftingTypes.BATCH_CRAFTING]: BatchCraftingSection,
   [CraftingTypes.CRAFT]: CraftingSection,
   [CraftingTypes.ENCHANT]: EnchantingSection,
   [CraftingTypes.ALCHEMY]: AlchemySection,

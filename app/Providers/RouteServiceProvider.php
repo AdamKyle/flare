@@ -32,7 +32,9 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Custom Rate Limiters go here.
+     * Register the application's custom rate limiters.
+     *
+     * @return void
      */
     protected function configureRateLimiting()
     {
@@ -98,8 +100,10 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
         $this->mapCharacterSheetRoutes();
         $this->mapCharacterInventoryRoutes();
-        $this->mapAutomationApiRoutes();
-        $this->mapBatchCraftingApiRoutes();
+        $this->mapExplorationAutomationApiRoutes();
+        $this->mapDelveAutomationApiRoutes();
+        $this->mapFactionLoyaltyAutomationApiRoutes();
+        $this->mapBatchCraftingAutomationApiRoutes();
         $this->mapGameCoreApiRoutes();
         $this->mapGameMarketApiRoutes();
         $this->mapGameMessageApiRoutes();
@@ -134,9 +138,7 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
-     * Define the "api" routes for the application.
-     *
-     * These routes are typically stateless.
+     * Define the Game Core Gem routes.
      *
      * @return void
      */
@@ -148,6 +150,13 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/gems/api.php'));
     }
 
+    /**
+     * Define the "api" routes for the application.
+     *
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
     protected function mapApiRoutes()
     {
         Route::prefix('api')
@@ -156,6 +165,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/api.php'));
     }
 
+    /**
+     * Define the Monsters api routes.
+     *
+     * @return void
+     */
     protected function mapMonstersApiRoutes()
     {
         Route::prefix('api')
@@ -164,6 +178,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/monsters/api.php'));
     }
 
+    /**
+     * Define the Character Sheet api routes.
+     *
+     * @return void
+     */
     protected function mapCharacterSheetRoutes()
     {
         Route::prefix('api')
@@ -172,6 +191,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/character/character-sheet/api.php'));
     }
 
+    /**
+     * Define the Character Inventory api routes.
+     *
+     * @return void
+     */
     protected function mapCharacterInventoryRoutes()
     {
         Route::prefix('api')
@@ -180,22 +204,63 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/character/character-inventory/api.php'));
     }
 
-    protected function mapAutomationApiRoutes()
+    /**
+     * Define the Exploration automation api routes.
+     *
+     * @return void
+     */
+    protected function mapExplorationAutomationApiRoutes()
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\Automation\Controllers')
-            ->group(base_path('routes/game/automation/api.php'));
+            ->namespace('App\Game\Automation\Exploration\Controllers')
+            ->group(base_path('routes/game/automation/exploration/api.php'));
     }
 
-    protected function mapBatchCraftingApiRoutes()
+    /**
+     * Define the Delve automation api routes.
+     *
+     * @return void
+     */
+    protected function mapDelveAutomationApiRoutes()
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
-            ->namespace('App\Game\BatchCrafting\Controllers')
-            ->group(base_path('routes/game/batch-crafting/api.php'));
+            ->namespace('App\Game\Automation\Delve\Controllers')
+            ->group(base_path('routes/game/automation/delve/api.php'));
     }
 
+    /**
+     * Define the Faction Loyalty automation api routes.
+     *
+     * @return void
+     */
+    protected function mapFactionLoyaltyAutomationApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\Automation\FactionLoyalty\Controllers')
+            ->group(base_path('routes/game/automation/faction-loyalty/api.php'));
+    }
+
+    /**
+     * Define the Batch Crafting automation api routes.
+     *
+     * @return void
+     */
+    protected function mapBatchCraftingAutomationApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\Automation\BatchCrafting\Controllers')
+            ->group(base_path('routes/game/automation/batch-crafting/api.php'));
+    }
+
+    /**
+     * Define the Kingdoms api routes.
+     *
+     * @return void
+     */
     protected function mapGameKingdomApiRoutes()
     {
         Route::prefix('api')
@@ -204,6 +269,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/kingdoms/api.php'));
     }
 
+    /**
+     * Define the Skills api routes.
+     *
+     * @return void
+     */
     protected function mapGameSkillsApiRoutes()
     {
         Route::prefix('api')
@@ -212,6 +282,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/skills/api.php'));
     }
 
+    /**
+     * Define the Shop api routes.
+     *
+     * @return void
+     */
     protected function mapShopApiRoutes()
     {
         Route::prefix('api')
@@ -220,6 +295,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/shop/api.php'));
     }
 
+    /**
+     * Define the Admin web routes.
+     *
+     * @return void
+     */
     protected function mapAdminRoutes()
     {
         Route::middleware('web')
@@ -227,6 +307,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/admin/web.php'));
     }
 
+    /**
+     * Define the Admin api routes.
+     *
+     * @return void
+     */
     protected function mapAdminApiRoutes()
     {
         Route::prefix('api')
@@ -235,6 +320,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/admin/api.php'));
     }
 
+    /**
+     * Define the Game Core web routes.
+     *
+     * @return void
+     */
     protected function mapGameCoreRoutes()
     {
         Route::middleware('web')
@@ -242,6 +332,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/web.php'));
     }
 
+    /**
+     * Define the Market web routes.
+     *
+     * @return void
+     */
     protected function mapGameMarketRoutes()
     {
         Route::middleware('web')
@@ -249,6 +344,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/market-board/web.php'));
     }
 
+    /**
+     * Define the Quests web routes.
+     *
+     * @return void
+     */
     protected function mapQuestRoutes()
     {
         Route::middleware('web')
@@ -256,6 +356,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/quests/web.php'));
     }
 
+    /**
+     * Define the Guide Quests web routes.
+     *
+     * @return void
+     */
     protected function mapGuideQuestsRoutes()
     {
         Route::middleware('web')
@@ -263,6 +368,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/guide-quests/web.php'));
     }
 
+    /**
+     * Define the Character Passive Skills web routes.
+     *
+     * @return void
+     */
     protected function mapCharacterPassiveSkillsRoutes()
     {
         Route::middleware('web')
@@ -270,6 +380,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/passive-skills/web.php'));
     }
 
+    /**
+     * Define the Gambler api routes.
+     *
+     * @return void
+     */
     protected function mapGamblingRoutes()
     {
         Route::prefix('api')
@@ -278,6 +393,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/gambler/api.php'));
     }
 
+    /**
+     * Define the Game Core api routes.
+     *
+     * @return void
+     */
     protected function mapGameCoreApiRoutes()
     {
         Route::prefix('api')
@@ -286,6 +406,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/api.php'));
     }
 
+    /**
+     * Define the Messages api routes.
+     *
+     * @return void
+     */
     protected function mapGameMessageApiRoutes()
     {
         Route::prefix('api')
@@ -294,6 +419,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/messages/api.php'));
     }
 
+    /**
+     * Define the Battle api routes.
+     *
+     * @return void
+     */
     protected function mapGameBattleApiRoutes()
     {
         Route::prefix('api')
@@ -302,6 +432,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/battle/api.php'));
     }
 
+    /**
+     * Define the Maps api routes.
+     *
+     * @return void
+     */
     protected function mapGameMapApiRoutes()
     {
         Route::prefix('api')
@@ -310,6 +445,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/maps/api.php'));
     }
 
+    /**
+     * Define the Market api routes.
+     *
+     * @return void
+     */
     protected function mapGameMarketApiRoutes()
     {
         Route::prefix('api')
@@ -318,6 +458,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/market-board/api.php'));
     }
 
+    /**
+     * Define the Quests api routes.
+     *
+     * @return void
+     */
     protected function mapQuestApiRoutes()
     {
         Route::middleware(['web', 'update.player-activity'])
@@ -325,6 +470,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/quests/api.php'));
     }
 
+    /**
+     * Define the Passive Skills api routes.
+     *
+     * @return void
+     */
     protected function mapGamePassiveSkillApiRoutes()
     {
         Route::prefix('api')
@@ -333,6 +483,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/passive-skills/api.php'));
     }
 
+    /**
+     * Define the Guide Quests api routes.
+     *
+     * @return void
+     */
     protected function mapGameGuideQuestsApiRoutes()
     {
         Route::prefix('api')
@@ -341,6 +496,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/guide-quests/api.php'));
     }
 
+    /**
+     * Define the Specialty Shops api routes.
+     *
+     * @return void
+     */
     protected function mapSpecialtyShopApiRoutes()
     {
         Route::prefix('api')
@@ -349,6 +509,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/specialty-shops/api.php'));
     }
 
+    /**
+     * Define the Reincarnate api routes.
+     *
+     * @return void
+     */
     protected function mapReincarnateApiRoutes()
     {
         Route::prefix('api')
@@ -357,6 +522,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/reincarnate/api.php'));
     }
 
+    /**
+     * Define the Class Ranks api routes.
+     *
+     * @return void
+     */
     protected function mapClassRanksApiRoutes()
     {
         Route::prefix('api')
@@ -365,6 +535,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/class-ranks/api.php'));
     }
 
+    /**
+     * Define the Seer npc action api routes.
+     *
+     * @return void
+     */
     protected function mapSeerActions()
     {
         Route::prefix('api')
@@ -373,6 +548,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/npc-actions/seer-actions/api.php'));
     }
 
+    /**
+     * Define the Queen of Hearts npc action api routes.
+     *
+     * @return void
+     */
     protected function mapQueenOfHeartsActions()
     {
         Route::prefix('api')
@@ -381,6 +561,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/npc-actions/queen-of-hearts/api.php'));
     }
 
+    /**
+     * Define the Labyrinth Oracle npc action api routes.
+     *
+     * @return void
+     */
     protected function mapLabyrinthOracleRoutes()
     {
         Route::prefix('api')
@@ -389,6 +574,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/npc-actions/labyrinth-oracle/api.php'));
     }
 
+    /**
+     * Define the Work Bench npc action api routes.
+     *
+     * @return void
+     */
     protected function mapWorkBenchActions()
     {
         Route::prefix('api')
@@ -397,6 +587,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/npc-actions/work-bench/api.php'));
     }
 
+    /**
+     * Define the Events api routes.
+     *
+     * @return void
+     */
     protected function mapEvents()
     {
         Route::prefix('api')
@@ -405,6 +600,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/events/api.php'));
     }
 
+    /**
+     * Define the Faction Loyalty api routes.
+     *
+     * @return void
+     */
     protected function mapFactionLoyaltyApiRoutes()
     {
         Route::prefix('api')
@@ -413,6 +613,11 @@ class RouteServiceProvider extends ServiceProvider
             ->group(base_path('routes/game/factions/faction-loyalty/api.php'));
     }
 
+    /**
+     * Define the Tops api routes.
+     *
+     * @return void
+     */
     protected function mapTopsApiRoutes()
     {
         Route::prefix('api')

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import React, {
   Attributes,
   createContext,
@@ -200,12 +200,20 @@ const createScreenManager = <TMap extends ScreenMap>() => {
             key={entry.key}
             className="pointer-events-none absolute inset-0 z-0 opacity-0"
             aria-hidden
+            inert
           >
             {renderResolved(entry.name as never, entry.props as never)}
           </div>
         );
       });
     };
+
+    const reduceMotion = useReducedMotion();
+    const topRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      topRef.current?.focus();
+    }, [top?.key]);
 
     const renderTopScreen = () => {
       if (!top) {
@@ -215,11 +223,13 @@ const createScreenManager = <TMap extends ScreenMap>() => {
       return (
         <motion.div
           key={top.key}
-          className="relative z-10"
-          variants={slideVariants}
-          initial="hidden"
-          animate="enter"
-          exit="exit"
+          ref={topRef}
+          tabIndex={-1}
+          className="relative z-10 focus:outline-none"
+          variants={reduceMotion ? undefined : slideVariants}
+          initial={reduceMotion ? false : 'hidden'}
+          animate={reduceMotion ? undefined : 'enter'}
+          exit={reduceMotion ? undefined : 'exit'}
         >
           {renderResolved(top.name as never, top.props as never)}
         </motion.div>

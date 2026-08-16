@@ -135,3 +135,7 @@ When the task prohibits local PHPUnit execution:
 - Do not execute PHPUnit locally.
 - Do not execute the CI shell block locally.
 - Do not claim the workflow is proven until GitHub executes it.
+
+## Diagnostics Must Not Modify Code With Output Statements
+
+Diagnostic work must not add temporary `fwrite`, `echo`, `print`, `var_dump`, `dump`, `dd`, STDERR/STDOUT writes, or debug environment branches to application/test code. Use PHPUnit's diagnostic/event output and focused commands instead.

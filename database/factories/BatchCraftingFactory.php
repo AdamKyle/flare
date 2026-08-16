@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Flare\Models\BatchCrafting;
-use App\Game\BatchCrafting\Values\BatchCraftingDisposition;
-use App\Game\BatchCrafting\Values\BatchCraftingType;
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingDisposition;
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BatchCraftingFactory extends Factory

@@ -3,6 +3,7 @@ import React from 'react';
 import MenuSectionProps from './types/menu-section-props';
 import { CraftingTypes } from '../../enums/crafting-types';
 import { getLocationRestrictedCraftingAction } from '../../shared/utils/get-location-restricted-crafting-action';
+import { useBatchCraftingStatus } from '../batch-crafting/api/hooks/use-batch-crafting-status';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -18,6 +19,15 @@ const MenuSection = ({
 }: MenuSectionProps) => {
   const { gameData } = useGameData();
   const character = gameData?.character ?? null;
+
+  const { status: batchCraftingStatus } = useBatchCraftingStatus({
+    characterId: character?.id ?? 0,
+    userId: character?.user_id ?? 0,
+  });
+  const isBatchCraftingVisible = Boolean(
+    batchCraftingStatus?.active || batchCraftingStatus?.is_visible
+  );
+  const isBatchCraftingRunning = Boolean(batchCraftingStatus?.is_running);
 
   const isFactionLoyaltyAutomationRunning =
     character?.is_faction_loyalty_automation_running === true;
@@ -70,17 +80,26 @@ const MenuSection = ({
         </Alert>
       )}
       <Button
+        label="Batch Craft"
+        on_click={() => handleSelectCraftingType(CraftingTypes.BATCH_CRAFTING)}
+        variant={
+          isBatchCraftingVisible ? ButtonVariant.ACTIVE : ButtonVariant.SUCCESS
+        }
+        additional_css="w-full my-2"
+      />
+      <Button
         label="Craft"
         on_click={() => handleSelectCraftingType(CraftingTypes.CRAFT)}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full my-2"
-        disabled={isFactionLoyaltyAutomationRunning}
+        disabled={isFactionLoyaltyAutomationRunning || isBatchCraftingRunning}
       />
       <Button
         label="Enchant"
         on_click={() => handleSelectCraftingType(CraftingTypes.ENCHANT)}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full my-2"
+        disabled={isBatchCraftingRunning}
       />
       {character?.is_alchemy_locked !== true && (
         <Button
@@ -88,6 +107,7 @@ const MenuSection = ({
           on_click={() => handleSelectCraftingType(CraftingTypes.ALCHEMY)}
           variant={ButtonVariant.PRIMARY}
           additional_css="w-full my-2"
+          disabled={isBatchCraftingRunning}
         />
       )}
       <Button
@@ -95,12 +115,14 @@ const MenuSection = ({
         on_click={() => handleSelectCraftingType(CraftingTypes.TRINKETS)}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full my-2"
+        disabled={isBatchCraftingRunning}
       />
       <Button
         label="Gem Crafting"
         on_click={() => handleSelectCraftingType(CraftingTypes.GEM_CRAFTING)}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full my-2"
+        disabled={isBatchCraftingRunning}
       />
       {canAccessQueenOfHearts && (
         <Button
@@ -110,6 +132,7 @@ const MenuSection = ({
           }
           variant={ButtonVariant.PRIMARY}
           additional_css="w-full my-2"
+          disabled={isBatchCraftingRunning}
         />
       )}
       {canAccessSeerCamp && (
@@ -118,6 +141,7 @@ const MenuSection = ({
           on_click={() => handleSelectCraftingType(CraftingTypes.SEER_CAMP)}
           variant={ButtonVariant.PRIMARY}
           additional_css="w-full my-2"
+          disabled={isBatchCraftingRunning}
         />
       )}
       {canUseWorkBench && (
@@ -126,6 +150,7 @@ const MenuSection = ({
           on_click={() => handleSelectCraftingType(CraftingTypes.WORK_BENCH)}
           variant={ButtonVariant.PRIMARY}
           additional_css="w-full my-2"
+          disabled={isBatchCraftingRunning}
         />
       )}
       {canAccessLabyrinthOracle && (
@@ -136,6 +161,7 @@ const MenuSection = ({
           }
           variant={ButtonVariant.PRIMARY}
           additional_css="w-full my-2"
+          disabled={isBatchCraftingRunning}
         />
       )}
     </>

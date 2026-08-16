@@ -6,7 +6,8 @@ import { StateSetter } from '../../types/state-setter-type';
 export default interface PaginatedApiHandlerDefinition<
   T,
   F extends Record<string, unknown>,
-  R = PaginatedApiResponseDefinition<T[]>,
+  R extends PaginatedApiResponseDefinition<T[]> =
+    PaginatedApiResponseDefinition<T[]>,
 > {
   data: T[];
   error: AxiosErrorDefinition | null;
@@ -18,7 +19,7 @@ export default interface PaginatedApiHandlerDefinition<
   searchText: string;
   setPage: StateSetter<number>;
   setSearchText: StateSetter<string>;
-  setFilters: StateSetter<F>;
+  setFilters: StateSetter<Partial<F>>;
   onEndReached: () => void;
   setRefresh: StateSetter<boolean>;
 }

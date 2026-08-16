@@ -1,0 +1,176 @@
+<?php
+
+namespace Tests\Feature\Game\Automation\Exploration\Controllers\Api;
+
+use App\Flare\Models\Character;
+use App\Flare\Models\Monster;
+use App\Game\Automation\Values\AutomationType;
+use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Maps\Values\LocationType;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
+use Tests\Setup\Character\CharacterFactory;
+use Tests\Setup\Monster\MonsterFactory;
+use Tests\TestCase;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateLocation;
+
+class ExplorationControllerTest extends TestCase
+{
+    use CreateCharacterAutomation, CreateLocation, RefreshDatabase;
+
+    private ?Character $character;
+
+    private ?Monster $monster;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->monster = (new MonsterFactory)
+            ->buildMonster()
+            ->updateMonster([
+                'game_map_id' => $this->character->map->game_map_id,
+            ])
+            ->getMonster();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->character = null;
+        $this->monster = null;
+    }
+
+    public function test_begin_starts_exploration(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'auto_attack_length' => 1,
+                'move_down_the_list_every' => 10,
+                'selected_monster_id' => $this->monster->id,
+                'attack_type' => AttackType::ATTACK->value,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(
+            'Exploration has started. Check the exploration tab (beside server messages) for update. The tab will every 1 minutes, rewards are handed to you or disenchanted automatically.',
+            $jsonData['message']
+        );
+    }
+
+    public function test_stop_stops_exploration(): void
+    {
+        Event::fake();
+
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/stop', [
+                '_token' => csrf_token(),
+            ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function test_begin_returns422_when_attack_type_is_invalid(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'auto_attack_length' => 1,
+                'move_down_the_list_every' => 10,
+                'selected_monster_id' => $this->monster->id,
+                'attack_type' => 'invalid',
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('Invalid attack type was selected. Please select from the drop down.', $jsonData['message']);
+    }
+
+    public function test_begin_returns422_when_automation_is_already_running(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->createCharacterAutomation([
+            'character_id' => $this->character->id,
+            'monster_id' => $this->monster->id,
+            'type' => AutomationType::EXPLORING->value,
+            'started_at' => now(),
+            'completed_at' => now()->addSeconds(3),
+            'move_down_monster_list_every' => 10,
+            'previous_level' => $this->character->level,
+            'current_level' => $this->character->level,
+            'attack_type' => AttackType::ATTACK->value,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'auto_attack_length' => 1,
+                'move_down_the_list_every' => 10,
+                'selected_monster_id' => $this->monster->id,
+                'attack_type' => AttackType::ATTACK->value,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('You cannot do that while Exploration automation is running. Cancel it first.', $jsonData['message']);
+    }
+
+    public function test_begin_returns422_when_character_is_on_blocked_location(): void
+    {
+        Queue::fake();
+        Event::fake();
+
+        $this->createLocation([
+            'x' => $this->character->map->character_position_x,
+            'y' => $this->character->map->character_position_y,
+            'game_map_id' => $this->character->map->game_map_id,
+            'type' => LocationType::UNDERWATER_CAVES->value,
+        ]);
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/automation/'.$this->character->id.'/start', [
+                '_token' => csrf_token(),
+                'auto_attack_length' => 1,
+                'move_down_the_list_every' => 10,
+                'selected_monster_id' => $this->monster->id,
+                'attack_type' => AttackType::ATTACK->value,
+            ]);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $this->assertEquals(422, $response->getStatusCode());
+        $this->assertEquals('This place is far too special for you to be able to explore. Manual fighting is only allowed here child.', $jsonData['message']);
+    }
+}

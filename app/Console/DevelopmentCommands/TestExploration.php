@@ -8,7 +8,7 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\Monster;
 use App\Flare\Models\User;
-use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Automation\Exploration\Services\ExplorationAutomationService;
 use App\Game\Character\CharacterCreation\Pipeline\CharacterCreationPipeline;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Exception;

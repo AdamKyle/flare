@@ -1,6 +1,6 @@
 ---
 name: front-end-project-layout-and-command-rules
-description: Use before Flare frontend work to understand repository layout, mirrored skill rules, package scripts, allowed validation commands, and frontend boundaries.
+description: Use before Flare frontend work to enforce repository layout, import aliases, package scripts, validation commands, dependency restrictions, and frontend boundaries.
 ---
 
 # Flare Frontend Project Layout and Command Rules
@@ -34,21 +34,6 @@ resources/js/game/game-launcher.tsx
 ```
 
 The frontend build tool is Vite. The frontend package manager is Yarn. The package scripts are defined in `package.json` at the repository root.
-
-## Mirrored skill rule
-
-The project uses both Claude skills and agent skills.
-
-Every frontend skill must exist in both folders with the exact same content:
-
-```text
-.claude/skills/<skill-name>/SKILL.md
-.agents/skills/<skill-name>/SKILL.md
-```
-
-Do not update one skill tree without updating the other.
-
-Do not put shared skill fragments outside `SKILL.md`. Each skill must be self-contained.
 
 ## Frontend source map
 
@@ -100,34 +85,34 @@ Use these boundaries:
 
 ## Import rules
 
-The project uses TypeScript path aliases from `tsconfig.json`.
-
-Use aliases for cross-folder imports:
+The canonical Vite aliases are:
 
 ```text
 configuration/*
 event-system/*
+api-handler/*
 game-data/*
 game-utils/*
-api-handler/*
+components/*
 ui/*
 service-container/*
 service-container-provider/*
-websockets
 screen-manager/*
 ```
 
-Use relative imports for files inside the same local feature/component folder.
+When an import crosses into one of these aliased roots, use the alias. Do not write deep relative imports such as `../../../ui/...` or `../../../../api-handler/...` to reach an aliased root.
 
-Do not replace clear aliases with brittle deep relative imports.
+Use relative imports only for files within the same local feature/component area when no configured alias is crossed.
 
-Do not add a new alias unless the task explicitly requires it and both TypeScript and ESLint configuration are updated together.
+Vite, TypeScript, and ESLint resolution must agree for aliases used by touched code. If the current configurations disagree, align them as part of the touched frontend work rather than introducing an import workaround.
 
-## Package scripts
+Do not invent a new alias without explicit user instruction.
 
-Use the existing package scripts:
+## Package scripts and mandatory validation
 
-```bash
+The repository defines these relevant scripts in `package.json`:
+
+```text
 yarn cleanup
 yarn lint
 yarn type-check
@@ -136,59 +121,29 @@ yarn build:dev
 yarn unused-files-check
 ```
 
-Meanings:
-
-- `yarn cleanup`: runs Prettier and ESLint fix over `resources/js/**/*.{ts,tsx}`.
-- `yarn lint`: runs ESLint over `resources/js/**/*.{ts,tsx}`.
-- `yarn type-check`: runs `tsc --noEmit --skipLibCheck`.
-- `yarn build`: production Vite build.
-- `yarn build:dev`: development Vite build.
-- `yarn unused-files-check`: runs `unimported`.
-
-There is no frontend test script in `package.json`. Do not claim frontend tests ran unless a real test command is added or provided by the user.
-
-## Validation order
-
-For frontend-only work, prefer this order:
+After code changes are complete, always run and require success from:
 
 ```bash
-yarn cleanup
-yarn lint
-yarn type-check
+yarn lint && yarn type-check && yarn cleanup && yarn unused-files-check && ./vendor/bin/pint
+```
+
+For frontend implementation work, also run:
+
+```bash
 yarn build:dev
 ```
 
-Run `yarn unused-files-check` when files are moved, deleted, renamed, or when import cleanup matters.
+Treat ESLint warnings in changed code as violations even when the process exits zero. Do not add rule suppressions to make the output appear clean.
 
-Run `yarn build` when the change could affect production build behavior.
-
-Do not run dependency installation commands unless the user explicitly asks for dependency changes.
-
-Do not use `npm`, `pnpm`, or `bun` in this repo.
+There is no frontend test script in `package.json`. Do not claim frontend tests ran unless a real test command is added or explicitly provided.
 
 ## Dependency rule
 
-Do not add, remove, upgrade, or lock frontend dependencies unless the user explicitly asks for dependency work.
+Do not install, add, remove, upgrade, downgrade, or replace dependencies without explicit user instruction.
 
-Before adding a dependency, check whether the project already has a suitable package:
+Do not run `npm`, `pnpm`, or `bun` for this repository. Yarn is the frontend package manager.
 
-- React 19
-- Vite 6
-- TypeScript
-- Tailwind CSS v4
-- `clsx`
-- `framer-motion`
-- `@headlessui/react`
-- `axios`
-- `laravel-echo`
-- `pusher-js`
-- `tsyringe`
-- `ts-pattern`
-- `react-markdown`
-- `lexical`
-- `recharts`
-- Font Awesome classes in Blade/UI code
-- `rpg-awesome` icons
+Before any explicitly authorized dependency change, inspect `package.json` and existing project abstractions first.
 
 ## Frontend change boundaries
 
@@ -208,5 +163,8 @@ Before finishing frontend work, verify:
 - mobile-first layout is preserved;
 - light and dark mode both work;
 - accessibility and screen-reader behavior were considered;
-- package scripts were run or clearly listed as not run;
-- `.claude/skills` and `.agents/skills` remain mirrored when skill files changed.
+- all mandatory quality gates completed successfully, or the exact factual blocker was reported;
+
+## Repository metadata boundary
+
+Frontend application work must not modify IDE/workspace/assistant metadata such as `.idea/**`, `.vscode/**`, or assistant task-state files. Those files are unrelated to application behavior unless explicitly requested.

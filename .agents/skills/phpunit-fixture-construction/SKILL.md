@@ -123,7 +123,9 @@ Do not assume an apparently unrelated component is unnecessary.
 
 `setUp()` runs before every test. It does not reuse one database character across the test class and is not itself a runtime optimization.
 
-Shared setup may be moved into `setUp()` only when:
+Shared setup belongs in `setUp()` when every test in the class requires the exact same baseline. Do not repeat that baseline in every test.
+
+Use `setUp()` only when:
 
 - Every test in that class requires the exact same baseline.
 - The setup is small and clear.
@@ -149,6 +151,10 @@ Do not put the following in `setUp()`:
 - Hidden behavior that makes individual tests difficult to understand.
 
 Scenario-specific setup remains in its test method, but must use traits or domain setup factories.
+
+## Lifecycle cleanup
+
+When the existing project pattern stores shared objects in class properties and tears them down explicitly, set those properties to `null` in `tearDown()` after calling the appropriate parent lifecycle method. Follow the exact nearby repository lifecycle pattern; do not invent cleanup for transactional database records.
 
 ## Test Helpers
 

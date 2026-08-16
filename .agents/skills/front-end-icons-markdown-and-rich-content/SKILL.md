@@ -129,3 +129,11 @@ An icon/rich-content change is acceptable when:
 - mobile overflow is handled;
 - user-generated content is not rendered unsafely;
 - shared editor components remain generic.
+
+## Icon-control fidelity
+
+When the task/design specifies an icon-based control, implement an actual icon control using the project's existing icon-button/button pattern. Do not substitute visible text such as `Previous` or `Next` merely because it is easier.
+
+Use the existing Font Awesome/RPG Awesome classes already present in the repository. The icon is decorative inside the button and uses `aria-hidden="true"`; the button itself receives the accessible name through the existing IconButton contract or `aria-label`.
+
+Do not create a second icon-button abstraction when the existing shared one supports the required behavior.

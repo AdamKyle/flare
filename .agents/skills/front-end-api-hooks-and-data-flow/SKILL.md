@@ -276,3 +276,27 @@ An API change is acceptable when:
 - 401/session behavior is handled consistently;
 - paginated endpoints use the paginated hook where appropriate;
 - backend payload field names remain faithful to the API contract.
+
+## Cancellation and stale-response safety
+
+Every Axios request path created or materially changed in a hook must have explicit lifecycle safety.
+
+For reads/search/pagination/preview/status requests:
+
+- own an `AbortController` for the active request;
+- pass its `signal` through the existing API handler;
+- abort superseded requests;
+- abort on unmount;
+- ignore intentional Axios cancellation as a user-facing error;
+- prevent stale responses from replacing newer data;
+- prevent an older request's `finally` block from clearing the loading state of a newer request.
+
+When a hook can issue overlapping requests, use request generation and/or controller identity so only the active request may update data, error, response, and loading state.
+
+For mutations, prevent duplicate submissions and abort the browser request on lifecycle cleanup where appropriate. Never treat a client-side abort as proof that the server-side mutation was rolled back.
+
+## No swallowed failures
+
+Do not swallow real API failures with an empty `.catch(() => {})`, fire-and-forget error loss, or console output.
+
+A hook that owns a request must own its error state or deliberately return/rethrow the error to an established caller. Components should receive a useful error through the hook contract when the failure affects the user's next action.

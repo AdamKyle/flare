@@ -5,7 +5,7 @@ namespace App\Game\Battle\Handlers;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Monster;
-use App\Game\BatchCrafting\Services\BatchCraftingService;
+use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
 use App\Game\Battle\Events\AttackTimeOutEvent;
 use App\Game\Battle\Events\CharacterRevive;
 use App\Game\Battle\Events\UpdateCharacterStatus;
@@ -24,7 +24,7 @@ class BattleEventHandler
     public function __construct(
         private BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager,
         private WeeklyBattleService $weeklyBattleService,
-        private BatchCraftingService $batchCraftingService,
+        private BatchCraftingAutomationService $batchCraftingAutomationService,
     ) {}
 
     /**
@@ -42,7 +42,7 @@ class BattleEventHandler
 
         $character = $character->refresh();
 
-        $this->batchCraftingService->completeForDeath($character);
+        $this->batchCraftingAutomationService->completeForDeath($character);
 
         if (! is_null($monster)) {
 

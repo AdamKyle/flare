@@ -4,4 +4,5 @@ export default interface CraftingSectionScreenProps {
   setActiveCraftingType: (type: CraftingTypes) => void;
   locationRestrictionWarning?: string | null;
   clearLocationRestrictionWarning?: () => void;
+  registerBackHandler?: (handler: (() => void) | null) => void;
 }

@@ -2,7 +2,6 @@
 
 namespace App\Game\Character\CharacterSheet\Transformers;
 
-use App\Flare\Models\BatchCrafting;
 use App\Flare\Models\Character;
 use App\Flare\Models\DelveExploration;
 use App\Flare\Models\FactionLoyalty;
@@ -11,8 +10,6 @@ use App\Flare\Models\GameClass;
 use App\Flare\Models\Item;
 use App\Flare\Transformers\BaseTransformer;
 use App\Game\Automation\Values\AutomationType;
-use App\Game\BatchCrafting\Services\BatchCraftingService;
-use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Battle\Services\AttackTimerService;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Builders\ClassAttackBuilder;
@@ -49,7 +46,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         $gameClass = GameClass::find($character->game_class_id);
         $factionLoyalty = $character->factionLoyalties()->where('is_pledged', '=', true)->first();
         $factionLoyaltyWarningNotices = $this->getFactionLoyaltyWarningNotices($character);
-        $activeBatchCrafting = $this->activeBatchCrafting($character);
         $locationBasedCraftingOptions = LocationBasedCraftingOptions::fromCharacter($character);
 
         return [
@@ -64,8 +60,8 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
             'damage_stat' => $character->class->damage_stat,
             'level' => $character->level,
             'max_level' => $this->getMaxLevel($character),
-            'xp' => (int) $character->xp,
-            'xp_next' => (int) $character->xp_next,
+            'xp' => $character->xp,
+            'xp_next' => $character->xp_next,
             'str_modded' => $characterStatBuilder->statMod('str'),
             'dur_modded' => $characterStatBuilder->statMod('dur'),
             'dex_modded' => $characterStatBuilder->statMod('dex'),
@@ -106,11 +102,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
                 ->where('completed_at', '>', now())
                 ->exists(),
             'is_delve_visible' => $this->isDelveVisible($character),
-            'is_batch_crafting_running' => ! is_null($activeBatchCrafting),
-            'is_batch_crafting_visible' => $this->visibleBatchCrafting($character),
-            'batch_crafting_time_out' => $this->batchCraftingTimeOutSeconds($activeBatchCrafting),
-            'is_batch_crafting_experience_mode' => $this->isBatchCraftingExperienceMode($activeBatchCrafting),
-            'is_batch_crafting_retry_mode' => $this->isBatchCraftingRetryMode($activeBatchCrafting),
             'can_set_delve_pack' => $this->canSetPactOptionsForDelve($character),
             'active_automation' => $this->activeAutomation($character),
             'automation_completed_at' => $this->getTimeLeftOnAutomation($character),
@@ -219,96 +210,6 @@ class CharacterSheetBaseInfoTransformer extends BaseTransformer
         }
 
         return now()->diffInSeconds($timestamp, false);
-    }
-
-    private function batchCraftingTimeOutSeconds(?BatchCrafting $batchCrafting): int
-    {
-        if (is_null($batchCrafting)) {
-            return 0;
-        }
-
-        $type = BatchCraftingType::from($batchCrafting->batch_type);
-        $progress = $batchCrafting->progress ?? [];
-
-        if ($type->usesEightHourTimer($progress)) {
-            return max(0, now()->diffInSeconds($batchCrafting->ends_at, false));
-        }
-
-        if (($progress['continuation_state'] ?? null) === 'processing') {
-            return 0;
-        }
-
-        $nextAttemptAt = $progress['next_attempt_at'] ?? null;
-
-        if (! is_string($nextAttemptAt) || $nextAttemptAt === '') {
-            return 0;
-        }
-
-        try {
-            $pendingUntil = Carbon::parse($nextAttemptAt);
-        } catch (\Throwable) {
-            return 0;
-        }
-
-        return max(0, now()->diffInSeconds($pendingUntil, false));
-    }
-
-    private function isBatchCraftingExperienceMode(?BatchCrafting $batchCrafting): bool
-    {
-        if (is_null($batchCrafting)) {
-            return false;
-        }
-
-        $type = BatchCraftingType::from($batchCrafting->batch_type);
-
-        return $type->isExperienceMode($batchCrafting->progress ?? []);
-    }
-
-    private function isBatchCraftingRetryMode(?BatchCrafting $batchCrafting): bool
-    {
-        if (is_null($batchCrafting)) {
-            return false;
-        }
-
-        $progress = $batchCrafting->progress ?? [];
-        $tickDelay = (int) ($progress['tick_delay_seconds'] ?? BatchCraftingService::RECURRING_DELAY_SECONDS);
-
-        return $tickDelay < BatchCraftingService::RECURRING_DELAY_SECONDS;
-    }
-
-    private function activeBatchCrafting(Character $character): ?BatchCrafting
-    {
-        $activeId = BatchCrafting::where('character_id', $character->id)
-            ->whereNull('completed_at')
-            ->whereNull('cancelled_at')
-            ->max('id');
-
-        if (is_null($activeId)) {
-            return null;
-        }
-
-        return BatchCrafting::select(['id', 'character_id', 'batch_type', 'progress', 'started_at', 'ends_at'])
-            ->find($activeId);
-    }
-
-    private function visibleBatchCrafting(Character $character): bool
-    {
-        $hasActiveBatchCrafting = BatchCrafting::where('character_id', $character->id)
-            ->whereNull('completed_at')
-            ->whereNull('cancelled_at')
-            ->exists();
-
-        if ($hasActiveBatchCrafting) {
-            return true;
-        }
-
-        return BatchCrafting::where('character_id', $character->id)
-            ->whereNull('panel_dismissed_at')
-            ->where(function ($query) {
-                $query->whereNotNull('completed_at')
-                    ->orWhereNotNull('cancelled_at');
-            })
-            ->exists();
     }
 
     private function isDelveVisible(Character $character): bool

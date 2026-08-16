@@ -9,6 +9,8 @@ Use this skill for all Tailwind styling in Flare.
 
 ## Theme source
 
+Before selecting or changing project/custom colors, inspect `resources/css/tailwind.css`. Use existing theme tokens and the appropriate light/dark variants. Do not invent raw colors or a new palette when the prompt references an existing project color.
+
 Inspect and use:
 
 ```text

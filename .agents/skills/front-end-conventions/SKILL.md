@@ -5,7 +5,7 @@ description: Use for any Flare frontend code change to apply the global React, T
 
 # Flare Frontend Conventions
 
-Use this skill for all frontend work in Flare.
+Use this skill for all frontend work in Flare. Also apply `repository-code-quality-and-clean-as-you-go`.
 
 ## Source of truth
 
@@ -50,6 +50,32 @@ Do not use `frontend/src`. That belongs to other projects, not Flare.
 - Echo/Reverb subscriptions use the websocket provider/hooks.
 - Global character/monster/announcement state belongs in `GameDataProvider` only when truly global.
 - Do not set state or start listeners during render.
+- Existing frontend violations in touched code must be cleaned up; do not copy them as precedent.
+- All React hooks must be called unconditionally before any component return.
+- Never disable an ESLint/TypeScript rule to bypass a design or type problem without explicit permission.
+- Cross-root imports must use the repository's configured aliases when an alias exists; do not reach an aliased root with deep `../../..` paths.
+- Never use `console.log`, `console.debug`, `console.info`, `console.warn`, `console.error`, `console.trace`, `console.table`, or similar console debugging/output in application code. Handle errors through the existing API/error/UI path. Remove existing console output when touching that path.
+
+## Canonical import aliases
+
+The Vite source aliases are:
+
+```text
+configuration
+event-system
+api-handler
+game-data
+game-utils
+components
+ui
+service-container
+service-container-provider
+screen-manager
+```
+
+Use these aliases when importing across those source roots. Relative imports are for files inside the same local feature/component area.
+
+If Vite, TypeScript, or ESLint alias configuration is inconsistent for an alias needed by the touched code, align the configurations instead of working around the mismatch with a deep relative import.
 
 ## Frontend ownership map
 
@@ -111,15 +137,12 @@ Do not add raw hex colors in JSX.
 
 ## Validation commands
 
-Use existing package scripts:
+After any code change, the repository-wide mandatory gates from `repository-code-quality-and-clean-as-you-go` apply:
 
 ```bash
-yarn cleanup
-yarn lint
-yarn type-check
-yarn build:dev
-yarn build
-yarn unused-files-check
+yarn lint && yarn type-check && yarn cleanup && yarn unused-files-check && ./vendor/bin/pint
 ```
 
-There is no frontend test script in `package.json`; do not claim frontend tests ran unless a real test command was added or provided.
+For frontend implementation work, also run `yarn build:dev` unless the task explicitly forbids builds.
+
+All ESLint warnings/errors in changed code must be resolved. There is no frontend test script in `package.json`; do not claim frontend tests ran unless a real test command was added or explicitly provided.

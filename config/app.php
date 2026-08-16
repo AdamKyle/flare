@@ -294,8 +294,13 @@ return [
          * Game Related
          */
         App\Game\Events\Providers\ServiceProvider::class,
-        App\Game\Automation\Providers\ServiceProvider::class,
-        App\Game\BatchCrafting\Providers\ServiceProvider::class,
+
+        // Automation Providers
+        App\Game\Automation\Exploration\Providers\ServiceProvider::class,
+        App\Game\Automation\Delve\Providers\ServiceProvider::class,
+        App\Game\Automation\FactionLoyalty\Providers\ServiceProvider::class,
+        App\Game\Automation\BatchCrafting\Providers\ServiceProvider::class,
+
         App\Game\Character\Providers\ServiceProvider::class,
         App\Game\Character\Builders\AttackBuilders\Providers\ServiceProvider::class,
         App\Game\Character\Builders\InformationBuilders\Providers\ServiceProvider::class,

@@ -9,6 +9,11 @@ Use this skill when adding, changing, or reviewing Tailwind classes, colors, typ
 
 ## Styling source of truth
 
+Before choosing or changing a project/custom color, inspect `resources/css/tailwind.css`. When a prompt names a color or visual state, use the appropriate existing light and dark palette values/classes from that file instead of inventing a color.
+
+If no appropriate project color exists, do not add a new palette or raw color without explicit instruction.
+
+
 The main theme source is:
 
 ```text

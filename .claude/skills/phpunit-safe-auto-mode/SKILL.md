@@ -10,9 +10,9 @@ description: Use this skill for autonomous PHPUnit cleanup tasks with strict fil
 For a test-only cleanup, files may be created, updated, or deleted only under:
 
 - `tests/**`
-- `.agents/skills/**`
-- `.claude/skills/**`
 - Root `proof_of_work.md`
+
+Repository skill files are governing inputs and are never writable during a test/application cleanup task. Skill maintenance must be a separate explicit task.
 
 Do not modify production application code.
 
@@ -39,23 +39,11 @@ Production code may be read to understand behavior but must not be edited.
 
 ## Preserve Existing Work
 
-Before editing:
-
-- Inspect `git status`.
-- Inspect the current diff.
-- Treat all existing unrelated changes as user-owned.
-- Do not overwrite, revert, reformat, or delete them.
-
-After editing:
-
-- Inspect `git status`.
-- Inspect the final diff.
-- Confirm every new change belongs to the allowed scope.
-- Preserve pre-existing changes exactly.
+Treat all unrelated repository files/changes as user-owned. Do not overwrite, revert, reformat, or delete them. Inspect only the files required by the task and preserve unrelated work exactly.
 
 ## Read-Only Commands
 
-Read-only inspection commands are allowed:
+Read-only filesystem inspection commands are allowed:
 
 - `sed`
 - `grep`
@@ -68,9 +56,10 @@ Read-only inspection commands are allowed:
 - `tail`
 - `wc`
 - `stat`
-- `git status`
-- `git diff`
-- `git grep`
+- `diff`
+- `cmp`
+
+Do not run any git command during safe auto mode.
 
 Read-only pipes are allowed only when they do not write a file.
 
@@ -87,7 +76,7 @@ Do not run:
 - Coverage.
 - Artisan.
 - Composer.
-- PHP scripts.
+- PHP scripts other than the mandatory Pint quality gate.
 - Application code.
 - Profilers.
 - Benchmarks.
@@ -98,62 +87,25 @@ Do not run:
 - Servers.
 - Queue workers.
 - Dependency installation.
-- Build commands other than the one exact validation chain explicitly authorized by the task.
+- Build commands other than repository quality gates or a build explicitly required by the task.
 - Generated cleanup scripts.
 - Python, Perl, Ruby, Node, or shell scripts created to rewrite the tests.
 
-## Forbidden Git Operations
+## Git is prohibited
 
-Do not run:
+Do not run the `git` executable at all during safe auto mode. This includes read-only commands and write commands. Use filesystem inspection tools instead.
 
-- `git add`
-- `git commit`
-- `git push`
-- `git pull`
-- `git fetch`
-- `git reset`
-- `git restore`
-- `git checkout`
-- `git clean`
-- `git stash`
-- `git rebase`
-- `git merge`
-- `git cherry-pick`
-- `git revert`
-- Any force operation.
-- Any branch-changing operation.
-- Any command that discards work.
+## Mandatory repository quality gates
 
-Only the explicitly listed read-only git commands are allowed.
+The repository-wide quality gates in `repository-code-quality-and-clean-as-you-go` are required after code changes:
 
-## Task-Specific Validation Exception
+```bash
+yarn lint && yarn type-check && yarn cleanup && yarn unused-files-check && ./vendor/bin/pint
+```
 
-When the task explicitly requires this exact validation chain, it is allowed once at the end:
+These commands may format files. Inspect repository state before and after, preserve pre-existing user changes, and retain only task-related formatting changes.
 
-`yarn lint && yarn type-check && yarn cleanup && yarn unused-files-check && ./vendor/bin/pint`
-
-Do not run any portion separately.
-
-Do not run the chain more than once.
-
-Do not substitute another command.
-
-Do not run it before the repository changes are complete.
-
-Because `yarn cleanup` and Pint can write files:
-
-1. Record the pre-command git status and diff.
-2. Run the exact chain once.
-3. Inspect the post-command status and diff.
-4. Retain formatting changes only in allowed test and skill files.
-5. Manually restore accidental new changes to production or frontend files using the editor.
-6. Do not use a forbidden git command to restore them.
-7. Do not overwrite pre-existing user changes.
-8. Do not rerun the validation chain after manual restoration.
-
-If the chain fails, do not invent a passing result.
-
-Record the exact failing command and output in `proof_of_work.md`.
+Do not install missing dependencies to make the gates runnable unless explicitly instructed. If a gate cannot run, report the exact blocker.
 
 ## No Test Claims
 

@@ -7,7 +7,7 @@ description: Use this skill when writing, reviewing, reducing, or refactoring PH
 
 ## Scope
 
-Use this skill for PHPUnit tests and test infrastructure only.
+Use this skill for PHPUnit tests and test infrastructure only. Also apply `repository-code-quality-and-clean-as-you-go`.
 
 Production backend rules belong to the `back-end-conventions` skill.
 
@@ -23,6 +23,8 @@ Do not assume behavior from a test name.
 
 ## Test Structure
 
+- Never declare test classes `final`; remove `final` when touching an existing test class.
+- Existing test-rule violations in a touched test must be cleaned up instead of copied or preserved.
 - One behavior per test method.
 - Use a descriptive test name.
 - Multiple assertions are allowed only when they verify the same behavior, mutation, response, event, or object state.
@@ -113,6 +115,18 @@ When a test manually executes a job only so it can stop before another copy is d
 - Remove queue-reinitialization metadata coverage when it provides no independent business confidence.
 - Do not introduce a complicated fake dispatcher solely to preserve such a test.
 
+## Real Path / Let It Fall Through
+
+The default testing strategy is to let the real application code path execute.
+
+Start from the public API owned by the subject and allow real deterministic collaborators to run unless an allowed mock category in `phpunit-mocking` applies.
+
+Do not mock a collaborator merely because arranging the real state takes more work. Do not mock the class that owns the business rule being asserted.
+
+For queued jobs, the real application path means dispatching the job and allowing the configured synchronous test queue to execute it.
+
+For PHP attributes, follow `phpunit-php-attributes`: test the public framework/application behavior that consumes the metadata, not reflection or attribute presence.
+
 ## Mocking
 
 Mocks are allowed under the categories defined by `phpunit-mocking`.
@@ -178,3 +192,17 @@ Report only factual work performed.
 Do not claim commands were run unless they were run.
 
 Do not claim behavior was verified by execution when only static inspection occurred.
+
+## Deleted implementation tests
+
+When production code is deleted because a legacy implementation has been replaced, delete tests that exist only to test that deleted implementation. Do not move giant legacy test classes into the new namespace and do not preserve implementation-detail tests for classes that no longer exist.
+
+Write focused tests for the new public responsibilities and let the real deterministic path fall through.
+
+## Coverage when explicitly required
+
+When the task explicitly requires 100% coverage for new or migrated backend code, every executable line in the task-specific new/migrated production files must reach 100% before completion.
+
+Inspect per-file coverage, not only aggregate coverage. Do not use `@codeCoverageIgnore`, meaningless framework tests, reflection-only tests, impossible mocks, loops, or data providers to manufacture the percentage. If a branch cannot occur under the real contract, simplify/remove the branch rather than inventing an artificial test path.
+
+Do not claim a coverage percentage unless coverage was actually run and inspected.

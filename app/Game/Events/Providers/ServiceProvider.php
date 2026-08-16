@@ -2,7 +2,7 @@
 
 namespace App\Game\Events\Providers;
 
-use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Automation\Exploration\Services\ExplorationAutomationService;
 use App\Game\Events\Console\Commands\EndScheduledEvent;
 use App\Game\Events\Console\Commands\ProcessScheduledEvents;
 use App\Game\Events\Console\Commands\RestartGlobalEventGoal;

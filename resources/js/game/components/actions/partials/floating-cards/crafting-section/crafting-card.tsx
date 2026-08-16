@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useCallback, useRef, useState } from 'react';
 
 import { ScreenMapper } from './component-mapping/screen-registry';
 import { CraftingTypes } from './enums/crafting-types';
@@ -24,6 +24,11 @@ const CraftingCard = (): ReactNode => {
       character: gameData?.character ?? null,
     });
 
+  const backHandlerRef = useRef<(() => void) | null>(null);
+  const registerBackHandler = useCallback((handler: (() => void) | null) => {
+    backHandlerRef.current = handler;
+  }, []);
+
   const ActiveScreen = ScreenMapper[activeCraftingType];
 
   const handleCloseCraftingCard = () => {
@@ -31,9 +36,13 @@ const CraftingCard = (): ReactNode => {
     closeCraftingCard();
   };
 
-  const renderBackAction = () => {
+  const handleBackAction = () => {
     if (activeCraftingType === CraftingTypes.HOME) {
       return;
+    }
+
+    if (backHandlerRef.current) {
+      return backHandlerRef.current();
     }
 
     return setActiveCraftingType(CraftingTypes.HOME);
@@ -44,7 +53,7 @@ const CraftingCard = (): ReactNode => {
       title={activeCraftingType}
       close_action={handleCloseCraftingCard}
       back_action={
-        activeCraftingType === CraftingTypes.HOME ? undefined : renderBackAction
+        activeCraftingType === CraftingTypes.HOME ? undefined : handleBackAction
       }
     >
       <CraftingScreenTransition
@@ -55,6 +64,7 @@ const CraftingCard = (): ReactNode => {
           setActiveCraftingType={setActiveCraftingType}
           locationRestrictionWarning={locationRestrictionWarning}
           clearLocationRestrictionWarning={clearLocationRestrictionWarning}
+          registerBackHandler={registerBackHandler}
         />
       </CraftingScreenTransition>
     </FloatingCard>

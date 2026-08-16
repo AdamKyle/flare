@@ -14,7 +14,7 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
 use App\Flare\Models\ScheduledEvent;
-use App\Game\Automation\Services\ExplorationAutomationService;
+use App\Game\Automation\Exploration\Services\ExplorationAutomationService;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Core\Values\FactionLevel;
 use App\Game\Events\Values\EventType;

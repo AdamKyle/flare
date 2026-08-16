@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 export default interface FormWizardNavProps {
   current_index: number;
   total_steps: number;
+  step_titles: string[];
   can_go_previous: boolean;
   is_last_step: boolean;
   is_loading?: boolean;
@@ -10,4 +11,6 @@ export default interface FormWizardNavProps {
   on_next_click: () => void;
   on_dot_click: (index_value: number) => void;
   render_loading_icon?: () => ReactNode;
+  finish_label?: string;
+  icon_navigation?: boolean;
 }

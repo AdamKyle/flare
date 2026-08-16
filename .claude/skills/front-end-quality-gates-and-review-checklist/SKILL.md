@@ -25,31 +25,21 @@ Review the change for:
 - validation and error handling;
 - command results.
 
-## Package validation commands
+## Required validation commands
 
-Available frontend scripts:
+After code changes are complete, always run:
 
 ```bash
-yarn cleanup
-yarn lint
-yarn type-check
-yarn build:dev
-yarn build
-yarn unused-files-check
+yarn lint && yarn type-check && yarn cleanup && yarn unused-files-check && ./vendor/bin/pint
 ```
 
-Recommended validation sequence:
+For frontend implementation work, also run:
 
 ```bash
-yarn cleanup
-yarn lint
-yarn type-check
 yarn build:dev
 ```
 
-Use `yarn unused-files-check` when files/imports were moved, renamed, removed, or created in a way that could leave dead files.
-
-Use `yarn build` when production build behavior matters.
+Every command must succeed. Resolve ESLint warnings/errors in changed code; do not treat warning-only output as acceptable compliance.
 
 Do not claim frontend tests passed unless a real frontend test command exists and was run.
 
@@ -78,6 +68,7 @@ Verify:
 - paginated data uses the paginated API handler when appropriate;
 - snake_case backend fields were preserved;
 - 401/inactivity behavior is handled consistently.
+- no `console.*` logging/debugging/error output remains in touched application code;
 
 ## TypeScript checklist
 
@@ -104,7 +95,10 @@ Verify:
 - derived values make conditions readable;
 - root feature components are not overloaded;
 - feature components are extracted at useful boundaries;
-- no major nested ternary JSX was added.
+- no major nested ternary JSX was added;
+- JSX `.map()` callbacks remain visually trivial and render already-prepared data;
+- non-trivial mapped display state is derived before JSX and passed to a named render function or focused component;
+- mapped JSX does not contain nested ternaries or a cluster of local derived-state declarations.
 
 ## Accessibility checklist
 
@@ -187,3 +181,16 @@ When reporting completion, include:
 - any risks or manual follow-up.
 
 Keep it factual and specific.
+
+## Strict implementation review additions
+
+Before accepting touched frontend code, verify:
+
+- no state setter or synchronization ref mutation occurs during render;
+- no new forced type assertions hide contract mismatches;
+- true integer form inputs reject decimal/trailing-junk strings rather than truncating them;
+- every touched Axios request has correct abort/stale-response behavior;
+- real API errors are not swallowed;
+- closed backend enum values use explicit frontend label mappings rather than generic string humanization;
+- requested icon-only controls use the project's actual icon-button pattern;
+- governing skill files and repository IDE/tool metadata were not modified by application work.

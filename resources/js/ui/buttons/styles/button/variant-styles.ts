@@ -24,5 +24,10 @@ export const variantStyles = (variant: ButtonVariant): string => {
       () =>
         'bg-mango-tango-600 hover:bg-mango-tango-500 focus:ring-mango-tango-400 dark:focus:ring-mango-tango-600'
     )
+    .with(
+      ButtonVariant.ACTIVE,
+      () =>
+        'bg-mango-tango-600 hover:bg-mango-tango-500 focus:ring-mango-tango-400 dark:focus:ring-mango-tango-600'
+    )
     .otherwise(() => '');
 };

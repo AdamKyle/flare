@@ -23,6 +23,9 @@ class BroadcastServiceProvider extends ServiceProvider
         require base_path('routes/game/character/character-inventory/channels.php');
         require base_path('routes/game/character/character-attack/channels.php');
         require base_path('routes/game/automation/channels.php');
+        require base_path('routes/game/automation/exploration/channels.php');
+        require base_path('routes/game/automation/delve/channels.php');
+        require base_path('routes/game/automation/batch-crafting/channels.php');
         require base_path('routes/game/messages/channels.php');
         require base_path('routes/game/battle/channels.php');
         require base_path('routes/game/kingdoms/channels.php');
@@ -36,6 +39,5 @@ class BroadcastServiceProvider extends ServiceProvider
         require base_path('routes/game/events/channels.php');
         require base_path('routes/game/factions/faction-loyalty/channels.php');
         require base_path('routes/game/tops/channels.php');
-        require base_path('routes/game/batch-crafting/channels.php');
     }
 }

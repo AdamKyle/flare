@@ -3,7 +3,6 @@
 namespace Tests\Unit\Game\Character\CharacterSheet\Transformers;
 
 use App\Game\Automation\Values\AutomationType;
-use App\Game\BatchCrafting\Values\BatchCraftingType;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Values\LocationBasedCraftingOptions;
@@ -13,7 +12,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\FactionLoyalty\FactionLoyaltyFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateDelveExploration;
 use Tests\Traits\CreateFactionLoyaltyAutomationWarning;
@@ -23,7 +21,7 @@ use Tests\Traits\CreateRole;
 
 class CharacterSheetBaseInfoTransformerTest extends TestCase
 {
-    use CreateBatchCrafting, CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, CreateRole, RefreshDatabase;
+    use CreateCharacterAutomation, CreateDelveExploration, CreateFactionLoyaltyAutomationWarning, CreateGameMap, CreateItem, CreateRole, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -186,127 +184,6 @@ class CharacterSheetBaseInfoTransformerTest extends TestCase
         $data = $this->transformer->transform($character);
 
         $this->assertFalse($data['is_delve_visible']);
-    }
-
-    public function test_batch_crafting_uses_the_eight_hour_timer_when_the_type_does_not_pend(): void
-    {
-        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
-
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::TRINKETRY->value,
-            'ends_at' => now()->addMinutes(30),
-            'progress' => [],
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertTrue($data['is_batch_crafting_running']);
-        $this->assertTrue($data['is_batch_crafting_visible']);
-        $this->assertSame(1800, $data['batch_crafting_time_out']);
-        $this->assertTrue($data['is_batch_crafting_experience_mode']);
-    }
-
-    public function test_batch_crafting_time_out_is_zero_while_continuation_is_processing(): void
-    {
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::HOLY_OILS->value,
-            'progress' => ['continuation_state' => 'processing'],
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertSame(0, $data['batch_crafting_time_out']);
-    }
-
-    public function test_batch_crafting_time_out_is_computed_from_the_next_attempt_timestamp(): void
-    {
-        Carbon::setTestNow(Carbon::parse('2026-01-01 12:00:00'));
-
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::HOLY_OILS->value,
-            'progress' => ['next_attempt_at' => now()->addMinutes(5)->toDateTimeString()],
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertSame(300, $data['batch_crafting_time_out']);
-    }
-
-    public function test_batch_crafting_time_out_is_zero_for_an_unparsable_next_attempt_timestamp(): void
-    {
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::HOLY_OILS->value,
-            'progress' => ['next_attempt_at' => 'not-a-real-timestamp'],
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertSame(0, $data['batch_crafting_time_out']);
-    }
-
-    public function test_batch_crafting_time_out_is_zero_when_next_attempt_at_is_missing(): void
-    {
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::HOLY_OILS->value,
-            'progress' => [],
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertSame(0, $data['batch_crafting_time_out']);
-    }
-
-    public function test_is_batch_crafting_retry_mode_is_true_when_tick_delay_is_below_the_recurring_delay(): void
-    {
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'batch_type' => BatchCraftingType::TRINKETRY->value,
-            'progress' => ['tick_delay_seconds' => 10],
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertTrue($data['is_batch_crafting_retry_mode']);
-    }
-
-    public function test_batch_crafting_is_visible_after_completion_when_not_dismissed(): void
-    {
-        $character = $this->character->givePlayerLocation()->getCharacter();
-
-        $this->createBatchCrafting([
-            'character_id' => $character->id,
-            'user_id' => $character->user_id,
-            'completed_at' => now(),
-            'panel_dismissed_at' => null,
-        ]);
-
-        $data = $this->transformer->transform($character->refresh());
-
-        $this->assertFalse($data['is_batch_crafting_running']);
-        $this->assertTrue($data['is_batch_crafting_visible']);
     }
 
     public function test_can_set_delve_pack_is_true_when_the_character_holds_the_delve_pack_choice_item(): void

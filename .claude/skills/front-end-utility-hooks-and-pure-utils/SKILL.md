@@ -93,9 +93,16 @@ Hooks must not:
 - return large chunks of JSX for normal UI rendering;
 - hide feature layout inside hook internals;
 - call hooks conditionally;
+- call hooks after an early return;
+- call hooks inside loops, callbacks, event handlers, or nested ordinary functions;
 - perform side effects during render;
+- call state setters during render;
+- use effects as substitutes for event handlers;
+- mirror props/derived values into state when the value can be derived directly;
 - swallow errors silently;
 - mutate objects directly.
+
+All hooks for a component/custom hook must be invoked unconditionally at the top level before any return path. If existing touched code violates this, restructure it; do not suppress the hooks rule.
 
 ## Pure utility rules
 
@@ -153,7 +160,9 @@ Effects must:
 - not replace simple derived values that could be computed in render;
 - not be used to mirror props into state without a reason.
 
-Avoid disabling exhaustive-deps unless the existing pattern genuinely requires it and the reason is clear.
+Do not disable `react-hooks/exhaustive-deps` to silence a dependency problem without explicit permission. Fix unstable dependencies, extract the effect concern, or use the correct project pattern.
+
+Do not add `useMemo` or `useCallback` by default. Use them only for a factual render/reference-stability requirement.
 
 ## Hook/utility checklist
 

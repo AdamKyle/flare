@@ -1,5 +1,6 @@
 export enum CraftingTypes {
   HOME = 'Crafting',
+  BATCH_CRAFTING = 'Batch Crafting',
   CRAFT = 'Craft Items',
   ENCHANT = 'Enchanting',
   ALCHEMY = 'Alchemy',

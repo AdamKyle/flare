@@ -4,4 +4,5 @@ export enum ButtonVariant {
   DANGER,
   SERVER_MESSAGE_LINK,
   DONATIONS,
+  ACTIVE,
 }

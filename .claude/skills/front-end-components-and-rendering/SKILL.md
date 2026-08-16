@@ -174,7 +174,9 @@ renderData
 
 React hooks must be called unconditionally at the top level of the component or inside custom hooks.
 
-Do not put hooks after early returns.
+Every hook call must occur before every component return path. Do not put hooks after early returns, inside conditions, loops, callbacks, event handlers, or nested ordinary functions.
+
+Do not suppress hook lint rules. Restructure the component/hook so the rule is naturally satisfied.
 
 Bad:
 
@@ -223,6 +225,40 @@ const isLastStep = current_index === computed_total_steps - 1;
 Do not repeat the same condition throughout JSX.
 
 Group related derived values with blank lines between unrelated groups.
+
+## Mapped rendering
+
+JSX `.map()` callbacks must stay visually trivial and primarily render already-prepared data.
+
+Do not declare multiple derived variables, calculate display state, or perform decision-heavy branching inside a JSX `.map()` callback. Do not use nested ternaries inside mapped JSX.
+
+Bad:
+
+```tsx
+{steps.map((index) => {
+  const isActive = index === currentIndex;
+  const isReachable = index < currentIndex;
+  const state = isActive ? 'current' : isReachable ? 'completed' : 'upcoming';
+
+  return <button aria-label={state} />;
+})}
+```
+
+When mapped rendering needs derived state, build a typed render model before JSX and then render that prepared data with a named render function or a small focused component.
+
+```tsx
+const stepModels = buildStepModels(steps, currentIndex);
+
+const renderStep = (step: StepModel) => (
+  <button aria-label={step.ariaLabel} />
+);
+
+return stepModels.map(renderStep);
+```
+
+A simple inline `.map()` is allowed when it only renders or transforms already-known fields and contains no non-trivial branching or derived state. Do not extract meaningless components for one-line maps.
+
+Pure data-normalization code outside JSX may use `.map()` to derive typed data when that transformation is itself the clear responsibility of the code.
 
 ## Handler rules
 
@@ -279,3 +315,11 @@ A component is acceptable when:
 - loading/error/empty states are explicit;
 - interactive controls are accessible;
 - mobile and dark mode classes are present where needed.
+
+## Render purity
+
+React render must be pure.
+
+Never call a state setter during render. Never mutate refs during render to synchronize props, filters, query parameters, request state, navigation state, or lifecycle state. Use derived values for pure computation and effects for synchronization/side effects.
+
+Do not start requests, abort requests, subscribe/unsubscribe listeners, move focus, navigate, or mutate external state during render.

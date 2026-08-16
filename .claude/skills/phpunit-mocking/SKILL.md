@@ -7,13 +7,17 @@ description: Use this skill whenever PHPUnit tests replace collaborators, contro
 
 ## Purpose
 
-Mocks are allowed when they isolate a legitimate boundary or control behavior that cannot be reliably or efficiently produced through the real collaborator.
+The default is **let the real code fall through**. Execute real deterministic collaborators through the public application path.
+
+Mocks are exceptions. They are allowed only when they fit an allowed category below and the subject under test still owns the behavior being asserted.
+
+Mocks may isolate a legitimate boundary or control behavior that cannot be reliably or appropriately produced through the real collaborator.
 
 The goal is not zero mocks.
 
 The goal is to retain only mocks that have a clear testing purpose.
 
-Do not remove a mock merely because the mocked class is a service.
+Do not remove a valid mock merely because the mocked class is a service. Equally, do not keep a mock merely because it already exists. Prove its category and ownership.
 
 ## Allowed Mock Categories
 

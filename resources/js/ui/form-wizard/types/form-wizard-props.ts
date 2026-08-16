@@ -7,6 +7,9 @@ export default interface FormWizardProps {
   is_loading?: boolean;
   render_loading_icon?: () => ReactNode;
   on_request_next?: (current_index: number) => Promise<boolean> | boolean;
+  finish_label?: string;
   children: ReactNode;
   form_error: AxiosErrorDefinition | null;
+  embedded?: boolean;
+  icon_navigation?: boolean;
 }

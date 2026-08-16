@@ -3,8 +3,8 @@
 namespace Tests\Unit\Game\Battle\Handlers;
 
 use App\Flare\Models\BatchCrafting;
-use App\Game\BatchCrafting\Services\BatchCraftingService;
-use App\Game\BatchCrafting\Values\BatchCraftingEndReason;
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingEndReason;
+use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
@@ -44,7 +44,7 @@ class BattleEventHandlerTest extends TestCase
             ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => []],
         )->andReturn($rewardRequest);
 
-        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))->processMonsterDeath($character->id, $monster->id);
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingAutomationService::class)))->processMonsterDeath($character->id, $monster->id);
     }
 
     public function test_exploration_monster_death_claims_weekly_fight_before_enqueue(): void
@@ -63,7 +63,7 @@ class BattleEventHandlerTest extends TestCase
             ['character_id' => $character->id, 'monster_id' => $monster->id, 'context' => ['exploration_log_id' => 30]],
         )->andReturn($rewardRequest);
 
-        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))->processMonsterDeath($character->id, $monster->id, ['exploration_log_id' => 30]);
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingAutomationService::class)))->processMonsterDeath($character->id, $monster->id, ['exploration_log_id' => 30]);
     }
 
     public function test_battle_reward_uses_second_priority_and_preserves_payload(): void
@@ -91,7 +91,7 @@ class BattleEventHandlerTest extends TestCase
         $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
         $weeklyBattleService->shouldNotReceive('claimMonsterDeath');
 
-        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingAutomationService::class)))
             ->processMonsterDeath(10, 20, ['attack_type' => 'attack']);
     }
 
@@ -120,7 +120,7 @@ class BattleEventHandlerTest extends TestCase
         $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
         $weeklyBattleService->shouldNotReceive('claimMonsterDeath');
 
-        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingService::class)))
+        (new BattleEventHandler($queueManager, $weeklyBattleService, Mockery::mock(BatchCraftingAutomationService::class)))
             ->processMonsterDeath(10, 20, ['exploration_log_id' => 30]);
     }
 
@@ -152,7 +152,7 @@ class BattleEventHandlerTest extends TestCase
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
-        $batchCraftingService = Mockery::mock(BatchCraftingService::class);
+        $batchCraftingService = Mockery::mock(BatchCraftingAutomationService::class);
         $batchCraftingService->shouldReceive('completeForDeath')->once();
 
         $battleEventHandler = new BattleEventHandler(
