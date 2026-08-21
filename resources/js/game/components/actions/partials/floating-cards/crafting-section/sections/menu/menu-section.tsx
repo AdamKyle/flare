@@ -11,6 +11,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Separator from 'ui/separator/separator';
 
 const MenuSection = ({
   setActiveCraftingType,
@@ -87,6 +88,7 @@ const MenuSection = ({
         }
         additional_css="w-full my-2"
       />
+      <Separator />
       <Button
         label="Craft"
         on_click={() => handleSelectCraftingType(CraftingTypes.CRAFT)}

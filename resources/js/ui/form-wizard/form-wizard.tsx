@@ -74,7 +74,7 @@ const FormWizard = ({
   const reduce_motion = useReducedMotion();
 
   useEffect(() => {
-    step_refs.current[current_index]?.focus();
+    step_refs.current[current_index]?.focus({ preventScroll: true });
   }, [current_index]);
 
   const step_elements = useMemo(() => getStepElements(children), [children]);

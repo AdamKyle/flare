@@ -4,6 +4,7 @@ namespace App\Game\Automation\BatchCrafting\Jobs;
 
 use App\Flare\Models\BatchCrafting;
 use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -19,7 +20,7 @@ class BatchCraftingJob implements ShouldQueue
     public const QUEUE = 'batch_crafting';
 
     /**
-     * @param  int  $batchCraftingId  The BatchCrafting record identifier to process.
+     * @param  int  $batchCraftingId
      */
     public function __construct(public readonly int $batchCraftingId)
     {
@@ -28,7 +29,7 @@ class BatchCraftingJob implements ShouldQueue
     }
 
     /**
-     * Process one queued Batch Crafting operation for the given run.
+     * Process the queued Batch Crafting run and re-dispatch itself when a recurring window remains.
      *
      * @param  BatchCraftingAutomationService  $batchCraftingAutomationService  The Batch Crafting lifecycle service.
      * @return void This method does not return a value.
@@ -41,6 +42,23 @@ class BatchCraftingJob implements ShouldQueue
             return;
         }
 
-        $batchCraftingAutomationService->processOneOperation($batchCrafting);
+        $nextAttemptAt = $batchCraftingAutomationService->process($batchCrafting);
+
+        if (! is_null($nextAttemptAt) && ! app()->runningUnitTests()) {
+            $this->redispatch($nextAttemptAt); // @codeCoverageIgnore
+        }
+    }
+
+    /**
+     * Re-dispatch this job for the next recurring execution window.
+     *
+     * @param  Carbon  $nextAttemptAt  The next execution time to schedule.
+     * @return void This method does not return a value.
+     *
+     * @codeCoverageIgnore
+     */
+    private function redispatch(Carbon $nextAttemptAt): void
+    {
+        self::dispatch($this->batchCraftingId)->delay($nextAttemptAt);
     }
 }

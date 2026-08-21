@@ -11,8 +11,8 @@ use InvalidArgumentException;
 class BatchCraftingOrchestratorFactory
 {
     /**
-     * @param  BatchCraftingAttributeRegistry  $registry  The handler/orchestrator class registry.
-     * @param  Container  $container  The application container used to resolve orchestrators.
+     * @param  BatchCraftingAttributeRegistry  $registry
+     * @param  Container  $container
      */
     public function __construct(
         private readonly BatchCraftingAttributeRegistry $registry,

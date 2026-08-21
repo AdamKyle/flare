@@ -15,7 +15,6 @@ use App\Game\Skills\Requests\CraftingValidation;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Transformers\CraftableItemTransformer;
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -24,6 +23,11 @@ class CraftingController extends Controller
 {
     use ChecksAutomationRestrictions, FactionLoyalty, ShouldShowCraftingEventButton;
 
+    /**
+     * @param  CraftingService  $craftingService
+     * @param  CraftableItemTransformer  $craftableItemTransformer
+     * @param  CraftingItemPreviewTransformer  $craftingItemPreviewTransformer
+     */
     public function __construct(
         private CraftingService $craftingService,
         private readonly CraftableItemTransformer $craftableItemTransformer,
@@ -31,31 +35,38 @@ class CraftingController extends Controller
     ) {}
 
     /**
-     * @throws Exception
+     * Fetch the Craftable items for the character, paginated when requested.
+     *
+     * @param  Request  $request
+     * @param  Character  $character
+     * @return JsonResponse
      */
     public function fetchItemsToCraft(Request $request, Character $character): JsonResponse
     {
         $perPage = $request->input('per_page');
 
         if ($perPage !== null) {
-            $craftingParams = ['crafting_type' => $request->crafting_type];
-            $searchText = (string) ($request->input('search_text') ?? '');
-            $armourSubtype = (string) ($request->input('filters.armour_type') ?? '');
-            $page = (int) $request->input('page', 1);
+            $craftingType = $request->string('crafting_type')->toString();
+            $craftingParams = ['crafting_type' => $craftingType];
+            $searchText = $request->string('search_text', '')->toString();
+            $armourSubtype = $request->string('filters.armour_type', '')->toString();
+            $itemType = $request->string('filters.item_type', '')->toString();
+            $page = $request->integer('page', 1);
 
             $paginated = $this->craftingService->fetchPaginatedCraftableItems(
                 $character,
                 $craftingParams,
-                (int) $perPage,
+                $request->integer('per_page'),
                 $page,
                 $searchText,
-                $armourSubtype
+                $armourSubtype,
+                $itemType
             );
 
             return response()->json(array_merge($paginated, [
                 'items' => $paginated['data'],
-                'xp' => $this->craftingService->getCraftingXP($character, $request->crafting_type),
-                'show_craft_for_npc' => $this->showCraftForNpcButton($character, $request->crafting_type),
+                'xp' => $this->craftingService->getCraftingXP($character, $craftingType),
+                'show_craft_for_npc' => $this->showCraftForNpcButton($character, $craftingType),
                 'show_craft_for_event' => $this->shouldShowCraftingEventButton($character),
                 'inventory_count' => $this->craftingService->getInventoryCount($character),
             ]));
@@ -71,7 +82,11 @@ class CraftingController extends Controller
     }
 
     /**
-     * @throws Exception
+     * Fetch the Craftable items valid for the character's class, paginated when requested.
+     *
+     * @param  Request  $request
+     * @param  Character  $character
+     * @return JsonResponse
      */
     public function fetchItemsForClass(Request $request, Character $character): JsonResponse
     {
@@ -96,9 +111,9 @@ class CraftingController extends Controller
             $paginated = $this->craftingService->fetchPaginatedCraftableItems(
                 $character,
                 $craftingParams,
-                (int) $perPage,
-                (int) $request->input('page', 1),
-                (string) ($request->input('search_text') ?? '')
+                $request->integer('per_page'),
+                $request->integer('page', 1),
+                $request->string('search_text', '')->toString()
             );
 
             return response()->json(array_merge($paginated, [
@@ -120,7 +135,12 @@ class CraftingController extends Controller
     }
 
     /**
-     * @throws Exception
+     * Craft the requested item for the character and return the refreshed Craftable item list.
+     *
+     * @param  CraftingValidation  $request
+     * @param  Character  $character
+     * @param  CraftingService  $craftingService
+     * @return JsonResponse
      */
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
@@ -144,17 +164,18 @@ class CraftingController extends Controller
         $perPage = $request->input('per_page');
 
         if ($perPage !== null) {
-            $craftingParams = ['crafting_type' => $request->type];
-            $searchText = (string) ($request->input('search_text') ?? '');
-            $armourSubtype = (string) ($request->input('filters.armour_type') ?? '');
+            $craftingParams = ['crafting_type' => $request->string('type')->toString()];
+            $searchText = $request->string('search_text', '')->toString();
+            $armourSubtype = $request->string('filters.armour_type', '')->toString();
 
             $paginated = $this->craftingService->fetchPaginatedCraftableItems(
                 $character->refresh(),
                 $craftingParams,
-                (int) $perPage,
+                $request->integer('per_page'),
                 1,
                 $searchText,
                 $armourSubtype,
+                '',
                 false
             );
 
@@ -182,6 +203,12 @@ class CraftingController extends Controller
         ], 200);
     }
 
+    /**
+     * Resolve the valid Crafting type(s) for the character's class.
+     *
+     * @param  Character  $character
+     * @return string|array
+     */
     private function resolveCraftingTypeForClass(Character $character): string|array
     {
         $craftingTypes = ItemTypeMapping::getForClass($character->class->name);
@@ -192,6 +219,12 @@ class CraftingController extends Controller
         return count($filteredWeapons) === 1 ? $filteredWeapons[0] : $filteredWeapons;
     }
 
+    /**
+     * Transform the given Craftable items for the API response.
+     *
+     * @param  iterable  $items
+     * @return array
+     */
     private function transformCraftableItems(iterable $items): array
     {
         return (new Collection($items))
@@ -200,6 +233,12 @@ class CraftingController extends Controller
             ->all();
     }
 
+    /**
+     * Build the crafted item result preview for the given inventory slot.
+     *
+     * @param  int|null  $inventorySlotId
+     * @return array|null
+     */
     private function buildResultPreview(?int $inventorySlotId): ?array
     {
         if (is_null($inventorySlotId)) {

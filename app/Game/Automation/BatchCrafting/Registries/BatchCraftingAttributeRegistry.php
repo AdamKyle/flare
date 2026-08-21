@@ -20,8 +20,8 @@ class BatchCraftingAttributeRegistry
     private readonly array $handlers;
 
     /**
-     * @param  array<int, class-string<BatchCraftingOrchestrator>>  $orchestratorCandidates  The candidate orchestrator classes to register.
-     * @param  array<int, class-string<BatchCraftingHandler>>  $handlerCandidates  The candidate handler classes to register.
+     * @param  array<int, class-string<BatchCraftingOrchestrator>>  $orchestratorCandidates
+     * @param  array<int, class-string<BatchCraftingHandler>>  $handlerCandidates
      */
     public function __construct(array $orchestratorCandidates, array $handlerCandidates)
     {

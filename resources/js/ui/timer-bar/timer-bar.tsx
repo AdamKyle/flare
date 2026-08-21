@@ -3,47 +3,91 @@ import { intervalToDuration } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { match, P } from 'ts-pattern';
 
+import TimerBarSize from 'ui/timer-bar/enums/timer-bar-size';
+import { timerBarSizeStyles } from 'ui/timer-bar/styles/timer-bar-size-styles';
 import TimerBarProps from 'ui/timer-bar/types/timer-bar-props';
 import { getColorLevel } from 'ui/timer-bar/util/get-color-level';
 
-const TimerBar = ({ length, title, additional_css }: TimerBarProps) => {
-  const [remaining, setRemaining] = useState(length);
+const pluralizeUnit = (value: number, unit: string): string =>
+  `${value} ${unit}${value === 1 ? '' : 's'}`;
+
+const formatRemainingTime = (remainingSeconds: number): string => {
+  const duration = intervalToDuration({
+    start: 0,
+    end: remainingSeconds * 1000,
+  });
+
+  return match(duration)
+    .with(
+      P.when((d) => (d.days ?? 0) > 0),
+      (d) => pluralizeUnit(d.days ?? 0, 'day')
+    )
+    .with(
+      P.when((d) => (d.hours ?? 0) > 0),
+      (d) => pluralizeUnit(d.hours ?? 0, 'hour')
+    )
+    .with(
+      P.when((d) => (d.minutes ?? 0) > 0),
+      (d) => pluralizeUnit(d.minutes ?? 0, 'minute')
+    )
+    .otherwise((d) => pluralizeUnit(d.seconds ?? 0, 'second'));
+};
+
+const TimerBar = ({
+  length,
+  title,
+  remaining: controlledRemaining,
+  size = TimerBarSize.DEFAULT,
+  additional_css,
+}: TimerBarProps) => {
+  const [internalRemaining, setInternalRemaining] = useState(length);
+
+  const isControlled = controlledRemaining !== undefined;
 
   useEffect(() => {
-    if (remaining <= 0) return;
-    const timerId = setInterval(
-      () => setRemaining((prev) => Math.max(prev - 1, 0)),
-      1000
-    );
-    return () => clearInterval(timerId);
-  }, [remaining]);
+    if (isControlled) {
+      return;
+    }
 
-  const percent = Math.round((remaining / length) * 100);
+    setInternalRemaining(length);
+
+    if (length <= 0) {
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      setInternalRemaining((prev) => {
+        const next = Math.max(prev - 1, 0);
+
+        if (next <= 0) {
+          clearInterval(timerId);
+        }
+
+        return next;
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [isControlled, length]);
+
+  const displayedRemaining = isControlled
+    ? controlledRemaining
+    : internalRemaining;
+  const clampedRemaining = Math.min(Math.max(displayedRemaining, 0), length);
+  const safeLength = length > 0 ? length : 1;
+  const percent = Math.round((clampedRemaining / safeLength) * 100);
 
   const [bgClass, darkBgClass] = getColorLevel(percent);
 
   const barClasses = clsx(
-    'h-4 rounded transition-all duration-1000 ease-linear',
+    'h-full rounded transition-all duration-1000 ease-linear',
     bgClass,
     darkBgClass
   );
 
-  const dur = intervalToDuration({ start: 0, end: remaining * 1000 });
-
-  const formattedRemaining = match(dur)
-    .with(
-      P.when((d) => (d.days ?? 0) > 0),
-      (d) => `${d.days} days`
-    )
-    .with(
-      P.when((d) => (d.hours ?? 0) > 0),
-      (d) => `${d.hours} hours`
-    )
-    .with(
-      P.when((d) => (d.minutes ?? 0) > 0),
-      (d) => `${d.minutes} minutes`
-    )
-    .otherwise((d) => `${d.seconds ?? 0} seconds`);
+  const formattedRemaining = formatRemainingTime(clampedRemaining);
 
   return (
     <div className={clsx('w-full', additional_css)}>
@@ -59,9 +103,13 @@ const TimerBar = ({ length, title, additional_css }: TimerBarProps) => {
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={length}
-        aria-valuenow={remaining}
+        aria-valuenow={clampedRemaining}
+        aria-valuetext={formattedRemaining}
         aria-label={title}
-        className="relative h-4 overflow-hidden rounded bg-gray-200 dark:bg-gray-700"
+        className={clsx(
+          'relative overflow-hidden rounded bg-gray-200 dark:bg-gray-700',
+          timerBarSizeStyles(size)
+        )}
       >
         <div className={barClasses} style={{ width: `${percent}%` }} />
       </div>

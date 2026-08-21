@@ -15,7 +15,7 @@ const UsePaginatedApiHandler = <
   R extends PaginatedApiResponseDefinition<T[]> =
     PaginatedApiResponseDefinition<T[]>,
 >(
-  params: ApiParametersDefinitions,
+  params: ApiParametersDefinitions<F>,
   perPage = 10
 ): PaginatedApiHandlerDefinition<T, F, R> => {
   const { apiHandler, getUrl } = useApiHandler();
@@ -31,8 +31,10 @@ const UsePaginatedApiHandler = <
   const [canLoadMore, setCanLoadMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
-  const [searchText, setSearchText] = useState('');
-  const [filters, setFilters] = useState<Partial<F>>({});
+  const [searchText, setSearchText] = useState(params.initialSearchText ?? '');
+  const [filters, setFilters] = useState<Partial<F>>(
+    params.initialFilters ?? {}
+  );
   const [refresh, setRefresh] = useState(false);
   const [response, setResponse] = useState<R | null>(null);
 

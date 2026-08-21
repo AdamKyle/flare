@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Game\Character\CharacterInventory\Controllers\Api;
 
+use App\Flare\Models\InventorySet;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Skills\Values\SkillTypeValue;
@@ -204,6 +205,42 @@ class CharacterInventoryControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertArrayHasKey('data', $response->json());
+    }
+
+    public function test_set_options_returns_paginated_lean_set_options(): void
+    {
+        $character = $this->character->getCharacter();
+        $eligibleSet = $this->createInventorySet(['character_id' => $character->id, 'name' => 'Lean Option Set', 'is_equipped' => false]);
+
+        $nonEmptySet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $this->createInventorySetSlot(['inventory_set_id' => $nonEmptySet->id, 'item_id' => $this->createItem()->id]);
+
+        $equippedSet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+
+        $batchCraftingSet = $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+            'is_equipped' => false,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character/'.$character->id.'/inventory/set-options');
+
+        $response->assertOk();
+        $data = $response->json()['data'];
+        $returnedSetIds = array_column($data, 'set_id');
+
+        $this->assertArrayHasKey('data', $response->json());
+        $this->assertArrayHasKey('set_id', $data[0]);
+        $this->assertArrayHasKey('display_name', $data[0]);
+        $this->assertArrayHasKey('set_number', $data[0]);
+        $this->assertArrayNotHasKey('items', $data[0]);
+        $this->assertContains($eligibleSet->id, $returnedSetIds);
+        $this->assertNotContains($nonEmptySet->id, $returnedSetIds);
+        $this->assertNotContains($equippedSet->id, $returnedSetIds);
+        $this->assertNotContains($batchCraftingSet->id, $returnedSetIds);
     }
 
     public function test_get_set_items_returns_paginated_set_items(): void

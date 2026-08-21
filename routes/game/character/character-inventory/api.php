@@ -9,6 +9,7 @@ Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are']], f
     Route::get('/character/{character}/inventory/comparison-from-chat', ['uses' => 'Api\ItemComparisonController@compareItemFromChat']);
     Route::get('/character/{character}/inventory/sets', ['uses' => 'Api\CharacterInventoryController@currentSets']);
     Route::get('/character/{character}/inventory/set-items', ['uses' => 'Api\CharacterInventoryController@getSetItems']);
+    Route::get('/character/{character}/inventory/set-options', ['uses' => 'Api\CharacterInventoryController@setOptions']);
     Route::get('/character/{character}/inventory-set-equippability-details/{inventorySet}', ['uses' => 'Api\CharacterInventoryController@inventorySetEquippabilityDetails']);
     Route::get('/character/{character}/gem-bag', ['uses' => 'Api\CharacterGemBagController@getGemSlots']);
     Route::get('/character/{character}/gem-details/{gemBagSlot}', ['uses' => 'Api\CharacterGemBagController@getGem']);

@@ -19,6 +19,27 @@ import { ScreenPropsOf } from './types/screen-props-of-type';
 import { StackEntry } from './types/stack-entry-type';
 import { slideVariants } from './variants/animation-variants';
 
+type ScreenAnimationState = 'enter' | 'inactive';
+
+interface ScreenView<TMap extends ScreenMap> {
+  entry: StackEntry<TMap>;
+  is_top: boolean;
+  animation_state: ScreenAnimationState;
+}
+
+const buildScreenView = <TMap extends ScreenMap>(
+  entry: StackEntry<TMap>,
+  topKey: string | null
+): ScreenView<TMap> => {
+  const is_top = entry.key === topKey;
+
+  return {
+    entry,
+    is_top,
+    animation_state: is_top ? 'enter' : 'inactive',
+  };
+};
+
 const createScreenManager = <TMap extends ScreenMap>() => {
   const Ctx = createContext<ScreenNavigation<TMap> | null>(null);
 
@@ -171,10 +192,21 @@ const createScreenManager = <TMap extends ScreenMap>() => {
 
   const ScreenHost = () => {
     const navigation = useScreenNavigation();
+    const reduceMotion = useReducedMotion();
+    const topRef = useRef<HTMLDivElement>(null);
 
-    const top = useMemo(() => {
-      return navigation._getTop();
-    }, [navigation]);
+    const top = useMemo(() => navigation._getTop(), [navigation]);
+
+    const screenViews = useMemo<ScreenView<TMap>[]>(() => {
+      const hidden = navigation._getHidden();
+      const entries: StackEntry<TMap>[] = top ? [...hidden, top] : hidden;
+
+      return entries.map((entry) => buildScreenView(entry, top?.key ?? null));
+    }, [navigation, top]);
+
+    useEffect(() => {
+      topRef.current?.focus({ preventScroll: true });
+    }, [top?.key]);
 
     const renderResolved = <K extends ScreenName<TMap>>(
       name: K,
@@ -187,51 +219,34 @@ const createScreenManager = <TMap extends ScreenMap>() => {
       return React.createElement(component, props as Attributes);
     };
 
-    const renderHiddenScreens = () => {
-      const hidden = navigation._getHidden();
-
-      if (hidden.length === 0) {
-        return null;
-      }
-
-      return hidden.map((entry: StackEntry<TMap>) => {
-        return (
-          <div
-            key={entry.key}
-            className="pointer-events-none absolute inset-0 z-0 opacity-0"
-            aria-hidden
-            inert
-          >
-            {renderResolved(entry.name as never, entry.props as never)}
-          </div>
-        );
-      });
-    };
-
-    const reduceMotion = useReducedMotion();
-    const topRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-      topRef.current?.focus();
-    }, [top?.key]);
-
-    const renderTopScreen = () => {
-      if (!top) {
-        return null;
-      }
+    const renderScreen = (screenView: ScreenView<TMap>) => {
+      const { entry, is_top, animation_state } = screenView;
 
       return (
         <motion.div
-          key={top.key}
-          ref={topRef}
-          tabIndex={-1}
-          className="relative z-10 focus:outline-none"
+          key={entry.key}
+          ref={is_top ? topRef : undefined}
+          tabIndex={is_top ? -1 : undefined}
+          className={clsx('focus:outline-none', {
+            'relative z-10': is_top,
+            'pointer-events-none absolute inset-0 z-0 opacity-0': !is_top,
+          })}
           variants={reduceMotion ? undefined : slideVariants}
           initial={reduceMotion ? false : 'hidden'}
-          animate={reduceMotion ? undefined : 'enter'}
+          animate={reduceMotion ? undefined : animation_state}
           exit={reduceMotion ? undefined : 'exit'}
+          transition={
+            reduceMotion
+              ? { duration: 0 }
+              : {
+                  x: { type: 'tween', duration: 0.25, ease: 'easeOut' },
+                  opacity: { duration: 0.15 },
+                }
+          }
+          aria-hidden={!is_top}
+          inert={!is_top}
         >
-          {renderResolved(top.name as never, top.props as never)}
+          {renderResolved(entry.name as never, entry.props as never)}
         </motion.div>
       );
     };
@@ -244,8 +259,9 @@ const createScreenManager = <TMap extends ScreenMap>() => {
         })}
         style={{ willChange: 'transform' }}
       >
-        {renderHiddenScreens()}
-        <AnimatePresence>{renderTopScreen()}</AnimatePresence>
+        <AnimatePresence initial={false} mode="popLayout">
+          {screenViews.map(renderScreen)}
+        </AnimatePresence>
       </div>
     );
   };

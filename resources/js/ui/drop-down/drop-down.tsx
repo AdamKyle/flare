@@ -72,6 +72,7 @@ const Dropdown = ({
   on_end_reached,
   empty_message,
   search_placeholder,
+  on_open,
 }: DropdownProps) => {
   const generatedId = useId().replace(/:/g, '');
   const triggerId = id ?? `dropdown-trigger-${generatedId}`;
@@ -263,12 +264,14 @@ const Dropdown = ({
     if (!isOpen) {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
+        on_open?.();
         setIsOpen(true);
         return;
       }
 
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault();
+        on_open?.();
         setIsOpen(true);
         setFocusedIndex(
           event.key === 'ArrowDown' ? 0 : Math.max(displayItems.length - 1, 0)
@@ -349,30 +352,25 @@ const Dropdown = ({
       return;
     }
 
-    setIsOpen((previousOpen) => {
-      const nextOpen = !previousOpen;
+    if (isOpen) {
+      closeMenu();
+      return;
+    }
 
-      if (
-        nextOpen &&
-        focus_selected_on_open &&
-        (selectedValue !== '' || pre_selected_item)
-      ) {
-        const valueToFind =
-          selectedValue !== '' ? selectedValue : pre_selected_item?.value;
+    on_open?.();
 
-        const indexToFocus = displayItems.findIndex(
-          (it) => it.value === valueToFind
-        );
+    if (focus_selected_on_open && (selectedValue !== '' || pre_selected_item)) {
+      const valueToFind =
+        selectedValue !== '' ? selectedValue : pre_selected_item?.value;
 
-        setFocusedIndex(indexToFocus >= 0 ? indexToFocus : 0);
-      }
+      const indexToFocus = displayItems.findIndex(
+        (it) => it.value === valueToFind
+      );
 
-      if (!nextOpen) {
-        setInternalSearchTerm('');
-      }
+      setFocusedIndex(indexToFocus >= 0 ? indexToFocus : 0);
+    }
 
-      return nextOpen;
-    });
+    setIsOpen(true);
   };
 
   const handleSelectItem = (item: DropdownItem) => {
@@ -415,10 +413,25 @@ const Dropdown = ({
     ));
 
   const renderSelectionText = () => {
-    const current =
-      selectedValue !== ''
-        ? items.find((it) => it.value === selectedValue)
-        : pre_selected_item;
+    const resolveCurrent = (): DropdownItem | undefined => {
+      if (selectedValue === '') {
+        return pre_selected_item;
+      }
+
+      const matchedItem = items.find((it) => it.value === selectedValue);
+
+      if (matchedItem) {
+        return matchedItem;
+      }
+
+      if (pre_selected_item?.value === selectedValue) {
+        return pre_selected_item;
+      }
+
+      return undefined;
+    };
+
+    const current = resolveCurrent();
 
     if (current) {
       return (

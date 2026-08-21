@@ -17,7 +17,11 @@ const Screen = ({
   const screenRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isPresent) screenRef.current?.focus();
+    if (!isPresent) {
+      return;
+    }
+
+    screenRef.current?.focus({ preventScroll: true });
   }, [isPresent]);
 
   return (

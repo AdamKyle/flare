@@ -1,4 +1,5 @@
-import React, { ReactNode, useState } from 'react';
+import { debounce } from 'lodash';
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 import CraftAmountPreview from './craft-amount-preview';
 import { useCraftableItemsApi } from '../../crafting/api/hooks/use-craftable-items-api';
@@ -22,6 +23,10 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
+import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
+
+const PREVIEW_DEBOUNCE_MS = 300;
 
 const CRAFT_TYPE_OPTIONS: DropdownItem[] = craftTypeOptions.filter(
   (option) => option.value !== 'for-class'
@@ -60,9 +65,11 @@ const CraftAmountForm = (): ReactNode => {
   const [searchText, setSearchTextState] = useState('');
 
   const selectedCraftingType =
-    typeof craftingType?.value === 'string' ? craftingType.value : null;
+    craftTypeOptions.find((option) => option.value === craftingType?.value)
+      ?.value ?? null;
   const selectedArmourType =
-    typeof armourType?.value === 'string' ? armourType.value : null;
+    armourTypeOptions.find((option) => option.value === armourType?.value)
+      ?.value ?? null;
 
   const {
     items,
@@ -75,6 +82,7 @@ const CraftAmountForm = (): ReactNode => {
     characterId,
     selectedType: selectedCraftingType,
     armourType: selectedArmourType,
+    itemType: null,
   });
 
   const {
@@ -90,13 +98,39 @@ const CraftAmountForm = (): ReactNode => {
     start,
   } = useStartBatchCrafting(characterId);
 
-  const request = buildCraftAmountRequest({
-    craftingType,
-    selectedItem,
-    amountText,
-    disposition,
-    outputDestination,
-  });
+  const request = useMemo(
+    () =>
+      buildCraftAmountRequest({
+        craftingType,
+        selectedItem,
+        amountText,
+        disposition,
+        outputDestination,
+      }),
+    [craftingType, selectedItem, amountText, disposition, outputDestination]
+  );
+
+  const debouncedFetchRef = useRef<ReturnType<typeof debounce> | null>(null);
+
+  useEffect(() => {
+    debouncedFetchRef.current?.cancel();
+    clearPreview();
+
+    if (!request) {
+      return;
+    }
+
+    const debouncedFetch = debounce(() => {
+      void fetchPreview(request);
+    }, PREVIEW_DEBOUNCE_MS);
+
+    debouncedFetchRef.current = debouncedFetch;
+    debouncedFetch();
+
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [request, fetchPreview, clearPreview]);
 
   const handleSearch = (value: string) => {
     setSearchTextState(value);
@@ -109,7 +143,6 @@ const CraftAmountForm = (): ReactNode => {
     setSelectedItem(null);
     setSearchTextState('');
     setSearchText('');
-    clearPreview();
   };
 
   const handleArmourTypeSelect = (item: DropdownItem) => {
@@ -117,17 +150,14 @@ const CraftAmountForm = (): ReactNode => {
     setSelectedItem(null);
     setSearchTextState('');
     setSearchText('');
-    clearPreview();
   };
 
   const handleItemSelect = (item: DropdownItem) => {
     setSelectedItem(item);
-    clearPreview();
   };
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmountText(event.target.value);
-    clearPreview();
   };
 
   const handleDispositionSelect = (item: DropdownItem) => {
@@ -141,7 +171,6 @@ const CraftAmountForm = (): ReactNode => {
       item.value === BatchCraftingDisposition.DESTROY
     ) {
       setDisposition(item.value);
-      clearPreview();
     }
   };
 
@@ -155,16 +184,7 @@ const CraftAmountForm = (): ReactNode => {
       item.value === BatchCraftingOutputDestination.CRAFTED_ITEMS_SET
     ) {
       setOutputDestination(item.value);
-      clearPreview();
     }
-  };
-
-  const handlePreview = () => {
-    if (!request) {
-      return;
-    }
-
-    void fetchPreview(request);
   };
 
   const handleStart = async () => {
@@ -192,6 +212,13 @@ const CraftAmountForm = (): ReactNode => {
     OUTPUT_DESTINATION_OPTIONS.find(
       (option) => option.value === outputDestination
     ) ?? OUTPUT_DESTINATION_OPTIONS[0];
+
+  const canStart =
+    request !== null &&
+    preview !== null &&
+    !previewLoading &&
+    preview.blockers.length === 0 &&
+    !starting;
 
   const renderArmourTypeField = () => {
     if (craftingType?.value !== 'armour') {
@@ -243,6 +270,15 @@ const CraftAmountForm = (): ReactNode => {
   };
 
   const renderPreview = () => {
+    if (previewLoading) {
+      return (
+        <IndeterminateProgressBar
+          label="Updating preview"
+          variant={ProgressBarVariant.PRIMARY}
+        />
+      );
+    }
+
     if (previewError) {
       return <Alert variant={AlertVariant.DANGER}>{previewError}</Alert>;
     }
@@ -342,14 +378,6 @@ const CraftAmountForm = (): ReactNode => {
 
       {renderOutputDestinationField()}
 
-      <Button
-        label="Preview"
-        variant={ButtonVariant.PRIMARY}
-        additional_css="w-full"
-        disabled={!request || previewLoading}
-        on_click={handlePreview}
-      />
-
       {renderPreview()}
 
       {startError && <Alert variant={AlertVariant.DANGER}>{startError}</Alert>}
@@ -358,7 +386,7 @@ const CraftAmountForm = (): ReactNode => {
         label="Batch Craft"
         variant={ButtonVariant.SUCCESS}
         additional_css="w-full"
-        disabled={!request || starting}
+        disabled={!canStart}
         on_click={handleStart}
       />
     </div>

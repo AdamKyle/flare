@@ -6,6 +6,8 @@ Route::middleware([
     'is.character.who.they.say.they.are',
 ])->group(function () {
     Route::get('/batch-crafting/{character}/status', ['as' => 'batch-crafting.status', 'uses' => 'Api\BatchCraftingController@status']);
+    Route::get('/batch-crafting/{character}/craft-set/recommendation', ['as' => 'batch-crafting.craft-set.recommendation', 'uses' => 'Api\BatchCraftingController@craftSetRecommendation']);
+    Route::get('/batch-crafting/{character}/craft-set/hand-recommendation', ['as' => 'batch-crafting.craft-set.hand-recommendation', 'uses' => 'Api\BatchCraftingController@craftSetHandRecommendation']);
 
     Route::middleware(['throttle:150,2'])->group(function () {
         Route::post('/batch-crafting/{character}/dismiss', ['as' => 'batch-crafting.dismiss', 'uses' => 'Api\BatchCraftingController@dismiss']);

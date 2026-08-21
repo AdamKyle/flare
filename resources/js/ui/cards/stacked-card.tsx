@@ -5,6 +5,8 @@ import React from 'react';
 import { useStackedCardAccessibility } from './hooks/use-stacked-card-accessibility';
 import StackedCardProps from './types/stacked-card-props';
 
+import { sidePeekPanelWidthStyles } from 'ui/side-peek/styles/side-peek-panel-styles';
+
 const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
   const isPresent = useIsPresent();
   const reduceMotion = useReducedMotion();
@@ -59,7 +61,8 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
         animate="enter"
         exit="exit"
         className={clsx(
-          'relative h-full w-full max-w-xl',
+          'relative h-full',
+          sidePeekPanelWidthStyles(),
           isPresent ? 'pointer-events-auto' : 'pointer-events-none'
         )}
         style={{ willChange: 'transform' }}

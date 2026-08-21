@@ -1,50 +1,60 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
+import { BatchCraftingEntryType } from '../enums/batch-crafting-entry-type';
 import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
-import { BatchCraftingType } from '../enums/batch-crafting-type';
+import { useBatchCraftingStatusContext } from '../hooks/use-batch-crafting-status-context';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-const BATCH_TYPE_OPTIONS: DropdownItem[] = [
-  { label: 'Craft', value: BatchCraftingType.CRAFT },
-];
-
 const BatchCraftingTypeScreen = (): ReactNode => {
   const navigation = BatchCraftingScreenManager.useScreenNavigation();
-  const [selected, setSelected] = useState<DropdownItem>(BATCH_TYPE_OPTIONS[0]);
+  const { status } = useBatchCraftingStatusContext();
 
-  const handleContinue = () => {
+  const canCraftForEvent = status?.capabilities?.can_craft_for_event ?? false;
+
+  const options = useMemo((): DropdownItem[] => {
+    const items: DropdownItem[] = [
+      { label: 'Craft', value: BatchCraftingEntryType.CRAFT },
+    ];
+
+    if (canCraftForEvent) {
+      items.push({
+        label: 'Craft For Event',
+        value: BatchCraftingEntryType.CRAFT_FOR_EVENT,
+      });
+    }
+
+    return items;
+  }, [canCraftForEvent]);
+
+  const handleSelect = (item: DropdownItem) => {
+    if (item.value === BatchCraftingEntryType.CRAFT_FOR_EVENT) {
+      navigation.navigateTo(BatchCraftingScreenNames.CRAFT_EVENT, {});
+
+      return;
+    }
+
     navigation.navigateTo(BatchCraftingScreenNames.MODE, {});
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Batch Type</h3>
       <fieldset>
         <legend
           id="batch-crafting-type-legend"
-          className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100"
         >
-          Batch Type
+          What do you want to craft?
         </legend>
         <Dropdown
           aria_labelled_by="batch-crafting-type-legend"
-          items={BATCH_TYPE_OPTIONS}
-          on_select={setSelected}
-          pre_selected_item={selected}
-          selection_placeholder="Select a batch type"
+          items={options}
+          on_select={handleSelect}
+          selection_placeholder="Please select a batch type"
         />
       </fieldset>
-      <Button
-        label="Continue"
-        variant={ButtonVariant.SUCCESS}
-        additional_css="w-full"
-        on_click={handleContinue}
-      />
     </div>
   );
 };

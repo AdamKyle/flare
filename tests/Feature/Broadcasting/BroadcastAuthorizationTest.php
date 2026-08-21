@@ -10,6 +10,9 @@ beforeEach(function () {
     require base_path('routes/game/messages/channels.php');
     require base_path('routes/game/automation/channels.php');
     require base_path('routes/game/maps/channels.php');
+
+    require base_path('routes/game/automation/delve/channels.php');
+    require base_path('routes/game/automation/batch-crafting/channels.php');
 });
 
 test('the authenticated owner is authorized for their private server message channel', function () {
@@ -98,6 +101,29 @@ test('a different authenticated user is rejected for another users private delve
 
     $response = $this->actingAs($otherUser)->post('/broadcasting/auth', [
         'channel_name' => 'private-delve-status-updated-'.$owner->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertForbidden();
+});
+
+test('the authenticated owner is authorized for their private batch crafting status channel', function () {
+    $user = $this->createUser();
+
+    $response = $this->actingAs($user)->post('/broadcasting/auth', [
+        'channel_name' => 'private-batch-crafting-status-updated-'.$user->id,
+        'socket_id' => '1234.5678',
+    ]);
+
+    $response->assertOk();
+});
+
+test('a different authenticated user is rejected for another users private batch crafting status channel', function () {
+    $owner = $this->createUser();
+    $otherUser = $this->createUser();
+
+    $response = $this->actingAs($otherUser)->post('/broadcasting/auth', [
+        'channel_name' => 'private-batch-crafting-status-updated-'.$owner->id,
         'socket_id' => '1234.5678',
     ]);
 

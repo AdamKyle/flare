@@ -8,6 +8,8 @@ enum BatchCraftingActionStatus: string
     case SOLD = 'sold';
     case DESTROYED = 'destroyed';
     case FAILED = 'failed';
+    case CRAFTED = 'crafted';
+    case SKIPPED = 'skipped';
 
     /**
      * Determine whether this action status represents a successfully crafted item.
@@ -17,8 +19,8 @@ enum BatchCraftingActionStatus: string
     public function didCraft(): bool
     {
         return match ($this) {
-            self::KEPT, self::SOLD, self::DESTROYED => true,
-            self::FAILED => false,
+            self::KEPT, self::SOLD, self::DESTROYED, self::CRAFTED => true,
+            self::FAILED, self::SKIPPED => false,
         };
     }
 }

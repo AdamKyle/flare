@@ -226,6 +226,141 @@ class CraftingControllerTest extends TestCase
         $this->assertArrayHasKey('preview', $data['items'][0]);
     }
 
+    public function test_fetch_items_to_craft_paginated_with_damage_spell_item_type_filter_excludes_healing_spells(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Searing Bolt',
+            'cost' => 100,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-damage',
+            'can_craft' => true,
+        ]);
+
+        $this->createItem([
+            'name' => 'Mending Light',
+            'cost' => 100,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-healing',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, [
+                'crafting_type' => 'spell',
+                'per_page' => 15,
+                'page' => 1,
+                'filters' => ['item_type' => 'spell-damage'],
+            ]);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertCount(1, $data['data']);
+        $this->assertSame('Searing Bolt', $data['data'][0]['preview']['name']);
+        $this->assertArrayHasKey('pagination', $data['meta']);
+    }
+
+    public function test_fetch_items_to_craft_paginated_with_healing_spell_item_type_filter_excludes_damage_spells(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Searing Bolt',
+            'cost' => 100,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-damage',
+            'can_craft' => true,
+        ]);
+
+        $this->createItem([
+            'name' => 'Mending Light',
+            'cost' => 100,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-healing',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, [
+                'crafting_type' => 'spell',
+                'per_page' => 15,
+                'page' => 1,
+                'filters' => ['item_type' => 'spell-healing'],
+            ]);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertCount(1, $data['data']);
+        $this->assertSame('Mending Light', $data['data'][0]['preview']['name']);
+        $this->assertArrayHasKey('pagination', $data['meta']);
+    }
+
+    public function test_fetch_items_to_craft_paginated_without_item_type_filter_returns_both_spell_types(): void
+    {
+        $craftingSkill = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignSkill($craftingSkill)
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createItem([
+            'name' => 'Searing Bolt',
+            'cost' => 100,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-damage',
+            'can_craft' => true,
+        ]);
+
+        $this->createItem([
+            'name' => 'Mending Light',
+            'cost' => 100,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'spell',
+            'type' => 'spell-healing',
+            'can_craft' => true,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, [
+                'crafting_type' => 'spell',
+                'per_page' => 15,
+                'page' => 1,
+            ]);
+
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertCount(2, $data['data']);
+    }
+
     public function test_craft_success_returns_result_preview_from_created_inventory_slot(): void
     {
         $this->instance(

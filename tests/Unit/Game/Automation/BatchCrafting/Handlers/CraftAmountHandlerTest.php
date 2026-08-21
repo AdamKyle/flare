@@ -5,6 +5,7 @@ namespace Tests\Unit\Game\Automation\BatchCrafting\Handlers;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Inventory;
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingActionStatus;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingDisposition;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingEndReason;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
@@ -112,6 +113,8 @@ class CraftAmountHandlerTest extends TestCase
         $result = $this->handler->handle($batchCrafting, $this->character);
 
         $this->assertTrue($result->didCraft());
+        $this->assertSame(1, $result->goldSpent());
+        $this->assertSame(0, $result->goldGained());
         $batchCraftingSet = resolve(BatchCraftingSetService::class)->getOrCreateForCharacter($this->character);
         $this->assertSame(1, $batchCraftingSet->slots()->where('item_id', $item->id)->count());
     }
@@ -130,6 +133,7 @@ class CraftAmountHandlerTest extends TestCase
         $result = $this->handler->handle($batchCrafting, $this->character);
 
         $this->assertTrue($result->didCraft());
+        $this->assertSame(1, $result->goldSpent());
         $this->assertSame(1, $this->character->inventory->slots()->where('item_id', $item->id)->count());
     }
 
@@ -149,6 +153,8 @@ class CraftAmountHandlerTest extends TestCase
         $result = $this->handler->handle($batchCrafting, $this->character);
 
         $this->assertTrue($result->didCraft());
+        $this->assertSame(100, $result->goldSpent());
+        $this->assertSame($expectedGoldGained, $result->goldGained());
         $this->assertSame($goldBeforeSale - 100 + $expectedGoldGained, $this->character->refresh()->gold);
     }
 
@@ -166,6 +172,7 @@ class CraftAmountHandlerTest extends TestCase
         $result = $this->handler->handle($batchCrafting, $this->character);
 
         $this->assertTrue($result->didCraft());
+        $this->assertSame(1, $result->goldSpent());
     }
 
     public function test_handle_increments_craft_specific_count_only_on_successful_craft(): void
@@ -200,6 +207,7 @@ class CraftAmountHandlerTest extends TestCase
 
         $this->assertFalse($result->didCraft());
         $this->assertSame(BatchCraftingEndReason::NO_GOLD, $result->endReason());
+        $this->assertSame(0, $result->goldSpent());
         $this->assertSame(0, $batchCrafting->refresh()->progress['craft_specific_count']);
     }
 
@@ -253,6 +261,8 @@ class CraftAmountHandlerTest extends TestCase
         $result = $this->handler->handle($batchCrafting, $this->character);
 
         $this->assertSame(BatchCraftingEndReason::FAILED, $result->endReason());
+        $this->assertSame(BatchCraftingActionStatus::FAILED, $result->actionStatus());
+        $this->assertSame(1, $result->goldSpent());
     }
 
     public function test_handle_returns_failed_action_status_when_craft_roll_fails(): void
@@ -278,6 +288,8 @@ class CraftAmountHandlerTest extends TestCase
 
         $this->assertFalse($result->didCraft());
         $this->assertNull($result->endReason());
+        $this->assertSame(BatchCraftingActionStatus::FAILED, $result->actionStatus());
+        $this->assertSame(1, $result->goldSpent());
     }
 
     public function test_handle_returns_failed_when_the_crafted_items_set_cannot_accept_the_item_at_commit_time(): void
@@ -300,5 +312,7 @@ class CraftAmountHandlerTest extends TestCase
         $result = resolve(CraftAmountHandler::class)->handle($batchCrafting, $this->character);
 
         $this->assertSame(BatchCraftingEndReason::FAILED, $result->endReason());
+        $this->assertSame(BatchCraftingActionStatus::FAILED, $result->actionStatus());
+        $this->assertSame(1, $result->goldSpent());
     }
 }

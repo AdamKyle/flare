@@ -9,7 +9,7 @@ use Attribute;
 class HandlesBatchCraftingType
 {
     /**
-     * @param  BatchCraftingType  $type  The Batch Crafting type this class handles.
+     * @param  BatchCraftingType  $type
      */
     public function __construct(public readonly BatchCraftingType $type) {}
 }

@@ -6,4 +6,6 @@ export default interface SetChoicesProps {
   on_set_selection_clear: () => void;
   set_equipped_set_name?: boolean;
   dont_show_equipped_set?: boolean;
+  initial_set_id?: number;
+  initial_set_name?: string;
 }

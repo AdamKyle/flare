@@ -7,6 +7,10 @@ import { useInfiniteScroll } from '../../../../../../../character-sheet/partials
 import { CraftingTypes } from '../../../enums/crafting-types';
 import { useCraftingTimeout } from '../../../shared/hooks/use-crafting-timeout';
 import CraftableItemDefinition from '../api/definitions/craftable-item-definition';
+import {
+  CraftableItemCraftingType,
+  CraftableItemSubtype,
+} from '../api/definitions/craftable-item-query-definition';
 import { useCraftItemApi } from '../api/hooks/use-craft-item-api';
 import { useCraftableItemsApi } from '../api/hooks/use-craftable-items-api';
 import { armourTypeOptions, craftTypeOptions } from '../utils/crafting-options';
@@ -20,8 +24,11 @@ export const useCraftItemsFlow = ({
 }: UseCraftItemsFlowParams): UseCraftItemsFlowDefinition => {
   const { gameData } = useGameData();
 
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [armourType, setArmourType] = useState<string | null>(null);
+  const [selectedType, setSelectedType] =
+    useState<CraftableItemCraftingType | null>(null);
+  const [armourType, setArmourType] = useState<CraftableItemSubtype | null>(
+    null
+  );
   const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const [searchInput, setSearchInput] = useState('');
   const [craftForNpc, setCraftForNpc] = useState(false);
@@ -46,7 +53,12 @@ export const useCraftItemsFlow = ({
     canLoadMore,
     onEndReached,
     setSearchText,
-  } = useCraftableItemsApi({ characterId, selectedType, armourType });
+  } = useCraftableItemsApi({
+    characterId,
+    selectedType,
+    armourType,
+    itemType: null,
+  });
 
   const selectedItem = items.find((item) => item.id === selectedItemId) ?? null;
 
@@ -64,7 +76,11 @@ export const useCraftItemsFlow = ({
   const displayedCraftingData = craftingResponse ?? craftingData;
 
   const handleTypeChange = (item: DropdownItem) => {
-    setSelectedType(String(item.value));
+    const matchedType =
+      craftTypeOptions.find((option) => option.value === item.value)?.value ??
+      null;
+
+    setSelectedType(matchedType);
     setArmourType(null);
     setSelectedItemId(null);
     setSearchInput('');
@@ -75,7 +91,11 @@ export const useCraftItemsFlow = ({
   };
 
   const handleArmourTypeChange = (item: DropdownItem) => {
-    setArmourType(String(item.value));
+    const matchedArmourType =
+      armourTypeOptions.find((option) => option.value === item.value)?.value ??
+      null;
+
+    setArmourType(matchedArmourType);
     setSelectedItemId(null);
     clearResult();
   };

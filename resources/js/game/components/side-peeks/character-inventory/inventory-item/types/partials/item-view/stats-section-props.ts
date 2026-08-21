@@ -1,5 +1,5 @@
-import { EquippableItemWithBase } from '../../../../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
+import StatModifiersDefinition from './stat-modifiers-definition';
 
 export default interface StatsSectionProps {
-  item: EquippableItemWithBase;
+  item: StatModifiersDefinition;
 }

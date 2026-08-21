@@ -1,50 +1,77 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
 import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
 import { CraftingBatchMode } from '../enums/crafting-batch-mode';
+import { useBatchCraftingStatusContext } from '../hooks/use-batch-crafting-status-context';
+import { createEnumValueGuard } from '../utils/create-enum-value-guard';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-const BATCH_MODE_OPTIONS: DropdownItem[] = [
-  { label: 'Craft Amount', value: CraftingBatchMode.AMOUNT },
-];
+const MODE_SCREENS: Partial<
+  Record<CraftingBatchMode, BatchCraftingScreenNames>
+> = {
+  [CraftingBatchMode.EXPERIENCE]: BatchCraftingScreenNames.CRAFT_EXPERIENCE,
+  [CraftingBatchMode.AMOUNT]: BatchCraftingScreenNames.CRAFT_AMOUNT,
+  [CraftingBatchMode.SET]: BatchCraftingScreenNames.CRAFT_SET_OUTPUT,
+};
+
+const isCraftingBatchMode = createEnumValueGuard(CraftingBatchMode);
 
 const BatchCraftingModeScreen = (): ReactNode => {
   const navigation = BatchCraftingScreenManager.useScreenNavigation();
-  const [selected, setSelected] = useState<DropdownItem>(BATCH_MODE_OPTIONS[0]);
+  const { status } = useBatchCraftingStatusContext();
 
-  const handleContinue = () => {
-    navigation.navigateTo(BatchCraftingScreenNames.CRAFT_AMOUNT, {});
+  const canCraftForExperience =
+    status?.capabilities?.can_craft_for_experience ?? false;
+
+  const options = useMemo((): DropdownItem[] => {
+    const items: DropdownItem[] = [];
+
+    if (canCraftForExperience) {
+      items.push({
+        label: 'Craft For Experience',
+        value: CraftingBatchMode.EXPERIENCE,
+      });
+    }
+
+    items.push({ label: 'Craft Amount', value: CraftingBatchMode.AMOUNT });
+    items.push({ label: 'Craft Set', value: CraftingBatchMode.SET });
+
+    return items;
+  }, [canCraftForExperience]);
+
+  const handleSelect = (item: DropdownItem) => {
+    if (typeof item.value !== 'string' || !isCraftingBatchMode(item.value)) {
+      return;
+    }
+
+    const screen = MODE_SCREENS[item.value];
+
+    if (!screen) {
+      return;
+    }
+
+    navigation.navigateTo(screen, {});
   };
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Craft Mode</h3>
       <fieldset>
         <legend
           id="batch-crafting-mode-legend"
-          className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100"
         >
-          Craft Mode
+          How do you want to craft?
         </legend>
         <Dropdown
           aria_labelled_by="batch-crafting-mode-legend"
-          items={BATCH_MODE_OPTIONS}
-          on_select={setSelected}
-          pre_selected_item={selected}
-          selection_placeholder="Select a mode"
+          items={options}
+          on_select={handleSelect}
+          selection_placeholder="Please select a craft mode"
         />
       </fieldset>
-      <Button
-        label="Continue"
-        variant={ButtonVariant.SUCCESS}
-        additional_css="w-full"
-        on_click={handleContinue}
-      />
     </div>
   );
 };

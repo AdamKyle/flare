@@ -10,13 +10,12 @@ use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use App\Game\Automation\BatchCrafting\Enums\CraftingBatchMode;
 use App\Game\Automation\BatchCrafting\Factories\BatchCraftingHandlerFactory;
 use App\Game\Automation\BatchCrafting\Values\BatchCraftingOperationResult;
-use InvalidArgumentException;
 
 #[HandlesBatchCraftingType(BatchCraftingType::CRAFT)]
 class CraftingOrchestrator implements BatchCraftingOrchestrator
 {
     /**
-     * @param  BatchCraftingHandlerFactory  $handlerFactory  The Batch Crafting handler resolver.
+     * @param  BatchCraftingHandlerFactory  $handlerFactory
      */
     public function __construct(private readonly BatchCraftingHandlerFactory $handlerFactory) {}
 
@@ -29,12 +28,8 @@ class CraftingOrchestrator implements BatchCraftingOrchestrator
      */
     public function orchestrate(BatchCrafting $batchCrafting, Character $character): BatchCraftingOperationResult
     {
-        $progress = $batchCrafting->progress ?? [];
-        $mode = CraftingBatchMode::tryFrom($progress['craft_mode'] ?? '');
-
-        if (is_null($mode)) {
-            throw new InvalidArgumentException('Batch Crafting ['.$batchCrafting->id.'] has no valid craft_mode for the Craft batch type.');
-        }
+        $progress = $batchCrafting->progress;
+        $mode = CraftingBatchMode::from($progress['craft_mode']);
 
         $handler = $this->handlerFactory->make(BatchCraftingType::CRAFT, $mode);
 

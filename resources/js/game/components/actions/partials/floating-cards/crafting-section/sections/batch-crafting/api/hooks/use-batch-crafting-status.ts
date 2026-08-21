@@ -3,7 +3,12 @@ import axios from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { extractBatchCraftingApiError } from '../../utils/extract-batch-crafting-api-error';
+import {
+  mergeBatchCraftingStatusUpdate,
+  mergeBatchCraftingStatusUpdates,
+} from '../../utils/merge-batch-crafting-status-update';
 import BatchCraftingStatusDefinition from '../definitions/batch-crafting-status-definition';
+import BatchCraftingStatusUpdatedDefinition from '../definitions/batch-crafting-status-updated-definition';
 import { BatchCraftingApiUrls } from '../enums/batch-crafting-api-urls';
 import UseBatchCraftingStatusDefinition from './definitions/use-batch-crafting-status-definition';
 import UseBatchCraftingStatusParams from './definitions/use-batch-crafting-status-params';
@@ -26,6 +31,10 @@ export const useBatchCraftingStatus = ({
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const requestGenerationRef = useRef(0);
+  const initialStatusResolvedRef = useRef(false);
+  const pendingStatusUpdatesRef = useRef<
+    BatchCraftingStatusUpdatedDefinition[]
+  >([]);
 
   const fetchStatus = useCallback(async () => {
     if (characterId <= 0) {
@@ -50,13 +59,28 @@ export const useBatchCraftingStatus = ({
         return;
       }
 
-      setStatus(result);
+      const nextStatus = mergeBatchCraftingStatusUpdates(
+        result,
+        pendingStatusUpdatesRef.current
+      );
+
+      pendingStatusUpdatesRef.current = [];
+      initialStatusResolvedRef.current = true;
+
+      setStatus(nextStatus);
     } catch (requestError) {
       if (axios.isCancel(requestError)) {
         return;
       }
 
       if (requestGenerationRef.current !== requestGeneration) {
+        return;
+      }
+
+      if (pendingStatusUpdatesRef.current.length > 0) {
+        initialStatusResolvedRef.current = true;
+        pendingStatusUpdatesRef.current = [];
+
         return;
       }
 
@@ -78,6 +102,9 @@ export const useBatchCraftingStatus = ({
   }, [apiHandler, getUrl, characterId]);
 
   useEffect(() => {
+    initialStatusResolvedRef.current = false;
+    pendingStatusUpdatesRef.current = [];
+
     void fetchStatus();
 
     return () => {
@@ -85,14 +112,32 @@ export const useBatchCraftingStatus = ({
     };
   }, [fetchStatus]);
 
-  useWebsocket({
+  const handleStatusUpdatedEvent = useCallback(
+    (update: BatchCraftingStatusUpdatedDefinition) => {
+      if (!initialStatusResolvedRef.current) {
+        pendingStatusUpdatesRef.current = [
+          ...pendingStatusUpdatesRef.current,
+          update,
+        ];
+      }
+
+      setStatus((currentStatus) =>
+        mergeBatchCraftingStatusUpdate(currentStatus, update)
+      );
+      setError(null);
+      setLoading(false);
+    },
+    []
+  );
+
+  useWebsocket<BatchCraftingStatusUpdatedDefinition>({
     url: BATCH_CRAFTING_STATUS_UPDATED_CHANNEL,
     params: { userId },
     type: ChannelType.PRIVATE,
     channelName: BATCH_CRAFTING_STATUS_UPDATED_EVENT,
-    onEvent: () => void fetchStatus(),
+    onEvent: handleStatusUpdatedEvent,
     enabled: userId > 0,
   });
 
-  return { status, loading, error, refetch: fetchStatus };
+  return { status, loading, error };
 };

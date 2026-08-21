@@ -26,6 +26,8 @@ class BatchCraftingJobTest extends TestCase
 
     private ?Character $character;
 
+    private array $progress;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -33,6 +35,18 @@ class BatchCraftingJobTest extends TestCase
         $this->weaponCrafting = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($this->weaponCrafting, 10, false)->getCharacter();
         $this->character->update(['gold' => 1000, 'inventory_max' => 30]);
+        $this->progress = [
+            'craft_mode' => 'specific_item',
+            'specific_crafting_type' => 'dagger',
+            'specific_item_id' => 1,
+            'craft_amount' => 1,
+            'craft_specific_count' => 0,
+            'scheduled_for' => null,
+            'processing_started_at' => null,
+            'gold_spent_total' => 0,
+            'gold_gained_total' => 0,
+            'chart_points' => [],
+        ];
     }
 
     protected function tearDown(): void
@@ -71,7 +85,7 @@ class BatchCraftingJobTest extends TestCase
         Event::assertNotDispatched(BatchCraftingStatusUpdated::class);
     }
 
-    public function test_handle_processes_exactly_one_operation_per_queued_job(): void
+    public function test_handle_processes_the_entire_run_to_completion_from_a_single_queued_job(): void
     {
         $item = $this->createItem(['name' => 'Job Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 5]);
         $batchCrafting = $this->createBatchCrafting([
@@ -79,7 +93,7 @@ class BatchCraftingJobTest extends TestCase
             'user_id' => $this->character->user_id,
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 3, 'craft_specific_count' => 0],
+            'progress' => [...$this->progress, 'specific_item_id' => $item->id, 'craft_amount' => 3],
         ]);
 
         BatchCraftingJob::dispatch($batchCrafting->id);
@@ -99,7 +113,7 @@ class BatchCraftingJobTest extends TestCase
             'user_id' => $this->character->user_id,
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'craft_specific_count' => 0],
+            'progress' => [...$this->progress, 'specific_item_id' => $item->id],
         ]);
 
         BatchCraftingJob::dispatch($batchCrafting->id);
@@ -121,7 +135,7 @@ class BatchCraftingJobTest extends TestCase
             'user_id' => $this->character->user_id,
             'batch_type' => BatchCraftingType::CRAFT->value,
             'disposition' => BatchCraftingDisposition::DESTROY->value,
-            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 1, 'craft_specific_count' => 0],
+            'progress' => [...$this->progress, 'specific_item_id' => $item->id],
         ]);
 
         BatchCraftingJob::dispatch($batchCrafting->id);

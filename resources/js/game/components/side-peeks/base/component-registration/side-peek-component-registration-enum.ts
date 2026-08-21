@@ -32,6 +32,11 @@ export enum SidePeekComponentRegistrationEnum {
   CRAFTED_ITEM = 'CRAFTED_ITEM',
 
   /**
+   * Item Details
+   */
+  ITEM_DETAILS = 'ITEM_DETAILS',
+
+  /**
    * Admin Monitoring
    */
   ADMIN_LOG_ENTRY = 'ADMIN_LOG_ENTRY',

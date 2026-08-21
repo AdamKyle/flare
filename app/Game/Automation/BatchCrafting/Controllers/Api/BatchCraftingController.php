@@ -5,14 +5,23 @@ namespace App\Game\Automation\BatchCrafting\Controllers\Api;
 use App\Flare\Models\Character;
 use App\Game\Automation\BatchCrafting\Requests\BatchCraftingRequest;
 use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
+use App\Game\Automation\BatchCrafting\Services\CraftSetHandRecommendationService;
+use App\Game\Automation\BatchCrafting\Services\CraftSetRecommendationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class BatchCraftingController
 {
     /**
-     * @param  BatchCraftingAutomationService  $batchCraftingAutomationService  The Batch Crafting lifecycle service.
+     * @param  BatchCraftingAutomationService  $batchCraftingAutomationService
+     * @param  CraftSetRecommendationService  $craftSetRecommendationService
+     * @param  CraftSetHandRecommendationService  $craftSetHandRecommendationService
      */
-    public function __construct(private readonly BatchCraftingAutomationService $batchCraftingAutomationService) {}
+    public function __construct(
+        private readonly BatchCraftingAutomationService $batchCraftingAutomationService,
+        private readonly CraftSetRecommendationService $craftSetRecommendationService,
+        private readonly CraftSetHandRecommendationService $craftSetHandRecommendationService,
+    ) {}
 
     /**
      * Start a new Batch Crafting run for the character.
@@ -80,6 +89,42 @@ class BatchCraftingController
     public function acknowledgeInfo(Character $character): JsonResponse
     {
         return $this->respond($this->batchCraftingAutomationService->acknowledgeInfo($character));
+    }
+
+    /**
+     * Return the authoritative Craft Set recommendation for the character.
+     *
+     * @param  Character  $character  The character requesting the recommendation.
+     * @return JsonResponse The recommended Craft Set positions and any missing required positions.
+     */
+    public function craftSetRecommendation(Character $character): JsonResponse
+    {
+        return response()->json($this->craftSetRecommendationService->build($character));
+    }
+
+    /**
+     * Recommend the best currently craftable item for one explicitly selected Craft Set hand type.
+     *
+     * @param  Request  $request  The incoming hand recommendation request.
+     * @param  Character  $character  The character requesting the recommendation.
+     * @return JsonResponse The recommended hand item, or a null item when nothing is craftable for the hand type.
+     */
+    public function craftSetHandRecommendation(Request $request, Character $character): JsonResponse
+    {
+        $handType = $request->string('hand_type')->toString();
+
+        $item = $this->craftSetHandRecommendationService->recommend($character, $handType);
+
+        if (is_null($item)) {
+            return response()->json(['item' => null]);
+        }
+
+        return response()->json([
+            'item' => [
+                'item_id' => $item->id,
+                'item_name' => $item->affix_name ?? $item->name,
+            ],
+        ]);
     }
 
     /**

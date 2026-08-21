@@ -11,6 +11,7 @@ use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
 use App\Flare\Pagination\Pagination;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Currency\Services\CurrencyLimit;
@@ -30,6 +31,7 @@ use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Exception;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use League\Fractal\Manager;
@@ -51,6 +53,21 @@ class CharacterInventoryService
 
     private ?string $inventorySetEquippedName = null;
 
+    /**
+     * @param  ItemEnricherFactory  $itemEnricherFactory
+     * @param  EquippableItemTransformer  $equippableItemTransformer
+     * @param  QuestItemTransformer  $questItemTransformer
+     * @param  UsableItemTransformer  $usableItemTransformer
+     * @param  InventoryTransformer  $inventoryTransformer
+     * @param  InventorySetService  $inventorySetService
+     * @param  MassDisenchantService  $massDisenchantService
+     * @param  UpdateCharacterSkillsService  $updateCharacterSkillsService
+     * @param  UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypesHandler
+     * @param  DisenchantService  $disenchantService
+     * @param  Pagination  $pagination
+     * @param  Manager  $manager
+     * @param  InventorySetOptionTransformer  $inventorySetOptionTransformer
+     */
     public function __construct(
         private readonly ItemEnricherFactory $itemEnricherFactory,
         private readonly EquippableItemTransformer $equippableItemTransformer,
@@ -64,10 +81,14 @@ class CharacterInventoryService
         private readonly DisenchantService $disenchantService,
         private readonly Pagination $pagination,
         private readonly Manager $manager,
+        private readonly InventorySetOptionTransformer $inventorySetOptionTransformer,
     ) {}
 
     /**
-     * Set the character
+     * Set the character used for subsequent inventory operations.
+     *
+     * @param  Character  $character  The character to operate on.
+     * @return CharacterInventoryService
      */
     public function setCharacter(Character $character): CharacterInventoryService
     {
@@ -77,7 +98,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Set the inventory slot
+     * Set the inventory slot used for subsequent inventory operations.
+     *
+     * @param  InventorySlot  $inventorySlot  The inventory slot to operate on.
+     * @return CharacterInventoryService
      */
     public function setInventorySlot(InventorySlot $inventorySlot): CharacterInventoryService
     {
@@ -87,7 +111,10 @@ class CharacterInventoryService
     }
 
     /**
-     * Set the positions
+     * Set the inventory slot positions used to resolve the character's inventory.
+     *
+     * @param  array  $positions  The slot positions to resolve inventory from.
+     * @return CharacterInventoryService
      */
     public function setPositions(array $positions): CharacterInventoryService
     {
@@ -97,7 +124,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Get api response.
+     * Build the complete inventory API payload for the character.
+     *
+     * @return array The full inventory, sets, quest items, usable items, and equipped-set payload.
      */
     public function getInventoryForApi(): array
     {
@@ -117,11 +146,22 @@ class CharacterInventoryService
         ];
     }
 
+    /**
+     * Return the currently equipped Inventory Set's name, when a set is equipped.
+     *
+     * @return string|null The equipped Inventory Set's name, or null when no set is equipped.
+     */
     public function getSetName(): ?string
     {
         return $this->inventorySetEquippedName;
     }
 
+    /**
+     * Return the character's inventory data for the requested inventory panel type.
+     *
+     * @param  string  $type  The requested inventory panel type.
+     * @return Collection|array The resolved inventory data for the requested type.
+     */
     public function getInventoryForType(string $type): Collection|array
     {
         switch ($type) {
@@ -156,6 +196,11 @@ class CharacterInventoryService
      * Crafting outputs kept in the Crafted Items Set), that ambiguous lookup can
      * resolve to the wrong physical slot. Callers that already know the specific
      * SetSlot id (such as Batch Crafting action history) should use this instead.
+     *
+     * @param  Character  $character  The owning character.
+     * @param  Item  $item  The catalog item the slot must contain.
+     * @param  int  $setSlotId  The exact SetSlot id to resolve.
+     * @return SetSlot|null The matching SetSlot, or null when it does not exist for the character.
      */
     public function getSetSlotForItemDetails(Character $character, Item $item, int $setSlotId): ?SetSlot
     {
@@ -166,7 +211,11 @@ class CharacterInventoryService
     }
 
     /**
-     * Gets the slot that holds the item, for its details.
+     * Resolve the inventory or set slot holding the given item, for item detail display.
+     *
+     * @param  Character  $character  The owning character.
+     * @param  int|Item  $slotIdOrItem  The slot id or item to resolve a slot for.
+     * @return InventorySlot|SetSlot|null The resolved slot, or null when none is found.
      */
     public function getSlotForItemDetails(Character $character, int|Item $slotIdOrItem): InventorySlot|SetSlot|null
     {
@@ -194,6 +243,10 @@ class CharacterInventoryService
 
     /**
      * Disenchant all items in an inventory.
+     *
+     * @param  Collection  $slots  The slots to disenchant.
+     * @param  Character  $character  The character disenchanting the items.
+     * @return array The disenchant-all result.
      */
     public function disenchantAllItems(Collection $slots, Character $character): array
     {
@@ -224,6 +277,10 @@ class CharacterInventoryService
 
     /**
      * Get character inventory sets.
+     *
+     * @param  int  $perPage  The number of sets to return per page.
+     * @param  int  $page  The page number to return.
+     * @return array The paginated inventory set payload.
      */
     public function getCharacterInventorySets(int $perPage = 10, int $page = 1): array
     {
@@ -265,6 +322,89 @@ class CharacterInventoryService
         return $this->pagination->paginateCollectionResponse($setCollection, $perPage, $page);
     }
 
+    /**
+     * Build the lean, database-paginated, searchable normal Inventory Set destination options for a Batch Crafting Craft Set output selector.
+     *
+     * Only empty, unequipped, normal Inventory Sets are eligible. The special Crafted Items/Batch Crafting Set is excluded here
+     * because it has its own dedicated output destination. Each eligible set carries its real ordinal position among the
+     * character's normal Inventory Sets ordered by id, so fallback display names stay stable regardless of which sets are eligible.
+     *
+     * @param  int  $perPage  The number of sets to return per page.
+     * @param  int  $page  The page number to return.
+     * @param  string  $search  The optional search text to filter sets by name.
+     * @return array The paginated, lean, eligible Inventory Set option payload.
+     */
+    public function getPaginatedInventorySetOptions(int $perPage = 10, int $page = 1, string $search = ''): array
+    {
+        $query = $this->character->inventorySets()
+            ->select('inventory_sets.*')
+            ->selectSub(
+                fn (QueryBuilder $query) => $query
+                    ->selectRaw('count(*) + 1')
+                    ->from('inventory_sets as numbered_inventory_sets')
+                    ->whereColumn('numbered_inventory_sets.character_id', 'inventory_sets.character_id')
+                    ->whereColumn('numbered_inventory_sets.id', '<', 'inventory_sets.id')
+                    ->where(fn ($query) => $query->whereNull('numbered_inventory_sets.special_type')
+                        ->orWhere('numbered_inventory_sets.special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)),
+                'set_number',
+            )
+            ->withCount('slots')
+            ->where('is_equipped', false)
+            ->where(fn ($query) => $query->whereNull('special_type')
+                ->orWhere('special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE))
+            ->whereDoesntHave('slots')
+            ->orderBy('id');
+
+        if ($search !== '') {
+            $query->where('name', 'LIKE', '%'.$search.'%');
+        }
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->inventorySetOptionTransformer);
+    }
+
+    /**
+     * Resolve a valid normal Inventory Set target belonging to the character, for a Batch Crafting destination.
+     *
+     * @param  int  $setId  The requested destination Inventory Set id.
+     * @return InventorySet|null The valid target set, or null when it is not a legal target.
+     */
+    public function resolveValidTargetInventorySet(int $setId): ?InventorySet
+    {
+        $set = $this->character->inventorySets()->find($setId);
+
+        if (is_null($set) || $set->is_equipped || $set->isBatchCraftingSet()) {
+            return null;
+        }
+
+        return $set;
+    }
+
+    /**
+     * Resolve an Inventory Set the character genuinely owns, for factual display purposes.
+     *
+     * Unlike resolveValidTargetInventorySet(), this does not exclude equipped or Batch
+     * Crafting Sets, because a previously selected destination set may legitimately have
+     * become equipped after a Batch Crafting run started.
+     *
+     * @param  int  $setId  The requested Inventory Set id.
+     * @return InventorySet|null The character's own set, or null when it does not belong to the character.
+     */
+    public function findOwnedInventorySet(int $setId): ?InventorySet
+    {
+        return $this->character->inventorySets()->find($setId);
+    }
+
+    /**
+     * Return the paginated items belonging to one of the character's Inventory Sets.
+     *
+     * @param  int  $perPage  The number of items to return per page.
+     * @param  int  $page  The page number to return.
+     * @param  string  $search  The optional search text to filter items by name.
+     * @param  array  $filters  The optional filters, including a specific set id.
+     * @return array The paginated set item payload.
+     */
     public function getSetItems(int $perPage = 10, int $page = 1, string $search = '', array $filters = []): array
     {
         $sets = $this->character->inventorySets();
@@ -293,7 +433,7 @@ class CharacterInventoryService
 
                 return $slot;
             })
-            ->sortByDesc(fn ($slot) => (float) $slot->item->total_damage_stat_bonus)
+            ->sortByDesc(fn ($slot) => $slot->item->total_damage_stat_bonus)
             ->values();
 
         return $this->pagination->buildPaginatedDate($slots, $this->equippableItemTransformer, $perPage, $page);
@@ -305,6 +445,8 @@ class CharacterInventoryService
      * - Either null if none.
      * - Equipped set name.
      * - Equipped set string id + 1
+     *
+     * @return string|null The equipped set's name, or null when no set is equipped.
      */
     public function getEquippedInventorySetName(): ?string
     {
@@ -325,6 +467,10 @@ class CharacterInventoryService
 
     /**
      * Returns the usable items.
+     *
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @param  array  $filters  The optional usable-item filters.
+     * @return array The usable item payload.
      */
     public function getUsableItems(string $searchText = '', array $filters = []): array
     {
@@ -342,6 +488,10 @@ class CharacterInventoryService
 
     /**
      * Returns the usable items as an Eloquent collection, filtered by search text and filters.
+     *
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @param  array  $filters  The optional usable-item filters.
+     * @return Collection The filtered usable item slots.
      */
     private function getUsableItemsCollection(string $searchText = '', array $filters = []): Collection
     {
@@ -375,6 +525,10 @@ class CharacterInventoryService
 
     /**
      * Determines whether a usable item matches any of the selected usable-item filters.
+     *
+     * @param  Item  $item  The item to test.
+     * @param  array  $filters  The selected usable-item filters.
+     * @return bool Whether the item matches at least one selected filter.
      */
     private function usableItemMatchesFilters(Item $item, array $filters): bool
     {
@@ -412,6 +566,9 @@ class CharacterInventoryService
 
     /**
      * Returns the quest items.
+     *
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @return Collection The matching quest items.
      */
     public function getQuestItems(string $searchText = ''): Collection
     {
@@ -433,6 +590,8 @@ class CharacterInventoryService
      *
      * We return the index + 1 which refers to the slot number.
      * ie, index of 0, is Slot 1 and so on.
+     *
+     * @return array The usable, non-equipped, non-Batch-Crafting inventory sets.
      */
     public function getUsableSets(): array
     {
@@ -474,6 +633,9 @@ class CharacterInventoryService
      *  - Does not include equipped, usable or quest items.
      *  - Only comes from inventory, does not include sets.
      *  - If the character is currently disenchanting selected items, do not get those items.
+     *
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @return Collection The matching inventory slots.
      */
     public function getInventorySlotsCollection(string $searchText = ''): Collection
     {
@@ -501,7 +663,13 @@ class CharacterInventoryService
         return $slots->values();
     }
 
-    public function getInventoryCollection(string $searchText = ''): \Illuminate\Support\Collection
+    /**
+     * Return the character's normal inventory, enriched and sorted by total damage stat bonus.
+     *
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @return Collection The enriched, sorted inventory slots.
+     */
+    public function getInventoryCollection(string $searchText = ''): Collection
     {
         return $this->getInventorySlotsCollection($searchText)
             ->map(function ($slot) {
@@ -509,7 +677,7 @@ class CharacterInventoryService
 
                 return $slot;
             })
-            ->sortByDesc(fn ($slot) => (float) $slot->item->total_damage_stat_bonus)
+            ->sortByDesc(fn ($slot) => $slot->item->total_damage_stat_bonus)
             ->values();
     }
 
@@ -518,6 +686,11 @@ class CharacterInventoryService
      *
      * - Does not include equipped, usable or quest items.
      * - Only comes from inventory, does not include sets.
+     *
+     * @param  int  $perPage  The number of items to return per page.
+     * @param  int  $page  The page number to return.
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @return array The paginated inventory payload.
      */
     public function fetchCharacterInventory(int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
@@ -528,6 +701,11 @@ class CharacterInventoryService
 
     /**
      * Returns all quest items - paginated.
+     *
+     * @param  int  $perPage  The number of items to return per page.
+     * @param  int  $page  The page number to return.
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @return array The paginated quest item payload.
      */
     public function fetchCharacterQuestItems(int $perPage = 10, int $page = 1, string $searchText = ''): array
     {
@@ -538,6 +716,12 @@ class CharacterInventoryService
 
     /**
      * Returns all usable items - paginated
+     *
+     * @param  int  $perPage  The number of items to return per page.
+     * @param  int  $page  The page number to return.
+     * @param  string  $searchText  The optional search text to filter items by name.
+     * @param  array  $filter  The optional usable-item filters.
+     * @return array The paginated usable item payload.
      */
     public function fetchCharacterUsableItems(int $perPage = 10, int $page = 1, string $searchText = '', array $filter = []): array
     {
@@ -551,6 +735,8 @@ class CharacterInventoryService
      *
      * - Does not include alchemy or quest items.
      * - Items can also not be equipped.
+     *
+     * @return array The matching inventory slot ids.
      */
     public function findCharacterInventorySlotIds(): array
     {
@@ -566,6 +752,8 @@ class CharacterInventoryService
 
     /**
      * Fetch equipped slots (InventorySlot or SetSlot) with each slot’s item enriched for the transformer.
+     *
+     * @return array The transformed equipped slot payload.
      */
     public function fetchEquipped(): array
     {
@@ -630,7 +818,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Set the inventory
+     * Resolve and store the inventory for the previously set positions.
+     *
+     * @return CharacterInventoryService
      */
     public function setInventory(): CharacterInventoryService
     {
@@ -640,7 +830,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Get inventory
+     * Resolve the inventory slots for the previously set positions, falling back to the equipped set's slots.
+     *
+     * @return Collection The resolved inventory slots.
      */
     protected function getInventory(): Collection
     {
@@ -663,7 +855,9 @@ class CharacterInventoryService
     }
 
     /**
-     * Return the inventory
+     * Return the previously resolved inventory.
+     *
+     * @return Collection The resolved inventory slots.
      */
     public function inventory(): Collection
     {
@@ -673,7 +867,8 @@ class CharacterInventoryService
     /**
      * Fetches the type of the item.
      *
-     * @throws Exception
+     * @param  Item  $item  The item to resolve the type for.
+     * @return string The resolved item type.
      */
     public function getType(Item $item): string
     {
@@ -682,6 +877,9 @@ class CharacterInventoryService
 
     /**
      * Delete an item from the inventory.
+     *
+     * @param  int  $itemId  The item id to delete.
+     * @return array The delete result.
      */
     public function deleteItem(int $itemId): array
     {
@@ -716,6 +914,8 @@ class CharacterInventoryService
      * - Will not destroy sets or items in sets.
      * - Will not destroy quest items or usable items.
      * - Will not destroy artifact items either.
+     *
+     * @return array The destroy-all result.
      */
     public function destroyAllItemsInInventory(): array
     {
@@ -733,6 +933,11 @@ class CharacterInventoryService
         ]);
     }
 
+    /**
+     * Disenchant every disenchantable item in the character's normal inventory.
+     *
+     * @return array The disenchant-all result.
+     */
     public function disenchantAllItemsInInventory(): array
     {
         $slots = $this->character->inventory->slots
@@ -758,7 +963,8 @@ class CharacterInventoryService
     /**
      * Unequip an item from the player.
      *
-     * @throws Exception
+     * @param  int  $inventorySlotId  The inventory slot id to unequip.
+     * @return array The unequip result.
      */
     public function unequipItem(int $inventorySlotId): array
     {
@@ -799,7 +1005,7 @@ class CharacterInventoryService
     /**
      * Unequip all items.
      *
-     * @throws Exception
+     * @return array The unequip-all result.
      */
     public function unequipAllItems(): array
     {
@@ -833,6 +1039,9 @@ class CharacterInventoryService
 
     /**
      * Destroy Alchemy item.
+     *
+     * @param  int  $slotId  The alchemy bag slot id to destroy.
+     * @return array The destroy result.
      */
     public function destroyAlchemyItem(int $slotId): array
     {
@@ -869,6 +1078,8 @@ class CharacterInventoryService
 
     /**
      * Destroy all alchemy items.
+     *
+     * @return array The destroy-all result.
      */
     public function destroyAllAlchemyItems(): array
     {
@@ -893,6 +1104,12 @@ class CharacterInventoryService
         ]);
     }
 
+    /**
+     * Sell one inventory item for the character.
+     *
+     * @param  int  $itemId  The item id to sell.
+     * @return array The sell result.
+     */
     public function sellItem(int $itemId): array
     {
 
@@ -919,6 +1136,12 @@ class CharacterInventoryService
         ]);
     }
 
+    /**
+     * Disenchant one inventory item for the character.
+     *
+     * @param  int  $itemId  The item id to disenchant.
+     * @return array The disenchant result.
+     */
     public function disenchantItem(int $itemId): array
     {
 
@@ -940,7 +1163,8 @@ class CharacterInventoryService
     /**
      * Updates the character stats.
      *
-     * @throws Exception
+     * @param  Character  $character  The character to update attack data for.
+     * @return void
      */
     private function updateCharacterAttackDataCache(Character $character): void
     {
@@ -950,7 +1174,8 @@ class CharacterInventoryService
     /**
      * Fetch type based on accepted types.
      *
-     * @throws Exception
+     * @param  string  $type  The raw item type to normalize.
+     * @return string The normalized, accepted item type.
      */
     private function fetchType(string $type): string
     {

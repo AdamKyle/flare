@@ -23,4 +23,5 @@ export default interface DropdownProps {
   on_end_reached?: () => void;
   empty_message?: string;
   search_placeholder?: string;
+  on_open?: () => void;
 }

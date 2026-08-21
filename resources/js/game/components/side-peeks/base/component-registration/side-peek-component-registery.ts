@@ -4,6 +4,7 @@ import LogEntrySidePeek from '../../../../../admin/logs-dashboard/components/sid
 import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
 import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
 import BackPack from '../../character-inventory/backpack/backpack';
+import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import Sets from '../../character-inventory/sets/sets';
@@ -12,6 +13,8 @@ import UsableItemsProps from '../../character-inventory/usable-items/types/usabl
 import UsableItems from '../../character-inventory/usable-items/usable-items';
 import CraftedItem from '../../crafted-item/crafted-item';
 import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
+import ItemDetails from '../../item-details/item-details';
+import ItemDetailsProps from '../../item-details/types/item-details-props';
 import Conjure from '../../map-actions/conjure/conjure';
 import ConjureProps from '../../map-actions/conjure/types/conjure-props';
 import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
@@ -27,12 +30,10 @@ import Traverse from '../../map-actions/traverse/traverse';
 import ServerChatItem from '../../server-chat-item/server-chat-item';
 import ServerChatItemProps from '../../server-chat-item/types/server-chat-item-props';
 
-import SidePeekProps from 'ui/side-peek/types/side-peek-props';
-
 export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.BACKPACK]: {
     component: BackPack,
-    props: {} as SidePeekProps,
+    props: {} as BackpackProps,
   },
   [SidePeekComponentRegistrationEnum.GEM_BAG]: {
     component: GemBag,
@@ -77,6 +78,10 @@ export const SidePeekComponentRegistry = {
   [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: {
     component: CraftedItem,
     props: {} as CraftedItemProps,
+  },
+  [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: {
+    component: ItemDetails,
+    props: {} as ItemDetailsProps,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: {
     component: LogEntrySidePeek,

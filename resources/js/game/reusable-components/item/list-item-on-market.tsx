@@ -8,7 +8,6 @@ import {
 } from './constants/market-history-filter-constants';
 import MarketHistoryChartPointDefinition from './definitions/market-history-chart-point-definition';
 import MarketHistoryRowDefinition from './definitions/market-history-row-definition';
-import MarketHistoryChartTooltip from './partials/item-market-listing/market-history-chart-tooltip';
 import ListItemOnMarketProps from './types/list-item-on-market-props';
 import { MarketHistoryForTypeFilters } from '../../components/market/api/enums/market-history-for-type-filters';
 import { useGetMarketHistoryForType } from '../../components/market/api/hooks/use-get-market-history-for-type';
@@ -20,6 +19,9 @@ import DropDownButton from 'ui/buttons/drop-down-button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 import LinkButton from 'ui/buttons/link-button';
+import LineChartColor from 'ui/charts/line-chart/enums/line-chart-color';
+import LineChartXAxisType from 'ui/charts/line-chart/enums/line-chart-x-axis-type';
+import LineChartYAxisType from 'ui/charts/line-chart/enums/line-chart-y-axis-type';
 import LineChart from 'ui/charts/line-chart/line-chart';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -175,91 +177,47 @@ const ListItemOnMarket = ({
 
   const renderChart = () => {
     return (
-      <div
-        className="text-danube-600 dark:text-danube-300 w-full"
-        role="img"
-        aria-label="Market history line chart"
-      >
-        <LineChart
-          data={chartData}
-          x_axis_data_key="soldWhenTimestamp"
-          tooltip_content={<MarketHistoryChartTooltip />}
-          responsive_container_props={{ width: '100%', height: 224 }}
-          empty_state={
-            <div className="py-10 text-center text-sm text-gray-600 italic dark:text-gray-400">
-              No market history data available for this period.
-            </div>
-          }
-          outer_container_props={{
-            className: 'w-full',
-          }}
-          chart_props={{
-            margin: { top: 8, right: 8, bottom: 0, left: 0 },
-          }}
-          cartesian_grid_props={{
-            stroke: 'currentColor',
-            strokeOpacity: 0.15,
-          }}
-          x_axis_props={{
-            type: 'number',
-            scale: 'time',
-            domain: ['dataMin', 'dataMax'],
-            minTickGap: 24,
-            tick: { fill: 'currentColor', fontSize: 12 },
-            tickFormatter: (value: unknown) => {
-              const resolvedValue =
-                typeof value === 'number' ? value : Number(value);
-
-              return formatDistanceToNowStrict(new Date(resolvedValue), {
-                addSuffix: true,
-              });
-            },
-            axisLine: { stroke: 'currentColor', opacity: 0.35 },
-            tickLine: { stroke: 'currentColor', opacity: 0.35 },
-          }}
-          y_axis_props={{
-            width: 56,
-            tick: { fill: 'currentColor', fontSize: 12 },
-            tickFormatter: (value: unknown) => {
-              const resolvedValue =
-                typeof value === 'number' ? value : Number(value);
-
-              return formatNumberWithCommas(resolvedValue);
-            },
-            axisLine: { stroke: 'currentColor', opacity: 0.35 },
-            tickLine: { stroke: 'currentColor', opacity: 0.35 },
-          }}
-          tooltip_props={{
-            cursor: { stroke: 'currentColor', strokeOpacity: 0.25 },
-          }}
-          lines={[
-            {
-              data_key: 'cost',
-              line_props: {
-                type: 'monotone',
-                stroke: 'currentColor',
-                strokeWidth: 2,
-                dot: {
-                  r: 3,
-                  fill: 'currentColor',
-                  stroke: 'currentColor',
-                },
-                activeDot: {
-                  r: 5,
-                  fill: 'currentColor',
-                  stroke: 'currentColor',
-                },
-              },
-            },
-          ]}
-          footer={
-            <p className="mt-2 text-center text-xs text-gray-600 italic dark:text-gray-400">
-              This chart represents the last 90 days and how much the item of
-              type {itemTypeLabel} has sold for over that period of time
-            </p>
-          }
-        />
-      </div>
+      <LineChart<MarketHistoryChartPointDefinition>
+        data={chartData}
+        x_data_key="soldWhenTimestamp"
+        x_label="Sale Time"
+        x_axis_type={LineChartXAxisType.TIME}
+        x_formatter={(value) =>
+          formatDistanceToNowStrict(new Date(value), { addSuffix: true })
+        }
+        y_axes={[
+          {
+            key: 'price',
+            type: LineChartYAxisType.NUMBER,
+            visible: true,
+            start_at_zero: false,
+            value_formatter: formatNumberWithCommas,
+          },
+        ]}
+        lines={[
+          {
+            data_key: 'cost',
+            label: 'Sale Price',
+            color: LineChartColor.DANUBE,
+            y_axis_key: 'price',
+            value_formatter: (value) => `${formatNumberWithCommas(value)} gold`,
+            show_points: true,
+          },
+        ]}
+        accessibility_label="Market history line chart showing sale prices over time."
+        show_legend={false}
+        empty_state={
+          <div className="py-10 text-center text-sm text-gray-600 italic dark:text-gray-400">
+            No market history data available for this period.
+          </div>
+        }
+        footer={
+          <p className="mt-2 text-center text-xs text-gray-600 italic dark:text-gray-400">
+            This chart represents the last 90 days and how much the item of type{' '}
+            {itemTypeLabel} has sold for over that period of time
+          </p>
+        }
+      />
     );
   };
 

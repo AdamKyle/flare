@@ -8,4 +8,12 @@ export enum BatchCraftingEndReason {
   FAILED = 'failed',
   AMOUNT_REACHED = 'amount_reached',
   BATCH_CRAFTING_SET_FULL = 'batch_crafting_set_full',
+  SKILL_MAXED = 'skill_maxed',
+  CRAFT_SET_COMPLETE = 'craft_set_complete',
+  CRAFT_SET_FULL = 'craft_set_full',
+  EVENT_GOAL_COMPLETE = 'event_goal_complete',
+  EVENT_NOT_RUNNING = 'event_not_running',
+  EVENT_WRONG_MAP = 'event_wrong_map',
+  EVENT_STEP_CHANGED = 'event_step_changed',
+  EVENT_NO_CRAFTABLE_ITEMS = 'event_no_craftable_items',
 }

@@ -3,6 +3,7 @@ import { motion, useIsPresent, useReducedMotion } from 'framer-motion';
 import React, { useEffect } from 'react';
 
 import { useSidePeekAccessibility } from 'ui/side-peek/hooks/use-side-peek-accessibility';
+import { sidePeekPanelWidthStyles } from 'ui/side-peek/styles/side-peek-panel-styles';
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 
 const SidePeek = (props: SidePeekProps) => {
@@ -55,7 +56,8 @@ const SidePeek = (props: SidePeekProps) => {
         exit={reduceMotion ? undefined : { x: '100%' }}
         transition={panelTransition}
         className={clsx(
-          'fixed top-0 right-0 z-50 h-full w-full md:w-1/2 lg:w-1/4',
+          'fixed top-0 right-0 z-50 h-full',
+          sidePeekPanelWidthStyles(),
           'bg-white shadow-lg dark:bg-gray-800',
           'position-static z-[99999] flex flex-col'
         )}

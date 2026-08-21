@@ -228,9 +228,10 @@ class SkillServiceTest extends TestCase
         $character = $this->character->assignSkill($craftingSkill, 400)->getCharacter();
         $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
 
-        $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+        $xpGained = $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
 
         $this->assertEquals(0, $skill->refresh()->xp);
+        $this->assertSame(0, $xpGained);
     }
 
     public function test_assign_xp_to_regular_skill_and_level_it_up()
@@ -248,6 +249,25 @@ class SkillServiceTest extends TestCase
         $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
 
         $this->assertGreaterThan(1, $skill->refresh()->level);
+    }
+
+    public function test_assign_xp_to_crafting_skill_returns_the_factual_xp_gained(): void
+    {
+        $craftingSkill = $this->createGameSkill([
+            'type' => SkillTypeValue::CRAFTING->value,
+            'name' => 'Weapon Crafting',
+            'max_level' => 400,
+        ]);
+
+        $character = $this->character->assignSkill($craftingSkill, 10, false, [
+            'xp' => 0,
+        ])->getCharacter();
+        $skill = $character->skills->where('game_skill_id', $craftingSkill->id)->first();
+
+        $xpGained = $this->skillService->assignXpToCraftingSkill($character->map->gameMap, $skill);
+
+        $this->assertGreaterThan(0, $xpGained);
+        $this->assertSame($xpGained, $skill->refresh()->xp);
     }
 
     public function test_assign_xp_to_regular_skill_and_do_not_level_it_up_when_maxed()
@@ -286,6 +306,35 @@ class SkillServiceTest extends TestCase
 
         $this->assertEquals(400, $skill->refresh()->level);
         $this->assertEquals(0, $skill->refresh()->xp);
+    }
+
+    public function test_get_character_xp_with_skill_training_reduction_returns_the_xp_unchanged_for_zero_training_percentage()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->first();
+        $skill->update(['currently_training' => true, 'xp_towards' => 0.0]);
+
+        $character = $character->refresh();
+
+        $result = $this->skillService->setSkillInTraining($character)->getCharacterXpWithSkillTrainingReduction($character, 100);
+
+        $this->assertSame(100, $result);
+    }
+
+    public function test_get_character_xp_with_skill_training_reduction_truncates_a_fractional_result()
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $character->skills->first();
+        $skill->update(['currently_training' => true, 'xp_towards' => 0.5]);
+
+        $character = $character->refresh();
+
+        $result = $this->skillService->setSkillInTraining($character)->getCharacterXpWithSkillTrainingReduction($character, 101);
+
+        $this->assertSame(50, $result);
+        $this->assertIsInt($result);
     }
 
     public function test_get_skill_uses_clamped_level_when_skill_is_above_max_level()

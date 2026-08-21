@@ -14,6 +14,7 @@ export const useCraftableItemsApi = ({
   characterId,
   selectedType,
   armourType,
+  itemType,
 }: UseCraftableItemsApiParams): UseCraftableItemsApiDefinition => {
   const canFetch = Boolean(
     characterId > 0 && selectedType && (selectedType !== 'armour' || armourType)
@@ -53,12 +54,18 @@ export const useCraftableItemsApi = ({
   );
 
   useEffect(() => {
-    const nextFilters: CraftingFiltersDefinition =
-      selectedType === 'armour' && armourType
-        ? { armour_type: armourType }
-        : {};
+    const nextFilters: CraftingFiltersDefinition = {};
+
+    if (selectedType === 'armour' && armourType !== null) {
+      nextFilters.armour_type = armourType;
+    }
+
+    if (itemType !== null) {
+      nextFilters.item_type = itemType;
+    }
+
     setFilters(nextFilters);
-  }, [selectedType, armourType, setFilters]);
+  }, [selectedType, armourType, itemType, setFilters]);
 
   return {
     items: data,

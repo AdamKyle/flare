@@ -28,6 +28,8 @@ class BatchCraftingAutomationLifecycleTest extends TestCase
 
     private ?BatchCraftingAutomationService $service;
 
+    private array $progress;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,6 +38,18 @@ class BatchCraftingAutomationLifecycleTest extends TestCase
         $this->character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($this->weaponCrafting, 10, false)->getCharacter();
         $this->character->update(['gold' => 1000, 'inventory_max' => 30]);
         $this->service = resolve(BatchCraftingAutomationService::class);
+        $this->progress = [
+            'craft_mode' => 'specific_item',
+            'specific_crafting_type' => 'dagger',
+            'specific_item_id' => 1,
+            'craft_amount' => 1,
+            'craft_specific_count' => 0,
+            'scheduled_for' => null,
+            'processing_started_at' => null,
+            'gold_spent_total' => 0,
+            'gold_gained_total' => 0,
+            'chart_points' => [],
+        ];
     }
 
     protected function tearDown(): void
@@ -50,7 +64,12 @@ class BatchCraftingAutomationLifecycleTest extends TestCase
     public function test_cancel_marks_the_running_batch_completed_and_cancelled(): void
     {
         Event::fake([BatchCraftingStatusUpdated::class, BatchCraftingMonitoringUpdated::class]);
-        $batchCrafting = $this->createBatchCrafting(['character_id' => $this->character->id, 'user_id' => $this->character->user_id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'disposition' => 'destroy',
+            'progress' => $this->progress,
+        ]);
 
         $result = $this->service->cancel($this->character);
 
@@ -125,7 +144,12 @@ class BatchCraftingAutomationLifecycleTest extends TestCase
     public function test_complete_for_death_ends_the_running_batch_with_died_reason(): void
     {
         Event::fake([BatchCraftingStatusUpdated::class]);
-        $batchCrafting = $this->createBatchCrafting(['character_id' => $this->character->id, 'user_id' => $this->character->user_id]);
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'disposition' => 'destroy',
+            'progress' => $this->progress,
+        ]);
 
         $this->service->completeForDeath($this->character);
 

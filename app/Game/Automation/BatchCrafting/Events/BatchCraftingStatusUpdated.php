@@ -15,10 +15,15 @@ class BatchCraftingStatusUpdated implements ShouldBroadcastNow
     private string $occurredAt;
 
     /**
-     * @param  int  $userId  The owning user's identifier.
+     * @param  int  $userId
+     * @param  array  $status
+     * @param  array|null  $chartPoint
      */
-    public function __construct(private readonly int $userId)
-    {
+    public function __construct(
+        private readonly int $userId,
+        private readonly array $status,
+        private readonly ?array $chartPoint = null,
+    ) {
         $this->occurredAt = now()->toJSON();
     }
 
@@ -35,13 +40,15 @@ class BatchCraftingStatusUpdated implements ShouldBroadcastNow
     /**
      * Return the broadcast payload for this event.
      *
-     * @return array The user id and occurred-at timestamp.
+     * @return array The user id, occurred-at timestamp, status snapshot, and optional latest chart point.
      */
     public function broadcastWith(): array
     {
         return [
             'user_id' => $this->userId,
             'occurred_at' => $this->occurredAt,
+            'status' => $this->status,
+            'chart_point' => $this->chartPoint,
         ];
     }
 

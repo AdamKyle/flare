@@ -122,4 +122,63 @@ class BatchCraftingSetServiceTest extends TestCase
         $this->assertSame('set_full', $result['reason']);
         $this->assertNull($result['set_slot']);
     }
+
+    public function test_find_owned_slot_returns_null_and_does_not_create_a_set_when_none_exists(): void
+    {
+        $character = $this->character;
+
+        $result = $this->batchCraftingSetService->findOwnedSlot($character, 1, 1);
+
+        $this->assertNull($result);
+        $this->assertSame(0, InventorySet::where('character_id', $character->id)->count());
+    }
+
+    public function test_replace_item_in_slot_swaps_the_item_without_changing_slot_count(): void
+    {
+        $character = $this->character;
+        $item = $this->createItem();
+        $placement = $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $item);
+        $newItem = $this->createItem();
+        $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
+
+        $result = $this->batchCraftingSetService->replaceItemInSlot($character, $placement['set_slot']->id, $item->id, $newItem);
+
+        $this->assertTrue($result['success']);
+        $this->assertSame($newItem->id, $result['set_slot']->item_id);
+        $this->assertSame($item->id, $result['displaced_item']->id);
+        $this->assertSame(1, $set->slots()->count());
+    }
+
+    public function test_replace_item_in_slot_succeeds_even_when_the_set_is_at_full_capacity(): void
+    {
+        $character = $this->character;
+        $item = $this->createItem();
+        $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
+        $placement = $this->batchCraftingSetService->createItemInBatchCraftingSet($character, $item);
+        $set->update(['max_slots' => 1]);
+        $newItem = $this->createItem();
+
+        $this->assertFalse($this->batchCraftingSetService->canAccept($character, 1));
+
+        $result = $this->batchCraftingSetService->replaceItemInSlot($character, $placement['set_slot']->id, $item->id, $newItem);
+
+        $this->assertTrue($result['success']);
+        $this->assertSame($newItem->id, $result['set_slot']->item_id);
+        $this->assertSame(1, $set->refresh()->slots()->count());
+    }
+
+    public function test_replace_item_in_slot_fails_when_the_slot_is_not_owned_by_the_character(): void
+    {
+        $character = $this->character;
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $item = $this->createItem();
+        $placement = $this->batchCraftingSetService->createItemInBatchCraftingSet($otherCharacter, $item);
+        $newItem = $this->createItem();
+
+        $result = $this->batchCraftingSetService->replaceItemInSlot($character, $placement['set_slot']->id, $item->id, $newItem);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('slot_not_found', $result['reason']);
+        $this->assertNull($result['set_slot']);
+    }
 }

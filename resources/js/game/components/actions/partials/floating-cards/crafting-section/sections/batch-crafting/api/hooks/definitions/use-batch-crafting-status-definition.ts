@@ -4,5 +4,4 @@ export default interface UseBatchCraftingStatusDefinition {
   status: BatchCraftingStatusDefinition | null;
   loading: boolean;
   error: string | null;
-  refetch: () => Promise<void>;
 }

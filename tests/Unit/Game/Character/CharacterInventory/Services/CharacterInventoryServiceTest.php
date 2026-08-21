@@ -1185,4 +1185,225 @@ class CharacterInventoryServiceTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertSame(0, $character->inventory->slots()->where('id', $slotId)->count());
     }
+
+    public function test_get_paginated_inventory_set_options_returns_lean_fields(): void
+    {
+        $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
+
+        $result = $this->characterInventoryService->setCharacter($character)->getPaginatedInventorySetOptions();
+
+        $option = $result['data'][0];
+        $this->assertArrayHasKey('set_id', $option);
+        $this->assertArrayHasKey('name', $option);
+        $this->assertArrayHasKey('equipped', $option);
+        $this->assertArrayHasKey('is_batch_crafting_set', $option);
+        $this->assertArrayHasKey('max_slots', $option);
+        $this->assertArrayHasKey('current_slots', $option);
+        $this->assertArrayHasKey('remaining_slots', $option);
+        $this->assertArrayHasKey('set_number', $option);
+        $this->assertArrayHasKey('display_name', $option);
+        $this->assertArrayNotHasKey('items', $option);
+    }
+
+    public function test_get_paginated_inventory_set_options_searches_by_name(): void
+    {
+        $character = $this->character->inventorySetManagement()->createInventorySets(1, true)->getCharacter();
+        $this->createInventorySet(['character_id' => $character->id, 'name' => 'Findable Set Name', 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions(10, 1, 'Findable');
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame('Findable Set Name', $result['data'][0]['name']);
+    }
+
+    public function test_get_paginated_inventory_set_options_excludes_the_batch_crafting_set(): void
+    {
+        $character = $this->character->getCharacter();
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+            'is_equipped' => false,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $batchCraftingSetIncluded = collect($result['data'])->contains(fn ($set) => $set['is_batch_crafting_set']);
+
+        $this->assertFalse($batchCraftingSetIncluded);
+    }
+
+    public function test_get_paginated_inventory_set_options_only_returns_empty_unequipped_normal_sets(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $emptySet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $nonEmptySet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $this->createInventorySetSlot(['inventory_set_id' => $nonEmptySet->id, 'item_id' => $this->createItem()->id]);
+        $equippedSet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => true]);
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+            'is_equipped' => false,
+        ]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $returnedSetIds = array_column($result['data'], 'set_id');
+
+        $this->assertSame([$emptySet->id], $returnedSetIds);
+        $this->assertNotContains($nonEmptySet->id, $returnedSetIds);
+        $this->assertNotContains($equippedSet->id, $returnedSetIds);
+    }
+
+    public function test_get_paginated_inventory_set_options_paginates_after_eligibility_filtering(): void
+    {
+        $character = $this->character->getCharacter();
+
+        for ($i = 0; $i < 3; $i++) {
+            $nonEmptySet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+            $this->createInventorySetSlot(['inventory_set_id' => $nonEmptySet->id, 'item_id' => $this->createItem()->id]);
+        }
+
+        $firstEligibleSet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $secondEligibleSet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions(1, 1);
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame($firstEligibleSet->id, $result['data'][0]['set_id']);
+        $this->assertTrue($result['meta']['can_load_more']);
+        $this->assertSame(2, $result['meta']['pagination']['total']);
+
+        $secondPage = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions(1, 2);
+
+        $this->assertSame($secondEligibleSet->id, $secondPage['data'][0]['set_id']);
+    }
+
+    public function test_get_paginated_inventory_set_options_preserves_a_named_set_name(): void
+    {
+        $character = $this->character->getCharacter();
+        $namedSet = $this->createInventorySet(['character_id' => $character->id, 'name' => 'Boss Gear', 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $option = collect($result['data'])->firstWhere('set_id', $namedSet->id);
+
+        $this->assertSame('Boss Gear', $option['name']);
+        $this->assertSame('Boss Gear', $option['display_name']);
+    }
+
+    public function test_get_paginated_inventory_set_options_unnamed_seventh_set_displays_set_seven(): void
+    {
+        $character = $this->character->getCharacter();
+
+        foreach (['First Set', 'Second Set', 'Third Set', 'Fourth Set', 'Fifth Set', 'Sixth Set'] as $name) {
+            $this->createInventorySet(['character_id' => $character->id, 'name' => $name, 'is_equipped' => false]);
+        }
+
+        $seventhSet = $this->createInventorySet(['character_id' => $character->id, 'name' => null, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $option = collect($result['data'])->firstWhere('set_id', $seventhSet->id);
+
+        $this->assertSame(7, $option['set_number']);
+        $this->assertSame('Set 7', $option['display_name']);
+    }
+
+    public function test_get_paginated_inventory_set_options_unnamed_eighth_set_displays_set_eight(): void
+    {
+        $character = $this->character->getCharacter();
+
+        foreach (['First Set', 'Second Set', 'Third Set', 'Fourth Set', 'Fifth Set', 'Sixth Set'] as $name) {
+            $this->createInventorySet(['character_id' => $character->id, 'name' => $name, 'is_equipped' => false]);
+        }
+
+        $this->createInventorySet(['character_id' => $character->id, 'name' => null, 'is_equipped' => false]);
+        $eighthSet = $this->createInventorySet(['character_id' => $character->id, 'name' => null, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $option = collect($result['data'])->firstWhere('set_id', $eighthSet->id);
+
+        $this->assertSame(8, $option['set_number']);
+        $this->assertSame('Set 8', $option['display_name']);
+    }
+
+    public function test_get_paginated_inventory_set_options_ordinal_includes_ineligible_earlier_normal_sets(): void
+    {
+        $character = $this->character->getCharacter();
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        }
+
+        $nonEmptySixthSet = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $this->createInventorySetSlot(['inventory_set_id' => $nonEmptySixthSet->id, 'item_id' => $this->createItem()->id]);
+
+        $seventhSet = $this->createInventorySet(['character_id' => $character->id, 'name' => null, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $option = collect($result['data'])->firstWhere('set_id', $seventhSet->id);
+
+        $this->assertSame(7, $option['set_number']);
+        $this->assertSame('Set 7', $option['display_name']);
+    }
+
+    public function test_get_paginated_inventory_set_options_batch_crafting_set_does_not_consume_a_normal_ordinal(): void
+    {
+        $character = $this->character->getCharacter();
+
+        for ($i = 0; $i < 6; $i++) {
+            $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        }
+
+        $this->createInventorySet([
+            'character_id' => $character->id,
+            'name' => InventorySet::BATCH_CRAFTING_SET_NAME,
+            'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE,
+            'max_slots' => InventorySet::BATCH_CRAFTING_MAX_SLOTS,
+            'is_equipped' => false,
+        ]);
+
+        $seventhNormalSet = $this->createInventorySet(['character_id' => $character->id, 'name' => null, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($character->refresh())->getPaginatedInventorySetOptions();
+
+        $option = collect($result['data'])->firstWhere('set_id', $seventhNormalSet->id);
+
+        $this->assertSame(7, $option['set_number']);
+        $this->assertSame('Set 7', $option['display_name']);
+    }
+
+    public function test_resolve_valid_target_inventory_set_returns_null_for_an_equipped_set(): void
+    {
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'is_equipped' => true]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveValidTargetInventorySet($set->id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_resolve_valid_target_inventory_set_returns_null_for_the_batch_crafting_set(): void
+    {
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveValidTargetInventorySet($set->id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_resolve_valid_target_inventory_set_returns_the_set_when_it_is_a_valid_target(): void
+    {
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveValidTargetInventorySet($set->id);
+
+        $this->assertSame($set->id, $result?->id);
+    }
 }

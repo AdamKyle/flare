@@ -10,8 +10,8 @@ use BackedEnum;
 class HandlesBatchCraftingMode
 {
     /**
-     * @param  BatchCraftingType  $type  The Batch Crafting type this class handles.
-     * @param  BackedEnum  $mode  The craft mode this class handles.
+     * @param  BatchCraftingType  $type
+     * @param  BackedEnum  $mode
      */
     public function __construct(
         public readonly BatchCraftingType $type,

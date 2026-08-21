@@ -17,6 +17,8 @@ const SetChoices = ({
   on_set_selection_clear,
   set_equipped_set_name,
   dont_show_equipped_set,
+  initial_set_id,
+  initial_set_name,
 }: SetChoicesProps) => {
   const { data, error, loading, canLoadMore, isLoadingMore, onEndReached } =
     UsePaginatedApiHandler<SetOptionDefinition>({
@@ -38,7 +40,7 @@ const SetChoices = ({
       label: set.name,
       value: set.set_id,
     }));
-  }, [data]);
+  }, [data, dont_show_equipped_set]);
 
   const preSelectedSetOption = useMemo((): DropdownItem | undefined => {
     const equippedSet = data.find((set: SetOptionDefinition) => set.equipped);
@@ -50,7 +52,19 @@ const SetChoices = ({
     return { label: equippedSet.name, value: equippedSet.set_id };
   }, [data]);
 
+  const initialSetOption = useMemo((): DropdownItem | undefined => {
+    if (!initial_set_id || !initial_set_name) {
+      return undefined;
+    }
+
+    return { label: initial_set_name, value: initial_set_id };
+  }, [initial_set_id, initial_set_name]);
+
   const setPreSelectedOption = () => {
+    if (initialSetOption) {
+      return initialSetOption;
+    }
+
     if (!set_equipped_set_name) {
       return undefined;
     }

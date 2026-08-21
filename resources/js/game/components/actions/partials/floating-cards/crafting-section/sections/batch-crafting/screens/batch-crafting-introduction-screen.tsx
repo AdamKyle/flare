@@ -36,7 +36,6 @@ const BatchCraftingIntroductionScreen = (): ReactNode => {
 
   return (
     <FormWizard
-      name="Batch Crafting"
       total_steps={INTRODUCTION_TOTAL_STEPS}
       is_loading={acknowledging}
       on_request_next={handleRequestNext}

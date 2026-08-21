@@ -1,8 +1,10 @@
-import React, { ReactNode, useCallback, useEffect, useRef } from 'react';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 
 import BatchCraftingScreenManager from './component-mapping/batch-crafting-screen-manager';
 import { batchCraftingScreenRegistry } from './component-mapping/batch-crafting-screen-registry';
+import BatchCraftingEntry from './components/batch-crafting-entry';
 import { BatchCraftingScreenNames } from './enums/batch-crafting-screen-names';
+import BatchCraftingStatusProvider from './providers/batch-crafting-status-provider';
 import { CraftingTypes } from '../../enums/crafting-types';
 import CraftingSectionScreenProps from '../../types/crafting-section-screen-props';
 
@@ -13,16 +15,15 @@ const BatchCraftingStack = ({
   registerBackHandler,
 }: CraftingSectionScreenProps): ReactNode => {
   const navigation = BatchCraftingScreenManager.useScreenNavigation();
-  const hasInitialized = useRef(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    if (hasInitialized.current) {
-      return;
-    }
-
-    hasInitialized.current = true;
-    navigation.resetTo(BatchCraftingScreenNames.ENTRY, {});
-  }, [navigation]);
+  const handleEntryReady = useCallback(
+    (screen: BatchCraftingScreenNames) => {
+      navigation.resetTo(screen, {});
+      setIsInitialized(true);
+    },
+    [navigation]
+  );
 
   const handleBack = useCallback(() => {
     if (navigation.stackDepth <= 1) {
@@ -40,9 +41,17 @@ const BatchCraftingStack = ({
     return () => registerBackHandler?.(null);
   }, [handleBack, registerBackHandler]);
 
+  const renderBatchCraftingContent = () => {
+    if (!isInitialized) {
+      return <BatchCraftingEntry on_ready={handleEntryReady} />;
+    }
+
+    return <BatchCraftingScreenManager.ScreenHost />;
+  };
+
   return (
     <FloatingCardScreenStack label="Batch Crafting">
-      <BatchCraftingScreenManager.ScreenHost />
+      {renderBatchCraftingContent()}
     </FloatingCardScreenStack>
   );
 };
@@ -52,14 +61,16 @@ const BatchCraftingSection = ({
   registerBackHandler,
 }: CraftingSectionScreenProps): ReactNode => {
   return (
-    <BatchCraftingScreenManager.ScreenManagerProvider
-      registry={batchCraftingScreenRegistry}
-    >
-      <BatchCraftingStack
-        setActiveCraftingType={setActiveCraftingType}
-        registerBackHandler={registerBackHandler}
-      />
-    </BatchCraftingScreenManager.ScreenManagerProvider>
+    <BatchCraftingStatusProvider>
+      <BatchCraftingScreenManager.ScreenManagerProvider
+        registry={batchCraftingScreenRegistry}
+      >
+        <BatchCraftingStack
+          setActiveCraftingType={setActiveCraftingType}
+          registerBackHandler={registerBackHandler}
+        />
+      </BatchCraftingScreenManager.ScreenManagerProvider>
+    </BatchCraftingStatusProvider>
   );
 };
 

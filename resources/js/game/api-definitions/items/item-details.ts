@@ -1,3 +1,5 @@
+import ItemAffixDefinition from './equippable-item-definitions/item-affix-definition';
+
 export default interface ItemDetails {
   id: number;
   name: string;
@@ -24,8 +26,8 @@ export default interface ItemDetails {
   skill_name: string | null;
   skill_training_bonus: number | null;
   skill_bonus: number | null;
-  item_prefix: string | null;
-  item_suffix: string | null;
+  item_prefix: ItemAffixDefinition | null;
+  item_suffix: ItemAffixDefinition | null;
   usable: boolean;
   can_use_on_other_items: boolean;
   crafting_type: string;
@@ -73,6 +75,8 @@ export default interface ItemDetails {
   sockets: unknown[];
   socket_amount: number;
   item_atonements: ItemAtonements;
+  item_skills: unknown[];
+  item_skill_progressions: unknown[];
 }
 
 export interface ItemAtonements {

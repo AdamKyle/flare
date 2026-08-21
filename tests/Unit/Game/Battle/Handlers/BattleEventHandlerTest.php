@@ -127,7 +127,23 @@ class BattleEventHandlerTest extends TestCase
     public function test_process_dead_character_ends_batch_crafting(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $this->createBatchCrafting(['character_id' => $character->id, 'user_id' => $character->user_id]);
+        $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'disposition' => 'destroy',
+            'progress' => [
+                'craft_mode' => 'specific_item',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => 1,
+                'craft_amount' => 1,
+                'craft_specific_count' => 0,
+                'scheduled_for' => null,
+                'processing_started_at' => null,
+                'gold_spent_total' => 0,
+                'gold_gained_total' => 0,
+                'chart_points' => [],
+            ],
+        ]);
 
         resolve(BattleEventHandler::class)->processDeadCharacter($character);
 

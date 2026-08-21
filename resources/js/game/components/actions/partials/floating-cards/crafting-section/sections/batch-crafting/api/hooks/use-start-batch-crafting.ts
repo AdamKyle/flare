@@ -2,8 +2,8 @@ import { useApiHandler } from 'api-handler/hooks/use-api-handler';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
+import BatchCraftingStartRequestDefinition from '../definitions/batch-crafting-start-request-definition';
 import BatchCraftingStartResponseDefinition from '../definitions/batch-crafting-start-response-definition';
-import CraftAmountRequestDefinition from '../definitions/craft-amount-request-definition';
 import { BatchCraftingApiUrls } from '../enums/batch-crafting-api-urls';
 import UseStartBatchCraftingDefinition from './definitions/use-start-batch-crafting-definition';
 import { extractBatchCraftingApiError } from '../../utils/extract-batch-crafting-api-error';
@@ -23,7 +23,7 @@ export const useStartBatchCrafting = (
   }, []);
 
   const start = async (
-    request: CraftAmountRequestDefinition
+    request: BatchCraftingStartRequestDefinition
   ): Promise<boolean> => {
     if (starting || abortControllerRef.current !== null) {
       return false;
@@ -39,7 +39,7 @@ export const useStartBatchCrafting = (
       await apiHandler.post<
         BatchCraftingStartResponseDefinition,
         never,
-        CraftAmountRequestDefinition
+        BatchCraftingStartRequestDefinition
       >(
         getUrl(BatchCraftingApiUrls.START, { character: characterId }),
         request,

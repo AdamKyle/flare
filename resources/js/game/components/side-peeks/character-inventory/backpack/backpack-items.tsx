@@ -1,17 +1,17 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { AnimatePresence } from 'framer-motion';
 import { debounce, isNil } from 'lodash';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { match } from 'ts-pattern';
 
 import BackPackSelectionActions from './back-pack-selection-actions';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
 import GenericItemList from '../../components/items/generic-item-list';
-import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
 import InventoryItem from '../inventory-item/inventory-item';
 import { SelectedEquippableItemsOptions } from './enums/selected-equippable-items-options';
+import BackpackItemsProps from './types/backpack-items-props';
 import { useManageMultipleSelectedItemsApi } from '../hooks/use-manage-multiple-selected-items-api';
 import { ItemSelectedType } from '../types/item-selected-type';
 
@@ -28,11 +28,30 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
+const resolveSelectedEquippableItemsOption = (
+  value: DropdownItem['value']
+): SelectedEquippableItemsOptions | null => {
+  if (value === SelectedEquippableItemsOptions.SELL) {
+    return SelectedEquippableItemsOptions.SELL;
+  }
+
+  if (value === SelectedEquippableItemsOptions.DESSTROY) {
+    return SelectedEquippableItemsOptions.DESSTROY;
+  }
+
+  if (value === SelectedEquippableItemsOptions.DISENCHANT) {
+    return SelectedEquippableItemsOptions.DISENCHANT;
+  }
+
+  return null;
+};
+
 const BackpackItems = ({
   character,
   on_switch_view,
   update_character,
-}: GenericItemProps) => {
+  initial_search_text,
+}: BackpackItemsProps) => {
   const [slotId, setSlotId] = useState<number | null>(null);
   const [selection, setSelection] = useState<ItemSelectedType | null>(null);
   const [actionSelected, setActionSelected] =
@@ -47,6 +66,7 @@ const BackpackItems = ({
     UsePaginatedApiHandler<EquippableItemWithBase>({
       url: CharacterInventoryApiUrls.CHARACTER_INVENTORY,
       urlParams: { character: character.id },
+      initialSearchText: initial_search_text,
     });
 
   const {
@@ -58,9 +78,14 @@ const BackpackItems = ({
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [setSearchText]
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearchText.cancel();
+    };
+  }, [debouncedSetSearchText]);
 
   const handleOnItemClick = (slot_id: number) => {
     setSlotId(slot_id);
@@ -141,7 +166,15 @@ const BackpackItems = ({
   };
 
   const onMultiActionSelected = (actionSelected: DropdownItem) => {
-    setActionSelected(actionSelected.value as SelectedEquippableItemsOptions);
+    const resolvedAction = resolveSelectedEquippableItemsOption(
+      actionSelected.value
+    );
+
+    if (resolvedAction === null) {
+      return;
+    }
+
+    setActionSelected(resolvedAction);
     setIsSelectionDisabled(true);
     setCloseSuccessMessage(true);
   };
@@ -272,7 +305,12 @@ const BackpackItems = ({
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       {renderSuccessMessage()}
       <div className="px-4 pt-2">
-        <Input on_change={onSearch} place_holder={'Search items'} clearable />
+        <Input
+          on_change={onSearch}
+          place_holder={'Search items'}
+          clearable
+          default_value={initial_search_text ?? null}
+        />
       </div>
       {renderSelectionActions()}
       <div className="min-h-0 flex-1">

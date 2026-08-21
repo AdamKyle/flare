@@ -2,6 +2,8 @@
 
 Route::group(['middleware' => ['auth', 'update.player-activity']], function () {
     Route::get('/calendar/events', ['uses' => 'Api\EventCalendarController@loadEvents']);
+
+    Route::get('/item-details/{item}', ['uses' => 'Api\ItemDetailsController@show']);
 });
 
 Route::group(['middleware' => ['auth', 'is.character.who.they.say.they.are', 'update.player-activity']], function () {

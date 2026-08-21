@@ -13,8 +13,8 @@ use App\Game\Skills\Services\CraftingService;
 class CraftAmountPreviewService
 {
     /**
-     * @param  CraftingService  $craftingService  The domain crafting service.
-     * @param  BatchCraftingSetService  $batchCraftingSetService  The Crafted Items Set domain service.
+     * @param  CraftingService  $craftingService
+     * @param  BatchCraftingSetService  $batchCraftingSetService
      */
     public function __construct(
         private readonly CraftingService $craftingService,
@@ -75,8 +75,7 @@ class CraftAmountPreviewService
      */
     private function findCraftableItem(Character $character, array $progress): ?Item
     {
-        return $this->craftingService->fetchCraftableItems($character, ['crafting_type' => $progress['specific_crafting_type']], false)
-            ->first(fn (Item $craftableItem): bool => $craftableItem->id === $progress['specific_item_id']);
+        return $this->craftingService->findCraftableItemForAutomation($character, $progress['specific_item_id']);
     }
 
     /**

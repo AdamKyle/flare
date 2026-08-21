@@ -1,12 +1,18 @@
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
+import BatchCraftingCountdown from './batch-crafting-countdown';
+import BatchCraftingElapsedTime from './batch-crafting-elapsed-time';
+import BatchCraftingNextAttemptCountdown from './batch-crafting-next-attempt-countdown';
 import { useBatchCraftingActions } from '../api/hooks/use-batch-crafting-actions';
-import { useBatchCraftingStatus } from '../api/hooks/use-batch-crafting-status';
+import { batchCraftingRunningSectionRegistry } from '../component-mapping/batch-crafting-running-section-registry';
+import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
 import { BatchCraftingEndReason } from '../enums/batch-crafting-end-reason';
+import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
+import { useBatchCraftingStatusContext } from '../hooks/use-batch-crafting-status-context';
 import {
+  craftModeLabel,
   dispositionLabel,
-  endReasonLabel,
-  outputDestinationLabel,
 } from '../utils/batch-crafting-labels';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -15,21 +21,18 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Separator from 'ui/separator/separator';
 
 const BatchCraftingRunningPanel = (): ReactNode => {
   const { gameData } = useGameData();
   const characterId = gameData?.character?.id ?? 0;
-  const userId = gameData?.character?.user_id ?? 0;
+  const navigation = BatchCraftingScreenManager.useScreenNavigation();
 
   const {
     status,
     loading,
     error: statusError,
-    refetch,
-  } = useBatchCraftingStatus({
-    characterId,
-    userId,
-  });
+  } = useBatchCraftingStatusContext();
   const {
     cancelling,
     dismissing,
@@ -41,23 +44,29 @@ const BatchCraftingRunningPanel = (): ReactNode => {
   const batch = status?.batch;
 
   const handleCancel = async () => {
-    const cancelled = await cancel();
-
-    if (cancelled) {
-      await refetch();
-    }
+    await cancel();
   };
 
   const handleDismiss = async () => {
     const dismissed = await dismiss();
 
-    if (dismissed) {
-      await refetch();
+    if (!dismissed) {
+      return;
     }
+
+    navigation.resetTo(BatchCraftingScreenNames.TYPE, {});
   };
 
   const stateLabel = (): string => {
-    if (status?.is_running) {
+    if (status?.is_scheduled) {
+      return 'Scheduled';
+    }
+
+    if (status?.is_waiting) {
+      return 'Waiting';
+    }
+
+    if (status?.is_processing) {
       return 'Running';
     }
 
@@ -68,41 +77,48 @@ const BatchCraftingRunningPanel = (): ReactNode => {
     return 'Completed';
   };
 
-  const renderEndReason = () => {
-    if (!batch?.ended_reason || status?.is_running) {
+  const stateStyles = (): string => {
+    if (status?.is_scheduled || status?.is_waiting) {
+      return 'text-marigold-700 dark:text-marigold-300';
+    }
+
+    if (status?.is_processing) {
+      return 'text-regent-st-blue-700 dark:text-regent-st-blue-300';
+    }
+
+    if (batch?.ended_reason === BatchCraftingEndReason.CANCELLED) {
+      return 'text-rose-700 dark:text-rose-400';
+    }
+
+    return 'text-emerald-700 dark:text-emerald-400';
+  };
+
+  const renderTimer = () => {
+    if (!batch) {
       return null;
     }
 
-    return <p>Reason: {endReasonLabel(batch.ended_reason)}</p>;
-  };
-
-  const renderOutputDestination = () => {
-    const label = outputDestinationLabel(batch?.output_destination ?? null);
-
-    if (!label) {
-      return null;
-    }
-
-    return <p>Destination: {label}</p>;
-  };
-
-  const renderCurrentItem = () => {
-    if (!batch?.current_item_name) {
-      return null;
-    }
-
-    return <p>Current item: {batch.current_item_name}</p>;
-  };
-
-  const renderFinishedNotice = () => {
-    if (status?.is_running) {
-      return null;
+    if (status?.is_scheduled) {
+      return (
+        <BatchCraftingCountdown
+          started_at={batch.started_at}
+          scheduled_for={batch.scheduled_for}
+        />
+      );
     }
 
     return (
-      <Alert variant={AlertVariant.INFO}>
-        This Batch Crafting run has finished. Dismiss it when you are ready.
-      </Alert>
+      <>
+        <BatchCraftingElapsedTime
+          processing_started_at={batch.processing_started_at}
+          completed_at={batch.completed_at}
+        />
+        {status?.is_waiting && batch.next_attempt_at && (
+          <BatchCraftingNextAttemptCountdown
+            next_attempt_at={batch.next_attempt_at}
+          />
+        )}
+      </>
     );
   };
 
@@ -122,40 +138,51 @@ const BatchCraftingRunningPanel = (): ReactNode => {
     return <Alert variant={AlertVariant.DANGER}>{statusError}</Alert>;
   };
 
-  const renderCancelButton = () => {
-    if (!status?.can_cancel) {
-      return null;
+  const renderAction = () => {
+    if (status?.can_cancel) {
+      return (
+        <Button
+          label="Cancel"
+          variant={ButtonVariant.DANGER}
+          additional_css="w-full"
+          disabled={cancelling}
+          on_click={handleCancel}
+        />
+      );
     }
 
-    return (
-      <Button
-        label="Cancel"
-        variant={ButtonVariant.DANGER}
-        additional_css="flex-1"
-        disabled={cancelling}
-        on_click={handleCancel}
-      />
-    );
+    if (status?.can_dismiss) {
+      return (
+        <Button
+          label="Dismiss"
+          variant={ButtonVariant.PRIMARY}
+          additional_css="w-full"
+          disabled={dismissing}
+          on_click={handleDismiss}
+        />
+      );
+    }
+
+    return null;
   };
 
-  const renderDismissButton = () => {
-    if (!status?.can_dismiss) {
+  const renderModeSection = () => {
+    if (!batch) {
       return null;
     }
 
-    return (
-      <Button
-        label="Dismiss"
-        variant={ButtonVariant.PRIMARY}
-        additional_css="flex-1"
-        disabled={dismissing}
-        on_click={handleDismiss}
-      />
-    );
+    const RunningSection =
+      batchCraftingRunningSectionRegistry[batch.craft_mode];
+
+    return <RunningSection batch={batch} character_id={characterId} />;
   };
 
   if (loading && !status) {
-    return <p>Loading Batch Crafting status...</p>;
+    return (
+      <p role="status" aria-live="polite">
+        Loading Batch Crafting status...
+      </p>
+    );
   }
 
   if (!batch) {
@@ -168,34 +195,37 @@ const BatchCraftingRunningPanel = (): ReactNode => {
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold">Batch Crafting</h3>
-
       {renderStatusError()}
 
-      <div className="space-y-1">
-        <p>Craft &middot; Craft Amount</p>
-        <p aria-live="polite">
-          Status: <span className="font-semibold">{stateLabel()}</span>.{' '}
-          {batch.completed_amount} of {batch.requested_amount ?? 0} crafted.
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <h3 className="text-lg font-semibold">
+            {craftModeLabel(batch.craft_mode)}
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {dispositionLabel(batch.disposition)}
+          </p>
+        </div>
+        <p
+          role="status"
+          aria-live="polite"
+          className={clsx('shrink-0 text-sm font-semibold', stateStyles())}
+        >
+          {stateLabel()}
         </p>
-        {renderEndReason()}
-        {renderCurrentItem()}
-        <p>Disposition: {dispositionLabel(batch.disposition)}</p>
-        {renderOutputDestination()}
-        <p>
-          Progress: {batch.completed_amount} of {batch.requested_amount ?? 0} (
-          {batch.remaining_amount ?? 0} remaining)
-        </p>
-        <p>Gold: {batch.gold_left}</p>
       </div>
 
-      {renderFinishedNotice()}
+      <Separator />
+
+      {renderTimer()}
+
+      {renderModeSection()}
+
       {renderActionError()}
 
-      <div className="flex gap-2">
-        {renderCancelButton()}
-        {renderDismissButton()}
-      </div>
+      <Separator />
+
+      {renderAction()}
     </div>
   );
 };

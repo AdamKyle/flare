@@ -1,7 +1,7 @@
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { AnimatePresence } from 'framer-motion';
 import { debounce } from 'lodash';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 
 import SetChoices from './set-choices';
 import SetsProps from './types/sets-props';
@@ -18,13 +18,20 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const Sets = ({ character_id }: SetsProps): ReactNode => {
+const Sets = ({
+  character_id,
+  initial_search_text,
+  initial_set_id,
+  initial_set_name,
+}: SetsProps): ReactNode => {
   const [slotId, setSlotId] = useState<number | null>(null);
 
   const { data, error, loading, onEndReached, setSearchText, setFilters } =
     UsePaginatedApiHandler<EquippableItemWithBase>({
       url: CharacterInventoryApiUrls.CHARACTER_SET_ITEMS,
       urlParams: { character: character_id },
+      initialSearchText: initial_search_text,
+      initialFilters: initial_set_id ? { set_id: initial_set_id } : undefined,
     });
 
   const { handleScroll: handleSetScrolling } = useInfiniteScroll({
@@ -33,9 +40,14 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
 
   const debouncedSetSearchText = useMemo(
     () => debounce((value: string) => setSearchText(value), 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [setSearchText]
   );
+
+  useEffect(() => {
+    return () => {
+      debouncedSetSearchText.cancel();
+    };
+  }, [debouncedSetSearchText]);
 
   const onSearch = (value: string) => {
     debouncedSetSearchText(value.trim());
@@ -95,7 +107,12 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
     <div className="flex h-full flex-col overflow-hidden">
       <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
       <div className="px-4 pt-2">
-        <Input on_change={onSearch} place_holder={'Search items'} clearable />
+        <Input
+          on_change={onSearch}
+          place_holder={'Search items'}
+          clearable
+          default_value={initial_search_text ?? null}
+        />
       </div>
       <div className="px-4 pt-2">
         <SetChoices
@@ -103,6 +120,8 @@ const Sets = ({ character_id }: SetsProps): ReactNode => {
           on_set_change={handleSetChange}
           on_set_selection_clear={handleClearSetSelection}
           set_equipped_set_name
+          initial_set_id={initial_set_id}
+          initial_set_name={initial_set_name}
         />
       </div>
       <div className="min-h-0 flex-1">

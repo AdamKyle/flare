@@ -31,3 +31,23 @@ export const armourTypeOptions: ArmourTypeOptionDefinition[] = [
   { label: 'Leggings', value: 'leggings' },
   { label: 'Feet', value: 'feet' },
 ];
+
+const WEAPON_CRAFT_TYPE_VALUES: string[] = [
+  'dagger',
+  'sword',
+  'claw',
+  'wand',
+  'censer',
+  'stave',
+  'hammer',
+  'bow',
+  'gun',
+  'fan',
+  'mace',
+  'scratch-awl',
+];
+
+export const weaponCraftTypeOptions: CraftTypeOptionDefinition[] =
+  craftTypeOptions.filter((option) =>
+    WEAPON_CRAFT_TYPE_VALUES.includes(option.value)
+  );

@@ -20,6 +20,8 @@ use App\Game\Messages\Types\CharacterMessageTypes;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Services\CraftingService;
 use App\Game\Skills\Services\SkillCheckService;
+use App\Game\Skills\Values\CraftingMessageMode;
+use App\Game\Skills\Values\CraftingSkillGroup;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -977,5 +979,551 @@ class CraftingServiceTest extends TestCase
         $globalEventCraftingInventory = GlobalEventCraftingInventory::where('character_id', $character->id)->first();
 
         $this->assertNull($globalEventCraftingInventory);
+    }
+
+    public function test_craft_for_batch_standard_mode_sends_the_standard_success_messages()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+        $character = $character->refresh();
+        $this->craftingItem->update(['skill_level_trivial' => -10]);
+
+        $this->craftingService->craftForBatch($character, $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::STANDARD);
+
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_EASY_TO_CRAFT);
+        });
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::CRAFTED, $this->craftingItem->name);
+        });
+    }
+
+    public function test_craft_for_batch_batch_crafting_mode_suppresses_the_too_easy_and_crafted_messages()
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+        $character = $character->refresh();
+        $this->craftingItem->update(['skill_level_trivial' => -10]);
+
+        $result = $this->craftingService->craftForBatch($character, $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::BATCH_CRAFTING);
+
+        $this->assertTrue($result['success']);
+        Event::assertNotDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::TO_EASY_TO_CRAFT);
+        });
+        Event::assertNotDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::CRAFTED, $this->craftingItem->name);
+        });
+    }
+
+    public function test_craft_for_batch_batch_crafting_mode_still_sends_the_failed_roll_message()
+    {
+        Event::fake();
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(100);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(1);
+            })
+        );
+
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+        $character = $character->refresh();
+
+        $result = $this->app->make(CraftingService::class)->craftForBatch($character, $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::BATCH_CRAFTING);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('failed_roll', $result['reason']);
+        Event::assertDispatched(function (ServerMessageEvent $event) {
+            return $event->message === resolve(ServerMessageBuilder::class)->buildWithAdditionalInformation(CraftingMessageTypes::FAILED_TO_CRAFT);
+        });
+    }
+
+    public function test_craft_for_batch_reports_not_enough_gold_without_charging_gold()
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 0]);
+        $character = $character->refresh();
+
+        $result = $this->craftingService->craftForBatch($character, $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::BATCH_CRAFTING);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('not_enough_gold', $result['reason']);
+        $this->assertSame(0, $character->refresh()->gold);
+    }
+
+    public function test_craft_for_batch_reports_destination_failed_when_the_destination_creator_returns_null()
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+        $character = $character->refresh();
+        $this->craftingItem->update(['skill_level_trivial' => -10]);
+
+        $result = $this->craftingService->craftForBatch(
+            $character,
+            $this->craftingItem->refresh(),
+            'hammer',
+            CraftingMessageMode::BATCH_CRAFTING,
+            fn () => null,
+        );
+
+        $this->assertFalse($result['success']);
+        $this->assertSame('destination_failed', $result['reason']);
+        $this->assertNull($result['destination']);
+    }
+
+    public function test_is_skill_maxed_is_true_when_the_skill_level_reached_its_max_level()
+    {
+        $character = $this->character->getCharacter();
+        $character->skills()->where('game_skill_id', $this->craftingSkill->id)->update(['level' => $this->craftingSkill->max_level]);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character->refresh(), 'weapon');
+
+        $result = $this->craftingService->isSkillMaxed($skill);
+
+        $this->assertTrue($result);
+    }
+
+    public function test_is_skill_maxed_is_false_when_the_skill_can_still_gain_levels()
+    {
+        $character = $this->character->getCharacter();
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->isSkillMaxed($skill);
+
+        $this->assertFalse($result);
+    }
+
+    public function test_fetch_meaningful_experience_candidates_returns_the_strongest_first_for_weapon_group()
+    {
+        $character = $this->character->getCharacter();
+        $character->skills()->where('game_skill_id', $this->craftingSkill->id)->update(['level' => 5]);
+        $character = $character->refresh();
+        $weakerItem = $this->createItem(['cost' => 10, 'skill_level_required' => 2, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'weapon', 'can_craft' => true, 'default_position' => 'hammer']);
+        $strongerItem = $this->createItem(['cost' => 10, 'skill_level_required' => 4, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'weapon', 'can_craft' => true, 'default_position' => 'hammer']);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->fetchMeaningfulExperienceCandidates($skill, CraftingSkillGroup::WEAPON);
+
+        $this->assertSame($strongerItem->id, $result->first()?->id);
+        $this->assertTrue($result->pluck('id')->contains($weakerItem->id));
+    }
+
+    public function test_fetch_meaningful_experience_candidates_excludes_items_that_are_now_trivial_for_the_skill()
+    {
+        $character = $this->character->getCharacter();
+        $this->craftingItem->update(['skill_level_trivial' => 0]);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->fetchMeaningfulExperienceCandidates($skill, CraftingSkillGroup::WEAPON);
+
+        $this->assertTrue($result->isEmpty());
+    }
+
+    public function test_fetch_meaningful_experience_candidates_narrows_by_armour_group()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $bodyItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+        $helmetItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'helmet', 'can_craft' => true, 'default_position' => 'helmet']);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'armour');
+
+        $result = $this->craftingService->fetchMeaningfulExperienceCandidates($skill, CraftingSkillGroup::ARMOUR);
+
+        $this->assertTrue($result->pluck('id')->contains($bodyItem->id));
+        $this->assertTrue($result->pluck('id')->contains($helmetItem->id));
+    }
+
+    public function test_fetch_meaningful_experience_candidates_narrows_by_weapon_group_across_default_position_and_type(): void
+    {
+        $character = $this->character->getCharacter();
+        $hammerItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'weapon', 'can_craft' => true, 'default_position' => 'hammer']);
+        $swordItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->fetchMeaningfulExperienceCandidates($skill, CraftingSkillGroup::WEAPON);
+
+        $this->assertTrue($result->pluck('id')->contains($hammerItem->id));
+        $this->assertTrue($result->pluck('id')->contains($swordItem->id));
+    }
+
+    public function test_find_inexpensive_craftable_item_returns_the_cheapest_candidate()
+    {
+        $character = $this->character->getCharacter();
+        $cheapItem = $this->createItem(['cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'weapon', 'can_craft' => true, 'default_position' => 'hammer']);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->findInexpensiveCraftableItem($skill, 'weapon');
+
+        $this->assertSame($cheapItem->id, $result?->id);
+    }
+
+    public function test_find_inexpensive_craftable_item_narrows_by_item_type_when_provided()
+    {
+        $spellCrafting = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->assignSkill($spellCrafting, 10, false)->getCharacter();
+
+        $this->createItem(['cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'spell', 'type' => 'spell-healing', 'can_craft' => true, 'default_position' => 'spell-healing']);
+        $matchingItem = $this->createItem(['cost' => 50, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'spell', 'type' => 'spell-damage', 'can_craft' => true, 'default_position' => 'spell-damage']);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'spell');
+
+        $result = $this->craftingService->findInexpensiveCraftableItem($skill, 'spell', 'spell-damage');
+
+        $this->assertSame($matchingItem->id, $result?->id);
+    }
+
+    public function test_find_inexpensive_craftable_item_returns_null_when_nothing_is_craftable()
+    {
+        $character = $this->character->getCharacter();
+        Item::query()->delete();
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->findInexpensiveCraftableItem($skill, 'weapon');
+
+        $this->assertNull($result);
+    }
+
+    public function test_find_craftable_item_for_automation_returns_the_exact_currently_craftable_item()
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->craftingService->findCraftableItemForAutomation($character, $this->craftingItem->id);
+
+        $this->assertSame($this->craftingItem->id, $result?->id);
+    }
+
+    public function test_find_craftable_item_for_automation_returns_null_for_a_nonexistent_item()
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->craftingService->findCraftableItemForAutomation($character, 999999);
+
+        $this->assertNull($result);
+    }
+
+    public function test_find_craftable_item_for_automation_returns_null_when_the_character_cannot_craft_the_item()
+    {
+        $armourItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+        $character = $this->character->getCharacter();
+
+        $result = $this->craftingService->findCraftableItemForAutomation($character, $armourItem->id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_find_craftable_item_for_automation_respects_the_real_crafting_discipline_for_armour()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $armourItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+
+        $result = $this->craftingService->findCraftableItemForAutomation($character, $armourItem->id);
+
+        $this->assertSame($armourItem->id, $result?->id);
+    }
+
+    public function test_find_craftable_item_for_automation_resolves_a_shield_through_the_armour_discipline()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $shield = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'shield', 'can_craft' => true, 'default_position' => 'shield']);
+
+        $result = $this->craftingService->findCraftableItemForAutomation($character, $shield->id);
+
+        $this->assertSame($shield->id, $result?->id);
+    }
+
+    public function test_find_inexpensive_craftable_weapon_for_automation_returns_the_cheapest_across_every_weapon_subtype()
+    {
+        $character = $this->character->getCharacter();
+        $expensiveSword = $this->createItem(['cost' => 100, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+        $cheapDagger = $this->createItem(['cost' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'dagger', 'can_craft' => true, 'default_position' => 'dagger']);
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'weapon');
+
+        $result = $this->craftingService->findInexpensiveCraftableWeaponForAutomation($skill);
+
+        $this->assertSame($cheapDagger->id, $result?->id);
+        $this->assertNotSame($expensiveSword->id, $result?->id);
+    }
+
+    public function test_craft_for_batch_reports_zero_xp_gained_on_a_failed_roll()
+    {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1000);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(1);
+            })
+        );
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+
+        $result = $this->app->make(CraftingService::class)->craftForBatch($character->refresh(), $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::BATCH_CRAFTING);
+
+        $this->assertFalse($result['success']);
+        $this->assertSame(0, $result['xp_gained']);
+    }
+
+    public function test_craft_for_batch_reports_zero_xp_gained_for_a_trivial_success()
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+        $this->craftingItem->update(['skill_level_trivial' => -10]);
+
+        $result = $this->craftingService->craftForBatch($character->refresh(), $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::BATCH_CRAFTING);
+
+        $this->assertTrue($result['success']);
+        $this->assertSame(0, $result['xp_gained']);
+    }
+
+    public function test_craft_for_batch_reports_the_factual_xp_actually_awarded_on_a_successful_roll()
+    {
+        $this->instance(
+            SkillCheckService::class,
+            Mockery::mock(SkillCheckService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('getDCCheck')->once()->andReturn(1);
+                $mock->shouldReceive('characterRoll')->once()->andReturn(100);
+            })
+        );
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => CurrencyLimit::MAX_GOLD]);
+        $skill = $character->refresh()->skills()->where('game_skill_id', $this->craftingSkill->id)->first();
+        $xpBefore = $skill->xp;
+
+        $result = $this->app->make(CraftingService::class)->craftForBatch($character->refresh(), $this->craftingItem->refresh(), 'hammer', CraftingMessageMode::BATCH_CRAFTING);
+
+        $this->assertTrue($result['success']);
+        $this->assertGreaterThan(0, $result['xp_gained']);
+        $this->assertSame($xpBefore + $result['xp_gained'], $skill->refresh()->xp);
+    }
+
+    public function test_fetch_paginated_craftable_items_applies_the_item_type_filter()
+    {
+        $character = $this->character->assignSkill($this->createGameSkill([
+            'name' => 'Spell Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+        ]))->getCharacter();
+
+        $this->createItem([
+            'name' => 'Searing Bolt',
+            'type' => 'spell-damage',
+            'crafting_type' => 'spell',
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
+        ]);
+
+        $this->createItem([
+            'name' => 'Mending Light',
+            'type' => 'spell-healing',
+            'crafting_type' => 'spell',
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
+        ]);
+
+        $result = $this->craftingService->fetchPaginatedCraftableItems(
+            $character,
+            ['crafting_type' => 'spell'],
+            15,
+            1,
+            '',
+            '',
+            'spell-damage'
+        );
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame('Searing Bolt', $result['data'][0]['preview']['name']);
+    }
+
+    public function test_fetch_paginated_craftable_items_still_applies_the_armour_subtype_filter()
+    {
+        $character = $this->character->assignSkill($this->createGameSkill([
+            'name' => 'Armour Crafting',
+            'type' => SkillTypeValue::CRAFTING->value,
+        ]))->getCharacter();
+
+        $this->createItem([
+            'name' => 'Reinforced Plate Body',
+            'type' => ArmourType::BODY->value,
+            'crafting_type' => 'armour',
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
+        ]);
+
+        $this->createItem([
+            'name' => 'Reinforced Plate Helmet',
+            'type' => ArmourType::HELMET->value,
+            'crafting_type' => 'armour',
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 100,
+            'can_craft' => true,
+        ]);
+
+        $result = $this->craftingService->fetchPaginatedCraftableItems(
+            $character,
+            ['crafting_type' => 'armour'],
+            15,
+            1,
+            '',
+            ArmourType::BODY->value
+        );
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame('Reinforced Plate Body', $result['data'][0]['preview']['name']);
+    }
+
+    public function test_fetch_best_craftable_items_by_type_for_automation_chooses_the_highest_required_level_per_type()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $lowerBody = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+        $higherBody = $this->createItem(['cost' => 10, 'skill_level_required' => 3, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+        $lowerHelmet = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'helmet', 'can_craft' => true, 'default_position' => 'helmet']);
+        $higherHelmet = $this->createItem(['cost' => 10, 'skill_level_required' => 3, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'helmet', 'can_craft' => true, 'default_position' => 'helmet']);
+
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'armour');
+        $skill->update(['level' => 5]);
+
+        $result = $this->craftingService->fetchBestCraftableItemsByTypeForAutomation($skill->refresh(), 'armour', ['body', 'helmet']);
+
+        $this->assertSame($higherBody->id, $result->get('body')->id);
+        $this->assertSame($higherHelmet->id, $result->get('helmet')->id);
+        $this->assertNotSame($lowerBody->id, $result->get('body')->id);
+        $this->assertNotSame($lowerHelmet->id, $result->get('helmet')->id);
+    }
+
+    public function test_fetch_best_craftable_items_by_type_for_automation_breaks_ties_with_the_lower_id()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $firstBody = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+        $secondBody = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'armour');
+
+        $result = $this->craftingService->fetchBestCraftableItemsByTypeForAutomation($skill, 'armour', ['body']);
+
+        $expectedId = min($firstBody->id, $secondBody->id);
+
+        $this->assertSame($expectedId, $result->get('body')->id);
+    }
+
+    public function test_fetch_best_craftable_items_by_type_for_automation_omits_a_type_with_no_candidate()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'armour');
+
+        $result = $this->craftingService->fetchBestCraftableItemsByTypeForAutomation($skill, 'armour', ['body', 'helmet']);
+
+        $this->assertTrue($result->has('body'));
+        $this->assertFalse($result->has('helmet'));
+    }
+
+    public function test_fetch_best_craftable_items_by_type_for_automation_excludes_items_beyond_the_characters_skill_level()
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $tooHighBody = $this->createItem(['cost' => 10, 'skill_level_required' => 500, 'skill_level_trivial' => 600, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+        $craftableBody = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+
+        $skill = $this->craftingService->getCraftingSkillForAutomation($character, 'armour');
+
+        $result = $this->craftingService->fetchBestCraftableItemsByTypeForAutomation($skill, 'armour', ['body']);
+
+        $this->assertSame($craftableBody->id, $result->get('body')->id);
+        $this->assertNotSame($tooHighBody->id, $result->get('body')->id);
+    }
+
+    public function test_find_best_craftable_weapon_for_automation_returns_the_highest_actually_craftable_sword(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->skills()->where('game_skill_id', $this->craftingSkill->id)->update(['level' => 5]);
+        $character = $character->refresh();
+
+        $lowerSword = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+        $higherSword = $this->createItem(['cost' => 10, 'skill_level_required' => 4, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+        $inaccessibleSword = $this->createItem(['cost' => 10, 'skill_level_required' => 500, 'skill_level_trivial' => 600, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+
+        $result = $this->craftingService->findBestCraftableWeaponForAutomation($character, 'sword');
+
+        $this->assertSame($higherSword->id, $result?->id);
+        $this->assertNotSame($lowerSword->id, $result?->id);
+        $this->assertNotSame($inaccessibleSword->id, $result?->id);
+    }
+
+    public function test_find_best_craftable_weapon_for_automation_breaks_ties_with_the_lower_id(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $firstSword = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+        $secondSword = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'sword', 'can_craft' => true, 'default_position' => 'sword']);
+
+        $result = $this->craftingService->findBestCraftableWeaponForAutomation($character, 'sword');
+
+        $expectedId = min($firstSword->id, $secondSword->id);
+
+        $this->assertSame($expectedId, $result?->id);
+    }
+
+    public function test_find_best_craftable_weapon_for_automation_matches_a_two_handed_weapon_by_default_position(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $bow = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'weapon', 'type' => 'weapon', 'can_craft' => true, 'default_position' => 'bow']);
+
+        $result = $this->craftingService->findBestCraftableWeaponForAutomation($character, 'bow');
+
+        $this->assertSame($bow->id, $result?->id);
+    }
+
+    public function test_find_best_craftable_shield_for_automation_returns_the_highest_actually_craftable_shield(): void
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+        $character = $this->character->assignSkill($armourCrafting, 5)->getCharacter();
+
+        $lowerShield = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'shield', 'can_craft' => true, 'default_position' => 'shield']);
+        $higherShield = $this->createItem(['cost' => 10, 'skill_level_required' => 4, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'shield', 'can_craft' => true, 'default_position' => 'shield']);
+        $inaccessibleShield = $this->createItem(['cost' => 10, 'skill_level_required' => 500, 'skill_level_trivial' => 600, 'crafting_type' => 'armour', 'type' => 'shield', 'can_craft' => true, 'default_position' => 'shield']);
+
+        $result = $this->craftingService->findBestCraftableShieldForAutomation($character);
+
+        $this->assertSame($higherShield->id, $result?->id);
+        $this->assertNotSame($lowerShield->id, $result?->id);
+        $this->assertNotSame($inaccessibleShield->id, $result?->id);
+    }
+
+    public function test_find_best_craftable_shield_for_automation_returns_null_without_an_armour_crafting_skill(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'shield', 'can_craft' => true, 'default_position' => 'shield']);
+
+        $result = $this->craftingService->findBestCraftableShieldForAutomation($character);
+
+        $this->assertNull($result);
     }
 }

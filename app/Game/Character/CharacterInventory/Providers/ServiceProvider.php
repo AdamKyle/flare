@@ -18,6 +18,7 @@ use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemSlotsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterGemsTransformer;
 use App\Game\Character\CharacterInventory\Transformers\CharacterInventoryCountTransformer;
+use App\Game\Character\CharacterInventory\Transformers\InventorySetOptionTransformer;
 use App\Game\Character\CharacterInventory\Transformers\InventoryTransformer;
 use App\Game\Character\CharacterInventory\Validations\SetHandsValidation;
 use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransformer;
@@ -82,7 +83,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(DisenchantService::class),
                 $app->make(Pagination::class),
-                $app->make(Manager::class)
+                $app->make(Manager::class),
+                $app->make(InventorySetOptionTransformer::class)
             );
         });
 
