@@ -16,14 +16,6 @@ use Illuminate\Support\Collection;
 
 class CraftAndEnchantSetPreviewService
 {
-    /**
-     * @param  CraftAndEnchantSetPlanService  $craftAndEnchantSetPlanService
-     * @param  CraftingService  $craftingService
-     * @param  EnchantingService  $enchantingService
-     * @param  BatchCraftingDestinationResolver  $destinationResolver
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     * @param  CharacterInventoryService  $characterInventoryService
-     */
     public function __construct(
         private readonly CraftAndEnchantSetPlanService $craftAndEnchantSetPlanService,
         private readonly CraftingService $craftingService,

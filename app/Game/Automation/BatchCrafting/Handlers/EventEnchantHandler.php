@@ -23,12 +23,6 @@ use App\Game\Skills\Values\CraftingMessageMode;
 #[HandlesBatchCraftingMode(BatchCraftingType::ENCHANT, EnchantingBatchMode::EVENT)]
 class EventEnchantHandler implements BatchCraftingHandler
 {
-    /**
-     * @param  EventEnchantTargetService  $eventEnchantTargetService
-     * @param  EnchantingService  $enchantingService
-     * @param  CraftingService  $craftingService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     */
     public function __construct(
         private readonly EventEnchantTargetService $eventEnchantTargetService,
         private readonly EnchantingService $enchantingService,

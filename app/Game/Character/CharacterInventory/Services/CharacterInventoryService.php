@@ -53,21 +53,6 @@ class CharacterInventoryService
 
     private ?string $inventorySetEquippedName = null;
 
-    /**
-     * @param  ItemEnricherFactory  $itemEnricherFactory
-     * @param  EquippableItemTransformer  $equippableItemTransformer
-     * @param  QuestItemTransformer  $questItemTransformer
-     * @param  UsableItemTransformer  $usableItemTransformer
-     * @param  InventoryTransformer  $inventoryTransformer
-     * @param  InventorySetService  $inventorySetService
-     * @param  MassDisenchantService  $massDisenchantService
-     * @param  UpdateCharacterSkillsService  $updateCharacterSkillsService
-     * @param  UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypesHandler
-     * @param  DisenchantService  $disenchantService
-     * @param  Pagination  $pagination
-     * @param  Manager  $manager
-     * @param  InventorySetOptionTransformer  $inventorySetOptionTransformer
-     */
     public function __construct(
         private readonly ItemEnricherFactory $itemEnricherFactory,
         private readonly EquippableItemTransformer $equippableItemTransformer,

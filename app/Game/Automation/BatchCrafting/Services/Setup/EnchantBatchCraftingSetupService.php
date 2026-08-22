@@ -9,9 +9,6 @@ use App\Game\Automation\BatchCrafting\Services\Capabilities\EnchantBatchCrafting
 
 class EnchantBatchCraftingSetupService implements BatchCraftingSetupService
 {
-    /**
-     * @param  EnchantBatchCraftingCapabilityService  $enchantBatchCraftingCapabilityService
-     */
     public function __construct(
         private readonly EnchantBatchCraftingCapabilityService $enchantBatchCraftingCapabilityService,
     ) {}

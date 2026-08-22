@@ -51,17 +51,6 @@ class CraftingService
 
     private ?int $lastCraftedInventorySlotId = null;
 
-    /**
-     * @param  RandomEnchantmentService  $randomEnchantmentService
-     * @param  SkillService  $skillService
-     * @param  ItemListCostTransformerService  $itemListCostTransformerService
-     * @param  SkillCheckService  $skillCheckService
-     * @param  UpdateCraftingTasksForFactionLoyalty  $updateCraftingTasksForFactionLoyalty
-     * @param  HandleUpdatingCraftingGlobalEventGoal  $handleUpdatingCraftingGlobalEventGoal
-     * @param  FactionLoyaltyService  $factionLoyaltyService
-     * @param  Pagination  $pagination
-     * @param  CraftableItemTransformer  $craftableItemTransformer
-     */
     public function __construct(
         RandomEnchantmentService $randomEnchantmentService,
         SkillService $skillService,

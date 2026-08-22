@@ -23,12 +23,6 @@ use App\Game\Skills\Values\CraftingMessageMode;
 #[HandlesBatchCraftingMode(BatchCraftingType::CRAFT_AND_ENCHANT, CraftAndEnchantBatchMode::SET)]
 class CraftAndEnchantSetHandler implements BatchCraftingHandler
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  EnchantingService  $enchantingService
-     * @param  CraftAndEnchantBatchAttemptService  $craftAndEnchantBatchAttemptService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly EnchantingService $enchantingService,

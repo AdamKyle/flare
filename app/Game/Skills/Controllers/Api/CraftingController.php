@@ -23,11 +23,6 @@ class CraftingController extends Controller
 {
     use ChecksAutomationRestrictions, FactionLoyalty, ShouldShowCraftingEventButton;
 
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  CraftableItemTransformer  $craftableItemTransformer
-     * @param  CraftingItemPreviewTransformer  $craftingItemPreviewTransformer
-     */
     public function __construct(
         private CraftingService $craftingService,
         private readonly CraftableItemTransformer $craftableItemTransformer,
@@ -36,10 +31,6 @@ class CraftingController extends Controller
 
     /**
      * Fetch the Craftable items for the character, paginated when requested.
-     *
-     * @param  Request  $request
-     * @param  Character  $character
-     * @return JsonResponse
      */
     public function fetchItemsToCraft(Request $request, Character $character): JsonResponse
     {
@@ -83,10 +74,6 @@ class CraftingController extends Controller
 
     /**
      * Fetch the Craftable items valid for the character's class, paginated when requested.
-     *
-     * @param  Request  $request
-     * @param  Character  $character
-     * @return JsonResponse
      */
     public function fetchItemsForClass(Request $request, Character $character): JsonResponse
     {
@@ -136,11 +123,6 @@ class CraftingController extends Controller
 
     /**
      * Craft the requested item for the character and return the refreshed Craftable item list.
-     *
-     * @param  CraftingValidation  $request
-     * @param  Character  $character
-     * @param  CraftingService  $craftingService
-     * @return JsonResponse
      */
     public function craft(CraftingValidation $request, Character $character, CraftingService $craftingService): JsonResponse
     {
@@ -205,9 +187,6 @@ class CraftingController extends Controller
 
     /**
      * Resolve the valid Crafting type(s) for the character's class.
-     *
-     * @param  Character  $character
-     * @return string|array
      */
     private function resolveCraftingTypeForClass(Character $character): string|array
     {
@@ -221,9 +200,6 @@ class CraftingController extends Controller
 
     /**
      * Transform the given Craftable items for the API response.
-     *
-     * @param  iterable  $items
-     * @return array
      */
     private function transformCraftableItems(iterable $items): array
     {
@@ -235,9 +211,6 @@ class CraftingController extends Controller
 
     /**
      * Build the crafted item result preview for the given inventory slot.
-     *
-     * @param  int|null  $inventorySlotId
-     * @return array|null
      */
     private function buildResultPreview(?int $inventorySlotId): ?array
     {

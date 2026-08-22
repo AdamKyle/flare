@@ -23,15 +23,6 @@ class SkillService
 
     private ?Skill $skillInTraining;
 
-    /**
-     * @param  Manager  $manager
-     * @param  BasicSkillsTransformer  $basicSkillsTransformer
-     * @param  SkillsTransformer  $skillsTransformer
-     * @param  UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypes
-     * @param  BattleMessageHandler  $battleMessageHandler
-     * @param  PlainDataSerializer  $plainDataSerializer
-     * @param  RandomNumberGenerator  $randomNumberGenerator
-     */
     public function __construct(
         private readonly Manager $manager,
         private readonly BasicSkillsTransformer $basicSkillsTransformer,
@@ -46,7 +37,6 @@ class SkillService
      * Set the current skill in training
      *
      * @param  Character  $character  The character whose training skill is being resolved.
-     * @return SkillService
      */
     public function setSkillInTraining(Character $character): SkillService
     {
@@ -184,7 +174,6 @@ class SkillService
      *
      * @param  Character  $character  The character whose training skill receives the XP.
      * @param  int  $totalXpToGive  The exact XP amount to give.
-     * @return void
      */
     public function giveXpToTrainingSkill(Character $character, int $totalXpToGive): void
     {

@@ -14,12 +14,6 @@ use App\Game\Skills\Services\EnchantingService;
 
 class CraftAndEnchantAmountPreviewService
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  EnchantingService  $enchantingService
-     * @param  BatchCraftingDestinationResolver  $destinationResolver
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly EnchantingService $enchantingService,

@@ -31,11 +31,6 @@ class DisenchantService
 
     private ?InventorySlot $questSlot = null;
 
-    /**
-     * @param  SkillCheckService  $skillCheckService
-     * @param  RandomNumberGenerator  $randomNumberGenerator
-     * @param  ChanceCalculator  $chanceCalculator
-     */
     public function __construct(
         private readonly SkillCheckService $skillCheckService,
         private readonly RandomNumberGenerator $randomNumberGenerator,

@@ -13,11 +13,6 @@ use App\Game\Skills\Services\CraftingService;
 
 class CraftAmountPreviewService
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     * @param  CharacterInventoryService  $characterInventoryService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly BatchCraftingSetService $batchCraftingSetService,

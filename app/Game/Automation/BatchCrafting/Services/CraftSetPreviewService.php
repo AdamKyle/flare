@@ -10,11 +10,6 @@ use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 
 class CraftSetPreviewService
 {
-    /**
-     * @param  CraftSetPlanService  $craftSetPlanService
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     * @param  CharacterInventoryService  $characterInventoryService
-     */
     public function __construct(
         private readonly CraftSetPlanService $craftSetPlanService,
         private readonly BatchCraftingSetService $batchCraftingSetService,

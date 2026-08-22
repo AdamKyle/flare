@@ -14,11 +14,6 @@ use App\Game\Skills\Services\TrinketCraftingService;
 
 class TrinketryStatusSection implements BatchCraftingStatusSection
 {
-    /**
-     * @param  TrinketCraftingService  $trinketCraftingService
-     * @param  CraftingService  $craftingService
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     */
     public function __construct(
         private readonly TrinketCraftingService $trinketCraftingService,
         private readonly CraftingService $craftingService,

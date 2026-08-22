@@ -20,9 +20,6 @@ class MarketBoard
 {
     private EquipItemService $equipItemService;
 
-    /**
-     * @param  EquipItemService  $equipItemService
-     */
     public function __construct(EquipItemService $equipItemService)
     {
         $this->equipItemService = $equipItemService;

@@ -29,15 +29,6 @@ class TrinketCraftingService
 
     private Pagination $pagination;
 
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  SkillCheckService  $skillCheckService
-     * @param  ItemListCostTransformerService  $itemListCostTransformerService
-     * @param  SkillService  $skillService
-     * @param  Pagination  $pagination
-     * @param  CraftingItemPreviewTransformer  $craftingItemPreviewTransformer
-     * @param  TrinketCraftingItemTransformer  $trinketCraftingItemTransformer
-     */
     public function __construct(
         CraftingService $craftingService,
         SkillCheckService $skillCheckService,

@@ -14,12 +14,6 @@ use App\Game\Automation\BatchCrafting\Services\CraftAndEnchantSetPreviewService;
 
 class CraftAndEnchantBatchCraftingSetupService implements BatchCraftingSetupService
 {
-    /**
-     * @param  CraftAndEnchantAmountPreviewService  $craftAndEnchantAmountPreviewService
-     * @param  CraftAndEnchantSetPreviewService  $craftAndEnchantSetPreviewService
-     * @param  CraftAndEnchantSetPlanService  $craftAndEnchantSetPlanService
-     * @param  CraftAndEnchantBatchCraftingCapabilityService  $craftAndEnchantBatchCraftingCapabilityService
-     */
     public function __construct(
         private readonly CraftAndEnchantAmountPreviewService $craftAndEnchantAmountPreviewService,
         private readonly CraftAndEnchantSetPreviewService $craftAndEnchantSetPreviewService,

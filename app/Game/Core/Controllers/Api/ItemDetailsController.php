@@ -9,9 +9,6 @@ use Illuminate\Http\JsonResponse;
 
 class ItemDetailsController extends Controller
 {
-    /**
-     * @param  ItemTransformer  $itemTransformer
-     */
     public function __construct(private readonly ItemTransformer $itemTransformer) {}
 
     /**

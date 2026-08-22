@@ -12,11 +12,6 @@ use Illuminate\Support\Collection as SupportCollection;
 
 class CraftAndEnchantExperienceTargetService
 {
-    /**
-     * @param  CraftExperienceTargetService  $craftExperienceTargetService
-     * @param  EnchantingService  $enchantingService
-     * @param  CraftingService  $craftingService
-     */
     public function __construct(
         private readonly CraftExperienceTargetService $craftExperienceTargetService,
         private readonly EnchantingService $enchantingService,

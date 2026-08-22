@@ -57,17 +57,6 @@ class EnchantingService
      */
     private bool $wasTooEasy = false;
 
-    /**
-     * @param  CharacterStatBuilder  $characterStatBuilder
-     * @param  CharacterInventoryService  $characterInventoryService
-     * @param  EnchantItemService  $enchantItemService
-     * @param  RandomEnchantmentService  $randomEnchantmentService
-     * @param  GlobalEventGoalEligibilityService  $globalEventGoalEligibilityService
-     * @param  Pagination  $pagination
-     * @param  EnchantingItemTransformer  $enchantingItemTransformer
-     * @param  EventEnchantingItemTransformer  $eventEnchantingItemTransformer
-     * @param  EnchantingAffixTransformer  $enchantingAffixTransformer
-     */
     public function __construct(
         CharacterStatBuilder $characterStatBuilder,
         CharacterInventoryService $characterInventoryService,

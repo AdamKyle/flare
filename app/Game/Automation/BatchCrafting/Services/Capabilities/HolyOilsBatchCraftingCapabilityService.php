@@ -7,9 +7,6 @@ use App\Game\Npcs\Actions\WorkBench\Services\HolyItemService;
 
 class HolyOilsBatchCraftingCapabilityService
 {
-    /**
-     * @param  HolyItemService  $holyItemService
-     */
     public function __construct(private readonly HolyItemService $holyItemService) {}
 
     /**

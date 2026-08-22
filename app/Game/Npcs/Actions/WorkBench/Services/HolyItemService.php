@@ -28,13 +28,6 @@ class HolyItemService
 {
     use ResponseBuilder;
 
-    /**
-     * @param  HolyItemBonusGenerator  $holyItemBonusGenerator
-     * @param  Pagination  $pagination
-     * @param  WorkBenchTargetTransformer  $workBenchTargetTransformer
-     * @param  WorkBenchHolyOilTransformer  $workBenchHolyOilTransformer
-     * @param  CraftingItemPreviewTransformer  $craftingItemPreviewTransformer
-     */
     public function __construct(
         private readonly HolyItemBonusGenerator $holyItemBonusGenerator,
         private readonly Pagination $pagination,

@@ -16,11 +16,6 @@ use Illuminate\Support\Collection;
 
 class CraftAndEnchantSetPlanService
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  SetHandsValidation  $setHandsValidation
-     * @param  EnchantingService  $enchantingService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly SetHandsValidation $setHandsValidation,

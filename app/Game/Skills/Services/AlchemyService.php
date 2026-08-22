@@ -35,13 +35,6 @@ class AlchemyService
 
     private Pagination $pagination;
 
-    /**
-     * @param  SkillCheckService  $skillCheckService
-     * @param  ItemListCostTransformerService  $itemListCostTransformerService
-     * @param  Pagination  $pagination
-     * @param  AlchemyItemTransformer  $alchemyItemTransformer
-     * @param  UsableItemTransformer  $usableItemTransformer
-     */
     public function __construct(
         SkillCheckService $skillCheckService,
         ItemListCostTransformerService $itemListCostTransformerService,
