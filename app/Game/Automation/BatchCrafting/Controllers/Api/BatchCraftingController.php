@@ -12,11 +12,6 @@ use Illuminate\Http\Request;
 
 class BatchCraftingController
 {
-    /**
-     * @param  BatchCraftingAutomationService  $batchCraftingAutomationService
-     * @param  CraftSetRecommendationService  $craftSetRecommendationService
-     * @param  CraftSetHandRecommendationService  $craftSetHandRecommendationService
-     */
     public function __construct(
         private readonly BatchCraftingAutomationService $batchCraftingAutomationService,
         private readonly CraftSetRecommendationService $craftSetRecommendationService,

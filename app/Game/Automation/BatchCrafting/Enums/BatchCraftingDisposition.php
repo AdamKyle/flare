@@ -7,8 +7,12 @@ enum BatchCraftingDisposition: string
     case KEEP = 'keep';
     case SELL = 'sell';
     case DESTROY = 'destroy';
+    case LIST = 'list';
+    case DISENCHANT = 'disenchant';
+    case USE_NOW = 'use_now';
     case KEEP_BEST_SELL_REST = 'keep_best_sell_rest';
     case KEEP_BEST_DESTROY_REST = 'keep_best_destroy_rest';
+    case KEEP_BEST_DISENCHANT_REST = 'keep_best_disenchant_rest';
 
     /**
      * Determine whether this disposition retains only the strongest crafted item per item type.
@@ -17,6 +21,8 @@ enum BatchCraftingDisposition: string
      */
     public function keepsBest(): bool
     {
-        return $this === self::KEEP_BEST_SELL_REST || $this === self::KEEP_BEST_DESTROY_REST;
+        return $this === self::KEEP_BEST_SELL_REST
+            || $this === self::KEEP_BEST_DESTROY_REST
+            || $this === self::KEEP_BEST_DISENCHANT_REST;
     }
 }

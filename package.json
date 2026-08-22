@@ -8,7 +8,7 @@
     "build": "NODE_ENV=production vite build",
     "build:dev": "NODE_ENV=development vite build",
     "prepare": "husky",
-    "lint": "yarn eslint resources/js/**/*.{ts,tsx}",
+    "lint": "yarn eslint \"resources/js/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit --skipLibCheck",
     "unused-files-check": "yarn unimported"
   },

@@ -10,10 +10,6 @@ use InvalidArgumentException;
 
 class BatchCraftingOrchestratorFactory
 {
-    /**
-     * @param  BatchCraftingAttributeRegistry  $registry
-     * @param  Container  $container
-     */
     public function __construct(
         private readonly BatchCraftingAttributeRegistry $registry,
         private readonly Container $container,

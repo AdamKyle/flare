@@ -7,11 +7,6 @@ use App\Game\Skills\Values\CraftingSkillGroup;
 
 class CraftExperienceCycleTarget
 {
-    /**
-     * @param  CraftingSkillGroup  $skillGroup
-     * @param  string  $craftingType
-     * @param  string|null  $itemType
-     */
     public function __construct(
         public readonly CraftingSkillGroup $skillGroup,
         public readonly string $craftingType,

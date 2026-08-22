@@ -30,7 +30,7 @@ const SkillModifiersSection = ({
       <DefinitionRow
         left={<InfoLabel label="Affected Skills" />}
         right={
-          <span className="mr-[-10px] inline-block max-w-2/3 text-left align-top text-sm leading-relaxed break-words whitespace-normal text-gray-800 dark:text-gray-200">
+          <span className="text-sm leading-relaxed text-gray-800 dark:text-gray-200">
             {item.skills.join(', ')}
           </span>
         }

@@ -13,11 +13,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 
 class CraftAmountPreviewServiceTest extends TestCase
 {
-    use CreateGameSkill, CreateItem, RefreshDatabase;
+    use CreateGameSkill, CreateInventorySets, CreateItem, RefreshDatabase;
 
     private ?GameSkill $weaponCrafting;
 
@@ -177,6 +178,62 @@ class CraftAmountPreviewServiceTest extends TestCase
 
         $result = $this->service->build($this->character, $validated);
 
+        $this->assertFalse($result['can_fit']);
+        $this->assertNotEmpty($result['blockers']);
+    }
+
+    public function test_build_for_keep_to_an_empty_inventory_set_returns_that_sets_real_capacity(): void
+    {
+        $item = $this->createItem(['name' => 'Service Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 5]);
+        $set = $this->createInventorySet(['character_id' => $this->character->id, 'is_equipped' => false, 'max_slots' => 20]);
+        resolve(BatchCraftingSetService::class)->getOrCreateForCharacter($this->character);
+
+        $validated = [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 5, 'output_destination' => 'inventory_set', 'output_set_id' => $set->id],
+        ];
+
+        $result = $this->service->build($this->character, $validated);
+
+        $this->assertSame(20, $result['destination_capacity']['max']);
+        $this->assertTrue($result['can_fit']);
+        $this->assertSame([], $result['blockers']);
+    }
+
+    public function test_build_for_keep_to_an_inventory_set_without_a_selected_set_id_is_blocked(): void
+    {
+        $item = $this->createItem(['name' => 'Service Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 5]);
+
+        $validated = [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 5, 'output_destination' => 'inventory_set'],
+        ];
+
+        $result = $this->service->build($this->character, $validated);
+
+        $this->assertNull($result['destination_capacity']);
+        $this->assertFalse($result['can_fit']);
+        $this->assertContains('A destination set is required.', $result['blockers']);
+    }
+
+    public function test_build_for_keep_to_a_non_empty_inventory_set_is_blocked(): void
+    {
+        $item = $this->createItem(['name' => 'Service Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 5]);
+        $occupyingItem = $this->createItem(['name' => 'Already In Set']);
+        $set = $this->createInventorySet(['character_id' => $this->character->id, 'is_equipped' => false, 'max_slots' => 20]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $occupyingItem->id]);
+
+        $validated = [
+            'batch_type' => BatchCraftingType::CRAFT->value,
+            'disposition' => BatchCraftingDisposition::KEEP->value,
+            'progress' => ['craft_mode' => 'specific_item', 'specific_crafting_type' => 'dagger', 'specific_item_id' => $item->id, 'craft_amount' => 5, 'output_destination' => 'inventory_set', 'output_set_id' => $set->id],
+        ];
+
+        $result = $this->service->build($this->character, $validated);
+
+        $this->assertNull($result['destination_capacity']);
         $this->assertFalse($result['can_fit']);
         $this->assertNotEmpty($result['blockers']);
     }

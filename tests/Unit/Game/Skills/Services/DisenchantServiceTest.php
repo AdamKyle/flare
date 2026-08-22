@@ -619,4 +619,51 @@ class DisenchantServiceTest extends TestCase
         $this->assertEquals('Disenchanted item '.$this->itemToDisenchant->affix_name.' Check server message tab for Gold Dust output.', $result['message']);
         $this->assertEquals(200, $result['status']);
     }
+
+    public function test_disenchant_batch_crafted_item_rewards_gold_dust_on_success(): void
+    {
+        Event::fake();
+
+        $this->instance(
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(400);
+                $mock->shouldReceive('numberBetween')->with(2, 1150)->andReturn(1000);
+            })
+        );
+
+        $character = $this->character->getCharacter();
+        $goldDustBefore = $character->gold_dust;
+
+        resolve(DisenchantService::class)->setUp($character)->disenchantBatchCraftedItem();
+
+        $character = $character->refresh();
+
+        $this->assertGreaterThan($goldDustBefore, $character->gold_dust);
+
+        Event::assertDispatched(UpdateSkillEvent::class);
+    }
+
+    public function test_disenchant_batch_crafted_item_grants_minimal_gold_dust_on_failure(): void
+    {
+        Event::fake();
+
+        $this->instance(
+            RandomNumberGenerator::class,
+            Mockery::mock(RandomNumberGenerator::class, function (MockInterface $mock): void {
+                $mock->shouldReceive('numberBetween')->with(1, 400)->andReturn(1, 400);
+            })
+        );
+
+        $character = $this->character->getCharacter();
+        $goldDustBefore = $character->gold_dust;
+
+        resolve(DisenchantService::class)->setUp($character)->disenchantBatchCraftedItem();
+
+        $character = $character->refresh();
+
+        $this->assertEquals($goldDustBefore + 1, $character->gold_dust);
+
+        Event::assertNotDispatched(UpdateSkillEvent::class);
+    }
 }

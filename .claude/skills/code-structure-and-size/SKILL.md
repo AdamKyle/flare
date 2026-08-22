@@ -46,6 +46,8 @@ When a touched service has grown into a broad coordinator plus implementation fo
 
 Do not move module-specific logic into a generic/global folder simply to shorten a class.
 
+Extracting a class does not create a module boundary. When extracted code is consumed by another game module, expose only the narrow owning-module contract required by the caller. Do not move the same coupling behind a deeper namespace.
+
 ## Routes
 
 Route files declare routing and middleware only.

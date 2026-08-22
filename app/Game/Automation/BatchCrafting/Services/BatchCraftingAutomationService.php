@@ -11,10 +11,10 @@ use App\Game\Automation\BatchCrafting\Enums\BatchCraftingDisposition;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingEndReason;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingStatus;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
-use App\Game\Automation\BatchCrafting\Enums\CraftingBatchMode;
 use App\Game\Automation\BatchCrafting\Events\BatchCraftingStatusUpdated;
 use App\Game\Automation\BatchCrafting\Factories\BatchCraftingOrchestratorFactory;
 use App\Game\Automation\BatchCrafting\Jobs\BatchCraftingJob;
+use App\Game\Automation\BatchCrafting\Services\Setup\BatchCraftingSetupResolver;
 use App\Game\Automation\BatchCrafting\Values\BatchCraftingOperationResult;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Core\Traits\ResponseBuilder;
@@ -27,21 +27,9 @@ class BatchCraftingAutomationService
 {
     use ResponseBuilder;
 
-    /**
-     * @param  CraftAmountPreviewService  $craftAmountPreviewService
-     * @param  CraftSetPreviewService  $craftSetPreviewService
-     * @param  CraftSetPlanService  $craftSetPlanService
-     * @param  BatchCraftingCapabilityService  $batchCraftingCapabilityService
-     * @param  BatchCraftingOrchestratorFactory  $orchestratorFactory
-     * @param  ServerMessageHandler  $serverMessageHandler
-     * @param  MonitoredBugReportService  $monitoredBugReportService
-     * @param  BatchCraftingStatusService  $batchCraftingStatusService
-     */
     public function __construct(
-        private readonly CraftAmountPreviewService $craftAmountPreviewService,
-        private readonly CraftSetPreviewService $craftSetPreviewService,
-        private readonly CraftSetPlanService $craftSetPlanService,
-        private readonly BatchCraftingCapabilityService $batchCraftingCapabilityService,
+        private readonly BatchCraftingSetupResolver $setupResolver,
+        private readonly BatchCraftingModeService $batchCraftingModeService,
         private readonly BatchCraftingOrchestratorFactory $orchestratorFactory,
         private readonly ServerMessageHandler $serverMessageHandler,
         private readonly MonitoredBugReportService $monitoredBugReportService,
@@ -57,13 +45,14 @@ class BatchCraftingAutomationService
      */
     public function preview(Character $character, array $validated): array
     {
-        $mode = CraftingBatchMode::from($validated['progress']['craft_mode']);
+        $type = BatchCraftingType::from($validated['batch_type']);
+        $preview = $this->setupResolver->resolve($type)->preview($character, $validated);
 
-        return match ($mode) {
-            CraftingBatchMode::AMOUNT => $this->successResult($this->craftAmountPreviewService->build($character, $validated)),
-            CraftingBatchMode::SET => $this->successResult($this->craftSetPreviewService->build($character, $validated['progress'], $validated['disposition'])),
-            default => $this->errorResult('A preview is not available for this craft mode.'),
-        };
+        if (is_null($preview)) {
+            return $this->errorResult('A preview is not available for this craft mode.');
+        }
+
+        return $this->successResult($preview);
     }
 
     /**
@@ -87,8 +76,8 @@ class BatchCraftingAutomationService
             return $this->errorResult('You cannot start Batch Crafting while dead.');
         }
 
-        $mode = CraftingBatchMode::from($validated['progress']['craft_mode']);
-        $resolved = $this->resolveModeProgress($character, $mode, $validated);
+        $type = BatchCraftingType::from($validated['batch_type']);
+        $resolved = $this->setupResolver->resolve($type)->resolveStart($character, $validated);
 
         if (! empty($resolved['blockers'])) {
             return $this->errorResult($resolved['blockers'][0]);
@@ -101,6 +90,11 @@ class BatchCraftingAutomationService
         $progress['processing_started_at'] = null;
         $progress['gold_spent_total'] = 0;
         $progress['gold_gained_total'] = 0;
+        $progress['gold_dust_spent_total'] = 0;
+        $progress['shards_spent_total'] = 0;
+        $progress['copper_coins_spent_total'] = 0;
+        $progress['disenchanted_count'] = 0;
+        $progress['used_count'] = 0;
         $progress['chart_points'] = [];
 
         $batchCrafting = BatchCrafting::create([
@@ -127,132 +121,6 @@ class BatchCraftingAutomationService
             'message' => 'Batch crafting has started.',
             'batch_crafting_id' => $batchCrafting->id,
         ]);
-    }
-
-    /**
-     * Resolve the mode-specific starting progress data and any blockers preventing the start.
-     *
-     * @param  Character  $character  The character starting the run.
-     * @param  CraftingBatchMode  $mode  The requested craft mode.
-     * @param  array  $validated  The validated Batch Crafting request data.
-     * @return array{progress: array, blockers: array<int, string>} The starting progress data and any blockers.
-     */
-    private function resolveModeProgress(Character $character, CraftingBatchMode $mode, array $validated): array
-    {
-        return match ($mode) {
-            CraftingBatchMode::AMOUNT => $this->resolveAmountStart($character, $validated),
-            CraftingBatchMode::SET => $this->resolveSetStart($character, $validated),
-            CraftingBatchMode::EXPERIENCE => $this->resolveExperienceStart($character, $validated),
-            CraftingBatchMode::EVENT => $this->resolveEventStart($character, $validated),
-        };
-    }
-
-    /**
-     * Resolve the starting progress data and blockers for a Craft Amount run.
-     *
-     * @param  Character  $character  The character starting the run.
-     * @param  array  $validated  The validated Batch Crafting request data.
-     * @return array{progress: array, blockers: array<int, string>} The starting progress data and any blockers.
-     */
-    private function resolveAmountStart(Character $character, array $validated): array
-    {
-        $preview = $this->craftAmountPreviewService->build($character, $validated);
-        $clientProgress = $validated['progress'];
-
-        $progress = [
-            'craft_mode' => $clientProgress['craft_mode'],
-            'specific_crafting_type' => $clientProgress['specific_crafting_type'],
-            'specific_item_id' => $clientProgress['specific_item_id'],
-            'craft_amount' => $clientProgress['craft_amount'],
-            'output_destination' => $clientProgress['output_destination'] ?? null,
-            'craft_specific_count' => 0,
-        ];
-
-        return ['progress' => $progress, 'blockers' => $preview['blockers']];
-    }
-
-    /**
-     * Resolve the starting progress data and blockers for a Craft Set run.
-     *
-     * @param  Character  $character  The character starting the run.
-     * @param  array  $validated  The validated Batch Crafting request data.
-     * @return array{progress: array, blockers: array<int, string>} The starting progress data and any blockers.
-     */
-    private function resolveSetStart(Character $character, array $validated): array
-    {
-        $clientProgress = $validated['progress'];
-        $preview = $this->craftSetPreviewService->build($character, $clientProgress, $validated['disposition']);
-
-        $progress = [
-            'craft_mode' => $clientProgress['craft_mode'],
-            'set_positions' => $clientProgress['set_positions'],
-            'output_destination' => $clientProgress['output_destination'] ?? null,
-            'output_set_id' => $clientProgress['output_set_id'] ?? null,
-            'set_queue' => $preview['positions'],
-            'set_index' => 0,
-        ];
-
-        return ['progress' => $progress, 'blockers' => $preview['blockers']];
-    }
-
-    /**
-     * Resolve the starting progress data and blockers for a Craft For Experience run.
-     *
-     * @param  Character  $character  The character starting the run.
-     * @param  array  $validated  The validated Batch Crafting request data.
-     * @return array{progress: array, blockers: array<int, string>} The starting progress data and any blockers.
-     */
-    private function resolveExperienceStart(Character $character, array $validated): array
-    {
-        $blockers = [];
-
-        if (! $this->batchCraftingCapabilityService->canCraftForExperience($character)) {
-            $blockers[] = 'You do not have a Crafting skill that can still gain levels, or nothing currently provides meaningful Crafting XP.';
-        }
-
-        $disposition = BatchCraftingDisposition::from($validated['disposition']);
-
-        $progress = [
-            'craft_mode' => $validated['progress']['craft_mode'],
-            'cycle_position' => 0,
-            'crafting_xp_gained' => 0,
-        ];
-
-        if ($disposition->keepsBest()) {
-            $progress['kept_best'] = [];
-        }
-
-        return ['progress' => $progress, 'blockers' => $blockers];
-    }
-
-    /**
-     * Resolve the starting progress data and blockers for a Craft For Event run.
-     *
-     * @param  Character  $character  The character starting the run.
-     * @param  array  $validated  The validated Batch Crafting request data.
-     * @return array{progress: array, blockers: array<int, string>} The starting progress data and any blockers.
-     */
-    private function resolveEventStart(Character $character, array $validated): array
-    {
-        $blockers = [];
-
-        if (! $this->batchCraftingCapabilityService->canCraftForEvent($character)) {
-            $blockers[] = 'There is no currently eligible Craft Event to contribute to.';
-        }
-
-        $goalFacts = $this->batchCraftingCapabilityService->eventGoalFacts($character);
-
-        $progress = [
-            'craft_mode' => $validated['progress']['craft_mode'],
-            'event_goal_id' => $goalFacts['goal_id'] ?? null,
-            'event_cycle_position' => 0,
-            'crafting_xp_gained' => 0,
-            'current_item_id' => null,
-            'current_item_name' => null,
-            'current_crafting_type' => null,
-        ];
-
-        return ['progress' => $progress, 'blockers' => $blockers];
     }
 
     /**
@@ -353,9 +221,9 @@ class BatchCraftingAutomationService
     /**
      * Process the active Batch Crafting run's current execution window.
      *
-     * Continuous modes (Amount, Set) process every operation to completion in this call.
-     * Recurring modes (Experience, Event) process up to their fixed window size and, when
-     * still running, return the next execution time for the caller to schedule.
+     * Continuous modes process every operation to completion in this call. Recurring modes
+     * process up to their fixed window size and, when still running, return the next
+     * execution time for the caller to schedule.
      *
      * @param  BatchCrafting  $batchCrafting  The Batch Crafting record to process.
      * @return Carbon|null The next execution time when a recurring window remains, otherwise null.
@@ -368,11 +236,12 @@ class BatchCraftingAutomationService
             return null;
         }
 
-        $mode = CraftingBatchMode::from($batchCrafting->progress['craft_mode']);
+        $type = BatchCraftingType::from($batchCrafting->batch_type);
+        $modeValue = $type->modeFromProgress($batchCrafting->progress);
 
         $this->beginProcessingWindow($batchCrafting);
 
-        $windowSize = $mode->executionWindowSize();
+        $windowSize = $this->batchCraftingModeService->executionWindowSize($type, $modeValue);
         $operations = 0;
 
         while (is_null($windowSize) || $operations < $windowSize) {
@@ -569,10 +438,31 @@ class BatchCraftingAutomationService
             return;
         }
 
+        if ($actionStatus === BatchCraftingActionStatus::APPLIED) {
+            $batchCrafting->increment('applied_count');
+
+            return;
+        }
+
+        if ($actionStatus === BatchCraftingActionStatus::DISENCHANTED) {
+            $batchCrafting->increment('crafted_count');
+            $this->incrementProgressCounter($batchCrafting, 'disenchanted_count');
+
+            return;
+        }
+
+        if ($actionStatus === BatchCraftingActionStatus::USED) {
+            $batchCrafting->increment('crafted_count');
+            $this->incrementProgressCounter($batchCrafting, 'used_count');
+
+            return;
+        }
+
         $column = match ($actionStatus) {
             BatchCraftingActionStatus::KEPT => 'kept_count',
             BatchCraftingActionStatus::SOLD => 'sold_count',
             BatchCraftingActionStatus::DESTROYED => 'destroyed_count',
+            BatchCraftingActionStatus::LISTED => 'listed_count',
             BatchCraftingActionStatus::CRAFTED => 'crafted_count',
         };
 
@@ -581,6 +471,20 @@ class BatchCraftingAutomationService
         if ($column !== 'crafted_count') {
             $batchCrafting->increment($column);
         }
+    }
+
+    /**
+     * Increment a counter persisted within the batch's progress data.
+     *
+     * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being updated.
+     * @param  string  $key  The progress counter key to increment.
+     * @return void This method does not return a value.
+     */
+    private function incrementProgressCounter(BatchCrafting $batchCrafting, string $key): void
+    {
+        $progress = $batchCrafting->fresh()->progress;
+        $progress[$key] = ($progress[$key] ?? 0) + 1;
+        $batchCrafting->update(['progress' => $progress]);
     }
 
     /**
@@ -599,15 +503,19 @@ class BatchCraftingAutomationService
         if ($result->additionalDestroyedCount() > 0) {
             $batchCrafting->increment('destroyed_count', $result->additionalDestroyedCount());
         }
+
+        if ($result->additionalDisenchantedCount() > 0) {
+            $this->incrementProgressCounter($batchCrafting, 'disenchanted_count');
+        }
     }
 
     /**
-     * Record the cumulative financial totals and append one chart point for an attempted craft.
+     * Record the cumulative resource totals and append one chart point for an attempted operation.
      *
      * A skipped Event action slot never reaches this method, so no fake craft attempt is ever charted.
      *
      * @param  BatchCrafting  $batchCrafting  The Batch Crafting record being updated.
-     * @param  BatchCraftingOperationResult  $result  The outcome of the attempted craft.
+     * @param  BatchCraftingOperationResult  $result  The outcome of the attempted operation.
      * @param  BatchCraftingActionStatus  $actionStatus  The operation's recorded action status.
      * @return array|null The newly recorded chart point, or null for a skipped action slot.
      */
@@ -617,9 +525,12 @@ class BatchCraftingAutomationService
             return null;
         }
 
-        $progress = $batchCrafting->progress;
+        $progress = $batchCrafting->fresh()->progress;
         $progress['gold_spent_total'] += $result->goldSpent();
         $progress['gold_gained_total'] += $result->goldGained();
+        $progress['gold_dust_spent_total'] = ($progress['gold_dust_spent_total'] ?? 0) + $result->goldDustSpent();
+        $progress['shards_spent_total'] = ($progress['shards_spent_total'] ?? 0) + $result->shardsSpent();
+        $progress['copper_coins_spent_total'] = ($progress['copper_coins_spent_total'] ?? 0) + $result->copperCoinsSpent();
 
         $chartPoint = [
             'occurred_at' => now()->toJSON(),
@@ -627,6 +538,9 @@ class BatchCraftingAutomationService
             'failed' => $batchCrafting->failed_count,
             'gold_spent' => $progress['gold_spent_total'],
             'gold_gained' => $progress['gold_gained_total'],
+            'gold_dust_spent' => $progress['gold_dust_spent_total'],
+            'shards_spent' => $progress['shards_spent_total'],
+            'copper_coins_spent' => $progress['copper_coins_spent_total'],
         ];
 
         $progress['chart_points'][] = $chartPoint;

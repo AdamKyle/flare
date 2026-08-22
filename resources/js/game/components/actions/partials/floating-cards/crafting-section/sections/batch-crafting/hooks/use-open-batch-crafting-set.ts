@@ -12,7 +12,11 @@ export const useOpenBatchCraftingSet = ({
 }: UseOpenBatchCraftingSetProps): UseOpenBatchCraftingSetDefinition => {
   const sidePeekEmitter = useSidePeekEmitter();
 
-  const openBatchCraftingSet = (set_id: number, set_name: string): void => {
+  const openBatchCraftingSet = (
+    set_id: number,
+    set_name: string,
+    item_name?: string
+  ): void => {
     sidePeekEmitter.emit(
       SidePeek.SIDE_PEEK,
       SidePeekComponentRegistrationEnum.SETS,
@@ -23,6 +27,7 @@ export const useOpenBatchCraftingSet = ({
         allow_clicking_outside: true,
         initial_set_id: set_id,
         initial_set_name: set_name,
+        ...(item_name ? { initial_search_text: item_name } : {}),
       }
     );
   };

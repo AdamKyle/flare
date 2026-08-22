@@ -597,6 +597,81 @@ class CraftingService
     }
 
     /**
+     * Resolve the cheapest currently craftable item for each requested Crafting skill group, in one bounded query.
+     *
+     * Used when a caller needs the fallback candidate for every Crafting discipline (there are
+     * only four closed groups) without executing a query per group from inside a loop.
+     *
+     * @param  SupportCollection<string, Skill|null>  $skillsByGroup  The character's already-resolved Crafting skills, keyed by Crafting skill group value.
+     * @return SupportCollection<string, Item|null> The cheapest craftable item per Crafting skill group value.
+     */
+    public function findInexpensiveCraftableItemsForGroups(SupportCollection $skillsByGroup): SupportCollection
+    {
+        $eligibleGroups = collect(CraftingSkillGroup::cases())
+            ->filter(fn (CraftingSkillGroup $group): bool => ! is_null($skillsByGroup->get($group->value)));
+
+        if ($eligibleGroups->isEmpty()) {
+            return collect();
+        }
+
+        $itemsByGroup = $this->fetchCraftableCandidatesForGroups($eligibleGroups, $skillsByGroup);
+
+        return $eligibleGroups->mapWithKeys(function (CraftingSkillGroup $group) use ($itemsByGroup): array {
+            $cheapest = $itemsByGroup->get($group->value, collect())
+                ->sortBy([['cost', 'asc'], ['id', 'asc']])
+                ->first();
+
+            return [$group->value => $cheapest];
+        });
+    }
+
+    /**
+     * Fetch every currently craftable candidate item across the requested Crafting skill groups, in one query.
+     *
+     * @param  SupportCollection<int, CraftingSkillGroup>  $eligibleGroups  The Crafting skill groups with a resolved skill.
+     * @param  SupportCollection<string, Skill|null>  $skillsByGroup  The character's already-resolved Crafting skills, keyed by Crafting skill group value.
+     * @return SupportCollection<string, Collection<int, Item>> The candidate items, grouped by their Crafting skill group value.
+     */
+    private function fetchCraftableCandidatesForGroups(SupportCollection $eligibleGroups, SupportCollection $skillsByGroup): SupportCollection
+    {
+        $items = Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
+            ->where('can_craft', true)
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
+            ->doesntHave('appliedHolyStacks')
+            ->doesntHave('sockets')
+            ->where(function (Builder $query) use ($eligibleGroups, $skillsByGroup): void {
+                foreach ($eligibleGroups as $group) {
+                    $skill = $skillsByGroup->get($group->value);
+
+                    $query->orWhere(function (Builder $subQuery) use ($group, $skill): void {
+                        $this->constrainQueryToCraftingGroup($subQuery, $group)->where('skill_level_required', '<=', $skill->level);
+                    });
+                }
+            })
+            ->get();
+
+        return $items->groupBy(fn (Item $item): ?string => $this->resolveCraftingSkillGroupForItem($item)?->value);
+    }
+
+    /**
+     * Constrain a query to items belonging to the given Crafting skill group.
+     *
+     * @param  Builder  $query  The query being constrained.
+     * @param  CraftingSkillGroup  $group  The Crafting skill group to constrain to.
+     * @return Builder The constrained query.
+     */
+    private function constrainQueryToCraftingGroup(Builder $query, CraftingSkillGroup $group): Builder
+    {
+        return match ($group) {
+            CraftingSkillGroup::WEAPON => $query->whereIn('type', ItemType::validWeapons()),
+            CraftingSkillGroup::ARMOUR => $query->where('crafting_type', 'armour'),
+            CraftingSkillGroup::RING => $query->where('crafting_type', 'ring'),
+            CraftingSkillGroup::SPELL => $query->where('crafting_type', 'spell'),
+        };
+    }
+
+    /**
      * Determine whether the given Crafting skill has reached its maximum level.
      *
      * @param  Skill  $skill  The Crafting skill being checked.
@@ -639,13 +714,81 @@ class CraftingService
     }
 
     /**
+     * Resolve every currently craftable item among the requested item ids, in one bounded operation.
+     *
+     * Used by Set-based automation planning so per-position/per-hand item resolution does not run
+     * one query per requested item.
+     *
+     * @param  Character  $character  The character resolving craftable items.
+     * @param  array<int, int>  $itemIds  The requested item ids.
+     * @return SupportCollection<int, Item> The currently craftable items among the requested ids, keyed by item id.
+     */
+    public function findCraftableItemsForAutomation(Character $character, array $itemIds): SupportCollection
+    {
+        $uniqueItemIds = array_values(array_unique($itemIds));
+
+        if (empty($uniqueItemIds)) {
+            return collect();
+        }
+
+        $skillsByGroup = $this->resolveCraftingSkillsForGroups($character, CraftingSkillGroup::cases());
+
+        return Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
+            ->whereIn('id', $uniqueItemIds)
+            ->where('can_craft', true)
+            ->whereNull('item_prefix_id')
+            ->whereNull('item_suffix_id')
+            ->doesntHave('appliedHolyStacks')
+            ->doesntHave('sockets')
+            ->get()
+            ->filter(fn (Item $item): bool => $this->itemIsCraftableWithResolvedSkills($item, $skillsByGroup))
+            ->keyBy('id');
+    }
+
+    /**
+     * Determine whether a resolved item is craftable given the character's already-resolved Crafting skills.
+     *
+     * @param  Item  $item  The candidate item.
+     * @param  SupportCollection<string, Skill|null>  $skillsByGroup  The character's Crafting skills, keyed by Crafting skill group value.
+     * @return bool True when the item's Crafting skill group has a skill meeting its level requirement.
+     */
+    private function itemIsCraftableWithResolvedSkills(Item $item, SupportCollection $skillsByGroup): bool
+    {
+        $group = $this->resolveCraftingSkillGroupForItem($item);
+        $skill = is_null($group) ? null : $skillsByGroup->get($group->value);
+
+        return ! is_null($skill) && $item->skill_level_required <= $skill->level;
+    }
+
+    /**
+     * Resolve the Crafting skill group that owns a given item's crafting discipline.
+     *
+     * @param  Item  $item  The item being classified.
+     * @return CraftingSkillGroup|null The owning Crafting skill group, or null when the item has no known group.
+     */
+    private function resolveCraftingSkillGroupForItem(Item $item): ?CraftingSkillGroup
+    {
+        if (in_array($item->type, ItemType::validWeapons(), true)) {
+            return CraftingSkillGroup::WEAPON;
+        }
+
+        return match ($item->crafting_type) {
+            'weapon' => CraftingSkillGroup::WEAPON,
+            'armour' => CraftingSkillGroup::ARMOUR,
+            'ring' => CraftingSkillGroup::RING,
+            'spell' => CraftingSkillGroup::SPELL,
+            default => null,
+        };
+    }
+
+    /**
      * Apply the character's class-specific crafting timeout adjustment for the item.
      *
      * @param  Character  $character  The character crafting the item.
      * @param  Item  $item  The item being crafted.
      * @return void This method does not return a value.
      */
-    protected function handleCraftingTimeOut(Character $character, Item $item): void
+    private function handleCraftingTimeOut(Character $character, Item $item): void
     {
         $craftingTimeOut = null;
 
@@ -681,7 +824,7 @@ class CraftingService
      * @param  Item  $item  The item being crafted.
      * @return int The class-adjusted Gold cost.
      */
-    protected function getItemCost(Character $character, Item $item): int
+    private function getItemCost(Character $character, Item $item): int
     {
         $cost = $item->cost;
 
@@ -709,7 +852,7 @@ class CraftingService
      * @param  Item  $item  The item to craft.
      * @return bool True when the item was successfully crafted and picked up.
      */
-    protected function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool
+    private function attemptToCraftItem(Character $character, Skill $skill, Item $item): bool
     {
         if ($skill->level < $item->skill_level_required) {
             ServerMessageHandler::handleMessage($character->user, CraftingMessageTypes::TO_HARD_TO_CRAFT);
@@ -748,7 +891,7 @@ class CraftingService
      * @param  string  $craftingType  The requested crafting type.
      * @return Skill The character's crafting skill.
      */
-    protected function fetchCraftingSkill(Character $character, string $craftingType): Skill
+    private function fetchCraftingSkill(Character $character, string $craftingType): Skill
     {
 
         if (
@@ -771,7 +914,7 @@ class CraftingService
      * @param  bool  $merchantMessage  Whether to send the Merchant cost-reduction server message.
      * @return SupportCollection The cost-reduced craftable items.
      */
-    protected function getItems(Character $character, Skill $skill, string|array $craftingType, bool $merchantMessage = true): SupportCollection
+    private function getItems(Character $character, Skill $skill, string|array $craftingType, bool $merchantMessage = true): SupportCollection
     {
         $items = $this->buildCraftableItemsQuery($skill, $craftingType)
             ->orderBy('skill_level_required', 'asc')

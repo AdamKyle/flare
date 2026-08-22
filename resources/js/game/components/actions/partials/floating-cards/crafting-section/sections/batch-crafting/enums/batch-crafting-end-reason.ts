@@ -16,4 +16,13 @@ export enum BatchCraftingEndReason {
   EVENT_WRONG_MAP = 'event_wrong_map',
   EVENT_STEP_CHANGED = 'event_step_changed',
   EVENT_NO_CRAFTABLE_ITEMS = 'event_no_craftable_items',
+  NO_GOLD_DUST = 'no_gold_dust',
+  NO_SHARDS = 'no_shards',
+  NO_COPPER_COINS = 'no_copper_coins',
+  NO_ENCHANTING_AFFIX = 'no_enchanting_affix',
+  INT_TOO_LOW = 'int_too_low',
+  NO_ALCHEMY_ITEMS = 'no_alchemy_items',
+  NO_HOLY_OILS = 'no_holy_oils',
+  NO_HOLY_OIL_TARGETS = 'no_holy_oil_targets',
+  NO_TRINKETRY_ITEMS = 'no_trinketry_items',
 }

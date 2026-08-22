@@ -872,4 +872,161 @@ class EnchantingServiceTest extends TestCase
         $this->assertSame('skill_too_low', $result['reason']);
         $this->assertSame($goldBefore, (int) $character->refresh()->gold);
     }
+
+    public function test_resolve_batch_affixes_returns_both_requested_affixes(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->resolveBatchAffixes($character, $this->prefix->id, $this->suffix->id);
+
+        $this->assertSame($this->prefix->id, $result['prefix']->id);
+        $this->assertSame($this->suffix->id, $result['suffix']->id);
+        $this->assertNull($result['error']);
+    }
+
+    public function test_resolve_batch_affixes_requires_at_least_one_affix(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->resolveBatchAffixes($character, null, null);
+
+        $this->assertSame('no_affixes', $result['error']);
+        $this->assertNull($result['prefix']);
+        $this->assertNull($result['suffix']);
+    }
+
+    public function test_resolve_batch_affixes_rejects_unknown_prefix_id(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->resolveBatchAffixes($character, 999999, null);
+
+        $this->assertSame('invalid_prefix', $result['error']);
+    }
+
+    public function test_resolve_batch_affixes_rejects_affix_above_skill_level(): void
+    {
+        $this->prefix->update(['skill_level_required' => 10000]);
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->resolveBatchAffixes($character, $this->prefix->id, null);
+
+        $this->assertSame('invalid_prefix', $result['error']);
+    }
+
+    public function test_resolve_batch_affixes_never_substitutes_a_different_suffix(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->resolveBatchAffixes($character, null, 999999);
+
+        $this->assertSame('invalid_suffix', $result['error']);
+        $this->assertNull($result['prefix']);
+    }
+
+    public function test_find_meaningful_batch_affixes_returns_the_strongest_non_trivial_affix(): void
+    {
+        $weakerPrefix = $this->createItemAffix([
+            'type' => 'prefix',
+            'int_required' => 1,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 2,
+            'cost' => 500,
+        ]);
+
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->findMeaningfulBatchAffixes($character);
+
+        $this->assertSame($this->prefix->id, $result['prefix']->id);
+        $this->assertNotEquals($weakerPrefix->id, $result['prefix']->id);
+        $this->assertFalse($result['intelligence_blocked']);
+    }
+
+    public function test_find_meaningful_batch_affixes_reports_intelligence_blocked_without_choosing_a_weaker_affix(): void
+    {
+        $this->prefix->update(['int_required' => 10000]);
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->findMeaningfulBatchAffixes($character);
+
+        $this->assertSame($this->prefix->id, $result['prefix']->id);
+        $this->assertTrue($result['intelligence_blocked']);
+    }
+
+    public function test_find_meaningful_batch_affixes_returns_null_when_none_are_meaningful(): void
+    {
+        $this->prefix->update(['skill_level_trivial' => -10]);
+        $this->suffix->update(['skill_level_trivial' => -10]);
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->findMeaningfulBatchAffixes($character);
+
+        $this->assertNull($result['prefix']);
+        $this->assertNull($result['suffix']);
+        $this->assertFalse($result['intelligence_blocked']);
+    }
+
+    public function test_find_event_batch_affixes_returns_the_cheapest_affordable_affix(): void
+    {
+        $cheaperPrefix = $this->createItemAffix([
+            'type' => 'prefix',
+            'int_required' => 1,
+            'skill_level_required' => 1,
+            'skill_level_trivial' => 2,
+            'cost' => 500,
+        ]);
+
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+
+        $result = $this->enchantingService->findEventBatchAffixes($character->refresh());
+
+        $this->assertSame($cheaperPrefix->id, $result['prefix']->id);
+        $this->assertFalse($result['intelligence_blocked']);
+    }
+
+    public function test_find_event_batch_affixes_excludes_affixes_the_character_cannot_afford(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 0]);
+
+        $result = $this->enchantingService->findEventBatchAffixes($character->refresh());
+
+        $this->assertNull($result['prefix']);
+        $this->assertNull($result['suffix']);
+    }
+
+    public function test_find_event_batch_affixes_reports_intelligence_blocked_without_choosing_a_weaker_affix(): void
+    {
+        $this->prefix->update(['int_required' => 10000]);
+        $character = $this->character->getCharacter();
+        $character->update(['gold' => 5000]);
+
+        $result = $this->enchantingService->findEventBatchAffixes($character->refresh());
+
+        $this->assertSame($this->prefix->id, $result['prefix']->id);
+        $this->assertTrue($result['intelligence_blocked']);
+    }
+
+    public function test_find_enchanting_skill_returns_the_characters_enchanting_skill(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->enchantingService->findEnchantingSkill($character);
+
+        $this->assertNotNull($result);
+        $this->assertSame($this->enchantingSkill->id, $result->game_skill_id);
+    }
+
+    public function test_find_enchanting_skill_returns_null_when_no_enchanting_game_skill_exists(): void
+    {
+        $character = $this->character->getCharacter();
+        $character->skills()->where('game_skill_id', $this->enchantingSkill->id)->delete();
+        GameSkill::where('type', SkillTypeValue::ENCHANTING->value)->delete();
+
+        $result = $this->enchantingService->findEnchantingSkill($character);
+
+        $this->assertNull($result);
+    }
 }

@@ -5,8 +5,6 @@ import React from 'react';
 import { useStackedCardAccessibility } from './hooks/use-stacked-card-accessibility';
 import StackedCardProps from './types/stacked-card-props';
 
-import { sidePeekPanelWidthStyles } from 'ui/side-peek/styles/side-peek-panel-styles';
-
 const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
   const isPresent = useIsPresent();
   const reduceMotion = useReducedMotion();
@@ -61,8 +59,7 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
         animate="enter"
         exit="exit"
         className={clsx(
-          'relative h-full',
-          sidePeekPanelWidthStyles(),
+          'relative h-full w-full',
           isPresent ? 'pointer-events-auto' : 'pointer-events-none'
         )}
         style={{ willChange: 'transform' }}
@@ -86,7 +83,7 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
           aria-hidden={!isPresent}
           inert={!isPresent}
           onKeyDown={handleKeyDown}
-          className="relative h-full overflow-y-auto rounded-sm border-1 border-gray-300 bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+          className="relative h-full overflow-x-hidden overflow-y-auto rounded-sm border-1 border-gray-300 bg-white focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
         >
           <div
             className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/15 to-transparent dark:from-white/10"

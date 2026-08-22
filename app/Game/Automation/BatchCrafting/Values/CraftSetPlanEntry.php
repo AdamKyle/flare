@@ -6,12 +6,6 @@ use App\Game\Automation\BatchCrafting\Enums\CraftSetPosition;
 
 class CraftSetPlanEntry
 {
-    /**
-     * @param  CraftSetPosition  $position
-     * @param  int  $itemId
-     * @param  string  $craftingType
-     * @param  string  $itemName
-     */
     public function __construct(
         public readonly CraftSetPosition $position,
         public readonly int $itemId,

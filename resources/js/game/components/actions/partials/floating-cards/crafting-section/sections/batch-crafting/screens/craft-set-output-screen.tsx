@@ -30,7 +30,7 @@ const DISPOSITION_OPTIONS: DropdownItem[] = [
 const OUTPUT_DESTINATION_OPTIONS: DropdownItem[] = [
   { label: 'Inventory', value: BatchCraftingOutputDestination.INVENTORY },
   {
-    label: 'Inventory Set',
+    label: 'Specified Empty Set',
     value: BatchCraftingOutputDestination.INVENTORY_SET,
   },
   {

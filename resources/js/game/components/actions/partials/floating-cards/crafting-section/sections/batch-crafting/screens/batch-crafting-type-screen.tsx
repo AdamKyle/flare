@@ -13,6 +13,13 @@ const BatchCraftingTypeScreen = (): ReactNode => {
   const { status } = useBatchCraftingStatusContext();
 
   const canCraftForEvent = status?.capabilities?.can_craft_for_event ?? false;
+  const canCraftAndEnchant =
+    status?.capabilities?.can_craft_and_enchant ?? false;
+  const canEnchantForEvent =
+    status?.capabilities?.can_enchant_for_event ?? false;
+  const canAlchemy = status?.capabilities?.can_alchemy ?? false;
+  const canHolyOils = status?.capabilities?.can_holy_oils ?? false;
+  const canTrinketry = status?.capabilities?.can_trinketry ?? false;
 
   const options = useMemo((): DropdownItem[] => {
     const items: DropdownItem[] = [
@@ -26,12 +33,87 @@ const BatchCraftingTypeScreen = (): ReactNode => {
       });
     }
 
+    if (canCraftAndEnchant) {
+      items.push({
+        label: 'Craft and Enchant',
+        value: BatchCraftingEntryType.CRAFT_AND_ENCHANT,
+      });
+    }
+
+    if (canEnchantForEvent) {
+      items.push({
+        label: 'Enchant For Event',
+        value: BatchCraftingEntryType.ENCHANT_FOR_EVENT,
+      });
+    }
+
+    if (canAlchemy) {
+      items.push({
+        label: 'Alchemy',
+        value: BatchCraftingEntryType.ALCHEMY,
+      });
+    }
+
+    if (canHolyOils) {
+      items.push({
+        label: 'Holy Oils',
+        value: BatchCraftingEntryType.HOLY_OILS,
+      });
+    }
+
+    if (canTrinketry) {
+      items.push({
+        label: 'Trinketry',
+        value: BatchCraftingEntryType.TRINKETRY,
+      });
+    }
+
     return items;
-  }, [canCraftForEvent]);
+  }, [
+    canCraftForEvent,
+    canCraftAndEnchant,
+    canEnchantForEvent,
+    canAlchemy,
+    canHolyOils,
+    canTrinketry,
+  ]);
 
   const handleSelect = (item: DropdownItem) => {
     if (item.value === BatchCraftingEntryType.CRAFT_FOR_EVENT) {
       navigation.navigateTo(BatchCraftingScreenNames.CRAFT_EVENT, {});
+
+      return;
+    }
+
+    if (item.value === BatchCraftingEntryType.CRAFT_AND_ENCHANT) {
+      navigation.navigateTo(
+        BatchCraftingScreenNames.CRAFT_AND_ENCHANT_MODE,
+        {}
+      );
+
+      return;
+    }
+
+    if (item.value === BatchCraftingEntryType.ENCHANT_FOR_EVENT) {
+      navigation.navigateTo(BatchCraftingScreenNames.ENCHANT_EVENT, {});
+
+      return;
+    }
+
+    if (item.value === BatchCraftingEntryType.ALCHEMY) {
+      navigation.navigateTo(BatchCraftingScreenNames.ALCHEMY_MODE, {});
+
+      return;
+    }
+
+    if (item.value === BatchCraftingEntryType.HOLY_OILS) {
+      navigation.navigateTo(BatchCraftingScreenNames.HOLY_OILS_MODE, {});
+
+      return;
+    }
+
+    if (item.value === BatchCraftingEntryType.TRINKETRY) {
+      navigation.navigateTo(BatchCraftingScreenNames.TRINKETRY, {});
 
       return;
     }

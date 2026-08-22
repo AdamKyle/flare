@@ -146,6 +146,21 @@ class CraftSetPreviewServiceTest extends TestCase
         $this->assertEmpty($result['blockers']);
     }
 
+    public function test_build_flags_a_selected_inventory_set_that_is_not_empty(): void
+    {
+        $occupyingItem = $this->createItem(['name' => 'Already In Set', 'type' => 'ring']);
+        $set = $this->createInventorySet(['character_id' => $this->character->id, 'is_equipped' => false, 'max_slots' => 20]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $occupyingItem->id]);
+
+        $progress = ['set_positions' => $this->requiredPositions, 'output_destination' => 'inventory_set', 'output_set_id' => $set->id];
+
+        $result = $this->service->build($this->character, $progress, 'keep');
+
+        $this->assertNull($result['destination_capacity']);
+        $this->assertFalse($result['can_fit']);
+        $this->assertNotEmpty($result['blockers']);
+    }
+
     public function test_build_flags_a_missing_destination_set_id(): void
     {
         $progress = ['set_positions' => $this->requiredPositions, 'output_destination' => 'inventory_set'];

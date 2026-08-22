@@ -5,4 +5,5 @@ import SidePeekProps from 'ui/side-peek/types/side-peek-props';
 export default interface UsableItemsProps extends SidePeekProps {
   character_id: number;
   initial_item?: BaseUsableItemDefinition;
+  initial_search_text?: string;
 }

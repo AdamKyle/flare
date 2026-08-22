@@ -30,12 +30,51 @@ const Y_AXES: LineChartYAxisDefinition[] = [
   },
 ];
 
-const buildAccessibilityLabel = (hasGoldGained: boolean): string => {
-  if (hasGoldGained) {
-    return 'Crafting activity line chart showing successful crafts, failed attempts, cumulative Gold spent, and Gold gained.';
+type ResourceLineKey =
+  | 'gold_spent'
+  | 'gold_gained'
+  | 'gold_dust_spent'
+  | 'shards_spent'
+  | 'copper_coins_spent';
+
+const RESOURCE_LINE_DEFINITIONS: Array<{
+  data_key: ResourceLineKey;
+  label: string;
+  color: LineChartColor;
+}> = [
+  {
+    data_key: 'gold_spent',
+    label: 'Gold Spent',
+    color: LineChartColor.REGENT_ST_BLUE,
+  },
+  {
+    data_key: 'gold_gained',
+    label: 'Gold Gained',
+    color: LineChartColor.MARIGOLD,
+  },
+  {
+    data_key: 'gold_dust_spent',
+    label: 'Gold Dust Spent',
+    color: LineChartColor.REGENT_ST_BLUE,
+  },
+  {
+    data_key: 'shards_spent',
+    label: 'Shards Spent',
+    color: LineChartColor.MARIGOLD,
+  },
+  {
+    data_key: 'copper_coins_spent',
+    label: 'Copper Coins Spent',
+    color: LineChartColor.DANUBE,
+  },
+];
+
+const buildAccessibilityLabel = (resourceLabels: string[]): string => {
+  if (resourceLabels.length === 0) {
+    return 'Crafting activity line chart showing successful crafts and failed attempts.';
   }
 
-  return 'Crafting activity line chart showing successful crafts, failed attempts, and cumulative Gold spent.';
+  return `Crafting activity line chart showing successful crafts, failed attempts, and ${resourceLabels.join(', ')}.`;
 };
 
 const BatchCraftingOutcomeChart = ({
@@ -47,10 +86,11 @@ const BatchCraftingOutcomeChart = ({
     [processing_started_at, chart_points]
   );
 
-  const hasGoldGained = useMemo(
-    () => chart_points.some((point) => point.gold_gained > 0),
-    [chart_points]
-  );
+  const resourceLines = useMemo(() => {
+    return RESOURCE_LINE_DEFINITIONS.filter((definition) =>
+      chart_points.some((point) => point[definition.data_key] > 0)
+    );
+  }, [chart_points]);
 
   const lines = useMemo((): Array<
     LineChartLineDefinition<BatchCraftingChartDataPointDefinition>
@@ -70,30 +110,18 @@ const BatchCraftingOutcomeChart = ({
         color: LineChartColor.ROSE,
         y_axis_key: 'counts',
       },
-      {
-        data_key: 'gold_spent',
-        label: 'Gold Spent',
-        color: LineChartColor.REGENT_ST_BLUE,
-        y_axis_key: 'gold',
-        value_formatter: formatNumberWithCommas,
-      },
     ];
 
-    if (!hasGoldGained) {
-      return baseLines;
-    }
+    const resourceChartLines = resourceLines.map((definition) => ({
+      data_key: definition.data_key,
+      label: definition.label,
+      color: definition.color,
+      y_axis_key: 'gold' as const,
+      value_formatter: formatNumberWithCommas,
+    }));
 
-    return [
-      ...baseLines,
-      {
-        data_key: 'gold_gained',
-        label: 'Gold Gained',
-        color: LineChartColor.MARIGOLD,
-        y_axis_key: 'gold',
-        value_formatter: formatNumberWithCommas,
-      },
-    ];
-  }, [hasGoldGained]);
+    return [...baseLines, ...resourceChartLines];
+  }, [resourceLines]);
 
   return (
     <LineChart<BatchCraftingChartDataPointDefinition>
@@ -104,7 +132,9 @@ const BatchCraftingOutcomeChart = ({
       x_formatter={formatBatchCraftingChartTime}
       y_axes={Y_AXES}
       lines={lines}
-      accessibility_label={buildAccessibilityLabel(hasGoldGained)}
+      accessibility_label={buildAccessibilityLabel(
+        resourceLines.map((definition) => definition.label)
+      )}
       empty_state={
         <p className="text-sm text-gray-600 italic dark:text-gray-400">
           Crafting activity will appear when Batch Crafting begins.

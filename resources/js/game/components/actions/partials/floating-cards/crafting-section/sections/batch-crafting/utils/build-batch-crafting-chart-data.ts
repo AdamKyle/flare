@@ -17,6 +17,9 @@ export const buildBatchCraftingChartData = (
     failed: 0,
     gold_spent: 0,
     gold_gained: 0,
+    gold_dust_spent: 0,
+    shards_spent: 0,
+    copper_coins_spent: 0,
   };
 
   const attemptPoints = chartPoints.map((point) => {
@@ -32,6 +35,9 @@ export const buildBatchCraftingChartData = (
       failed: point.failed,
       gold_spent: point.gold_spent,
       gold_gained: point.gold_gained,
+      gold_dust_spent: point.gold_dust_spent,
+      shards_spent: point.shards_spent,
+      copper_coins_spent: point.copper_coins_spent,
     };
   });
 

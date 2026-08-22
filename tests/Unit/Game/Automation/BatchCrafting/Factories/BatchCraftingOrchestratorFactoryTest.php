@@ -4,7 +4,12 @@ namespace Tests\Unit\Game\Automation\BatchCrafting\Factories;
 
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use App\Game\Automation\BatchCrafting\Factories\BatchCraftingOrchestratorFactory;
+use App\Game\Automation\BatchCrafting\Orchestrators\AlchemyOrchestrator;
+use App\Game\Automation\BatchCrafting\Orchestrators\CraftAndEnchantOrchestrator;
 use App\Game\Automation\BatchCrafting\Orchestrators\CraftingOrchestrator;
+use App\Game\Automation\BatchCrafting\Orchestrators\EnchantingOrchestrator;
+use App\Game\Automation\BatchCrafting\Orchestrators\HolyOilsOrchestrator;
+use App\Game\Automation\BatchCrafting\Orchestrators\TrinketryOrchestrator;
 use App\Game\Automation\BatchCrafting\Registries\BatchCraftingAttributeRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
@@ -21,6 +26,18 @@ class BatchCraftingOrchestratorFactoryTest extends TestCase
         $orchestrator = $factory->make(BatchCraftingType::CRAFT);
 
         $this->assertInstanceOf(CraftingOrchestrator::class, $orchestrator);
+    }
+
+    public function test_make_resolves_the_correct_orchestrator_for_every_final_type(): void
+    {
+        $factory = resolve(BatchCraftingOrchestratorFactory::class);
+
+        $this->assertInstanceOf(CraftingOrchestrator::class, $factory->make(BatchCraftingType::CRAFT));
+        $this->assertInstanceOf(CraftAndEnchantOrchestrator::class, $factory->make(BatchCraftingType::CRAFT_AND_ENCHANT));
+        $this->assertInstanceOf(EnchantingOrchestrator::class, $factory->make(BatchCraftingType::ENCHANT));
+        $this->assertInstanceOf(AlchemyOrchestrator::class, $factory->make(BatchCraftingType::ALCHEMY));
+        $this->assertInstanceOf(HolyOilsOrchestrator::class, $factory->make(BatchCraftingType::HOLY_OILS));
+        $this->assertInstanceOf(TrinketryOrchestrator::class, $factory->make(BatchCraftingType::TRINKETRY));
     }
 
     public function test_make_throws_clearly_when_the_registry_has_no_orchestrator_for_the_type(): void

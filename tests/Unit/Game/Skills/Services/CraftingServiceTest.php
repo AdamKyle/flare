@@ -1244,6 +1244,39 @@ class CraftingServiceTest extends TestCase
         $this->assertSame($shield->id, $result?->id);
     }
 
+    public function test_find_craftable_items_for_automation_returns_every_craftable_requested_item(): void
+    {
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
+        $character = $this->character->assignSkill($armourCrafting)->getCharacter();
+
+        $armourItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+
+        $result = $this->craftingService->findCraftableItemsForAutomation($character, [$this->craftingItem->id, $armourItem->id]);
+
+        $this->assertSame($this->craftingItem->id, $result->get($this->craftingItem->id)?->id);
+        $this->assertSame($armourItem->id, $result->get($armourItem->id)?->id);
+    }
+
+    public function test_find_craftable_items_for_automation_excludes_an_item_the_character_cannot_craft(): void
+    {
+        $character = $this->character->getCharacter();
+        $armourItem = $this->createItem(['cost' => 10, 'skill_level_required' => 1, 'skill_level_trivial' => 100, 'crafting_type' => 'armour', 'type' => 'body', 'can_craft' => true, 'default_position' => 'body']);
+
+        $result = $this->craftingService->findCraftableItemsForAutomation($character, [$this->craftingItem->id, $armourItem->id]);
+
+        $this->assertTrue($result->has($this->craftingItem->id));
+        $this->assertFalse($result->has($armourItem->id));
+    }
+
+    public function test_find_craftable_items_for_automation_returns_an_empty_collection_for_no_requested_ids(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $result = $this->craftingService->findCraftableItemsForAutomation($character, []);
+
+        $this->assertTrue($result->isEmpty());
+    }
+
     public function test_find_inexpensive_craftable_weapon_for_automation_returns_the_cheapest_across_every_weapon_subtype()
     {
         $character = $this->character->getCharacter();

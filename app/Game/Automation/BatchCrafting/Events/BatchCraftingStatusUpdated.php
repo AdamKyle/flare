@@ -14,11 +14,6 @@ class BatchCraftingStatusUpdated implements ShouldBroadcastNow
 
     private string $occurredAt;
 
-    /**
-     * @param  int  $userId
-     * @param  array  $status
-     * @param  array|null  $chartPoint
-     */
     public function __construct(
         private readonly int $userId,
         private readonly array $status,

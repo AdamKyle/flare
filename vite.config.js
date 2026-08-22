@@ -37,6 +37,7 @@ export default defineConfig({
             'service-container': path.resolve(__dirname, 'resources/js/service-container'),
             'service-container-provider': path.resolve(__dirname, 'resources/js/service-container-provider'),
             'screen-manager': path.resolve(__dirname, 'resources/js/screen-manager'),
+            websockets: path.resolve(__dirname, 'resources/js/websocket-handler'),
         },
     },
     build: {

@@ -18,10 +18,12 @@ const SidePeek = (props: SidePeekProps) => {
     });
 
   useEffect(() => {
-    document.body.classList.add('body-no-scroll');
+    const previousBodyOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = 'hidden';
 
     return () => {
-      document.body.classList.remove('body-no-scroll');
+      document.body.style.overflow = previousBodyOverflow;
     };
   }, []);
 
@@ -56,10 +58,9 @@ const SidePeek = (props: SidePeekProps) => {
         exit={reduceMotion ? undefined : { x: '100%' }}
         transition={panelTransition}
         className={clsx(
-          'fixed top-0 right-0 z-50 h-full',
+          'fixed top-0 right-0 bottom-0 z-[99999] flex h-full flex-col overflow-hidden',
           sidePeekPanelWidthStyles(),
-          'bg-white shadow-lg dark:bg-gray-800',
-          'position-static z-[99999] flex flex-col'
+          'bg-white shadow-lg dark:bg-gray-800'
         )}
       >
         <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">

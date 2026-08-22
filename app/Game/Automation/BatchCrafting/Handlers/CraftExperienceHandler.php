@@ -25,12 +25,6 @@ use Illuminate\Support\Collection as SupportCollection;
 #[HandlesBatchCraftingMode(BatchCraftingType::CRAFT, CraftingBatchMode::EXPERIENCE)]
 class CraftExperienceHandler implements BatchCraftingHandler
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     * @param  CraftExperienceKeepBestService  $craftExperienceKeepBestService
-     * @param  CraftExperienceTargetService  $craftExperienceTargetService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly CraftingBatchAttemptService $craftingBatchAttemptService,

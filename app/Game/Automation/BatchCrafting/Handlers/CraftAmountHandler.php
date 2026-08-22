@@ -18,10 +18,6 @@ use App\Game\Skills\Services\CraftingService;
 #[HandlesBatchCraftingMode(BatchCraftingType::CRAFT, CraftingBatchMode::AMOUNT)]
 class CraftAmountHandler implements BatchCraftingHandler
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly CraftingBatchAttemptService $craftingBatchAttemptService,

@@ -5,7 +5,16 @@ use Tests\Traits\CreateUser;
 uses(CreateUser::class);
 
 beforeEach(function () {
-    config(['broadcasting.default' => 'reverb']);
+    config([
+        'broadcasting.default' => 'reverb',
+        'broadcasting.connections.reverb.key' => 'test-reverb-key',
+        'broadcasting.connections.reverb.secret' => 'test-reverb-secret',
+        'broadcasting.connections.reverb.app_id' => 'test-reverb-app-id',
+        'broadcasting.connections.reverb.options.host' => '127.0.0.1',
+        'broadcasting.connections.reverb.options.port' => 8080,
+        'broadcasting.connections.reverb.options.scheme' => 'http',
+        'broadcasting.connections.reverb.options.useTLS' => false,
+    ]);
 
     require base_path('routes/game/messages/channels.php');
     require base_path('routes/game/automation/channels.php');

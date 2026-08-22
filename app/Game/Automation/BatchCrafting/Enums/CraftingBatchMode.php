@@ -2,7 +2,9 @@
 
 namespace App\Game\Automation\BatchCrafting\Enums;
 
-enum CraftingBatchMode: string
+use App\Game\Automation\BatchCrafting\Contracts\BatchCraftingMode;
+
+enum CraftingBatchMode: string implements BatchCraftingMode
 {
     case AMOUNT = 'specific_item';
     case EXPERIENCE = 'experience';

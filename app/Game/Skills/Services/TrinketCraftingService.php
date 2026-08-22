@@ -14,7 +14,6 @@ use App\Game\Core\Items\Transformers\CraftingItemPreviewTransformer;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\CraftingMessageTypes;
 use App\Game\Skills\Transformers\TrinketCraftingItemTransformer;
-use Exception;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -30,6 +29,15 @@ class TrinketCraftingService
 
     private Pagination $pagination;
 
+    /**
+     * @param  CraftingService  $craftingService
+     * @param  SkillCheckService  $skillCheckService
+     * @param  ItemListCostTransformerService  $itemListCostTransformerService
+     * @param  SkillService  $skillService
+     * @param  Pagination  $pagination
+     * @param  CraftingItemPreviewTransformer  $craftingItemPreviewTransformer
+     * @param  TrinketCraftingItemTransformer  $trinketCraftingItemTransformer
+     */
     public function __construct(
         CraftingService $craftingService,
         SkillCheckService $skillCheckService,
@@ -49,7 +57,11 @@ class TrinketCraftingService
     /**
      * Fetches a paginated, searchable list of Trinkets eligible for crafting.
      *
-     * @throws Exception
+     * @param  Character  $character  The character requesting the list.
+     * @param  int  $perPage  The number of items per page.
+     * @param  int  $page  The requested page number.
+     * @param  string  $search  The optional item name search text.
+     * @return array The paginated craftable Trinket payload.
      */
     public function fetchPaginatedItemsToCraft(Character $character, int $perPage, int $page, string $search = ''): array
     {
@@ -75,7 +87,9 @@ class TrinketCraftingService
     /**
      * Fetch trinkets the player can craft.
      *
-     * @throws Exception
+     * @param  Character  $character  The character requesting the list.
+     * @param  bool  $showMerchantMessage  Whether to attach the merchant discount message.
+     * @return array The craftable Trinket payload.
      */
     public function fetchItemsToCraft(Character $character, bool $showMerchantMessage = true): array
     {
@@ -90,6 +104,12 @@ class TrinketCraftingService
         return $reducedItems->map(fn (Item $item) => $this->trinketCraftingItemTransformer->transform($item))->values()->toArray();
     }
 
+    /**
+     * Build the base eligible-Trinket query for the given Trinketry skill level.
+     *
+     * @param  Skill  $trinketrySkill  The character's Trinketry skill.
+     * @return Builder The base eligible-Trinket query.
+     */
     private function buildTrinketItemsQuery(Skill $trinketrySkill): Builder
     {
         return Item::with(['itemPrefix', 'itemSuffix', 'appliedHolyStacks', 'itemSkillProgressions'])
@@ -97,6 +117,12 @@ class TrinketCraftingService
             ->where('skill_level_required', '<=', $trinketrySkill->level);
     }
 
+    /**
+     * Return the character's current Trinketry skill XP facts.
+     *
+     * @param  Character  $character  The character requesting the XP facts.
+     * @return array The Trinketry XP facts.
+     */
     public function fetchSkillXP(Character $character): array
     {
         $skill = $this->fetchCharacterSkill($character);
@@ -110,13 +136,11 @@ class TrinketCraftingService
     }
 
     /**
-     * Attempt to craft the item.
+     * Attempt to craft the item, removing currency, rolling the craft, and giving the item to the player.
      *
-     * - Removes currency
-     * - Crafts, attempts to, item
-     * - Attempts to give item to player
-     *
-     * @throws Exception
+     * @param  Character  $character  The character crafting the item.
+     * @param  Item  $item  The item being crafted.
+     * @return array The updated craftable items and the resulting item preview, when kept.
      */
     public function craft(Character $character, Item $item): array
     {
@@ -165,6 +189,8 @@ class TrinketCraftingService
 
     /**
      * Build the preview for the trinket inventory slot created by the most recent pickUpItem() call.
+     *
+     * @return array|null The crafted item preview, or null when no slot was created.
      */
     private function buildResultPreview(): ?array
     {
@@ -189,7 +215,11 @@ class TrinketCraftingService
      * Preserves the same affordability, skill requirement, success/failure roll, and
      * currency spending rules as craft(), but never picks the item up into inventory.
      *
-     * @throws Exception
+     * @param  Character  $character  The character crafting the item.
+     * @param  Item  $item  The item being crafted.
+     * @param  bool  $suppressSuccessServerMessage  Whether to suppress the success server message.
+     * @param  callable|null  $destinationCreator  The optional retained-destination callback.
+     * @return array The batch craft outcome.
      */
     public function craftForBatch(
         Character $character,
@@ -260,46 +290,94 @@ class TrinketCraftingService
 
     /**
      * Fetch the crafting skill for the player.
+     *
+     * @param  Character  $character  The character requesting the skill.
+     * @return Skill The character's Trinketry skill.
      */
-    protected function fetchCharacterSkill(Character $character): Skill
+    private function fetchCharacterSkill(Character $character): Skill
+    {
+        return $this->findTrinketrySkill($character);
+    }
+
+    /**
+     * Resolve the character's Trinketry skill, tolerating its absence.
+     *
+     * @param  Character  $character  The character being checked.
+     * @return Skill|null The character's Trinketry skill, or null when it does not exist.
+     */
+    public function findTrinketrySkill(Character $character): ?Skill
     {
         $gameSkill = GameSkill::where('name', 'Trinketry')->first();
+
+        if (is_null($gameSkill)) {
+            return null;
+        }
 
         return $character->skills()->where('game_skill_id', $gameSkill->id)->first();
     }
 
     /**
-     * Can the player afford to make this item?
+     * Find the character's highest-requirement Trinket that still meaningfully grants XP.
      *
-     * @throws Exception
+     * @param  Character  $character  The character requesting the target.
+     * @return Item|null The resolved meaningful item, or null when none currently applies.
+     */
+    public function findMeaningfulBatchItem(Character $character): ?Item
+    {
+        $skill = $this->findTrinketrySkill($character);
+
+        if (is_null($skill) || $skill->level >= $skill->max_level) {
+            return null;
+        }
+
+        return $this->buildTrinketItemsQuery($skill)
+            ->where('skill_level_trivial', '>=', $skill->level)
+            ->orderByDesc('skill_level_required')
+            ->orderBy('id')
+            ->first();
+    }
+
+    /**
+     * Resolve the Gold Dust and Copper Coin cost facts for crafting the given item.
+     *
+     * @param  Character  $character  The character being charged.
+     * @param  Item  $item  The item being priced.
+     * @return array The Gold Dust and Copper Coin cost facts.
      */
     public function craftingCost(Character $character, Item $item): array
     {
-        $copperCoinCost = (int) $item->copper_coin_cost;
-        $goldDustCost = (int) $item->gold_dust_cost;
+        $copperCoinCost = $item->copper_coin_cost;
+        $goldDustCost = $item->gold_dust_cost;
 
         if ($character->classType()->isMerchant()) {
-            $copperCoinCost = floor($copperCoinCost - $copperCoinCost * 0.10);
-            $goldDustCost = floor($goldDustCost - $goldDustCost * 0.10);
+            $copperCoinCost = intdiv($copperCoinCost * 90, 100);
+            $goldDustCost = intdiv($goldDustCost * 90, 100);
         }
 
         return [
             'item_id' => $item->id,
             'item_name' => $item->name,
             'gold_dust' => [
-                'required' => (int) $goldDustCost,
-                'available' => (int) $character->gold_dust,
-                'missing' => max(0, (int) $goldDustCost - (int) $character->gold_dust),
+                'required' => $goldDustCost,
+                'available' => $character->gold_dust,
+                'missing' => max(0, $goldDustCost - $character->gold_dust),
             ],
             'copper_coins' => [
-                'required' => (int) $copperCoinCost,
-                'available' => (int) $character->copper_coins,
-                'missing' => max(0, (int) $copperCoinCost - (int) $character->copper_coins),
+                'required' => $copperCoinCost,
+                'available' => $character->copper_coins,
+                'missing' => max(0, $copperCoinCost - $character->copper_coins),
             ],
         ];
     }
 
-    protected function canAfford(Character $character, Item $item): bool
+    /**
+     * Determine whether the character can afford the item's Gold Dust and Copper Coin cost.
+     *
+     * @param  Character  $character  The character being checked.
+     * @param  Item  $item  The item being priced.
+     * @return bool True when the character can afford the item.
+     */
+    private function canAfford(Character $character, Item $item): bool
     {
         $cost = $this->craftingCost($character, $item);
 
@@ -307,6 +385,13 @@ class TrinketCraftingService
             && $cost['copper_coins']['missing'] === 0;
     }
 
+    /**
+     * Deduct the item's crafting cost from the character's currencies.
+     *
+     * @param  Character  $character  The character being charged.
+     * @param  Item  $item  The item being crafted.
+     * @return void This method does not return a value.
+     */
     private function deductCraftingCost(Character $character, Item $item): void
     {
         $cost = $this->craftingCost($character, $item);
@@ -321,6 +406,12 @@ class TrinketCraftingService
 
     /**
      * Can the character craft this item?
+     *
+     * Kept protected as an existing test seam: TrinketCraftingServiceTest mocks this method to
+     * force a deterministic craft roll outcome.
+     *
+     * @param  Skill  $trinketSkill  The character's Trinketry skill.
+     * @return bool True when the craft roll succeeds.
      */
     protected function canCraft(Skill $trinketSkill): bool
     {

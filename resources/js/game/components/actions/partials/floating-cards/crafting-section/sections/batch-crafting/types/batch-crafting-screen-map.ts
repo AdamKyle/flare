@@ -1,5 +1,7 @@
+import CraftAndEnchantOutputSelection from './craft-and-enchant-output-selection';
+import CraftAndEnchantSetSelection from './craft-and-enchant-set-selection';
 import CraftSetOutputSelection from './craft-set-output-selection';
-import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
+import { BatchCraftingScreenNames as Screen } from '../enums/batch-crafting-screen-names';
 
 export type EmptyBatchCraftingScreenProps = Record<string, never>;
 
@@ -22,16 +24,69 @@ export interface CraftSetScreenProps {
 
 export type CraftEventScreenProps = EmptyBatchCraftingScreenProps;
 
+export type CraftAndEnchantModeScreenProps = EmptyBatchCraftingScreenProps;
+
+export type CraftAndEnchantAmountOutputScreenProps =
+  EmptyBatchCraftingScreenProps;
+
+export interface CraftAndEnchantAmountScreenProps {
+  output_selection: CraftAndEnchantOutputSelection;
+}
+
+export type CraftAndEnchantExperienceScreenProps =
+  EmptyBatchCraftingScreenProps;
+
+export type CraftAndEnchantSetOutputScreenProps = EmptyBatchCraftingScreenProps;
+
+export interface CraftAndEnchantSetScreenProps {
+  output_selection: CraftAndEnchantOutputSelection;
+}
+
+export interface CraftAndEnchantSetEnchantmentsScreenProps {
+  set_selection: CraftAndEnchantSetSelection;
+}
+
+export type EnchantEventScreenProps = EmptyBatchCraftingScreenProps;
+
+export type AlchemyModeScreenProps = EmptyBatchCraftingScreenProps;
+
+export type AlchemyAmountScreenProps = EmptyBatchCraftingScreenProps;
+
+export type AlchemyExperienceScreenProps = EmptyBatchCraftingScreenProps;
+
+export type HolyOilsModeScreenProps = EmptyBatchCraftingScreenProps;
+
+export type HolyOilsSelectedItemsScreenProps = EmptyBatchCraftingScreenProps;
+
+export type HolyOilsSetScreenProps = EmptyBatchCraftingScreenProps;
+
+export type TrinketryScreenProps = EmptyBatchCraftingScreenProps;
+
 export type BatchCraftingRunningScreenProps = EmptyBatchCraftingScreenProps;
 
 export interface BatchCraftingScreenMap {
-  [BatchCraftingScreenNames.INTRODUCTION]: BatchCraftingIntroductionScreenProps;
-  [BatchCraftingScreenNames.TYPE]: BatchCraftingTypeScreenProps;
-  [BatchCraftingScreenNames.MODE]: BatchCraftingModeScreenProps;
-  [BatchCraftingScreenNames.CRAFT_AMOUNT]: CraftAmountScreenProps;
-  [BatchCraftingScreenNames.CRAFT_EXPERIENCE]: CraftExperienceScreenProps;
-  [BatchCraftingScreenNames.CRAFT_SET_OUTPUT]: CraftSetOutputScreenProps;
-  [BatchCraftingScreenNames.CRAFT_SET]: CraftSetScreenProps;
-  [BatchCraftingScreenNames.CRAFT_EVENT]: CraftEventScreenProps;
-  [BatchCraftingScreenNames.RUNNING]: BatchCraftingRunningScreenProps;
+  [Screen.INTRODUCTION]: BatchCraftingIntroductionScreenProps;
+  [Screen.TYPE]: BatchCraftingTypeScreenProps;
+  [Screen.MODE]: BatchCraftingModeScreenProps;
+  [Screen.CRAFT_AMOUNT]: CraftAmountScreenProps;
+  [Screen.CRAFT_EXPERIENCE]: CraftExperienceScreenProps;
+  [Screen.CRAFT_SET_OUTPUT]: CraftSetOutputScreenProps;
+  [Screen.CRAFT_SET]: CraftSetScreenProps;
+  [Screen.CRAFT_EVENT]: CraftEventScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_MODE]: CraftAndEnchantModeScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_AMOUNT_OUTPUT]: CraftAndEnchantAmountOutputScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_AMOUNT]: CraftAndEnchantAmountScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_EXPERIENCE]: CraftAndEnchantExperienceScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_SET_OUTPUT]: CraftAndEnchantSetOutputScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_SET]: CraftAndEnchantSetScreenProps;
+  [Screen.CRAFT_AND_ENCHANT_SET_ENCHANTMENTS]: CraftAndEnchantSetEnchantmentsScreenProps;
+  [Screen.ENCHANT_EVENT]: EnchantEventScreenProps;
+  [Screen.ALCHEMY_MODE]: AlchemyModeScreenProps;
+  [Screen.ALCHEMY_AMOUNT]: AlchemyAmountScreenProps;
+  [Screen.ALCHEMY_EXPERIENCE]: AlchemyExperienceScreenProps;
+  [Screen.HOLY_OILS_MODE]: HolyOilsModeScreenProps;
+  [Screen.HOLY_OILS_SELECTED_ITEMS]: HolyOilsSelectedItemsScreenProps;
+  [Screen.HOLY_OILS_SET]: HolyOilsSetScreenProps;
+  [Screen.TRINKETRY]: TrinketryScreenProps;
+  [Screen.RUNNING]: BatchCraftingRunningScreenProps;
 }

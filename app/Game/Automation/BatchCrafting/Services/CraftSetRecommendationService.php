@@ -13,9 +13,6 @@ use Illuminate\Support\Collection;
 
 class CraftSetRecommendationService
 {
-    /**
-     * @param  CraftingService  $craftingService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
     ) {}

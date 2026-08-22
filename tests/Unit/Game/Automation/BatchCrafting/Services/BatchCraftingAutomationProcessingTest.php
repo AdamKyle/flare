@@ -350,6 +350,100 @@ class BatchCraftingAutomationProcessingTest extends TestCase
         $this->assertSame(BatchCraftingEndReason::CANCELLED->value, $batchCrafting->ended_reason);
     }
 
+    public function test_process_increments_applied_count_for_an_applied_result(): void
+    {
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => [...$this->progress, 'specific_item_id' => 1],
+        ]);
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->once()->andReturn(
+            BatchCraftingOperationResult::applied(10)->withEndReason(BatchCraftingEndReason::EVENT_GOAL_COMPLETE)
+        );
+        $orchestratorFactory = Mockery::mock(BatchCraftingOrchestratorFactory::class, function (MockInterface $mock) use ($orchestrator) {
+            $mock->shouldReceive('make')->once()->andReturn($orchestrator);
+        });
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $orchestratorFactory);
+
+        resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $this->assertSame(1, $batchCrafting->refresh()->applied_count);
+    }
+
+    public function test_process_increments_the_disenchanted_progress_counter_for_a_disenchanted_result(): void
+    {
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'disposition' => BatchCraftingDisposition::DISENCHANT->value,
+            'progress' => [...$this->progress, 'specific_item_id' => 1],
+        ]);
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->once()->andReturn(
+            BatchCraftingOperationResult::disenchanted(10)->withEndReason(BatchCraftingEndReason::AMOUNT_REACHED)
+        );
+        $orchestratorFactory = Mockery::mock(BatchCraftingOrchestratorFactory::class, function (MockInterface $mock) use ($orchestrator) {
+            $mock->shouldReceive('make')->once()->andReturn($orchestrator);
+        });
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $orchestratorFactory);
+
+        resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $refreshed = $batchCrafting->refresh();
+        $this->assertSame(1, $refreshed->crafted_count);
+        $this->assertSame(1, $refreshed->progress['disenchanted_count']);
+    }
+
+    public function test_process_increments_the_disenchanted_progress_counter_for_an_additional_disenchant_displacement(): void
+    {
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_DISENCHANT_REST->value,
+            'progress' => [...$this->progress, 'specific_item_id' => 1],
+        ]);
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->once()->andReturn(
+            BatchCraftingOperationResult::keptWithDisplacedDisenchant(10)->withEndReason(BatchCraftingEndReason::AMOUNT_REACHED)
+        );
+        $orchestratorFactory = Mockery::mock(BatchCraftingOrchestratorFactory::class, function (MockInterface $mock) use ($orchestrator) {
+            $mock->shouldReceive('make')->once()->andReturn($orchestrator);
+        });
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $orchestratorFactory);
+
+        resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $refreshed = $batchCrafting->refresh();
+        $this->assertSame(1, $refreshed->kept_count);
+        $this->assertSame(1, $refreshed->progress['disenchanted_count']);
+    }
+
+    public function test_process_increments_the_used_progress_counter_for_a_used_result(): void
+    {
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $this->character->id,
+            'user_id' => $this->character->user_id,
+            'disposition' => BatchCraftingDisposition::USE_NOW->value,
+            'progress' => [...$this->progress, 'specific_item_id' => 1],
+        ]);
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->once()->andReturn(
+            BatchCraftingOperationResult::used()->withEndReason(BatchCraftingEndReason::AMOUNT_REACHED)
+        );
+        $orchestratorFactory = Mockery::mock(BatchCraftingOrchestratorFactory::class, function (MockInterface $mock) use ($orchestrator) {
+            $mock->shouldReceive('make')->once()->andReturn($orchestrator);
+        });
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $orchestratorFactory);
+
+        resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $refreshed = $batchCrafting->refresh();
+        $this->assertSame(1, $refreshed->crafted_count);
+        $this->assertSame(1, $refreshed->progress['used_count']);
+    }
+
     public function test_process_fires_status_and_monitoring_events_for_processing_start_and_completion(): void
     {
         Event::fake([BatchCraftingStatusUpdated::class, BatchCraftingMonitoringUpdated::class]);

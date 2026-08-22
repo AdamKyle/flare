@@ -8,6 +8,7 @@ use App\Game\Automation\BatchCrafting\Enums\BatchCraftingDisposition;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingOutputDestination;
 use App\Game\Automation\BatchCrafting\Requests\BatchCraftingRequest;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Skills\Services\CraftingService;
 
 class CraftAmountPreviewService
@@ -15,10 +16,12 @@ class CraftAmountPreviewService
     /**
      * @param  CraftingService  $craftingService
      * @param  BatchCraftingSetService  $batchCraftingSetService
+     * @param  CharacterInventoryService  $characterInventoryService
      */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly BatchCraftingSetService $batchCraftingSetService,
+        private readonly CharacterInventoryService $characterInventoryService,
     ) {}
 
     /**
@@ -46,8 +49,9 @@ class CraftAmountPreviewService
         $canAfford = $availableGold >= $totalCost;
         $goldAfterPurchase = max(0, $availableGold - $totalCost);
 
-        $destinationCapacity = $this->resolvePreviewDestinationCapacity($character, $disposition, $progress);
-        $canFit = $this->canFitRequestedAmount($requestedAmount, $destinationCapacity);
+        $destinationResult = $this->resolvePreviewDestinationCapacity($character, $disposition, $progress);
+        $destinationCapacity = $destinationResult['capacity'];
+        $canFit = $this->canFitRequestedAmount($requestedAmount, $destinationCapacity, $destinationResult['error']);
         $maximumRequestAmount = $this->maximumRequestAmount($availableGold, $unitCost, $destinationCapacity);
 
         return [
@@ -62,7 +66,7 @@ class CraftAmountPreviewService
             'destination_capacity' => $destinationCapacity,
             'can_fit' => $canFit,
             'maximum_request_amount' => $maximumRequestAmount,
-            'blockers' => $this->buildPreviewBlockers($canAfford, $canFit),
+            'blockers' => $this->buildPreviewBlockers($canAfford, $canFit, $destinationResult['error']),
         ];
     }
 
@@ -106,11 +110,18 @@ class CraftAmountPreviewService
     /**
      * Resolve the character's current capacity for the requested output destination.
      *
+     * Every destination is resolved to its own real capacity: Inventory resolves the
+     * character's Backpack, Crafted Items Set resolves the special Batch Crafting Set, and
+     * a specified normal Inventory Set resolves through the empty-at-start Batch Crafting
+     * destination contract so a normal Set's capacity is never silently substituted with the
+     * Crafted Items Set's capacity.
+     *
      * @param  Character  $character  The character requesting the preview.
      * @param  string  $destinationValue  The requested output destination value.
-     * @return array{current: int, max: int, remaining: int} The destination's current, max, and remaining capacity.
+     * @param  int|null  $outputSetId  The requested destination Inventory Set id, when applicable.
+     * @return array{capacity: array{current: int, max: int, remaining: int}|null, error: string|null} The resolved capacity facts.
      */
-    private function resolveDestinationCapacity(Character $character, string $destinationValue): array
+    private function resolveDestinationCapacity(Character $character, string $destinationValue, ?int $outputSetId): array
     {
         $destination = BatchCraftingOutputDestination::from($destinationValue);
 
@@ -118,13 +129,42 @@ class CraftAmountPreviewService
             $current = $character->getInventoryCount();
             $max = $character->inventory_max;
 
-            return ['current' => $current, 'max' => $max, 'remaining' => max(0, $max - $current)];
+            return ['capacity' => ['current' => $current, 'max' => $max, 'remaining' => max(0, $max - $current)], 'error' => null];
         }
 
-        $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
-        $remaining = $set->remainingSlots();
+        if ($destination === BatchCraftingOutputDestination::CRAFTED_ITEMS_SET) {
+            $set = $this->batchCraftingSetService->getOrCreateForCharacter($character);
+            $remaining = $set->remainingSlots();
 
-        return ['current' => $set->max_slots - $remaining, 'max' => $set->max_slots, 'remaining' => $remaining];
+            return ['capacity' => ['current' => $set->max_slots - $remaining, 'max' => $set->max_slots, 'remaining' => $remaining], 'error' => null];
+        }
+
+        return $this->resolveInventorySetCapacity($character, $outputSetId);
+    }
+
+    /**
+     * Resolve the requested normal Inventory Set destination's real capacity, validating it is empty at start.
+     *
+     * @param  Character  $character  The character requesting the preview.
+     * @param  int|null  $outputSetId  The requested destination Inventory Set id.
+     * @return array{capacity: array{current: int, max: int, remaining: int}|null, error: string|null} The resolved capacity facts.
+     */
+    private function resolveInventorySetCapacity(Character $character, ?int $outputSetId): array
+    {
+        if (is_null($outputSetId)) {
+            return ['capacity' => null, 'error' => 'A destination set is required.'];
+        }
+
+        $set = $this->characterInventoryService->setCharacter($character)->resolveEmptyBatchCraftingDestinationSet($outputSetId);
+
+        if (is_null($set)) {
+            return ['capacity' => null, 'error' => 'The selected destination set must be an empty, unequipped Set you own.'];
+        }
+
+        $remaining = $set->remainingSlots();
+        $capacity = is_null($set->max_slots) ? null : ['current' => $set->currentSlotCount(), 'max' => $set->max_slots, 'remaining' => $remaining];
+
+        return ['capacity' => $capacity, 'error' => null];
     }
 
     /**
@@ -133,15 +173,15 @@ class CraftAmountPreviewService
      * @param  Character  $character  The character requesting the preview.
      * @param  BatchCraftingDisposition  $disposition  The requested crafting disposition.
      * @param  array  $progress  The requested Craft Amount progress data.
-     * @return array{current: int, max: int, remaining: int}|null The destination capacity, or null when not retaining the item.
+     * @return array{capacity: array{current: int, max: int, remaining: int}|null, error: string|null} The resolved destination facts.
      */
-    private function resolvePreviewDestinationCapacity(Character $character, BatchCraftingDisposition $disposition, array $progress): ?array
+    private function resolvePreviewDestinationCapacity(Character $character, BatchCraftingDisposition $disposition, array $progress): array
     {
         if ($disposition !== BatchCraftingDisposition::KEEP) {
-            return null;
+            return ['capacity' => null, 'error' => null];
         }
 
-        return $this->resolveDestinationCapacity($character, $progress['output_destination']);
+        return $this->resolveDestinationCapacity($character, $progress['output_destination'], $progress['output_set_id'] ?? null);
     }
 
     /**
@@ -149,10 +189,15 @@ class CraftAmountPreviewService
      *
      * @param  int  $requestedAmount  The requested Craft Amount.
      * @param  array{current: int, max: int, remaining: int}|null  $destinationCapacity  The resolved destination capacity, if any.
+     * @param  string|null  $destinationError  The resolved destination blocker, if any.
      * @return bool True when the requested amount fits.
      */
-    private function canFitRequestedAmount(int $requestedAmount, ?array $destinationCapacity): bool
+    private function canFitRequestedAmount(int $requestedAmount, ?array $destinationCapacity, ?string $destinationError): bool
     {
+        if (! is_null($destinationError)) {
+            return false;
+        }
+
         if (is_null($destinationCapacity)) {
             return true;
         }
@@ -194,9 +239,10 @@ class CraftAmountPreviewService
      *
      * @param  bool  $canAfford  Whether the character can afford the requested amount.
      * @param  bool  $canFit  Whether the requested amount fits the destination capacity.
+     * @param  string|null  $destinationError  The resolved destination blocker, if any.
      * @return array<int, string> The blocking messages, empty when nothing blocks the request.
      */
-    private function buildPreviewBlockers(bool $canAfford, bool $canFit): array
+    private function buildPreviewBlockers(bool $canAfford, bool $canFit, ?string $destinationError): array
     {
         $blockers = [];
 
@@ -204,7 +250,9 @@ class CraftAmountPreviewService
             $blockers[] = 'You do not have enough Gold to craft this item.';
         }
 
-        if (! $canFit) {
+        if (! is_null($destinationError)) {
+            $blockers[] = $destinationError;
+        } elseif (! $canFit) {
             $blockers[] = 'The selected destination does not have enough remaining space.';
         }
 

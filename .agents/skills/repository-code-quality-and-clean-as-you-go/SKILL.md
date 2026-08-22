@@ -28,6 +28,8 @@ Skill files may be changed only when the user explicitly requests a dedicated sk
 
 The current repository is the source of truth for architecture, behavior, naming, placement, APIs, models, frontend structure, tests, and conventions.
 
+For backend work that crosses `app/Game/<Module>` boundaries, inspect both incoming and outgoing dependencies in the touched path. Do not treat an existing cross-module import as permission to add another. Apply the modular-boundary skills and preserve or reduce coupling.
+
 Reference code may explain an old capability, but reference code does not override the current repository's architecture or rules.
 
 Before changing behavior, inspect the exact current code path. Do not infer a class, relation, cast, route, payload field, hook, component, color, service, or test abstraction from a name alone.
@@ -150,3 +152,5 @@ Do not move a giant legacy service, processor, controller, hook, or test class i
 Do not keep compatibility adapters, fallback branches, duplicated implementations, legacy result serializers, or transitional code after the task's target architecture no longer needs them.
 
 Do not add convenience methods to an unrelated existing domain service merely to make a new feature easier to implement. Reuse the service's current public contract. Extend the owning domain only when a concrete missing domain capability is proven, belongs there, and is required by the task. Keep that addition minimal and test it in the owning domain.
+
+Do not introduce `DB::transaction()`, `DatabaseTransactions`, manual begin/commit/rollback calls, after-commit dispatch, transactional jobs/listeners, or an outbox pattern during implementation or cleanup unless the user explicitly authorizes the exact addition. Existing transaction behavior outside the touched path is not authorization to expand it.

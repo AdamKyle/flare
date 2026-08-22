@@ -31,11 +31,6 @@ class CharacterInventoryController extends Controller
 {
     use ChecksAutomationRestrictions;
 
-    /**
-     * @param  CharacterInventoryService  $characterInventoryService
-     * @param  InventorySetService  $inventorySetService
-     * @param  UseItemService  $useItemService
-     */
     public function __construct(
         private readonly CharacterInventoryService $characterInventoryService,
         private readonly InventorySetService $inventorySetService,
@@ -145,6 +140,20 @@ class CharacterInventoryController extends Controller
     {
         return response()->json(
             $this->characterInventoryService->setCharacter($character)->getPaginatedInventorySetOptions($request->per_page, $request->page, $request->search_text),
+        );
+    }
+
+    /**
+     * Return the character's paginated selectable Inventory Set Holy Oil targets.
+     *
+     * @param  PaginationRequest  $request  The validated pagination/search request.
+     * @param  Character  $character  The character requesting the set options.
+     * @return JsonResponse The paginated Holy Oil target set option payload.
+     */
+    public function holyOilTargetSetOptions(PaginationRequest $request, Character $character): JsonResponse
+    {
+        return response()->json(
+            $this->characterInventoryService->setCharacter($character)->getPaginatedHolyOilTargetSetOptions($request->per_page, $request->page, $request->search_text),
         );
     }
 

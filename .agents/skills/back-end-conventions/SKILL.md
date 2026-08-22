@@ -24,6 +24,7 @@ Before changing code, inspect the existing implementation, nearby files, related
 * Existing violations in touched code are not precedent. Apply `repository-code-quality-and-clean-as-you-go` and bring the touched area into compliance.
 * Do not rename or move files unless the behavior/structure being changed requires it.
 * Do not add new architecture unless the current code cannot support the change cleanly.
+* The preceding rule does not permit new or changed code to deepen a proven cross-module dependency. When a task crosses `app/Game/<Module>` boundaries, apply `back-end-modular-boundaries`, `back-end-module-contracts`, and `back-end-data-ownership` before choosing the implementation.
 * Do not create a new folder, provider, route file, service style, controller style, or request style when the target module already has an existing pattern.
 
 ## App Placement Rules
@@ -33,6 +34,7 @@ Before changing code, inspect the existing implementation, nearby files, related
 * If code belongs to a specific game area, put it under the active `app/Game/<ModuleName>` module.
 * Do not place module-specific controllers, services, jobs, handlers, loggers, requests, providers, or commands in global app folders.
 * Eloquent models live in `app/Flare/Models`.
+* Global model placement does not make every model writable by every module. Model and table ownership is governed by `back-end-data-ownership`.
 
 ## PHP Style
 
@@ -234,6 +236,8 @@ Controllers, requests, services, values, events, tests, factories, imports, and 
 * Broadcast events should follow existing event patterns in nearby modules.
 * Use `ShouldBroadcast` or `ShouldBroadcastNow` only when the behavior requires it.
 * Use `ShouldBroadcastNow` when the UI must update immediately and the surrounding code expects synchronous broadcast behavior.
+* Apply `back-end-events-and-module-coordination` when an event, listener, job, or service call crosses a game-module boundary.
+* Do not introduce database transactions, after-commit dispatch, transactional event behavior, or an outbox pattern unless the user explicitly authorizes that exact architecture.
 
 ## Jobs
 
@@ -277,8 +281,8 @@ Controllers, requests, services, values, events, tests, factories, imports, and 
 ## Database And Persistence
 
 * Prefer Eloquent model methods, relationships, scopes, and query builders over raw SQL.
-* Do not use database transactions by default.
-* Use a transaction only when multiple writes must succeed or fail together and there is a real consistency risk.
+* Do not introduce database transactions, including `DB::transaction()` or manual begin/commit/rollback calls.
+* Multiple writes, consistency concerns, an external architecture example, or framework availability do not authorize a transaction. Explicit user authorization for the exact transaction is required.
 * Avoid N+1 queries by eager loading relationships when needed.
 * Do not eager load unrelated relationships.
 * Do not eager load large JSON/log relationships for normal read endpoints unless the endpoint specifically needs those logs.

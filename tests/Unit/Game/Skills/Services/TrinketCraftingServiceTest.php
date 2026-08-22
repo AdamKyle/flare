@@ -543,4 +543,47 @@ class TrinketCraftingServiceTest extends TestCase
 
         $this->assertEquals($trinketCraftingXPData, $expected);
     }
+
+    public function test_find_trinketry_skill_returns_the_characters_trinketry_skill(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $this->trinketCraftingService->findTrinketrySkill($character);
+
+        $this->assertNotNull($skill);
+        $this->assertSame('Trinketry', $skill->baseSkill->name);
+    }
+
+    public function test_find_meaningful_batch_item_returns_highest_requirement_eligible_item(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $this->trinketSkill->update(['max_level' => 20]);
+        $character->skills()->where('game_skill_id', $this->trinketSkill->id)->update(['level' => 10]);
+
+        $strongerTrinket = $this->createItem([
+            'type' => 'trinket',
+            'can_craft' => true,
+            'gold_dust_cost' => 10,
+            'copper_coin_cost' => 10,
+            'skill_level_required' => 10,
+            'skill_level_trivial' => 100,
+        ]);
+
+        $item = $this->trinketCraftingService->findMeaningfulBatchItem($character->refresh());
+
+        $this->assertNotNull($item);
+        $this->assertSame($strongerTrinket->id, $item->id);
+    }
+
+    public function test_find_meaningful_batch_item_returns_null_when_nothing_is_eligible(): void
+    {
+        $character = $this->character->getCharacter();
+
+        Item::where('type', 'trinket')->update(['skill_level_trivial' => 0]);
+
+        $item = $this->trinketCraftingService->findMeaningfulBatchItem($character);
+
+        $this->assertNull($item);
+    }
 }

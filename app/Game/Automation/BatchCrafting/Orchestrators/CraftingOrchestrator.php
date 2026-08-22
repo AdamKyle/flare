@@ -14,9 +14,6 @@ use App\Game\Automation\BatchCrafting\Values\BatchCraftingOperationResult;
 #[HandlesBatchCraftingType(BatchCraftingType::CRAFT)]
 class CraftingOrchestrator implements BatchCraftingOrchestrator
 {
-    /**
-     * @param  BatchCraftingHandlerFactory  $handlerFactory
-     */
     public function __construct(private readonly BatchCraftingHandlerFactory $handlerFactory) {}
 
     /**

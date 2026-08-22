@@ -44,6 +44,8 @@ class CraftSetPlanService
      */
     public function resolvePlan(Character $character, array $setPositions): array
     {
+        $craftableItemsById = $this->craftingService->findCraftableItemsForAutomation($character, array_values($setPositions));
+
         $blockers = [];
         $resolvedItems = [];
 
@@ -58,7 +60,7 @@ class CraftSetPlanService
                 continue;
             }
 
-            $item = $this->resolvePositionItem($character, $position, $setPositions[$position->value]);
+            $item = $this->resolvePositionItem($craftableItemsById, $position, $setPositions[$position->value]);
 
             if (is_null($item)) {
                 $blockers[] = 'The selected item for the '.$position->value.' position is no longer craftable.';
@@ -69,7 +71,7 @@ class CraftSetPlanService
             $resolvedItems[$position->value] = $item;
         }
 
-        $handResult = $this->resolveHandPositions($character, $setPositions);
+        $handResult = $this->resolveHandPositions($craftableItemsById, $setPositions);
         $blockers = [...$blockers, ...$handResult['blockers']];
         $resolvedItems = [...$resolvedItems, ...$handResult['items']];
 
@@ -124,11 +126,11 @@ class CraftSetPlanService
     /**
      * Resolve the optional hand positions into resolved items, validating the hand combination.
      *
-     * @param  Character  $character  The character building the plan.
+     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
      * @param  array<string, int>  $setPositions  The requested position-to-item-id map.
      * @return array{items: array<string, Item>, blockers: array<int, string>} The resolved hand items and any blockers.
      */
-    private function resolveHandPositions(Character $character, array $setPositions): array
+    private function resolveHandPositions(Collection $craftableItemsById, array $setPositions): array
     {
         $handPositions = array_filter(
             CraftSetPosition::orderedCases(),
@@ -143,7 +145,7 @@ class CraftSetPlanService
                 continue;
             }
 
-            $item = $this->resolveHandItem($character, $setPositions[$position->value]);
+            $item = $this->resolveHandItem($craftableItemsById, $setPositions[$position->value]);
 
             if (is_null($item)) {
                 return ['items' => [], 'blockers' => ['The selected item for the '.$position->value.' position is not a valid hand item.']];
@@ -163,14 +165,14 @@ class CraftSetPlanService
     /**
      * Resolve the currently craftable item for a required plan position and requested item id.
      *
-     * @param  Character  $character  The character building the plan.
+     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
      * @param  CraftSetPosition  $position  The plan position being resolved.
      * @param  int  $itemId  The requested item id for the position.
      * @return Item|null The matching craftable item, or null when unavailable.
      */
-    private function resolvePositionItem(Character $character, CraftSetPosition $position, int $itemId): ?Item
+    private function resolvePositionItem(Collection $craftableItemsById, CraftSetPosition $position, int $itemId): ?Item
     {
-        $item = $this->craftingService->findCraftableItemForAutomation($character, $itemId);
+        $item = $craftableItemsById->get($itemId);
 
         if (is_null($item) || $item->type !== $position->requiredItemType()) {
             return null;
@@ -182,13 +184,13 @@ class CraftSetPlanService
     /**
      * Resolve the currently craftable hand item (weapon or shield) for a requested item id.
      *
-     * @param  Character  $character  The character building the plan.
+     * @param  Collection<int, Item>  $craftableItemsById  The character's bulk-resolved craftable items, keyed by item id.
      * @param  int  $itemId  The requested item id for the hand position.
      * @return Item|null The matching craftable hand item, or null when unavailable.
      */
-    private function resolveHandItem(Character $character, int $itemId): ?Item
+    private function resolveHandItem(Collection $craftableItemsById, int $itemId): ?Item
     {
-        $item = $this->craftingService->findCraftableItemForAutomation($character, $itemId);
+        $item = $craftableItemsById->get($itemId);
 
         if (is_null($item) || ! $this->setHandsValidation->isHandItem($item)) {
             return null;

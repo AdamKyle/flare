@@ -20,13 +20,6 @@ use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 
 class CraftingBatchAttemptService
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     * @param  CharacterInventoryService  $characterInventoryService
-     * @param  InventorySetService  $inventorySetService
-     * @param  ServerMessageHandler  $serverMessageHandler
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly BatchCraftingSetService $batchCraftingSetService,

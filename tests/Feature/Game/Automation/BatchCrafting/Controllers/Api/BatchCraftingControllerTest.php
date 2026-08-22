@@ -13,11 +13,13 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
+use Tests\Traits\CreateItemAffix;
 
 class BatchCraftingControllerTest extends TestCase
 {
-    use CreateBatchCrafting, CreateGameSkill, CreateItem, RefreshDatabase;
+    use CreateBatchCrafting, CreateGameSkill, CreateInventorySets, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?GameSkill $weaponCrafting;
 
@@ -77,6 +79,21 @@ class BatchCraftingControllerTest extends TestCase
             ->call('POST', '/api/batch-crafting/'.$this->character->id.'/start', [
                 '_token' => csrf_token(),
             ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_start_returns_a_validation_error_when_the_progress_mode_key_is_missing(): void
+    {
+        $payload = [
+            '_token' => csrf_token(),
+            'batch_type' => 'craft',
+            'disposition' => 'keep',
+            'progress' => [],
+        ];
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/batch-crafting/'.$this->character->id.'/start', $payload, [], [], ['HTTP_ACCEPT' => 'application/json']);
 
         $response->assertStatus(422);
     }
@@ -615,5 +632,93 @@ class BatchCraftingControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertNull($jsonData['item']);
+    }
+
+    public function test_start_returns_a_validation_error_when_craft_and_enchant_amount_uses_a_normal_inventory_set_destination(): void
+    {
+        $item = $this->createItem(['name' => 'Enchant Dagger', 'type' => 'dagger', 'crafting_type' => 'weapon', 'default_position' => 'dagger', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50]);
+        $prefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => false, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 50, 'cost' => 10]);
+        $set = $this->createInventorySet(['character_id' => $this->character->id, 'is_equipped' => false, 'max_slots' => 15]);
+        $payload = [
+            '_token' => csrf_token(),
+            'batch_type' => 'craft_and_enchant',
+            'disposition' => 'keep',
+            'progress' => [
+                'craft_enchant_mode' => 'amount',
+                'specific_crafting_type' => 'dagger',
+                'specific_item_id' => $item->id,
+                'prefix_id' => $prefix->id,
+                'craft_amount' => 5,
+                'output_destination' => 'inventory_set',
+                'output_set_id' => $set->id,
+            ],
+        ];
+
+        $response = $this->actingAs($this->character->user)
+            ->call('POST', '/api/batch-crafting/'.$this->character->id.'/start', $payload, [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(422);
+        $this->assertSame(0, BatchCrafting::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_start_creates_a_running_craft_and_enchant_set_batch_with_a_normal_inventory_set_destination(): void
+    {
+        Queue::fake([BatchCraftingJob::class]);
+
+        $armourCrafting = $this->createGameSkill(['name' => 'Armour Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $ringCrafting = $this->createGameSkill(['name' => 'Ring Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $spellCrafting = $this->createGameSkill(['name' => 'Spell Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()
+            ->assignSkill($armourCrafting, 10, false)
+            ->assignSkill($ringCrafting, 10, false)
+            ->assignSkill($spellCrafting, 10, false)
+            ->getCharacter();
+
+        $enchantingGameSkill = GameSkill::where('type', SkillTypeValue::ENCHANTING->value)->first();
+        $character->skills()->where('game_skill_id', $enchantingGameSkill->id)->update(['level' => 10]);
+        $character->update(['gold' => 100000]);
+        $character = $character->refresh();
+
+        $prefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => false, 'int_required' => 1, 'skill_level_required' => 1, 'skill_level_trivial' => 50, 'cost' => 10]);
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false, 'max_slots' => 15]);
+
+        $setPositions = [
+            'body' => $this->createItem(['name' => 'Set body', 'type' => 'body', 'crafting_type' => 'armour', 'default_position' => 'body', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'leggings' => $this->createItem(['name' => 'Set leggings', 'type' => 'leggings', 'crafting_type' => 'armour', 'default_position' => 'leggings', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'sleeves' => $this->createItem(['name' => 'Set sleeves', 'type' => 'sleeves', 'crafting_type' => 'armour', 'default_position' => 'sleeves', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'gloves' => $this->createItem(['name' => 'Set gloves', 'type' => 'gloves', 'crafting_type' => 'armour', 'default_position' => 'gloves', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'feet' => $this->createItem(['name' => 'Set feet', 'type' => 'feet', 'crafting_type' => 'armour', 'default_position' => 'feet', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'helmet' => $this->createItem(['name' => 'Set helmet', 'type' => 'helmet', 'crafting_type' => 'armour', 'default_position' => 'helmet', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'ring_0' => $this->createItem(['name' => 'Set Ring 0', 'type' => 'ring', 'crafting_type' => 'ring', 'default_position' => 'ring', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'ring_1' => $this->createItem(['name' => 'Set Ring 1', 'type' => 'ring', 'crafting_type' => 'ring', 'default_position' => 'ring', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'spell-damage' => $this->createItem(['name' => 'Set Damage Spell', 'type' => 'spell-damage', 'crafting_type' => 'spell', 'default_position' => 'spell-damage', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+            'spell-healing' => $this->createItem(['name' => 'Set Healing Spell', 'type' => 'spell-healing', 'crafting_type' => 'spell', 'default_position' => 'spell-healing', 'can_craft' => true, 'cost' => 5, 'skill_level_required' => 1, 'skill_level_trivial' => 50])->id,
+        ];
+        $enchantments = array_fill_keys(array_keys($setPositions), ['prefix_id' => $prefix->id, 'suffix_id' => null]);
+
+        $payload = [
+            '_token' => csrf_token(),
+            'batch_type' => 'craft_and_enchant',
+            'disposition' => 'keep',
+            'progress' => [
+                'craft_enchant_mode' => 'set',
+                'set_positions' => $setPositions,
+                'enchantments' => $enchantments,
+                'output_destination' => 'inventory_set',
+                'output_set_id' => $set->id,
+            ],
+        ];
+
+        $response = $this->actingAs($character->user)
+            ->call('POST', '/api/batch-crafting/'.$character->id.'/start', $payload);
+
+        $jsonData = json_decode($response->getContent(), true);
+
+        $response->assertOk();
+        $this->assertNotNull($jsonData['batch_crafting_id']);
+        $batchCrafting = BatchCrafting::find($jsonData['batch_crafting_id']);
+        $this->assertSame($character->id, $batchCrafting->character_id);
+        $this->assertSame('running', $batchCrafting->status);
+        $this->assertSame($set->id, $batchCrafting->progress['output_set_id']);
     }
 }

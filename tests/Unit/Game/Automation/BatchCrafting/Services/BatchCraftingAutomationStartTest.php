@@ -12,6 +12,7 @@ use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use App\Game\Automation\BatchCrafting\Events\BatchCraftingStatusUpdated;
 use App\Game\Automation\BatchCrafting\Jobs\BatchCraftingJob;
 use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
+use App\Game\Automation\BatchCrafting\Services\Setup\BatchCraftingSetupResolver;
 use App\Game\Automation\Events\AutomationLogUpdate;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
@@ -23,6 +24,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use InvalidArgumentException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
@@ -96,7 +98,8 @@ class BatchCraftingAutomationStartTest extends TestCase
         $batchCrafting = BatchCrafting::find($result['batch_crafting_id']);
         $this->assertEqualsCanonicalizing([
             'craft_mode', 'specific_crafting_type', 'specific_item_id', 'craft_amount', 'output_destination',
-            'craft_specific_count', 'scheduled_for', 'processing_started_at', 'gold_spent_total', 'gold_gained_total', 'chart_points',
+            'craft_specific_count', 'scheduled_for', 'processing_started_at', 'gold_spent_total', 'gold_gained_total',
+            'gold_dust_spent_total', 'shards_spent_total', 'copper_coins_spent_total', 'disenchanted_count', 'used_count', 'chart_points',
         ], array_keys($batchCrafting->progress));
         $this->assertSame(0, $batchCrafting->progress['craft_specific_count']);
         $this->assertNull($batchCrafting->progress['processing_started_at']);
@@ -287,6 +290,19 @@ class BatchCraftingAutomationStartTest extends TestCase
         $this->assertEmpty($result['blockers']);
     }
 
+    public function test_preview_returns_an_error_when_no_preview_is_available_for_the_mode(): void
+    {
+        $validated = [
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::KEEP_BEST_SELL_REST->value,
+            'progress' => ['craft_enchant_mode' => 'experience'],
+        ];
+
+        $result = $this->service->preview($this->character, $validated);
+
+        $this->assertSame(422, $result['status']);
+    }
+
     public function test_start_creates_a_running_craft_set_batch_with_a_resolved_queue(): void
     {
         Queue::fake();
@@ -388,5 +404,14 @@ class BatchCraftingAutomationStartTest extends TestCase
 
         $this->assertSame(422, $result['status']);
         $this->assertSame(0, BatchCrafting::where('character_id', $this->character->id)->count());
+    }
+
+    public function test_setup_resolver_throws_clearly_when_no_setup_service_is_registered_for_the_type(): void
+    {
+        $resolver = new BatchCraftingSetupResolver([]);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $resolver->resolve(BatchCraftingType::CRAFT);
     }
 }

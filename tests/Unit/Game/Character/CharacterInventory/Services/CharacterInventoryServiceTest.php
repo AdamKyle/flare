@@ -1406,4 +1406,52 @@ class CharacterInventoryServiceTest extends TestCase
 
         $this->assertSame($set->id, $result?->id);
     }
+
+    public function test_resolve_empty_batch_crafting_destination_set_resolves_an_empty_normal_unequipped_set(): void
+    {
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveEmptyBatchCraftingDestinationSet($set->id);
+
+        $this->assertSame($set->id, $result?->id);
+    }
+
+    public function test_resolve_empty_batch_crafting_destination_set_returns_null_for_a_non_empty_set(): void
+    {
+        $item = $this->createItem(['name' => 'Occupying Item']);
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'is_equipped' => false]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $item->id]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveEmptyBatchCraftingDestinationSet($set->id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_resolve_empty_batch_crafting_destination_set_returns_null_for_an_equipped_set(): void
+    {
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'is_equipped' => true]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveEmptyBatchCraftingDestinationSet($set->id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_resolve_empty_batch_crafting_destination_set_returns_null_for_the_crafted_items_set(): void
+    {
+        $set = $this->createInventorySet(['character_id' => $this->character->getCharacter()->id, 'special_type' => InventorySet::BATCH_CRAFTING_SPECIAL_TYPE, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveEmptyBatchCraftingDestinationSet($set->id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_resolve_empty_batch_crafting_destination_set_returns_null_for_another_characters_set(): void
+    {
+        $otherCharacter = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $set = $this->createInventorySet(['character_id' => $otherCharacter->id, 'is_equipped' => false]);
+
+        $result = $this->characterInventoryService->setCharacter($this->character->getCharacter())->resolveEmptyBatchCraftingDestinationSet($set->id);
+
+        $this->assertNull($result);
+    }
 }

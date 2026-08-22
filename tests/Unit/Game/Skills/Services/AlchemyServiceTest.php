@@ -425,4 +425,69 @@ class AlchemyServiceTest extends TestCase
 
         $this->assertEquals($alchemyCraftingXpData, $expected);
     }
+
+    public function test_find_alchemy_skill_returns_the_characters_alchemy_skill(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $skill = $this->alchemyService->findAlchemySkill($character);
+
+        $this->assertNotNull($skill);
+        $this->assertSame('Alchemy', $skill->baseSkill->name);
+    }
+
+    public function test_find_meaningful_batch_item_returns_highest_requirement_eligible_item(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $alchemyGameSkill = GameSkill::where('type', SkillTypeValue::ALCHEMY->value)->first();
+        $alchemyGameSkill->update(['max_level' => 20]);
+        $character->skills()->where('game_skill_id', $alchemyGameSkill->id)->update(['level' => 10]);
+
+        $weakerItem = $this->createItem([
+            'gold_dust_cost' => 10,
+            'shards_cost' => 10,
+            'skill_level_required' => 5,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'type' => 'alchemy',
+        ]);
+        $strongerItem = $this->createItem([
+            'gold_dust_cost' => 10,
+            'shards_cost' => 10,
+            'skill_level_required' => 10,
+            'skill_level_trivial' => 100,
+            'crafting_type' => 'alchemy',
+            'can_craft' => true,
+            'type' => 'alchemy',
+        ]);
+
+        $item = $this->alchemyService->findMeaningfulBatchItem($character->refresh());
+
+        $this->assertNotNull($item);
+        $this->assertSame($strongerItem->id, $item->id);
+        $this->assertNotSame($weakerItem->id, $item->id);
+    }
+
+    public function test_find_meaningful_batch_item_returns_null_when_nothing_is_eligible(): void
+    {
+        $character = $this->character->getCharacter();
+
+        Item::where('crafting_type', 'alchemy')->update(['skill_level_trivial' => 0]);
+
+        $item = $this->alchemyService->findMeaningfulBatchItem($character);
+
+        $this->assertNull($item);
+    }
+
+    public function test_resolve_cost_applies_no_discount_for_a_normal_class(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $cost = $this->alchemyService->resolveCost($character, $this->alchemyItem);
+
+        $this->assertEquals(1000, $cost['gold_dust']);
+        $this->assertEquals(1000, $cost['shards']);
+    }
 }

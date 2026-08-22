@@ -19,9 +19,6 @@ class BatchCraftingJob implements ShouldQueue
 
     public const QUEUE = 'batch_crafting';
 
-    /**
-     * @param  int  $batchCraftingId
-     */
     public function __construct(public readonly int $batchCraftingId)
     {
         $this->onConnection(self::CONNECTION);

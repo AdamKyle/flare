@@ -12,11 +12,12 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBagSlot;
 use Tests\Traits\CreateHolyStack;
+use Tests\Traits\CreateInventorySets;
 use Tests\Traits\CreateItem;
 
 class HolyItemServiceTest extends TestCase
 {
-    use CreateAlchemyBagSlot, CreateHolyStack, CreateItem, RefreshDatabase;
+    use CreateAlchemyBagSlot, CreateHolyStack, CreateInventorySets, CreateItem, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -596,5 +597,195 @@ class HolyItemServiceTest extends TestCase
 
         $this->assertEquals(200, $result['status']);
         $this->assertEquals(1, $updatedItem->holy_stacks_applied);
+    }
+
+    public function test_apply_oil_for_batch_succeeds_and_reports_saturation(): void
+    {
+        $targetItem = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
+        $oil = $this->createItem(['type' => 'alchemy', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+        $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
+        $character = $character->refresh();
+
+        $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
+        $oilSlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOilForBatch($character, $targetSlot->id, $oilSlot->id);
+
+        $this->assertTrue($result->success);
+        $this->assertTrue($result->saturated);
+        $this->assertEquals(100, $result->goldDustSpent);
+    }
+
+    public function test_apply_oil_for_batch_rejects_trinket_target(): void
+    {
+        $trinketItem = $this->createItem(['type' => 'trinket', 'holy_stacks' => 20]);
+        $oil = $this->createItem(['type' => 'alchemy', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+
+        $character = $this->character->inventoryManagement()->giveItem($trinketItem)->getCharacter();
+        $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
+        $character = $character->refresh();
+
+        $targetSlot = $character->inventory->slots()->where('item_id', $trinketItem->id)->first();
+        $oilSlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOilForBatch($character, $targetSlot->id, $oilSlot->id);
+
+        $this->assertFalse($result->success);
+        $this->assertSame('invalid_target', $result->reason);
+    }
+
+    public function test_apply_oil_for_batch_rejects_insufficient_gold_dust(): void
+    {
+        $targetItem = $this->createItem(['type' => 'weapon', 'holy_stacks' => 20]);
+        $oil = $this->createItem(['type' => 'alchemy', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+        $character->update(['gold_dust' => 0]);
+        $character = $character->refresh();
+
+        $targetSlot = $character->inventory->slots()->where('item_id', $targetItem->id)->first();
+        $oilSlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOilForBatch($character, $targetSlot->id, $oilSlot->id);
+
+        $this->assertFalse($result->success);
+        $this->assertSame('not_enough_gold_dust', $result->reason);
+    }
+
+    public function test_apply_oil_to_set_slot_for_batch_succeeds(): void
+    {
+        $targetItem = $this->createItem(['type' => 'weapon', 'holy_stacks' => 20]);
+        $oil = $this->createItem(['type' => 'alchemy', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+
+        $character = $this->character->getCharacter();
+        $character->update(['gold_dust' => CurrencyLimit::MAX_GOLD_DUST]);
+        $character = $character->refresh();
+
+        $set = $this->createInventorySet(['character_id' => $character->id]);
+        $setSlot = $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $targetItem->id]);
+        $oilSlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $result = $this->holyItemService->applyOilToSetSlotForBatch($character, $set, $setSlot->id, $oilSlot->id);
+
+        $this->assertTrue($result->success);
+        $this->assertFalse($result->saturated);
+        $this->assertEquals(1, $result->resultingSlot->item->holy_stacks_applied);
+    }
+
+    public function test_has_eligible_inventory_target_returns_false_when_no_target_item(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $this->assertFalse($this->holyItemService->hasEligibleInventoryTarget($character));
+    }
+
+    public function test_has_eligible_inventory_target_returns_true_for_eligible_loose_item(): void
+    {
+        $targetItem = $this->createItem(['type' => 'weapon', 'holy_stacks' => 20]);
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+
+        $this->assertTrue($this->holyItemService->hasEligibleInventoryTarget($character->refresh()));
+    }
+
+    public function test_has_eligible_inventory_target_excludes_trinket(): void
+    {
+        $trinketItem = $this->createItem(['type' => 'trinket', 'holy_stacks' => 20]);
+        $character = $this->character->inventoryManagement()->giveItem($trinketItem)->getCharacter();
+
+        $this->assertFalse($this->holyItemService->hasEligibleInventoryTarget($character->refresh()));
+    }
+
+    public function test_has_eligible_inventory_target_excludes_artifact(): void
+    {
+        $artifactItem = $this->createItem(['type' => 'artifact', 'holy_stacks' => 20]);
+        $character = $this->character->inventoryManagement()->giveItem($artifactItem)->getCharacter();
+
+        $this->assertFalse($this->holyItemService->hasEligibleInventoryTarget($character->refresh()));
+    }
+
+    public function test_has_eligible_inventory_target_excludes_saturated_item(): void
+    {
+        $targetItem = $this->createItem(['type' => 'weapon', 'holy_stacks' => 1]);
+
+        $this->createHolyStack([
+            'item_id' => $targetItem->id,
+            'devouring_darkness_bonus' => 0.10,
+            'stat_increase_bonus' => 0.10,
+        ]);
+
+        $targetItem = $targetItem->refresh();
+        $character = $this->character->inventoryManagement()->giveItem($targetItem)->getCharacter();
+
+        $this->assertFalse($this->holyItemService->hasEligibleInventoryTarget($character->refresh()));
+    }
+
+    public function test_has_eligible_inventory_set_target_returns_false_when_no_set_target(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $this->assertFalse($this->holyItemService->hasEligibleInventorySetTarget($character));
+    }
+
+    public function test_has_eligible_inventory_set_target_returns_true_for_eligible_set_item(): void
+    {
+        $targetItem = $this->createItem(['type' => 'weapon', 'holy_stacks' => 20]);
+        $character = $this->character->getCharacter();
+
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $targetItem->id]);
+
+        $this->assertTrue($this->holyItemService->hasEligibleInventorySetTarget($character->refresh()));
+    }
+
+    public function test_has_eligible_inventory_set_target_excludes_trinket_and_artifact_only_set(): void
+    {
+        $trinketItem = $this->createItem(['type' => 'trinket', 'holy_stacks' => 20]);
+        $artifactItem = $this->createItem(['type' => 'artifact', 'holy_stacks' => 20]);
+        $character = $this->character->getCharacter();
+
+        $set = $this->createInventorySet(['character_id' => $character->id, 'is_equipped' => false]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $trinketItem->id]);
+        $this->createInventorySetSlot(['inventory_set_id' => $set->id, 'item_id' => $artifactItem->id]);
+
+        $this->assertFalse($this->holyItemService->hasEligibleInventorySetTarget($character->refresh()));
+    }
+
+    public function test_has_eligible_holy_oil_reflects_real_alchemy_bag_state(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $this->assertFalse($this->holyItemService->hasEligibleHolyOil($character));
+
+        $oil = $this->createItem(['type' => 'alchemy', 'holy_level' => 1, 'can_use_on_other_items' => true]);
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $oil->id,
+            'amount' => 1,
+        ]);
+
+        $this->assertTrue($this->holyItemService->hasEligibleHolyOil($character->refresh()));
     }
 }

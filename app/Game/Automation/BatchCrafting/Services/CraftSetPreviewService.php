@@ -120,10 +120,10 @@ class CraftSetPreviewService
             return ['capacity' => null, 'can_fit' => false, 'error' => 'A destination set is required.'];
         }
 
-        $set = $this->characterInventoryService->setCharacter($character)->resolveValidTargetInventorySet($setId);
+        $set = $this->characterInventoryService->setCharacter($character)->resolveEmptyBatchCraftingDestinationSet($setId);
 
         if (is_null($set)) {
-            return ['capacity' => null, 'can_fit' => false, 'error' => 'The selected destination set is not a valid target.'];
+            return ['capacity' => null, 'can_fit' => false, 'error' => 'The selected destination set must be an empty, unequipped Set you own.'];
         }
 
         $remaining = $set->remainingSlots();

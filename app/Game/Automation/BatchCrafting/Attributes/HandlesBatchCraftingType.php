@@ -8,8 +8,5 @@ use Attribute;
 #[Attribute(Attribute::TARGET_CLASS)]
 class HandlesBatchCraftingType
 {
-    /**
-     * @param  BatchCraftingType  $type
-     */
     public function __construct(public readonly BatchCraftingType $type) {}
 }

@@ -12,10 +12,6 @@ use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
 
 class CraftExperienceKeepBestService
 {
-    /**
-     * @param  BatchCraftingSetService  $batchCraftingSetService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     */
     public function __construct(
         private readonly BatchCraftingSetService $batchCraftingSetService,
         private readonly CraftingBatchAttemptService $craftingBatchAttemptService,

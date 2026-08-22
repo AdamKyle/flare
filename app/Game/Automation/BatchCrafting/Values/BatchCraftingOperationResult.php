@@ -7,15 +7,6 @@ use App\Game\Automation\BatchCrafting\Enums\BatchCraftingEndReason;
 
 class BatchCraftingOperationResult
 {
-    /**
-     * @param  BatchCraftingActionStatus|null  $actionStatus
-     * @param  BatchCraftingEndReason|null  $endReason
-     * @param  int  $goldSpent
-     * @param  int  $goldGained
-     * @param  int  $additionalSoldCount
-     * @param  int  $additionalDestroyedCount
-     * @param  int  $xpGained
-     */
     private function __construct(
         private readonly ?BatchCraftingActionStatus $actionStatus,
         private readonly ?BatchCraftingEndReason $endReason,
@@ -23,7 +14,11 @@ class BatchCraftingOperationResult
         private readonly int $goldGained,
         private readonly int $additionalSoldCount = 0,
         private readonly int $additionalDestroyedCount = 0,
+        private readonly int $additionalDisenchantedCount = 0,
         private readonly int $xpGained = 0,
+        private readonly int $goldDustSpent = 0,
+        private readonly int $shardsSpent = 0,
+        private readonly int $copperCoinsSpent = 0,
     ) {}
 
     /**
@@ -85,6 +80,17 @@ class BatchCraftingOperationResult
     }
 
     /**
+     * Build a result representing a new best item that displaced and disenchanted the previous best.
+     *
+     * @param  int  $goldSpent  The Gold spent crafting the new best item.
+     * @return self A result with the kept action status and one additional disenchanted count.
+     */
+    public static function keptWithDisplacedDisenchant(int $goldSpent): self
+    {
+        return new self(BatchCraftingActionStatus::KEPT, null, $goldSpent, 0, additionalDisenchantedCount: 1);
+    }
+
+    /**
      * Build a result representing a crafted item that was destroyed.
      *
      * @param  int  $goldSpent  The Gold spent crafting the item.
@@ -93,6 +99,49 @@ class BatchCraftingOperationResult
     public static function destroyed(int $goldSpent): self
     {
         return new self(BatchCraftingActionStatus::DESTROYED, null, $goldSpent, 0);
+    }
+
+    /**
+     * Build a result representing a crafted item that was listed on the Market.
+     *
+     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @return self A result with the listed action status.
+     */
+    public static function listed(int $goldSpent = 0): self
+    {
+        return new self(BatchCraftingActionStatus::LISTED, null, $goldSpent, 0);
+    }
+
+    /**
+     * Build a result representing a crafted item that was disenchanted.
+     *
+     * @param  int  $goldSpent  The Gold spent crafting the item.
+     * @return self A result with the disenchanted action status.
+     */
+    public static function disenchanted(int $goldSpent = 0): self
+    {
+        return new self(BatchCraftingActionStatus::DISENCHANTED, null, $goldSpent, 0);
+    }
+
+    /**
+     * Build a result representing a produced item that was immediately used.
+     *
+     * @return self A result with the used action status.
+     */
+    public static function used(): self
+    {
+        return new self(BatchCraftingActionStatus::USED, null, 0, 0);
+    }
+
+    /**
+     * Build a result representing a target item that had a Holy Oil or Event enchantment applied to it.
+     *
+     * @param  int  $goldSpent  The Gold spent applying it, when applicable.
+     * @return self A result with the applied action status.
+     */
+    public static function applied(int $goldSpent = 0): self
+    {
+        return new self(BatchCraftingActionStatus::APPLIED, null, $goldSpent, 0);
     }
 
     /**
@@ -128,6 +177,21 @@ class BatchCraftingOperationResult
     }
 
     /**
+     * Build a result representing a multi-step workflow's intermediate phase transition.
+     *
+     * Carries no action status and no end reason, so the run continues immediately with no
+     * counter incremented, while the broadcast status still reflects the transient state
+     * (for example, a Craft and Enchant Set position moving from its crafting phase to its
+     * enchanting phase) that was persisted before this result was returned.
+     *
+     * @return self A result carrying neither an action status nor an end reason.
+     */
+    public static function inProgress(): self
+    {
+        return new self(null, null, 0, 0);
+    }
+
+    /**
      * Build a result representing an attempt that charged Gold but ended the run at commit time.
      *
      * @param  BatchCraftingEndReason  $reason  The reason the run ended.
@@ -143,11 +207,23 @@ class BatchCraftingOperationResult
      * Build a copy of this result carrying the supplied terminal end reason.
      *
      * @param  BatchCraftingEndReason  $reason  The reason the run ended.
-     * @return self A result with the same action status and Gold totals, carrying the end reason.
+     * @return self A result with the same action status and totals, carrying the end reason.
      */
     public function withEndReason(BatchCraftingEndReason $reason): self
     {
-        return new self($this->actionStatus, $reason, $this->goldSpent, $this->goldGained, $this->additionalSoldCount, $this->additionalDestroyedCount, $this->xpGained);
+        return new self(
+            $this->actionStatus,
+            $reason,
+            $this->goldSpent,
+            $this->goldGained,
+            $this->additionalSoldCount,
+            $this->additionalDestroyedCount,
+            $this->additionalDisenchantedCount,
+            $this->xpGained,
+            $this->goldDustSpent,
+            $this->shardsSpent,
+            $this->copperCoinsSpent,
+        );
     }
 
     /**
@@ -158,7 +234,44 @@ class BatchCraftingOperationResult
      */
     public function withXpGained(int $xpGained): self
     {
-        return new self($this->actionStatus, $this->endReason, $this->goldSpent, $this->goldGained, $this->additionalSoldCount, $this->additionalDestroyedCount, $xpGained);
+        return new self(
+            $this->actionStatus,
+            $this->endReason,
+            $this->goldSpent,
+            $this->goldGained,
+            $this->additionalSoldCount,
+            $this->additionalDestroyedCount,
+            $this->additionalDisenchantedCount,
+            $xpGained,
+            $this->goldDustSpent,
+            $this->shardsSpent,
+            $this->copperCoinsSpent,
+        );
+    }
+
+    /**
+     * Build a copy of this result carrying the supplied factual resource spending.
+     *
+     * @param  int  $goldDustSpent  The Gold Dust spent by the operation.
+     * @param  int  $shardsSpent  The Shards spent by the operation.
+     * @param  int  $copperCoinsSpent  The Copper Coins spent by the operation.
+     * @return self A result with the same action status and totals, carrying the resource spending.
+     */
+    public function withResourceSpending(int $goldDustSpent = 0, int $shardsSpent = 0, int $copperCoinsSpent = 0): self
+    {
+        return new self(
+            $this->actionStatus,
+            $this->endReason,
+            $this->goldSpent,
+            $this->goldGained,
+            $this->additionalSoldCount,
+            $this->additionalDestroyedCount,
+            $this->additionalDisenchantedCount,
+            $this->xpGained,
+            $goldDustSpent,
+            $shardsSpent,
+            $copperCoinsSpent,
+        );
     }
 
     /**
@@ -222,6 +335,16 @@ class BatchCraftingOperationResult
     }
 
     /**
+     * Return the additional number of items disenchanted as a side effect of this operation.
+     *
+     * @return int The additional disenchanted count, on top of the primary action status.
+     */
+    public function additionalDisenchantedCount(): int
+    {
+        return $this->additionalDisenchantedCount;
+    }
+
+    /**
      * Return the factual XP gained by this operation's craft attempt.
      *
      * @return int The factual XP gained.
@@ -229,6 +352,36 @@ class BatchCraftingOperationResult
     public function xpGained(): int
     {
         return $this->xpGained;
+    }
+
+    /**
+     * Return the Gold Dust spent on this operation.
+     *
+     * @return int The Gold Dust spent.
+     */
+    public function goldDustSpent(): int
+    {
+        return $this->goldDustSpent;
+    }
+
+    /**
+     * Return the Shards spent on this operation.
+     *
+     * @return int The Shards spent.
+     */
+    public function shardsSpent(): int
+    {
+        return $this->shardsSpent;
+    }
+
+    /**
+     * Return the Copper Coins spent on this operation.
+     *
+     * @return int The Copper Coins spent.
+     */
+    public function copperCoinsSpent(): int
+    {
+        return $this->copperCoinsSpent;
     }
 
     /**

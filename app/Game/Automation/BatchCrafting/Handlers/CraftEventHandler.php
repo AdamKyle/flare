@@ -24,13 +24,6 @@ use App\Game\Skills\Values\CraftingMessageMode;
 #[HandlesBatchCraftingMode(BatchCraftingType::CRAFT, CraftingBatchMode::EVENT)]
 class CraftEventHandler implements BatchCraftingHandler
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     * @param  CraftEventTargetService  $craftEventTargetService
-     * @param  GlobalEventGoalEligibilityService  $globalEventGoalEligibilityService
-     * @param  HandleUpdatingCraftingGlobalEventGoal  $handleUpdatingCraftingGlobalEventGoal
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly CraftingBatchAttemptService $craftingBatchAttemptService,

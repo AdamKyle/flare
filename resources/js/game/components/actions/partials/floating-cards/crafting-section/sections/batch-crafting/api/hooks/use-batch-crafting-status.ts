@@ -12,8 +12,9 @@ import BatchCraftingStatusUpdatedDefinition from '../definitions/batch-crafting-
 import { BatchCraftingApiUrls } from '../enums/batch-crafting-api-urls';
 import UseBatchCraftingStatusDefinition from './definitions/use-batch-crafting-status-definition';
 import UseBatchCraftingStatusParams from './definitions/use-batch-crafting-status-params';
-import { ChannelType } from '../../../../../../../../../../websocket-handler/enums/channel-type';
-import { useWebsocket } from '../../../../../../../../../../websocket-handler/hooks/use-websocket';
+
+import { ChannelType } from 'websockets/enums/channel-type';
+import { useWebsocket } from 'websockets/hooks/use-websocket';
 
 const BATCH_CRAFTING_STATUS_UPDATED_CHANNEL =
   'batch-crafting-status-updated-{userId}';

@@ -9,11 +9,17 @@ import { batchCraftingRunningSectionRegistry } from '../component-mapping/batch-
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
 import { BatchCraftingEndReason } from '../enums/batch-crafting-end-reason';
 import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
+import { BatchCraftingType } from '../enums/batch-crafting-type';
+import { CraftAndEnchantBatchMode } from '../enums/craft-and-enchant-batch-mode';
+import { CraftingBatchMode } from '../enums/crafting-batch-mode';
 import { useBatchCraftingStatusContext } from '../hooks/use-batch-crafting-status-context';
 import {
+  batchTypeLabel,
+  craftAndEnchantModeLabel,
   craftModeLabel,
   dispositionLabel,
 } from '../utils/batch-crafting-labels';
+import { buildBatchCraftingRunningSectionKey } from '../utils/batch-crafting-running-section-key';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -171,10 +177,33 @@ const BatchCraftingRunningPanel = (): ReactNode => {
       return null;
     }
 
-    const RunningSection =
-      batchCraftingRunningSectionRegistry[batch.craft_mode];
+    const key = buildBatchCraftingRunningSectionKey(
+      batch.batch_type,
+      batch.mode
+    );
+    const RunningSection = batchCraftingRunningSectionRegistry[key];
+
+    if (!RunningSection) {
+      return null;
+    }
 
     return <RunningSection batch={batch} character_id={characterId} />;
+  };
+
+  const headingLabel = (): string => {
+    if (!batch) {
+      return '';
+    }
+
+    if (batch.batch_type === BatchCraftingType.CRAFT_AND_ENCHANT) {
+      return craftAndEnchantModeLabel(batch.mode as CraftAndEnchantBatchMode);
+    }
+
+    if (batch.batch_type === BatchCraftingType.CRAFT) {
+      return craftModeLabel(batch.mode as CraftingBatchMode);
+    }
+
+    return batchTypeLabel(batch.batch_type);
   };
 
   if (loading && !status) {
@@ -199,9 +228,7 @@ const BatchCraftingRunningPanel = (): ReactNode => {
 
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h3 className="text-lg font-semibold">
-            {craftModeLabel(batch.craft_mode)}
-          </h3>
+          <h3 className="text-lg font-semibold">{headingLabel()}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {dispositionLabel(batch.disposition)}
           </p>

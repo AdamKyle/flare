@@ -7,13 +7,16 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\InventorySet;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingDisposition;
 use App\Game\Automation\BatchCrafting\Enums\BatchCraftingEndReason;
+use App\Game\Automation\BatchCrafting\Enums\BatchCraftingType;
 use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
 use App\Game\Automation\BatchCrafting\Services\BatchCraftingStatusService;
+use App\Game\Automation\BatchCrafting\Services\Status\BatchCraftingStatusSectionResolver;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Events\Values\EventType;
 use App\Game\Events\Values\GlobalEventSteps;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use InvalidArgumentException;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateBatchCrafting;
@@ -529,5 +532,14 @@ class BatchCraftingStatusServiceTest extends TestCase
         $this->assertArrayNotHasKey('remaining_human', $result['batch']);
         $this->assertArrayNotHasKey('progress_percent', $result['batch']);
         $this->assertArrayNotHasKey('stop_reason', $result['batch']);
+    }
+
+    public function test_status_section_resolver_throws_clearly_when_no_section_is_registered_for_the_type_and_mode(): void
+    {
+        $resolver = new BatchCraftingStatusSectionResolver([]);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $resolver->resolve(BatchCraftingType::CRAFT, 'amount');
     }
 }

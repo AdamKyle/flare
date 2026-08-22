@@ -9,9 +9,6 @@ use App\Game\Skills\Services\CraftingService;
 
 class CraftSetHandRecommendationService
 {
-    /**
-     * @param  CraftingService  $craftingService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
     ) {}

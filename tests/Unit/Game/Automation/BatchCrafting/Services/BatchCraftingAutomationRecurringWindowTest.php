@@ -184,6 +184,145 @@ class BatchCraftingAutomationRecurringWindowTest extends TestCase
         $this->assertSame(3, $batchCrafting->progress['event_cycle_position']);
     }
 
+    public function test_craft_and_enchant_experience_process_performs_exactly_twenty_three_actions_in_one_window(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::CRAFT_AND_ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['craft_enchant_mode' => 'experience', 'cycle_position' => 0, 'crafting_xp_gained' => 0, 'enchanting_xp_gained' => 0, 'scheduled_for' => null, 'processing_started_at' => null, 'gold_spent_total' => 0, 'gold_gained_total' => 0, 'chart_points' => []],
+        ]);
+        $callCount = 0;
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->times(23)->andReturnUsing(function () use (&$callCount): BatchCraftingOperationResult {
+            $callCount++;
+
+            return BatchCraftingOperationResult::crafted(0);
+        });
+        $factory = Mockery::mock(BatchCraftingOrchestratorFactory::class);
+        $factory->shouldReceive('make')->andReturn($orchestrator);
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $factory);
+
+        $nextAttemptAt = resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $this->assertNotNull($nextAttemptAt);
+        $this->assertSame(23, $callCount);
+    }
+
+    public function test_enchant_event_process_performs_exactly_twenty_three_actions_in_one_window(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ENCHANT->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['enchant_mode' => 'event', 'event_enchant_phase' => 'select', 'enchanting_xp_gained' => 0, 'crafting_xp_gained' => 0, 'event_goal_id' => null, 'scheduled_for' => null, 'processing_started_at' => null, 'gold_spent_total' => 0, 'gold_gained_total' => 0, 'chart_points' => []],
+        ]);
+        $callCount = 0;
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->times(23)->andReturnUsing(function () use (&$callCount): BatchCraftingOperationResult {
+            $callCount++;
+
+            return BatchCraftingOperationResult::crafted(0);
+        });
+        $factory = Mockery::mock(BatchCraftingOrchestratorFactory::class);
+        $factory->shouldReceive('make')->andReturn($orchestrator);
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $factory);
+
+        $nextAttemptAt = resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $this->assertNotNull($nextAttemptAt);
+        $this->assertSame(23, $callCount);
+    }
+
+    public function test_alchemy_experience_process_performs_exactly_six_actions_in_one_window(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['alchemy_mode' => 'experience', 'alchemy_xp_gained' => 0, 'current_item_id' => null, 'current_item_name' => null, 'scheduled_for' => null, 'processing_started_at' => null, 'gold_spent_total' => 0, 'gold_gained_total' => 0, 'chart_points' => []],
+        ]);
+        $callCount = 0;
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->times(6)->andReturnUsing(function () use (&$callCount): BatchCraftingOperationResult {
+            $callCount++;
+
+            return BatchCraftingOperationResult::crafted(0);
+        });
+        $factory = Mockery::mock(BatchCraftingOrchestratorFactory::class);
+        $factory->shouldReceive('make')->andReturn($orchestrator);
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $factory);
+
+        $nextAttemptAt = resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $this->assertNotNull($nextAttemptAt);
+        $this->assertSame(6, $callCount);
+    }
+
+    public function test_trinketry_process_performs_exactly_six_actions_in_one_window(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::TRINKETRY->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['trinketry_mode' => 'experience', 'trinketry_xp_gained' => 0, 'current_item_id' => null, 'current_item_name' => null, 'scheduled_for' => null, 'processing_started_at' => null, 'gold_spent_total' => 0, 'gold_gained_total' => 0, 'chart_points' => []],
+        ]);
+        $callCount = 0;
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->times(6)->andReturnUsing(function () use (&$callCount): BatchCraftingOperationResult {
+            $callCount++;
+
+            return BatchCraftingOperationResult::crafted(0);
+        });
+        $factory = Mockery::mock(BatchCraftingOrchestratorFactory::class);
+        $factory->shouldReceive('make')->andReturn($orchestrator);
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $factory);
+
+        $nextAttemptAt = resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $this->assertNotNull($nextAttemptAt);
+        $this->assertSame(6, $callCount);
+    }
+
+    public function test_continuous_modes_are_not_capped_by_a_fixed_recurring_window(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $batchCrafting = $this->createBatchCrafting([
+            'character_id' => $character->id,
+            'user_id' => $character->user_id,
+            'batch_type' => BatchCraftingType::ALCHEMY->value,
+            'disposition' => BatchCraftingDisposition::DESTROY->value,
+            'progress' => ['alchemy_mode' => 'amount', 'alchemy_amount' => 999, 'completed_amount' => 0, 'alchemy_xp_gained' => 0, 'current_item_id' => null, 'current_item_name' => null, 'scheduled_for' => null, 'processing_started_at' => null, 'gold_spent_total' => 0, 'gold_gained_total' => 0, 'chart_points' => []],
+        ]);
+        $callCount = 0;
+        $orchestrator = Mockery::mock(BatchCraftingOrchestrator::class);
+        $orchestrator->shouldReceive('orchestrate')->times(30)->andReturnUsing(function (BatchCrafting $orchestrated) use (&$callCount): BatchCraftingOperationResult {
+            $callCount++;
+
+            if ($callCount === 30) {
+                $orchestrated->update(['cancelled_at' => now()]);
+            }
+
+            return BatchCraftingOperationResult::crafted(0);
+        });
+        $factory = Mockery::mock(BatchCraftingOrchestratorFactory::class);
+        $factory->shouldReceive('make')->andReturn($orchestrator);
+        $this->app->instance(BatchCraftingOrchestratorFactory::class, $factory);
+
+        $nextAttemptAt = resolve(BatchCraftingAutomationService::class)->process($batchCrafting);
+
+        $this->assertNull($nextAttemptAt);
+        $this->assertSame(30, $callCount);
+    }
+
     public function test_process_returns_null_when_the_batch_is_cancelled_during_the_final_window_operation(): void
     {
         $skill = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value, 'max_level' => 400]);

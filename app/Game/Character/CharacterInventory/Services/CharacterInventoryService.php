@@ -88,7 +88,6 @@ class CharacterInventoryService
      * Set the character used for subsequent inventory operations.
      *
      * @param  Character  $character  The character to operate on.
-     * @return CharacterInventoryService
      */
     public function setCharacter(Character $character): CharacterInventoryService
     {
@@ -101,7 +100,6 @@ class CharacterInventoryService
      * Set the inventory slot used for subsequent inventory operations.
      *
      * @param  InventorySlot  $inventorySlot  The inventory slot to operate on.
-     * @return CharacterInventoryService
      */
     public function setInventorySlot(InventorySlot $inventorySlot): CharacterInventoryService
     {
@@ -114,7 +112,6 @@ class CharacterInventoryService
      * Set the inventory slot positions used to resolve the character's inventory.
      *
      * @param  array  $positions  The slot positions to resolve inventory from.
-     * @return CharacterInventoryService
      */
     public function setPositions(array $positions): CharacterInventoryService
     {
@@ -365,6 +362,52 @@ class CharacterInventoryService
     }
 
     /**
+     * Return the character's paginated selectable Inventory Sets that contain at least one
+     * currently eligible Holy Oil target item.
+     *
+     * Unlike getPaginatedInventorySetOptions(), a Set does not need to be empty to appear here.
+     *
+     * @param  int  $perPage  The number of sets to return per page.
+     * @param  int  $page  The page number to return.
+     * @param  string  $search  The optional search text to filter sets by name.
+     * @return array The paginated Holy Oil target set option payload.
+     */
+    public function getPaginatedHolyOilTargetSetOptions(int $perPage = 10, int $page = 1, string $search = ''): array
+    {
+        $query = $this->character->inventorySets()
+            ->select('inventory_sets.*')
+            ->selectSub(
+                fn (QueryBuilder $query) => $query
+                    ->selectRaw('count(*) + 1')
+                    ->from('inventory_sets as numbered_inventory_sets')
+                    ->whereColumn('numbered_inventory_sets.character_id', 'inventory_sets.character_id')
+                    ->whereColumn('numbered_inventory_sets.id', '<', 'inventory_sets.id')
+                    ->where(fn ($query) => $query->whereNull('numbered_inventory_sets.special_type')
+                        ->orWhere('numbered_inventory_sets.special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE)),
+                'set_number',
+            )
+            ->withCount('slots')
+            ->where('is_equipped', false)
+            ->where(fn ($query) => $query->whereNull('special_type')
+                ->orWhere('special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE))
+            ->whereHas('slots', function ($slotQuery) {
+                $slotQuery->whereHas('item', function ($itemQuery) {
+                    $itemQuery->whereNotIn('type', ['trinket', 'artifact'])
+                        ->whereRaw('holy_stacks > (select count(*) from holy_stacks where holy_stacks.item_id = items.id)');
+                });
+            })
+            ->orderBy('id');
+
+        if ($search !== '') {
+            $query->where('name', 'LIKE', '%'.$search.'%');
+        }
+
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
+
+        return $this->pagination->transformLengthAwarePaginator($paginator, $this->inventorySetOptionTransformer);
+    }
+
+    /**
      * Resolve a valid normal Inventory Set target belonging to the character, for a Batch Crafting destination.
      *
      * @param  int  $setId  The requested destination Inventory Set id.
@@ -379,6 +422,27 @@ class CharacterInventoryService
         }
 
         return $set;
+    }
+
+    /**
+     * Resolve a normal, unequipped, currently empty Inventory Set belonging to the character, for Batch Crafting start/preview validation only.
+     *
+     * Unlike resolveValidTargetInventorySet(), which resolves the already-selected destination
+     * during runtime placement after a Batch has begun filling it, this method enforces the
+     * empty-at-start contract required before a Batch Crafting run may begin.
+     *
+     * @param  int  $setId  The requested destination Inventory Set id.
+     * @return InventorySet|null The eligible empty set, or null when it is not a legal start destination.
+     */
+    public function resolveEmptyBatchCraftingDestinationSet(int $setId): ?InventorySet
+    {
+        return $this->character->inventorySets()
+            ->where('id', $setId)
+            ->where('is_equipped', false)
+            ->where(fn ($query) => $query->whereNull('special_type')
+                ->orWhere('special_type', '!=', InventorySet::BATCH_CRAFTING_SPECIAL_TYPE))
+            ->whereDoesntHave('slots')
+            ->first();
     }
 
     /**
@@ -819,8 +883,6 @@ class CharacterInventoryService
 
     /**
      * Resolve and store the inventory for the previously set positions.
-     *
-     * @return CharacterInventoryService
      */
     public function setInventory(): CharacterInventoryService
     {
@@ -834,7 +896,7 @@ class CharacterInventoryService
      *
      * @return Collection The resolved inventory slots.
      */
-    protected function getInventory(): Collection
+    private function getInventory(): Collection
     {
         $inventory = $this->character->inventory->slots()->whereIn('position', $this->positions)->get();
 
@@ -1164,7 +1226,6 @@ class CharacterInventoryService
      * Updates the character stats.
      *
      * @param  Character  $character  The character to update attack data for.
-     * @return void
      */
     private function updateCharacterAttackDataCache(Character $character): void
     {

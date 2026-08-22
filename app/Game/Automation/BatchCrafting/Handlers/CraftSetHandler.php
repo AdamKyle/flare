@@ -20,10 +20,6 @@ use Closure;
 #[HandlesBatchCraftingMode(BatchCraftingType::CRAFT, CraftingBatchMode::SET)]
 class CraftSetHandler implements BatchCraftingHandler
 {
-    /**
-     * @param  CraftingService  $craftingService
-     * @param  CraftingBatchAttemptService  $craftingBatchAttemptService
-     */
     public function __construct(
         private readonly CraftingService $craftingService,
         private readonly CraftingBatchAttemptService $craftingBatchAttemptService,

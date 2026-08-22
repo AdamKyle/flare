@@ -39,3 +39,33 @@ export const useInventorySetOptionsApi = ({
     setSearchText,
   };
 };
+
+export const useHolyOilTargetSetOptionsApi = ({
+  characterId,
+  enabled,
+}: UseInventorySetOptionsApiParams) => {
+  const {
+    data,
+    loading,
+    isLoadingMore,
+    canLoadMore,
+    onEndReached,
+    setSearchText,
+  } = UsePaginatedApiHandler<InventorySetOptionDefinition>(
+    {
+      url: CharacterInventoryApiUrls.CHARACTER_HOLY_OIL_TARGET_SET_OPTIONS,
+      urlParams: { character: characterId },
+      enabled: enabled && characterId > 0,
+    },
+    SET_OPTIONS_PER_PAGE
+  );
+
+  return {
+    setOptions: data,
+    loading,
+    isLoadingMore,
+    canLoadMore,
+    onEndReached,
+    setSearchText,
+  };
+};

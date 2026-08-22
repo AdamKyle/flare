@@ -18,7 +18,11 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-const UsableItems = ({ character_id, initial_item }: UsableItemsProps) => {
+const UsableItems = ({
+  character_id,
+  initial_item,
+  initial_search_text,
+}: UsableItemsProps) => {
   const [itemToView, setItemToView] = useState<BaseUsableItemDefinition | null>(
     initial_item ?? null
   );
@@ -27,6 +31,7 @@ const UsableItems = ({ character_id, initial_item }: UsableItemsProps) => {
     UsePaginatedApiHandler<BaseUsableItemDefinition>({
       url: CharacterInventoryApiUrls.CHARACTER_USABLE_ITEMS,
       urlParams: { character: character_id },
+      initialSearchText: initial_search_text,
     });
 
   useEffect(() => {
@@ -108,7 +113,12 @@ const UsableItems = ({ character_id, initial_item }: UsableItemsProps) => {
       <div className="flex h-full flex-col overflow-hidden">
         <hr className="w-full border-t border-gray-300 dark:border-gray-600" />
         <div className="px-4 pt-2">
-          <Input on_change={onSearch} place_holder={'Search items'} clearable />
+          <Input
+            on_change={onSearch}
+            place_holder={'Search items'}
+            default_value={initial_search_text ?? null}
+            clearable
+          />
         </div>
         <div className="mt-4 px-4 pb-4">
           <Dropdown
