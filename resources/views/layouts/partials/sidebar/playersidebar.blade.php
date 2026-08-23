@@ -5,41 +5,34 @@
             <span class="icon fas fa-dice-d20"></span>
             <span class="title">Game</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=shop]" data-toggle="tooltip-menu"
-            >
+        <a href="#no-link" class="link" data-target="[data-menu=shop]" data-toggle="tooltip-menu">
             <span class="icon ra ra-anvil"></span>
             <span class="title">Shop</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=market]" data-toggle="tooltip-menu"
-            >
+        <a href="#no-link" class="link" data-target="[data-menu=market]" data-toggle="tooltip-menu">
             <span class="icon ra ra-wooden-sign"></span>
             <span class="title">Market</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=quests]" data-toggle="tooltip-menu"
-            >
+        <a href="#no-link" class="link" data-target="[data-menu=quests]" data-toggle="tooltip-menu">
             <span class="icon fas fa-feather"></span>
             <span class="title">Quest Log</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=tops]" data-toggle="tooltip-menu"
-            >
+        <a href="#no-link" class="link" data-target="[data-menu=tops]" data-toggle="tooltip-menu">
             <span class="icon fas fa-chart-area"></span>
             <span class="title">Tops</span>
         </a>
-        <a href="{{ route('game.event.calendar') }}" class="link" data-toggle="tooltip-menu"
-            >
+        <a href="{{ route('game.event.calendar') }}" class="link" data-toggle="tooltip-menu">
             <span class="icon fas fa-calendar"></span>
             <span class="title">Event Calendar</span>
         </a>
-        <a href="{{ route('tlessa.donations') }}" class="link" data-toggle="tooltip-menu"
-           >
+        <a href="{{ route('tlessa.donations') }}" class="link" data-toggle="tooltip-menu">
             <span class="icon fas fa-hand-holding-usd"></span>
             <span class="title">Donate</span>
         </a>
-        <a href="{{ route('game.whos-playing') }}" class="link" data-toggle="tooltip-menu"
-        >
-         <span class="icon fas fa-plug"></span>
-         <span class="title">Who's Online?</span>
-     </a>
+        <a href="{{ route('game.whos-playing') }}" class="link" data-toggle="tooltip-menu">
+            <span class="icon fas fa-plug"></span>
+            <span class="title">Who's Online?</span>
+        </a>
     </div>
 
     <!-- Character -->
@@ -84,9 +77,12 @@
                 Visit Market
             </a>
             <a
-                href="{{ route('game.current-listings', [
-                    'character' => auth()->user()->character->id,
-                ]) }}">
+                href="{{
+                    route('game.current-listings', [
+                        'character' => auth()->user()->character->id,
+                    ])
+                }}"
+            >
                 <span class="fas fa-search-dollar"></span>
                 Your Listings
             </a>
@@ -115,19 +111,31 @@
                 <span class="fas fa-list"></span>
                 Character Progression
             </a>
-            <a href="{{ route('game.tops.exploration') }}" class="{{ request()->routeIs('game.tops.exploration') ? 'active' : '' }}">
+            <a
+                href="{{ route('game.tops.exploration') }}"
+                class="{{ request()->routeIs('game.tops.exploration') ? 'active' : '' }}"
+            >
                 <span class="fas fa-compass"></span>
                 Exploration
             </a>
-            <a href="{{ route('game.tops.delve') }}" class="{{ request()->routeIs('game.tops.delve') ? 'active' : '' }}">
+            <a
+                href="{{ route('game.tops.delve') }}"
+                class="{{ request()->routeIs('game.tops.delve') ? 'active' : '' }}"
+            >
                 <span class="fas fa-mountain"></span>
                 Delve
             </a>
-            <a href="{{ route('game.tops.faction-loyalty') }}" class="{{ request()->routeIs('game.tops.faction-loyalty') ? 'active' : '' }}">
+            <a
+                href="{{ route('game.tops.faction-loyalty') }}"
+                class="{{ request()->routeIs('game.tops.faction-loyalty') ? 'active' : '' }}"
+            >
                 <span class="fas fa-handshake"></span>
                 Faction Loyalty
             </a>
-            <a href="{{ route('game.tops.kingdoms') }}" class="{{ request()->routeIs('game.tops.kingdoms') ? 'active' : '' }}">
+            <a
+                href="{{ route('game.tops.kingdoms') }}"
+                class="{{ request()->routeIs('game.tops.kingdoms') ? 'active' : '' }}"
+            >
                 <span class="fas fa-chess-rook"></span>
                 Kingdoms
             </a>

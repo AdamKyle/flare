@@ -1,8 +1,8 @@
 @props([
-  'target',
-  'primaryTitle',
-  'secondaryTitle',
-  'isActive' => 'false'
+    'target',
+    'primaryTitle',
+    'secondaryTitle',
+    'isActive' => 'false',
 ])
 
 <button
@@ -16,6 +16,6 @@
     data-toggle="tab"
     data-target="{{ '#' . $target }}"
 >
-    {{$primaryTitle}}
-    <small class="block text-gray-600 dark:text-gray-400">{{$secondaryTitle}}</small>
+    {{ $primaryTitle }}
+    <small class="block text-gray-600 dark:text-gray-400">{{ $secondaryTitle }}</small>
 </button>

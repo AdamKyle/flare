@@ -9,7 +9,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($locationTemplates as $locationTemplate)
+        @foreach ($locationTemplates as $locationTemplate)
             <tr>
                 <td>{{ $locationTemplate->name }}</td>
                 <td>{{ $locationTemplate->description }}</td>

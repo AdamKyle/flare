@@ -1,96 +1,80 @@
 <div class="dropdown">
-  <button
-    class="flex items-center text-gray-700 ltr:ml-4 rtl:mr-4"
-    data-toggle="custom-dropdown-menu"
-  >
-    <span class="avatar"><i class="ra ra-player"></i></span>
-  </button>
-  <div class="custom-dropdown-menu w-64">
-    <div class="p-5">
-      <h5 class="uppercase">
-        @if (auth()->user()->hasRole('Admin'))
-          Administrator
-        @else
-          {{ auth()->user()->character->name }}
+    <button class="flex items-center text-gray-700 ltr:ml-4 rtl:mr-4" data-toggle="custom-dropdown-menu">
+        <span class="avatar"><i class="ra ra-player"></i></span>
+    </button>
+    <div class="custom-dropdown-menu w-64">
+        <div class="p-5">
+            <h5 class="uppercase">
+                @if (auth()->user()->hasRole('Admin'))
+                    Administrator
+                @else
+                    {{ auth()->user()->character->name }}
+                @endif
+            </h5>
+            <p>
+                @if (auth()->user()->hasRole('Admin'))
+                    The Creator
+                @else
+                    Hero of Tlessa
+                @endif
+            </p>
+        </div>
+        @if (! auth()->user()->hasRole('Admin'))
+            <hr />
+            <div class="p-5">
+                <a
+                    href="{{ route('user.settings', ['user' => auth()->user()->id]) }}"
+                    class="hover:text-primary dark:hover:text-primary flex items-center text-gray-700 dark:text-gray-500"
+                >
+                    <span class="la la-user-circle text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
+                    Settings
+                </a>
+                <a
+                    href="/information/home"
+                    class="hover:text-primary dark:hover:text-primary mt-5 flex items-center text-gray-700 dark:text-gray-500"
+                    target="_blank"
+                >
+                    <span class="fas fa-info-circle text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
+                    Help I am stuck!
+                </a>
+                <a
+                    href="https://discord.gg/hcwdqJUerh"
+                    target="_blank"
+                    class="hover:text-primary dark:hover:text-primary mt-5 flex items-center text-gray-700 dark:text-gray-500"
+                    target="_blank"
+                >
+                    <span class="fab fa-discord text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
+                    Discord
+                </a>
+                <a
+                    href="{{ route('tlessa.donations') }}"
+                    target="_blank"
+                    class="hover:text-primary dark:hover:text-primary mt-5 flex items-center text-gray-700 dark:text-gray-500"
+                    target="_blank"
+                >
+                    <span class="fas fa-hand-holding-usd text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
+                    Donate
+                </a>
+            </div>
         @endif
-      </h5>
-      <p>
-        @if (auth()->user()->hasRole('Admin'))
-          The Creator
-        @else
-            Hero of Tlessa
-        @endif
-      </p>
-    </div>
-    @if (! auth()->user()->hasRole('Admin'))
-      <hr />
-      <div class="p-5">
-        <a
-          href="{{ route('user.settings', ['user' => auth()->user()->id]) }}"
-          class="hover:text-primary dark:hover:text-primary flex items-center text-gray-700 dark:text-gray-500"
-        >
-          <span
-            class="la la-user-circle text-2xl leading-none ltr:mr-2 rtl:ml-2"
-          ></span>
-          Settings
-        </a>
-        <a
-          href="/information/home"
-          class="hover:text-primary dark:hover:text-primary mt-5 flex items-center text-gray-700 dark:text-gray-500"
-          target="_blank"
-        >
-          <span
-            class="fas fa-info-circle text-2xl leading-none ltr:mr-2 rtl:ml-2"
-          ></span>
-          Help I am stuck!
-        </a>
-        <a
-          href="https://discord.gg/hcwdqJUerh"
-          target="_blank"
-          class="hover:text-primary dark:hover:text-primary mt-5 flex items-center text-gray-700 dark:text-gray-500"
-          target="_blank"
-        >
-          <span
-            class="fab fa-discord text-2xl leading-none ltr:mr-2 rtl:ml-2"
-          ></span>
-          Discord
-        </a>
-        <a
-          href="{{ route('tlessa.donations') }}"
-          target="_blank"
-          class="hover:text-primary dark:hover:text-primary mt-5 flex items-center text-gray-700 dark:text-gray-500"
-          target="_blank"
-        >
-          <span
-            class="fas fa-hand-holding-usd text-2xl leading-none ltr:mr-2 rtl:ml-2"
-          ></span>
-          Donate
-        </a>
-      </div>
-    @endif
 
-    <hr />
-    <div class="p-5">
-      <a
-        href="{{ route('logout') }}"
-        onclick="event.preventDefault();
-                                        document.getElementById('logout-form-profile').submit();"
-        class="hover:text-primary dark:hover:text-primary flex items-center text-gray-700 dark:text-gray-500"
-      >
-        <span
-          class="la la-power-off text-2xl leading-none ltr:mr-2 rtl:ml-2"
-        ></span>
-        Logout
-      </a>
-    </div>
+        <hr />
+        <div class="p-5">
+            <a
+                href="{{ route('logout') }}"
+                onclick="
+                    event.preventDefault();
+                    document.getElementById('logout-form-profile').submit();
+                "
+                class="hover:text-primary dark:hover:text-primary flex items-center text-gray-700 dark:text-gray-500"
+            >
+                <span class="la la-power-off text-2xl leading-none ltr:mr-2 rtl:ml-2"></span>
+                Logout
+            </a>
+        </div>
 
-    <form
-      id="logout-form-profile"
-      action="{{ route('logout') }}"
-      method="POST"
-      class="hidden"
-    >
-      @csrf
-    </form>
-  </div>
+        <form id="logout-form-profile" action="{{ route('logout') }}" method="POST" class="hidden">
+            @csrf
+        </form>
+    </div>
 </div>

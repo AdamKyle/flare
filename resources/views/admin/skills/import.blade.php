@@ -2,12 +2,8 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.cards.card-with-title
-            title="Import Skills"
-            buttons="true"
-            backUrl="{{route('skills.list')}}"
-        >
-            <form class="mt-4" action="{{route('skills.import-data')}}" method="POST" enctype="multipart/form-data">
+        <x-core.cards.card-with-title title="Import Skills" buttons="true" backUrl="{{ route('skills.list') }}">
+            <form class="mt-4" action="{{ route('skills.import-data') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <x-core.forms.file-upload label="Items File" name="skills_import" />
                 <x-core.buttons.primary-button type="submit">Import Skills</x-core.buttons.primary-button>

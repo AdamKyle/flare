@@ -13,31 +13,36 @@
     $fieldId = $fieldName;
     $hasError = $errors->has($fieldName);
     $describedBy = collect([
-        $helpText ? $fieldId . '-help' : null,
-        $hasError ? $fieldId . '-error' : null,
+        $helpText ? $fieldId.'-help' : null,
+        $hasError ? $fieldId.'-error' : null,
     ])->filter()->implode(' ');
-    $selectedValue = old($fieldName, !is_null($model) ? $model->{$resolvedModelKey} : '');
+    $selectedValue = old($fieldName, ! is_null($model) ? $model->{$resolvedModelKey} : '');
 @endphp
 
 <div class="mb-5 w-full">
-    <label class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100" for="{{ $fieldId }}">{{ $label }}</label>
+    <label
+        class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100"
+        for="{{ $fieldId }}"
+    >{{ $label }}</label>
     <select
         name="{{ $name }}"
         id="{{ $fieldId }}"
-        @if($hasError) aria-invalid="true" @endif
-        @if($describedBy) aria-describedby="{{ $describedBy }}" @endif
-        {{ $attributes->class([
-            'block w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100',
-            'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600' => !$hasError,
-            'border-red-600 focus:border-red-600 focus:ring-red-600 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500' => $hasError,
-        ]) }}
+        @if ($hasError) aria-invalid="true" @endif
+        @if ($describedBy) aria-describedby="{{ $describedBy }}" @endif
+        {{
+            $attributes->class([
+                'block w-full rounded-md border bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-gray-100',
+                'border-gray-300 focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600' => ! $hasError,
+                'border-red-600 focus:border-red-600 focus:ring-red-600 dark:border-red-500 dark:focus:border-red-500 dark:focus:ring-red-500' => $hasError,
+            ])
+        }}
     >
         <option value="">Please select</option>
-        @foreach($options as $key => $value)
+        @foreach ($options as $key => $value)
             <option value="{{ $key }}" @selected((string) $selectedValue === (string) $key)>{{ $value }}</option>
         @endforeach
     </select>
-    @if($helpText)
+    @if ($helpText)
         <p id="{{ $fieldId }}-help" class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ $helpText }}</p>
     @endif
     @error($fieldName)

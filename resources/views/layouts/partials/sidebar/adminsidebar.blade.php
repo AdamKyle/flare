@@ -1,17 +1,15 @@
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky menu-hidden">
     <div class="menu-items">
-        <a href="{{route('home')}}" class="link" data-toggle="tooltip-menu">
+        <a href="{{ route('home') }}" class="link" data-toggle="tooltip-menu">
             <span class="icon fas fa-home"></span>
             <span class="title">Home</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=admin]" data-toggle="tooltip-menu"
-        >
+        <a href="#no-link" class="link" data-target="[data-menu=admin]" data-toggle="tooltip-menu">
             <span class="icon fas fa-user-shield"></span>
             <span class="title">Admin</span>
         </a>
-        <a href="#no-link" class="link" data-target="[data-menu=manage-game]" data-toggle="tooltip-menu"
-        >
+        <a href="#no-link" class="link" data-target="[data-menu=manage-game]" data-toggle="tooltip-menu">
             <span class="icon ra ra-player"></span>
             <span class="title">Manage Game</span>
         </a>
@@ -20,42 +18,42 @@
     <!-- Character -->
     <div class="menu-detail" data-menu="admin">
         <div class="menu-detail-wrapper">
-            <a href="{{route('admin.statistics')}}">
+            <a href="{{ route('admin.statistics') }}">
                 <span class="fas fa-chart-bar"></span>
                 Statistics
             </a>
             <hr />
             <h6 class="uppercase">Character Reward Queue</h6>
-            <a href="{{route('admin.character-reward-queue')}}">
+            <a href="{{ route('admin.character-reward-queue') }}">
                 <span class="fas fa-layer-group"></span>
                 Reward Queues
             </a>
             <hr />
             <h6 class="uppercase">Monitoring</h6>
-            <a href="{{route('admin.monitoring.exploration')}}">
+            <a href="{{ route('admin.monitoring.exploration') }}">
                 <span class="fas fa-map-marked-alt"></span>
                 Exploration
             </a>
-            <a href="{{route('admin.monitoring.faction-loyalty')}}">
+            <a href="{{ route('admin.monitoring.faction-loyalty') }}">
                 <span class="fas fa-handshake"></span>
                 Faction Loyalty
             </a>
-            <a href="{{route('admin.monitoring.delve')}}">
+            <a href="{{ route('admin.monitoring.delve') }}">
                 <span class="fas fa-dungeon"></span>
                 Delve
             </a>
-            <a href="{{route('admin.monitoring.batch-crafting')}}">
+            <a href="{{ route('admin.monitoring.batch-crafting') }}">
                 <span class="fas fa-hammer"></span>
                 Batch Crafting
             </a>
-            <a href="{{route('admin.monitoring.logs')}}">
+            <a href="{{ route('admin.monitoring.logs') }}">
                 <span class="fas fa-file-alt"></span>
                 Logs
             </a>
             <hr />
             <hr />
             <h6 class="uppercase">Event Management</h6>
-            <a href="{{route('admin.events')}}">
+            <a href="{{ route('admin.events') }}">
                 <span class="fas fa-list"></span>
                 Event Scheduler
             </a>
@@ -66,138 +64,137 @@
 
     <div class="menu-detail" data-menu="manage-game">
         <h6 class="uppercase">Races and Classes</h6>
-        <a href="{{route('races.create')}}">
+        <a href="{{ route('races.create') }}">
             <span class="fas fa-plus"></span>
             Create New Race
         </a>
 
-        <a href="{{route('classes.create')}}">
+        <a href="{{ route('classes.create') }}">
             <span class="fas fa-plus"></span>
             Create New Class
         </a>
 
-        <a href="{{route('class-specials.create')}}">
+        <a href="{{ route('class-specials.create') }}">
             <span class="fas fa-plus"></span>
             Create New Class Special
         </a>
         <hr />
         <h6 class="uppercase">Maps</h6>
-        <a href="{{route('maps.upload')}}">
+        <a href="{{ route('maps.upload') }}">
             <span class="fas fa-plus"></span>
             Upload New Map
         </a>
         <hr />
         <h6 class="uppercase">Locations</h6>
-        <a href="{{route('locations.create')}}">
+        <a href="{{ route('locations.create') }}">
             <span class="fas fa-plus"></span>
             Create New Location
         </a>
         <hr />
         <h6 class="uppercase">Quests</h6>
-        <a href="{{route('quests.create')}}">
+        <a href="{{ route('quests.create') }}">
             <span class="fas fa-plus"></span>
             Create New Quest
         </a>
         <hr />
         <h6 class="uppercase">NPC's</h6>
-        <a href="{{route('npcs.create')}}">
+        <a href="{{ route('npcs.create') }}">
             <span class="fas fa-plus"></span>
             Create New NPC
         </a>
         <hr />
         <h6 class="uppercase">Kingdoms</h6>
-        <a href="{{route('kingdoms.export')}}">
+        <a href="{{ route('kingdoms.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('kingdoms.import')}}">
+        <a href="{{ route('kingdoms.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
         <hr />
         <h6 class="uppercase">Monsters</h6>
-        <a href="{{route('monsters.create')}}">
+        <a href="{{ route('monsters.create') }}">
             <span class="fas fa-plus"></span>
             Create New Monster
         </a>
-        <a href="{{route('monsters.export')}}">
+        <a href="{{ route('monsters.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('monsters.import')}}">
+        <a href="{{ route('monsters.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
         <hr />
         <h6 class="uppercase">Items</h6>
-        <a href="{{route('items.create')}}">
+        <a href="{{ route('items.create') }}">
             <span class="fas fa-plus"></span>
             Create New Item
         </a>
-        <a href="{{route('items.export')}}">
+        <a href="{{ route('items.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('items.import')}}">
+        <a href="{{ route('items.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
         <hr />
         <h6 class="uppercase">Affixes</h6>
-        <a href="{{route('affixes.create')}}">
+        <a href="{{ route('affixes.create') }}">
             <span class="fas fa-plus"></span>
             Create New Affix
         </a>
-        <a href="{{route('affixes.export')}}">
+        <a href="{{ route('affixes.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('affixes.import')}}">
+        <a href="{{ route('affixes.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
         <hr />
         <h6 class="uppercase">Skills</h6>
-        <a href="{{route('skills.create')}}">
+        <a href="{{ route('skills.create') }}">
             <span class="fas fa-plus"></span>
             Create New Skill
         </a>
-        <a href="{{route('skills.export')}}">
+        <a href="{{ route('skills.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('skills.import')}}">
+        <a href="{{ route('skills.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
         <hr />
         <h6 class="uppercase">Item Skills</h6>
-        <a href="{{route('admin.items-skills.create')}}">
+        <a href="{{ route('admin.items-skills.create') }}">
             <span class="fas fa-plus"></span>
             Create New Skill
         </a>
-        <a href="{{route('admin.items-skills.export-data')}}">
+        <a href="{{ route('admin.items-skills.export-data') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('admin.items-skills.import-data')}}">
+        <a href="{{ route('admin.items-skills.import-data') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
         <hr />
         <h6 class="uppercase">Passives</h6>
-        <a href="{{route('passive.skills.create')}}">
+        <a href="{{ route('passive.skills.create') }}">
             <span class="fas fa-plus"></span>
             Create New Passive
         </a>
-        <a href="{{route('passive.skills.export')}}">
+        <a href="{{ route('passive.skills.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{route('passive.skills.import')}}">
+        <a href="{{ route('passive.skills.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>
     </div>
-
 </aside>

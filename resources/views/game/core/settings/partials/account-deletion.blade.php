@@ -1,15 +1,15 @@
 <div class="my-4 rounded-md border-1 border-gray-500 p-4 dark:border-gray-400">
-  <h4 class="text-lg font-bold">Account Management</h4>
-  <x-core.separator.separator />
+    <h4 class="text-lg font-bold">Account Management</h4>
+    <x-core.separator.separator />
 
-  <div class="mx-auto w-full md:w-2/3">
-    <div class="flex gap-4">
-      <div class="flex-1">
-        @include('game.core.settings.partials.modals.account-deletion-modal', ['user' => $user])
-      </div>
-      <div class="flex-1">
-        @include('game.core.settings.partials.modals.account-reset-modal', ['user' => $user])
-      </div>
+    <div class="mx-auto w-full md:w-2/3">
+        <div class="flex gap-4">
+            <div class="flex-1">
+                @include('game.core.settings.partials.modals.account-deletion-modal', ['user' => $user])
+            </div>
+            <div class="flex-1">
+                @include('game.core.settings.partials.modals.account-reset-modal', ['user' => $user])
+            </div>
+        </div>
     </div>
-  </div>
 </div>

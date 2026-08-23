@@ -42,7 +42,7 @@
             <th>description</th>
             <th>game_map_name</th>
             <th>crafting_skill_names</th>
-            @foreach($fields as $field)
+            @foreach ($fields as $field)
                 <th>{{ $field }}</th>
             @endforeach
             <th>monster_atonement</th>
@@ -50,14 +50,16 @@
         </tr>
     </thead>
     <tbody>
-        @foreach($mapGems as $mapGem)
+        @foreach ($mapGems as $mapGem)
             <tr>
                 <td>{{ $mapGem->id }}</td>
                 <td>{{ $mapGem->name }}</td>
                 <td>{{ $mapGem->description }}</td>
                 <td>{{ $mapGem->gameMap->name }}</td>
-                <td>{{ \App\Flare\Models\GameSkill::whereIn('id', $mapGem->crafting_skill_ids ?? [])->orderBy('name')->pluck('name')->implode(', ') }}</td>
-                @foreach($fields as $field)
+                <td>
+                    {{ \App\Flare\Models\GameSkill::whereIn('id', $mapGem->crafting_skill_ids ?? [])->orderBy('name')->pluck('name')->implode(', ') }}
+                </td>
+                @foreach ($fields as $field)
                     <td>{{ $mapGem->{$field} }}</td>
                 @endforeach
                 <td>{{ is_null($mapGem->monster_atonement) ? '' : $atonementNames[$mapGem->monster_atonement] }}</td>

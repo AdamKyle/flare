@@ -98,7 +98,8 @@
                 <td>{{ !is_null($guideQuest->required_game_map_id) ? $guideQuest->game_map_name : '' }}</td>
                 <td>{{ !is_null($guideQuest->required_quest_id) ? $guideQuest->quest_name : '' }}</td>
                 <td>{{ !is_null($guideQuest->required_quest_item_id) ? $guideQuest->quest_item_name : '' }}</td>
-                <td>{{ !is_null($guideQuest->secondary_quest_item_id) ? $guideQuest->secondary_quest_item_name : '' }}
+                <td>
+                    {{ !is_null($guideQuest->secondary_quest_item_id) ? $guideQuest->secondary_quest_item_name : '' }}
                 </td>
                 <td>{{ $guideQuest->required_gold }}</td>
                 <td>{{ $guideQuest->required_gold_dust }}</td>
@@ -108,7 +109,8 @@
                 <td>{{ $guideQuest->required_kingdoms }}</td>
                 <td>{{ $guideQuest->required_kingdom_level }}</td>
                 <td>{{ $guideQuest->required_kingdom_units }}</td>
-                <td>{{ !is_null($guideQuest->required_kingdom_building_id) ? $guideQuest->kingdom_building_name : '' }}
+                <td>
+                    {{ !is_null($guideQuest->required_kingdom_building_id) ? $guideQuest->kingdom_building_name : '' }}
                 </td>
                 <td>{{ $guideQuest->required_kingdom_building_level }}</td>
                 <td>{{ !is_null($guideQuest->required_passive_skill) ? $guideQuest->passive_name : '' }}</td>
@@ -125,10 +127,10 @@
                 <td>{{ $guideQuest->shards_reward }}</td>
                 <td>{{ $guideQuest->gold_reward }}</td>
                 <td>{{ $guideQuest->xp_reward }}</td>
-                <td>{{ !is_null($guideQuest->parent_id) ? $guideQuest->parent_quest_name : ''}}</td>
-                <td>{{ $guideQuest->unlock_at_level}}</td>
-                <td>{{ $guideQuest->only_during_event}}</td>
-                <td>{{ !is_null($guideQuest->be_on_game_map) ? $guideQuest->required_to_be_on_game_map_name : ''}}</td>
+                <td>{{ !is_null($guideQuest->parent_id) ? $guideQuest->parent_quest_name : '' }}</td>
+                <td>{{ $guideQuest->unlock_at_level }}</td>
+                <td>{{ $guideQuest->only_during_event }}</td>
+                <td>{{ !is_null($guideQuest->be_on_game_map) ? $guideQuest->required_to_be_on_game_map_name : '' }}</td>
                 <td>{{ $guideQuest->required_event_goal_participation }}</td>
                 <td>{{ $guideQuest->required_event_goal_crafting_participation }}</td>
                 <td>{{ $guideQuest->required_event_goal_enchanting_participation }}</td>
@@ -151,7 +153,9 @@
                     <td>{{ $requiredBatchCraftedItem['name'] ?? '' }}</td>
                     <td>{{ $requiredBatchCraftedItem['type_name'] ?? '' }}</td>
                     <td>{{ $requiredBatchCraftedItem['amount'] ?? '' }}</td>
-                    <td>{{ !is_null($requiredBatchCraftedItem) ? ($requiredBatchCraftedItem['must_be_enchanted'] ? '1' : '0') : '' }}</td>
+                    <td>
+                        {{ !is_null($requiredBatchCraftedItem) ? ($requiredBatchCraftedItem['must_be_enchanted'] ? '1' : '0') : '' }}
+                    </td>
                 @endfor
             </tr>
         @endforeach

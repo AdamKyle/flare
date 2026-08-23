@@ -53,10 +53,9 @@
         $href = route('event.type', ['event_type' => 'corrupted-bishop-raid']);
     }
 
-        if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster') {
+    if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster') {
         $href = route('event.type', ['event_type' => 'labyrinth-monster-raid']);
     }
-
 @endphp
 
 <x-core.cards.feature-card>
@@ -67,7 +66,7 @@
         <h3 class="text-xl md:text-2xl">{{ $eventRunning->getTitleOfEvent() }}</h3>
     </x-slot:title>
 
-    <p class="my-2 text-sm text-orange-600 dark:text-orange-300 md:text-base">
+    <p class="my-2 text-sm text-orange-600 md:text-base dark:text-orange-300">
         <strong>Runs from</strong>: {{ $eventRunning->start_date->format('l, j \of F, Y \a\t g:iA') }}
         <strong>until</strong>: {{ $eventRunning->end_date->format('l, j \of F, Y \a\t g:iA') }}
     </p>
@@ -108,26 +107,25 @@
             him gets a new Ancestral item!
         @endif
 
-          @if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster')
-            Join the Labyrinth Monster raid and help the Little Girl uncover the truth of her parents and the curse The Witch put on them. Alas not all is what it seems.
-          @endif
+        @if ($eventRunning->getTitleOfEvent() === 'The Labyrinth Monster')
+            Join the Labyrinth Monster raid and help the Little Girl uncover the truth of her parents and the curse The
+            Witch put on them. Alas not all is what it seems.
+        @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Ice Queens Reign')
-            Join The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player
-            who kills her gets a new Ancestral item!
+            Join The Ice Queens Reign raid! Head to The Fathers Tomb on The Ice Plane and band together! The player who
+            kills her gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'The Frozen King')
-            Join The Frozen King raid! head to The Frozen Christmas Tree Lot on The Ice Plane and band together! The player
-            who kills him gets a new Ancestral item!
+            Join The Frozen King raid! head to The Frozen Christmas Tree Lot on The Ice Plane and band together! The
+            player who kills him gets a new Ancestral item!
         @endif
 
         @if ($eventRunning->getTitleOfEvent() === 'Corrupted Bishop')
-            Join the Corrupted Bishop raid! head down to the Delusional Memories Federation Controlled Town to band together!
-            The Player who kills him gets a new Ancestral item!
+            Join the Corrupted Bishop raid! head down to the Delusional Memories Federation Controlled Town to band
+            together! The Player who kills him gets a new Ancestral item!
         @endif
-
-
     </p>
     <div class="text-center">
         <x-core.buttons.link-buttons.primary-button href="{{ $href }}">

@@ -2,7 +2,11 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.cards.card-with-title title="Export Map Gems" buttons="true" backUrl="{{ route('admin.map-gems.list') }}">
+        <x-core.cards.card-with-title
+            title="Export Map Gems"
+            buttons="true"
+            backUrl="{{ route('admin.map-gems.list') }}"
+        >
             <form method="POST" action="{{ route('admin.map-gems.export') }}" class="text-center">
                 @csrf
                 <x-core.buttons.primary-button type="submit">Export</x-core.buttons.primary-button>

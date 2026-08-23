@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-  <div class="w-full  mx-auto md:w-2/3 px-4">
-      @include('admin.monsters.partials.monster', ['monster' => $monster, 'quest' => $quest])
-  </div>
+    <div class="mx-auto w-full px-4 md:w-2/3">
+        @include('admin.monsters.partials.monster', ['monster' => $monster, 'quest' => $quest])
+    </div>
 @endsection

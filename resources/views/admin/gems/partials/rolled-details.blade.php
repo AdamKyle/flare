@@ -74,22 +74,28 @@
             <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Current Rolled Gem</h3>
 
             <dl class="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-[minmax(10rem,16rem)_minmax(0,1fr)_minmax(10rem,16rem)_minmax(0,1fr)]">
-                <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Name</dt>
+                <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Name</dt>
                 <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $rolledGem->name }}</dd>
-                <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Gem Roll Number</dt>
+                <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Gem Roll Number</dt>
                 <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $rolledGem->roll_number }}</dd>
-                <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Domain</dt>
+                <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Domain</dt>
                 <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $rolledGem->domain }}</dd>
-                @if(! is_null($rolledGem->monster_atonement) && isset($atonementNames[$rolledGem->monster_atonement]))
-                    <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Monster Atonement</dt>
-                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $atonementNames[$rolledGem->monster_atonement] }}</dd>
+                @if (! is_null($rolledGem->monster_atonement) && isset($atonementNames[$rolledGem->monster_atonement]))
+                    <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Monster Atonement</dt>
+                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                        {{ $atonementNames[$rolledGem->monster_atonement] }}
+                    </dd>
                 @endif
-                @if((float) $rolledGem->monster_atonement_amount > 0)
-                    <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Monster Atonement Amount</dt>
-                    <dd class="text-sm font-medium leading-6 text-green-700 dark:text-green-400">+{{ number_format((float) $rolledGem->monster_atonement_amount * 100, 3) }}%</dd>
+                @if ((float) $rolledGem->monster_atonement_amount > 0)
+                    <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">
+                        Monster Atonement Amount
+                    </dt>
+                    <dd class="text-sm leading-6 font-medium text-green-700 dark:text-green-400">
+                        +{{ number_format((float) $rolledGem->monster_atonement_amount * 100, 3) }}%
+                    </dd>
                 @endif
-                @if($craftingSkillNames !== '')
-                    <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Crafting Skills</dt>
+                @if ($craftingSkillNames !== '')
+                    <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Crafting Skills</dt>
                     <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $craftingSkillNames }}</dd>
                 @endif
             </dl>
@@ -97,11 +103,14 @@
 
         <aside class="self-start rounded-lg border border-blue-300 bg-blue-50 p-4 text-blue-900 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100">
             <h2 class="mb-2 text-lg font-semibold">About this rolled gem</h2>
-            <p class="text-sm leading-6">Shows the name, roll number, domain, and any crafting skill or atonement bonuses for this specific gem result.</p>
+            <p class="text-sm leading-6">
+                Shows the name, roll number, domain, and any crafting skill or atonement bonuses for this specific gem
+                result.
+            </p>
         </aside>
     </div>
 
-    @foreach($rolledSections as $sectionTitle => $section)
+    @foreach ($rolledSections as $sectionTitle => $section)
         @php
             $visibleRows = collect($section['fields'])
                 ->map(function (array $fieldConfig, string $field) use ($rolledGem): ?array {
@@ -116,14 +125,16 @@
                 })
                 ->filter();
         @endphp
-        @if($visibleRows->isNotEmpty())
+        @if ($visibleRows->isNotEmpty())
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
                 <section class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $sectionTitle }}</h3>
 
                     <dl class="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-[minmax(10rem,16rem)_minmax(0,1fr)_minmax(10rem,16rem)_minmax(0,1fr)]">
-                        @foreach($visibleRows as $row)
-                            <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">{{ $row['label'] }}</dt>
+                        @foreach ($visibleRows as $row)
+                            <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $row['label'] }}
+                            </dt>
                             <dd class="text-sm font-medium leading-6 {{ $row['class'] }}">{{ $row['value'] }}</dd>
                         @endforeach
                     </dl>

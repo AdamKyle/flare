@@ -2,17 +2,13 @@
 
 @section('content')
     <x-core.layout.info-container>
-        <x-core.cards.card-with-title
-            title="Import Items"
-            buttons="true"
-            backUrl="{{route('items.list')}}"
-        >
+        <x-core.cards.card-with-title title="Import Items" buttons="true" backUrl="{{ route('items.list') }}">
             <div class="mt-4 mb-4">
                 <x-core.alerts.info-alert title="ATTN!!">
                     If an item affects a skill that no doesn't exist, the item will be ignored.
                 </x-core.alerts.info-alert>
             </div>
-            <form class="mt-4" action="{{route('items.import-data')}}" method="POST" enctype="multipart/form-data">
+            <form class="mt-4" action="{{ route('items.import-data') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <x-core.forms.file-upload label="Items File" name="items_import" />
                 <x-core.buttons.primary-button type="submit">Import Items</x-core.buttons.primary-button>

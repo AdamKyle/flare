@@ -1,7 +1,5 @@
 @props([
-    'css' => ''
+    'css' => '',
 ])
 
-<form {{ $attributes->class($css) }}>
-    {{$slot}}
-</form>
+<form {{ $attributes->class($css) }}>{{ $slot }}</form>

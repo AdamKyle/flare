@@ -2,18 +2,15 @@
 
 @section('content')
     <x-core.layout.info-container>
-
         <div class="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             <x-core.cards.card>
                 <i class="fas fa-bug text-red-500"></i>
                 <div class="mt-4 flex items-center justify-between">
                     <div>
-                        <h4 class="text-3xl font-bold text-black dark:text-white">
-                            {{$bugsCount}}
-                        </h4>
-                        <a href="admin/feedback/bugs" class="text-sm font-medium text-meta-7">Bugs Count</a>
+                        <h4 class="text-3xl font-bold text-black dark:text-white">{{ $bugsCount }}</h4>
+                        <a href="admin/feedback/bugs" class="text-meta-7 text-sm font-medium">Bugs Count</a>
                     </div>
-                    <div class="text-right text-sm font-medium text-meta-3">
+                    <div class="text-meta-3 text-right text-sm font-medium">
                         <span>{{ $bugsPercentage }}%</span>
                         <div class="text-xs text-gray-500">Last 7 days share</div>
                     </div>
@@ -24,12 +21,11 @@
                 <i class="far fa-lightbulb text-yellow-500 dark:text-yellow-400"></i>
                 <div class="mt-4 flex items-center justify-between">
                     <div>
-                        <h4 class="text-3xl font-bold text-black dark:text-white">
-                            {{$suggestionCount}}
-                        </h4>
-                        <a href="admin/feedback/suggestions" class="text-sm font-medium text-meta-7">Suggestions Count</a>
+                        <h4 class="text-3xl font-bold text-black dark:text-white">{{ $suggestionCount }}</h4>
+                        <a href="admin/feedback/suggestions" class="text-meta-7 text-sm font-medium"
+                            >Suggestions Count</a>
                     </div>
-                    <div class="text-right text-sm font-medium text-meta-3">
+                    <div class="text-meta-3 text-right text-sm font-medium">
                         <span>{{ $suggestionPercentage }}%</span>
                         <div class="text-xs text-gray-500">Last 7 days share</div>
                     </div>
@@ -44,15 +40,19 @@
                             <h4 class="text-3xl font-bold text-black dark:text-white">
                                 {{ $rewardQueueSummary['queued'] }}
                             </h4>
-                            <a href="{{ route('admin.character-reward-queue') }}" class="text-sm font-medium text-meta-7">
+                            <a
+                                href="{{ route('admin.character-reward-queue') }}"
+                                class="text-meta-7 text-sm font-medium"
+                            >
                                 Character Reward Queue
                             </a>
                         </div>
-                        <span class="text-xs text-gray-500">
-                            {{ $rewardQueueSummary['processing'] }} processing
-                        </span>
+                        <span class="text-xs text-gray-500"> {{ $rewardQueueSummary['processing'] }} processing </span>
                     </div>
-                    <div class="mt-3 flex h-10 items-end gap-1 overflow-hidden" aria-label="Reward requests created in the last hour">
+                    <div
+                        class="mt-3 flex h-10 items-end gap-1 overflow-hidden"
+                        aria-label="Reward requests created in the last hour"
+                    >
                         @forelse ($rewardQueueLastHour as $point)
                             @php
                                 $volume = $point['pending'] + $point['processing'] + $point['completed'] + $point['failed'];
@@ -73,10 +73,8 @@
                 <i class="fas fa-map-marked-alt text-green-500"></i>
                 <div class="mt-4 flex items-center justify-between">
                     <div>
-                        <h4 class="text-3xl font-bold text-black dark:text-white">
-                            {{ $exploringCount }}
-                        </h4>
-                        <a href="{{ route('admin.monitoring.exploration') }}" class="text-sm font-medium text-meta-7">
+                        <h4 class="text-3xl font-bold text-black dark:text-white">{{ $exploringCount }}</h4>
+                        <a href="{{ route('admin.monitoring.exploration') }}" class="text-meta-7 text-sm font-medium">
                             Characters Exploring
                         </a>
                     </div>
@@ -87,10 +85,11 @@
                 <i class="fas fa-handshake text-purple-500"></i>
                 <div class="mt-4 flex items-center justify-between">
                     <div>
-                        <h4 class="text-3xl font-bold text-black dark:text-white">
-                            {{ $factionLoyaltyCount }}
-                        </h4>
-                        <a href="{{ route('admin.monitoring.faction-loyalty') }}" class="text-sm font-medium text-meta-7">
+                        <h4 class="text-3xl font-bold text-black dark:text-white">{{ $factionLoyaltyCount }}</h4>
+                        <a
+                            href="{{ route('admin.monitoring.faction-loyalty') }}"
+                            class="text-meta-7 text-sm font-medium"
+                        >
                             Characters in Faction Loyalty
                         </a>
                     </div>
@@ -101,10 +100,8 @@
                 <i class="fas fa-dungeon text-orange-500"></i>
                 <div class="mt-4 flex items-center justify-between">
                     <div>
-                        <h4 class="text-3xl font-bold text-black dark:text-white">
-                            {{ $delveCount }}
-                        </h4>
-                        <a href="{{ route('admin.monitoring.delve') }}" class="text-sm font-medium text-meta-7">
+                        <h4 class="text-3xl font-bold text-black dark:text-white">{{ $delveCount }}</h4>
+                        <a href="{{ route('admin.monitoring.delve') }}" class="text-meta-7 text-sm font-medium">
                             Characters in Delve
                         </a>
                     </div>
@@ -119,15 +116,19 @@
                                 <h4 class="text-3xl font-bold text-black dark:text-white">
                                     {{ $batchCraftingSummary['active'] }}
                                 </h4>
-                                <a href="{{ route('admin.monitoring.batch-crafting') }}" class="text-sm font-medium text-meta-7">
+                                <a
+                                    href="{{ route('admin.monitoring.batch-crafting') }}"
+                                    class="text-meta-7 text-sm font-medium"
+                                >
                                     Batch Crafting Monitoring
                                 </a>
                             </div>
-                            <span class="text-xs text-gray-500">
-                                {{ $batchCraftingSummary['total_runs'] }} runs
-                            </span>
+                            <span class="text-xs text-gray-500"> {{ $batchCraftingSummary['total_runs'] }} runs </span>
                         </div>
-                        <div class="mt-3 flex h-10 items-end gap-1 overflow-hidden" aria-label="Batch crafting runs in the selected period">
+                        <div
+                            class="mt-3 flex h-10 items-end gap-1 overflow-hidden"
+                            aria-label="Batch crafting runs in the selected period"
+                        >
                             @forelse ($batchCraftingChart as $point)
                                 @php
                                     $volume = $point['runs'] + $point['crafted'] + $point['failed'];
@@ -149,7 +150,7 @@
                     <div class="mt-4 flex items-center justify-between">
                         <div>
                             <h4 class="text-lg font-semibold text-black dark:text-white">Application Logs</h4>
-                            <a href="{{ route('admin.monitoring.logs') }}" class="text-sm font-medium text-meta-7">
+                            <a href="{{ route('admin.monitoring.logs') }}" class="text-meta-7 text-sm font-medium">
                                 View Logs Dashboard
                             </a>
                         </div>
@@ -161,7 +162,5 @@
         <div class="my-5">
             <div id="administrator-chat"></div>
         </div>
-
     </x-core.layout.info-container>
 @endsection
-

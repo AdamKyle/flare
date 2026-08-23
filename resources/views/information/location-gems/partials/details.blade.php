@@ -70,7 +70,9 @@
 <div class="space-y-6 text-gray-700 dark:text-gray-300">
     <div class="mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
         <h3 class="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">Description</h3>
-        <p class="whitespace-pre-line text-sm leading-6 text-gray-700 dark:text-gray-300">{{ filled($gameLocationGemParamter->description) ? $gameLocationGemParamter->description : 'N/A' }}</p>
+        <p class="text-sm leading-6 whitespace-pre-line text-gray-700 dark:text-gray-300">
+            {{ filled($gameLocationGemParamter->description) ? $gameLocationGemParamter->description : 'N/A' }}
+        </p>
     </div>
 
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
@@ -78,24 +80,30 @@
             <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Overview</h3>
 
             <dl class="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-[minmax(10rem,16rem)_minmax(0,1fr)_minmax(10rem,16rem)_minmax(0,1fr)]">
-                <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Location</dt>
+                <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Location</dt>
                 <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">
                     <a href="{{ $locationRoute }}">{{ $gameLocationGemParamter->location->name }}</a>
                 </dd>
-                <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Game Map</dt>
+                <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Game Map</dt>
                 <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">
                     <a href="{{ $mapRoute }}">{{ $gameLocationGemParamter->location->map->name }}</a>
                 </dd>
-                @if(! is_null($gameLocationGemParamter->monster_atonement) && isset($atonementNames[$gameLocationGemParamter->monster_atonement]))
-                    <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Monster Atonement</dt>
-                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $atonementNames[$gameLocationGemParamter->monster_atonement] }}</dd>
+                @if (! is_null($gameLocationGemParamter->monster_atonement) && isset($atonementNames[$gameLocationGemParamter->monster_atonement]))
+                    <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Monster Atonement</dt>
+                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                        {{ $atonementNames[$gameLocationGemParamter->monster_atonement] }}
+                    </dd>
                 @endif
-                @if(filled($gameLocationGemParamter->monster_atonement_range))
-                    <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Monster Atonement Range</dt>
-                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">+{{ $gameLocationGemParamter->monster_atonement_range }}%</dd>
+                @if (filled($gameLocationGemParamter->monster_atonement_range))
+                    <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">
+                        Monster Atonement Range
+                    </dt>
+                    <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">
+                        +{{ $gameLocationGemParamter->monster_atonement_range }}%
+                    </dd>
                 @endif
-                @if($craftingSkillNames !== '')
-                    <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">Crafting Skills</dt>
+                @if ($craftingSkillNames !== '')
+                    <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">Crafting Skills</dt>
                     <dd class="text-sm leading-6 text-gray-700 dark:text-gray-300">{{ $craftingSkillNames }}</dd>
                 @endif
             </dl>
@@ -103,11 +111,14 @@
 
         <aside class="self-start rounded-lg border border-blue-300 bg-blue-50 p-4 text-blue-900 dark:border-blue-700 dark:bg-blue-950 dark:text-blue-100">
             <h2 class="mb-2 text-lg font-semibold">What this setup controls</h2>
-            <p class="text-sm leading-6">Shows the map or location this parameter setup belongs to, its monster atonement selection, and any crafting skills attached to it.</p>
+            <p class="text-sm leading-6">
+                Shows the map or location this parameter setup belongs to, its monster atonement selection, and any
+                crafting skills attached to it.
+            </p>
         </aside>
     </div>
 
-    @foreach($sections as $sectionTitle => $section)
+    @foreach ($sections as $sectionTitle => $section)
         @php
             $visibleRows = collect($section['fields'])
                 ->map(function (array $fieldConfig, string $field) use ($gameLocationGemParamter): ?array {
@@ -115,18 +126,21 @@
                     if (! filled($gameLocationGemParamter->{$field})) {
                         return null;
                     }
+
                     return ['label' => $label, 'value' => '+'.$gameLocationGemParamter->{$field}.'%', 'class' => $colorClass];
                 })
                 ->filter();
         @endphp
-        @if($visibleRows->isNotEmpty())
+        @if ($visibleRows->isNotEmpty())
             <div class="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-start">
                 <section class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
                     <h3 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $sectionTitle }}</h3>
 
                     <dl class="grid grid-cols-1 gap-x-8 gap-y-4 lg:grid-cols-[minmax(10rem,16rem)_minmax(0,1fr)_minmax(10rem,16rem)_minmax(0,1fr)]">
-                        @foreach($visibleRows as $row)
-                            <dt class="text-sm font-semibold leading-6 text-gray-900 dark:text-gray-100">{{ $row['label'] }}</dt>
+                        @foreach ($visibleRows as $row)
+                            <dt class="text-sm leading-6 font-semibold text-gray-900 dark:text-gray-100">
+                                {{ $row['label'] }}
+                            </dt>
                             <dd class="text-sm font-medium leading-6 {{ $row['class'] }}">{{ $row['value'] }}</dd>
                         @endforeach
                     </dl>

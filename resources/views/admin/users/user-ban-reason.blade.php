@@ -7,16 +7,23 @@
                 <h4 class="mt-3">Reason For Ban</h4>
             </div>
             <div>
-                <a href="{{ url()->previous() }}" class="inline-flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 dark:bg-red-700 dark:hover:bg-red-600 dark:focus:ring-offset-gray-900 md:w-auto">Cancel</a>
+                <a
+                    href="{{ url()->previous() }}"
+                    class="inline-flex w-full items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:outline-none md:w-auto dark:bg-red-700 dark:hover:bg-red-600 dark:focus:ring-offset-gray-900"
+                >Cancel</a>
             </div>
         </div>
 
         <div class="card">
             <div class="p-5 md:p-10">
-                <form method="POST"
-                    action="{{ route('ban.user.with.reason', [
-                        'user' => $user,
-                    ]) }}">
+                <form
+                    method="POST"
+                    action="{{
+                        route('ban.user.with.reason', [
+                            'user' => $user,
+                        ])
+                    }}"
+                >
                     @csrf
 
                     <input type="hidden" name="for" value="{{ $for }}" />
@@ -25,8 +32,10 @@
                         $reasonHasError = $errors->has('reason');
                     @endphp
                     <div class="mb-5 w-full">
-                        <label for="reason"
-                            class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100">{{ __('Reason for ban') }}</label>
+                        <label
+                            for="reason"
+                            class="mb-2 block text-sm font-semibold text-gray-900 dark:text-gray-100"
+                        >{{ __('Reason for ban') }}</label>
 
                         <div class="w-full">
                             <textarea
@@ -36,13 +45,17 @@
                                 required
                                 autofocus
                                 aria-describedby="reason-help{{ $reasonHasError ? ' reason-error' : '' }}"
-                                @if($reasonHasError) aria-invalid="true" @endif
+                                @if ($reasonHasError) aria-invalid="true" @endif
                             >{{ old('reason', $email ?? '') }}</textarea>
-                            <small id="reason-help" class="mt-2 block text-sm text-gray-600 dark:text-gray-400">This reason will be emailed to the user as a
-                                reason why.</small>
+                            <small id="reason-help" class="mt-2 block text-sm text-gray-600 dark:text-gray-400"
+                                >This reason will be emailed to the user as a reason why.</small>
 
                             @error('reason')
-                                <p id="reason-error" class="mt-2 text-sm font-medium text-red-700 dark:text-red-400" role="alert">
+                                <p
+                                    id="reason-error"
+                                    class="mt-2 text-sm font-medium text-red-700 dark:text-red-400"
+                                    role="alert"
+                                >
                                     {{ $message }}
                                 </p>
                             @enderror
@@ -51,7 +64,10 @@
 
                     <div class="mb-0 flex flex-col md:flex-row md:justify-end">
                         <div>
-                            <button type="submit" class="inline-flex w-full items-center justify-center rounded-md bg-primary-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-primary-600 dark:hover:bg-primary-500 dark:focus:ring-offset-gray-900 md:w-auto">
+                            <button
+                                type="submit"
+                                class="bg-primary-500 hover:bg-primary-600 focus:ring-primary-500 dark:bg-primary-600 dark:hover:bg-primary-500 inline-flex w-full items-center justify-center rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm focus:ring-2 focus:ring-offset-2 focus:outline-none md:w-auto dark:focus:ring-offset-gray-900"
+                            >
                                 {{ __('Submit Request') }}
                             </button>
                         </div>
@@ -62,55 +78,53 @@
     </div>
 
     <div class="card">
-      <div class="card-body">
-        <form
-          method="POST"
-          action="{{
-            route('ban.user.with.reason', [
-              'user' => $user,
-            ])
-          }}"
-        >
-          @csrf
+        <div class="card-body">
+            <form
+                method="POST"
+                action="{{
+                    route('ban.user.with.reason', [
+                        'user' => $user,
+                    ])
+                }}"
+            >
+                @csrf
 
-          <input type="hidden" name="for" value="{{ $for }}" />
+                <input type="hidden" name="for" value="{{ $for }}" />
 
-          <div class="form-group row">
-            <label for="reason" class="col-md-4 col-form-label text-md-right">
-              {{ __('Reason for ban') }}
-            </label>
+                <div class="form-group row">
+                    <label for="reason" class="col-md-4 col-form-label text-md-right">
+                        {{ __('Reason for ban') }}
+                    </label>
 
-            <div class="col-md-6">
-              <textarea
-                id="reason"
-                type="reason"
-                class="form-control @error('reason') is-invalid @enderror"
-                name="reason"
-                value="{{ $email ?? old('reason') }}"
-                required
-                autofocus
-              ></textarea>
-              <small id="reasonHelp" class="form-text text-muted">
-                This reason will be emailed to the user as a reason why.
-              </small>
+                    <div class="col-md-6">
+                        <textarea
+                            id="reason"
+                            type="reason"
+                            class="form-control @error('reason') is-invalid @enderror"
+                            name="reason"
+                            value="{{ $email ?? old('reason') }}"
+                            required
+                            autofocus
+                        ></textarea>
+                        <small id="reasonHelp" class="form-text text-muted">
+                            This reason will be emailed to the user as a reason why.
+                        </small>
 
-              @error('reason')
-                <span class="invalid-feedback" role="alert">
-                  <strong>{{ $message }}</strong>
-                </span>
-              @enderror
-            </div>
-          </div>
+                        @error('reason')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                </div>
 
-          <div class="form-group row mb-0">
-            <div class="col-md-6 offset-md-4">
-              <button type="submit" class="btn btn-primary">
-                {{ __('Submit Request') }}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+                <div class="form-group row mb-0">
+                    <div class="col-md-6 offset-md-4">
+                        <button type="submit" class="btn btn-primary">{{ __('Submit Request') }}</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
+    </div>
 @endsection
