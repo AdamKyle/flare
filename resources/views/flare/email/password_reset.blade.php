@@ -54,6 +54,7 @@
             </xml>
         <![endif]--><!
     [endif]-->
+    <! [endif]-->
     <!--[if lte mso 11]>
         <style type="text/css">
             .mj-outlook-group-fix {
@@ -158,12 +159,12 @@
                     </tr>
             </table>
 
-        </td>
-        </tr>
-        </tbody>
-        </table>
-    </div>
-    <!--[if mso | IE]>
+            </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
+        <!--[if mso | IE]>
           </td>
         </tr>
       </table>
@@ -174,19 +175,19 @@
         <tr>
           <td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;">
       <![endif]-->
-    <div style="background: #1a62a1; background-color: #1a62a1; margin: 0px auto; max-width: 600px">
-        <table
-            align="center"
-            border="0"
-            cellpadding="0"
-            cellspacing="0"
-            role="presentation"
-            style="background: #1a62a1; background-color: #1a62a1; width: 100%"
-        >
-            <tbody>
-                <tr>
-                    <td style="direction: ltr; font-size: 0px; padding: 20px 0; text-align: center">
-                        <!--[if mso | IE]>
+        <div style="background: #1a62a1; background-color: #1a62a1; margin: 0px auto; max-width: 600px">
+            <table
+                align="center"
+                border="0"
+                cellpadding="0"
+                cellspacing="0"
+                role="presentation"
+                style="background: #1a62a1; background-color: #1a62a1; width: 100%"
+            >
+                <tbody>
+                    <tr>
+                        <td style="direction: ltr; font-size: 0px; padding: 20px 0; text-align: center">
+                            <!--[if mso | IE]>
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0">
 
         <tr>
@@ -195,122 +196,128 @@
                class="" style="vertical-align:top;width:400px;"
             >
           <![endif]-->
-                        <div
-                            class="mj-column-px-400 mj-outlook-group-fix"
-                            style="
-                                font-size: 0px;
-                                text-align: left;
-                                direction: ltr;
-                                display: inline-block;
-                                vertical-align: top;
-                                width: 100%;
-                            "
-                        >
-                            <table
-                                border="0"
-                                cellpadding="0"
-                                cellspacing="0"
-                                role="presentation"
-                                style="vertical-align: top"
-                                width="100%"
+                            <div
+                                class="mj-column-px-400 mj-outlook-group-fix"
+                                style="
+                                    font-size: 0px;
+                                    text-align: left;
+                                    direction: ltr;
+                                    display: inline-block;
+                                    vertical-align: top;
+                                    width: 100%;
+                                "
                             >
-                                <tr>
-                                    <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word">
-                                        <div
-                                            style="
-                                                font-family: Ubuntu, Helvetica, Arial, sans-serif;
-                                                font-size: 13px;
-                                                line-height: 1;
-                                                text-align: left;
-                                                color: #dedede;
-                                            "
+                                <table
+                                    border="0"
+                                    cellpadding="0"
+                                    cellspacing="0"
+                                    role="presentation"
+                                    style="vertical-align: top"
+                                    width="100%"
+                                >
+                                    <tr>
+                                        <td
+                                            align="left"
+                                            style="font-size: 0px; padding: 10px 25px; word-break: break-word"
                                         >
-                                            Hello,
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td align="left" style="font-size: 0px; padding: 10px 25px; word-break: break-word">
-                                        <div
-                                            style="
-                                                font-family: Ubuntu, Helvetica, Arial, sans-serif;
-                                                font-size: 13px;
-                                                line-height: 1;
-                                                text-align: left;
-                                                color: #dedede;
-                                            "
+                                            <div
+                                                style="
+                                                    font-family: Ubuntu, Helvetica, Arial, sans-serif;
+                                                    font-size: 13px;
+                                                    line-height: 1;
+                                                    text-align: left;
+                                                    color: #dedede;
+                                                "
+                                            >
+                                                Hello,
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                            align="left"
+                                            style="font-size: 0px; padding: 10px 25px; word-break: break-word"
                                         >
-                                            Looks like you requested your password to be reset. If this wasn't you, feel
-                                            free to ignore it.
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td
-                                        align="center"
-                                        vertical-align="middle"
-                                        style="font-size: 0px; padding: 10px 25px; word-break: break-word"
-                                    >
-                                        <table
-                                            border="0"
-                                            cellpadding="0"
-                                            cellspacing="0"
-                                            role="presentation"
-                                            style="border-collapse: separate; line-height: 100%"
+                                            <div
+                                                style="
+                                                    font-family: Ubuntu, Helvetica, Arial, sans-serif;
+                                                    font-size: 13px;
+                                                    line-height: 1;
+                                                    text-align: left;
+                                                    color: #dedede;
+                                                "
+                                            >
+                                                Looks like you requested your password to be reset. If this wasn't you,
+                                                feel free to ignore it.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td
+                                            align="center"
+                                            vertical-align="middle"
+                                            style="font-size: 0px; padding: 10px 25px; word-break: break-word"
                                         >
-                                            <tr>
-                                                <td
-                                                    align="center"
-                                                    bgcolor="#388a2d"
-                                                    role="presentation"
-                                                    style="
-                                                        border: none;
-                                                        border-radius: 3px;
-                                                        cursor: auto;
-                                                        mso-padding-alt: 10px 25px;
-                                                        background: #388a2d;
-                                                    "
-                                                    valign="middle"
-                                                >
-                                                    <a
-                                                        href="{{ route('password.reset', $token) }}"
+                                            <table
+                                                border="0"
+                                                cellpadding="0"
+                                                cellspacing="0"
+                                                role="presentation"
+                                                style="border-collapse: separate; line-height: 100%"
+                                            >
+                                                <tr>
+                                                    <td
+                                                        align="center"
+                                                        bgcolor="#388a2d"
+                                                        role="presentation"
                                                         style="
-                                                            display: inline-block;
-                                                            background: #388a2d;
-                                                            color: #ffffff;
-                                                            font-family: Ubuntu, Helvetica, Arial, sans-serif;
-                                                            font-size: 13px;
-                                                            font-weight: normal;
-                                                            line-height: 120%;
-                                                            margin: 0;
-                                                            text-decoration: none;
-                                                            text-transform: none;
-                                                            padding: 10px 25px;
-                                                            mso-padding-alt: 0px;
+                                                            border: none;
                                                             border-radius: 3px;
+                                                            cursor: auto;
+                                                            mso-padding-alt: 10px 25px;
+                                                            background: #388a2d;
                                                         "
-                                                        target="_blank"
+                                                        valign="middle"
                                                     >
-                                                        Reset password
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                        <!--[if mso | IE]> <![endif]-->
-                    </td>
-                </tr>
-        </table>
+                                                        <a
+                                                            href="{{ route('password.reset', $token) }}"
+                                                            style="
+                                                                display: inline-block;
+                                                                background: #388a2d;
+                                                                color: #ffffff;
+                                                                font-family: Ubuntu, Helvetica, Arial, sans-serif;
+                                                                font-size: 13px;
+                                                                font-weight: normal;
+                                                                line-height: 120%;
+                                                                margin: 0;
+                                                                text-decoration: none;
+                                                                text-transform: none;
+                                                                padding: 10px 25px;
+                                                                mso-padding-alt: 0px;
+                                                                border-radius: 3px;
+                                                            "
+                                                            target="_blank"
+                                                        >
+                                                            Reset password
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <!--[if mso | IE]> <![endif]-->
+                        </td>
+                    </tr>
+            </table>
 
-    </td>
-    </tr>
-    </tbody>
-    </table>
-    </div>
-    <!--[if mso | IE]>
+            </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
+        <!--[if mso | IE]>
           </td>
         </tr>
       </table>
