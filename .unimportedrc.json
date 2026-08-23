@@ -16,17 +16,11 @@
     "@lexical/extension",
     "@tailwindcss/vite",
     "@types/node",
-    "@types/react-resizable",
     "framer-motion",
-    "postcss-custom-properties",
     "postcss-import",
-    "postcss-nested",
-    "postcss-nesting",
     "pusher-js",
     "rpg-awesome",
-    "tailwind-scrollbar",
-    "tailwindcss-classnames",
-    "tippy.js"
+    "tailwind-scrollbar"
   ],
   "ignorePatterns": [
     "postcss.config.js",
@@ -35,8 +29,6 @@
     "eslint-rules/**",
     "resources/js/dts/**",
     "public/**",
-    "resources/js/vendor/livewire-data-tables.js",
-    "resources/js/vendor/livewire.js",
     "resources/js/vendor/theme-script.js",
     "tailwind.config.js",
     "vite.config.js"

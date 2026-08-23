@@ -71,8 +71,7 @@ export const CRAFT_SET_REQUIRED_POSITIONS: CraftSetPosition[] =
   CRAFT_SET_REQUIRED_POSITION_OPTIONS.map((position) => position.key);
 
 export const CRAFT_SET_ALL_POSITIONS: (
-  | CraftSetHandPositionOption
-  | CraftSetRequiredPositionOption
+  CraftSetHandPositionOption | CraftSetRequiredPositionOption
 )[] = [
   ...CRAFT_SET_OPTIONAL_HAND_POSITIONS,
   ...CRAFT_SET_REQUIRED_POSITION_OPTIONS,

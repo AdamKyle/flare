@@ -5,7 +5,6 @@
       href="{{ route('info.page', ['pageName' => 'home']) }}"
       class="link"
       data-toggle="tooltip-menu"
-      data-tippy-content="Home"
     >
       <span class="icon la la-book-open"></span>
       <span class="title">Home</span>
@@ -15,7 +14,6 @@
       class="link"
       data-target="[data-menu=basic-info]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Basic Info"
     >
       <span class="icon fas fa-question-circle"></span>
       <span class="title">Basic Information</span>
@@ -25,7 +23,6 @@
       class="link"
       data-target="[data-menu=character-info]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Character Info"
     >
       <span class="icon ra ra-muscle-fat"></span>
       <span class="title">Character Information</span>
@@ -35,7 +32,6 @@
       class="link"
       data-target="[data-menu=events]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Events"
     >
       <span class="icon fas fa-calendar"></span>
       <span class="title">Events</span>
@@ -45,7 +41,6 @@
       class="link"
       data-target="[data-menu=map]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Map"
     >
       <span class="icon ra ra-scroll-unfurled"></span>
       <span class="title">Map</span>
@@ -55,7 +50,6 @@
       class="link"
       data-target="[data-menu=kingdom]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Kingdom"
     >
       <span class="icon ra ra-tower"></span>
       <span class="title">Kingdoms</span>
@@ -65,7 +59,6 @@
       class="link"
       data-target="[data-menu=game-systems]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Game Systems"
     >
       <span class="icon ra ra-tower"></span>
       <span class="title">Game Systems</span>
@@ -75,7 +68,6 @@
       class="link"
       data-target="[data-menu=gear-sets]"
       data-toggle="tooltip-menu"
-      data-tippy-content="Gear Sets"
     >
       <span class="icon ra ra-knight-helmet"></span>
       <span class="title">Gear Sets</span>

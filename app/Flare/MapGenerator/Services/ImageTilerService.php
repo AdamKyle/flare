@@ -10,14 +10,21 @@ class ImageTilerService
 {
     private int $tileSize = 250;
 
+    /**
+     * @param ImageManager $imageManager
+     */
     public function __construct(private readonly ImageManager $imageManager) {}
 
     /**
-     * Break image into pieces.
+     * Break the image at the given path into tiles and return the resulting tile map.
+     *
+     * @param string $imagePath
+     * @param string $folderName
+     * @return array
      */
     public function breakIntoTiles(string $imagePath, string $folderName): array
     {
-        $image = $this->imageManager->read($imagePath);
+        $image = $this->imageManager->decodePath($imagePath);
 
         $width = $image->width();
         $height = $image->height();
@@ -30,7 +37,13 @@ class ImageTilerService
     }
 
     /**
-     * Chop up the image.
+     * Chop the given image into tile-sized rows and columns.
+     *
+     * @param ImageInterface $image
+     * @param int $width
+     * @param int $height
+     * @param string $folder
+     * @return array
      */
     private function chopImage(ImageInterface $image, int $width, int $height, string $folder): array
     {
@@ -52,11 +65,17 @@ class ImageTilerService
     }
 
     /**
-     * Save the file and return the public URL.
+     * Crop a single tile from the given image and save it, returning its public URL.
+     *
+     * @param ImageInterface $image
+     * @param int $x
+     * @param int $y
+     * @param string $folder
+     * @return string
      */
     private function saveTile(ImageInterface $image, int $x, int $y, string $folder): string
     {
-        $tile = $this->imageManager->read((string) $image->encode())->crop($this->tileSize, $this->tileSize, $x, $y);
+        $tile = $this->imageManager->decodeBinary((string) $image->encode())->crop($this->tileSize, $this->tileSize, $x, $y);
         $filename = "{$folder}_tile_{$x}_{$y}.png";
         $path = "{$folder}/{$filename}";
 

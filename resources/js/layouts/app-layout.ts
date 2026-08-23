@@ -16,7 +16,7 @@ const initDarkModeToggle = (): void => {
   }
 
   toggleButton.addEventListener('click', () => {
-    let isDarkModeEnabled = false;
+    let isDarkModeEnabled: boolean;
 
     try {
       isDarkModeEnabled = Boolean(

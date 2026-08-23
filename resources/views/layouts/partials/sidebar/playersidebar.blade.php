@@ -1,42 +1,42 @@
 <!-- Menu Bar -->
 <aside class="menu-bar menu-sticky menu-hidden">
     <div class="menu-items">
-        <a href="{{ route('game') }}" class="link" data-toggle="tooltip-menu" data-tippy-content="Game">
+        <a href="{{ route('game') }}" class="link" data-toggle="tooltip-menu">
             <span class="icon fas fa-dice-d20"></span>
             <span class="title">Game</span>
         </a>
         <a href="#no-link" class="link" data-target="[data-menu=shop]" data-toggle="tooltip-menu"
-            data-tippy-content="Shop">
+            >
             <span class="icon ra ra-anvil"></span>
             <span class="title">Shop</span>
         </a>
         <a href="#no-link" class="link" data-target="[data-menu=market]" data-toggle="tooltip-menu"
-            data-tippy-content="Market">
+            >
             <span class="icon ra ra-wooden-sign"></span>
             <span class="title">Market</span>
         </a>
         <a href="#no-link" class="link" data-target="[data-menu=quests]" data-toggle="tooltip-menu"
-            data-tippy-content="Quests">
+            >
             <span class="icon fas fa-feather"></span>
             <span class="title">Quest Log</span>
         </a>
         <a href="#no-link" class="link" data-target="[data-menu=tops]" data-toggle="tooltip-menu"
-            data-tippy-content="Tops">
+            >
             <span class="icon fas fa-chart-area"></span>
             <span class="title">Tops</span>
         </a>
         <a href="{{ route('game.event.calendar') }}" class="link" data-toggle="tooltip-menu"
-            data-tippy-content="Events">
+            >
             <span class="icon fas fa-calendar"></span>
             <span class="title">Event Calendar</span>
         </a>
         <a href="{{ route('tlessa.donations') }}" class="link" data-toggle="tooltip-menu"
-           data-tippy-content="Events">
+           >
             <span class="icon fas fa-hand-holding-usd"></span>
             <span class="title">Donate</span>
         </a>
         <a href="{{ route('game.whos-playing') }}" class="link" data-toggle="tooltip-menu"
-        data-tippy-content="Events">
+        >
          <span class="icon fas fa-plug"></span>
          <span class="title">Who's Online?</span>
      </a>

@@ -14,17 +14,10 @@ export default defineConfig({
             'resources/js/game.ts',
             'resources/js/admin-apps.ts',
             'resources/js/layouts/app-layout.ts',
-            'resources/js/vendor/livewire-data-tables.js',
-            'resources/js/vendor/livewire.js',
         ]),
         tailwindcss(),
         react(),
     ],
-    optimizeDeps: {
-        esbuildOptions: {
-            tsconfig: 'tsconfig.json',
-        },
-    },
     resolve: {
         alias: {
             configuration: path.resolve(__dirname, 'resources/js/configuration'),
@@ -43,9 +36,8 @@ export default defineConfig({
     build: {
         minify: !isDevelopment,
         sourcemap: isDevelopment,
-        inlineDynamicImports: !isDevelopment,
         chunkSizeWarningLimit: 2000,
-        rollupOptions: {
+        rolldownOptions: {
             output: {
                 manualChunks(id) {
                     const match = id.match(/node_modules\/([^/]+)/);

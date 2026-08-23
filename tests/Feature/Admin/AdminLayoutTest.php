@@ -12,7 +12,7 @@ class AdminLayoutTest extends TestCase
 {
     use CreateRole, CreateUser, RefreshDatabase;
 
-    public function test_admin_page_renders_with_livewire_script_configuration(): void
+    public function test_admin_page_does_not_render_livewire_script_configuration(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
 
@@ -20,18 +20,18 @@ class AdminLayoutTest extends TestCase
         $content = $response->getContent();
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('livewireScriptConfig', $content);
-        $this->assertStringContainsString('Livewire Styles', $content);
+        $this->assertStringNotContainsString('livewireScriptConfig', $content);
+        $this->assertStringNotContainsString('Livewire Styles', $content);
     }
 
-    public function test_admin_layout_source_loads_livewire_and_livewire_tables_entries(): void
+    public function test_admin_layout_source_does_not_load_livewire_or_livewire_tables_entries(): void
     {
         $layoutSource = File::get(resource_path('views/layouts/admin.blade.php'));
 
-        $this->assertStringContainsString('@livewireStyles', $layoutSource);
-        $this->assertStringContainsString('@livewireScriptConfig', $layoutSource);
-        $this->assertStringContainsString("@vite('resources/js/vendor/livewire.js')", $layoutSource);
-        $this->assertStringContainsString("@vite('resources/js/vendor/livewire-data-tables.js')", $layoutSource);
+        $this->assertStringNotContainsString('@livewireStyles', $layoutSource);
+        $this->assertStringNotContainsString('@livewireScriptConfig', $layoutSource);
+        $this->assertStringNotContainsString('resources/js/vendor/livewire.js', $layoutSource);
+        $this->assertStringNotContainsString('resources/js/vendor/livewire-data-tables.js', $layoutSource);
     }
 
     public function test_admin_view_extends_admin_layout(): void

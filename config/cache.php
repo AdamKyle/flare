@@ -1,5 +1,9 @@
 <?php
 
+use App\Flare\Models\Item;
+use App\Flare\Models\Quest;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 return [
@@ -99,5 +103,24 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_cache'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Serializable Cache Classes
+    |--------------------------------------------------------------------------
+    |
+    | When deserializing cached values, Laravel will only allow the classes
+    | listed here to be unserialized from the cache payload. This narrow
+    | allow-list preserves existing cache payload shapes without allowing
+    | arbitrary object deserialization.
+    |
+    */
+
+    'serializable_classes' => [
+        Collection::class,
+        Carbon::class,
+        Quest::class,
+        Item::class,
+    ],
 
 ];

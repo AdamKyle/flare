@@ -61,7 +61,6 @@
             <label
               class="switch switch_outlined"
               data-toggle="tooltip"
-              data-tippy-content="Toggle Dark Mode"
             >
               <input id="darkModeToggler" type="checkbox" />
               <span></span>
@@ -79,7 +78,6 @@
             <label
               class="switch switch_outlined"
               data-toggle="tooltip"
-              data-tippy-content="Toggle Dark Mode"
             >
               <input id="darkModeToggler" type="checkbox" />
               <span></span>

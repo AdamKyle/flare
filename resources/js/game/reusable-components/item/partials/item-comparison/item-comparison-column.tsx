@@ -33,8 +33,7 @@ const ItemComparisonColumn = ({
   showHeaderSection = true,
 }: ItemComparisonColumnProps) => {
   const adjustments = row?.comparison?.adjustments as
-    | ItemAdjustments
-    | undefined;
+    ItemAdjustments | undefined;
 
   if (!adjustments) {
     return null;

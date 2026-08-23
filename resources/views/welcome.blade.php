@@ -29,7 +29,7 @@
         <div class="grid w-2/3 gap-2 mb-5 ml-auto mr-auto md:hidden">
             @guest
                 <div class="flex items-center justify-center mb-4 mr-2">
-                    <label class="switch switch_outlined" data-toggle="tooltip" data-tippy-content="Toggle Dark Mode">
+                    <label class="switch switch_outlined" data-toggle="tooltip">
                         <input id="darkModeToggler" type="checkbox">
                         <span></span>
                     </label>

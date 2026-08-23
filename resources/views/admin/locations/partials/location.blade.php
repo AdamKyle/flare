@@ -108,17 +108,9 @@
         </ul>
         <p class="mb-4">These are the monsters you can encounter here while doing delve. These creatures can only be fought during delve. That means you cannot fight manually or through exploration here.</p>
         <div>
-        @livewire('admin.items.items-table', [
-            'type' => 'quest',
-            'locationId' => $location->id,
-        ])
         </div>
         <p class="my-8">Below ate the items that can drop here. Above it indicates how long you must survive in delve before the quest items drop. These are tied to your looting chance with any and all other bonuses.</p>
         <div>
-        @livewire('admin.items.items-table', [
-            'type' => 'quest',
-            'locationId' => $location->id,
-        ])
         </div>
     @endif
 @endif

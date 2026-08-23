@@ -44,9 +44,6 @@
       href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css"
     />
 
-    @livewireStyles
-    @vite('resources/js/vendor/livewire-data-tables.js')
-    @vite('resources/js/vendor/livewire.js')
     @stack('head')
   </head>
   <body
@@ -80,7 +77,6 @@
         </main>
       </x-core.page.content-area>
     </x-core.page.page-wrapper>
-    @livewireScriptConfig
     @vite('resources/js/admin-apps.ts')
 
     <script>

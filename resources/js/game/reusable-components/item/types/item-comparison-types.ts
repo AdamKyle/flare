@@ -8,9 +8,7 @@ import { ItemAdjustments } from '../../../api-definitions/items/item-comparison-
  */
 export type NumericAdjustmentKey = {
   [K in keyof ItemAdjustments]: ItemAdjustments[K] extends
-    | number
-    | null
-    | undefined
+    number | null | undefined
     ? K
     : never;
 }[keyof ItemAdjustments];

@@ -46,4 +46,3 @@
 <h2 class="my-5 font-light">Child Skills</h2>
 <p class="my-5">These skills will unlock at specific levels of this skill.</p>
 
-@livewire('admin.passive-skills.passive-skill-table', ['skillId' => $skill->id])

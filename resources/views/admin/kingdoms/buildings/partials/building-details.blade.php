@@ -254,6 +254,5 @@
   </x-core.cards.card-with-title>
   <div class="mt-5">
     <h4 class="mb-4">Units this building can recruit</h4>
-    @livewire('admin.kingdoms.units.units-table', ['building' => $building])
   </div>
 </x-core.layout.info-container>

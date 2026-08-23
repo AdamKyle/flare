@@ -8,41 +8,33 @@
     ],
     "license": "MIT",
     "require": {
-        "php": ">=8.4",
-        "bkwld/cloner": "^3.11.0",
-        "christianessl/landmap-generation": "^1.0",
+        "php": "^8.5",
+        "bkwld/cloner": "3.15.0",
+        "christianessl/landmap-generation": "1.0.0",
         "deployer/deployer": "v7.5.12",
-        "doctrine/dbal": "^3.1",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "http-interop/http-factory-guzzle": "^1.0",
-        "intervention/image": "^3.11",
-        "knplabs/github-api": "^3.0",
-        "laravel/framework": "^12.0",
-        "laravel/helpers": "^1.6",
-        "laravel/horizon": "^5.14.2",
-        "laravel/reverb": "^1.0",
-        "laravel/tinker": "^2.8.1",
-        "laravel/ui": "^4.2.1",
-        "league/commonmark": "^2.3",
-        "league/fractal": "^0.20.1",
-        "livewire/livewire": "^3.6.3",
-        "maatwebsite/excel": "^3.1",
-        "pusher/pusher-php-server": "^7.2",
-        "rappasoft/laravel-livewire-tables": "^3.7.1",
-        "spatie/laravel-collection-macros": "^8.0.0",
-        "spatie/laravel-permission": "^6.9.0"
+        "guzzlehttp/guzzle": "7.15.3",
+        "intervention/image": "4.3.0",
+        "knplabs/github-api": "v3.16.1",
+        "laravel/framework": "13.26.1",
+        "laravel/horizon": "5.48.3",
+        "laravel/reverb": "1.11.1",
+        "laravel/tinker": "3.0.2",
+        "laravel/ui": "4.6.3",
+        "league/commonmark": "2.10.0",
+        "league/fractal": "0.21",
+        "maatwebsite/excel": "4.0.1",
+        "spatie/laravel-permission": "8.3.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.5.5",
-        "beyondcode/laravel-dump-server": "^2.1.0",
-        "fakerphp/faker": "^1.21.0",
-        "laravel/pint": "^1.25",
-        "mockery/mockery": "^1.6.6",
-        "nunomaduro/collision": "^8.1",
-        "pestphp/pest": "^4.7",
-        "pestphp/pest-plugin-laravel": "^4.1",
-        "phpunit/phpunit": "^12.0",
-        "spatie/laravel-ignition": "^2.0"
+        "barryvdh/laravel-ide-helper": "3.7.0",
+        "fakerphp/faker": "1.24.1",
+        "laravel/pint": "1.30.5",
+        "mockery/mockery": "1.6.12",
+        "nunomaduro/collision": "8.9.5",
+        "pestphp/pest": "5.1.1",
+        "pestphp/pest-plugin-laravel": "5.0.1",
+        "phpunit/phpunit": "13.3.0",
+        "spatie/laravel-ignition": "2.12.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -75,18 +67,11 @@
             "Tests\\": "tests/"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/AdamKyle/laravel-websockets.git"
-        }
-    ],
     "prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi",
-            "@php artisan vendor:publish --force --tag=livewire:assets --ansi"
+            "@php artisan package:discover --ansi"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

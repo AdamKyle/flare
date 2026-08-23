@@ -39,7 +39,7 @@ const TabsPanels = <PTuple extends readonly object[]>({
 
     const maybeWithProps = activeItem as { props?: ActiveProps };
 
-    let content = null;
+    let content: React.ReactNode;
 
     if (hasProps<ActiveProps>(maybeWithProps)) {
       const provided = maybeWithProps.props;

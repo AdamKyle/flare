@@ -2,8 +2,6 @@
   <button
     class="flex items-center text-gray-700 ltr:ml-4 rtl:mr-4"
     data-toggle="custom-dropdown-menu"
-    data-tippy-arrow="true"
-    data-tippy-placement="bottom-end"
   >
     <span class="avatar"><i class="ra ra-player"></i></span>
   </button>

@@ -21,9 +21,7 @@ export interface CraftedGemItemProps {
 }
 
 type CraftedItemVariant =
-  | CraftedInventoryItemProps
-  | CraftedUsableItemProps
-  | CraftedGemItemProps;
+  CraftedInventoryItemProps | CraftedUsableItemProps | CraftedGemItemProps;
 
 type CraftedItemProps = SidePeekProps & CraftedItemVariant;
 
