@@ -3,13 +3,11 @@
 namespace App\Game\Market\Transformers;
 
 use App\Flare\Models\MarketBoard;
-use App\Flare\Traits\IsItemUnique;
+use App\Game\Core\Items\Values\ItemUniqueness;
 use League\Fractal\TransformerAbstract;
 
 class MarketItemsTransformer extends TransformerAbstract
 {
-    use IsItemUnique;
-
     /**
      * Gets the response data for the character sheet
      */
@@ -24,7 +22,7 @@ class MarketItemsTransformer extends TransformerAbstract
             'listed_price' => $marketListing->listed_price,
             'character_name' => $marketListing->character->name,
             'type' => $marketListing->item->type,
-            'unique' => $this->isUnique($marketListing->item),
+            'unique' => ItemUniqueness::fromItem($marketListing->item)->isUnique(),
             'listed_at' => $marketListing->created_at,
         ];
     }

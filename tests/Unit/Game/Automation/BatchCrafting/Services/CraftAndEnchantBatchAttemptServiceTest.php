@@ -212,11 +212,4 @@ class CraftAndEnchantBatchAttemptServiceTest extends TestCase
 
         $this->assertSame($goldBefore, $this->character->refresh()->gold);
     }
-
-    public function test_disenchant_for_displacement_does_not_error(): void
-    {
-        $this->service->disenchantForDisplacement($this->character);
-
-        $this->assertTrue(true);
-    }
 }

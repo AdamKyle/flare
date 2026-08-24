@@ -4,7 +4,6 @@ namespace App\Game\Market\Controllers\Api;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\MarketBoard;
-use App\Flare\Traits\IsItemUnique;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
@@ -25,7 +24,7 @@ use League\Fractal\Resource\Collection;
 
 class MarketController extends Controller
 {
-    use ChecksAutomationRestrictions, IsItemUnique, UpdateMarketBoard;
+    use ChecksAutomationRestrictions, UpdateMarketBoard;
 
     public function __construct(
         private readonly Manager $manager,

@@ -170,6 +170,17 @@ Existing test helper methods in retained test files must be removed by:
 
 `setUp()` and `tearDown()` are the only permitted lifecycle methods.
 
+Anonymous classes used as narrow fakes may implement interface methods; those methods are not
+test-class helpers. This exception does not permit fixture builders, assertion helpers,
+production-method proxies, or reflection wrappers in the test class.
+
+## Map And Binary Fixtures
+
+Test files must not manufacture image/map fixtures with GD or output buffering. The final audit
+must find zero test-file uses of `imagecreatetruecolor`, `imagecolorallocate`, `imagefill`,
+`ob_start`, `imagepng`, `imagedestroy`, or writes to the `maps` disk. Use an existing fixture
+abstraction or mock the established image/pixel boundary.
+
 ## Jobs
 
 Use the application dispatch path:

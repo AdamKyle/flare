@@ -14,12 +14,12 @@ const BatchCraftingElapsedTime = ({
       return;
     }
 
-    const interval = window.setInterval(() => {
+    const interval = setInterval(() => {
       setNow(Date.now());
     }, 1000);
 
     return () => {
-      window.clearInterval(interval);
+      clearInterval(interval);
     };
   }, [completed_at]);
 

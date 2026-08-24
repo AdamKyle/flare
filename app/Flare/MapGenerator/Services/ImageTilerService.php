@@ -56,11 +56,11 @@ class ImageTilerService
      */
     private function saveTile(ImageInterface $image, int $x, int $y, string $folder): string
     {
-        $tile = $this->imageManager->decodeBinary((string) $image->encode())->crop($this->tileSize, $this->tileSize, $x, $y);
+        $tile = $this->imageManager->decodeBinary($image->encode()->toString())->crop($this->tileSize, $this->tileSize, $x, $y);
         $filename = "{$folder}_tile_{$x}_{$y}.png";
         $path = "{$folder}/{$filename}";
 
-        Storage::disk('maps')->put($path, (string) $tile->encode());
+        Storage::disk('maps')->put($path, $tile->encode()->toString());
 
         return Storage::disk('maps')->url($path);
     }

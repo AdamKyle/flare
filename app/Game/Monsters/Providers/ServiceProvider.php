@@ -24,6 +24,10 @@ class ServiceProvider extends ApplicationServiceProvider
             return new MonsterListService;
         });
 
+        $this->app->bind(MonsterTransformer::class, function ($app) {
+            return new MonsterTransformer;
+        });
+
         $this->app->bind(BuildMonsterCacheService::class, function ($app) {
             return new BuildMonsterCacheService(
                 $app->make(Manager::class),

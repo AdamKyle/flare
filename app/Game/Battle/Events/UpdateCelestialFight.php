@@ -2,7 +2,7 @@
 
 namespace App\Game\Battle\Events;
 
-use App\Flare\ServerFight\MonsterPlayerFight;
+use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;

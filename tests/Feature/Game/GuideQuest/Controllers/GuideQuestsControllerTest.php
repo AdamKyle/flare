@@ -105,8 +105,8 @@ class GuideQuestsControllerTest extends TestCase
         $response->assertSee('Required Batch Crafting');
         $response->assertSee('Run Craft and Enchant For Experience for at least 1 hour.');
         $response->assertSee('Required Item');
-        $response->assertSee('Have 15x Paladin\'s Oath Chest of type Body in your inventory with both a prefix and a suffix.');
-        $response->assertSee('Have 20x Diamond Mace of type Mace in your inventory.');
+        $response->assertSeeText('Have 15x Paladin\'s Oath Chest of type Body in your inventory with both a prefix and a suffix.', false);
+        $response->assertSeeText('Have 20x Diamond Mace of type Mace in your inventory.', false);
         $response->assertSee('Item Consumption');
         $response->assertSee('These items are consumed when the guide quest is handed in.');
         $response->assertDontSee('Required Crafted or Alchemy Items');
@@ -133,7 +133,7 @@ class GuideQuestsControllerTest extends TestCase
         $response = $this->actingAs($character->user)->get('/game/completed-guide-quest/'.$character->id.'/'.$quest->id);
 
         $response->assertSee('Required Item');
-        $response->assertSee('Have 25x Mixtures and Concoctions of type Increases Alchemy Skill in your alchemy bag.');
+        $response->assertSeeText('Have 25x Mixtures and Concoctions of type Increases Alchemy Skill in your alchemy bag.', false);
         $response->assertSee('Item Consumption');
         $response->assertSee('These items are consumed when the guide quest is handed in.');
         $response->assertDontSee('Required Crafted or Alchemy Items');

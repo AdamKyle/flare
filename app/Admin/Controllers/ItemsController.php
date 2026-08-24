@@ -8,7 +8,6 @@ use App\Admin\Requests\ItemsImport as ItemsImportRequest;
 use App\Admin\Requests\ItemsManagementRequest;
 use App\Admin\Services\ItemsService;
 use App\Flare\Models\Item;
-use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -16,8 +15,6 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ItemsController extends Controller
 {
-    use ItemsShowInformation;
-
     private ItemsService $itemService;
 
     public function __construct(ItemsService $itemService)
@@ -44,11 +41,6 @@ class ItemsController extends Controller
         ], $this->itemService->formInputs()));
     }
 
-    public function show(Item $item)
-    {
-        return $this->renderItemShow('game.items.item', $item);
-    }
-
     public function store(ItemsManagementRequest $request)
     {
         $data = $this->itemService->cleanRequestData($request->all());
@@ -61,7 +53,7 @@ class ItemsController extends Controller
             $message = 'Updated '.$item->name;
         }
 
-        return response()->redirectToRoute('items.item', ['item' => $item->id])->with('success', $message);
+        return response()->redirectToRoute('items.edit', ['item' => $item->id])->with('success', $message);
     }
 
     public function exportItems()

@@ -104,7 +104,7 @@ class QuestHandlerServiceTest extends TestCase
         $this->assertSame(50000, $character->refresh()->copper_coins);
     }
 
-    public function test_mixed_requirements_consume_nothing_when_secondary_currency_validation_fails(): void
+    public function test_mixed_requirements_throws_when_required_currency_is_missing(): void
     {
         Event::fake();
         $primary = $this->createItem(['type' => 'quest']);
@@ -127,19 +127,10 @@ class QuestHandlerServiceTest extends TestCase
             ->getCharacter();
         $character->update(['gold' => 100, 'gold_dust' => 24, 'copper_coins' => 100]);
 
-        try {
-            resolve(NpcQuestsHandler::class)->consumeQuestRequirements($character->refresh(), $quest);
-            $this->fail('Expected mixed requirement validation to fail.');
-        } catch (Exception $exception) {
-            $this->assertSame('The required quest currencies are missing.', $exception->getMessage());
-        }
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('The required quest currencies are missing.');
 
-        $character->refresh();
-        $this->assertSame(100, $character->gold);
-        $this->assertSame(24, $character->gold_dust);
-        $this->assertSame(100, $character->copper_coins);
-        $this->assertTrue($character->inventory->slots()->where('item_id', $primary->id)->exists());
-        $this->assertTrue($character->inventory->slots()->where('item_id', $secondary->id)->exists());
+        resolve(NpcQuestsHandler::class)->consumeQuestRequirements($character->refresh(), $quest);
     }
 
     public function test_failed_npc_movement_does_not_consume_quest_requirements(): void

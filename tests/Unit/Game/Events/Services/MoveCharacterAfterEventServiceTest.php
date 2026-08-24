@@ -8,7 +8,7 @@ use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
-use Facades\App\Flare\Cache\CoordinatesCache as CoordinatesCacheFacade;
+use Facades\App\Game\Maps\Cache\CoordinatesCache as CoordinatesCacheFacade;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -96,13 +96,6 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertSame(1, $callbackInvocations);
     }
 
-    public function test_stop_exploration_for_does_nothing_with_empty_collection(): void
-    {
-        $emptyCharacters = new EloquentCollection();
-        $this->service->stopExplorationFor($emptyCharacters);
-        $this->assertTrue(true);
-    }
-
     public function test_stop_exploration_for_stops_exploration(): void
     {
         $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
@@ -119,15 +112,6 @@ class MoveCharacterAfterEventServiceTest extends TestCase
 
         $this->assertSame(0, $firstCharacter->refresh()->currentAutomations()->count());
         $this->assertSame(0, $secondCharacter->refresh()->currentAutomations()->count());
-    }
-
-    public function test_reset_faction_progress_for_map_does_nothing_with_empty_collection(): void
-    {
-        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
-
-        $emptyCharacters = new EloquentCollection();
-        $this->service->resetFactionProgressForMap($emptyCharacters, $surfaceMap->id);
-        $this->assertTrue(true);
     }
 
     public function test_reset_faction_progress_for_map_resets_values(): void
@@ -152,15 +136,6 @@ class MoveCharacterAfterEventServiceTest extends TestCase
         $this->assertFalse((bool) $factionAfterReset->maxed);
         $this->assertNull($factionAfterReset->title);
         $this->assertSame(FactionLevel::getPointsNeeded(0), (int) $factionAfterReset->points_needed);
-    }
-
-    public function test_move_all_to_surface_does_nothing_with_empty_collection(): void
-    {
-        $surfaceMap = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
-
-        $emptyCharacters = new EloquentCollection();
-        $this->service->moveAllToSurface($emptyCharacters, $surfaceMap);
-        $this->assertTrue(true);
     }
 
     public function test_move_all_to_surface_moves_characters(): void

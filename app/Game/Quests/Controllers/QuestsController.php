@@ -6,8 +6,8 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
-use App\Flare\View\Tables\TableColumn;
-use App\Flare\View\Tables\TableQueryBuilder;
+use App\Flare\Tables\TableColumn;
+use App\Flare\Tables\TableQueryBuilder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 

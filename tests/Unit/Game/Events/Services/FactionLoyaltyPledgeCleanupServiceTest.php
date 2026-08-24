@@ -46,8 +46,6 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, null);
-
-        $this->assertTrue(true);
     }
 
     public function test_unpledge_if_on_faction_when_no_loyalty_record_does_nothing(): void
@@ -70,8 +68,6 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
-
-        $this->assertTrue(true);
     }
 
     public function test_unpledge_if_on_faction_when_loyalty_exists_without_assisting_npc_removes_pledge_only(): void
@@ -102,8 +98,6 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
-
-        $this->assertTrue(true);
     }
 
     public function test_unpledge_if_on_faction_when_assisting_npc_stops_assistance_then_removes_pledge(): void
@@ -148,7 +142,5 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
-
-        $this->assertTrue(true);
     }
 }

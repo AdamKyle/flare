@@ -2,18 +2,20 @@
 
 namespace App\Flare\ImageGeneration\Services;
 
+use App\Flare\ImageGeneration\DeepAi\DeepAiImageDownloader;
 use App\Flare\ImageGeneration\DeepAi\DeepAiImageGeneration;
 use Exception;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\RequestException;
 use Storage;
 
 class DeepAiImageTextGenerationService
 {
     private string $apiKey = '';
 
-    public function __construct(private readonly DeepAiImageGeneration $deepAiImageGeneration) {}
+    public function __construct(
+        private readonly DeepAiImageGeneration $deepAiImageGeneration,
+        private readonly DeepAiImageDownloader $deepAiImageDownloader,
+    ) {}
 
     public function setApiKey(string $apiKey): DeepAiImageTextGenerationService
     {
@@ -37,30 +39,20 @@ class DeepAiImageTextGenerationService
     /**
      * Download and Save the image.
      *
+     *
      * @throws Exception|GuzzleException
      */
     public function downloadAndSaveImage(string $url, string $path): bool
     {
+        $imageContents = $this->deepAiImageDownloader->download($url);
 
-        $imageClient = new Client();
-
-        try {
-            $response = $imageClient->get($url);
-
-            if ($response->getStatusCode() === 200) {
-
-                $imageContents = $response->getBody()->getContents();
-
-                Storage::disk('generated-monsters-and-bugs')->put($path, $imageContents);
-
-                return true;
-            }
-
+        if (is_null($imageContents)) {
             return false;
-        } catch (RequestException $e) {
-
-            throw new Exception($e);
         }
+
+        Storage::disk('generated-monsters-and-bugs')->put($path, $imageContents);
+
+        return true;
     }
 
     public function imageAlreadyGeneratedForMonster(string $path): bool

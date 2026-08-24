@@ -37,7 +37,7 @@ class CreateMap extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(MapBuilder $mapBuilder)
     {
 
         // Surface:
@@ -110,7 +110,7 @@ class CreateMap extends Command
 
         ini_set('memory_limit', '3G');
 
-        resolve(MapBuilder::class)->setLandColor($land)
+        $mapBuilder->setLandColor($land)
             ->setWaterColor($water)
             ->setMapHeight($this->argument('height'))
             ->setMapWidth($this->argument('width'))

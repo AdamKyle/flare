@@ -4,6 +4,7 @@ import { BatchCraftingStatus } from '../../enums/batch-crafting-status';
 import { useOpenBatchCraftedItem } from '../../hooks/use-open-batch-crafted-item';
 import { getBatchCraftedItemLinkLabel } from '../../utils/get-batch-crafted-item-link-label';
 import BatchCraftingCompletionSummary from '../batch-crafting-completion-summary';
+import BatchCraftingDetailSection from '../batch-crafting-detail-section';
 import BatchCraftingOutcomeChart from '../batch-crafting-outcome-chart';
 import CraftAmountMetrics from '../craft-amount-metrics';
 import CraftAmountProgress from '../craft-amount-progress';
@@ -52,37 +53,45 @@ const CraftAmountRunningSection = ({
 
   return (
     <div className="space-y-3">
-      {renderCurrentItem()}
+      <BatchCraftingDetailSection title="Progress">
+        {renderCurrentItem()}
 
-      <CraftAmountProgress
-        requested_amount={requestedAmount}
-        completed_amount={completedAmount}
-        output_destination={batch.output_destination}
-        destination_capacity={batch.destination_capacity}
-      />
+        <CraftAmountProgress
+          requested_amount={requestedAmount}
+          completed_amount={completedAmount}
+          output_destination={batch.output_destination}
+          destination_capacity={batch.destination_capacity}
+        />
+      </BatchCraftingDetailSection>
 
-      <CraftAmountMetrics
-        disposition={batch.disposition}
-        successful={completedAmount}
-        failed={batch.failed_count}
-        remaining={remainingAmount}
-        gold_spent={batch.gold_spent}
-        gold_gained={batch.gold_gained}
-        gold_left={batch.gold_left}
-      />
+      <BatchCraftingDetailSection title="Results">
+        <CraftAmountMetrics
+          disposition={batch.disposition}
+          successful={completedAmount}
+          failed={batch.failed_count}
+          remaining={remainingAmount}
+          gold_spent={batch.gold_spent}
+          gold_gained={batch.gold_gained}
+          gold_left={batch.gold_left}
+        />
+      </BatchCraftingDetailSection>
 
-      <BatchCraftingOutcomeChart
-        chart_points={batch.chart_points}
-        processing_started_at={batch.processing_started_at}
-      />
+      <BatchCraftingDetailSection title="Activity">
+        <BatchCraftingOutcomeChart
+          chart_points={batch.chart_points}
+          processing_started_at={batch.processing_started_at}
+        />
+      </BatchCraftingDetailSection>
 
       {!isRunning && batch.ended_reason && (
-        <BatchCraftingCompletionSummary
-          end_reason={batch.ended_reason}
-          requested={batch.requested_amount}
-          completed={completedAmount}
-          remaining={remainingAmount}
-        />
+        <BatchCraftingDetailSection title="Completion">
+          <BatchCraftingCompletionSummary
+            end_reason={batch.ended_reason}
+            requested={batch.requested_amount}
+            completed={completedAmount}
+            remaining={remainingAmount}
+          />
+        </BatchCraftingDetailSection>
       )}
     </div>
   );

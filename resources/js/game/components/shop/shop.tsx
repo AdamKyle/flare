@@ -113,28 +113,16 @@ const Shop = ({ close_shop }: ShopProps) => {
     setSelectedType(null);
   };
 
-  const handleViewItem = (item_id: number) => {
-    const found = data.find((item) => item.item_id === item_id);
-
-    if (found) {
-      setItemToView(found);
-    }
+  const handleViewItem = (item: EquippableItemWithBase) => {
+    setItemToView(item);
   };
 
-  const handleViewBuyMany = (item_id: number) => {
-    const found = data.find((item) => item.item_id === item_id);
-
-    if (found) {
-      setBuyManyItem(found);
-    }
+  const handleViewBuyMany = (item: EquippableItemWithBase) => {
+    setBuyManyItem(item);
   };
 
-  const handleCompareItem = (item_id: number) => {
-    const found = data.find((item) => item.item_id === item_id);
-
-    if (found) {
-      setItemToCompare(found);
-    }
+  const handleCompareItem = (item: EquippableItemWithBase) => {
+    setItemToCompare(item);
   };
 
   const handleBuyItem = (item_id: number) => {
@@ -177,9 +165,10 @@ const Shop = ({ close_shop }: ShopProps) => {
 
     return (
       <InfiniteRow handle_scroll={handleScroll} additional_css="max-h-[500px]">
-        {data.map((item) => (
+        {data.map((item, index) => (
           <ShopCard
-            key={item.item_id}
+            key={`${item.item_id}-${index}`}
+            row_key={`${item.item_id}-${index}`}
             item={item}
             view_item={handleViewItem}
             compare_item={handleCompareItem}

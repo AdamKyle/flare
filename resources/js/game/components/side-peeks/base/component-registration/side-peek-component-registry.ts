@@ -1,0 +1,103 @@
+import React from 'react';
+
+import { SidePeekComponentPropsMap } from './side-peek-component-props-map';
+import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
+import BugReportSidePeek from '../../../../../admin/logs-dashboard/components/side-peeks/bug-report-side-peek';
+import LogEntrySidePeek from '../../../../../admin/logs-dashboard/components/side-peeks/log-entry-side-peek';
+import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
+import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
+import BackPack from '../../character-inventory/backpack/backpack';
+import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
+import GemBag from '../../character-inventory/gem-bag/gem-bag';
+import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
+import Sets from '../../character-inventory/sets/sets';
+import SetsProps from '../../character-inventory/sets/types/sets-props';
+import UsableItemsProps from '../../character-inventory/usable-items/types/usable-items-props';
+import UsableItems from '../../character-inventory/usable-items/usable-items';
+import CraftedItem from '../../crafted-item/crafted-item';
+import CraftedItemProps from '../../crafted-item/types/crafted-item-props';
+import ItemDetails from '../../item-details/item-details';
+import ItemDetailsProps from '../../item-details/types/item-details-props';
+import Conjure from '../../map-actions/conjure/conjure';
+import ConjureProps from '../../map-actions/conjure/types/conjure-props';
+import CharacterKingdomDetails from '../../map-actions/kingdom-details/character-kingdom-details';
+import CharacterKingdomDetailsProps from '../../map-actions/kingdom-details/types/character-kingdom-details-props';
+import LocationDetails from '../../map-actions/location-details/location-details';
+import LocationDetailsProps from '../../map-actions/location-details/types/location-details-props';
+import SetSail from '../../map-actions/set-sail/set-sail';
+import SetSailProps from '../../map-actions/set-sail/types/set-sail-props';
+import Teleport from '../../map-actions/teleport/teleport';
+import TeleportProps from '../../map-actions/teleport/types/teleport-props';
+import TraversePropsDefinition from '../../map-actions/traverse/definitions/traverse-props-definition';
+import Traverse from '../../map-actions/traverse/traverse';
+import ServerChatItem from '../../server-chat-item/server-chat-item';
+import ServerChatItemProps from '../../server-chat-item/types/server-chat-item-props';
+
+export const SidePeekComponentRegistry: {
+  [K in keyof SidePeekComponentPropsMap]: {
+    component: React.ComponentType<SidePeekComponentPropsMap[K]>;
+    props: SidePeekComponentPropsMap[K];
+  };
+} = {
+  [SidePeekComponentRegistrationEnum.BACKPACK]: {
+    component: BackPack,
+    props: {} as BackpackProps,
+  },
+  [SidePeekComponentRegistrationEnum.GEM_BAG]: {
+    component: GemBag,
+    props: {} as GemBagProps,
+  },
+  [SidePeekComponentRegistrationEnum.USABLE_ITEMS]: {
+    component: UsableItems,
+    props: {} as UsableItemsProps,
+  },
+  [SidePeekComponentRegistrationEnum.SETS]: {
+    component: Sets,
+    props: {} as SetsProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TELEPORT]: {
+    component: Teleport,
+    props: {} as TeleportProps,
+  },
+  [SidePeekComponentRegistrationEnum.LOCATION_DETAILS]: {
+    component: LocationDetails,
+    props: {} as LocationDetailsProps,
+  },
+  [SidePeekComponentRegistrationEnum.CHARACTER_KINGDOM_DETAILS]: {
+    component: CharacterKingdomDetails,
+    props: {} as CharacterKingdomDetailsProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_TRAVERSE]: {
+    component: Traverse,
+    props: {} as TraversePropsDefinition,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_SET_SAIL]: {
+    component: SetSail,
+    props: {} as SetSailProps,
+  },
+  [SidePeekComponentRegistrationEnum.MAP_ACTIONS_CONJURE]: {
+    component: Conjure,
+    props: {} as ConjureProps,
+  },
+  [SidePeekComponentRegistrationEnum.SERVER_CHAT_ITEM]: {
+    component: ServerChatItem,
+    props: {} as ServerChatItemProps,
+  },
+  [SidePeekComponentRegistrationEnum.CRAFTED_ITEM]: {
+    component: CraftedItem,
+    props: {} as CraftedItemProps,
+  },
+  [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: {
+    component: ItemDetails,
+    props: {} as ItemDetailsProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: {
+    component: LogEntrySidePeek,
+    props: {} as LogEntrySidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_BUG_REPORT]: {
+    component: BugReportSidePeek,
+    props: {} as BugReportSidePeekProps,
+  },
+  // Add more components here
+};

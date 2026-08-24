@@ -22,14 +22,14 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
-use App\Flare\Traits\Controllers\ItemsShowInformation;
-use App\Flare\Traits\Controllers\MonstersShowInformation;
-use App\Flare\View\Tables\Definitions\LocationGemsTableDefinition;
-use App\Flare\View\Tables\Definitions\MapGemsTableDefinition;
-use App\Flare\View\Tables\TableQueryBuilder;
+use App\Flare\Tables\TableQueryBuilder;
+use App\Game\Core\Items\Services\ItemShowInformationService;
 use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Core\Monsters\Services\MonsterShowInformationService;
 use App\Game\Core\Values\View\ClassBonusInformation;
 use App\Game\Maps\Values\LocationType;
+use App\Info\Tables\Definitions\LocationGemsTableDefinition;
+use App\Info\Tables\Definitions\MapGemsTableDefinition;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -37,9 +37,11 @@ use Storage;
 
 class InfoPageController extends Controller
 {
-    use ItemsShowInformation, MonstersShowInformation;
-
-    public function __construct(private readonly ClassBonusInformation $classBonusInformation) {}
+    public function __construct(
+        private readonly ClassBonusInformation $classBonusInformation,
+        private readonly ItemShowInformationService $itemShowInformationService,
+        private readonly MonsterShowInformationService $monsterShowInformationService,
+    ) {}
 
     public function search(Request $request)
     {
@@ -183,7 +185,7 @@ class InfoPageController extends Controller
 
     public function viewMonster(Request $request, Monster $monster)
     {
-        return $this->renderMonsterShow($monster, 'information.monsters.monster');
+        return view('information.monsters.monster', $this->monsterShowInformationService->details($monster));
     }
 
     public function viewLocation(Request $request, Location $location)
@@ -240,7 +242,7 @@ class InfoPageController extends Controller
 
     public function viewItem(Request $request, Item $item)
     {
-        return $this->renderItemShow('information.items.item', $item);
+        return view('information.items.item', $this->itemShowInformationService->details($item));
     }
 
     public function viewAffix(Request $request, ItemAffix $affix)

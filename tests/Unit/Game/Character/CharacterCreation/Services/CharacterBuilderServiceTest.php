@@ -7,40 +7,35 @@ use App\Flare\Models\CharacterPassiveSkill;
 use App\Flare\Models\Skill;
 use App\Game\Character\CharacterCreation\Services\CharacterBuilderService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Str;
+use Tests\Setup\Character\CharacterCreation\CharacterBuilderServiceFactory;
 use Tests\TestCase;
-use Tests\Traits\CreateCharacter;
 use Tests\Traits\CreateCharacterClassRank;
-use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameSkill;
 use Tests\Traits\CreateNpc;
 use Tests\Traits\CreatePassiveSkill;
 use Tests\Traits\CreateQuest;
-use Tests\Traits\CreateRace;
-use Tests\Traits\CreateUser;
 
 class CharacterBuilderServiceTest extends TestCase
 {
-    use CreateCharacter,
-        CreateCharacterClassRank,
-        CreateClass,
+    use CreateCharacterClassRank,
         CreateGameSkill,
         CreateNpc,
         CreatePassiveSkill,
         CreateQuest,
-        CreateRace,
-        CreateUser,
         RefreshDatabase;
 
     private ?CharacterBuilderService $builder = null;
 
     private ?Character $character = null;
 
+    private CharacterBuilderServiceFactory $characterBuilderServiceFactory;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->builder = new CharacterBuilderService;
+        $this->characterBuilderServiceFactory = new CharacterBuilderServiceFactory();
     }
 
     protected function tearDown(): void
@@ -49,32 +44,12 @@ class CharacterBuilderServiceTest extends TestCase
 
         $this->builder = null;
         $this->character = null;
-    }
-
-    private function makeBareCharacter(?string $className = 'Fighter'): Character
-    {
-        $user = $this->createUser();
-        $race = $this->createRace();
-        $class = $this->createClass(['name' => $className]);
-
-        return $this->createCharacter([
-            'damage_stat' => $class->damage_stat,
-            'name' => Str::random(10),
-            'user_id' => $user->id,
-            'level' => 1,
-            'xp' => 0,
-            'can_attack' => true,
-            'can_move' => true,
-            'inventory_max' => 75,
-            'gold' => 10,
-            'game_class_id' => $class->id,
-            'game_race_id' => $race->id,
-        ]);
+        unset($this->characterBuilderServiceFactory);
     }
 
     public function test_assign_skills_creates_missing_global_and_class_skills(): void
     {
-        $this->character = $this->makeBareCharacter();
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter();
 
         $globalSkill = $this->createGameSkill(['game_class_id' => null]);
         $classSkill = $this->createGameSkill(['game_class_id' => $this->character->game_class_id]);
@@ -91,7 +66,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_skills_does_not_duplicate_an_already_assigned_skill(): void
     {
-        $this->character = $this->makeBareCharacter();
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter();
 
         $globalSkill = $this->createGameSkill(['game_class_id' => null]);
 
@@ -106,7 +81,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_passive_skills_creates_top_level_and_locked_child(): void
     {
-        $this->character = $this->makeBareCharacter();
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter();
 
         $parent = $this->createPassiveSkill([
             'is_locked' => false,
@@ -131,7 +106,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_passive_skills_updates_locked_status_for_an_existing_row(): void
     {
-        $this->character = $this->makeBareCharacter();
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter();
 
         $parent = $this->createPassiveSkill([
             'is_locked' => false,
@@ -161,7 +136,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_passive_skills_locks_a_passive_behind_an_uncompleted_quest(): void
     {
-        $this->character = $this->makeBareCharacter();
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter();
 
         $passiveSkill = $this->createPassiveSkill([
             'is_locked' => false,
@@ -180,7 +155,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_passive_skills_unlocks_a_passive_behind_a_completed_quest(): void
     {
-        $this->character = $this->makeBareCharacter();
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter();
 
         $passiveSkill = $this->createPassiveSkill([
             'is_locked' => false,
@@ -204,7 +179,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_weapon_masteries_uses_string_mapping_for_a_single_weapon_class(): void
     {
-        $this->character = $this->makeBareCharacter('Fighter');
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter('Fighter');
 
         $classRank = $this->createCharacterClassRank([
             'character_id' => $this->character->id,
@@ -221,7 +196,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_weapon_masteries_grants_prisoner_full_level_only_for_the_first_mapped_type(): void
     {
-        $this->character = $this->makeBareCharacter('Prisoner');
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter('Prisoner');
 
         $classRank = $this->createCharacterClassRank([
             'character_id' => $this->character->id,
@@ -238,7 +213,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_weapon_masteries_grants_merchant_specific_levels_for_mapped_types(): void
     {
-        $this->character = $this->makeBareCharacter('Merchant');
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter('Merchant');
 
         $classRank = $this->createCharacterClassRank([
             'character_id' => $this->character->id,
@@ -256,7 +231,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_weapon_masteries_grants_default_level_for_non_special_mapped_class(): void
     {
-        $this->character = $this->makeBareCharacter('Thief');
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter('Thief');
 
         $classRank = $this->createCharacterClassRank([
             'character_id' => $this->character->id,
@@ -274,7 +249,7 @@ class CharacterBuilderServiceTest extends TestCase
 
     public function test_assign_weapon_masteries_grants_zero_level_for_an_unmapped_class(): void
     {
-        $this->character = $this->makeBareCharacter('Unmapped Custom Class');
+        $this->character = $this->characterBuilderServiceFactory->makeBareCharacter('Unmapped Custom Class');
 
         $classRank = $this->createCharacterClassRank([
             'character_id' => $this->character->id,

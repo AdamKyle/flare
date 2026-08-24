@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Automation\Services\AutomationRestrictionService;
@@ -12,6 +11,7 @@ use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Services\GameTimerService;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
 use Exception;

@@ -4,9 +4,9 @@ namespace Tests\Unit\Game\Battle\Services;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
-use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Combat\Values\AttackType;

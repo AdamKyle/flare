@@ -23,6 +23,7 @@ use App\Game\Gems\Builders\GemBuilder;
 use App\Game\Gems\Transformers\GemTransformer;
 use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Npcs\Actions\QueenOfHearts\Services\RandomEnchantmentService;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Console\Commands\AssignNewSkillsToPlayers;
 use App\Game\Skills\Handlers\HandleUpdatingCraftingGlobalEventGoal;
 use App\Game\Skills\Handlers\HandleUpdatingEnchantingGlobalEventGoal;
@@ -64,6 +65,10 @@ class ServiceProvider extends ApplicationServiceProvider
     public function register()
     {
         $this->app->bind(SkillBonusContextService::class);
+
+        $this->app->bind(BaseSkillBuilder::class, function ($app) {
+            return new BaseSkillBuilder($app->make(RandomNumberGenerator::class));
+        });
 
         $this->commands([
             AssignNewSkillsToPlayers::class,

@@ -2,24 +2,27 @@
 
 namespace App\Flare\GemWorldGeneration\Services;
 
+use App\Flare\GemWorldGeneration\Values\GemWorldGenerationConfig;
+use App\Flare\MapGenerator\Contracts\LandMapImageFactory;
 use App\Flare\MapGenerator\Schemes\MapColorScheme;
+use App\Flare\MapGenerator\Support\GdPngImageWriter;
 use App\Flare\Models\GameMap;
 use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
-use ChristianEssl\LandmapGeneration\Generator\LandmapGenerator;
 use ChristianEssl\LandmapGeneration\Settings\MapSettings;
-use ChristianEssl\LandmapGeneration\Utility\ImageUtility;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GemWorldImageGenerator
 {
     public function __construct(
         private readonly GemWorldPlaneGenerationSettings $settings,
+        private readonly LandMapImageFactory $landMapImageFactory,
+        private readonly GdPngImageWriter $imageWriter,
+        private readonly GemWorldGenerationConfig $config,
     ) {}
 
     public function generate(GameMap $parentMap, string $mapName): string
     {
-        ini_set('memory_limit', (string) config('gem_world_generation.memory_limit', '3G'));
+        ini_set('memory_limit', $this->config->memoryLimit);
 
         $path = 'generated-gem-worlds/'.Str::slug($mapName).'.png';
 
@@ -30,23 +33,15 @@ class GemWorldImageGenerator
                     $this->settings->landColor($parentMap),
                     $this->settings->waterColor($parentMap),
                 ))
-                ->setWidth((int) config('gem_world_generation.map_width', 2500))
-                ->setHeight((int) config('gem_world_generation.map_height', 2500))
+                ->setWidth($this->config->mapWidth)
+                ->setHeight($this->config->mapHeight)
                 ->setWaterLevel($this->settings->waterLevel($parentMap));
 
-            $landMapGenerator = new LandmapGenerator($mapSettings, Str::slug($mapName));
-            $map = $landMapGenerator->generateMap();
-            $image = ImageUtility::createImage($map);
+            $image = $this->landMapImageFactory->build($mapSettings, Str::slug($mapName));
 
-            ob_start();
-            imagepng($image);
-            $imageData = ob_get_contents();
-            ob_end_clean();
-            imagedestroy($image);
-
-            Storage::disk('maps')->put($path, $imageData);
+            $this->imageWriter->encodeAndStore($image, 'maps', $path);
         } finally {
-            unset($map, $image, $landMapGenerator, $mapSettings, $imageData);
+            unset($image, $mapSettings);
             gc_collect_cycles();
         }
 

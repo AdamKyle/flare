@@ -3,14 +3,12 @@
 namespace App\Game\Gems\Traits;
 
 use App\Flare\Models\Item;
-use App\Flare\Traits\ElementAttackData;
+use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Gems\Values\GemTypeValue;
 use Illuminate\Support\Facades\DB;
 
 trait GetItemAtonements
 {
-    use ElementAttackData;
-
     /**
      * Get atonement data based on gem array data.
      */
@@ -108,10 +106,11 @@ trait GetItemAtonements
     {
 
         $elementData = $atonements['atonements'];
+        $elementAttackData = new ElementAttackData;
 
-        $highestElementalDamage = $this->getHighestElementDamage($elementData);
+        $highestElementalDamage = $elementAttackData->getHighestElementDamage($elementData);
 
-        $highestElementalName = $this->getHighestElementName($elementData, $highestElementalDamage);
+        $highestElementalName = $elementAttackData->getHighestElementName($elementData, $highestElementalDamage);
 
         if ($highestElementalDamage <= 0) {
             $atonements['elemental_damage'] = [

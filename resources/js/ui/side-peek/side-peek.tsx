@@ -36,7 +36,7 @@ const SidePeek = (props: SidePeekProps) => {
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-40 z-[99999] bg-black dark:bg-black/70"
+        className="fixed inset-0 z-[99999] bg-black dark:bg-black/70"
         initial={reduceMotion ? false : { opacity: 0 }}
         animate={reduceMotion ? undefined : { opacity: 0.5 }}
         exit={reduceMotion ? undefined : { opacity: 0 }}

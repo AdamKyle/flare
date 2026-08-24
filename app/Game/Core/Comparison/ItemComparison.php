@@ -4,15 +4,13 @@ namespace App\Game\Core\Comparison;
 
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
-use App\Flare\Traits\IsItemUnique;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Core\Items\Values\ItemUniqueness;
 use Illuminate\Database\Eloquent\Collection;
 
 class ItemComparison
 {
-    use IsItemUnique;
-
     private $character;
 
     private $coreStats = [
@@ -70,7 +68,7 @@ class ItemComparison
             if (! empty($result)) {
 
                 $result['position'] = $slot->position;
-                $result['is_unique'] = $this->isUnique($slot->item);
+                $result['is_unique'] = ItemUniqueness::fromItem($slot->item)->isUnique();
                 $result['is_mythic'] = $slot->item->is_mythic;
                 $result['is_cosmic'] = $slot->item->is_cosmic;
                 $result['affix_count'] = $slot->item->affix_count;

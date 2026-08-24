@@ -24,22 +24,16 @@ class GetReleaseData extends Command
      */
     protected $description = 'Fetches Github Release Data';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
     }
 
     /**
-     * Execute the console command.
+     * Fetch Github release data and persist any non-draft releases not already stored.
+     *
      *
      * @throws Exception
-     *
-     * @codeCoverageIgnore
      */
     public function handle(Github $github): void
     {
@@ -63,6 +57,9 @@ class GetReleaseData extends Command
         $this->storeRelease($releaseData);
     }
 
+    /**
+     * Store the given Github release data as a ReleaseNote when a matching URL does not already exist.
+     */
     public function storeRelease(array $releaseData): void
     {
         $notes = ReleaseNote::where('url', $releaseData['html_url'])->first();

@@ -12,6 +12,7 @@ use App\Game\Maps\Values\MapName;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\File as FileFacade;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
@@ -220,10 +221,9 @@ class ImportGameData extends Command
         $sourceDirectory = resource_path('backup/info-sections-images');
         $destinationDirectory = storage_path('app/public');
 
-        $command = 'cp -R '.escapeshellarg($sourceDirectory).' '.escapeshellarg($destinationDirectory);
-        exec($command, $output, $exitCode);
+        $copied = FileFacade::copyDirectory($sourceDirectory, $destinationDirectory);
 
-        if ($exitCode === 0) {
+        if ($copied) {
             $this->line('Information section images directory copied to public successfully. Information section is now set up.');
         } else {
             $this->line('Failed to copy the information images directory over. You can do this manually from the resources/backup/information-sections-images. Copy the entire directory to app/public');
@@ -265,13 +265,13 @@ class ImportGameData extends Command
         $mapGemsPath = resource_path('data-imports').'/World Gems/map-gems.xlsx';
         $locationGemsPath = resource_path('data-imports').'/World Gems/location-gems.xlsx';
 
-        if (! file_exists($mapGemsPath)) {
+        if (! FileFacade::exists($mapGemsPath)) {
             $this->error('Missing file: resources/data-imports/World Gems/map-gems.xlsx');
 
             return;
         }
 
-        if (! file_exists($locationGemsPath)) {
+        if (! FileFacade::exists($locationGemsPath)) {
             $this->error('Missing file: resources/data-imports/World Gems/location-gems.xlsx');
 
             return;

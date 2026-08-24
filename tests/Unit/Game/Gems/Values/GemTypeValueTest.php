@@ -73,4 +73,20 @@ class GemTypeValueTest extends TestCase
 
         $this->assertTrue($gemTypeValue->isIce());
     }
+
+    public function test_get_names_returns_names_keyed_by_constant(): void
+    {
+        $this->assertSame([
+            GemTypeValue::FIRE => 'Fire',
+            GemTypeValue::ICE => 'Ice',
+            GemTypeValue::WATER => 'Water',
+        ], GemTypeValue::getNames());
+    }
+
+    public function test_get_name_of_atonement_returns_the_matching_element_name(): void
+    {
+        $gemTypeValue = new GemTypeValue(GemTypeValue::WATER);
+
+        $this->assertSame('Water', $gemTypeValue->getNameOfAtonement());
+    }
 }

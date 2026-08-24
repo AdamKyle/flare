@@ -64,6 +64,10 @@ Remove tests that:
 - Repeat the same event, message, log, or transformed payload for every caller.
 - Test implementation details rather than public behavior.
 - Exist only to increase assertion or coverage counts.
+- Use reflection or another visibility bypass to test implementation details.
+- Only resolve concrete classes or exercise provider `register()`, `boot()`, or `provides()` plumbing.
+- Assert constructor/property assignment, declared enum values, or a thin third-party factory's returned class without an application-owned contract.
+- Use tautological assertions such as `assertTrue(true)`.
 - Recreate an already-authoritative scenario using a more expensive HTTP or job path.
 - Exercise the same formula using arbitrary examples when representative boundaries cover the formula.
 - Verify job reconstruction or reinitialization that the application does not perform.

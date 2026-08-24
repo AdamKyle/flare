@@ -248,9 +248,9 @@
                 </p>
 
                 @php
-                    $itemSkillsColumns = \App\Flare\View\Tables\Definitions\ItemSkillsTableDefinition::columns();
-                    $itemSkillsPaginator = \App\Flare\View\Tables\TableQueryBuilder::paginate(
-                        \App\Flare\View\Tables\Definitions\ItemSkillsTableDefinition::builder($item->itemSkill->id),
+                    $itemSkillsColumns = \App\Game\Core\Items\Tables\Definitions\ItemSkillsTableDefinition::columns();
+                    $itemSkillsPaginator = \App\Flare\Tables\TableQueryBuilder::paginate(
+                        \App\Game\Core\Items\Tables\Definitions\ItemSkillsTableDefinition::builder($item->itemSkill->id),
                         $itemSkillsColumns,
                         request()
                     );

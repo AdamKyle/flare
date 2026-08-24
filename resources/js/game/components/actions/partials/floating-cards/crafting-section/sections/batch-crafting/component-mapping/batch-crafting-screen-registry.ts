@@ -1,4 +1,4 @@
-import { ScreenRegistry } from 'screen-manager/types/registery-type';
+import { ScreenRegistry } from 'screen-manager/types/registry-type';
 
 import BatchCraftingRunningPanel from '../components/batch-crafting-running-panel';
 import CraftAmountForm from '../components/craft-amount-form';

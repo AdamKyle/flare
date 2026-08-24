@@ -9,12 +9,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
+use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 use Tests\Traits\CreateUserLoginDuration;
 
 class TrackSessionLifeMiddlewareTest extends TestCase
 {
-    use CreateUser, CreateUserLoginDuration, RefreshDatabase;
+    use CreateRole, CreateUser, CreateUserLoginDuration, RefreshDatabase;
 
     public function test_active_request_updates_heartbeat_and_activity_time(): void
     {
@@ -103,6 +104,40 @@ class TrackSessionLifeMiddlewareTest extends TestCase
         (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
 
         $this->assertSame(0, UserLoginDuration::where('user_id', $user->id)->count());
+    }
+
+    public function test_unauthenticated_requests_pass_through_without_tracking(): void
+    {
+        $response = (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
+
+        $this->assertSame('ok', $response->getContent());
+    }
+
+    public function test_admin_requests_pass_through_without_tracking(): void
+    {
+        $user = $this->createUser();
+        $this->createAdminRole();
+        $user->assignRole('Admin');
+        $this->actingAs($user);
+
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHour(), 'last_activity' => now()->subMinute(), 'last_heart_beat' => now()->subMinute()]);
+
+        (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
+
+        $this->assertFalse($session->refresh()->last_activity->equalTo(now()));
+    }
+
+    public function test_last_activity_in_the_future_is_clamped_to_now(): void
+    {
+        Carbon::setTestNow('2026-07-19 12:00:00');
+        config(['session.lifetime' => 30]);
+        $user = $this->createUser();
+        $session = $this->createUserLoginDuration(['user_id' => $user->id, 'logged_in_at' => now()->subHour(), 'last_activity' => now()->addHour(), 'last_heart_beat' => now()->addHour()]);
+        $this->actingAs($user);
+
+        (new TrackSessionLifeMiddleware())->handle(Request::create('/game', 'GET'), fn () => response('ok'));
+
+        $this->assertTrue($session->refresh()->last_activity->equalTo(now()));
     }
 
     public function test_closed_session_is_not_rewritten(): void

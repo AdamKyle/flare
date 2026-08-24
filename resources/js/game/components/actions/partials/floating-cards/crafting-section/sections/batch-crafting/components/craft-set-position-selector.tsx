@@ -56,31 +56,37 @@ const CraftSetPositionSelector = ({
       : 'No craftable items found.';
 
   return (
-    <fieldset>
-      <legend
-        id={legendId}
-        className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
+    <div className="space-y-2 rounded-md border border-gray-300 p-3 dark:border-gray-700">
+      <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
         {label}
-      </legend>
-      <Dropdown
-        aria_labelled_by={legendId}
-        items={itemOptions}
-        on_select={on_select}
-        pre_selected_item={selected_item ?? undefined}
-        selection_placeholder={`Select ${label}`}
-        searchable
-        search_value={searchText}
-        on_search={handleSearch}
-        can_load_more={canLoadMore}
-        is_loading_more={isLoadingMore}
-        on_end_reached={onEndReached}
-        empty_message={emptyMessage}
-        search_placeholder={`Search ${label}`}
-        focus_selected_on_open
-        on_open={() => setOptionsRequested(true)}
-      />
-    </fieldset>
+      </h4>
+      <fieldset>
+        <legend
+          id={legendId}
+          className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
+          <span className="sr-only">{label} </span>
+          Item
+        </legend>
+        <Dropdown
+          aria_labelled_by={legendId}
+          items={itemOptions}
+          on_select={on_select}
+          pre_selected_item={selected_item ?? undefined}
+          selection_placeholder="Select an item"
+          searchable
+          search_value={searchText}
+          on_search={handleSearch}
+          can_load_more={canLoadMore}
+          is_loading_more={isLoadingMore}
+          on_end_reached={onEndReached}
+          empty_message={emptyMessage}
+          search_placeholder="Search items"
+          focus_selected_on_open
+          on_open={() => setOptionsRequested(true)}
+        />
+      </fieldset>
+    </div>
   );
 };
 

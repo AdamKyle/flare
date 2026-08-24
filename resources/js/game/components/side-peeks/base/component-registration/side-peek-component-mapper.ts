@@ -1,14 +1,11 @@
 import React from 'react';
 
-import { SidePeekComponentRegistry } from './side-peek-component-registery';
+import { SidePeekComponentPropsMap } from './side-peek-component-props-map';
+import { SidePeekComponentRegistry } from './side-peek-component-registry';
 
-export const SidePeekComponentMapper = Object.fromEntries(
-  Object.entries(SidePeekComponentRegistry).map(([key, { component }]) => [
-    key,
-    component,
-  ])
-) as {
-  [K in keyof typeof SidePeekComponentRegistry]: React.ComponentType<
-    (typeof SidePeekComponentRegistry)[K]['props']
-  >;
-};
+export const resolveSidePeekComponent = <
+  K extends keyof SidePeekComponentPropsMap,
+>(
+  key: K
+): React.ComponentType<SidePeekComponentPropsMap[K]> =>
+  SidePeekComponentRegistry[key].component;

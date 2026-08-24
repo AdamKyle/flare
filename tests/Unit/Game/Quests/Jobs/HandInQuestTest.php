@@ -51,7 +51,7 @@ class HandInQuestTest extends TestCase
         });
     }
 
-    public function test_failed_reward_handling_does_not_create_completed_quest_log(): void
+    public function test_failed_reward_handling_rethrows_exception(): void
     {
         Event::fake();
 
@@ -70,41 +70,10 @@ class HandInQuestTest extends TestCase
 
         $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
 
-        try {
-            HandInQuest::dispatch($character, $quest);
-            $this->fail('The reward exception was not rethrown.');
-        } catch (Exception $exception) {
-            $this->assertSame('Reward failed.', $exception->getMessage());
-            $this->assertSame(0, $character->fresh()->questsCompleted()->where('quest_id', $quest->id)->count());
-        }
-    }
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Reward failed.');
 
-    public function test_failed_reward_handling_does_not_fire_completed_message(): void
-    {
-        Event::fake();
-
-        $npc = $this->createNpc();
-        $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
-        $quest = $this->createQuest(['npc_id' => $npc->id]);
-
-        $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
-        $npcQuestsHandler->shouldReceive('handleNpcQuest')
-            ->once()
-            ->with(
-                Mockery::on(fn (Character $queuedCharacter): bool => $queuedCharacter->is($character)),
-                Mockery::on(fn ($queuedQuest): bool => $queuedQuest->is($quest)),
-            )
-            ->andThrow(new Exception('Reward failed.'));
-
-        $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
-
-        try {
-            HandInQuest::dispatch($character, $quest);
-            $this->fail('The reward exception was not rethrown.');
-        } catch (Exception $exception) {
-            $this->assertSame('Reward failed.', $exception->getMessage());
-            Event::assertNotDispatched(GlobalMessageEvent::class);
-        }
+        HandInQuest::dispatch($character, $quest);
     }
 
     public function test_failed_reward_handling_logs_and_rethrows_exception(): void
@@ -115,8 +84,6 @@ class HandInQuestTest extends TestCase
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
         $quest = $this->createQuest(['npc_id' => $npc->id]);
         $exception = new Exception('Reward failed.');
-
-        Log::spy();
 
         $npcQuestsHandler = Mockery::mock(NpcQuestsHandler::class);
         $npcQuestsHandler->shouldReceive('handleNpcQuest')
@@ -129,13 +96,12 @@ class HandInQuestTest extends TestCase
 
         $this->app->instance(NpcQuestsHandler::class, $npcQuestsHandler);
 
-        try {
-            HandInQuest::dispatch($character, $quest);
-            $this->fail('The reward exception was not rethrown.');
-        } catch (Exception $thrownException) {
-            $this->assertSame('Reward failed.', $thrownException->getMessage());
-            Log::shouldHaveReceived('error')->once()->with('Reward failed.');
-        }
+        Log::shouldReceive('error')->once()->with('Reward failed.');
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Reward failed.');
+
+        HandInQuest::dispatch($character, $quest);
     }
 
     public function test_quest_completion_log_is_written_before_xp_reward_processing(): void

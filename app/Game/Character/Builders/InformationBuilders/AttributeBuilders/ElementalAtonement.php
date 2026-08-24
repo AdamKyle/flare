@@ -3,16 +3,14 @@
 namespace App\Game\Character\Builders\InformationBuilders\AttributeBuilders;
 
 use App\Flare\Models\Item;
-use App\Flare\Traits\ElementAttackData;
+use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Gems\Services\GemComparison;
 
 class ElementalAtonement extends BaseAttribute
 {
-    use ElementAttackData;
-
     private GemComparison $gemComparison;
 
-    public function __construct(GemComparison $gemComparison)
+    public function __construct(GemComparison $gemComparison, private readonly ElementAttackData $elementAttackData)
     {
         $this->gemComparison = $gemComparison;
     }
@@ -100,8 +98,8 @@ class ElementalAtonement extends BaseAttribute
      */
     private function calculateHighestElement(array $atonements): array
     {
-        $highestElementDamage = $this->getHighestElementDamage($atonements);
-        $highestElementName = ($highestElementDamage <= 0) ? 'N/A' : $this->getHighestElementName($atonements, $highestElementDamage);
+        $highestElementDamage = $this->elementAttackData->getHighestElementDamage($atonements);
+        $highestElementName = ($highestElementDamage <= 0) ? 'N/A' : $this->elementAttackData->getHighestElementName($atonements, $highestElementDamage);
 
         return [
             'name' => $highestElementName,

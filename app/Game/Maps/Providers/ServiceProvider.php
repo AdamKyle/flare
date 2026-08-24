@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Providers;
 
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Battle\Services\ConjureService;
@@ -14,8 +13,11 @@ use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Services\GameTimerService;
+use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
+use App\Game\Maps\Contracts\CoordinatesQuery;
+use App\Game\Maps\Services\CoordinatesQueryService;
 use App\Game\Maps\Services\LocationService;
 use App\Game\Maps\Services\MovementService;
 use App\Game\Maps\Services\PctService;
@@ -44,6 +46,10 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
+
+        $this->app->bind(CoordinatesQuery::class, function ($app) {
+            return new CoordinatesQueryService($app->make(CoordinatesCache::class));
+        });
 
         $this->app->bind(LocationTransformer::class, function () {
             return new LocationTransformer();

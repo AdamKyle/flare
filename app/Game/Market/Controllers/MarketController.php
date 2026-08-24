@@ -5,7 +5,6 @@ namespace App\Game\Market\Controllers;
 use App\Flare\Models\Character;
 use App\Flare\Models\Item;
 use App\Flare\Models\MarketBoard;
-use App\Flare\Traits\Controllers\ItemsShowInformation;
 use App\Game\Character\CharacterInventory\Exceptions\EquipItemException;
 use App\Game\Character\CharacterInventory\Services\ComparisonService;
 use App\Game\Core\Currency\Services\CurrencyLimit;
@@ -21,8 +20,6 @@ use League\Fractal\Manager;
 
 class MarketController extends Controller
 {
-    use ItemsShowInformation;
-
     private Manager $manager;
 
     private MarketItemsTransformer $transformer;

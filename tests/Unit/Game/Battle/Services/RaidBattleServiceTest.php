@@ -4,10 +4,10 @@ namespace Tests\Unit\Game\Battle\Services;
 
 use App\Flare\Models\RaidBoss;
 use App\Flare\Models\RaidBossParticipation;
-use App\Flare\ServerFight\Monster\BuildMonster;
-use App\Flare\ServerFight\Monster\ServerMonster;
-use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Handlers\BattleEventHandler;
+use App\Game\Battle\ServerFight\Monster\BuildMonster;
+use App\Game\Battle\ServerFight\Monster\ServerMonster;
+use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Services\RaidBattleService;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Monsters\Services\BuildMonsterCacheService;

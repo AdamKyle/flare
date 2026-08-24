@@ -9,9 +9,9 @@ use GuzzleHttp\Exception\RequestException;
 
 class DeepAiImageGeneration
 {
-    private Client $client;
-
     private string $apiKey;
+
+    public function __construct(private readonly Client $client) {}
 
     /**
      * Initialize the class for an api call.
@@ -22,15 +22,12 @@ class DeepAiImageGeneration
     {
         $this->apiKey = $apiKey;
 
-        $this->client = new Client([
-            'base_uri' => 'https://api.deepai.org',
-        ]);
-
         return $this;
     }
 
     /**
      * Generate the image based off the prompt.
+     *
      *
      * @throws GuzzleException
      */

@@ -6,30 +6,39 @@ use App\Admin\Requests\MoveLocationRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Npc;
+use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Services\LocationService;
 use App\Http\Controllers\Controller;
-use Facades\App\Flare\Cache\CoordinatesCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
 class MapManagerController extends Controller
 {
-    public function __construct(private readonly LocationService $locationService) {}
+    public function __construct(
+        private readonly LocationService $locationService,
+        private readonly CoordinatesQuery $coordinatesQuery,
+    ) {}
 
+    /**
+     * Return the map image path, coordinate grid, locations, and Npcs for the given GameMap.
+     */
     public function getMapData(GameMap $gameMap): JsonResponse
     {
 
-        $coordinates = CoordinatesCache::getFromCache();
+        $coordinates = $this->coordinatesQuery->get();
 
         return response()->json([
             'path' => Storage::disk('maps')->url($gameMap->path),
-            'x_coordinates' => $coordinates['x'],
-            'y_coordinates' => $coordinates['y'],
+            'x_coordinates' => $coordinates->x,
+            'y_coordinates' => $coordinates->y,
             'locations' => $this->locationService->fetchLocationsForMap($gameMap),
             'npcs' => Npc::where('game_map_id', $gameMap->id)->get(),
         ]);
     }
 
+    /**
+     * Move the given Location or Npc to the requested X/Y position on the map.
+     */
     public function moveLocation(MoveLocationRequest $request, GameMap $gameMap): JsonResponse
     {
         if ($request->location_id > 0) {

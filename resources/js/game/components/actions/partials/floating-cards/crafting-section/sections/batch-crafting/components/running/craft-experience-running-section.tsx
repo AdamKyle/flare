@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import BatchCraftingDetailSection from '../batch-crafting-detail-section';
 import BatchCraftingOutcomeChart from '../batch-crafting-outcome-chart';
 import CraftingSkillProgressList from '../crafting-skill-progress-list';
 import BatchCraftingRunningSectionProps from './types/batch-crafting-running-section-props';
@@ -15,7 +16,6 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
-import Separator from 'ui/separator/separator';
 
 const CraftExperienceRunningSection = ({
   batch,
@@ -59,56 +59,65 @@ const CraftExperienceRunningSection = ({
 
   return (
     <div className="space-y-3">
-      {renderCurrentItem()}
+      <BatchCraftingDetailSection title="Progress">
+        {renderCurrentItem()}
 
-      {disciplineLabel && (
-        <p className="text-sm">
-          <span className="text-gray-600 dark:text-gray-400">
-            Current Crafting Discipline:
-          </span>{' '}
-          <span className="font-semibold">{disciplineLabel}</span>
+        {disciplineLabel && (
+          <p className="text-sm">
+            <span className="text-gray-600 dark:text-gray-400">
+              Current Crafting Discipline:
+            </span>{' '}
+            <span className="font-semibold">{disciplineLabel}</span>
+          </p>
+        )}
+
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          6 actions per minute
+          {experience &&
+            ` · Cycle position ${experience.current_cycle_position + 1} of ${experience.cycle_size}`}
         </p>
-      )}
 
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        6 actions per minute
-        {experience &&
-          ` · Cycle position ${experience.current_cycle_position + 1} of ${experience.cycle_size}`}
-      </p>
+        {experience && (
+          <CraftingSkillProgressList skills={experience.crafting_skills} />
+        )}
+      </BatchCraftingDetailSection>
 
-      {experience && (
-        <CraftingSkillProgressList skills={experience.crafting_skills} />
-      )}
+      <BatchCraftingDetailSection title="Results">
+        <dl className="xsm:grid-cols-2 grid grid-cols-1 gap-x-3 gap-y-1 text-sm">
+          <dt className="text-gray-600 dark:text-gray-400">Successful</dt>
+          <dd>{batch.crafted_count}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Failed</dt>
+          <dd>{batch.failed_count}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">
+            Crafting XP Gained
+          </dt>
+          <dd>{(experience?.crafting_xp_gained ?? 0).toLocaleString()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Gold Spent</dt>
+          <dd>{batch.gold_spent.toLocaleString()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Gold Gained</dt>
+          <dd>{batch.gold_gained.toLocaleString()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Gold Left</dt>
+          <dd>{batch.gold_left.toLocaleString()}</dd>
+        </dl>
+      </BatchCraftingDetailSection>
 
-      <Separator />
-
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-        <dt className="text-gray-600 dark:text-gray-400">Successful</dt>
-        <dd>{batch.crafted_count}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Failed</dt>
-        <dd>{batch.failed_count}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Crafting XP Gained</dt>
-        <dd>{(experience?.crafting_xp_gained ?? 0).toLocaleString()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Gold Spent</dt>
-        <dd>{batch.gold_spent.toLocaleString()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Gold Gained</dt>
-        <dd>{batch.gold_gained.toLocaleString()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Gold Left</dt>
-        <dd>{batch.gold_left.toLocaleString()}</dd>
-      </dl>
-
-      <BatchCraftingOutcomeChart
-        chart_points={batch.chart_points}
-        processing_started_at={batch.processing_started_at}
-      />
+      <BatchCraftingDetailSection title="Activity">
+        <BatchCraftingOutcomeChart
+          chart_points={batch.chart_points}
+          processing_started_at={batch.processing_started_at}
+        />
+      </BatchCraftingDetailSection>
 
       {!isRunning && batch.ended_reason && (
-        <Alert variant={AlertVariant.INFO}>
-          {endReasonLabel(batch.ended_reason)}. Crafted{' '}
-          {batch.crafted_count.toLocaleString()}, failed{' '}
-          {batch.failed_count.toLocaleString()}, gained{' '}
-          {(experience?.crafting_xp_gained ?? 0).toLocaleString()} Crafting XP.
-        </Alert>
+        <BatchCraftingDetailSection title="Completion">
+          <Alert variant={AlertVariant.INFO}>
+            {endReasonLabel(batch.ended_reason)}. Crafted{' '}
+            {batch.crafted_count.toLocaleString()}, failed{' '}
+            {batch.failed_count.toLocaleString()}, gained{' '}
+            {(experience?.crafting_xp_gained ?? 0).toLocaleString()} Crafting
+            XP.
+          </Alert>
+        </BatchCraftingDetailSection>
       )}
     </div>
   );

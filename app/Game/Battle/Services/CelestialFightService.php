@@ -6,13 +6,13 @@ use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterInCelestialFight;
 use App\Flare\Models\Map;
-use App\Flare\ServerFight\MonsterPlayerFight;
 use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Events\UpdateCelestialFight;
 use App\Game\Battle\Events\UpdateCharacterStatus;
 use App\Game\Battle\Handlers\BattleEventHandler;
 use App\Game\Battle\Jobs\CelestialTimeOut;
+use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
@@ -21,10 +21,10 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Events\UpdateCharacterCelestialTimeOut;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Values\MapTileValue;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Facades\App\Flare\Cache\CoordinatesCache;
 
 class CelestialFightService
 {
@@ -44,6 +44,7 @@ class CelestialFightService
         MonsterPlayerFight $monsterPlayerFight,
         MapTileValue $mapTileValue,
         private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly CoordinatesQuery $coordinatesQuery,
     ) {
         $this->battleEventHandler = $battleEventHandler;
         $this->characterCacheData = $characterCacheData;
@@ -287,8 +288,9 @@ class CelestialFightService
      */
     private function getCelestialCoordinates(CelestialFight $celestialFight): array
     {
-        $xPosition = CoordinatesCache::getFromCache()['x'][$this->randomNumberGenerator->numberBetween(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
-        $yPosition = CoordinatesCache::getFromCache()['y'][$this->randomNumberGenerator->numberBetween(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+        $coordinates = $this->coordinatesQuery->get();
+        $xPosition = $coordinates->x[$this->randomNumberGenerator->numberBetween($coordinates->x[0], count($coordinates->x) - 1)];
+        $yPosition = $coordinates->y[$this->randomNumberGenerator->numberBetween($coordinates->y[0], count($coordinates->y) - 1)];
         $gameMap = $celestialFight->monster->gameMap;
 
         if ($gameMap->mapType()->isTwistedMemories() || $gameMap->mapType()->isDelusionalMemories()) {

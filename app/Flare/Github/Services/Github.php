@@ -10,6 +10,8 @@ class Github
 {
     private ?Client $client = null;
 
+    public function __construct(private readonly GithubClientFactory $clientFactory) {}
+
     /**
      * Inject a client object.
      */
@@ -27,7 +29,7 @@ class Github
      */
     public function initiateClient(bool $withAuth = false): Github
     {
-        $client = new Client;
+        $client = $this->clientFactory->create();
 
         if ($withAuth) {
             $client->authenticate(config('github.token'), AuthMethod::ACCESS_TOKEN);
@@ -40,6 +42,7 @@ class Github
 
     /**
      * Fetch the latest release.
+     *
      *
      * @throws Exception
      */
@@ -54,6 +57,7 @@ class Github
 
     /**
      * Fetch all releases from github.
+     *
      *
      * @throws Exception
      */

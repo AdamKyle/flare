@@ -12,6 +12,7 @@ import LinkButton from 'ui/buttons/link-button';
 
 const ShopCard = ({
   item,
+  row_key,
   view_item,
   compare_item,
   view_buy_many,
@@ -40,15 +41,15 @@ const ShopCard = ({
     <>
       <div className="flex items-start justify-between">
         <h3
-          id={`item-${item.item_id}-name`}
+          id={`item-${row_key}-name`}
           className="text-danube-600 dark:text-danube-300 flex-1 text-lg font-semibold break-words"
         >
           {item.name}
         </h3>
         <LinkButton
-          label="view"
+          label="View"
           variant={ButtonVariant.PRIMARY}
-          on_click={() => view_item(item.item_id)}
+          on_click={() => view_item(item)}
         />
       </div>
       <p className="mt-2 text-gray-700 dark:text-gray-300">
@@ -59,7 +60,7 @@ const ShopCard = ({
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <Button
-          on_click={() => compare_item(item.item_id)}
+          on_click={() => compare_item(item)}
           label="Compare"
           variant={ButtonVariant.SUCCESS}
           disabled={is_actions_disabled}
@@ -71,7 +72,7 @@ const ShopCard = ({
           disabled={is_actions_disabled}
         />
         <Button
-          on_click={() => view_buy_many(item.item_id)}
+          on_click={() => view_buy_many(item)}
           label="Buy Multiple"
           variant={ButtonVariant.PRIMARY}
           disabled={is_actions_disabled}

@@ -18,6 +18,13 @@ class CraftingControllerTest extends TestCase
 {
     use CreateGameSkill, CreateItem, RefreshDatabase;
 
+    protected function tearDown(): void
+    {
+        Model::preventLazyLoading(false);
+
+        parent::tearDown();
+    }
+
     public function test_fetch_items_to_craft_returns_condensed_rows_with_nested_preview(): void
     {
         $craftingSkill = $this->createGameSkill(['name' => 'Weapon Crafting', 'type' => SkillTypeValue::CRAFTING->value]);
@@ -502,22 +509,18 @@ class CraftingControllerTest extends TestCase
 
         Model::preventLazyLoading();
 
-        try {
-            $response = $this->actingAs($character->user)
-                ->call('GET', '/api/crafting/'.$character->id, [
-                    'crafting_type' => 'hammer',
-                    'per_page' => 15,
-                    'page' => 1,
-                ]);
+        $response = $this->actingAs($character->user)
+            ->call('GET', '/api/crafting/'.$character->id, [
+                'crafting_type' => 'hammer',
+                'per_page' => 15,
+                'page' => 1,
+            ]);
 
-            $response->assertOk();
+        $response->assertOk();
 
-            $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true);
 
-            $this->assertCount(2, $data['data']);
-            $this->assertArrayHasKey('preview', $data['data'][0]);
-        } finally {
-            Model::preventLazyLoading(false);
-        }
+        $this->assertCount(2, $data['data']);
+        $this->assertArrayHasKey('preview', $data['data'][0]);
     }
 }

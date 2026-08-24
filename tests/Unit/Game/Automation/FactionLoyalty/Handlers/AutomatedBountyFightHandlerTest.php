@@ -99,14 +99,6 @@ class AutomatedBountyFightHandlerTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_automated_bounty_fight_handler_resolves_from_container(): void
-    {
-        $this->assertInstanceOf(
-            AutomatedBountyFightHandler::class,
-            resolve(AutomatedBountyFightHandler::class),
-        );
-    }
-
     public function test_handle_returns_invalid_task_when_task_is_missing_required_fields(): void
     {
         Event::fake();

@@ -6,21 +6,19 @@ use App\Flare\Models\Character;
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\Item;
 use App\Flare\Models\SetSlot;
-use App\Flare\Traits\IsItemUnique;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Core\Items\Enricher\EquippableEnricher;
 use App\Game\Core\Items\Transformers\BaseEquippableItemTransformer;
 use App\Game\Core\Items\Values\ArmourType;
 use App\Game\Core\Items\Values\EquippablePositionType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Core\Items\Values\ItemUniqueness;
 use Illuminate\Database\Eloquent\Collection;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as FractalItem;
 
 class ItemComparison
 {
-    use IsItemUnique;
-
     public function __construct(
         private readonly EquippableEnricher $enricher,
         private readonly Comparator $comparator,
@@ -160,7 +158,7 @@ class ItemComparison
                 'holy_stacks_total_stat_increase' => $enrichedEquippedItem->holy_stack_stat_bonus,
                 'is_cosmic' => $enrichedEquippedItem->is_cosmic,
                 'is_mythic' => $enrichedEquippedItem->is_mythic,
-                'is_unique' => $this->isUnique($enrichedEquippedItem),
+                'is_unique' => ItemUniqueness::fromItem($enrichedEquippedItem)->isUnique(),
                 'usable' => $enrichedEquippedItem->usable,
                 'holy_level' => $enrichedEquippedItem->holy_level,
                 'damages_kingdoms' => $enrichedEquippedItem->damages_kingdoms,

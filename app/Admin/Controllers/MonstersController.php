@@ -9,7 +9,6 @@ use App\Admin\Requests\MonstersImport as MonstersImportRequest;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
-use App\Flare\Traits\Controllers\MonstersShowInformation;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Messages\Events\GlobalMessageEvent;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
@@ -20,15 +19,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class MonstersController extends Controller
 {
-    use MonstersShowInformation;
-
     private $monsterCache;
 
     public function __construct(BuildMonsterCacheService $monsterCache)
     {
-        $this->middleware('is.admin')->except([
-            'show',
-        ]);
+        $this->middleware('is.admin');
 
         $this->monsterCache = $monsterCache;
     }
@@ -38,11 +33,6 @@ class MonstersController extends Controller
         return view('admin.monsters.monsters', [
             'gameMapNames' => GameMap::all()->pluck('name')->toArray(),
         ]);
-    }
-
-    public function show(Monster $monster)
-    {
-        return $this->renderMonsterShow($monster);
     }
 
     public function create()
@@ -121,7 +111,7 @@ class MonstersController extends Controller
             $message = 'Updated: '.$monster->name;
         }
 
-        return response()->redirectToRoute('monsters.monster', ['monster' => $monster->id])->with('success', $message);
+        return response()->redirectToRoute('monster.edit', ['monster' => $monster->id])->with('success', $message);
     }
 
     protected function cleanRequestData(array $params): array

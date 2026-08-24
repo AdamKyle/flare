@@ -21,8 +21,6 @@ class UserOnlineService
 
     /**
      * Returns a collection of users currently online.
-     *
-     * @codeCoverageIgnore
      */
     public function getUsersOnline(): Collection
     {
@@ -37,8 +35,6 @@ class UserOnlineService
      * Returns a query object of sessions currently active.
      *
      * @return mixed
-     *
-     * @codeCoverageIgnore
      */
     public function getUsersOnlineQuery()
     {

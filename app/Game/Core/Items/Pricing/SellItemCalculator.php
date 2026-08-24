@@ -3,15 +3,12 @@
 namespace App\Game\Core\Items\Pricing;
 
 use App\Flare\Models\Item;
-use App\Flare\Traits\IsItemUnique;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Core\Items\Values\RandomAffixTier;
 use Exception;
 
 class SellItemCalculator
 {
-    use IsItemUnique;
-
     const MAX_AFFIX_COST = 2_000_000_000;
 
     /**

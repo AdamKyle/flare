@@ -24,7 +24,7 @@ use App\Admin\Services\SiteStatisticsService;
 use App\Admin\Services\SuggestionAndBugsService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
-use App\Flare\Cache\CoordinatesCache;
+use App\Game\Maps\Contracts\CoordinatesQuery;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -71,7 +71,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(LocationService::class, function ($app) {
-            return new LocationService($app->make(CoordinatesCache::class));
+            return new LocationService($app->make(CoordinatesQuery::class));
         });
 
         $this->app->bind(SuggestionAndBugsService::class, function () {

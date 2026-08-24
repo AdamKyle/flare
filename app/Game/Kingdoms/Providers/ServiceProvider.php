@@ -53,13 +53,17 @@ use App\Game\Kingdoms\Service\UnitRecallService;
 use App\Game\Kingdoms\Service\UnitReturnService;
 use App\Game\Kingdoms\Service\UnitService;
 use App\Game\Kingdoms\Service\UpdateKingdom;
+use App\Game\Kingdoms\Transformers\BasicKingdomTransformer;
 use App\Game\Kingdoms\Transformers\CapitalCityKingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomAttackLogsTransformer;
+use App\Game\Kingdoms\Transformers\KingdomBuildingTransformer;
 use App\Game\Kingdoms\Transformers\KingdomResourceHourlyProductionTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTableTransformer;
 use App\Game\Kingdoms\Transformers\KingdomTransformer;
+use App\Game\Kingdoms\Transformers\OtherKingdomTransformer;
 use App\Game\Kingdoms\Transformers\SelectedKingdom;
 use App\Game\Kingdoms\Transformers\UnitMovementTransformer;
+use App\Game\Kingdoms\Transformers\UnitTransformer;
 use App\Game\Kingdoms\Validation\KingdomBuildingResourceValidation;
 use App\Game\Kingdoms\Validation\KingdomUnitResourceValidation;
 use App\Game\Kingdoms\Validators\BuildingUpgradeRequestValidator;
@@ -299,6 +303,26 @@ class ServiceProvider extends ApplicationServiceProvider
             return new KingdomTransformer(
                 $app->make(KingdomResourceHourlyProductionTransformer::class)
             );
+        });
+
+        $this->app->bind(OtherKingdomTransformer::class, function ($app) {
+            return new OtherKingdomTransformer;
+        });
+
+        $this->app->bind(BasicKingdomTransformer::class, function ($app) {
+            return new BasicKingdomTransformer;
+        });
+
+        $this->app->bind(KingdomBuildingTransformer::class, function ($app) {
+            return new KingdomBuildingTransformer;
+        });
+
+        $this->app->bind(UnitTransformer::class, function ($app) {
+            return new UnitTransformer;
+        });
+
+        $this->app->bind(KingdomAttackLogsTransformer::class, function () {
+            return new KingdomAttackLogsTransformer;
         });
 
         $this->app->bind(AttackWithItemsService::class, function ($app) {

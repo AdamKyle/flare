@@ -5,18 +5,18 @@ import { HolyOilsBatchMode } from '../enums/holy-oils-batch-mode';
 
 interface BuildHolyOilsSelectedItemsRequestParams {
   targetSlotIds: number[];
-  oilSlotIds: number[];
+  selectedOilId: number | null;
   disposition: BatchCraftingDisposition | null;
   listingPriceText: string;
 }
 
 export const buildHolyOilsSelectedItemsRequest = ({
   targetSlotIds,
-  oilSlotIds,
+  selectedOilId,
   disposition,
   listingPriceText,
 }: BuildHolyOilsSelectedItemsRequestParams): HolyOilsSelectedItemsRequestDefinition | null => {
-  if (targetSlotIds.length === 0 || oilSlotIds.length === 0) {
+  if (targetSlotIds.length === 0 || selectedOilId === null) {
     return null;
   }
 
@@ -32,6 +32,8 @@ export const buildHolyOilsSelectedItemsRequest = ({
   ) {
     return null;
   }
+
+  const oilSlotIds = selectedOilId !== null ? [selectedOilId] : [];
 
   return {
     batch_type: BatchCraftingType.HOLY_OILS,

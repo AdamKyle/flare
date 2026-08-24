@@ -2,29 +2,7 @@
 
 namespace App\Game\Battle\Providers;
 
-use App\Flare\ServerFight\Monster\BuildMonster;
-use App\Flare\ServerFight\MonsterPlayerFight;
-use App\Game\Automation\BatchCrafting\Services\BatchCraftingAutomationService;
 use App\Game\Battle\Console\Commands\ClearCelestials;
-use App\Game\Battle\Handlers\BattleEventHandler;
-use App\Game\Battle\Services\BattleDrop;
-use App\Game\Battle\Services\CelestialFightService;
-use App\Game\Battle\Services\ConjureService;
-use App\Game\Battle\Services\FactionLoyaltyFightService;
-use App\Game\Battle\Services\MonsterFightService;
-use App\Game\Battle\Services\RaidBattleService;
-use App\Game\BattleRewardProcessing\Services\BattleRewardProcessingQueueManager;
-use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
-use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
-use App\Game\Core\Chance\RandomNumberGenerator;
-use App\Game\Core\Items\Builders\RandomItemDropBuilder;
-use App\Game\Core\Services\GoldRush;
-use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
-use App\Game\Maps\Values\MapTileValue;
-use App\Game\Messages\Builders\NpcServerMessageBuilder;
-use App\Game\Monsters\Services\BuildMonsterCacheService;
-use App\Game\Shop\Services\ShopService;
-use App\Game\Skills\Services\DisenchantService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -36,61 +14,6 @@ class ServiceProvider extends ApplicationServiceProvider
      */
     public function register()
     {
-        $this->app->bind(ConjureService::class, function ($app) {
-            return new ConjureService(
-                $app->make(NpcServerMessageBuilder::class),
-                $app->make(RandomNumberGenerator::class),
-            );
-        });
-
-        $this->app->bind(GoldRush::class, function ($app) {
-            return new GoldRush;
-        });
-
-        $this->app->bind(BattleDrop::class, function ($app) {
-            return new BattleDrop(
-                $app->make(RandomItemDropBuilder::class),
-                $app->make(DisenchantService::class),
-                $app->make(ShopService::class)
-            );
-        });
-
-        $this->app->bind(CelestialFightService::class, function ($app) {
-            return new CelestialFightService(
-                $app->make(BattleEventHandler::class),
-                $app->make(CharacterCacheData::class),
-                $app->make(MonsterPlayerFight::class),
-                $app->make(MapTileValue::class),
-                $app->make(RandomNumberGenerator::class),
-            );
-        });
-
-        $this->app->bind(RaidBattleService::class, function ($app) {
-            return new RaidBattleService(
-                $app->make(BuildMonster::class),
-                $app->make(CharacterCacheData::class),
-                $app->make(MonsterPlayerFight::class),
-                $app->make(BuildMonsterCacheService::class),
-                $app->make(BattleEventHandler::class)
-            );
-        });
-
-        $this->app->bind(BattleEventHandler::class, function ($app) {
-            return new BattleEventHandler(
-                $app->make(BattleRewardProcessingQueueManager::class),
-                $app->make(WeeklyBattleService::class),
-                $app->make(BatchCraftingAutomationService::class),
-            );
-        });
-
-        $this->app->bind(FactionLoyaltyFightService::class, function ($app) {
-            return new FactionLoyaltyFightService(
-                $app->make(MonsterFightService::class),
-                $app->make(BattleEventHandler::class),
-                $app->make(FactionLoyaltyService::class)
-            );
-        });
-
         $this->commands([
             ClearCelestials::class,
         ]);

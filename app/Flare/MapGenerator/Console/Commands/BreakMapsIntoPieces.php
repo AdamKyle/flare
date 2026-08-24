@@ -2,7 +2,7 @@
 
 namespace App\Flare\MapGenerator\Console\Commands;
 
-use App\Flare\MapGenerator\Services\ImageTilerService;
+use App\Flare\MapGenerator\Services\MapTileGenerationService;
 use App\Flare\Models\GameMap;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +14,7 @@ class BreakMapsIntoPieces extends Command
 
     protected $description = 'Breaks a large map image into 125x125 pieces';
 
-    public function handle(ImageTilerService $imageTilerService): void
+    public function handle(MapTileGenerationService $mapTileGenerationService): void
     {
         $gameMaps = GameMap::all();
 
@@ -36,11 +36,7 @@ class BreakMapsIntoPieces extends Command
                 continue;
             }
 
-            $tileMap = $imageTilerService->breakIntoTiles($imagePath, $folderName);
-
-            $gameMap->update([
-                'tile_map' => $tileMap,
-            ]);
+            $mapTileGenerationService->tile($gameMap);
 
             $this->info("Successfully chopped {$gameMap->name} into tiles.");
         }

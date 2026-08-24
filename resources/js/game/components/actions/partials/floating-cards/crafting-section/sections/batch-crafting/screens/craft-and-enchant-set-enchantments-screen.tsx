@@ -39,9 +39,10 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
   const characterId = gameData?.character?.id ?? 0;
   const navigation = BatchCraftingScreenManager.useScreenNavigation();
 
-  const includedPositions = Object.keys(
-    set_selection.selected_items
-  ) as CraftSetPosition[];
+  const includedPositions = useMemo(
+    () => Object.keys(set_selection.selected_items) as CraftSetPosition[],
+    [set_selection.selected_items]
+  );
 
   const [enchantments, setEnchantments] = useState<EnchantmentSelection>({});
   const [bulkPrefix, setBulkPrefix] = useState<DropdownItem | null>(null);
@@ -85,8 +86,7 @@ const CraftAndEnchantSetEnchantmentsScreen = ({
     });
 
     return positions;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [set_selection.selected_items]);
+  }, [includedPositions, set_selection.selected_items]);
 
   const request = useMemo(
     () =>

@@ -29,18 +29,18 @@ const BatchCraftingCountdown = ({
       return;
     }
 
-    const interval = window.setInterval(() => {
+    const interval = setInterval(() => {
       const currentTime = Date.now();
 
       setNow(currentTime);
 
       if (currentTime >= scheduledForMs) {
-        window.clearInterval(interval);
+        clearInterval(interval);
       }
     }, 1000);
 
     return () => {
-      window.clearInterval(interval);
+      clearInterval(interval);
     };
   }, [scheduledForMs]);
 

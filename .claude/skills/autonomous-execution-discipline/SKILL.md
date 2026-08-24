@@ -54,4 +54,6 @@ Before declaring completion:
 
 Do not stop at “mostly done.”
 
+For backend/test work, self-review must include the prohibited-pattern audit required by `repository-code-quality-and-clean-as-you-go`. Green tests or 100% coverage never override a skill violation; completion is blocked while any unexplained prohibited match remains.
+
 Do not claim completion while a known rule violation, uncovered task path, failing gate, stale debug code, or requested cleanup remains.

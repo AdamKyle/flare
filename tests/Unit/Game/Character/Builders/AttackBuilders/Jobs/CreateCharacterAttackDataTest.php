@@ -34,17 +34,6 @@ class CreateCharacterAttackDataTest extends TestCase
         $this->assertNotNull(Cache::get('character-attack-data-'.$character->id));
     }
 
-    public function test_handle_returns_early_when_character_does_not_exist(): void
-    {
-        Log::spy();
-
-        CreateCharacterAttackData::dispatch(999999999);
-
-        Log::shouldNotHaveReceived('warning');
-
-        $this->addToAssertionCount(1);
-    }
-
     public function test_handle_flags_user_for_deletion_when_inventory_is_missing(): void
     {
         Log::spy();

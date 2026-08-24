@@ -49,7 +49,7 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
   return (
     <div
       className={clsx(
-        'fixed inset-0 z-[100000] flex items-stretch justify-end',
+        'absolute inset-0 z-40 flex items-stretch justify-end',
         isPresent ? 'pointer-events-auto' : 'pointer-events-none'
       )}
     >

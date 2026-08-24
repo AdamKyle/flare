@@ -3,9 +3,10 @@
 namespace App\Admin\Import\Locations;
 
 use App\Admin\Import\Locations\Sheets\LocationsSheet;
+use Maatwebsite\Excel\Concerns\Import;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class LocationsImport implements WithMultipleSheets
+class LocationsImport implements Import, WithMultipleSheets
 {
     public function sheets(): array
     {

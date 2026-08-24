@@ -49,6 +49,8 @@ Use Laravel's existing framework behavior before introducing custom infrastructu
 
 Concrete classes with resolvable concrete dependencies normally use zero-configuration container resolution. Do not add service-provider bindings solely because a concrete class has constructor dependencies.
 
+For every new or changed explicit binding, record why zero-configuration resolution is insufficient: interface mapping, primitive/configuration input, contextual binding, lifecycle choice, or external-client construction. Remove redundant concrete bindings; never add provider-resolution tests to justify them.
+
 Bind interfaces, contextual dependencies, lifecycle-specific services, or other cases that actually require container configuration using the project's module pattern.
 
 Prefer existing Eloquent relationships/scopes/query builders, Form Requests, enums, value objects, events, jobs, and module services when they already own the behavior.

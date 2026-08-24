@@ -507,7 +507,7 @@ const Dropdown = ({
       return (
         <InfiniteScroll
           handle_scroll={handleEndReachedScroll}
-          additional_css="scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md"
+          additional_css="min-h-0 flex-1 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 scrollbar-thumb-rounded-md"
         >
           {renderList()}
           {renderLoadingMore()}
@@ -516,7 +516,7 @@ const Dropdown = ({
     }
 
     return (
-      <div className="scrollbar-thumb-rounded-md max-h-60 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 overflow-auto dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
+      <div className="scrollbar-thumb-rounded-md min-h-0 flex-1 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 overflow-auto dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800">
         {renderList()}
       </div>
     );

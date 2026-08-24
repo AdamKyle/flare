@@ -2,8 +2,8 @@
 
 namespace App\Game\Kingdoms\Console\Commands;
 
-use App\Flare\Jobs\UpdateKingdomJob;
 use App\Flare\Models\Kingdom;
+use App\Game\Kingdoms\Jobs\UpdateKingdomJob;
 use Illuminate\Console\Command;
 
 class UpdateKingdoms extends Command

@@ -6,7 +6,6 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\ItemAffix;
-use App\Flare\Traits\ElementAttackData;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DamageBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\DefenceBuilder;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ElementalAtonement;
@@ -23,7 +22,7 @@ use Illuminate\Support\Collection;
 
 class CharacterStatBuilder
 {
-    use Boons, ElementAttackData, FetchEquipped;
+    use Boons, FetchEquipped;
 
     private Character $character;
 

@@ -2,28 +2,28 @@
 
 namespace App\Admin\Services;
 
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
+use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Values\LocationType;
 
 class LocationService
 {
-    private CoordinatesCache $coordinatesCache;
-
-    public function __construct(CoordinatesCache $coordinatesCache)
-    {
-        $this->coordinatesCache = $coordinatesCache;
-    }
+    public function __construct(private readonly CoordinatesQuery $coordinatesQuery) {}
 
     /**
      * Get view variables.
      */
     public function getViewVariables(?Location $location = null): array
     {
+        $coordinates = $this->coordinatesQuery->get();
+
         return [
-            'coordinates' => $this->coordinatesCache->getFromCache(),
+            'coordinates' => [
+                'x' => $coordinates->x,
+                'y' => $coordinates->y,
+            ],
             'gameMaps' => GameMap::pluck('name', 'id')->toArray(),
             'questItems' => Item::where('type', 'quest')->pluck('name', 'id')->toArray(),
             'locationTypes' => LocationType::getNamedValues(),
@@ -32,6 +32,9 @@ class LocationService
         ];
     }
 
+    /**
+     * Return the map-pin CSS classes used by special seasonal locations.
+     */
     protected function getLocationCssPins(): array
     {
         return [

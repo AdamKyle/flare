@@ -80,8 +80,6 @@ class EventEnderRegistryTest extends TestCase
         $current = new Event();
 
         $registry->end($type, $scheduled, $current);
-
-        $this->assertTrue(true);
     }
 
     public function test_end_does_nothing_when_no_ender_supports(): void
@@ -135,7 +133,5 @@ class EventEnderRegistryTest extends TestCase
         $current = new Event();
 
         $registry->end($type, $scheduled, $current);
-
-        $this->assertTrue(true);
     }
 }

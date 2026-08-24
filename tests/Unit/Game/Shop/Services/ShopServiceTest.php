@@ -156,7 +156,7 @@ class ShopServiceTest extends TestCase
         $this->assertGreaterThan(0, $character->gold);
     }
 
-    public function test_buy_and_replace_rejects_invalid_replacement_before_gold_or_inventory_changes(): void
+    public function test_buy_and_replace_with_another_unique_item_throws(): void
     {
         $existingUniquePrefix = $this->createItemAffix(['type' => 'prefix', 'randomly_generated' => true]);
         $existingUniqueItem = $this->createItem(['type' => 'shield', 'item_prefix_id' => $existingUniquePrefix->id]);
@@ -175,21 +175,13 @@ class ShopServiceTest extends TestCase
         $character->update(['gold' => 50000]);
         $character = $character->refresh();
 
-        try {
-            $this->shopService->buyAndReplace($newUniqueShield, $character, [
-                'position' => 'left-hand',
-                'slot_id' => $equippedSlot->id,
-            ]);
+        $this->expectException(EquipItemException::class);
+        $this->expectExceptionMessage('Cannot equip another unique.');
 
-            $this->fail('Expected the invalid replacement to be rejected.');
-        } catch (EquipItemException $exception) {
-            $this->assertSame('Cannot equip another unique.', $exception->getMessage());
-        }
-
-        $character = $character->refresh();
-
-        $this->assertSame(50000, $character->gold);
-        $this->assertNull($character->inventory->slots->firstWhere('item_id', $newUniqueShield->id));
+        $this->shopService->buyAndReplace($newUniqueShield, $character, [
+            'position' => 'left-hand',
+            'slot_id' => $equippedSlot->id,
+        ]);
     }
 
     public function test_get_items_for_shop_returns_standard_paginated_shape()

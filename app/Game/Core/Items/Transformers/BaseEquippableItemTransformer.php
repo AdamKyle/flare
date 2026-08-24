@@ -3,7 +3,7 @@
 namespace App\Game\Core\Items\Transformers;
 
 use App\Flare\Models\Item;
-use App\Flare\Traits\IsItemUnique;
+use App\Game\Core\Items\Values\ItemUniqueness;
 use App\Game\Gems\Traits\GetItemAtonements;
 use League\Fractal\TransformerAbstract;
 
@@ -15,7 +15,7 @@ use League\Fractal\TransformerAbstract;
  */
 class BaseEquippableItemTransformer extends TransformerAbstract
 {
-    use GetItemAtonements, IsItemUnique;
+    use GetItemAtonements;
 
     private $slotId = null;
 
@@ -44,7 +44,7 @@ class BaseEquippableItemTransformer extends TransformerAbstract
             'affix_count' => $item->affix_count,
             'holy_stack_stat_bonus' => $item->holy_stack_stat_bonus,
             'holy_stacks_applied' => $item->holy_stacks_applied,
-            'is_unique' => $this->isUnique($item),
+            'is_unique' => ItemUniqueness::fromItem($item)->isUnique(),
             'is_mythic' => $item->is_mythic,
             'is_cosmic' => $item->is_cosmic,
             'is_usable' => $item->usable,

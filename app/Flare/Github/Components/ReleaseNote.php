@@ -11,12 +11,7 @@ class ReleaseNote extends Component
 {
     public ReleaseNoteModel $releaseNote;
 
-    /**
-     * Create a new component instance.
-     *
-     * @return void
-     */
-    public function __construct(ReleaseNoteModel $releaseNote)
+    public function __construct(ReleaseNoteModel $releaseNote, private readonly Markdown $markdown)
     {
         $this->releaseNote = $releaseNote;
     }
@@ -26,7 +21,7 @@ class ReleaseNote extends Component
      */
     public function render(): string|View
     {
-        $content = resolve(Markdown::class)->convertToHtml($this->releaseNote->body);
+        $content = $this->markdown->convertToHtml($this->releaseNote->body);
 
         return view('components.release-note', [
             'release' => $this->releaseNote,

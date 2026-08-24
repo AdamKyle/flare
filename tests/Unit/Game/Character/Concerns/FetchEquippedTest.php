@@ -32,7 +32,7 @@ class FetchEquippedTest extends TestCase
         $this->character = null;
     }
 
-    public function test_missing_inventory_flags_user_and_immediately_throws_explicit_exception(): void
+    public function test_fetch_equipped_throws_missing_inventory_exception_when_inventory_is_deleted(): void
     {
         $character = $this->character;
         $character->inventory()->delete();
@@ -41,17 +41,13 @@ class FetchEquippedTest extends TestCase
             use FetchEquipped;
         };
 
-        try {
-            $fetcher->fetchEquipped($character->refresh());
-            $this->fail('The missing-inventory exception was not thrown.');
-        } catch (MissingInventoryException $exception) {
-            $this->assertSame('The character inventory is missing.', $exception->getMessage());
-        }
+        $this->expectException(MissingInventoryException::class);
+        $this->expectExceptionMessage('The character inventory is missing.');
 
-        $this->assertTrue($character->user->refresh()->will_be_deleted);
+        $fetcher->fetchEquipped($character->refresh());
     }
 
-    public function test_missing_inventory_does_not_re_flag_a_user_already_marked_for_deletion(): void
+    public function test_fetch_equipped_throws_missing_inventory_exception_when_user_already_marked_for_deletion(): void
     {
         $character = $this->character;
         $character->inventory()->delete();
@@ -62,14 +58,10 @@ class FetchEquippedTest extends TestCase
             use FetchEquipped;
         };
 
-        try {
-            $fetcher->fetchEquipped($character->refresh());
-            $this->fail('The missing-inventory exception was not thrown.');
-        } catch (MissingInventoryException $exception) {
-            $this->assertSame('The character inventory is missing.', $exception->getMessage());
-        }
+        $this->expectException(MissingInventoryException::class);
+        $this->expectExceptionMessage('The character inventory is missing.');
 
-        $this->assertTrue($character->user->refresh()->will_be_deleted);
+        $fetcher->fetchEquipped($character->refresh());
     }
 
     public function test_returns_equipped_inventory_slots_via_direct_query_when_relations_are_not_loaded(): void

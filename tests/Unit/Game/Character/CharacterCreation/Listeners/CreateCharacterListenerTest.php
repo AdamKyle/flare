@@ -41,25 +41,30 @@ class CreateCharacterListenerTest extends TestCase
 
         $event = new CreateCharacterEvent($user, $map, $request, 'Explicit Name');
 
+        $state = new CharacterBuildState();
+
+        $capturedState = null;
+
         $pipeline = Mockery::mock(CharacterCreationPipeline::class);
         $pipeline->shouldReceive('run')
             ->once()
-            ->with(Mockery::on(function (CharacterBuildState $state) use ($user, $race, $class, $map) {
-                return $state->getUser()->is($user)
-                    && $state->getRace()->is($race)
-                    && $state->getClass()->is($class)
-                    && $state->getMap()->is($map)
-                    && $state->getCharacterName() === 'Explicit Name'
-                    && $state->getNow() !== null;
+            ->with(Mockery::on(function (CharacterBuildState $runState) use (&$capturedState) {
+                $capturedState = $runState;
+
+                return true;
             }))
-            ->andReturnUsing(fn (CharacterBuildState $state) => $state);
+            ->andReturnUsing(fn (CharacterBuildState $runState) => $runState);
 
-        $this->app->instance(CharacterCreationPipeline::class, $pipeline);
-
-        $listener = resolve(CreateCharacterListener::class);
+        $listener = new CreateCharacterListener($pipeline, $state);
 
         $listener->handle($event);
 
-        $this->addToAssertionCount(1);
+        $this->assertSame($state, $capturedState);
+        $this->assertTrue($capturedState->getUser()->is($user));
+        $this->assertTrue($capturedState->getRace()->is($race));
+        $this->assertTrue($capturedState->getClass()->is($class));
+        $this->assertTrue($capturedState->getMap()->is($map));
+        $this->assertSame('Explicit Name', $capturedState->getCharacterName());
+        $this->assertNotNull($capturedState->getNow());
     }
 }

@@ -2,10 +2,9 @@ import React, { ReactNode, useEffect, useState } from 'react';
 
 import { useCraftSetRecommendation } from '../api/hooks/use-craft-set-recommendation';
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
+import BatchCraftingOutputSummary from '../components/batch-crafting-output-summary';
 import CraftSetHandSelector from '../components/craft-set-hand-selector';
 import CraftSetPositionSelector from '../components/craft-set-position-selector';
-import { BatchCraftingDisposition } from '../enums/batch-crafting-disposition';
-import { BatchCraftingOutputDestination } from '../enums/batch-crafting-output-destination';
 import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
 import { CraftSetPosition } from '../enums/craft-set-position';
 import {
@@ -13,11 +12,7 @@ import {
   CRAFT_SET_REQUIRED_POSITION_OPTIONS,
 } from '../enums/craft-set-positions';
 import { CraftAndEnchantSetScreenProps } from '../types/batch-crafting-screen-map';
-import {
-  craftSetPositionLabel,
-  dispositionLabel,
-  outputDestinationLabel,
-} from '../utils/batch-crafting-labels';
+import { craftSetPositionLabel } from '../utils/batch-crafting-labels';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -87,10 +82,6 @@ const CraftAndEnchantSetScreen = ({
     setSelectedPositions((current) => ({ ...current, [position]: item }));
   };
 
-  const handleChangeOutput = () => {
-    navigation.pop();
-  };
-
   const requiredPositionsComplete = CRAFT_SET_REQUIRED_POSITION_OPTIONS.every(
     (position) => typeof selectedPositions[position.key]?.value === 'number'
   );
@@ -146,39 +137,6 @@ const CraftAndEnchantSetScreen = ({
 
   const missingPositionLabels = (recommendation?.missing_positions ?? []).map(
     (position) => craftSetPositionLabel(position) ?? position
-  );
-
-  const destinationSummaryValue =
-    output_selection.output_destination ===
-    BatchCraftingOutputDestination.INVENTORY_SET
-      ? output_selection.output_set_name
-      : outputDestinationLabel(output_selection.output_destination);
-
-  const renderOutputSummary = () => (
-    <div className="space-y-2">
-      <h4 className={SECTION_HEADING_CSS}>Enchanted Set Output</h4>
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-        <dt className="text-gray-600 dark:text-gray-400">Action</dt>
-        <dd>{dispositionLabel(output_selection.disposition)}</dd>
-        {output_selection.disposition === BatchCraftingDisposition.KEEP && (
-          <>
-            <dt className="text-gray-600 dark:text-gray-400">Destination</dt>
-            <dd>{destinationSummaryValue}</dd>
-          </>
-        )}
-        {output_selection.disposition === BatchCraftingDisposition.LIST && (
-          <>
-            <dt className="text-gray-600 dark:text-gray-400">Listing Price</dt>
-            <dd>{output_selection.listing_price?.toLocaleString()}</dd>
-          </>
-        )}
-      </dl>
-      <Button
-        label="Change"
-        variant={ButtonVariant.PRIMARY}
-        on_click={handleChangeOutput}
-      />
-    </div>
   );
 
   const renderMissingPositionsAlert = () => {
@@ -250,7 +208,13 @@ const CraftAndEnchantSetScreen = ({
         item before continuing to enchantments.
       </p>
 
-      {renderOutputSummary()}
+      <BatchCraftingOutputSummary
+        title="Enchanted Set Output"
+        disposition={output_selection.disposition}
+        output_destination={output_selection.output_destination}
+        output_set_name={output_selection.output_set_name}
+        listing_price={output_selection.listing_price}
+      />
 
       {renderPositionSelectors()}
 

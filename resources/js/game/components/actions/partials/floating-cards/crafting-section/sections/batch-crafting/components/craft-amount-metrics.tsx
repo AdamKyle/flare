@@ -32,7 +32,7 @@ const CraftAmountMetrics = ({
   };
 
   return (
-    <dl className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
+    <dl className="xsm:grid-cols-2 grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
       <div>
         <dt className="text-xs text-gray-600 dark:text-gray-400">Successful</dt>
         <dd className="font-semibold text-emerald-600 dark:text-emerald-400">

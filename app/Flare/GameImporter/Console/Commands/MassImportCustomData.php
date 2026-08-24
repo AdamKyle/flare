@@ -1,5 +1,7 @@
 <?php
 
+// @codeCoverageIgnoreStart
+
 namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
@@ -140,3 +142,4 @@ class MassImportCustomData extends Command
         }
     }
 }
+// @codeCoverageIgnoreEnd

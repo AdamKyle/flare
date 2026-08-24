@@ -6,6 +6,7 @@ use App\Flare\GemWorldGeneration\Exceptions\CouldNotPlaceGeneratedGemWorldLocati
 use App\Flare\GemWorldGeneration\Values\GemWorldGenerationResult;
 use App\Flare\GemWorldGeneration\Values\GemWorldLocationPlacement;
 use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
+use App\Flare\MapGenerator\Services\MapTileGenerationService;
 use App\Flare\Models\GameLocationGemParamter;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameMapGemParamter;
@@ -22,6 +23,7 @@ class GemWorldGenerationService
     public function __construct(
         private readonly GemWorldImageGenerator $imageGenerator,
         private readonly GemWorldLocationPlacementService $placementService,
+        private readonly MapTileGenerationService $mapTileGenerationService,
     ) {}
 
     public function generateMapGem(GameMapGemParamter $gemParamter): GemWorldGenerationResult
@@ -153,6 +155,8 @@ class GemWorldGenerationService
             'game_location_gem_paramter_id' => $locationGemParamter?->id,
         ]);
 
+        $this->mapTileGenerationService->tile($generatedMap);
+
         try {
             $locationsCreated = $this->createLocations($generatedMap, $profileName);
         } catch (CouldNotPlaceGeneratedGemWorldLocation $exception) {
@@ -231,7 +235,7 @@ class GemWorldGenerationService
         }
 
         $imageData = $disk->get($oldPath);
-        $image = imagecreatefromstring($imageData);
+        $image = @imagecreatefromstring($imageData);
 
         if ($image === false) {
             return null;
@@ -240,10 +244,6 @@ class GemWorldGenerationService
         imagedestroy($image);
 
         $newPath = preg_replace('/\.(jpeg|jpg)$/i', '.png', $oldPath);
-
-        if (is_null($newPath)) {
-            return null;
-        }
 
         if (! $disk->exists($newPath)) {
             $disk->put($newPath, $imageData);

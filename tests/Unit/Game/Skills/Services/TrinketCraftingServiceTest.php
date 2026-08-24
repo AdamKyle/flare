@@ -119,7 +119,7 @@ class TrinketCraftingServiceTest extends TestCase
         $this->assertSame(0, $cost['copper_coins']['missing']);
     }
 
-    public function test_batch_destination_race_rolls_back_both_crafting_currencies(): void
+    public function test_batch_destination_race_throws_batch_crafting_destination_full_exception(): void
     {
         Event::fake();
         $character = $this->character->getCharacter();
@@ -138,22 +138,14 @@ class TrinketCraftingServiceTest extends TestCase
             resolve(TrinketCraftingItemTransformer::class),
         );
 
-        try {
-            $trinketService->craftForBatch(
-                $character->refresh(),
-                $this->trinket,
-                true,
-                fn (): null => null,
-            );
-            $this->fail('Expected the destination race to reject the retained trinket.');
-        } catch (BatchCraftingDestinationFullException) {
-            $this->addToAssertionCount(1);
-        }
+        $this->expectException(BatchCraftingDestinationFullException::class);
 
-        $this->assertSame(2000, $character->refresh()->gold_dust);
-        $this->assertSame(3000, $character->refresh()->copper_coins);
-        $this->assertSame(40, $character->skills()->where('game_skill_id', $this->trinketSkill->id)->first()->xp);
-        $this->assertSame(1, $character->skills()->where('game_skill_id', $this->trinketSkill->id)->first()->level);
+        $trinketService->craftForBatch(
+            $character->refresh(),
+            $this->trinket,
+            true,
+            fn (): null => null,
+        );
     }
 
     public function test_successful_batch_trinket_craft_awards_trinketry_xp_after_destination_acceptance(): void

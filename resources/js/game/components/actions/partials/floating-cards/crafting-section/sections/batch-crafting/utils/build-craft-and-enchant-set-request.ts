@@ -122,7 +122,10 @@ export const buildCraftAndEnchantSetRequest = ({
     const position = positionKey as CraftSetPosition;
     const entry = enchantments[position];
 
-    const key = position as unknown as keyof CraftSetPositionsDefinition;
+    // CraftSetPosition enum values are defined identically to
+    // CraftSetPositionsDefinition's keys; String() drops the nominal enum
+    // type so the literal union cast below is a single, sound assertion.
+    const key = String(position) as keyof CraftSetPositionsDefinition;
 
     enchantmentEntries[key] = {
       prefix_id:

@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\CelestialFight;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
@@ -19,6 +18,7 @@ use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Traits\KingdomCache;
+use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Events\UpdateLocationBasedCraftingOptions;
 use App\Game\Maps\Events\UpdateLocationBasedEventGoals;
 use App\Game\Maps\Services\Common\CanPlayerMassEmbezzle;

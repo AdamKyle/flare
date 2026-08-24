@@ -2,7 +2,6 @@
 
 namespace App\Game\Maps\Services;
 
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\Models\Character;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
@@ -13,6 +12,7 @@ use App\Game\Automation\Concerns\ChecksAutomationRestrictions;
 use App\Game\Automation\Services\AutomationRestrictionService;
 use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Chance\ChanceCalculator;
+use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Events\UpdateCharacterBasePosition;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Values\LocationType;

@@ -34,6 +34,8 @@ class TrinketCraftingControllerTest extends TestCase
 
     protected function tearDown(): void
     {
+        Model::preventLazyLoading(false);
+
         parent::tearDown();
 
         $this->character = null;
@@ -143,21 +145,17 @@ class TrinketCraftingControllerTest extends TestCase
 
         Model::preventLazyLoading();
 
-        try {
-            $response = $this->actingAs($this->character->user)
-                ->call('GET', '/api/trinket-crafting/'.$this->character->id.'/items', [
-                    'per_page' => 15,
-                    'page' => 1,
-                ]);
+        $response = $this->actingAs($this->character->user)
+            ->call('GET', '/api/trinket-crafting/'.$this->character->id.'/items', [
+                'per_page' => 15,
+                'page' => 1,
+            ]);
 
-            $response->assertOk();
+        $response->assertOk();
 
-            $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true);
 
-            $this->assertCount(2, $data['data']);
-            $this->assertArrayHasKey('preview', $data['data'][0]);
-        } finally {
-            Model::preventLazyLoading(false);
-        }
+        $this->assertCount(2, $data['data']);
+        $this->assertArrayHasKey('preview', $data['data'][0]);
     }
 }

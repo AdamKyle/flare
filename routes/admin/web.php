@@ -82,7 +82,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
 
     Route::redirect('/admin/monsters', '/admin')->name('monsters.list');
     Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
-    Route::get('/admin/monsters/{monster}', ['as' => 'monsters.monster', 'uses' => 'MonstersController@show']);
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
     Route::post('/admin/monsters/store', ['as' => 'monster.store', 'uses' => 'MonstersController@store']);
 
@@ -93,7 +92,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
 
     Route::redirect('/admin/items', '/admin')->name('items.list');
     Route::get('/admin/items/create', ['as' => 'items.create', 'uses' => 'ItemsController@create']);
-    Route::get('/admin/items/{item}', ['as' => 'items.item', 'uses' => 'ItemsController@show']);
     Route::get('/admin/items/{item}/edit', ['as' => 'items.edit', 'uses' => 'ItemsController@edit']);
     Route::post('/admin/items/store', ['as' => 'item.store', 'uses' => 'ItemsController@store']);
     Route::post('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);

@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import BatchCraftingCountdown from './batch-crafting-countdown';
+import BatchCraftingDetailSection from './batch-crafting-detail-section';
 import BatchCraftingElapsedTime from './batch-crafting-elapsed-time';
 import BatchCraftingNextAttemptCountdown from './batch-crafting-next-attempt-countdown';
 import { useBatchCraftingActions } from '../api/hooks/use-batch-crafting-actions';
@@ -27,7 +28,6 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import Separator from 'ui/separator/separator';
 
 const BatchCraftingRunningPanel = (): ReactNode => {
   const { gameData } = useGameData();
@@ -242,15 +242,13 @@ const BatchCraftingRunningPanel = (): ReactNode => {
         </p>
       </div>
 
-      <Separator />
-
-      {renderTimer()}
+      <BatchCraftingDetailSection title="Timing">
+        {renderTimer()}
+      </BatchCraftingDetailSection>
 
       {renderModeSection()}
 
       {renderActionError()}
-
-      <Separator />
 
       {renderAction()}
     </div>

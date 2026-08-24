@@ -39,7 +39,7 @@
 
             @if (! is_null($section['live_wire_component']) && $section['live_wire_component'] !== 'null' && ($section['item_table_type'] === null || $section['item_table_type'] === 'null'))
                 @php
-                    $informationSection = app(\App\Flare\View\Information\InformationSectionRenderer::class)
+                    $informationSection = app(\App\Info\Services\InformationSectionRenderer::class)
                         ->render($section['live_wire_component'], request());
                 @endphp
 

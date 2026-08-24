@@ -17,7 +17,7 @@ class MailHandler extends Mailable
 
     public function __construct(string $toEmail, Mailable $mailable)
     {
-        $this->to = $toEmail;
+        $this->toEmail = $toEmail;
         $this->mailable = $mailable;
     }
 

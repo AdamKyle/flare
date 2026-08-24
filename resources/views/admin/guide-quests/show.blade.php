@@ -266,10 +266,6 @@
 
         <x-core.cards.card-with-title title="Intro">
             <div class="space-y-6">
-                @php
-                    $introBlocks = is_array($guideQuest->intro_text ?? null) ? $guideQuest->intro_text : [];
-                @endphp
-
                 @forelse ($introBlocks as $block)
                     @if (! empty($block['image_url']))
                         <div class="grid items-start gap-8 md:grid-cols-5">
@@ -280,14 +276,14 @@
                             </div>
                             <div class="md:col-span-3">
                                 <div class="prose dark:prose-invert max-w-none text-left">
-                                    @convertMarkdownToHtml($block['content'])
+                                    {!! $block['content_html'] !!}
                                 </div>
                             </div>
                         </div>
                     @else
                         <div class="mx-auto w-full md:w-2/3">
                             <div class="prose dark:prose-invert max-w-none text-left">
-                                @convertMarkdownToHtml($block['content'])
+                                {!! $block['content_html'] !!}
                             </div>
                         </div>
                     @endif
@@ -299,10 +295,6 @@
 
         <x-core.cards.card-with-title title="Desktop Instructions">
             <div class="space-y-6">
-                @php
-                    $desktopInstructions = is_array($guideQuest->desktop_instructions ?? null) ? $guideQuest->desktop_instructions : [];
-                @endphp
-
                 @forelse ($desktopInstructions as $block)
                     @if (! empty($block['image_url']))
                         <div class="gap-8md:grid-cols-5 grid items-start">
@@ -313,14 +305,14 @@
                             </div>
                             <div class="md:col-span-3">
                                 <div class="prose dark:prose-invert max-w-none text-left">
-                                    @convertMarkdownToHtml($block['content'])
+                                    {!! $block['content_html'] !!}
                                 </div>
                             </div>
                         </div>
                     @else
                         <div class="mx-auto w-full md:w-2/3">
                             <div class="prose dark:prose-invert max-w-none text-left">
-                                @convertMarkdownToHtml($block['content'])
+                                {!! $block['content_html'] !!}
                             </div>
                         </div>
                     @endif
@@ -332,10 +324,6 @@
 
         <x-core.cards.card-with-title title="Mobile Instructions">
             <div class="space-y-6">
-                @php
-                    $mobileInstructions = is_array($guideQuest->mobile_instructions ?? null) ? $guideQuest->mobile_instructions : [];
-                @endphp
-
                 @forelse ($mobileInstructions as $block)
                     @if (! empty($block['image_url']))
                         <div class="grid items-start gap-4 md:grid-cols-5">
@@ -346,14 +334,14 @@
                             </div>
                             <div class="md:col-span-3">
                                 <div class="prose dark:prose-invert max-w-none text-left">
-                                    @convertMarkdownToHtml($block['content'])
+                                    {!! $block['content_html'] !!}
                                 </div>
                             </div>
                         </div>
                     @else
                         <div class="mx-auto w-full md:w-2/3">
                             <div class="prose dark:prose-invert max-w-none text-left">
-                                @convertMarkdownToHtml($block['content'])
+                                {!! $block['content_html'] !!}
                             </div>
                         </div>
                     @endif

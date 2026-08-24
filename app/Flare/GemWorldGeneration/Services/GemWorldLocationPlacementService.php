@@ -2,14 +2,16 @@
 
 namespace App\Flare\GemWorldGeneration\Services;
 
-use App\Flare\Cache\CoordinatesCache;
 use App\Flare\GemWorldGeneration\Exceptions\CouldNotPlaceGeneratedGemWorldLocation;
+use App\Flare\GemWorldGeneration\Values\GemWorldGenerationConfig;
 use App\Flare\GemWorldGeneration\Values\GemWorldLocationPlacement;
+use App\Flare\MapGenerator\Contracts\MapPixelReader;
+use App\Flare\MapGenerator\Contracts\MapPixelReaderFactory;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
+use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Values\LocationTemplateType;
 use Illuminate\Support\Facades\Storage;
-use RuntimeException;
 
 class GemWorldLocationPlacementService
 {
@@ -18,8 +20,10 @@ class GemWorldLocationPlacementService
     private const MAX_RANDOM_ATTEMPTS = 500;
 
     public function __construct(
-        private readonly CoordinatesCache $coordinatesCache,
+        private readonly CoordinatesQuery $coordinatesQuery,
         private readonly GemWorldPlaneGenerationSettings $generationSettings,
+        private readonly MapPixelReaderFactory $mapPixelReaderFactory,
+        private readonly GemWorldGenerationConfig $config,
     ) {}
 
     /**
@@ -30,7 +34,7 @@ class GemWorldLocationPlacementService
         $parentMap = GameMap::find($gameMap->generated_parent_game_map_id);
         $waterColor = $this->waterColor($parentMap);
 
-        $coordinates = $this->coordinatesCache->getFromCache();
+        $coordinates = $this->coordinatesQuery->get();
         $imageResource = $this->loadMapImage($gameMap);
         $types = [
             ...array_fill(0, 16, LocationTemplateType::REGULAR->value),
@@ -41,31 +45,27 @@ class GemWorldLocationPlacementService
 
         $placements = [];
         $usedCoordinates = [];
-        $xValues = $coordinates['x'];
-        $yValues = $coordinates['y'];
+        $xValues = $coordinates->x;
+        $yValues = $coordinates->y;
 
         $shuffledX = $xValues;
         $shuffledY = $yValues;
         shuffle($shuffledX);
         shuffle($shuffledY);
 
-        try {
-            foreach ($types as $type) {
-                $placements[] = $this->nextPlacement(
-                    $type,
-                    $shuffledX,
-                    $shuffledY,
-                    $xValues,
-                    $yValues,
-                    $usedCoordinates,
-                    $imageResource,
-                    $waterColor,
-                    $gameMap,
-                    $parentMap,
-                );
-            }
-        } finally {
-            imagedestroy($imageResource);
+        foreach ($types as $type) {
+            $placements[] = $this->nextPlacement(
+                $type,
+                $shuffledX,
+                $shuffledY,
+                $xValues,
+                $yValues,
+                $usedCoordinates,
+                $imageResource,
+                $waterColor,
+                $gameMap,
+                $parentMap,
+            );
         }
 
         return $placements;
@@ -82,6 +82,12 @@ class GemWorldLocationPlacementService
         return ['red' => $color->r, 'green' => $color->g, 'blue' => $color->b];
     }
 
+    /**
+     * @param  int[]  $shuffledX
+     * @param  int[]  $shuffledY
+     * @param  int[]  $orderedX
+     * @param  int[]  $orderedY
+     */
     private function nextPlacement(
         string $type,
         array $shuffledX,
@@ -89,7 +95,7 @@ class GemWorldLocationPlacementService
         array $orderedX,
         array $orderedY,
         array &$usedCoordinates,
-        mixed $imageResource,
+        MapPixelReader $imageResource,
         array $waterColor,
         GameMap $generatedMap,
         ?GameMap $parentMap,
@@ -105,8 +111,6 @@ class GemWorldLocationPlacementService
 
         foreach ($shuffledX as $x) {
             foreach ($shuffledY as $y) {
-                $x = (int) $x;
-                $y = (int) $y;
                 $key = $x.'-'.$y;
 
                 if ($randomAttempts >= self::MAX_RANDOM_ATTEMPTS) {
@@ -142,8 +146,6 @@ class GemWorldLocationPlacementService
 
         foreach ($orderedX as $x) {
             foreach ($orderedY as $y) {
-                $x = (int) $x;
-                $y = (int) $y;
                 $key = $x.'-'.$y;
                 $attempts++;
                 $deterministicScanCount++;
@@ -179,8 +181,8 @@ class GemWorldLocationPlacementService
             mapPath: $generatedMap->path,
             parentMapName: $parentMap?->name ?? 'unknown',
             profileName: $generatedMap->name,
-            imageWidth: imagesx($imageResource),
-            imageHeight: imagesy($imageResource),
+            imageWidth: $imageResource->width(),
+            imageHeight: $imageResource->height(),
             imageLoaded: true,
             diagnostics: [
                 'Generated map name' => $generatedMap->name,
@@ -192,7 +194,7 @@ class GemWorldLocationPlacementService
                 'File extension' => pathinfo($generatedMap->path, PATHINFO_EXTENSION),
                 'Image decoder/load method' => 'imagecreatefromstring',
                 'Expected water color' => implode(',', $waterColor),
-                'Water color tolerance' => (int) config('gem_world_generation.water_color_tolerance', 70),
+                'Water color tolerance' => $this->config->waterColorTolerance,
                 'Sampled water count' => $this->sampledWaterCount($imageResource, $waterColor),
                 'Closest water color found' => implode(',', $this->closestColorToWater($imageResource, $waterColor)),
                 'Land candidate count' => $landCandidateCount,
@@ -207,18 +209,12 @@ class GemWorldLocationPlacementService
         );
     }
 
-    private function loadMapImage(GameMap $gameMap): mixed
+    private function loadMapImage(GameMap $gameMap): MapPixelReader
     {
-        $imageResource = imagecreatefromstring(Storage::disk('maps')->get($gameMap->path));
-
-        if ($imageResource === false) {
-            throw new RuntimeException('Could not load generated gem world map image.');
-        }
-
-        return $imageResource;
+        return $this->mapPixelReaderFactory->fromBinary(Storage::disk('maps')->get($gameMap->path));
     }
 
-    private function canPlaceLocationType(string $type, int $x, int $y, mixed $imageResource, array $waterColor, int &$landCandidateCount, int &$nearWaterCandidateCount): bool
+    private function canPlaceLocationType(string $type, int $x, int $y, MapPixelReader $imageResource, array $waterColor, int &$landCandidateCount, int &$nearWaterCandidateCount): bool
     {
         if ($this->isWaterTile($x, $y, $imageResource, $waterColor)) {
             return false;
@@ -239,7 +235,7 @@ class GemWorldLocationPlacementService
         return true;
     }
 
-    private function isNearWater(int $x, int $y, mixed $imageResource, array $waterColor): bool
+    private function isNearWater(int $x, int $y, MapPixelReader $imageResource, array $waterColor): bool
     {
         $adjacentCoordinates = [
             [$x + self::MOVEMENT_BLOCK_SIZE, $y],
@@ -257,25 +253,24 @@ class GemWorldLocationPlacementService
         return false;
     }
 
-    private function isWaterTile(int $x, int $y, mixed $imageResource, array $waterColor): bool
+    private function isWaterTile(int $x, int $y, MapPixelReader $imageResource, array $waterColor): bool
     {
-        if ($x < 0 || $y < 0 || $x >= imagesx($imageResource) || $y >= imagesy($imageResource)) {
+        if ($x < 0 || $y < 0 || $x >= $imageResource->width() || $y >= $imageResource->height()) {
             return false;
         }
 
-        $rgbIndex = imagecolorat($imageResource, $x, $y);
-        $rgbArray = imagecolorsforindex($imageResource, $rgbIndex);
+        $rgbArray = $imageResource->colorAt($x, $y);
 
-        return $this->colorDistance($rgbArray, $waterColor) <= (int) config('gem_world_generation.water_color_tolerance', 70);
+        return $this->colorDistance($rgbArray, $waterColor) <= $this->config->waterColorTolerance;
     }
 
-    private function sampledWaterCount(mixed $imageResource, array $waterColor): int
+    private function sampledWaterCount(MapPixelReader $imageResource, array $waterColor): int
     {
         $count = 0;
         $step = self::MOVEMENT_BLOCK_SIZE;
 
-        for ($x = 0; $x < imagesx($imageResource); $x += $step) {
-            for ($y = 0; $y < imagesy($imageResource); $y += $step) {
+        for ($x = 0; $x < $imageResource->width(); $x += $step) {
+            for ($y = 0; $y < $imageResource->height(); $y += $step) {
                 if ($this->isWaterTile($x, $y, $imageResource, $waterColor)) {
                     $count++;
                 }
@@ -285,15 +280,15 @@ class GemWorldLocationPlacementService
         return $count;
     }
 
-    private function closestColorToWater(mixed $imageResource, array $waterColor): array
+    private function closestColorToWater(MapPixelReader $imageResource, array $waterColor): array
     {
         $closest = ['red' => 0, 'green' => 0, 'blue' => 0];
         $closestDistance = PHP_INT_MAX;
         $step = self::MOVEMENT_BLOCK_SIZE;
 
-        for ($x = 0; $x < imagesx($imageResource); $x += $step) {
-            for ($y = 0; $y < imagesy($imageResource); $y += $step) {
-                $rgbArray = imagecolorsforindex($imageResource, imagecolorat($imageResource, $x, $y));
+        for ($x = 0; $x < $imageResource->width(); $x += $step) {
+            for ($y = 0; $y < $imageResource->height(); $y += $step) {
+                $rgbArray = $imageResource->colorAt($x, $y);
                 $distance = $this->colorDistance($rgbArray, $waterColor);
 
                 if ($distance < $closestDistance) {

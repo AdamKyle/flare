@@ -2,18 +2,26 @@
 
 namespace App\Game\GuideQuests\Controllers;
 
+use App\Flare\Github\Services\Markdown;
 use App\Flare\Models\Character;
 use App\Flare\Models\GuideQuest;
 use App\Flare\Models\QuestsCompleted;
 use App\Flare\Models\User;
-use App\Flare\View\Tables\TableColumn;
-use App\Flare\View\Tables\TableQueryBuilder;
+use App\Flare\Tables\TableColumn;
+use App\Flare\Tables\TableQueryBuilder;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class GuideQuestsController extends Controller
 {
+    private Markdown $markdown;
+
+    public function __construct(Markdown $markdown)
+    {
+        $this->markdown = $markdown;
+    }
+
     public function index(Request $request, User $user)
     {
         $character = $user->character;
@@ -73,6 +81,11 @@ class GuideQuestsController extends Controller
 
     public function show(Character $character, GuideQuest $guideQuest)
     {
-        return view('admin.guide-quests.show', ['guideQuest' => $guideQuest]);
+        return view('admin.guide-quests.show', [
+            'guideQuest' => $guideQuest,
+            'introBlocks' => $this->markdown->renderBlocks($guideQuest->intro_text),
+            'desktopInstructions' => $this->markdown->renderBlocks($guideQuest->desktop_instructions),
+            'mobileInstructions' => $this->markdown->renderBlocks($guideQuest->mobile_instructions),
+        ]);
     }
 }

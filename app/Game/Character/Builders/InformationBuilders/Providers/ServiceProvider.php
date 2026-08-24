@@ -11,6 +11,7 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilde
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
+use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Gems\Services\GemComparison;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -49,7 +50,7 @@ class ServiceProvider extends ApplicationServiceProvider
         });
 
         $this->app->bind(ElementalAtonement::class, function ($app) {
-            return new ElementalAtonement($app->make(GemComparison::class));
+            return new ElementalAtonement($app->make(GemComparison::class), $app->make(ElementAttackData::class));
         });
 
         $this->app->bind(CharacterStatBuilder::class, function ($app) {

@@ -4,7 +4,7 @@ namespace App\Game\Core\Items\Transformers;
 
 use App\Flare\Models\InventorySlot;
 use App\Flare\Models\SetSlot;
-use App\Flare\Traits\IsItemUnique;
+use App\Game\Core\Items\Values\ItemUniqueness;
 use App\Game\Gems\Traits\GetItemAtonements;
 use Facades\App\Game\Core\Items\Pricing\SellItemCalculator;
 use League\Fractal\TransformerAbstract;
@@ -17,7 +17,7 @@ use League\Fractal\TransformerAbstract;
  */
 class EquippableItemTransformer extends TransformerAbstract
 {
-    use GetItemAtonements, IsItemUnique;
+    use GetItemAtonements;
 
     /**
      * Transforms an enriched Item model into an API-ready array.
@@ -63,7 +63,7 @@ class EquippableItemTransformer extends TransformerAbstract
             'cost' => $slot->item->cost,
             'fight_time_out_mod_bonus' => $slot->item->fight_time_out_mod_bonus,
             'move_time_out_mod_bonus' => $slot->item->move_time_out_mod_bonus,
-            'is_unique' => $this->isUnique($slot->item),
+            'is_unique' => ItemUniqueness::fromItem($slot->item)->isUnique(),
             'is_mythic' => $slot->item->is_mythic,
             'is_cosmic' => $slot->item->is_cosmic,
             'holy_level' => $slot->item->holy_level,

@@ -2,9 +2,10 @@ import { EquippableItemWithBase } from '../../../api-definitions/items/equippabl
 
 export default interface ShopCardProps {
   item: EquippableItemWithBase;
-  view_item: (item_id: number) => void;
-  compare_item: (item_id: number) => void;
-  view_buy_many: (item_id: number) => void;
+  row_key: string;
+  view_item: (item: EquippableItemWithBase) => void;
+  compare_item: (item: EquippableItemWithBase) => void;
+  view_buy_many: (item: EquippableItemWithBase) => void;
   on_purchase_item: (item_id: number) => void;
   is_actions_disabled?: boolean;
 }

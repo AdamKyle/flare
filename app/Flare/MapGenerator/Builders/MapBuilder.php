@@ -2,12 +2,11 @@
 
 namespace App\Flare\MapGenerator\Builders;
 
+use App\Flare\MapGenerator\Contracts\LandMapImageFactory;
 use App\Flare\MapGenerator\Schemes\MapColorScheme;
 use ChristianEssl\LandmapGeneration\Color\Shader\DetailShader;
-use ChristianEssl\LandmapGeneration\Generator\LandmapGenerator;
 use ChristianEssl\LandmapGeneration\Settings\MapSettings;
 use ChristianEssl\LandmapGeneration\Struct\Color as StructColor;
-use ChristianEssl\LandmapGeneration\Utility\ImageUtility;
 
 class MapBuilder
 {
@@ -51,8 +50,11 @@ class MapBuilder
      *
      * @return void
      */
-    public function __construct(MapSettings $mapSettings, ImageBuilder $imageBuilder)
-    {
+    public function __construct(
+        MapSettings $mapSettings,
+        ImageBuilder $imageBuilder,
+        private readonly LandMapImageFactory $landMapImageFactory,
+    ) {
         $this->mapSettings = $mapSettings;
         $this->imageBuilder = $imageBuilder;
     }
@@ -132,10 +134,7 @@ class MapBuilder
             ->setHeight($this->height)
             ->setWaterLevel($waterLevel);
 
-        $landMapGenerator = new LandmapGenerator($settings, $this->seed);
-        $map = $landMapGenerator->generateMap();
-
-        $image = ImageUtility::createImage($map);
+        $image = $this->landMapImageFactory->build($settings, $this->seed);
 
         $this->imageBuilder->buildAndStoreImage($image, $mapName);
     }

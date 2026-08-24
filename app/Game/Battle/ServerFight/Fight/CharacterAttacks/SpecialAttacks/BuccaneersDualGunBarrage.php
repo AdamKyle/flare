@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Game\Battle\ServerFight\Fight\CharacterAttacks\SpecialAttacks;
+
+use App\Flare\Models\Character;
+use App\Game\Battle\ServerFight\BattleBase;
+use App\Game\Character\CharacterAttack\Values\ClassSpecialAttackType;
+
+class BuccaneersDualGunBarrage extends BattleBase
+{
+    public function handleAttack(Character $character, array $attackData): void
+    {
+        $extraActionData = $this->characterCacheData->getCachedCharacterData($character, 'extra_action_chance');
+
+        if (! $extraActionData['has_item']) {
+            return;
+        }
+
+        if (! isset($extraActionData['type']) || $extraActionData['type'] !== ClassSpecialAttackType::BUCCANEERS_DUAL_GUN_BARRAGE->value) {
+            return;
+        }
+
+        if (! ($extraActionData['chance'] >= 1)) {
+            if (! $this->chanceCalculator->passesPercentage($extraActionData['chance'] * 100)) {
+                return;
+            }
+        }
+
+        $weaponDamage = $attackData['weapon_damage'];
+
+        $this->addMessage('You draw both guns and unleash a Buccaneer\'s Dual Gun Barrage!', 'regular');
+
+        $this->fireShot($attackData, $weaponDamage * 0.75, 'Shot 1');
+        $this->fireShot($attackData, $weaponDamage * 0.55, 'Shot 2');
+        $this->fireShot($attackData, $weaponDamage * 0.35, 'Shot 3');
+    }
+
+    private function fireShot(array $attackData, float $damage, string $shotLabel): void
+    {
+        if ($attackData['damage_deduction'] > 0.0) {
+            $this->addMessage('The Plane weakens your ability to do full damage!', 'enemy-action');
+
+            $damage = $damage - $damage * $attackData['damage_deduction'];
+        }
+
+        if ($this->isRaidBoss && $damage > self::MAX_DAMAGE_FOR_RAID_BOSSES) {
+            $damage = self::MAX_DAMAGE_FOR_RAID_BOSSES;
+        }
+
+        $truncatedDamage = $this->truncatedDamage($damage);
+
+        $this->monsterHealth -= $truncatedDamage;
+
+        $this->addMessage('You hit for (Buccaneer\'s Dual Gun Barrage - '.$shotLabel.') '.number_format($truncatedDamage), 'player-action');
+    }
+}

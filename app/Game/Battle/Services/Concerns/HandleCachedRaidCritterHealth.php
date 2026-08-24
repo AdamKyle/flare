@@ -2,7 +2,7 @@
 
 namespace App\Game\Battle\Services\Concerns;
 
-use App\Flare\ServerFight\Monster\ServerMonster;
+use App\Game\Battle\ServerFight\Monster\ServerMonster;
 use Illuminate\Support\Facades\Cache;
 
 trait HandleCachedRaidCritterHealth

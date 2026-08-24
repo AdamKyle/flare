@@ -10,6 +10,7 @@ import {
   endReasonLabel,
 } from '../../utils/batch-crafting-labels';
 import { getBatchCraftedItemLinkLabel } from '../../utils/get-batch-crafted-item-link-label';
+import BatchCraftingDetailSection from '../batch-crafting-detail-section';
 import BatchCraftingOutcomeChart from '../batch-crafting-outcome-chart';
 
 import { Alert } from 'ui/alerts/alert';
@@ -18,7 +19,6 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import ProgressBar from 'ui/progress/progress-bar';
-import Separator from 'ui/separator/separator';
 
 const CraftSetRunningSection = ({
   batch,
@@ -91,64 +91,71 @@ const CraftSetRunningSection = ({
 
   return (
     <div className="space-y-3">
-      {setProgress && (
-        <ProgressBar
-          value={setProgress.completed_entries}
-          max={setProgress.total_entries}
-          label="Set Entries"
-          value_label={`${setProgress.completed_entries} / ${setProgress.total_entries}`}
-          variant={ProgressBarVariant.PRIMARY}
+      <BatchCraftingDetailSection title="Progress">
+        {setProgress && (
+          <ProgressBar
+            value={setProgress.completed_entries}
+            max={setProgress.total_entries}
+            label="Set Entries"
+            value_label={`${setProgress.completed_entries} / ${setProgress.total_entries}`}
+            variant={ProgressBarVariant.PRIMARY}
+          />
+        )}
+
+        {batch.destination_capacity && (
+          <ProgressBar
+            value={batch.destination_capacity.current}
+            max={batch.destination_capacity.max}
+            label="Destination Capacity"
+            value_label={`${batch.destination_capacity.current} / ${batch.destination_capacity.max}`}
+            variant={ProgressBarVariant.ARTIC}
+          />
+        )}
+      </BatchCraftingDetailSection>
+
+      <BatchCraftingDetailSection title="Results">
+        <dl className="xsm:grid-cols-2 grid grid-cols-1 gap-x-3 gap-y-1 text-sm">
+          <dt className="text-gray-600 dark:text-gray-400">Destination</dt>
+          <dd>{renderDestination()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Current Position</dt>
+          <dd>
+            {craftSetPositionLabel(setProgress?.current_position ?? null) ??
+              '—'}
+          </dd>
+          <dt className="text-gray-600 dark:text-gray-400">Current Item</dt>
+          <dd>{renderCurrentItem()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Completed</dt>
+          <dd>{setProgress?.completed_entries ?? 0}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Remaining</dt>
+          <dd>{setProgress?.remaining_entries ?? 0}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Failed</dt>
+          <dd>{batch.failed_count}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Gold Spent</dt>
+          <dd>{batch.gold_spent.toLocaleString()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Gold Gained</dt>
+          <dd>{batch.gold_gained.toLocaleString()}</dd>
+          <dt className="text-gray-600 dark:text-gray-400">Gold Left</dt>
+          <dd>{batch.gold_left.toLocaleString()}</dd>
+        </dl>
+      </BatchCraftingDetailSection>
+
+      <BatchCraftingDetailSection title="Activity">
+        <BatchCraftingOutcomeChart
+          chart_points={batch.chart_points}
+          processing_started_at={batch.processing_started_at}
         />
-      )}
-
-      {batch.destination_capacity && (
-        <ProgressBar
-          value={batch.destination_capacity.current}
-          max={batch.destination_capacity.max}
-          label="Destination Capacity"
-          value_label={`${batch.destination_capacity.current} / ${batch.destination_capacity.max}`}
-          variant={ProgressBarVariant.ARTIC}
-        />
-      )}
-
-      <Separator />
-
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-        <dt className="text-gray-600 dark:text-gray-400">Destination</dt>
-        <dd>{renderDestination()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Current Position</dt>
-        <dd>
-          {craftSetPositionLabel(setProgress?.current_position ?? null) ?? '—'}
-        </dd>
-        <dt className="text-gray-600 dark:text-gray-400">Current Item</dt>
-        <dd>{renderCurrentItem()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Completed</dt>
-        <dd>{setProgress?.completed_entries ?? 0}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Remaining</dt>
-        <dd>{setProgress?.remaining_entries ?? 0}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Failed</dt>
-        <dd>{batch.failed_count}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Gold Spent</dt>
-        <dd>{batch.gold_spent.toLocaleString()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Gold Gained</dt>
-        <dd>{batch.gold_gained.toLocaleString()}</dd>
-        <dt className="text-gray-600 dark:text-gray-400">Gold Left</dt>
-        <dd>{batch.gold_left.toLocaleString()}</dd>
-      </dl>
-
-      <BatchCraftingOutcomeChart
-        chart_points={batch.chart_points}
-        processing_started_at={batch.processing_started_at}
-      />
+      </BatchCraftingDetailSection>
 
       {!isRunning && batch.ended_reason && setProgress && (
-        <Alert variant={AlertVariant.INFO}>
-          {endReasonLabel(batch.ended_reason)}. Completed{' '}
-          {setProgress.completed_entries.toLocaleString()} of{' '}
-          {setProgress.total_entries.toLocaleString()} set entries, with{' '}
-          {setProgress.remaining_entries.toLocaleString()} remaining and{' '}
-          {batch.failed_count.toLocaleString()} failed.
-        </Alert>
+        <BatchCraftingDetailSection title="Completion">
+          <Alert variant={AlertVariant.INFO}>
+            {endReasonLabel(batch.ended_reason)}. Completed{' '}
+            {setProgress.completed_entries.toLocaleString()} of{' '}
+            {setProgress.total_entries.toLocaleString()} set entries, with{' '}
+            {setProgress.remaining_entries.toLocaleString()} remaining and{' '}
+            {batch.failed_count.toLocaleString()} failed.
+          </Alert>
+        </BatchCraftingDetailSection>
       )}
     </div>
   );

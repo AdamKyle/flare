@@ -48,8 +48,6 @@ If a value is required by a validated request and persisted by the feature, down
 
 Application service methods must not intentionally throw or rethrow exceptions as part of their public contract.
 
-This rule also applies to public module contracts. Do not copy exception-based module API examples from external architecture material into Flare. Use the established `ResponseBuilder` result or a typed result/value object owned by the providing module.
-
 Do not write:
 
 ```php
@@ -91,8 +89,6 @@ Unexpected failures must be:
 The queue job should stay thin and invoke the service. Do not make a service throw just so the job can fail after the service already recorded failure.
 
 If framework retry behavior is explicitly required by a task, model that at the job boundary and document the intentional contract; do not silently change a service into a throwing API.
-
-Do not introduce a database transaction, after-commit callback, transactional listener/job, or outbox as a failure-handling mechanism unless the user explicitly authorizes that exact architecture.
 
 ## ResponseBuilder
 

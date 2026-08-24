@@ -12,7 +12,7 @@ import React, {
 
 import UseBindScreenParams from './hooks/definitions/use-bind-screen-params';
 import { ScreenNavigation } from './types/navigation-type';
-import { ScreenRegistry } from './types/registery-type';
+import { ScreenRegistry } from './types/registry-type';
 import { ScreenMap } from './types/screen-map-type';
 import { ScreenName } from './types/screen-name-type';
 import { ScreenPropsOf } from './types/screen-props-of-type';
@@ -206,6 +206,11 @@ const createScreenManager = <TMap extends ScreenMap>() => {
 
     useEffect(() => {
       topRef.current?.focus({ preventScroll: true });
+      topRef.current?.scrollIntoView({
+        block: 'start',
+        inline: 'nearest',
+        behavior: 'instant',
+      });
     }, [top?.key]);
 
     const renderResolved = <K extends ScreenName<TMap>>(

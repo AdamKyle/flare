@@ -178,7 +178,17 @@ When a job test requires a mocked dependency:
 3. Dispatch the job normally.
 4. Allow the configured synchronous queue connection to execute it.
 
-Do not manually call a job’s `handle()` method.
+Do not manually call a job's `handle()` method.
+
+## Container Access In Tests
+
+Do not use `resolve()`, `app()`, `$this->app->make()`, or equivalent service location merely to
+construct an ordinary test subject or prove that a concrete class resolves. Instantiate the
+subject with explicit collaborators, or enter through the real public application path.
+
+`$this->app->instance()` is permitted only to replace an allowed boundary before the real public
+path executes. It does not make manual job handling, provider-resolution tests, or
+implementation-detail tests acceptable.
 
 Selective queue fakes may be used when the subject job must execute but downstream jobs must not execute.
 

@@ -35,6 +35,24 @@ Do not assume behavior from a test name.
 - Do not use reflection.
 - Exercise behavior through public APIs.
 
+## Non-Public Access Is An Automatic Failure
+
+Tests must contain zero uses of `ReflectionClass`, `ReflectionMethod`, `ReflectionProperty`,
+`setAccessible()`, `invoke()`, or `invokeArgs()` to reach production internals. Do not use bound
+closures, anonymous subclasses, visibility changes, or another indirect mechanism to execute or
+inspect private/protected production state.
+
+When a rule cannot be reached through a meaningful public path, cover it through the existing
+public workflow, extract a genuinely independent rule into a focused public collaborator, or
+simplify/remove an impossible branch. Never change production visibility only for a test.
+
+## Assertion Integrity
+
+Never use `assertTrue(true)`, `assertFalse(false)`, assertions on values created entirely by the
+test, or another tautology to satisfy PHPUnit's assertion count. Tests must not exist only to prove
+container resolution, provider `register()`/`boot()`/`provides()` plumbing, framework plumbing, or
+direct constructor-to-property assignment.
+
 ## Shared Setup
 
 Scenario-specific setup belongs in the test method and must use traits or domain setup factories.
@@ -192,6 +210,10 @@ Report only factual work performed.
 Do not claim commands were run unless they were run.
 
 Do not claim behavior was verified by execution when only static inspection occurred.
+
+Before completion, search every touched test path for prohibited patterns. Zero matches are
+required for reflection, non-lifecycle test helpers, assertion padding, direct model factories,
+and manual queued-job execution.
 
 ## Deleted implementation tests
 

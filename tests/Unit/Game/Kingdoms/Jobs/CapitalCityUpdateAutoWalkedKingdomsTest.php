@@ -32,16 +32,21 @@ class CapitalCityUpdateAutoWalkedKingdomsTest extends TestCase
     public function test_failed_logs_original_exception_and_kingdom_identifier(): void
     {
         $exception = new RuntimeException('broadcast transport failed');
+
+        $capturedContext = null;
+
         Log::shouldReceive('error')
             ->once()
-            ->with('Capital city kingdom update job failed.', Mockery::on(
-                fn (array $context): bool => $context['kingdom_id'] === 82
-                    && $context['exception'] === $exception,
-            ));
+            ->with('Capital city kingdom update job failed.', Mockery::on(function (array $context) use (&$capturedContext) {
+                $capturedContext = $context;
+
+                return true;
+            }));
 
         (new CapitalCityUpdateAutoWalkedKingdoms(82))->failed($exception);
 
-        $this->addToAssertionCount(1);
+        $this->assertSame(82, $capturedContext['kingdom_id']);
+        $this->assertSame($exception, $capturedContext['exception']);
     }
 
     public function test_broadcast_failure_after_transformation_does_not_fail_or_repeat_transformation(): void
@@ -59,19 +64,24 @@ class CapitalCityUpdateAutoWalkedKingdomsTest extends TestCase
         Event::listen(UpdateKingdom::class, function (): void {
             throw new RuntimeException('broadcast transport failed');
         });
+
+        $capturedContext = null;
+
         Log::shouldReceive('warning')
             ->once()
-            ->with('Capital city kingdom update broadcast failed after transformation.', Mockery::on(
-                fn (array $context): bool => $context['kingdom_id'] === $kingdom->id
-                    && $context['character_id'] === $character->id
-                    && $context['exception'] instanceof RuntimeException,
-            ));
+            ->with('Capital city kingdom update broadcast failed after transformation.', Mockery::on(function (array $context) use (&$capturedContext) {
+                $capturedContext = $context;
+
+                return true;
+            }));
 
         $this->app->instance(KingdomTransformer::class, $transformer);
         $this->app->instance(Manager::class, $manager);
 
         CapitalCityUpdateAutoWalkedKingdoms::dispatch($kingdom->id);
 
-        $this->addToAssertionCount(1);
+        $this->assertSame($kingdom->id, $capturedContext['kingdom_id']);
+        $this->assertSame($character->id, $capturedContext['character_id']);
+        $this->assertInstanceOf(RuntimeException::class, $capturedContext['exception']);
     }
 }

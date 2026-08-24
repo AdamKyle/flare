@@ -6,10 +6,11 @@ import { useWorkBenchItemsApi } from '../../work-bench/api/hooks/use-work-bench-
 import { useHolyOilsSelectedItemsPreview } from '../api/hooks/use-holy-oils-selected-items-preview';
 import { useStartBatchCrafting } from '../api/hooks/use-start-batch-crafting';
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
+import HolyOilDropdownField from '../components/holy-oil-dropdown-field';
 import { BatchCraftingDisposition } from '../enums/batch-crafting-disposition';
 import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
-import { dispositionLabel } from '../utils/batch-crafting-labels';
 import { buildHolyOilsSelectedItemsRequest } from '../utils/build-holy-oils-selected-items-request';
+import { HOLY_OILS_DISPOSITION_OPTIONS } from '../utils/holy-oils-disposition-options';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
 
@@ -25,18 +26,7 @@ import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
 
 const PREVIEW_DEBOUNCE_MS = 300;
 
-const DISPOSITION_OPTIONS: DropdownItem[] = [
-  BatchCraftingDisposition.KEEP,
-  BatchCraftingDisposition.SELL,
-  BatchCraftingDisposition.DESTROY,
-  BatchCraftingDisposition.LIST,
-  BatchCraftingDisposition.DISENCHANT,
-].map((disposition) => ({
-  label: dispositionLabel(disposition),
-  value: disposition,
-}));
-
-const toggleId = (ids: number[], id: number): number[] =>
+const toggleTargetSlotId = (ids: number[], id: number): number[] =>
   ids.includes(id) ? ids.filter((existing) => existing !== id) : [...ids, id];
 
 const HolyOilsSelectedItemsScreen = (): ReactNode => {
@@ -47,10 +37,13 @@ const HolyOilsSelectedItemsScreen = (): ReactNode => {
   const [disposition, setDisposition] = useState<DropdownItem | null>(null);
   const [listingPriceText, setListingPriceText] = useState('');
   const [targetSlotIds, setTargetSlotIds] = useState<number[]>([]);
-  const [oilSlotIds, setOilSlotIds] = useState<number[]>([]);
+  const [selectedOil, setSelectedOil] = useState<DropdownItem | null>(null);
 
   const targetItems = useWorkBenchItemsApi({ character_id: characterId });
   const holyOils = useHolyOilsApi({ character_id: characterId });
+
+  const selectedOilId =
+    typeof selectedOil?.value === 'number' ? selectedOil.value : null;
 
   const {
     preview,
@@ -74,11 +67,11 @@ const HolyOilsSelectedItemsScreen = (): ReactNode => {
     () =>
       buildHolyOilsSelectedItemsRequest({
         targetSlotIds,
-        oilSlotIds,
+        selectedOilId,
         disposition: selectedDisposition,
         listingPriceText,
       }),
-    [targetSlotIds, oilSlotIds, selectedDisposition, listingPriceText]
+    [targetSlotIds, selectedOilId, selectedDisposition, listingPriceText]
   );
 
   const debouncedFetchRef = useRef<ReturnType<typeof debounce> | null>(null);
@@ -137,7 +130,9 @@ const HolyOilsSelectedItemsScreen = (): ReactNode => {
               type="checkbox"
               checked={targetSlotIds.includes(item.slot_id)}
               onChange={() =>
-                setTargetSlotIds((current) => toggleId(current, item.slot_id))
+                setTargetSlotIds((current) =>
+                  toggleTargetSlotId(current, item.slot_id)
+                )
               }
               aria-labelledby="holy-oils-target-legend"
             />
@@ -154,44 +149,6 @@ const HolyOilsSelectedItemsScreen = (): ReactNode => {
         {!targetItems.loading && targetItems.loadedItems.length === 0 && (
           <p className="text-sm text-gray-600 dark:text-gray-400">
             No eligible target items found.
-          </p>
-        )}
-      </div>
-    </fieldset>
-  );
-
-  const renderOilList = () => (
-    <fieldset>
-      <legend
-        id="holy-oils-oil-legend"
-        className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
-      >
-        Holy Oils
-      </legend>
-      <div className="max-h-48 space-y-1 overflow-y-auto rounded-md border border-gray-500 p-2 dark:border-gray-700">
-        {holyOils.loadedItems.map((item) => (
-          <label key={item.id} className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={oilSlotIds.includes(item.id)}
-              onChange={() =>
-                setOilSlotIds((current) => toggleId(current, item.id))
-              }
-              aria-labelledby="holy-oils-oil-legend"
-            />
-            {item.name} (x{item.stack_amount})
-          </label>
-        ))}
-        {holyOils.canLoadMore && (
-          <LinkButton
-            label="Load more"
-            variant={ButtonVariant.PRIMARY}
-            on_click={holyOils.onEndReached}
-          />
-        )}
-        {!holyOils.loading && holyOils.loadedItems.length === 0 && (
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            No Holy Oils found.
           </p>
         )}
       </div>
@@ -252,7 +209,7 @@ const HolyOilsSelectedItemsScreen = (): ReactNode => {
         </legend>
         <Dropdown
           aria_labelled_by="holy-oils-selected-disposition-legend"
-          items={DISPOSITION_OPTIONS}
+          items={HOLY_OILS_DISPOSITION_OPTIONS}
           on_select={setDisposition}
           pre_selected_item={disposition ?? undefined}
           selection_placeholder="Select a disposition"
@@ -279,7 +236,20 @@ const HolyOilsSelectedItemsScreen = (): ReactNode => {
       )}
 
       {renderTargetList()}
-      {renderOilList()}
+
+      <HolyOilDropdownField
+        legend_id="holy-oils-oil-legend"
+        loaded_items={holyOils.loadedItems}
+        selected_oil={selectedOil}
+        loading={holyOils.loading}
+        can_load_more={holyOils.canLoadMore}
+        is_loading_more={holyOils.isLoadingMore}
+        search_text={holyOils.searchText}
+        on_search={holyOils.setSearchText}
+        on_end_reached={holyOils.onEndReached}
+        on_select={setSelectedOil}
+      />
+
       {renderPreview()}
 
       {startError && <Alert variant={AlertVariant.DANGER}>{startError}</Alert>}

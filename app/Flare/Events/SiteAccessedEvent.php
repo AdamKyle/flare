@@ -4,9 +4,6 @@ namespace App\Flare\Events;
 
 use Illuminate\Queue\SerializesModels;
 
-/**
- * @codeCoverageIgnore
- */
 class SiteAccessedEvent
 {
     use SerializesModels;

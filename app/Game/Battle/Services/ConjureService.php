@@ -12,6 +12,7 @@ use App\Game\Battle\Values\CelestialConjureType;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Events\Values\EventType;
+use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Values\MapName;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
@@ -20,7 +21,6 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\NpcMessageTypes;
 use App\Game\Npcs\Values\NpcType;
 use Exception;
-use Facades\App\Flare\Cache\CoordinatesCache;
 
 class ConjureService
 {
@@ -29,6 +29,7 @@ class ConjureService
     public function __construct(
         NpcServerMessageBuilder $npcServerMessageBuilder,
         private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly CoordinatesQuery $coordinatesQuery,
     ) {
         $this->npcServerMessageBuilder = $npcServerMessageBuilder;
     }
@@ -164,7 +165,9 @@ class ConjureService
      */
     protected function getXPosition(): int
     {
-        return CoordinatesCache::getFromCache()['x'][$this->randomNumberGenerator->numberBetween(CoordinatesCache::getFromCache()['x'][0], (count(CoordinatesCache::getFromCache()['x']) - 1))];
+        $x = $this->coordinatesQuery->get()->x;
+
+        return $x[$this->randomNumberGenerator->numberBetween($x[0], count($x) - 1)];
     }
 
     /**
@@ -172,7 +175,9 @@ class ConjureService
      */
     protected function getYPosition(): int
     {
-        return CoordinatesCache::getFromCache()['y'][$this->randomNumberGenerator->numberBetween(CoordinatesCache::getFromCache()['y'][0], (count(CoordinatesCache::getFromCache()['y']) - 1))];
+        $y = $this->coordinatesQuery->get()->y;
+
+        return $y[$this->randomNumberGenerator->numberBetween($y[0], count($y) - 1)];
     }
 
     private function isEventWithCelestialsRunning(): bool

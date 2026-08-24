@@ -4,8 +4,8 @@ namespace App\Game\Core\Items\Transformers;
 
 use App\Flare\Models\GameSkill;
 use App\Flare\Models\Item;
-use App\Flare\Traits\IsItemUnique;
 use App\Game\Core\Items\Enricher\ItemEnricherFactory;
+use App\Game\Core\Items\Values\ItemUniqueness;
 use App\Game\Gems\Traits\GetItemAtonements;
 use App\Game\Maps\Transformers\LocationTransformer;
 use League\Fractal\Resource\Item as ItemResource;
@@ -13,7 +13,7 @@ use League\Fractal\TransformerAbstract;
 
 class ItemTransformer extends TransformerAbstract
 {
-    use GetItemAtonements, IsItemUnique;
+    use GetItemAtonements;
 
     protected array $defaultIncludes = ['drop_location'];
 
@@ -89,7 +89,7 @@ class ItemTransformer extends TransformerAbstract
             'affix_damage_reduction' => $item->affix_damage_reduction,
             'increase_skill_bonus_by' => $item->increase_skill_bonus_by,
             'increase_skill_training_bonus_by' => $item->increase_skill_training_bonus_by,
-            'is_unique' => $this->isUnique($item),
+            'is_unique' => ItemUniqueness::fromItem($item)->isUnique(),
             'min_cost' => $item->cost,
             'holy_level' => $item->holy_level,
             'holy_stacks' => $item->holy_stacks,

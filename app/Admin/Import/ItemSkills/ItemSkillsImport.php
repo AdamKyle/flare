@@ -3,9 +3,10 @@
 namespace App\Admin\Import\ItemSkills;
 
 use App\Admin\Import\ItemSkills\Sheets\ItemSkillsSheet;
+use Maatwebsite\Excel\Concerns\Import;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ItemSkillsImport implements WithMultipleSheets
+class ItemSkillsImport implements Import, WithMultipleSheets
 {
     public function sheets(): array
     {

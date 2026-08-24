@@ -1,14 +1,13 @@
 import { debounce } from 'lodash';
 import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
+import BatchCraftingOutputSummary from './batch-crafting-output-summary';
 import CraftSetHandSelector from './craft-set-hand-selector';
 import CraftSetPositionSelector from './craft-set-position-selector';
 import { useCraftSetPreview } from '../api/hooks/use-craft-set-preview';
 import { useCraftSetRecommendation } from '../api/hooks/use-craft-set-recommendation';
 import { useStartBatchCrafting } from '../api/hooks/use-start-batch-crafting';
 import BatchCraftingScreenManager from '../component-mapping/batch-crafting-screen-manager';
-import { BatchCraftingDisposition } from '../enums/batch-crafting-disposition';
-import { BatchCraftingOutputDestination } from '../enums/batch-crafting-output-destination';
 import { BatchCraftingScreenNames } from '../enums/batch-crafting-screen-names';
 import { CraftSetPosition } from '../enums/craft-set-position';
 import {
@@ -16,11 +15,7 @@ import {
   CRAFT_SET_REQUIRED_POSITION_OPTIONS,
 } from '../enums/craft-set-positions';
 import { CraftSetScreenProps } from '../types/batch-crafting-screen-map';
-import {
-  craftSetPositionLabel,
-  dispositionLabel,
-  outputDestinationLabel,
-} from '../utils/batch-crafting-labels';
+import { craftSetPositionLabel } from '../utils/batch-crafting-labels';
 import { buildCraftSetRequest } from '../utils/build-craft-set-request';
 
 import { useGameData } from 'game-data/hooks/use-game-data';
@@ -29,7 +24,6 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import LinkButton from 'ui/buttons/link-button';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import { ProgressBarVariant } from 'ui/progress/enums/progress-bar-variant';
 import IndeterminateProgressBar from 'ui/progress/indeterminate-progress-bar';
@@ -136,10 +130,6 @@ const CraftSetForm = ({ output_selection }: CraftSetScreenProps): ReactNode => {
     setSelectedPositions((current) => ({ ...current, [position]: item }));
   };
 
-  const handleChangeOutput = () => {
-    navigation.pop();
-  };
-
   const handleStart = async () => {
     if (!request) {
       return;
@@ -161,33 +151,6 @@ const CraftSetForm = ({ output_selection }: CraftSetScreenProps): ReactNode => {
 
   const missingPositionLabels = (recommendation?.missing_positions ?? []).map(
     (position) => craftSetPositionLabel(position) ?? position
-  );
-
-  const destinationSummaryValue =
-    output_selection.output_destination ===
-    BatchCraftingOutputDestination.INVENTORY_SET
-      ? output_selection.output_set_name
-      : outputDestinationLabel(output_selection.output_destination);
-
-  const renderOutputSummary = () => (
-    <div className="space-y-2">
-      <h4 className={SECTION_HEADING_CSS}>Crafted Set Output</h4>
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-1 text-sm">
-        <dt className="text-gray-600 dark:text-gray-400">Action</dt>
-        <dd>{dispositionLabel(output_selection.disposition)}</dd>
-        {output_selection.disposition === BatchCraftingDisposition.KEEP && (
-          <>
-            <dt className="text-gray-600 dark:text-gray-400">Destination</dt>
-            <dd>{destinationSummaryValue}</dd>
-          </>
-        )}
-      </dl>
-      <LinkButton
-        label="Change"
-        variant={ButtonVariant.PRIMARY}
-        on_click={handleChangeOutput}
-      />
-    </div>
   );
 
   const renderPreview = () => {
@@ -296,7 +259,12 @@ const CraftSetForm = ({ output_selection }: CraftSetScreenProps): ReactNode => {
         item before starting.
       </p>
 
-      {renderOutputSummary()}
+      <BatchCraftingOutputSummary
+        title="Crafted Set Output"
+        disposition={output_selection.disposition}
+        output_destination={output_selection.output_destination}
+        output_set_name={output_selection.output_set_name}
+      />
 
       {renderPositionSelectors()}
 

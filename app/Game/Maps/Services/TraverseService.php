@@ -26,7 +26,7 @@ use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\MovementMessageTypes;
 use App\Game\Monsters\Services\MonsterListService;
 use App\Game\Monsters\Transformers\MonsterTransformer;
-use Facades\App\Flare\Cache\CoordinatesCache;
+use Facades\App\Game\Maps\Cache\CoordinatesCache;
 use Facades\App\Game\Messages\Handlers\ServerMessageHandler;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;

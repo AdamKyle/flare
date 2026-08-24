@@ -128,11 +128,11 @@ const CraftSetHandSelector = ({
   })();
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2 rounded-md border border-gray-300 p-3 dark:border-gray-700">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
           {label}
-        </p>
+        </h4>
         {selected_item && (
           <Button
             label="Clear"
@@ -146,7 +146,8 @@ const CraftSetHandSelector = ({
           id={typeLegendId}
           className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
         >
-          {label} Item Type
+          <span className="sr-only">{label} </span>
+          Type
         </legend>
         <Dropdown
           aria_labelled_by={typeLegendId}
@@ -162,7 +163,8 @@ const CraftSetHandSelector = ({
             id={itemLegendId}
             className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            {label} Item
+            <span className="sr-only">{label} </span>
+            Item
           </legend>
           <Dropdown
             aria_labelled_by={itemLegendId}

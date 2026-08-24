@@ -37,4 +37,25 @@ class Markdown
 
         return $converter->convert($text)->getContent();
     }
+
+    /**
+     * Add a sanitized `content_html` key to every content block.
+     *
+     * Used by any view that renders a list of `['content' => markdown, ...]`
+     * blocks, so the view never needs to invoke the converter itself.
+     */
+    public function renderBlocks(mixed $blocks): array
+    {
+        if (! is_array($blocks)) {
+            return [];
+        }
+
+        return array_map(function (array $block): array {
+            $block['content_html'] = $this->convertToHtml(
+                $this->cleanMarkdown($block['content'] ?? null)
+            );
+
+            return $block;
+        }, $blocks);
+    }
 }
