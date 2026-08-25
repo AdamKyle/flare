@@ -10,8 +10,11 @@ use App\Game\Battle\ServerFight\MonsterPlayerFight;
 use App\Game\Battle\Services\MonsterFightService;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Combat\Values\AttackType;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\Setup\Monster\MonsterFactory;
@@ -111,5 +114,69 @@ class MonsterFightServiceTest extends TestCase
 
         $this->assertSame(422, $result['status']);
         $this->assertSame('You cannot do that while Delve automation is running. Cancel it first.', $result['message']);
+    }
+
+    public function test_fight_monster_does_not_emit_defeat_message_when_monster_survives(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+
+        Cache::put('monster-fight-'.$this->character->id, [
+            'monster' => ['id' => $this->monster->id, 'name' => $this->monster->name],
+        ], 900);
+
+        $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
+        $monsterPlayerFight->shouldReceive('setCharacter')->once();
+        $monsterPlayerFight->shouldReceive('fightMonster')->once();
+        $monsterPlayerFight->shouldReceive('getCharacterHealth')->andReturn(50);
+        $monsterPlayerFight->shouldReceive('getMonsterHealth')->andReturn(10);
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+        $monsterPlayerFight->shouldReceive('getMonsterLastRolledAttack')->andReturn(5);
+        $monsterPlayerFight->shouldReceive('getMonster')->andReturn(['id' => $this->monster->id]);
+
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldReceive('canFightMonster')->once()->andReturn(true);
+
+        $this->instance(MonsterPlayerFight::class, $monsterPlayerFight);
+        $this->instance(WeeklyBattleService::class, $weeklyBattleService);
+
+        $service = resolve(MonsterFightService::class);
+
+        $service->fightMonster($this->character, AttackType::ATTACK->value);
+
+        Event::assertNotDispatched(ServerMessageEvent::class);
+    }
+
+    public function test_fight_monster_emits_immediate_defeat_message_when_monster_is_killed(): void
+    {
+        Event::fake([ServerMessageEvent::class]);
+        Queue::fake();
+
+        Cache::put('monster-fight-'.$this->character->id, [
+            'monster' => ['id' => $this->monster->id, 'name' => $this->monster->name],
+        ], 900);
+
+        $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
+        $monsterPlayerFight->shouldReceive('setCharacter')->once();
+        $monsterPlayerFight->shouldReceive('fightMonster')->once();
+        $monsterPlayerFight->shouldReceive('getCharacterHealth')->andReturn(50);
+        $monsterPlayerFight->shouldReceive('getMonsterHealth')->andReturn(0);
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+        $monsterPlayerFight->shouldReceive('getMonsterLastRolledAttack')->andReturn(5);
+        $monsterPlayerFight->shouldReceive('getMonster')->andReturn(['id' => $this->monster->id]);
+
+        $weeklyBattleService = Mockery::mock(WeeklyBattleService::class);
+        $weeklyBattleService->shouldReceive('canFightMonster')->once()->andReturn(true);
+
+        $this->instance(MonsterPlayerFight::class, $monsterPlayerFight);
+        $this->instance(WeeklyBattleService::class, $weeklyBattleService);
+
+        $service = resolve(MonsterFightService::class);
+
+        $service->fightMonster($this->character, AttackType::ATTACK->value);
+
+        Event::assertDispatchedTimes(ServerMessageEvent::class, 1);
+        Event::assertDispatched(ServerMessageEvent::class, function (ServerMessageEvent $event) {
+            return $event->message === 'You have defeated: '.$this->monster->name.'.';
+        });
     }
 }

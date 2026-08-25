@@ -19,6 +19,15 @@ class SetSailService extends BaseMovementService
 
     private PortService $portService;
 
+    /**
+     * @param MapTileValue $mapTileValue
+     * @param CoordinatesCache $coordinatesCache
+     * @param ConjureService $conjureService
+     * @param MovementService $movementService
+     * @param PortService $portService
+     * @param TraverseService $traverseService
+     * @param ChanceCalculator $chanceCalculator
+     */
     public function __construct(
         MapTileValue $mapTileValue,
         CoordinatesCache $coordinatesCache,

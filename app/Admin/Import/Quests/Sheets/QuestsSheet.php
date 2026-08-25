@@ -16,7 +16,10 @@ class QuestsSheet implements ToCollection
 {
     private $requiredQuestChains = [];
 
-    public function collection(Collection $rows)
+    /**
+     * Import quest rows from the uploaded spreadsheet, persisting them and resolving required quest chains.
+     */
+    public function collection(Collection $rows): void
     {
         $questsWhichRequireOtherQuests = [];
 
@@ -51,6 +54,11 @@ class QuestsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean quest payload from a raw spreadsheet row, resolving related quest requirements.
+     *
+     * @return array
+     */
     protected function returnCleanItem(array $quest)
     {
 

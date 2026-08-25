@@ -10,7 +10,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class BuildingsUnitsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import kingdom building unit rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index === 0) {

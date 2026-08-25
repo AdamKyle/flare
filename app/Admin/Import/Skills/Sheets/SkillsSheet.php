@@ -9,7 +9,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class SkillsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import game skill rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
 
         foreach ($rows as $index => $row) {

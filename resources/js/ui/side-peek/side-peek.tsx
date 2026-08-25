@@ -19,11 +19,20 @@ const SidePeek = (props: SidePeekProps) => {
 
   useEffect(() => {
     const previousBodyOverflow = document.body.style.overflow;
+    const previousBodyPaddingRight = document.body.style.paddingRight;
+
+    const scrollbarWidth =
+      window.innerWidth - document.documentElement.clientWidth;
+    const computedPaddingRight = parseFloat(
+      window.getComputedStyle(document.body).paddingRight
+    );
 
     document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${computedPaddingRight + scrollbarWidth}px`;
 
     return () => {
       document.body.style.overflow = previousBodyOverflow;
+      document.body.style.paddingRight = previousBodyPaddingRight;
     };
   }, []);
 

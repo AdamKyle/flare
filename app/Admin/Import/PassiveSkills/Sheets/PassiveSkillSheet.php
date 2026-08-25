@@ -8,7 +8,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class PassiveSkillSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import passive skill rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -22,6 +25,9 @@ class PassiveSkillSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean passive skill payload from a raw spreadsheet row, resolving the parent skill.
+     */
     protected function returnCleanData(array $passiveSkillData): array
     {
         $cleanData = [];

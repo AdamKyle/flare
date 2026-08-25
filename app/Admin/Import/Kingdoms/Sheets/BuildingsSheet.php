@@ -9,7 +9,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class BuildingsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import kingdom building rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -22,6 +25,11 @@ class BuildingsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean kingdom building payload from a raw spreadsheet row, resolving the passive skill.
+     *
+     * @return array
+     */
     protected function returnCleanBuildingData(array $buildingData)
     {
         $cleanData = [];

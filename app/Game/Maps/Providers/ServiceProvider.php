@@ -145,7 +145,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CondensedKingdomTransformer::class),
                 $app->make(PlainDataSerializer::class),
                 $app->make(Pagination::class),
-                $app->make(Manager::class)
+                $app->make(Manager::class),
             );
         });
 

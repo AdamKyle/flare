@@ -22,12 +22,9 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
       transition: reduceMotion
         ? { duration: 0 }
         : {
-            x: {
-              type: 'tween' as const,
-              ease: 'easeOut' as const,
-              duration: 0.45,
-            },
-            opacity: { duration: 0.2 },
+            type: 'tween' as const,
+            ease: 'easeOut' as const,
+            duration: 0.35,
           },
     },
     exit: {
@@ -36,12 +33,9 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
       transition: reduceMotion
         ? { duration: 0 }
         : {
-            x: {
-              type: 'tween' as const,
-              ease: 'easeIn' as const,
-              duration: 0.35,
-            },
-            opacity: { duration: 0.2 },
+            type: 'tween' as const,
+            ease: 'easeIn' as const,
+            duration: 0.35,
           },
     },
   };
@@ -49,7 +43,7 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
   return (
     <div
       className={clsx(
-        'absolute inset-0 z-40 flex items-stretch justify-end',
+        'absolute inset-0 z-40 flex items-stretch justify-end overflow-hidden',
         isPresent ? 'pointer-events-auto' : 'pointer-events-none'
       )}
     >
@@ -59,21 +53,11 @@ const StackedCard = ({ children, on_close, aria_label }: StackedCardProps) => {
         animate="enter"
         exit="exit"
         className={clsx(
-          'relative h-full w-full',
+          'absolute inset-0 h-full w-full',
           isPresent ? 'pointer-events-auto' : 'pointer-events-none'
         )}
         style={{ willChange: 'transform' }}
       >
-        <div
-          className="absolute top-4 right-0 bottom-0 left-4 rounded-sm border-1 border-gray-300/40 bg-white/25 dark:border-gray-700/40 dark:bg-gray-900/30"
-          aria-hidden
-        />
-
-        <div
-          className="absolute top-2 right-0 bottom-0 left-2 rounded-sm border-1 border-gray-300/50 bg-white/40 dark:border-gray-700/50 dark:bg-gray-900/45"
-          aria-hidden
-        />
-
         <div
           ref={dialogRef}
           tabIndex={-1}

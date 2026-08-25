@@ -498,7 +498,7 @@ class Exploration implements ShouldQueue
             'damage_blocked' => 0,
         ];
 
-        foreach ($fightData['messages'] ?? [] as $messageData) {
+        foreach ($fightData['attack_messages'] ?? [] as $messageData) {
             if (! is_array($messageData)) {
                 continue;
             }

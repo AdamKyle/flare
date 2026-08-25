@@ -9,7 +9,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class NpcsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import NPC rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -23,6 +26,9 @@ class NpcsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean NPC payload from a raw spreadsheet row, resolving the game map.
+     */
     protected function returnCleanData(array $npcData): array
     {
         $cleanData = [];

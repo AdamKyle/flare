@@ -5,6 +5,7 @@ import React, {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -204,13 +205,14 @@ const createScreenManager = <TMap extends ScreenMap>() => {
       return entries.map((entry) => buildScreenView(entry, top?.key ?? null));
     }, [navigation, top]);
 
-    useEffect(() => {
-      topRef.current?.focus({ preventScroll: true });
-      topRef.current?.scrollIntoView({
-        block: 'start',
-        inline: 'nearest',
-        behavior: 'instant',
+    useLayoutEffect(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'auto',
       });
+
+      topRef.current?.focus({ preventScroll: true });
     }, [top?.key]);
 
     const renderResolved = <K extends ScreenName<TMap>>(
@@ -259,8 +261,8 @@ const createScreenManager = <TMap extends ScreenMap>() => {
     return (
       <div
         className={clsx({
-          'pointer-events-none w-full': !top,
-          'relative z-20 w-full': top,
+          'pointer-events-none w-full overflow-x-clip': !top,
+          'relative z-20 w-full overflow-x-clip': top,
         })}
         style={{ willChange: 'transform' }}
       >

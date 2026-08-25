@@ -1,6 +1,12 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { isNil } from 'lodash';
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import { useAttackMonster } from './api/hooks/use-attack-monster';
 import { AttackType } from './enums/attack-type';
@@ -45,7 +51,10 @@ const MonsterSection = ({
   const [showExplorationConfiguration, setShowExplorationConfiguration] =
     useState(false);
 
-  const monsters = gameData?.monsters;
+  const monsters = useMemo(
+    () => (Array.isArray(gameData?.monsters) ? gameData.monsters : []),
+    [gameData?.monsters]
+  );
 
   useEffect(() => {
     if (!monsters || monsters.length === 0) {
@@ -60,7 +69,7 @@ const MonsterSection = ({
   }, [listenForMonsterUpdates]);
 
   const handelMonsterSelection = (shouldFightAgain?: boolean) => {
-    if (!monsters || !monsters[currentIndex] || !gameData.character) {
+    if (!monsters || !monsters[currentIndex] || !gameData?.character) {
       return;
     }
 
@@ -79,18 +88,7 @@ const MonsterSection = ({
     }
   };
 
-  const handleNextIndex = (index: number) => {
-    if (!monsters || !monsters[index]) {
-      return;
-    }
-
-    const selectedMonster = monsters[index] as MonsterDefinition;
-    setCurrentIndex(index);
-    setMonsterToFight(null);
-    setMonsterName(selectedMonster.name);
-  };
-
-  const handlePreviousAction = (index: number) => {
+  const handleMonsterSelected = (index: number) => {
     if (!monsters || !monsters[index]) {
       return;
     }
@@ -102,7 +100,7 @@ const MonsterSection = ({
   };
 
   const handleAttackMonster = (attackType: AttackType) => {
-    if (!monsters || !monsters[currentIndex] || !gameData.character) {
+    if (!monsters || !monsters[currentIndex] || !gameData?.character) {
       return;
     }
 
@@ -120,7 +118,7 @@ const MonsterSection = ({
     setShowExplorationConfiguration(false);
   }, []);
 
-  if (!monsters) {
+  if (!gameData) {
     return <GameDataError />;
   }
 
@@ -302,14 +300,12 @@ const MonsterSection = ({
     <>
       <MonsterTopSection
         img_src={getMonsterImage()}
-        next_action={handleNextIndex}
-        prev_action={handlePreviousAction}
         total_monsters={monsters.length - 1}
         current_index={currentIndex}
         view_monster_stats={show_monster_stats}
         monster_name={monsterName}
         monsters={monsters}
-        select_action={handleNextIndex}
+        select_action={handleMonsterSelected}
       />
       {renderMonsterFightSection()}
     </>

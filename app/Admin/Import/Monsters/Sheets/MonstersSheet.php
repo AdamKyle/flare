@@ -10,7 +10,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class MonstersSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import monster rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
 
         foreach ($rows as $index => $row) {
@@ -38,6 +41,11 @@ class MonstersSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean monster payload from a raw spreadsheet row, resolving related records.
+     *
+     * @return array|null
+     */
     protected function returnCleanMonster(array $monster)
     {
 

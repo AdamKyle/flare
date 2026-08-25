@@ -1165,7 +1165,7 @@ class ExplorationTest extends TestCase
             ]);
             $mock->shouldReceive('fightMonster')->andReturn([
                 'health' => ['current_character_health' => 10, 'current_monster_health' => 0],
-                'messages' => [
+                'attack_messages' => [
                     'not-an-array-entry',
                     ['no_message_key' => 'x'],
                     ['message' => 'Your weapon hits Goblin for: 50'],

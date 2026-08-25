@@ -11,7 +11,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class RaidSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import raid rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -33,6 +36,9 @@ class RaidSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean raid payload from a raw spreadsheet row, resolving related monster and location records.
+     */
     protected function cleanRaidData(array $raidData): array
     {
 
@@ -76,7 +82,7 @@ class RaidSheet implements ToCollection
     }
 
     /**
-     * Handle updateing or creating data.
+     * Update the existing raid or create a new one from the clean raid data.
      */
     protected function handleEvent(array $eventData, ?Raid $raid = null): void
     {

@@ -8,7 +8,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class ClassSpecialsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import class special rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {

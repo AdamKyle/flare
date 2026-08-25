@@ -10,7 +10,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class ItemSkillsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import item skill rows from the uploaded spreadsheet, persist them, and rebuild character attack data.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {

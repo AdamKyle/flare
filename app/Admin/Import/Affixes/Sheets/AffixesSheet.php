@@ -9,7 +9,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class AffixesSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import affix rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -32,6 +35,11 @@ class AffixesSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean affix payload from a raw spreadsheet row, resolving the related skill.
+     *
+     * @return array|null
+     */
     protected function returnCleanAffix(array $item)
     {
         $cleanData = [];

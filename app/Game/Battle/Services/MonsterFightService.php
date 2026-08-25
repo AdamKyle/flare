@@ -14,6 +14,7 @@ use App\Game\BattleRewardProcessing\Jobs\BattleAttackHandler;
 use App\Game\BattleRewardProcessing\Services\WeeklyBattleService;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Values\LocationType;
+use App\Game\Messages\Events\ServerMessageEvent;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
@@ -160,7 +161,7 @@ class MonsterFightService
 
         $cache['health']['current_character_health'] = $characterHealth;
         $cache['health']['current_monster_health'] = $monsterHealth;
-        $cache['messages'] = $this->monsterPlayerFight->getBattleMessages();
+        $cache['attack_messages'] = $this->monsterPlayerFight->getBattleMessages();
         $cache['attack_damage'] = $this->monsterPlayerFight->getMonsterLastRolledAttack();
 
         if ($monsterHealth > 0) {
@@ -176,6 +177,8 @@ class MonsterFightService
         if ($returnData) {
             return $cache;
         }
+
+        event(new ServerMessageEvent($character->user, 'You have defeated: '.$cache['monster']['name'].'.'));
 
         Cache::delete('monster-fight-'.$character->id);
         BattleAttackHandler::dispatch($character->id, $this->monsterPlayerFight->getMonster()['id'])->onQueue('battle_reward_processing')->onConnection('battle_reward_processing')->delay(now()->addSeconds(2));

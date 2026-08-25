@@ -11,7 +11,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class LocationsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import location rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -25,6 +28,9 @@ class LocationsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean location payload from a raw spreadsheet row, resolving related records.
+     */
     protected function returnCleanData(array $locations): array
     {
         $cleanData = [];

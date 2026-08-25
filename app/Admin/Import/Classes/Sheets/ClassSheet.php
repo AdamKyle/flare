@@ -8,7 +8,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class ClassSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import game class rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {

@@ -12,7 +12,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class ItemsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import item rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -58,6 +61,11 @@ class ItemsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean item payload from a raw spreadsheet row, resolving related item data.
+     *
+     * @return array
+     */
     private function returnCleanItem(array $item)
     {
         $cleanData = [];

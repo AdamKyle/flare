@@ -25,7 +25,10 @@ class GuideQuestsSheet implements ToCollection
         'trinketry',
     ];
 
-    public function collection(Collection $rows)
+    /**
+     * Import guide quest rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -48,6 +51,11 @@ class GuideQuestsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean guide quest payload from a raw spreadsheet row, resolving related requirements.
+     *
+     * @return array
+     */
     protected function returnCleanAffix(array $data)
     {
 
@@ -158,6 +166,9 @@ class GuideQuestsSheet implements ToCollection
         return $data;
     }
 
+    /**
+     * Resolve the required batch crafted items configured for the guide quest row.
+     */
     private function requiredBatchCraftedItems(array $data): ?array
     {
         $requiredBatchCraftedItems = [];
@@ -207,6 +218,9 @@ class GuideQuestsSheet implements ToCollection
         return $requiredBatchCraftedItems;
     }
 
+    /**
+     * Resolve the craftable inventory item matching the required item name and type.
+     */
     private function findInventoryRequirementItem(string $itemName, string $itemType): ?Item
     {
         if (! in_array($itemType, $this->validBatchCraftedItemTypes(), true) && ! in_array($itemType, $this->validBatchCraftedItemTypeNames(), true)) {
@@ -230,6 +244,9 @@ class GuideQuestsSheet implements ToCollection
             ->first();
     }
 
+    /**
+     * Resolve the alchemy item matching the required item name and alchemy type.
+     */
     private function findAlchemyRequirementItem(string $itemName, string $itemType): ?Item
     {
         return Item::where('name', $itemName)
@@ -246,6 +263,9 @@ class GuideQuestsSheet implements ToCollection
             ->first();
     }
 
+    /**
+     * Return the item types that are valid for a required batch crafted item.
+     */
     private function validBatchCraftedItemTypes(): array
     {
         return array_merge(
@@ -259,11 +279,17 @@ class GuideQuestsSheet implements ToCollection
         );
     }
 
+    /**
+     * Return the human readable names for the valid batch crafted item types.
+     */
     private function validBatchCraftedItemTypeNames(): array
     {
         return array_map(fn (string $type) => $this->batchCraftedItemTypeName($type), $this->validBatchCraftedItemTypes());
     }
 
+    /**
+     * Resolve the human readable name for a single batch crafted item type.
+     */
     private function batchCraftedItemTypeName(string $type): string
     {
         return match ($type) {
@@ -274,6 +300,9 @@ class GuideQuestsSheet implements ToCollection
         };
     }
 
+    /**
+     * Return the human readable names for the alchemy item types.
+     */
     private function alchemyItemTypeNames(): array
     {
         return [

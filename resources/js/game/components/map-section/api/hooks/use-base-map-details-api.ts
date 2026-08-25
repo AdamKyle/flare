@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import BaseMapApiDefinition from './definitions/base-map-api-definition';
 import BaseMapDetailsApiDefinition from './definitions/base-map-details-api-definition';
 import MapDetailsApiRequestParams from './definitions/map-details-api-request-params';
+import isValidBaseMapApiResponse from '../utils/is-valid-base-map-api-response';
 
 const useBaseMapDetailsApi = (
   params: MapDetailsApiRequestParams
@@ -35,6 +36,11 @@ const useBaseMapDetailsApi = (
           BaseMapApiDefinition,
           AxiosRequestConfig<AxiosResponse<BaseMapApiDefinition>>
         >(url);
+
+        if (!isValidBaseMapApiResponse(result)) {
+          setError({ message: 'Unable to load the map. Please try again.' });
+          return;
+        }
 
         setData(result);
 

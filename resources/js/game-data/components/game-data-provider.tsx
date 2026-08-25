@@ -46,14 +46,18 @@ const GameDataProvider = (props: GameDataProviderProps) => {
   const handleOnMonsterListUpdate = (
     monsterList: UseMonsterUpdateStreamResponse
   ) => {
+    const updatedMonsters = Array.isArray(monsterList.monsters)
+      ? monsterList.monsters
+      : monsterList.monsters.data;
+
     setGameData((prev): GameDataDefinition | null => {
-      if (!prev || !prev.monsters) {
+      if (!prev) {
         return prev;
       }
 
       return {
         ...prev,
-        monsters: monsterList.monsters,
+        monsters: updatedMonsters,
       };
     });
   };

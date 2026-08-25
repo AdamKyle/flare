@@ -8,7 +8,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class UnitsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import kingdom unit rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -21,6 +24,11 @@ class UnitsSheet implements ToCollection
         }
     }
 
+    /**
+     * Build a clean kingdom unit payload from a raw spreadsheet row, dropping empty values.
+     *
+     * @return array
+     */
     protected function returnCleanUnitData(array $unitData)
     {
         $cleanData = [];

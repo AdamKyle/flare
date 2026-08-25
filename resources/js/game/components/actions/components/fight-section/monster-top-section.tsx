@@ -8,8 +8,6 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import LinkButton from 'ui/buttons/link-button';
 
 const MonsterTopSection = ({
-  next_action,
-  prev_action,
   monster_name,
   img_src,
   view_monster_stats,
@@ -18,30 +16,33 @@ const MonsterTopSection = ({
   monsters,
   select_action,
 }: MonsterTopSectionProps): ReactNode => {
-  const handleMoveNext = () => {
-    let newIndex = current_index + 1;
+  const isAtFirstMonster = current_index <= 0;
+  const isAtLastMonster = current_index >= total_monsters;
 
-    if (newIndex > total_monsters) {
-      newIndex = total_monsters;
+  const handleMoveNext = () => {
+    if (isAtLastMonster) {
+      return;
     }
 
-    next_action(newIndex);
+    select_action(current_index + 1);
   };
 
   const handleMovePrevious = () => {
-    let newIndex = current_index - 1;
-
-    if (newIndex < 0) {
-      newIndex = 0;
+    if (isAtFirstMonster) {
+      return;
     }
 
-    prev_action(newIndex);
+    select_action(current_index - 1);
   };
 
-  const handleViewMonsterStats = () => {
-    const monsterId = monsters[current_index].id;
+  const selectedMonster = monsters[current_index];
 
-    view_monster_stats(monsterId || 0);
+  const handleViewMonsterStats = () => {
+    if (!selectedMonster) {
+      return;
+    }
+
+    view_monster_stats(selectedMonster.id);
   };
 
   return (
@@ -53,9 +54,10 @@ const MonsterTopSection = ({
       />
       <div className="mx-auto mt-4 flex w-full items-center justify-center gap-x-3 text-lg leading-none">
         <button
-          className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
+          className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 dark:hover:text-gray-500"
           aria-label="Previous"
           onClick={handleMovePrevious}
+          disabled={isAtFirstMonster}
           type="button"
         >
           <i className="fas fa-chevron-circle-left" aria-hidden="true"></i>
@@ -71,9 +73,10 @@ const MonsterTopSection = ({
         </div>
 
         <button
-          className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 dark:hover:text-gray-500"
+          className="transform text-xl transition-all duration-300 ease-in-out hover:scale-105 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 dark:hover:text-gray-500"
           aria-label="Next"
           onClick={handleMoveNext}
+          disabled={isAtLastMonster}
           type="button"
         >
           <i className="fas fa-chevron-circle-right" aria-hidden="true"></i>
@@ -85,6 +88,7 @@ const MonsterTopSection = ({
           label="View Stats"
           variant={ButtonVariant.PRIMARY}
           on_click={handleViewMonsterStats}
+          disabled={!selectedMonster}
         />
       </div>
       <div className={'mt-2'}>

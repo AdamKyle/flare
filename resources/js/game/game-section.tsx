@@ -29,12 +29,9 @@ const GameSection = () => {
           <div className="relative z-10 col-start-1 row-start-1">
             <motion.div
               className={clsx({
-                'pointer-events-none': stackDepth > 0,
-                'absolute inset-0': stackDepth > 0,
+                'pointer-events-none absolute inset-0': stackDepth > 0,
               })}
-              initial={false}
               animate={{ opacity: stackDepth > 0 ? 0 : 1 }}
-              transition={{ duration: 0.25 }}
               aria-hidden={stackDepth > 0}
             >
               <GameCard />

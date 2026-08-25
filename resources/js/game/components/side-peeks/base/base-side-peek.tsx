@@ -89,7 +89,7 @@ const BaseSidePeek = () => {
           allow_clicking_outside={componentProps.allow_clicking_outside}
         >
           <div className="flex h-full min-h-0 flex-col pb-4">
-            <div className="flex-1 overflow-x-hidden overflow-y-auto">
+            <div className="relative flex-1 overflow-x-hidden overflow-y-auto">
               {ComponentToRender && <ComponentToRender {...componentProps} />}
             </div>
             {renderFooter()}

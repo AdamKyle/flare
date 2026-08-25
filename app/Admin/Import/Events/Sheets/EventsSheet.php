@@ -9,7 +9,10 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class EventsSheet implements ToCollection
 {
-    public function collection(Collection $rows)
+    /**
+     * Import scheduled event rows from the uploaded spreadsheet and persist them.
+     */
+    public function collection(Collection $rows): void
     {
         foreach ($rows as $index => $row) {
             if ($index !== 0) {
@@ -33,7 +36,7 @@ class EventsSheet implements ToCollection
     }
 
     /**
-     * Handle updateing or creating data.
+     * Update the existing scheduled event or create a new one from the clean event data.
      */
     protected function handleEvent(array $eventData, ?ScheduledEvent $scheduledEvent = null): void
     {

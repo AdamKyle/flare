@@ -23,7 +23,7 @@ export const useStackedCardAccessibility = ({
         ? document.activeElement
         : null;
 
-    dialogRef.current?.focus();
+    dialogRef.current?.focus({ preventScroll: true });
 
     return () => {
       const previouslyFocusedElement = previouslyFocusedElementRef.current;
@@ -32,7 +32,7 @@ export const useStackedCardAccessibility = ({
         previouslyFocusedElement &&
         document.contains(previouslyFocusedElement)
       ) {
-        previouslyFocusedElement.focus();
+        previouslyFocusedElement.focus({ preventScroll: true });
       }
     };
   }, [active]);

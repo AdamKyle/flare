@@ -11,7 +11,7 @@ const MonsterNamePicker = ({
   current_index,
   on_select,
 }: MonsterNamePickerProps) => {
-  if (!monsters || monsters.length === 0) {
+  if (!Array.isArray(monsters) || monsters.length === 0) {
     return null;
   }
 
@@ -37,8 +37,10 @@ const MonsterNamePicker = ({
 
   return (
     <Dropdown
+      key={current_index}
       items={dropdownItems}
       on_select={handleSelect}
+      on_clear={() => on_select(0)}
       pre_selected_item={preSelectedItem}
       selection_placeholder={display_name}
       focus_selected_on_open
