@@ -1,6 +1,12 @@
 import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
-import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
-import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
+import GameMapCoordinateSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-coordinate-side-peek-props';
+import GameMapFormSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-form-side-peek-props';
+import GameMapImportSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-import-side-peek-props';
+import GameMapKingdomSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-kingdom-side-peek-props';
+import GameMapLocationSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-location-side-peek-props';
+import GameMapNpcSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-npc-side-peek-props';
+import BugReportSidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
+import LogEntrySidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBagProps from '../../character-inventory/gem-bag/types/gem-bag-props';
 import SetsProps from '../../character-inventory/sets/types/sets-props';
@@ -31,5 +37,11 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.ITEM_DETAILS]: ItemDetailsProps;
   [SidePeekComponentRegistrationEnum.ADMIN_LOG_ENTRY]: LogEntrySidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_BUG_REPORT]: BugReportSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_COORDINATE]: GameMapCoordinateSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_LOCATION]: GameMapLocationSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_NPC]: GameMapNpcSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_KINGDOM]: GameMapKingdomSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_FORM]: GameMapFormSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_IMPORT]: GameMapImportSidePeekProps;
   // Future components go here
 };

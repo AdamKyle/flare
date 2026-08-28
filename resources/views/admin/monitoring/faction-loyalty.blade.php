@@ -7,3 +7,7 @@
         <div id="faction-loyalty-monitoring"></div>
     </x-core.layout.info-container>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/admin/monitoring/faction-loyalty-monitoring.tsx')
+@endpush

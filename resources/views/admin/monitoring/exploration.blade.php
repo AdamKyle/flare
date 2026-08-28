@@ -7,3 +7,7 @@
         <div id="exploration-monitoring"></div>
     </x-core.layout.info-container>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/admin/monitoring/exploration-monitoring.tsx')
+@endpush

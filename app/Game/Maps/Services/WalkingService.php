@@ -17,14 +17,6 @@ class WalkingService extends BaseMovementService
 {
     use ResponseBuilder;
 
-    /**
-     * @param MapTileValue $mapTileValue
-     * @param CoordinatesCache $coordinatesCache
-     * @param ConjureService $conjureService
-     * @param MovementService $movementService
-     * @param TraverseService $traverseService
-     * @param ChanceCalculator $chanceCalculator
-     */
     public function __construct(
         MapTileValue $mapTileValue,
         CoordinatesCache $coordinatesCache,

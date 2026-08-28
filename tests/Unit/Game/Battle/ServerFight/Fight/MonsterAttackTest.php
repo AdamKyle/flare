@@ -58,7 +58,13 @@ class MonsterAttackTest extends TestCase
         $playerHealing->shouldReceive('getMessages')->andReturn([]);
         $playerHealing->shouldReceive('clearMessages');
 
-        $monsterAttack = $this->monsterAttackFactory->buildMonsterAttack(playerHealing: $playerHealing, canHit: $canHit);
+        $enchantmentRandomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $enchantmentRandomNumberGenerator->shouldNotReceive('numberBetween');
+        $monsterAttack = $this->monsterAttackFactory->buildMonsterAttack(
+            playerHealing: $playerHealing,
+            canHit: $canHit,
+            randomNumberGenerator: $enchantmentRandomNumberGenerator,
+        );
         $monsterAttack->setCharacterHealth(1000);
         $monsterAttack->setMonsterHealth(1000);
 
@@ -81,6 +87,62 @@ class MonsterAttackTest extends TestCase
 
         $this->assertContains([
             'message' => 'Test Monster misses!',
+            'type' => 'enemy-action',
+        ], $monsterAttack->getMessages());
+    }
+
+    public function test_monster_attack_rolls_positive_affix_damage(): void
+    {
+        $character = (new CharacterFactory())->createBaseCharacter()->getCharacter();
+        Cache::put('character-sheet-'.$character->id, [
+            'level' => $character->level,
+            'health' => 1000,
+            'affix_damage_reduction' => 0.0,
+        ]);
+
+        $canHit = Mockery::mock(CanHit::class);
+        $canHit->shouldReceive('canMonsterHitPlayer')->once()->andReturn(false);
+        $canHit->shouldReceive('canMonsterCastSpell')->once()->andReturn(false);
+
+        $playerHealing = Mockery::mock(PlayerHealing::class);
+        $playerHealing->shouldReceive('setMonsterHealth');
+        $playerHealing->shouldReceive('setCharacterHealth');
+        $playerHealing->shouldReceive('healInBattle');
+        $playerHealing->shouldReceive('lifeSteal');
+        $playerHealing->shouldReceive('getCharacterHealth')->andReturnUsing(fn () => 1000);
+        $playerHealing->shouldReceive('getMonsterHealth')->andReturnUsing(fn () => 1000);
+        $playerHealing->shouldReceive('getMessages')->andReturn([]);
+        $playerHealing->shouldReceive('clearMessages');
+
+        $enchantmentRandomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $enchantmentRandomNumberGenerator->shouldReceive('numberBetween')->once()->with(1, 10)->andReturn(5);
+        $monsterAttack = $this->monsterAttackFactory->buildMonsterAttack(
+            playerHealing: $playerHealing,
+            canHit: $canHit,
+            randomNumberGenerator: $enchantmentRandomNumberGenerator,
+        );
+        $monsterAttack->setCharacterHealth(1000);
+        $monsterAttack->setMonsterHealth(1000);
+
+        $monsterRandomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $monsterRandomNumberGenerator->shouldReceive('numberBetween')->andReturnUsing(fn ($min, $max) => $min);
+        $monster = (new ServerMonster(new ChanceCalculator($monsterRandomNumberGenerator), $monsterRandomNumberGenerator))->setMonster([
+            'name' => 'Test Monster',
+            'is_raid_monster' => false,
+            'is_raid_boss' => false,
+            'fire_atonement' => 0,
+            'ice_atonement' => 0,
+            'water_atonement' => 0,
+            'criticality' => 0.0,
+            'attack_range' => '50-50',
+            'increases_damage_by' => null,
+            'max_affix_damage' => 10,
+        ]);
+
+        $monsterAttack->monsterAttack($monster, $character, 'attack');
+
+        $this->assertContains([
+            'message' => 'Test Monster\'s enchantments glow, lashing out for: 5',
             'type' => 'enemy-action',
         ], $monsterAttack->getMessages());
     }
@@ -171,7 +233,13 @@ class MonsterAttackTest extends TestCase
         $playerHealing->shouldReceive('getMessages')->andReturn([]);
         $playerHealing->shouldReceive('clearMessages');
 
-        $monsterAttack = $this->monsterAttackFactory->buildMonsterAttack(playerHealing: $playerHealing, canHit: $canHit);
+        $enchantmentRandomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $enchantmentRandomNumberGenerator->shouldNotReceive('numberBetween');
+        $monsterAttack = $this->monsterAttackFactory->buildMonsterAttack(
+            playerHealing: $playerHealing,
+            canHit: $canHit,
+            randomNumberGenerator: $enchantmentRandomNumberGenerator,
+        );
         $monsterAttack->setCharacterHealth(0);
         $monsterAttack->setMonsterHealth(1000);
 

@@ -4,4 +4,6 @@ export default interface ImageUploaderProps {
   initialImageUrl?: string | null;
   className?: string;
   deletable?: boolean;
+  restoreInitialImageOnDelete?: boolean;
+  deleteLabel?: string;
 }

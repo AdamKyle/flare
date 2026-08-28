@@ -1,7 +1,8 @@
 import React from 'react';
 
 import MapTilesProps from './types/map-tiles-props';
-import { MapTileSize } from '../enums/map-tile-size';
+
+import { MapTileSize } from 'game-utils/map-tile-size';
 
 const MapTiles = ({ tiles, zoom }: MapTilesProps) => {
   const tileSize = MapTileSize.TILE_SIZE * zoom;

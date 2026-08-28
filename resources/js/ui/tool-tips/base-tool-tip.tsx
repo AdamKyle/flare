@@ -114,7 +114,7 @@ const BaseToolTip = (props: BaseToolTipProps) => {
         aria-live="polite"
         className={clsx(
           'absolute z-50 rounded-md border bg-white p-3 shadow-lg',
-          'max-w-[min(28rem,calc(100vw-3rem))] min-w-[16rem] break-words whitespace-normal',
+          'w-max max-w-72 break-words whitespace-normal sm:max-w-md sm:min-w-64',
           'max-h-[min(70vh,28rem)] overflow-auto',
           'border-gray-200 text-gray-800',
           'dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100',

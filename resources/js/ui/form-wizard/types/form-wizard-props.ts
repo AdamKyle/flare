@@ -12,4 +12,6 @@ export default interface FormWizardProps {
   form_error: AxiosErrorDefinition | null;
   embedded?: boolean;
   icon_navigation?: boolean;
+  current_step_index?: number;
+  on_step_change?: (current_index: number) => void;
 }

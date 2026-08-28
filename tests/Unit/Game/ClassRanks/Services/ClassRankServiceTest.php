@@ -86,6 +86,80 @@ class ClassRankServiceTest extends TestCase
         $this->assertNotFalse($index);
     }
 
+    public function test_class_is_locked_when_primary_prerequisite_is_below_required_level(): void
+    {
+        $primary = $this->createClass(['name' => 'Primary']);
+        $secondary = $this->createClass(['name' => 'Secondary']);
+        $lockedClass = $this->createClass([
+            'name' => 'Locked Class',
+            'primary_required_class_id' => $primary->id,
+            'secondary_required_class_id' => $secondary->id,
+            'primary_required_class_level' => 10,
+            'secondary_required_class_level' => 20,
+        ]);
+        $character = $this->character->addAdditionalClassRanks([$primary->id, $secondary->id, $lockedClass->id])->getCharacter();
+        $character->classRanks()->where('game_class_id', $primary->id)->update(['level' => 9]);
+        $character->classRanks()->where('game_class_id', $secondary->id)->update(['level' => 20]);
+
+        $response = $this->classRankService->getClassRanks($character->refresh());
+        $classRank = collect($response['class_ranks'])->firstWhere('game_class_id', $lockedClass->id);
+
+        $this->assertTrue($classRank['is_locked']);
+    }
+
+    public function test_class_is_locked_when_secondary_prerequisite_is_below_required_level(): void
+    {
+        $primary = $this->createClass(['name' => 'Primary']);
+        $secondary = $this->createClass(['name' => 'Secondary']);
+        $lockedClass = $this->createClass([
+            'name' => 'Locked Class',
+            'primary_required_class_id' => $primary->id,
+            'secondary_required_class_id' => $secondary->id,
+            'primary_required_class_level' => 10,
+            'secondary_required_class_level' => 20,
+        ]);
+        $character = $this->character->addAdditionalClassRanks([$primary->id, $secondary->id, $lockedClass->id])->getCharacter();
+        $character->classRanks()->where('game_class_id', $primary->id)->update(['level' => 10]);
+        $character->classRanks()->where('game_class_id', $secondary->id)->update(['level' => 19]);
+
+        $response = $this->classRankService->getClassRanks($character->refresh());
+        $classRank = collect($response['class_ranks'])->firstWhere('game_class_id', $lockedClass->id);
+
+        $this->assertTrue($classRank['is_locked']);
+    }
+
+    public function test_class_is_unlocked_when_both_prerequisites_are_satisfied(): void
+    {
+        $primary = $this->createClass(['name' => 'Primary']);
+        $secondary = $this->createClass(['name' => 'Secondary']);
+        $unlockedClass = $this->createClass([
+            'name' => 'Unlocked Class',
+            'primary_required_class_id' => $primary->id,
+            'secondary_required_class_id' => $secondary->id,
+            'primary_required_class_level' => 10,
+            'secondary_required_class_level' => 20,
+        ]);
+        $character = $this->character->addAdditionalClassRanks([$primary->id, $secondary->id, $unlockedClass->id])->getCharacter();
+        $character->classRanks()->where('game_class_id', $primary->id)->update(['level' => 10]);
+        $character->classRanks()->where('game_class_id', $secondary->id)->update(['level' => 20]);
+
+        $response = $this->classRankService->getClassRanks($character->refresh());
+        $classRank = collect($response['class_ranks'])->firstWhere('game_class_id', $unlockedClass->id);
+
+        $this->assertFalse($classRank['is_locked']);
+    }
+
+    public function test_class_without_prerequisite_pair_is_unlocked(): void
+    {
+        $unlockedClass = $this->createClass(['name' => 'Unlocked Class']);
+        $character = $this->character->addAdditionalClassRanks([$unlockedClass->id])->getCharacter();
+
+        $response = $this->classRankService->getClassRanks($character);
+        $classRank = collect($response['class_ranks'])->firstWhere('game_class_id', $unlockedClass->id);
+
+        $this->assertFalse($classRank['is_locked']);
+    }
+
     public function test_cannot_equip_more_then_three_specialties()
     {
         $character = $this->character->getCharacter();

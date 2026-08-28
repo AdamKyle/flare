@@ -7,4 +7,5 @@ export default interface ApiParametersDefinitions<
   additionalParams?: Record<string, unknown>;
   initialSearchText?: string;
   initialFilters?: Partial<F>;
+  paginationMode?: 'append' | 'replace';
 }

@@ -615,7 +615,7 @@ class ClassRankService
             $secondaryClassRank = $character->classRanks->where('game_class_id', $secondaryRequiredClassId)->first();
 
             return ! (($primaryClassRank->level >= $classRank->gameClass->primary_required_class_level) &&
-                ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_level));
+                ($secondaryClassRank->level >= $classRank->gameClass->secondary_required_class_level));
         }
 
         return false;

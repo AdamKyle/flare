@@ -7,3 +7,7 @@
         <div id="delve-monitoring"></div>
     </x-core.layout.info-container>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/admin/monitoring/delve-monitoring.tsx')
+@endpush

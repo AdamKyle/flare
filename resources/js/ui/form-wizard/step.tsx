@@ -2,13 +2,17 @@ import React from 'react';
 
 import StepProps from 'ui/form-wizard/types/step-props';
 
-const Step = ({ step_title, children }: StepProps) => {
+const Step = ({ step_title, show_title = true, children }: StepProps) => {
   const renderHeader = () => {
-    if (!step_title) {
+    if (!show_title) {
       return null;
     }
 
-    return <h3 className="mb-6 text-lg font-semibold">{step_title}</h3>;
+    return (
+      <h3 className="text-glacier-900 dark:text-glacier-100 mb-6 text-lg font-semibold">
+        {step_title}
+      </h3>
+    );
   };
 
   const renderBody = () => {

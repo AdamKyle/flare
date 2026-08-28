@@ -41,6 +41,50 @@ export default class ApiHandler implements AxiosDefinition {
   }
 
   /**
+   * Put data to the server.
+   *
+   * @param url
+   * @param data
+   * @param config
+   */
+  async put<T, C, D>(
+    url: string,
+    data: D,
+    config: AxiosRequestConfig & { params?: C } = {}
+  ): Promise<T> {
+    this.setCsrfToken(config);
+    const modifiedUrl = this.addApiPrefix(url);
+    const response: AxiosResponse<T> = await axios.put<T>(
+      modifiedUrl,
+      data,
+      config
+    );
+    return response.data;
+  }
+
+  /**
+   * Patch data on the server.
+   *
+   * @param url
+   * @param data
+   * @param config
+   */
+  async patch<T, C, D>(
+    url: string,
+    data: D,
+    config: AxiosRequestConfig & { params?: C } = {}
+  ): Promise<T> {
+    this.setCsrfToken(config);
+    const modifiedUrl = this.addApiPrefix(url);
+    const response: AxiosResponse<T> = await axios.patch<T>(
+      modifiedUrl,
+      data,
+      config
+    );
+    return response.data;
+  }
+
+  /**
    * Add `/api` prefix to the URL if it's not already there.
    *
    * @param url

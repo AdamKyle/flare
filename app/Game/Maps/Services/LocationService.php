@@ -43,17 +43,6 @@ class LocationService
 
     private ?Location $location = null;
 
-    /**
-     * @param CoordinatesCache $coordinatesCache
-     * @param CharacterCacheData $characterCacheData
-     * @param UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes
-     * @param QuestItemTransformer $questItemTransformer
-     * @param LocationsTransformer $locationTransformer
-     * @param CondensedKingdomTransformer $condensedKingdomTransformer
-     * @param PlainDataSerializer $plainArraySerializer
-     * @param Pagination $pagination
-     * @param Manager $manager
-     */
     public function __construct(
         private readonly CoordinatesCache $coordinatesCache,
         private readonly CharacterCacheData $characterCacheData,

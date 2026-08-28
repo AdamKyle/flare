@@ -2,10 +2,22 @@ import React from 'react';
 
 import { SidePeekComponentPropsMap } from './side-peek-component-props-map';
 import { SidePeekComponentRegistrationEnum } from './side-peek-component-registration-enum';
-import BugReportSidePeek from '../../../../../admin/logs-dashboard/components/side-peeks/bug-report-side-peek';
-import LogEntrySidePeek from '../../../../../admin/logs-dashboard/components/side-peeks/log-entry-side-peek';
-import BugReportSidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
-import LogEntrySidePeekProps from '../../../../../admin/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
+import GameMapCoordinateSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-coordinate-side-peek';
+import GameMapFormSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-form-side-peek';
+import GameMapImportSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-import-side-peek';
+import GameMapKingdomSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-kingdom-side-peek';
+import GameMapCoordinateSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-coordinate-side-peek-props';
+import GameMapFormSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-form-side-peek-props';
+import GameMapImportSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-import-side-peek-props';
+import GameMapKingdomSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-kingdom-side-peek-props';
+import GameMapLocationSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-location-side-peek-props';
+import GameMapNpcSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-npc-side-peek-props';
+import GameMapLocationSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-location-side-peek';
+import GameMapNpcSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-npc-side-peek';
+import BugReportSidePeek from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/bug-report-side-peek';
+import LogEntrySidePeek from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/log-entry-side-peek';
+import BugReportSidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
+import LogEntrySidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
 import BackPack from '../../character-inventory/backpack/backpack';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
 import GemBag from '../../character-inventory/gem-bag/gem-bag';
@@ -98,6 +110,30 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_BUG_REPORT]: {
     component: BugReportSidePeek,
     props: {} as BugReportSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_COORDINATE]: {
+    component: GameMapCoordinateSidePeek,
+    props: {} as GameMapCoordinateSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_LOCATION]: {
+    component: GameMapLocationSidePeek,
+    props: {} as GameMapLocationSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_NPC]: {
+    component: GameMapNpcSidePeek,
+    props: {} as GameMapNpcSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_KINGDOM]: {
+    component: GameMapKingdomSidePeek,
+    props: {} as GameMapKingdomSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_FORM]: {
+    component: GameMapFormSidePeek,
+    props: {} as GameMapFormSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_IMPORT]: {
+    component: GameMapImportSidePeek,
+    props: {} as GameMapImportSidePeekProps,
   },
   // Add more components here
 };

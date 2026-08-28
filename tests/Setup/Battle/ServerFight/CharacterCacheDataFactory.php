@@ -29,7 +29,7 @@ class CharacterCacheDataFactory
                 new HealingBuilder(new ClassRanksWeaponMasteriesBuilder()),
                 new HolyBuilder(),
                 new ReductionsBuilder(),
-                new ElementalAtonement(),
+                resolve(ElementalAtonement::class),
             ),
         );
     }

@@ -7,3 +7,7 @@
         <div id="logs-dashboard"></div>
     </x-core.layout.info-container>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/admin/monitoring/logs-dashboard.tsx')
+@endpush

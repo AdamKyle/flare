@@ -73,6 +73,9 @@ const Dropdown = ({
   empty_message,
   search_placeholder,
   on_open,
+  aria_described_by,
+  aria_invalid,
+  aria_required,
 }: DropdownProps) => {
   const generatedId = useId().replace(/:/g, '');
   const triggerId = id ?? `dropdown-trigger-${generatedId}`;
@@ -559,6 +562,9 @@ const Dropdown = ({
               : (selection_placeholder ?? 'Select an option'))
           }
           aria-labelledby={aria_labelled_by}
+          aria-describedby={aria_described_by}
+          aria-invalid={aria_invalid}
+          aria-required={aria_required}
           aria-activedescendant={
             isOpen && focusedIndex !== null
               ? `${listboxId}-option-${focusedIndex}`

@@ -36,13 +36,6 @@ class QuestHandlerService
 
     private BuildQuestCacheService $buildQuestCacheService;
 
-    /**
-     * @param NpcQuestsHandler $npcQuestsHandler
-     * @param CanTravelToMap $canTravelToMap
-     * @param MapTileValue $mapTileValue
-     * @param BuildQuestCacheService $buildQuestCacheService
-     * @param BattleRewardProcessingQueueManager $battleRewardProcessingQueueManager
-     */
     public function __construct(
         NpcQuestsHandler $npcQuestsHandler,
         CanTravelToMap $canTravelToMap,

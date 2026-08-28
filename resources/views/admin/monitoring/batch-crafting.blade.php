@@ -7,3 +7,7 @@
         <div id="batch-crafting-monitoring"></div>
     </x-core.layout.info-container>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/admin/monitoring/batch-crafting-monitoring.tsx')
+@endpush

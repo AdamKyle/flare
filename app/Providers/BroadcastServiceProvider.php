@@ -19,6 +19,10 @@ class BroadcastServiceProvider extends ServiceProvider
         require base_path('routes/channels.php');
         require base_path('routes/flare/channels.php');
         require base_path('routes/admin/channels.php');
+        require base_path('routes/admin/monitoring/channels.php');
+        require base_path('routes/admin/game-maps/channels.php');
+        require base_path('routes/admin/locations/channels.php');
+        require base_path('routes/admin/npcs/channels.php');
         require base_path('routes/game/channels.php');
         require base_path('routes/game/character/character-inventory/channels.php');
         require base_path('routes/game/character/character-attack/channels.php');

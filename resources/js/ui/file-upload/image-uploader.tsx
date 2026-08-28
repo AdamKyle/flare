@@ -10,6 +10,8 @@ const ImageUploader = ({
   initialImageUrl: initialImageUrlProp = null,
   className,
   deletable = true,
+  restoreInitialImageOnDelete = false,
+  deleteLabel = 'Delete image',
 }: ImageUploaderProps) => {
   const [initialImageUrl, setInitialImageUrl] = useState(initialImageUrlProp);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -119,7 +121,9 @@ const ImageUploader = ({
   const handleDelete = () => {
     setSelectedFile(null);
     setObjectUrl(null);
-    setInitialImageUrl(null);
+    setInitialImageUrl(
+      restoreInitialImageOnDelete ? initialImageUrlProp : null
+    );
 
     if (onFileChange) {
       onFileChange(null);
@@ -222,7 +226,7 @@ const ImageUploader = ({
         className="text-mango-tango-500 mt-2 underline"
         data-testid="file-upload-delete"
       >
-        Delete image
+        {deleteLabel}
       </button>
     );
   };

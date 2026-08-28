@@ -1,0 +1,15 @@
+export enum LocationFormField {
+  Name = 'name',
+  Description = 'description',
+  QuestRewardItemId = 'quest_reward_item_id',
+  RequiredQuestItemId = 'required_quest_item_id',
+  IsPort = 'is_port',
+  CanPlayersEnter = 'can_players_enter',
+  CanAutoBattle = 'can_auto_battle',
+  X = 'x',
+  Y = 'y',
+  Type = 'type',
+  PinCssClass = 'pin_css_class',
+  HoursToDrop = 'hours_to_drop',
+  MinutesBetweenDelveFights = 'minutes_between_delve_fights',
+}

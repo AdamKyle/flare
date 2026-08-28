@@ -43,7 +43,7 @@ class ImageTilerServiceTest extends TestCase
 
         $service = new ImageTilerService($imageManager);
 
-        $tileMap = $service->breakIntoTiles('my-image.png', 'my-folder');
+        $tileMap = $service->breakIntoTiles('my-image.png', 'my-folder', 'my-folder');
 
         $this->assertCount(2, $tileMap);
         $this->assertCount(2, $tileMap[0]);
@@ -83,7 +83,7 @@ class ImageTilerServiceTest extends TestCase
 
         $service = new ImageTilerService($imageManager);
 
-        $tileMap = $service->breakIntoTiles('small-image.png', 'small-folder');
+        $tileMap = $service->breakIntoTiles('small-image.png', 'small-folder', 'small-folder');
 
         $this->assertSame([['https://example.test/small-folder/small-folder_tile_0_0.png']], $tileMap);
     }

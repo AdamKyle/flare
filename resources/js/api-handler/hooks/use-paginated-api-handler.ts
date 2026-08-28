@@ -23,6 +23,7 @@ const UsePaginatedApiHandler = <
 
   const enabled = params.enabled !== false;
   const additionalParams = params.additionalParams ?? EMPTY_ADDITIONAL_PARAMS;
+  const paginationMode = params.paginationMode ?? 'append';
 
   const [data, setData] = useState<T[]>([]);
   const [error, setError] =
@@ -99,6 +100,8 @@ const UsePaginatedApiHandler = <
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    setError(null);
+
     if (page > 1) {
       setIsLoadingMore(true);
     } else {
@@ -121,9 +124,13 @@ const UsePaginatedApiHandler = <
         return;
       }
 
-      setData((previousData) =>
-        page === 1 ? result.data : [...previousData, ...result.data]
-      );
+      setData((previousData) => {
+        if (paginationMode === 'replace') {
+          return result.data;
+        }
+
+        return page === 1 ? result.data : [...previousData, ...result.data];
+      });
       setCanLoadMore(result.meta.can_load_more);
       setResponse(result);
     } catch (errorInstance) {
@@ -182,6 +189,7 @@ const UsePaginatedApiHandler = <
     trackedSearchText,
     trackedFilters,
     trackedAdditionalParams,
+    paginationMode,
   ]);
 
   useEffect(() => {

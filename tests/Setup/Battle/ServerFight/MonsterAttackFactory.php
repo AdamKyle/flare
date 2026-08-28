@@ -22,8 +22,9 @@ class MonsterAttackFactory
         ?ElementalAttack $elementalAttack = null,
         ?MonsterSpecialAttack $monsterSpecialAttack = null,
         ?Counter $counter = null,
+        ?RandomNumberGenerator $randomNumberGenerator = null,
     ): MonsterAttack {
-        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator ??= Mockery::mock(RandomNumberGenerator::class);
 
         return new MonsterAttack(
             (new CharacterCacheDataFactory())->build(),

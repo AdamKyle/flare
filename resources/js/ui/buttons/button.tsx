@@ -16,8 +16,9 @@ const Button = (props: ButtonProps): ReactNode => {
       )}
       aria-label={props.aria_label || props.label}
       disabled={props.disabled}
+      aria-busy={props.aria_busy}
       role="button"
-      type="button"
+      type={props.type ?? 'button'}
     >
       {props.label}
     </button>

@@ -3,7 +3,16 @@
     "resources/js/app.ts",
     "resources/js/admin-apps.ts",
     "resources/js/game.ts",
-    "resources/js/layouts/app-layout.ts"
+    "resources/js/layouts/app-layout.ts",
+    "resources/js/admin/monitoring/batch-crafting-monitoring.tsx",
+    "resources/js/admin/monitoring/battle-reward-queue.tsx",
+    "resources/js/admin/monitoring/delve-monitoring.tsx",
+    "resources/js/admin/monitoring/exploration-monitoring.tsx",
+    "resources/js/admin/monitoring/faction-loyalty-monitoring.tsx",
+    "resources/js/admin/monitoring/logs-dashboard.tsx",
+    "resources/js/admin/game-maps/game-maps-app.tsx",
+    "resources/js/admin/locations/locations-app.tsx",
+    "resources/js/admin/npcs/npcs-app.tsx"
   ],
   "extensions": [
     ".ts",

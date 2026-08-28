@@ -12,8 +12,14 @@ class BreakMapsIntoPieces extends Command
 {
     protected $signature = 'break:maps-into-pieces';
 
-    protected $description = 'Breaks a large map image into 125x125 pieces';
+    protected $description = 'Breaks a large map image into 250x250 pieces';
 
+    /**
+     * Generate missing 250-by-250 tile sets for every persisted Game Map.
+     *
+     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile generation service.
+     * @return void Missing tile sets are generated and progress is reported.
+     */
     public function handle(MapTileGenerationService $mapTileGenerationService): void
     {
         $gameMaps = GameMap::all();
@@ -40,6 +46,5 @@ class BreakMapsIntoPieces extends Command
 
             $this->info("Successfully chopped {$gameMap->name} into tiles.");
         }
-
     }
 }

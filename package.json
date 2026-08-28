@@ -6,7 +6,7 @@
     "dev": "vite",
     "cleanup": "prettier --write \"resources/js/**/*.{ts,tsx}\" && eslint --fix \"resources/js/**/*.{ts,tsx}\"",
     "build": "NODE_ENV=production vite build",
-    "build:dev": "NODE_ENV=development vite build",
+    "build:dev": "NODE_ENV=local vite build",
     "prepare": "husky",
     "lint": "yarn eslint \"resources/js/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit --skipLibCheck",

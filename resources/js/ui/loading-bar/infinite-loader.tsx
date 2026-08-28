@@ -1,7 +1,11 @@
 import React, { ReactNode } from 'react';
 
 const InfiniteLoader = (): ReactNode => (
-  <div className="my-4 flex w-full flex-col items-center space-y-2">
+  <div
+    role="status"
+    aria-live="polite"
+    className="my-4 flex w-full flex-col items-center space-y-2"
+  >
     <div className="flex w-full justify-between text-xs">
       <span className="text-gray-600 dark:text-gray-300">Loading...</span>
       <span className="text-gray-600 dark:text-gray-300"></span>

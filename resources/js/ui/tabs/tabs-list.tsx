@@ -113,10 +113,6 @@ const TabsList = <PTuple extends readonly object[]>({
       return null;
     }
 
-    const totalTabs = tabs.length;
-    const indicatorWidth = `calc((100% - 0.5rem) / ${totalTabs})`;
-    const indicatorTransform = `translateX(${activeIndex * 100}%)`;
-
     return (
       <div
         role="tablist"
@@ -124,22 +120,17 @@ const TabsList = <PTuple extends readonly object[]>({
         aria-orientation="horizontal"
         onKeyDown={handleTabListKeyDown}
         className={clsx(
-          'relative flex rounded-md border border-gray-300 bg-gray-100 p-1 dark:border-gray-600 dark:bg-gray-700',
+          'flex rounded-md border border-gray-300 bg-gray-100 p-1 dark:border-gray-600 dark:bg-gray-700',
           additional_tab_css
         )}
       >
-        <div
-          aria-hidden="true"
-          className="border-danube-500 dark:border-danube-300 pointer-events-none absolute top-1 bottom-1 left-1 rounded-md border bg-gray-300 shadow-sm transition-transform duration-300 ease-out dark:bg-gray-500"
-          style={{ width: indicatorWidth, transform: indicatorTransform }}
-        />
         {tabs.map((_, tabIndex) => {
           const isSelected = tabIndex === activeIndex;
 
           const className = clsx(
-            'relative z-[1] flex-1 rounded-md text-center font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 max-sm:px-2 max-sm:py-1 sm:px-3 sm:py-1.5 max-sm:text-xs sm:text-sm',
+            'flex-1 rounded-md border border-transparent text-center font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 dark:focus-visible:ring-brand-400 max-sm:px-2 max-sm:py-1 sm:px-3 sm:py-1.5 max-sm:text-xs sm:text-sm',
             isSelected
-              ? 'text-danube-700 dark:text-danube-200'
+              ? 'border-danube-500 bg-gray-300 text-danube-700 shadow-sm dark:border-danube-300 dark:bg-gray-500 dark:text-danube-200'
               : 'text-gray-800 dark:text-gray-200'
           );
 

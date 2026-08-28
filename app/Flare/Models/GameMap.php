@@ -21,6 +21,7 @@ class GameMap extends Model
      */
     protected $fillable = [
         'name',
+        'description',
         'path',
         'tile_map',
         'default',
@@ -49,6 +50,7 @@ class GameMap extends Model
         'character_attack_reduction' => 'float',
         'only_during_event_type' => 'integer',
         'can_traverse' => 'boolean',
+        'required_location_id' => 'integer',
         'generated_parent_game_map_id' => 'integer',
         'game_map_gem_paramter_id' => 'integer',
         'game_location_gem_paramter_id' => 'integer',

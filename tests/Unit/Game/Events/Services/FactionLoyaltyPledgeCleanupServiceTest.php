@@ -36,7 +36,20 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
 
     public function test_unpledge_if_on_faction_with_null_faction_does_nothing(): void
     {
-        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $surface = $this->createGameMap(['name' => MapName::SURFACE->value, 'default' => true]);
+
+        $character = (new CharacterFactory)
+            ->createBaseCharacter()
+            ->assignFactionSystem()
+            ->givePlayerLocation(16, 16, $surface)
+            ->getCharacter();
+
+        $faction = $character->factions->where('game_map_id', $surface->id)->first();
+        $loyalty = $this->createFactionLoyalty([
+            'faction_id' => $faction->id,
+            'character_id' => $character->id,
+            'is_pledged' => true,
+        ]);
 
         $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) {
             $m->shouldNotReceive('stopAssistingNpc');
@@ -46,6 +59,8 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, null);
+
+        $this->assertTrue($loyalty->fresh()->is_pledged);
     }
 
     public function test_unpledge_if_on_faction_when_no_loyalty_record_does_nothing(): void
@@ -68,6 +83,12 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
+
+        $this->assertFalse(
+            $character->factionLoyalties()
+                ->where('faction_id', $faction->id)
+                ->exists()
+        );
     }
 
     public function test_unpledge_if_on_faction_when_loyalty_exists_without_assisting_npc_removes_pledge_only(): void
@@ -88,16 +109,23 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
             'is_pledged' => true,
         ]);
 
-        $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) use ($character, $faction) {
+        $calls = [];
+        $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) use ($character, $faction, &$calls) {
             $m->shouldNotReceive('stopAssistingNpc');
             $m->shouldReceive('removePledge')->once()->withArgs(function ($c, $f) use ($character, $faction) {
                 return $c->id === $character->id && $f->id === $faction->id;
+            })->andReturnUsing(function () use (&$calls): array {
+                $calls[] = 'remove_pledge';
+
+                return [];
             });
         });
         $this->instance(FactionLoyaltyService::class, $mock);
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
+
+        $this->assertSame(['remove_pledge'], $calls);
     }
 
     public function test_unpledge_if_on_faction_when_assisting_npc_stops_assistance_then_removes_pledge(): void
@@ -130,17 +158,31 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
             'kingdom_item_defence_bonus' => 0.002,
         ]);
 
-        $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) use ($character, $assistingNpc, $faction) {
+        $calls = [];
+        $mock = Mockery::mock(FactionLoyaltyService::class, function (MockInterface $m) use ($character, $assistingNpc, $faction, &$calls) {
             $m->shouldReceive('stopAssistingNpc')->once()->withArgs(function ($c, $n) use ($character, $assistingNpc) {
                 return $c->id === $character->id && $n->id === $assistingNpc->id;
+            })->ordered()->andReturnUsing(function () use (&$calls): array {
+                $calls[] = 'stop_assisting_npc';
+
+                return [];
             });
             $m->shouldReceive('removePledge')->once()->withArgs(function ($c, $f) use ($character, $faction) {
                 return $c->id === $character->id && $f->id === $faction->id;
+            })->ordered()->andReturnUsing(function () use (&$calls): array {
+                $calls[] = 'remove_pledge';
+
+                return [];
             });
         });
         $this->instance(FactionLoyaltyService::class, $mock);
         $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
+
+        $this->assertSame([
+            'stop_assisting_npc',
+            'remove_pledge',
+        ], $calls);
     }
 }

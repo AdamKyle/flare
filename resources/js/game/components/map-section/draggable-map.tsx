@@ -1,9 +1,9 @@
 import React from 'react';
 
-import { MapTileSize } from './enums/map-tile-size';
 import DraggableMapProps from './types/draggable-map-props';
 import { calculateCharacterCenter } from './utils/map-geometry';
 
+import { MapTileSize } from 'game-utils/map-tile-size';
 import DraggableContainerWrapper from 'ui/draggable/draggable-container';
 
 const DraggableMap = ({

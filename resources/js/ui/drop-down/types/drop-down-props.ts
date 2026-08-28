@@ -24,4 +24,7 @@ export default interface DropdownProps {
   empty_message?: string;
   search_placeholder?: string;
   on_open?: () => void;
+  aria_described_by?: string;
+  aria_invalid?: boolean;
+  aria_required?: boolean;
 }

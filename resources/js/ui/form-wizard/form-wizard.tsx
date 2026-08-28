@@ -68,10 +68,26 @@ const FormWizard = ({
   form_error,
   embedded,
   icon_navigation,
+  current_step_index,
+  on_step_change,
 }: FormWizardProps) => {
-  const [current_index, set_current_index] = useState(0);
+  const [internal_current_index, set_internal_current_index] = useState(0);
+  const is_controlled = current_step_index !== undefined;
+  const current_index = is_controlled
+    ? current_step_index
+    : internal_current_index;
   const step_refs = useRef<Array<HTMLDivElement | null>>([]);
   const reduce_motion = useReducedMotion();
+
+  const set_current_index = (next_index: number) => {
+    if (is_controlled) {
+      on_step_change?.(next_index);
+
+      return;
+    }
+
+    set_internal_current_index(next_index);
+  };
 
   useEffect(() => {
     step_refs.current[current_index]?.focus({ preventScroll: true });
@@ -102,7 +118,7 @@ const FormWizard = ({
       return;
     }
 
-    set_current_index((value) => value - 1);
+    set_current_index(current_index - 1);
   };
 
   const handleNextClick = async () => {
@@ -122,7 +138,7 @@ const FormWizard = ({
       return;
     }
 
-    set_current_index((value) => value + 1);
+    set_current_index(current_index + 1);
   };
 
   const handleDotClick = (target_index: number) => {

@@ -6,26 +6,33 @@ use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestPriority;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestSourceType;
 use App\Game\BattleRewardProcessing\Enums\BattleRewardRequestStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Queue;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\ConfiguresAdminMonitoringBroadcasting;
 use Tests\Traits\CreateCharacterBattleReward;
 use Tests\Traits\CreateRole;
 use Tests\Traits\CreateUser;
 
 class BattleRewardQueueControllerTest extends TestCase
 {
-    use CreateCharacterBattleReward, CreateRole, CreateUser, RefreshDatabase;
+    use ConfiguresAdminMonitoringBroadcasting, CreateCharacterBattleReward, CreateRole, CreateUser, RefreshDatabase;
 
-    public function test_admin_can_view_reward_queue_page_and_home_card(): void
+    public function test_admin_can_view_reward_queue_home_card(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
 
         $homeResponse = $this->actingAs($admin)->get(route('home'));
+
         $homeResponse->assertSee('Character Reward Queue');
+    }
+
+    public function test_admin_can_view_reward_queue_page(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
 
         $queueResponse = $this->actingAs($admin)->get(route('admin.character-reward-queue'));
+
         $queueResponse->assertOk();
         $queueResponse->assertSee('Character Reward Queue');
     }
@@ -40,54 +47,106 @@ class BattleRewardQueueControllerTest extends TestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    public function test_admin_api_returns_summary_characters_charts_and_filtered_requests(): void
+    public function test_admin_api_returns_summary(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
-            'priority' => BattleRewardRequestPriority::FIRST,
-            'source_type' => BattleRewardRequestSourceType::QUEST,
+            'status' => BattleRewardRequestStatus::FAILED,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/summary');
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(1, json_decode($response->getContent(), true)['failed']);
+    }
+
+    public function test_admin_api_returns_characters(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/characters');
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertSame($character->name, json_decode($response->getContent(), true)['data'][0]['character_name']);
+    }
+
+    public function test_admin_api_returns_charts(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/charts');
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('last_hour', json_decode($response->getContent(), true));
+    }
+
+    public function test_admin_api_returns_filtered_requests(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
             'source_id' => 'quest-1',
             'status' => BattleRewardRequestStatus::FAILED,
             'failed_reason' => 'specific failure',
         ]);
 
-        $summary = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/summary');
-        $characters = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/characters');
-        $charts = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/charts');
-        $requests = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/requests', [
-            'status' => BattleRewardRequestStatus::FAILED->value,
-            'priority' => BattleRewardRequestPriority::FIRST->value,
-            'source_type' => BattleRewardRequestSourceType::QUEST->value,
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/character-reward-queue/requests', [
             'date_from' => now()->toDateString(),
             'date_to' => now()->toDateString(),
             'character_name' => $character->name,
             'failed_reason' => 'specific',
             'source_id' => 'quest-1',
         ]);
-        $detail = $this->actingAs($admin)->call(
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertCount(1, json_decode($response->getContent(), true)['data']);
+    }
+
+    public function test_admin_api_returns_character_detail(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+        ]);
+
+        $response = $this->actingAs($admin)->call(
             'GET',
             '/api/admin/character-reward-queue/characters/'.$character->id,
         );
-        $statusBreakdown = $this->actingAs($admin)->call(
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertArrayHasKey('30', json_decode($response->getContent(), true)['charts']);
+    }
+
+    public function test_admin_api_returns_status_breakdown(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::FAILED,
+        ]);
+
+        $response = $this->actingAs($admin)->call(
             'GET',
             '/api/admin/character-reward-queue/status-breakdown',
             ['days' => 30],
         );
 
-        $this->assertSame(200, $summary->getStatusCode());
-        $this->assertSame(200, $characters->getStatusCode(), $characters->getContent());
-        $this->assertSame(200, $charts->getStatusCode(), $charts->getContent());
-        $this->assertSame(200, $requests->getStatusCode(), $requests->getContent());
-        $this->assertSame(200, $detail->getStatusCode(), $detail->getContent());
-        $this->assertSame(200, $statusBreakdown->getStatusCode(), $statusBreakdown->getContent());
-        $this->assertSame(1, json_decode($summary->getContent(), true)['failed']);
-        $this->assertSame($character->name, json_decode($characters->getContent(), true)['data'][0]['character_name']);
-        $this->assertArrayHasKey('last_hour', json_decode($charts->getContent(), true));
-        $this->assertCount(1, json_decode($requests->getContent(), true)['data']);
-        $this->assertArrayHasKey('30', json_decode($detail->getContent(), true)['charts']);
-        $this->assertCount(1, json_decode($statusBreakdown->getContent(), true));
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertCount(1, json_decode($response->getContent(), true));
     }
 
     public function test_non_admin_cannot_access_reward_queue_api(): void
@@ -100,51 +159,111 @@ class BattleRewardQueueControllerTest extends TestCase
         $this->assertSame(403, $response->getStatusCode());
     }
 
-    public function test_request_enum_filters_work_individually(): void
+    public function test_reward_queue_requests_can_be_filtered_by_status(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::FAILED,
+        ]);
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'status' => BattleRewardRequestStatus::COMPLETED,
+        ]);
+
+        $response = $this->actingAs($admin)->call(
+            'GET',
+            '/api/admin/character-reward-queue/requests',
+            ['status' => BattleRewardRequestStatus::FAILED->value],
+        );
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertCount(1, json_decode($response->getContent(), true)['data']);
+    }
+
+    public function test_reward_queue_requests_can_be_filtered_by_priority(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
         $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::FIRST,
-            'source_type' => BattleRewardRequestSourceType::QUEST,
-            'status' => BattleRewardRequestStatus::FAILED,
         ]);
         $this->createCharacterBattleRewardRequest([
             'character_id' => $character->id,
             'priority' => BattleRewardRequestPriority::SECOND,
-            'source_type' => BattleRewardRequestSourceType::BATTLE,
-            'status' => BattleRewardRequestStatus::COMPLETED,
         ]);
 
-        $statusResponse = $this->actingAs($admin)->call(
-            'GET',
-            '/api/admin/character-reward-queue/requests',
-            ['status' => BattleRewardRequestStatus::FAILED->value],
-        );
-        $priorityResponse = $this->actingAs($admin)->call(
+        $response = $this->actingAs($admin)->call(
             'GET',
             '/api/admin/character-reward-queue/requests',
             ['priority' => BattleRewardRequestPriority::SECOND->value],
         );
-        $sourceResponse = $this->actingAs($admin)->call(
+
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertCount(1, json_decode($response->getContent(), true)['data']);
+    }
+
+    public function test_reward_queue_requests_can_be_filtered_by_source_type(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::QUEST,
+        ]);
+        $this->createCharacterBattleRewardRequest([
+            'character_id' => $character->id,
+            'source_type' => BattleRewardRequestSourceType::BATTLE,
+        ]);
+
+        $response = $this->actingAs($admin)->call(
             'GET',
             '/api/admin/character-reward-queue/requests',
             ['source_type' => BattleRewardRequestSourceType::QUEST->value],
         );
 
-        $this->assertCount(1, json_decode($statusResponse->getContent(), true)['data']);
-        $this->assertCount(1, json_decode($priorityResponse->getContent(), true)['data']);
-        $this->assertCount(1, json_decode($sourceResponse->getContent(), true)['data']);
+        $this->assertSame(200, $response->getStatusCode(), $response->getContent());
+        $this->assertCount(1, json_decode($response->getContent(), true)['data']);
     }
 
-    public function test_reward_queue_broadcast_channel_is_admin_only(): void
+    public function test_unauthenticated_request_is_rejected_for_admin_reward_queue_channel(): void
     {
-        $callback = Broadcast::driver()->getChannels()->get('admin-character-reward-queue');
+        $this->configureAdminMonitoringBroadcasting();
+
+        $response = $this->post('/broadcasting/auth', [
+            'channel_name' => 'private-admin-character-reward-queue',
+            'socket_id' => '1234.5678',
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_authenticated_non_admin_is_rejected_for_admin_reward_queue_channel(): void
+    {
+        $this->configureAdminMonitoringBroadcasting();
+
+        $response = $this->actingAs($this->createUser())->post('/broadcasting/auth', [
+            'channel_name' => 'private-admin-character-reward-queue',
+            'socket_id' => '1234.5678',
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    public function test_authenticated_admin_is_authorized_for_admin_reward_queue_channel(): void
+    {
+        $this->configureAdminMonitoringBroadcasting();
+
         $admin = $this->createAdmin($this->createAdminRole());
 
-        $this->assertTrue($callback($admin));
-        $this->assertFalse($callback($this->createUser()));
+        $response = $this->actingAs($admin)->post('/broadcasting/auth', [
+            'channel_name' => 'private-admin-character-reward-queue',
+            'socket_id' => '1234.5678',
+        ]);
+
+        $response->assertOk();
     }
 
     public function test_admin_can_fetch_stale_queue_state_data(): void

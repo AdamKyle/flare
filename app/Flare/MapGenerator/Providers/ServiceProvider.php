@@ -14,12 +14,11 @@ use App\Flare\MapGenerator\Support\GdLandMapImageFactory;
 use App\Flare\MapGenerator\Support\GdMapPixelReaderFactory;
 use App\Flare\MapGenerator\Support\GdPngImageWriter;
 use ChristianEssl\LandmapGeneration\Settings\MapSettings;
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use Intervention\Image\Drivers\Gd\Driver as GDDriver;
 use Intervention\Image\ImageManager;
 
-class ServiceProvider extends ApplicationServiceProvider implements DeferrableProvider
+class ServiceProvider extends ApplicationServiceProvider
 {
     /**
      * Register any application services.
@@ -78,19 +77,5 @@ class ServiceProvider extends ApplicationServiceProvider implements DeferrablePr
                 BreakMapsIntoPieces::class,
             ]);
         }
-    }
-
-    public function provides()
-    {
-        return [
-            MapSettings::class,
-            MapBuilder::class,
-            MapTileGenerationService::class,
-            MapPixelReaderFactory::class,
-            LandMapImageFactory::class,
-            GdPngImageWriter::class,
-            ImageBuilder::class,
-            ImageTilerService::class,
-        ];
     }
 }

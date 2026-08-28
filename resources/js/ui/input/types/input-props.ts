@@ -5,4 +5,9 @@ export default interface InputProps {
   value?: string;
   default_value?: string | null;
   disabled?: boolean;
+  id?: string;
+  aria_label?: string;
+  described_by?: string;
+  invalid?: boolean;
+  required?: boolean;
 }

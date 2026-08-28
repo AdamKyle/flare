@@ -122,6 +122,8 @@ class ServerMessageHandlerTest extends TestCase
                     && $context['user_id'] === $user->id;
             });
 
-        $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+        $result = $this->serverMessageHandler->sendBasicMessage($user, 'test message');
+
+        $this->assertNull($result);
     }
 }

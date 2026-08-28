@@ -9,6 +9,11 @@ const Input = ({
   value,
   default_value,
   disabled,
+  id,
+  aria_label,
+  described_by,
+  invalid,
+  required,
 }: InputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,9 +58,13 @@ const Input = ({
     <div className="relative w-full">
       <input
         ref={inputRef}
+        id={id}
         type="text"
         onChange={handleTextChange}
-        aria-label="Input field"
+        aria-label={aria_label ?? (id ? undefined : 'Input field')}
+        aria-describedby={described_by}
+        aria-invalid={invalid}
+        required={required}
         className="w-full rounded-sm border border-gray-500 bg-white p-2 pr-10 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
         placeholder={placeHolder}
         disabled={disabled}

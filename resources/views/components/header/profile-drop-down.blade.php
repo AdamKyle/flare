@@ -2,21 +2,26 @@
     'user' => null,
 ])
 
-<div class="relative" x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen = false">
+<div class="relative">
     @if ($user->hasRole('Admin'))
-        <x-header.profile-drop-down-trigger image="{{ asset('character-images/knight-in-a-field.png') }}">
+        <x-header.profile-drop-down-trigger
+            :toggle="true"
+            image="{{ asset('character-images/knight-in-a-field.png') }}"
+        >
             Administrator
         </x-header.profile-drop-down-trigger>
     @else
-        <x-header.profile-drop-down-trigger image="{{ asset('character-images/knight-in-a-field.png') }}">
+        <x-header.profile-drop-down-trigger
+            :toggle="true"
+            image="{{ asset('character-images/knight-in-a-field.png') }}"
+        >
             {{ $user->character->name }}
         </x-header.profile-drop-down-trigger>
     @endif
 
     <div
-        x-cloak
-        x-show="dropdownOpen"
-        class="shadow-theme-lg absolute right-0 mt-[17px] flex w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-700"
+        id="app-profile-menu"
+        class="shadow-theme-lg absolute right-0 mt-[17px] hidden w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-700"
     >
         @if ($user->hasRole('Admin'))
             <x-header.profile-drop-down-trigger image="{{ asset('character-images/knight-in-a-field.png') }}">
@@ -45,13 +50,14 @@
         </x-header.profile-drop-down-options-container>
 
         <button
+            type="button"
             class="group text-theme-sm dark:hover:bg:white/5 mt-3 flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-300"
             onclick="
                 event.preventDefault();
                 document.getElementById('logout-form-profile').submit();
             "
         >
-            <i class="fas fa-sign-out-alt group-hover:fill-gray-700 dark:fill-gray-400"></i>
+            <i class="fas fa-sign-out-alt group-hover:fill-gray-700 dark:fill-gray-400" aria-hidden="true"></i>
             Sign out
         </button>
 

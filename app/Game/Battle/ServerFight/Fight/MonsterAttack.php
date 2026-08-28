@@ -264,9 +264,21 @@ class MonsterAttack extends BattleBase
         $this->addMessage($monster->getName().' hits for: '.number_format($attack), 'enemy-action');
     }
 
-    private function fireEnchantments(ServerMonster $monster, Character $character)
+    /**
+     * Apply the monster's enchantment damage when its affixes can deal damage.
+     *
+     * @param  ServerMonster  $monster  Attacking monster.
+     * @param  Character  $character  Defending character.
+     * @return void Enchantment damage and messages are applied when relevant.
+     */
+    private function fireEnchantments(ServerMonster $monster, Character $character): void
     {
         $maxAffixDamage = $monster->getMonsterStat('max_affix_damage');
+
+        if ($maxAffixDamage <= 0) {
+            return;
+        }
+
         $maxAffixDamage = $this->randomNumberGenerator->numberBetween(1, $maxAffixDamage);
         $damageReduction = $this->characterCacheData->getCachedCharacterData($character, 'affix_damage_reduction');
 
