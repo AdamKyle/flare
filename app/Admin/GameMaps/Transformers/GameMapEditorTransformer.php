@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Storage;
 
 class GameMapEditorTransformer
 {
+    /**
+     * @param  GameMapLocationMarkerTransformer  $gameMapLocationMarkerTransformer  Location editor marker transformer.
+     * @param  GameMapNpcMarkerTransformer  $gameMapNpcMarkerTransformer  NPC editor marker transformer.
+     * @param  GameMapKingdomMarkerTransformer  $gameMapKingdomMarkerTransformer  Kingdom editor marker transformer.
+     */
     public function __construct(
         private readonly GameMapLocationMarkerTransformer $gameMapLocationMarkerTransformer,
         private readonly GameMapNpcMarkerTransformer $gameMapNpcMarkerTransformer,
@@ -20,6 +25,9 @@ class GameMapEditorTransformer
 
     /**
      * Transform the supplied internal Game Map editor data into its Admin API representation.
+     *
+     * @param  array{game_map: GameMap, coordinates: Coordinates, locations: Collection<int, Location>, npcs: Collection<int, Npc>, kingdoms: Collection<int, Kingdom>}  $editorData  Internal Game Map editor data.
+     * @return array{game_map: array{id: int, name: string, map_url: string, tiles: array<int, array<int, string>>}, coordinates: array{x: array<int, int>, y: array<int, int>}, locations: array<int, array<string, mixed>>, npcs: array<int, array<string, mixed>>, kingdoms: array<int, array<string, mixed>>} Admin Game Map editor representation.
      */
     public function transform(array $editorData): array
     {

@@ -108,12 +108,12 @@ class GameMapService
     /**
      * Build the internal Admin Game Map form option data.
      *
-     * @return array{event_types: array<int,string>, locations: Collection<int,Location>} Internal Game Map form options.
+     * @return array{event_types: array<int,int>, locations: Collection<int,Location>} Internal Game Map form options.
      */
     public function formOptions(): array
     {
         return [
-            'event_types' => EventType::getOptionsForSelect(),
+            'event_types' => array_keys(EventType::getOptionsForSelect()),
             'locations' => Location::orderBy('name')
                 ->orderBy('id')
                 ->get(),
@@ -277,6 +277,7 @@ class GameMapService
      * @param  GameMap  $gameMap  Game Map being processed.
      * @param  string  $stage  Replacement lifecycle stage.
      * @param  Throwable  $failure  Operational failure.
+     * @return void Writes the failure to the application log.
      */
     private function logReplacementFailure(GameMap $gameMap, string $stage, Throwable $failure): void
     {

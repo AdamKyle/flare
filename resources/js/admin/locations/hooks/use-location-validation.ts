@@ -38,16 +38,14 @@ export const useLocationValidation = (
 
     if (
       state.type !== null &&
-      !formOptions?.location_types.some((option) => option.value === state.type)
+      !formOptions?.location_types.includes(state.type)
     ) {
       stepErrors.type = 'Select a valid Location type.';
     }
 
     if (
       state.pin_css_class !== null &&
-      !formOptions?.special_pins.some(
-        (option) => option.value === state.pin_css_class
-      )
+      !formOptions?.special_pins.includes(state.pin_css_class)
     ) {
       stepErrors.pin_css_class = 'Select a valid map pin.';
     }

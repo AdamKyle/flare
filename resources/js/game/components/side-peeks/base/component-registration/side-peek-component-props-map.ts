@@ -5,6 +5,13 @@ import GameMapImportSidePeekProps from '../../../../../admin/game-maps/component
 import GameMapKingdomSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-kingdom-side-peek-props';
 import GameMapLocationSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-location-side-peek-props';
 import GameMapNpcSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-npc-side-peek-props';
+import AdminItemDetailSidePeekProps from '../../../../../admin/items/components/side-peeks/types/admin-item-detail-side-peek-props';
+import ItemFormSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-form-side-peek-props';
+import ItemImportSidePeekProps from '../../../../../admin/items/components/side-peeks/types/item-import-side-peek-props';
+import LocationFormSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/location-form-side-peek-props';
+import LocationImportSidePeekProps from '../../../../../admin/locations/components/side-peeks/types/location-import-side-peek-props';
+import NpcFormSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-form-side-peek-props';
+import NpcImportSidePeekProps from '../../../../../admin/npcs/components/side-peeks/types/npc-import-side-peek-props';
 import BugReportSidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/bug-report-side-peek-props';
 import LogEntrySidePeekProps from '../../../../../admin/monitoring/logs-dashboard/components/side-peeks/types/log-entry-side-peek-props';
 import BackpackProps from '../../character-inventory/backpack/types/backpack-props';
@@ -43,5 +50,12 @@ export type SidePeekComponentPropsMap = {
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_KINGDOM]: GameMapKingdomSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_FORM]: GameMapFormSidePeekProps;
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_IMPORT]: GameMapImportSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_FORM]: LocationFormSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_IMPORT]: LocationImportSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_NPC_FORM]: NpcFormSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_NPC_IMPORT]: NpcImportSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL]: AdminItemDetailSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_ITEM_FORM]: ItemFormSidePeekProps;
+  [SidePeekComponentRegistrationEnum.ADMIN_ITEM_IMPORT]: ItemImportSidePeekProps;
   // Future components go here
 };

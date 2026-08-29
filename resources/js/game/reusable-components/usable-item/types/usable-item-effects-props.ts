@@ -1,5 +1,5 @@
-import BaseUsableItemDefinition from '../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
+import UsableItemFactualDefinition from './usable-item-factual-definition';
 
 export default interface UsableItemEffectsProps {
-  item: BaseUsableItemDefinition;
+  item: UsableItemFactualDefinition;
 }

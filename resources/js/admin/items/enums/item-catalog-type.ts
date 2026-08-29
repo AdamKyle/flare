@@ -1,0 +1,106 @@
+export enum ItemCatalogType {
+  WEAPON = 'weapon',
+  STAVE = 'stave',
+  BOW = 'bow',
+  DAGGER = 'dagger',
+  SCRATCH_AWL = 'scratch-awl',
+  MACE = 'mace',
+  HAMMER = 'hammer',
+  GUN = 'gun',
+  FAN = 'fan',
+  WAND = 'wand',
+  CENSER = 'censer',
+  CENSOR = 'censor',
+  CLAW = 'claw',
+  SWORD = 'sword',
+  SPELL_HEALING = 'spell-healing',
+  SPELL_DAMAGE = 'spell-damage',
+  RING = 'ring',
+  TRINKET = 'trinket',
+  ARTIFACT = 'artifact',
+  SHIELD = 'shield',
+  BODY = 'body',
+  LEGGINGS = 'leggings',
+  SLEEVES = 'sleeves',
+  GLOVES = 'gloves',
+  FEET = 'feet',
+  HELMET = 'helmet',
+  QUEST = 'quest',
+  ALCHEMY = 'alchemy',
+}
+
+export const ITEM_CATALOG_TYPE_LABELS: Record<ItemCatalogType, string> = {
+  [ItemCatalogType.WEAPON]: 'Weapon',
+  [ItemCatalogType.STAVE]: 'Stave',
+  [ItemCatalogType.BOW]: 'Bow',
+  [ItemCatalogType.DAGGER]: 'Dagger',
+  [ItemCatalogType.SCRATCH_AWL]: 'Scratch Awl',
+  [ItemCatalogType.MACE]: 'Mace',
+  [ItemCatalogType.HAMMER]: 'Hammer',
+  [ItemCatalogType.GUN]: 'Gun',
+  [ItemCatalogType.FAN]: 'Fan',
+  [ItemCatalogType.WAND]: 'Wand',
+  [ItemCatalogType.CENSER]: 'Censer',
+  [ItemCatalogType.CENSOR]: 'Censor',
+  [ItemCatalogType.CLAW]: 'Claw',
+  [ItemCatalogType.SWORD]: 'Sword',
+  [ItemCatalogType.SPELL_HEALING]: 'Spell Healing',
+  [ItemCatalogType.SPELL_DAMAGE]: 'Spell Damage',
+  [ItemCatalogType.RING]: 'Ring',
+  [ItemCatalogType.TRINKET]: 'Trinket',
+  [ItemCatalogType.ARTIFACT]: 'Artifact',
+  [ItemCatalogType.SHIELD]: 'Shield',
+  [ItemCatalogType.BODY]: 'Body',
+  [ItemCatalogType.LEGGINGS]: 'Leggings',
+  [ItemCatalogType.SLEEVES]: 'Sleeves',
+  [ItemCatalogType.GLOVES]: 'Gloves',
+  [ItemCatalogType.FEET]: 'Feet',
+  [ItemCatalogType.HELMET]: 'Helmet',
+  [ItemCatalogType.QUEST]: 'Quest',
+  [ItemCatalogType.ALCHEMY]: 'Alchemy',
+};
+
+export const ITEM_CATALOG_TYPE_VALUES: ItemCatalogType[] = [
+  ItemCatalogType.WEAPON,
+  ItemCatalogType.STAVE,
+  ItemCatalogType.BOW,
+  ItemCatalogType.DAGGER,
+  ItemCatalogType.SCRATCH_AWL,
+  ItemCatalogType.MACE,
+  ItemCatalogType.HAMMER,
+  ItemCatalogType.GUN,
+  ItemCatalogType.FAN,
+  ItemCatalogType.WAND,
+  ItemCatalogType.CENSER,
+  ItemCatalogType.CENSOR,
+  ItemCatalogType.CLAW,
+  ItemCatalogType.SWORD,
+  ItemCatalogType.SPELL_HEALING,
+  ItemCatalogType.SPELL_DAMAGE,
+  ItemCatalogType.RING,
+  ItemCatalogType.TRINKET,
+  ItemCatalogType.ARTIFACT,
+  ItemCatalogType.SHIELD,
+  ItemCatalogType.BODY,
+  ItemCatalogType.LEGGINGS,
+  ItemCatalogType.SLEEVES,
+  ItemCatalogType.GLOVES,
+  ItemCatalogType.FEET,
+  ItemCatalogType.HELMET,
+  ItemCatalogType.QUEST,
+  ItemCatalogType.ALCHEMY,
+];
+
+/**
+ * Narrow a Dropdown's generic `string | number` selection value down to a
+ * known Item catalog type, without a forced type assertion at each call site.
+ */
+export const isItemCatalogType = (
+  value: string | number
+): value is ItemCatalogType => {
+  if (typeof value !== 'string') {
+    return false;
+  }
+
+  return ITEM_CATALOG_TYPE_VALUES.some((catalogType) => catalogType === value);
+};

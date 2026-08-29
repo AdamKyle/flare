@@ -29,6 +29,10 @@ class ReplaceGameMapTilesJob implements ShouldQueue
 
     /**
      * Generate and promote replacement tiles for the persisted Game Map.
+     *
+     * @param  GameMapService  $gameMapService  Canonical Game Map application service.
+     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile generation service.
+     * @return void Persists the promoted replacement tile set on the Game Map.
      */
     public function handle(
         GameMapService $gameMapService,

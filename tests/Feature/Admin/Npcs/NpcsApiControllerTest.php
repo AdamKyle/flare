@@ -67,9 +67,8 @@ class NpcsApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps/'.$gameMap->id.'/npcs/options');
         $data = json_decode($response->getContent(), true);
 
-        $this->assertCount(count(NpcType::cases()), $data['npc_types']);
-        $this->assertContains(
-            ['value' => NpcType::SUMMONER->value, 'label' => 'Summoner'],
+        $this->assertSame(
+            array_map(fn (NpcType $npcType): int => $npcType->value, NpcType::cases()),
             $data['npc_types']
         );
     }
@@ -90,16 +89,18 @@ class NpcsApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps/'.$gameMap->id.'/npcs/'.$npc->id);
 
         $this->assertSame(200, $response->getStatusCode());
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertArrayNotHasKey('type_name', $data);
         $this->assertSame([
             'id' => $npc->id,
             'game_map_id' => $gameMap->id,
             'name' => 'OldMerchant',
             'real_name' => 'Old Merchant',
             'type' => NpcType::QUEST_GIVER->value,
-            'type_name' => 'Quest Giver',
             'x_position' => 32,
             'y_position' => 64,
-        ], json_decode($response->getContent(), true));
+        ], $data);
     }
 
     public function test_show_returns_404_for_npc_on_a_different_map(): void

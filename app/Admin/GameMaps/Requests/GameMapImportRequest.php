@@ -8,6 +8,8 @@ class GameMapImportRequest extends FormRequest
 {
     /**
      * Allow the route middleware to own Admin authorization.
+     *
+     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {

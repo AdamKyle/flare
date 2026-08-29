@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\Game\Messages\Handlers;
 
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageContext;
+use App\Game\BattleRewardProcessing\Services\BattleRewardMessageOutboxService;
+use App\Game\Messages\Builders\ServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Handlers\ServerMessageHandler;
 use App\Game\Messages\Types\CharacterMessageTypes;
@@ -23,7 +26,11 @@ class ServerMessageHandlerTest extends TestCase
     {
         parent::setUp();
 
-        $this->serverMessageHandler = resolve(ServerMessageHandler::class);
+        $this->serverMessageHandler = new ServerMessageHandler(
+            new ServerMessageBuilder,
+            new BattleRewardMessageContext,
+            new BattleRewardMessageOutboxService,
+        );
     }
 
     protected function tearDown(): void

@@ -3,14 +3,10 @@
 @section('content')
     <x-core.layout.info-container>
         @php
-            $backUrl = route('locations.list');
+            $backUrl = '/information/locations';
 
-            if (
-                ! auth()
-                    ->user()
-                    ->hasRole('Admin')
-            ) {
-                $backUrl = '/information/locations';
+            if (auth()->user()?->hasRole('Admin')) {
+                $backUrl = route('admin.locations.index');
             }
         @endphp
 

@@ -9,6 +9,8 @@ class GameMapsController extends Controller
 {
     /**
      * Render the Admin Game Maps application shell.
+     *
+     * @return View Admin Game Maps application shell view.
      */
     public function index(): View
     {

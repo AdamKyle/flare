@@ -21,7 +21,7 @@ const StatIncreaseSection = ({
         left={<InfoLabel label="Increases Stat by" />}
         right={
           <span className="text-gray-800 dark:text-gray-200">
-            {formatPercent(item.stat_increase)}
+            {formatPercent(item.stat_increase!)}
           </span>
         }
       />

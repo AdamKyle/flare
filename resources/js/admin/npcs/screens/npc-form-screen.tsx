@@ -6,6 +6,10 @@ import NpcPositionFields from '../components/forms/npc-position-fields';
 import { useNpcForm } from '../hooks/use-npc-form';
 import NpcFormScreenProps from '../types/npc-form-screen-props';
 
+import AdminBackButton from '../../shared/components/admin-back-button';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
+
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import FormWizard from 'ui/form-wizard/form-wizard';
 import Step from 'ui/form-wizard/step';
@@ -67,7 +71,7 @@ const NpcFormScreen = ({
         total_steps={2}
         is_loading={saving}
         on_request_next={handleRequestNext}
-        finish_label={saving ? 'Saving…' : 'Save Npc'}
+        finish_label={saving ? 'Saving…' : 'Save NPC'}
         form_error={null}
         embedded
         current_step_index={currentStepIndex}
@@ -99,21 +103,13 @@ const NpcFormScreen = ({
   }
 
   return (
-    <div className="container mx-auto my-4 px-4">
-      <button
-        type="button"
-        onClick={on_cancel}
-        className="text-danube-600 focus:ring-danube-500 dark:text-danube-300 mb-4 text-sm font-medium hover:underline focus:ring-2 focus:outline-none"
-      >
-        &larr; Back
-      </button>
-
-      <h1 className="text-glacier-900 dark:text-glacier-100 mb-4 text-xl font-semibold">
-        {npc_id ? 'Edit Npc' : 'Create Npc'}
-      </h1>
-
+    <AdminPage
+      title={npc_id ? 'Edit NPC' : 'Create NPC'}
+      width={AdminPageWidth.Standard}
+      header_actions={<AdminBackButton on_click={on_cancel} />}
+    >
       {wizard}
-    </div>
+    </AdminPage>
   );
 };
 

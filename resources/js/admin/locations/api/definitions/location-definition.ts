@@ -1,3 +1,6 @@
+import { LocationPin } from '../../enums/location-pin';
+import { LocationType } from '../../enums/location-type';
+
 export default interface LocationDefinition {
   id: number;
   game_map_id: number;
@@ -10,8 +13,8 @@ export default interface LocationDefinition {
   can_auto_battle: boolean;
   x: number;
   y: number;
-  type: number | null;
-  pin_css_class: string | null;
+  type: LocationType | null;
+  pin_css_class: LocationPin | null;
   hours_to_drop: number | null;
   minutes_between_delve_fights: number | null;
 }

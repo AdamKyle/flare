@@ -78,6 +78,9 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminRoutes();
         $this->mapAdminMonitoringWebRoutes();
         $this->mapAdminGameMapsWebRoutes();
+        $this->mapAdminLocationsWebRoutes();
+        $this->mapAdminNpcsWebRoutes();
+        $this->mapAdminItemsWebRoutes();
         $this->mapQuestRoutes();
         $this->mapGuideQuestsRoutes();
         $this->mapGameMarketRoutes();
@@ -92,6 +95,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminGameMapsApiRoutes();
         $this->mapAdminLocationsApiRoutes();
         $this->mapAdminNpcsApiRoutes();
+        $this->mapAdminItemsApiRoutes();
 
         // Game Core Api Routes:
         $this->mapGemRoutes();
@@ -354,9 +358,9 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Define the Admin Game Maps web routes.
      *
-     * @return void
+     * @return void Registers the Admin Game Maps web routes.
      */
-    protected function mapAdminGameMapsWebRoutes()
+    protected function mapAdminGameMapsWebRoutes(): void
     {
         Route::middleware('web')
             ->namespace('App\Admin\GameMaps\Controllers')
@@ -366,9 +370,9 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Define the Admin Game Maps api routes.
      *
-     * @return void
+     * @return void Registers the Admin Game Maps api routes.
      */
-    protected function mapAdminGameMapsApiRoutes()
+    protected function mapAdminGameMapsApiRoutes(): void
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
@@ -377,11 +381,23 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
+     * Define the Admin Locations web routes.
+     *
+     * @return void Registers the Admin Locations web routes.
+     */
+    protected function mapAdminLocationsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Locations\Controllers')
+            ->group(base_path('routes/admin/locations/web.php'));
+    }
+
+    /**
      * Define the Admin Locations api routes.
      *
-     * @return void
+     * @return void Registers the Admin Locations api routes.
      */
-    protected function mapAdminLocationsApiRoutes()
+    protected function mapAdminLocationsApiRoutes(): void
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
@@ -390,16 +406,53 @@ class RouteServiceProvider extends ServiceProvider
     }
 
     /**
+     * Define the Admin Npcs web routes.
+     *
+     * @return void Registers the Admin NPCs web routes.
+     */
+    protected function mapAdminNpcsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Npcs\Controllers')
+            ->group(base_path('routes/admin/npcs/web.php'));
+    }
+
+    /**
      * Define the Admin Npcs api routes.
      *
-     * @return void
+     * @return void Registers the Admin NPCs api routes.
      */
-    protected function mapAdminNpcsApiRoutes()
+    protected function mapAdminNpcsApiRoutes(): void
     {
         Route::prefix('api')
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Admin\Npcs\Controllers')
             ->group(base_path('routes/admin/npcs/api.php'));
+    }
+
+    /**
+     * Define the Admin Items web routes.
+     *
+     * @return void Registers the Admin Items web routes.
+     */
+    protected function mapAdminItemsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Items\Controllers')
+            ->group(base_path('routes/admin/items/web.php'));
+    }
+
+    /**
+     * Define the Admin Items api routes.
+     *
+     * @return void Registers the Admin Items api routes.
+     */
+    protected function mapAdminItemsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Items\Controllers')
+            ->group(base_path('routes/admin/items/api.php'));
     }
 
     /**

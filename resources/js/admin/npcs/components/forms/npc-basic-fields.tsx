@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import { NPC_TYPE_LABELS, isNpcType } from '../../enums/npc-type';
 import NpcBasicFieldsProps from '../../types/npc-basic-fields-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
@@ -14,9 +15,9 @@ const NpcBasicFields = ({
   form_options: formOptions,
   on_change: onChange,
 }: NpcBasicFieldsProps): ReactNode => {
-  const typeItems: DropdownItem[] = formOptions.npc_types.map((option) => ({
-    label: option.label,
-    value: option.value,
+  const typeItems: DropdownItem[] = formOptions.npc_types.map((npcType) => ({
+    label: NPC_TYPE_LABELS[npcType],
+    value: npcType,
   }));
 
   return (
@@ -48,11 +49,11 @@ const NpcBasicFields = ({
         )}
       </FieldWrapper>
 
-      <FieldWrapper id="npc-type" label="Npc Type" required error={errors.type}>
+      <FieldWrapper id="npc-type" label="NPC Type" required error={errors.type}>
         {(describedBy) => (
           <Dropdown
             id="npc-type"
-            aria_label="Npc Type"
+            aria_label="NPC Type"
             aria_described_by={describedBy}
             aria_invalid={!!errors.type}
             aria_required
@@ -60,8 +61,14 @@ const NpcBasicFields = ({
             pre_selected_item={typeItems.find(
               (item) => item.value === state.type
             )}
-            on_select={(item) => onChange('type', Number(item.value))}
-            selection_placeholder="Select an Npc type"
+            on_select={(item) => {
+              if (!isNpcType(item.value)) {
+                return;
+              }
+
+              onChange('type', item.value);
+            }}
+            selection_placeholder="Select an NPC type"
           />
         )}
       </FieldWrapper>

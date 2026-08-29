@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Admin\Npcs\Exports;
+
+use App\Admin\Npcs\Exports\Sheets\NpcsSheet;
+use Maatwebsite\Excel\Concerns\Exportable;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+
+class NpcsExport implements WithMultipleSheets
+{
+    use Exportable;
+
+    /**
+     * Return the sheets included in the NPCs workbook.
+     *
+     * @return array<int, NpcsSheet> NPCs workbook sheets.
+     */
+    public function sheets(): array
+    {
+        return [
+            new NpcsSheet,
+        ];
+    }
+}

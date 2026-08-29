@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
 import { useGameMap } from '../api/hooks/use-game-map';
 import { GameMapCopy } from '../enums/game-map-copy';
+import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
 import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
 import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
@@ -11,6 +12,7 @@ import { GameMapShowScreenProps } from '../screen-manager/game-map-screen-props'
 import { resolveRequiredQuestItemCopy } from '../utils/resolve-required-quest-item-copy';
 import { convertStoredBonusToPercentage } from '../utils/convert-stored-bonus-to-percentage';
 
+import AdminBackButton from '../../shared/components/admin-back-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 
@@ -195,7 +197,11 @@ const GameMapShowScreen = ({
             <Dt>Can traverse</Dt>
             <Dd>{gameMap.can_traverse ? 'Yes' : 'No'}</Dd>
             <Dt>Event restriction</Dt>
-            <Dd>{gameMap.event_restriction?.label ?? 'None'}</Dd>
+            <Dd>
+              {gameMap.event_restriction === null
+                ? 'None'
+                : GAME_MAP_EVENT_TYPE_LABELS[gameMap.event_restriction]}
+            </Dd>
             <Dt>Required Location</Dt>
             <Dd>{gameMap.required_location?.name ?? 'None'}</Dd>
             <Dt>Kingdom color</Dt>
@@ -263,15 +269,7 @@ const GameMapShowScreen = ({
     <AdminPage
       title={gameMap?.name ?? 'Game Map'}
       width={AdminPageWidth.Detail}
-      header_actions={
-        <button
-          type="button"
-          onClick={handleBack}
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-        >
-          Back
-        </button>
-      }
+      header_actions={<AdminBackButton on_click={handleBack} />}
     >
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}

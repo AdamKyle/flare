@@ -9,6 +9,7 @@ use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Values\Coordinates;
+use App\Game\Npcs\Values\NpcType;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -171,6 +172,7 @@ class GameMapsApiControllerTest extends TestCase
             'tile_map' => [['tile-a']],
             'can_traverse' => false,
             'character_attack_reduction' => 0,
+            'only_during_event_type' => EventType::WINTER_EVENT,
         ]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps/'.$gameMap->id);
@@ -185,7 +187,7 @@ class GameMapsApiControllerTest extends TestCase
             'kingdom_color' => '#ffffff',
             'default' => true,
             'can_traverse' => false,
-            'event_restriction' => null,
+            'event_restriction' => EventType::WINTER_EVENT,
             'xp_bonus' => null,
             'skill_training_bonus' => null,
             'drop_chance_bonus' => null,
@@ -343,7 +345,7 @@ class GameMapsApiControllerTest extends TestCase
             $mock->shouldReceive('get')->andReturn(new Coordinates([0, 250, 500], [0, 250, 500]));
         });
 
-        $this->createNpc(['game_map_id' => $gameMap->id, 'real_name' => 'Merchant']);
+        $this->createNpc(['game_map_id' => $gameMap->id, 'real_name' => 'Merchant', 'type' => NpcType::QUEST_GIVER->value]);
         $this->createNpc(['game_map_id' => $otherMap->id, 'real_name' => 'Elsewhere Npc']);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps/'.$gameMap->id.'/editor');
@@ -351,6 +353,8 @@ class GameMapsApiControllerTest extends TestCase
 
         $this->assertCount(1, $data['npcs']);
         $this->assertSame('Merchant', $data['npcs'][0]['real_name']);
+        $this->assertSame(NpcType::QUEST_GIVER->value, $data['npcs'][0]['type']);
+        $this->assertArrayNotHasKey('type_name', $data['npcs'][0]);
     }
 
     public function test_editor_returns_both_player_and_npc_owned_kingdoms_for_selected_map(): void
@@ -430,11 +434,7 @@ class GameMapsApiControllerTest extends TestCase
         $data = json_decode($response->getContent(), true);
 
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertIsInt($data['event_types'][0]['value']);
-        $this->assertSame(
-            EventType::getOptionsForSelect()[$data['event_types'][0]['value']],
-            $data['event_types'][0]['label']
-        );
+        $this->assertSame(array_keys(EventType::getOptionsForSelect()), $data['event_types']);
         $this->assertSame('Alpha Post', $data['locations'][0]['name']);
         $this->assertSame('Zeta Post', $data['locations'][1]['name']);
     }

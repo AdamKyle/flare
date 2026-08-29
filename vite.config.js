@@ -23,6 +23,7 @@ export default defineConfig({
             'resources/js/admin/game-maps/game-maps-app.tsx',
             'resources/js/admin/locations/locations-app.tsx',
             'resources/js/admin/npcs/npcs-app.tsx',
+            'resources/js/admin/items/items-app.tsx',
         ]),
         tailwindcss(),
         react(),

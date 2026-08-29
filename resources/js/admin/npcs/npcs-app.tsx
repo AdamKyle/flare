@@ -1,34 +1,46 @@
-import React, { ReactNode } from 'react';
-import { createRoot } from 'react-dom/client';
-
-import NpcsStandaloneApp from './components/npcs-standalone-app';
-import NpcsAppProps from './types/npcs-app-props';
-
-import AdminAppConfigurationError from '../shared/components/admin-app-configuration-error';
-import { readPositiveDatasetInteger } from '../shared/utils/read-positive-dataset-integer';
-
 import { ApiHandlerProvider } from 'api-handler/components/api-handler-provider';
+import { EventSystemProvider } from 'event-system/components/event-system-provider';
+import React, { ReactNode, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ServiceContainer } from 'service-container-provider/service-container';
 
-const NpcsAdminApp = ({
-  mount_element: mountElement,
-}: NpcsAppProps): ReactNode => {
-  const gameMapId = readPositiveDatasetInteger(mountElement, 'gameMapId');
+import { NpcScreens } from './screen-manager/npc-screen-constants';
+import {
+  NpcScreenHost,
+  NpcScreenProvider,
+  useNpcScreenNavigation,
+} from './screen-manager/npc-screen-kit';
 
-  const renderContent = (): ReactNode => {
-    if (gameMapId === null) {
-      return (
-        <AdminAppConfigurationError message="A valid Game Map is required to manage Npcs." />
-      );
-    }
+import BaseSidePeek from '../../game/components/side-peeks/base/base-side-peek';
 
-    return <NpcsStandaloneApp game_map_id={gameMapId} />;
-  };
+const NpcListInitializer = (): null => {
+  const navigation = useNpcScreenNavigation();
+  const navigationRef = useRef(navigation);
+  navigationRef.current = navigation;
 
-  return <ApiHandlerProvider>{renderContent()}</ApiHandlerProvider>;
+  useEffect(() => {
+    navigationRef.current.resetTo(NpcScreens.LIST, {});
+  }, []);
+
+  return null;
 };
+
+const NpcsAdminApp = (): ReactNode => (
+  <ServiceContainer>
+    <EventSystemProvider>
+      <ApiHandlerProvider>
+        <NpcScreenProvider>
+          <NpcListInitializer />
+          <NpcScreenHost />
+        </NpcScreenProvider>
+        <BaseSidePeek />
+      </ApiHandlerProvider>
+    </EventSystemProvider>
+  </ServiceContainer>
+);
 
 const npcsElement = document.getElementById('npcs-admin-app');
 
 if (npcsElement) {
-  createRoot(npcsElement).render(<NpcsAdminApp mount_element={npcsElement} />);
+  createRoot(npcsElement).render(<NpcsAdminApp />);
 }

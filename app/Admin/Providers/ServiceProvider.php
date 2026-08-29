@@ -15,8 +15,6 @@ use App\Admin\Services\GuideQuestService;
 use App\Admin\Services\ImageHandlerService;
 use App\Admin\Services\InfoPageService;
 use App\Admin\Services\ItemAffixService;
-use App\Admin\Services\ItemsService;
-use App\Admin\Services\LocationService;
 use App\Admin\Services\LogReader;
 use App\Admin\Services\MonitoredBugReportService;
 use App\Admin\Services\QuestService;
@@ -24,7 +22,6 @@ use App\Admin\Services\SiteStatisticsService;
 use App\Admin\Services\SuggestionAndBugsService;
 use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
-use App\Game\Maps\Contracts\CoordinatesQuery;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
 class ServiceProvider extends ApplicationServiceProvider
@@ -50,10 +47,6 @@ class ServiceProvider extends ApplicationServiceProvider
             return new UserService;
         });
 
-        $this->app->bind(ItemsService::class, function ($app) {
-            return new ItemsService;
-        });
-
         $this->app->bind(QuestService::class, function () {
             return new QuestService;
         });
@@ -68,10 +61,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(GiveToPlayerService::class, function () {
             return new GiveToPlayerService;
-        });
-
-        $this->app->bind(LocationService::class, function ($app) {
-            return new LocationService($app->make(CoordinatesQuery::class));
         });
 
         $this->app->bind(SuggestionAndBugsService::class, function () {

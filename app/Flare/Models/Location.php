@@ -62,17 +62,26 @@ class Location extends Model
         'minutes_between_delve_fights' => 'integer',
     ];
 
+    /**
+     * The canonical relationship for quest Items that drop at this Location.
+     */
     public function questItemDrops(): HasMany
     {
         return $this->hasMany(Item::class, 'drop_location_id', 'id')
             ->where('type', 'quest');
     }
 
+    /**
+     * Scope Locations to only those with at least one quest Item drop.
+     */
     public function scopeDropsQuestItems(Builder $query): Builder
     {
         return $query->whereHas('questItemDrops');
     }
 
+    /**
+     * Scope Locations to those eligible to receive a Location Gem parameter.
+     */
     public function scopeEligibleForLocationGems(Builder $query): Builder
     {
         return $query->where(function (Builder $query) {
@@ -81,17 +90,23 @@ class Location extends Model
         });
     }
 
+    /**
+     * Build the Location's display name including its Map name.
+     */
     public function getNameWithMapAttribute(): string
     {
         return $this->name.' ('.$this->map->name.')';
     }
 
+    /**
+     * Build the Location's display name including its special type and plane name for Location Gem selection.
+     */
     public function getNameWithPlaneForLocationGemAttribute(): string
     {
         $planeName = $this->map?->name ?? '';
 
         if (! is_null($this->type)) {
-            $typeName = LocationType::getNamedValues()[$this->type] ?? (string) $this->type;
+            $typeName = LocationType::getNamedValues()[$this->type] ?? $this->type;
 
             return $this->name.' [Special Type: '.$typeName.'] ('.$planeName.')';
         }
@@ -99,32 +114,50 @@ class Location extends Model
         return $this->name.' ('.$planeName.')';
     }
 
-    public function questRewardItem()
+    /**
+     * The quest Item awarded for visiting this Location.
+     */
+    public function questRewardItem(): HasOne
     {
         return $this->hasOne(Item::class, 'id', 'quest_reward_item_id');
     }
 
-    public function map()
+    /**
+     * The Game Map this Location belongs to.
+     */
+    public function map(): HasOne
     {
         return $this->hasOne(GameMap::class, 'id', 'game_map_id');
     }
 
-    public function raid()
+    /**
+     * The Raid associated with this Location, when one is set.
+     */
+    public function raid(): HasOne
     {
         return $this->hasOne(Raid::class, 'id', 'raid_id');
     }
 
+    /**
+     * The Location Gem parameters configured for this Location.
+     */
     public function gemParamters(): HasOne
     {
         return $this->hasOne(GameLocationGemParamter::class);
     }
 
-    public function requiredQuestItem()
+    /**
+     * The quest Item required to be handed in for quests tied to this Location.
+     */
+    public function requiredQuestItem(): HasOne
     {
         return $this->hasOne(Item::class, 'id', 'required_quest_item_id');
     }
 
-    public function locationType()
+    /**
+     * Resolve the Location's current type enum case, when one is set.
+     */
+    public function locationType(): ?LocationType
     {
         if (is_null($this->type)) {
             return null;
@@ -133,16 +166,17 @@ class Location extends Model
         return LocationType::tryFrom($this->type);
     }
 
-    public function locationQuestItems()
-    {
-        return $this->hasMany(Item::class, 'id', 'drop_location_id');
-    }
-
-    protected static function newFactory()
+    /**
+     * Resolve the factory used to build new Location instances.
+     */
+    protected static function newFactory(): LocationFactory
     {
         return LocationFactory::new();
     }
 
+    /**
+     * Register model lifecycle hooks that invalidate the cached map-locations list.
+     */
     protected static function booted(): void
     {
         static::saved(function (Location $location): void {

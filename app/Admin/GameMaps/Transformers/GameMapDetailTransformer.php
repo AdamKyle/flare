@@ -6,7 +6,6 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
-use App\Game\Events\Values\EventType;
 use Illuminate\Support\Facades\Storage;
 
 class GameMapDetailTransformer
@@ -15,7 +14,7 @@ class GameMapDetailTransformer
      * Transform the supplied internal Game Map detail data into its Admin detail representation.
      *
      * @param  array{game_map: GameMap, required_item: Item|null, required_quest: Quest|null, required_location: Location|null}  $detailData  Internal Game Map detail data.
-     * @return array{id: int, name: string, map_url: string, tiles: array<int, array<int, string>>, description: string|null, kingdom_color: string, default: bool, can_traverse: bool, event_restriction: array{value: int, label: string}|null, xp_bonus: float|null, skill_training_bonus: float|null, drop_chance_bonus: float|null, enemy_stat_bonus: float|null, character_attack_reduction: float|null, required_location: array{id: int, name: string}|null, required_quest_item: array{id: int, name: string, quest: array{id: int, name: string}|null}|null} Admin Game Map detail representation.
+     * @return array{id: int, name: string, map_url: string, tiles: array<int, array<int, string>>, description: string|null, kingdom_color: string, default: bool, can_traverse: bool, event_restriction: int|null, xp_bonus: float|null, skill_training_bonus: float|null, drop_chance_bonus: float|null, enemy_stat_bonus: float|null, character_attack_reduction: float|null, required_location: array{id: int, name: string}|null, required_quest_item: array{id: int, name: string, quest: array{id: int, name: string}|null}|null} Admin Game Map detail representation.
      */
     public function transform(array $detailData): array
     {
@@ -40,7 +39,7 @@ class GameMapDetailTransformer
             'kingdom_color' => $gameMap->kingdom_color,
             'default' => $gameMap->default,
             'can_traverse' => $gameMap->can_traverse,
-            'event_restriction' => $this->transformEventRestriction($gameMap->only_during_event_type),
+            'event_restriction' => $gameMap->only_during_event_type,
             'xp_bonus' => $gameMap->xp_bonus,
             'skill_training_bonus' => $gameMap->skill_training_bonus,
             'drop_chance_bonus' => $gameMap->drop_chance_bonus,
@@ -52,26 +51,10 @@ class GameMapDetailTransformer
     }
 
     /**
-     * Transform the configured event restriction into display data.
-     *
-     * @return array{value: int, label: string}|null
-     */
-    private function transformEventRestriction(?int $eventType): ?array
-    {
-        if (is_null($eventType)) {
-            return null;
-        }
-
-        return [
-            'value' => $eventType,
-            'label' => (new EventType($eventType))->getNameForEvent(),
-        ];
-    }
-
-    /**
      * Transform the required Location into display data.
      *
-     * @return array{id: int, name: string}|null
+     * @param  Location|null  $requiredLocation  Game Map's required access Location, when one is set.
+     * @return array{id: int, name: string}|null Compact Location identity.
      */
     private function transformRequiredLocation(?Location $requiredLocation): ?array
     {

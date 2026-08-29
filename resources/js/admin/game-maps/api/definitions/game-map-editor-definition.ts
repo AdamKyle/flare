@@ -1,6 +1,7 @@
 import GameMapKingdomMarkerDefinition from './game-map-kingdom-marker-definition';
 import GameMapLocationMarkerDefinition from './game-map-location-marker-definition';
 import GameMapNpcMarkerDefinition from './game-map-npc-marker-definition';
+import { GameMapEventType } from '../../enums/game-map-event-type';
 
 export type GameMapTile = string[];
 
@@ -24,7 +25,7 @@ export interface GameMapDetailDefinition {
   kingdom_color: string;
   default: boolean;
   can_traverse: boolean;
-  event_restriction: GameMapEventRestrictionDefinition | null;
+  event_restriction: GameMapEventType | null;
   xp_bonus: number | null;
   skill_training_bonus: number | null;
   drop_chance_bonus: number | null;
@@ -32,11 +33,6 @@ export interface GameMapDetailDefinition {
   character_attack_reduction: number | null;
   required_location: GameMapRequiredLocationDefinition | null;
   required_quest_item: GameMapRequiredQuestItemDefinition | null;
-}
-
-export interface GameMapEventRestrictionDefinition {
-  value: number;
-  label: string;
 }
 
 export interface GameMapRequiredLocationDefinition {

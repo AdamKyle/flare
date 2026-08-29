@@ -9,6 +9,7 @@ import GameMapEditorToolbar from '../components/game-map-editor-toolbar';
 import { GameMapMoveStateDefinition } from '../events/definitions/game-map-move-event-map';
 import { useOwnGameMapMove } from '../events/hooks/use-own-game-map-move';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
+import AdminBackButton from '../../shared/components/admin-back-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import CoordinateDefinition from '../types/coordinate-definition';
@@ -118,7 +119,6 @@ const GameMapEditorScreen = ({
         on_close: handleSidePeekClosed,
         game_map_id: gameMapId,
         location_id: locationId,
-        location_marker: locationMarker,
         on_editor_changed: handleEditorChanged,
         on_move_requested: handleMoveLocationRequested,
       }
@@ -282,15 +282,7 @@ const GameMapEditorScreen = ({
       <AdminPage
         title={`Edit Locations for: ${editor.game_map.name}`}
         width={AdminPageWidth.Workspace}
-        header_actions={
-          <button
-            type="button"
-            onClick={handleBack}
-            className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-          >
-            Back
-          </button>
-        }
+        header_actions={<AdminBackButton on_click={handleBack} />}
       >
         <Alert variant={AlertVariant.INFO}>
           Map tile processing is not complete. Refresh the Game Map detail page
@@ -304,15 +296,7 @@ const GameMapEditorScreen = ({
     <AdminPage
       title={`Edit Locations for: ${editor.game_map.name}`}
       width={AdminPageWidth.Workspace}
-      header_actions={
-        <button
-          type="button"
-          onClick={handleBack}
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-        >
-          Back
-        </button>
-      }
+      header_actions={<AdminBackButton on_click={handleBack} />}
     >
       <div className="mb-4">
         <GameMapEditorLegend />

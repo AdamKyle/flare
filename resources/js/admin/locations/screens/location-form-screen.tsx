@@ -7,6 +7,10 @@ import { useFocusFirstInvalidLocationField } from '../hooks/use-focus-first-inva
 import { useLocationForm } from '../hooks/use-location-form';
 import LocationFormScreenProps from '../types/location-form-screen-props';
 
+import AdminBackButton from '../../shared/components/admin-back-button';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
+
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import FormWizard from 'ui/form-wizard/form-wizard';
 import Step from 'ui/form-wizard/step';
@@ -120,21 +124,13 @@ const LocationFormScreen = ({
   }
 
   return (
-    <div className="container mx-auto my-4 px-4">
-      <button
-        type="button"
-        onClick={on_cancel}
-        className="text-danube-600 focus:ring-danube-500 dark:text-danube-300 mb-4 text-sm font-medium hover:underline focus:ring-2 focus:outline-none"
-      >
-        &larr; Back
-      </button>
-
-      <h1 className="text-glacier-900 dark:text-glacier-100 mb-4 text-xl font-semibold">
-        {location_id ? 'Edit Location' : 'Create Location'}
-      </h1>
-
+    <AdminPage
+      title={location_id ? 'Edit Location' : 'Create Location'}
+      width={AdminPageWidth.Standard}
+      header_actions={<AdminBackButton on_click={on_cancel} />}
+    >
       {wizard}
-    </div>
+    </AdminPage>
   );
 };
 

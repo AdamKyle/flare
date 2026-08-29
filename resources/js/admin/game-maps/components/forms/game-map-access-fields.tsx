@@ -1,6 +1,10 @@
 import React, { ReactNode } from 'react';
 
 import GameMapAccessFieldsProps from '../../types/game-map-access-fields-props';
+import {
+  GAME_MAP_EVENT_TYPE_LABELS,
+  isGameMapEventType,
+} from '../../enums/game-map-event-type';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
@@ -21,8 +25,8 @@ const GameMapAccessFields = ({
   );
   const eventTypeItems: DropdownItem[] = formOptions.event_types.map(
     (eventType) => ({
-      label: eventType.label,
-      value: eventType.value,
+      label: GAME_MAP_EVENT_TYPE_LABELS[eventType],
+      value: eventType,
     })
   );
 
@@ -72,9 +76,13 @@ const GameMapAccessFields = ({
             pre_selected_item={eventTypeItems.find(
               (item) => item.value === state.only_during_event_type
             )}
-            on_select={(item) =>
-              onChange('only_during_event_type', Number(item.value))
-            }
+            on_select={(item) => {
+              if (!isGameMapEventType(item.value)) {
+                return;
+              }
+
+              onChange('only_during_event_type', item.value);
+            }}
             on_clear={() => onChange('only_during_event_type', null)}
             selection_placeholder="Not event-restricted"
           />

@@ -299,6 +299,16 @@ test('monster show page renders', function () {
     $response->assertSee('Goblin');
 });
 
+test('location show page renders for a guest', function () {
+    $map = $this->createGameMap();
+    $location = $this->createLocation(['name' => 'Guest Field', 'game_map_id' => $map->id, 'quest_reward_item_id' => null, 'type' => null]);
+
+    $response = $this->get(route('info.page.location', $location));
+
+    $response->assertOk();
+    $response->assertSee('Guest Field');
+});
+
 test('location show page renders without a quest reward item', function () {
     $map = $this->createGameMap();
     $location = $this->createLocation(['name' => 'Quiet Field', 'game_map_id' => $map->id, 'quest_reward_item_id' => null, 'type' => null]);

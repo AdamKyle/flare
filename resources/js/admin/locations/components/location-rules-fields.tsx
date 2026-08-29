@@ -1,5 +1,7 @@
 import React, { ReactNode } from 'react';
 
+import { LOCATION_PIN_LABELS, isLocationPin } from '../enums/location-pin';
+import { LOCATION_TYPE_LABELS, isLocationType } from '../enums/location-type';
 import LocationRulesFieldsProps from '../types/location-rules-fields-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
@@ -14,15 +16,17 @@ const LocationRulesFields = ({
   on_change,
 }: LocationRulesFieldsProps): ReactNode => {
   const locationTypeItems: DropdownItem[] = form_options.location_types.map(
-    (option) => ({
-      label: option.label,
-      value: option.value,
+    (locationType) => ({
+      label: LOCATION_TYPE_LABELS[locationType],
+      value: locationType,
     })
   );
-  const pinItems: DropdownItem[] = form_options.special_pins.map((option) => ({
-    label: option.label,
-    value: option.value,
-  }));
+  const pinItems: DropdownItem[] = form_options.special_pins.map(
+    (locationPin) => ({
+      label: LOCATION_PIN_LABELS[locationPin],
+      value: locationPin,
+    })
+  );
   const questItemItems: DropdownItem[] = form_options.quest_items.map(
     (option) => ({
       label: option.label,
@@ -47,7 +51,13 @@ const LocationRulesFields = ({
             pre_selected_item={locationTypeItems.find(
               (item) => item.value === state.type
             )}
-            on_select={(item) => on_change('type', Number(item.value))}
+            on_select={(item) => {
+              if (!isLocationType(item.value)) {
+                return;
+              }
+
+              on_change('type', item.value);
+            }}
             on_clear={() => on_change('type', null)}
             selection_placeholder="No special type"
           />
@@ -69,7 +79,13 @@ const LocationRulesFields = ({
             pre_selected_item={pinItems.find(
               (item) => item.value === state.pin_css_class
             )}
-            on_select={(item) => on_change('pin_css_class', String(item.value))}
+            on_select={(item) => {
+              if (!isLocationPin(item.value)) {
+                return;
+              }
+
+              on_change('pin_css_class', item.value);
+            }}
             on_clear={() => on_change('pin_css_class', null)}
             selection_placeholder="Default pin"
           />

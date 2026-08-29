@@ -35,7 +35,6 @@ class EventEnderRegistryTest extends TestCase
                 });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(RaidEventEnderService::class, $raid);
 
         $weeklyCurrency = Mockery::mock(WeeklyCurrencyEventEnderService::class, function (MockInterface $m) use ($type, $scheduled, $current, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)
@@ -49,39 +48,41 @@ class EventEnderRegistryTest extends TestCase
                     $calls[] = 'weekly_currency.end';
                 });
         });
-        $this->app->instance(WeeklyCurrencyEventEnderService::class, $weeklyCurrency);
 
         $weeklyCelestials = Mockery::mock(WeeklyCelestialEventEnderService::class, function (MockInterface $m) {
             $m->shouldNotReceive('supports');
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WeeklyCelestialEventEnderService::class, $weeklyCelestials);
 
         $weeklyFaction = Mockery::mock(WeeklyFactionLoyaltyEnderService::class, function (MockInterface $m) {
             $m->shouldNotReceive('supports');
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WeeklyFactionLoyaltyEnderService::class, $weeklyFaction);
 
         $winter = Mockery::mock(WinterEventEnderService::class, function (MockInterface $m) {
             $m->shouldNotReceive('supports');
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WinterEventEnderService::class, $winter);
 
         $delusional = Mockery::mock(DelusionalMemoriesEventEnderService::class, function (MockInterface $m) {
             $m->shouldNotReceive('supports');
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(DelusionalMemoriesEventEnderService::class, $delusional);
 
         $feedback = Mockery::mock(FeedbackEventEnderService::class, function (MockInterface $m) {
             $m->shouldNotReceive('supports');
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(FeedbackEventEnderService::class, $feedback);
 
-        $registry = $this->app->make(EventEnderRegistry::class);
+        $registry = new EventEnderRegistry(
+            $raid,
+            $weeklyCurrency,
+            $weeklyCelestials,
+            $weeklyFaction,
+            $winter,
+            $delusional,
+            $feedback,
+        );
 
         $registry->end($type, $scheduled, $current);
 
@@ -107,7 +108,6 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(RaidEventEnderService::class, $raid);
 
         $weeklyCurrency = Mockery::mock(WeeklyCurrencyEventEnderService::class, function (MockInterface $m) use ($type, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)->andReturnUsing(function () use (&$calls): bool {
@@ -117,7 +117,6 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WeeklyCurrencyEventEnderService::class, $weeklyCurrency);
 
         $weeklyCelestials = Mockery::mock(WeeklyCelestialEventEnderService::class, function (MockInterface $m) use ($type, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)->andReturnUsing(function () use (&$calls): bool {
@@ -127,7 +126,6 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WeeklyCelestialEventEnderService::class, $weeklyCelestials);
 
         $weeklyFaction = Mockery::mock(WeeklyFactionLoyaltyEnderService::class, function (MockInterface $m) use ($type, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)->andReturnUsing(function () use (&$calls): bool {
@@ -137,7 +135,6 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WeeklyFactionLoyaltyEnderService::class, $weeklyFaction);
 
         $winter = Mockery::mock(WinterEventEnderService::class, function (MockInterface $m) use ($type, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)->andReturnUsing(function () use (&$calls): bool {
@@ -147,7 +144,6 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(WinterEventEnderService::class, $winter);
 
         $delusional = Mockery::mock(DelusionalMemoriesEventEnderService::class, function (MockInterface $m) use ($type, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)->andReturnUsing(function () use (&$calls): bool {
@@ -157,7 +153,6 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(DelusionalMemoriesEventEnderService::class, $delusional);
 
         $feedback = Mockery::mock(FeedbackEventEnderService::class, function (MockInterface $m) use ($type, &$calls) {
             $m->shouldReceive('supports')->once()->with($type)->andReturnUsing(function () use (&$calls): bool {
@@ -167,9 +162,16 @@ class EventEnderRegistryTest extends TestCase
             });
             $m->shouldNotReceive('end');
         });
-        $this->app->instance(FeedbackEventEnderService::class, $feedback);
 
-        $registry = $this->app->make(EventEnderRegistry::class);
+        $registry = new EventEnderRegistry(
+            $raid,
+            $weeklyCurrency,
+            $weeklyCelestials,
+            $weeklyFaction,
+            $winter,
+            $delusional,
+            $feedback,
+        );
 
         $registry->end($type, $scheduled, $current);
 

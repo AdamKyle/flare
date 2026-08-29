@@ -50,4 +50,15 @@ export default interface AxiosDefinition {
     data: D,
     config?: AxiosRequestConfig & { params?: C }
   ): Promise<T>;
+
+  /**
+   * Handles DELETE requests.
+   *
+   * @param url - The endpoint to send the DELETE request to.
+   * @param config - Optional Axios configuration, including query parameters.
+   */
+  delete<T, C>(
+    url: string,
+    config?: AxiosRequestConfig & { params?: C }
+  ): Promise<T>;
 }

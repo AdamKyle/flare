@@ -4,4 +4,8 @@ export enum LocationApiUrls {
   STORE = '/admin/game-maps/{gameMap}/locations',
   UPDATE = SHOW,
   MOVE = '/admin/game-maps/{gameMap}/locations/{location}/position',
+  LIST = '/admin/locations',
+  DETAIL = '/admin/locations/{location}',
+  QUEST_ITEMS = '/admin/locations/{location}/quest-items',
+  IMPORT = '/admin/locations/import',
 }

@@ -1,3 +1,6 @@
+import { LocationPin } from '../enums/location-pin';
+import { LocationType } from '../enums/location-type';
+
 export default interface LocationFormState {
   name: string;
   description: string;
@@ -8,8 +11,8 @@ export default interface LocationFormState {
   can_auto_battle: boolean;
   x: number | null;
   y: number | null;
-  type: number | null;
-  pin_css_class: string | null;
+  type: LocationType | null;
+  pin_css_class: LocationPin | null;
   hours_to_drop: string;
   minutes_between_delve_fights: string;
 }

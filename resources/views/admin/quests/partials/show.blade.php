@@ -41,7 +41,7 @@
                     @else
                         <a
                             href="{{
-                                route('game.npcs.show', [
+                                route('info.page.npc', [
                                     'npc' => $quest->npc_id,
                                 ])
                             }}"

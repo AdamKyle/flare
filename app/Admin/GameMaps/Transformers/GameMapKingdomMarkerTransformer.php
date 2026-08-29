@@ -8,6 +8,9 @@ class GameMapKingdomMarkerTransformer
 {
     /**
      * Transform a Kingdom into its Game Map editor marker representation.
+     *
+     * @param  Kingdom  $kingdom  Kingdom to transform.
+     * @return array{id: int, name: string, npc_owned: bool, owner_type: string, x_position: int, y_position: int} Game Map editor Kingdom marker representation.
      */
     public function transform(Kingdom $kingdom): array
     {

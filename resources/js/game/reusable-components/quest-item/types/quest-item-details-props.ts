@@ -1,5 +1,5 @@
-import BaseQuestItemDefinition from '../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
+import QuestItemFactualDefinition from './quest-item-factual-definition';
 
 export default interface QuestItemDetailsProps {
-  item: BaseQuestItemDefinition;
+  item: QuestItemFactualDefinition;
 }

@@ -22,7 +22,7 @@ const UsableItemEffects = ({ item }: UsableItemEffectsProps) => {
     const shouldShowExperienceBonuses =
       item.gain_additional_level || (item.xp_bonus ?? 0) > 0;
 
-    const shouldShowStatIncrease = item.stat_increase > 0;
+    const shouldShowStatIncrease = (item.stat_increase ?? 0) > 0;
 
     const shouldShowCoreModifiers =
       (item.base_damage_mod ?? 0) > 0 ||

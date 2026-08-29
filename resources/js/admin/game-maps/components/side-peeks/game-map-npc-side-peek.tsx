@@ -4,14 +4,18 @@ import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import GameMapNpcSidePeekProps from './types/game-map-npc-side-peek-props';
 import NpcDefinition from '../../../npcs/api/definitions/npc-definition';
 import { NpcApiMessages } from '../../../npcs/api/enums/npc-api-messages';
-import { useNpc } from '../../../npcs/api/hooks/use-npc';
+import { useNpcDetail } from '../../../npcs/api/hooks/use-npc-detail';
+import { useNpcQuests } from '../../../npcs/api/hooks/use-npc-quests';
+import { useNpcRewardItems } from '../../../npcs/api/hooks/use-npc-reward-items';
+import NpcDetailBody from '../../../npcs/components/npc-detail-body';
 import NpcFormScreen from '../../../npcs/screens/npc-form-screen';
+
+import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import StackedCard from 'ui/cards/stacked-card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const GameMapNpcSidePeek = ({
@@ -20,12 +24,12 @@ const GameMapNpcSidePeek = ({
   on_editor_changed: onEditorChanged,
   on_move_requested: onMoveRequested,
 }: GameMapNpcSidePeekProps): ReactNode => {
-  const { npc, loading, error } = useNpc(gameMapId, npcId);
-  const [editedNpc, setEditedNpc] = useState<NpcDefinition | null>(null);
+  const sidePeekEmitter = useSidePeekEmitter();
+  const { npc, loading, error, refresh } = useNpcDetail(npcId);
+  const quests = useNpcQuests(npcId);
+  const rewardItems = useNpcRewardItems(npcId);
   const [showEdit, setShowEdit] = useState(false);
   const [announcement, setAnnouncement] = useState('');
-
-  const displayedNpc = editedNpc ?? npc;
 
   const handleEdit = (): void => {
     setShowEdit(true);
@@ -36,14 +40,31 @@ const GameMapNpcSidePeek = ({
   };
 
   const handleSaved = (updated: NpcDefinition): void => {
-    setEditedNpc(updated);
     void onEditorChanged();
+    refresh();
     setShowEdit(false);
-    setAnnouncement(GameMapSidePeekMessages.NpcSaved);
+    setAnnouncement(`${updated.real_name ?? GameMapSidePeekMessages.NpcSaved}`);
   };
 
   const handleMove = (): void => {
     onMoveRequested(npcId);
+  };
+
+  const handleOpenItem = (itemId: number, itemName: string): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
+      {
+        is_open: true,
+        title: itemName,
+        allow_clicking_outside: true,
+        item_id: itemId,
+        on_item_changed: () => {
+          quests.refresh();
+          rewardItems.refresh();
+        },
+      }
+    );
   };
 
   const renderContent = (): ReactNode => {
@@ -51,23 +72,12 @@ const GameMapNpcSidePeek = ({
       return <InfiniteLoader />;
     }
 
-    if (error || !displayedNpc) {
+    if (error || !npc) {
       return <ApiErrorAlert apiError={error?.message ?? NpcApiMessages.Load} />;
     }
 
     return (
       <div className="space-y-4 px-4">
-        <Dl>
-          <Dt>Real Name</Dt>
-          <Dd>{displayedNpc.real_name}</Dd>
-          <Dt>Type</Dt>
-          <Dd>{displayedNpc.type_name}</Dd>
-          <Dt>Coordinates</Dt>
-          <Dd>
-            X {displayedNpc.x_position}, Y {displayedNpc.y_position}
-          </Dd>
-        </Dl>
-
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -84,6 +94,13 @@ const GameMapNpcSidePeek = ({
             Move
           </button>
         </div>
+
+        <NpcDetailBody
+          npc={npc}
+          quests={quests}
+          reward_items={rewardItems}
+          on_open_item={handleOpenItem}
+        />
       </div>
     );
   };

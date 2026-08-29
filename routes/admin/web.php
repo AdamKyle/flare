@@ -4,7 +4,6 @@ Route::get('/affixes/{affix}', ['as' => 'game.affixes.affix', 'uses' => 'Affixes
 Route::get('/game/kingdoms/units/{gameUnit}', ['as' => 'game.units.unit', 'uses' => 'UnitsController@show']);
 Route::get('/game/kingdoms/buildings/{building}', ['as' => 'game.buildings.building', 'uses' => 'BuildingsController@show']);
 Route::get('/game/quests/{quest}', ['as' => 'game.quests.show', 'uses' => 'QuestsController@show']);
-Route::get('/game/npcs/{npc}', ['as' => 'game.npcs.show', 'uses' => 'NpcsController@show']);
 
 Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin', ['as' => 'home', 'uses' => 'AdminController@home']);
@@ -30,17 +29,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/map-gems/{gameMapGemParamter}/roll', ['as' => 'admin.map-gems.roll', 'uses' => 'MapGemsController@roll']);
     Route::post('/admin/map-gems/export', ['as' => 'admin.map-gems.export', 'uses' => 'MapGemsController@export']);
     Route::post('/admin/map-gems/import', ['as' => 'admin.map-gems.import', 'uses' => 'MapGemsController@importData']);
-
-    Route::get('/admin/locations/export-locations', ['as' => 'locations.export', 'uses' => 'LocationsController@exportLocations']);
-    Route::get('/admin/locations/import-locations', ['as' => 'locations.import', 'uses' => 'LocationsController@importLocations']);
-    Route::post('/admin/locations/export-data', ['as' => 'locations.export-data', 'uses' => 'LocationsController@export']);
-    Route::post('/admin/locations/import-data', ['as' => 'locations.import-data', 'uses' => 'LocationsController@importData']);
-
-    Route::redirect('/admin/locations', '/admin')->name('locations.list');
-    Route::get('/admin/locations/create', ['as' => 'locations.create', 'uses' => 'LocationsController@create']);
-    Route::get('/admin/location/{location}', ['as' => 'locations.location', 'uses' => 'LocationsController@show']);
-    Route::get('/admin/locations/{location}/edit', ['as' => 'location.edit', 'uses' => 'LocationsController@edit']);
-    Route::post('/admin/locations/store', ['as' => 'locations.store', 'uses' => 'LocationsController@store']);
 
     Route::redirect('/admin/location-templates', '/admin')->name('admin.location-templates.list');
     Route::get('/admin/location-templates/create', ['as' => 'admin.location-templates.create', 'uses' => 'LocationTemplatesController@create']);
@@ -74,18 +62,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
     Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
     Route::post('/admin/monsters/store', ['as' => 'monster.store', 'uses' => 'MonstersController@store']);
-
-    Route::get('/admin/items/export-items', ['as' => 'items.export', 'uses' => 'ItemsController@exportItems']);
-    Route::get('/admin/items/import-items', ['as' => 'items.import', 'uses' => 'ItemsController@importItems']);
-    Route::post('/admin/items/export-data', ['as' => 'items.export-data', 'uses' => 'ItemsController@export']);
-    Route::post('/admin/items/import-data', ['as' => 'items.import-data', 'uses' => 'ItemsController@importData']);
-
-    Route::redirect('/admin/items', '/admin')->name('items.list');
-    Route::get('/admin/items/create', ['as' => 'items.create', 'uses' => 'ItemsController@create']);
-    Route::get('/admin/items/{item}/edit', ['as' => 'items.edit', 'uses' => 'ItemsController@edit']);
-    Route::post('/admin/items/store', ['as' => 'item.store', 'uses' => 'ItemsController@store']);
-    Route::post('/admin/items/{item}/delete', ['as' => 'items.delete', 'uses' => 'ItemsController@delete']);
-    Route::post('/admin/items/delete-all', ['as' => 'items.delete.all', 'uses' => 'ItemsController@deleteAll']);
 
     Route::get('/admin/affixes/export-affixes', ['as' => 'affixes.export', 'uses' => 'AffixesController@exportItems']);
     Route::get('/admin/affixes/import-affixes', ['as' => 'affixes.import', 'uses' => 'AffixesController@importItems']);
@@ -184,17 +160,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/kingdoms/import', ['as' => 'kingdoms.import', 'uses' => 'KingdomsController@import']);
     Route::post('/admin/kingdoms/export-data', ['as' => 'kingdoms.export-data', 'uses' => 'KingdomsController@export']);
     Route::post('/admin/kingdoms/import-data', ['as' => 'kingdoms.import-data', 'uses' => 'KingdomsController@importData']);
-
-    Route::get('/admin/npcs/export-npcs', ['as' => 'npcs.export', 'uses' => 'NpcsController@exportNpcs']);
-    Route::get('/admin/npcs/import-npcs', ['as' => 'npcs.import', 'uses' => 'NpcsController@importNpcs']);
-    Route::post('/admin/npcs/export-data', ['as' => 'npcs.export-data', 'uses' => 'NpcsController@export']);
-    Route::post('/admin/npcs/import-data', ['as' => 'npcs.import-data', 'uses' => 'NpcsController@import']);
-
-    Route::redirect('/admin/npcs/index', '/admin')->name('npcs.index');
-    Route::get('/admin/npcs/create', ['as' => 'npcs.create', 'uses' => 'NpcsController@create']);
-    Route::get('/admin/npcs/edit/{npc}', ['as' => 'npcs.edit', 'uses' => 'NpcsController@edit']);
-    Route::get('/admin/npcs/{npc}', ['as' => 'npcs.show', 'uses' => 'NpcsController@show']);
-    Route::post('/admin/npc/store', ['as' => 'npc.store', 'uses' => 'NpcsController@store']);
 
     Route::get('/admin/quests/export-quests', ['as' => 'quests.export', 'uses' => 'QuestsController@exportQuests']);
     Route::get('/admin/quests/import-quests', ['as' => 'quests.import', 'uses' => 'QuestsController@importQuests']);

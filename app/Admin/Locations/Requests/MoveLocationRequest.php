@@ -8,6 +8,8 @@ class MoveLocationRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -16,6 +18,8 @@ class MoveLocationRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -27,6 +31,8 @@ class MoveLocationRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
+     *
+     * @return array<string,string>
      */
     public function messages(): array
     {

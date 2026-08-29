@@ -1,36 +1,46 @@
-import React, { ReactNode } from 'react';
-import { createRoot } from 'react-dom/client';
-
-import LocationsStandaloneApp from './components/locations-standalone-app';
-import LocationsAppProps from './types/locations-app-props';
-
-import AdminAppConfigurationError from '../shared/components/admin-app-configuration-error';
-import { readPositiveDatasetInteger } from '../shared/utils/read-positive-dataset-integer';
-
 import { ApiHandlerProvider } from 'api-handler/components/api-handler-provider';
+import { EventSystemProvider } from 'event-system/components/event-system-provider';
+import React, { ReactNode, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ServiceContainer } from 'service-container-provider/service-container';
 
-const LocationsAdminApp = ({
-  mount_element: mountElement,
-}: LocationsAppProps): ReactNode => {
-  const gameMapId = readPositiveDatasetInteger(mountElement, 'gameMapId');
+import { LocationScreens } from './screen-manager/location-screen-constants';
+import {
+  LocationScreenHost,
+  LocationScreenProvider,
+  useLocationScreenNavigation,
+} from './screen-manager/location-screen-kit';
 
-  const renderContent = (): ReactNode => {
-    if (gameMapId === null) {
-      return (
-        <AdminAppConfigurationError message="A valid Game Map is required to manage Locations." />
-      );
-    }
+import BaseSidePeek from '../../game/components/side-peeks/base/base-side-peek';
 
-    return <LocationsStandaloneApp game_map_id={gameMapId} />;
-  };
+const LocationListInitializer = (): null => {
+  const navigation = useLocationScreenNavigation();
+  const navigationRef = useRef(navigation);
+  navigationRef.current = navigation;
 
-  return <ApiHandlerProvider>{renderContent()}</ApiHandlerProvider>;
+  useEffect(() => {
+    navigationRef.current.resetTo(LocationScreens.LIST, {});
+  }, []);
+
+  return null;
 };
+
+const LocationsAdminApp = (): ReactNode => (
+  <ServiceContainer>
+    <EventSystemProvider>
+      <ApiHandlerProvider>
+        <LocationScreenProvider>
+          <LocationListInitializer />
+          <LocationScreenHost />
+        </LocationScreenProvider>
+        <BaseSidePeek />
+      </ApiHandlerProvider>
+    </EventSystemProvider>
+  </ServiceContainer>
+);
 
 const locationsElement = document.getElementById('locations-admin-app');
 
 if (locationsElement) {
-  createRoot(locationsElement).render(
-    <LocationsAdminApp mount_element={locationsElement} />
-  );
+  createRoot(locationsElement).render(<LocationsAdminApp />);
 }

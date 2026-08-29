@@ -86,7 +86,7 @@
         </a>
         <hr />
         <h6 class="uppercase">Locations</h6>
-        <a href="{{ route('locations.create') }}">
+        <a href="{{ route('admin.locations.index') }}">
             <span class="fas fa-plus"></span>
             Create New Location
         </a>
@@ -98,7 +98,7 @@
         </a>
         <hr />
         <h6 class="uppercase">NPC's</h6>
-        <a href="{{ route('npcs.create') }}">
+        <a href="{{ route('admin.npcs.index') }}">
             <span class="fas fa-plus"></span>
             Create New NPC
         </a>
@@ -128,15 +128,15 @@
         </a>
         <hr />
         <h6 class="uppercase">Items</h6>
-        <a href="{{ route('items.create') }}">
+        <a href="{{ route('admin.items.index') }}">
             <span class="fas fa-plus"></span>
             Create New Item
         </a>
-        <a href="{{ route('items.export') }}">
+        <a href="{{ route('admin.items.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{ route('items.import') }}">
+        <a href="{{ route('admin.items.index') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>

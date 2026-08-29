@@ -1,3 +1,5 @@
+import { GameMapEventType } from '../enums/game-map-event-type';
+
 export default interface GameMapFormStateDefinition {
   name: string;
   description: string;
@@ -12,5 +14,5 @@ export default interface GameMapFormStateDefinition {
   character_attack_reduction: string;
   required_location_id: number | null;
   can_traverse: boolean;
-  only_during_event_type: number | null;
+  only_during_event_type: GameMapEventType | null;
 }

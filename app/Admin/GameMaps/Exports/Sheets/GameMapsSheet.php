@@ -12,6 +12,8 @@ class GameMapsSheet implements FromView, ShouldAutoSize, WithTitle
 {
     /**
      * Build the export view with deterministically ordered Game Maps.
+     *
+     * @return View Game Maps export sheet view.
      */
     public function view(): View
     {
@@ -26,6 +28,8 @@ class GameMapsSheet implements FromView, ShouldAutoSize, WithTitle
 
     /**
      * Return the Game Maps workbook sheet title.
+     *
+     * @return string The workbook sheet title.
      */
     public function title(): string
     {

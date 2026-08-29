@@ -85,6 +85,25 @@ export default class ApiHandler implements AxiosDefinition {
   }
 
   /**
+   * Delete data on the server.
+   *
+   * @param url
+   * @param config
+   */
+  async delete<T, C>(
+    url: string,
+    config: AxiosRequestConfig & { params?: C } = {}
+  ): Promise<T> {
+    this.setCsrfToken(config);
+    const modifiedUrl = this.addApiPrefix(url);
+    const response: AxiosResponse<T> = await axios.delete<T>(
+      modifiedUrl,
+      config
+    );
+    return response.data;
+  }
+
+  /**
    * Add `/api` prefix to the URL if it's not already there.
    *
    * @param url

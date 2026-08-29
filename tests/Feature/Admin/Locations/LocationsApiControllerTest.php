@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin\Locations;
 use App\Flare\Models\Location;
 use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Values\Coordinates;
+use App\Game\Maps\Values\LocationPin;
 use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery\MockInterface;
@@ -57,8 +58,8 @@ class LocationsApiControllerTest extends TestCase
         $this->assertSame(['id' => $gameMap->id, 'name' => 'Surface'], $data['game_map']);
         $this->assertSame(['x' => [0, 250, 500], 'y' => [0, 250, 500]], $data['coordinates']);
         $this->assertSame([
-            ['value' => 'christmas-tree-x-pin', 'label' => 'Christmas Tree'],
-            ['value' => 'snowman-x-pin', 'label' => 'Snowman'],
+            LocationPin::CHRISTMAS_TREE->value,
+            LocationPin::SNOWMAN->value,
         ], $data['special_pins']);
     }
 
@@ -91,9 +92,8 @@ class LocationsApiControllerTest extends TestCase
         $response = $this->actingAs($admin)->call('GET', '/api/admin/game-maps/'.$gameMap->id.'/locations/options');
         $data = json_decode($response->getContent(), true);
 
-        $this->assertCount(count(LocationType::cases()), $data['location_types']);
-        $this->assertContains(
-            ['value' => LocationType::GOLD_MINES->value, 'label' => 'Gold Mines'],
+        $this->assertSame(
+            array_map(fn (LocationType $locationType): int => $locationType->value, LocationType::cases()),
             $data['location_types']
         );
     }
@@ -310,6 +310,40 @@ class LocationsApiControllerTest extends TestCase
         );
 
         $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_store_rejects_invalid_location_pin(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap();
+        $this->mock(CoordinatesQuery::class, function (MockInterface $mock) {
+            $mock->shouldReceive('get')->andReturn(new Coordinates([0, 250, 500], [0, 250, 500]));
+        });
+
+        $response = $this->actingAs($admin)->call(
+            'POST',
+            '/api/admin/game-maps/'.$gameMap->id.'/locations',
+            [
+                'name' => 'Old Church',
+                'description' => 'A crumbling church.',
+                'quest_reward_item_id' => null,
+                'required_quest_item_id' => null,
+                'is_port' => false,
+                'can_players_enter' => true,
+                'can_auto_battle' => true,
+                'x' => 250,
+                'y' => 250,
+                'type' => null,
+                'pin_css_class' => 'invalid-pin',
+                'hours_to_drop' => null,
+                'minutes_between_delve_fights' => null,
+            ],
+            [], [], ['HTTP_ACCEPT' => 'application/json'],
+        );
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertArrayHasKey('pin_css_class', $data['errors']);
     }
 
     public function test_store_rejects_x_outside_the_coordinate_grid(): void

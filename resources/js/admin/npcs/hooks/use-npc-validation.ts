@@ -14,14 +14,11 @@ export const useNpcValidation = (
     const stepErrors: NpcFormErrors = {};
 
     if (state.real_name.trim() === '') {
-      stepErrors.real_name = 'Enter an Npc name.';
+      stepErrors.real_name = 'Enter an NPC name.';
     }
 
-    if (
-      state.type === null ||
-      !formOptions?.npc_types.some((option) => option.value === state.type)
-    ) {
-      stepErrors.type = 'Select a valid Npc type.';
+    if (state.type === null || !formOptions?.npc_types.includes(state.type)) {
+      stepErrors.type = 'Select a valid NPC type.';
     }
 
     return stepErrors;

@@ -23,8 +23,6 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
     }
 
     protected function tearDown(): void
@@ -55,8 +53,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
             $m->shouldNotReceive('stopAssistingNpc');
             $m->shouldNotReceive('removePledge');
         });
-        $this->instance(FactionLoyaltyService::class, $mock);
-        $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
+        $this->service = new FactionLoyaltyPledgeCleanupService($mock);
 
         $this->service->unpledgeIfOnFaction($character, null);
 
@@ -79,8 +76,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
             $m->shouldNotReceive('stopAssistingNpc');
             $m->shouldNotReceive('removePledge');
         });
-        $this->instance(FactionLoyaltyService::class, $mock);
-        $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
+        $this->service = new FactionLoyaltyPledgeCleanupService($mock);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
 
@@ -120,8 +116,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
                 return [];
             });
         });
-        $this->instance(FactionLoyaltyService::class, $mock);
-        $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
+        $this->service = new FactionLoyaltyPledgeCleanupService($mock);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
 
@@ -175,8 +170,7 @@ class FactionLoyaltyPledgeCleanupServiceTest extends TestCase
                 return [];
             });
         });
-        $this->instance(FactionLoyaltyService::class, $mock);
-        $this->service = app()->make(FactionLoyaltyPledgeCleanupService::class);
+        $this->service = new FactionLoyaltyPledgeCleanupService($mock);
 
         $this->service->unpledgeIfOnFaction($character, $faction);
 

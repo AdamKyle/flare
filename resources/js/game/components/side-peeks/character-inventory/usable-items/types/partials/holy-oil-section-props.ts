@@ -1,6 +1,6 @@
-import BaseUsableItemDefinition from '../../../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
+import UsableItemFactualDefinition from '../../../../../../reusable-components/usable-item/types/usable-item-factual-definition';
 
 export default interface HolyOilSectionProps {
-  item: BaseUsableItemDefinition;
+  item: UsableItemFactualDefinition;
   showTitleSeparator?: boolean;
 }

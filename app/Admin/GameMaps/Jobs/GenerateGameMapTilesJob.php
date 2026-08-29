@@ -23,6 +23,10 @@ class GenerateGameMapTilesJob implements ShouldQueue
 
     /**
      * Generate the initial tile set for the persisted Game Map.
+     *
+     * @param  GameMapService  $gameMapService  Canonical Game Map application service.
+     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile generation service.
+     * @return void Persists the generated tile set on the Game Map.
      */
     public function handle(
         GameMapService $gameMapService,

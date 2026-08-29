@@ -10,6 +10,8 @@ class StoreNpcRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     *
+     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -18,6 +20,8 @@ class StoreNpcRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -31,16 +35,18 @@ class StoreNpcRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
+     *
+     * @return array<string,string>
      */
     public function messages(): array
     {
         return [
-            'real_name.required' => 'Enter an Npc name.',
-            'real_name.max' => 'The Npc name may not be longer than 255 characters.',
-            'type.required' => 'Select an Npc type.',
-            'type.integer' => 'The selected Npc type is invalid.',
-            'x_position.required' => 'Select an X coordinate for this Npc.',
-            'y_position.required' => 'Select a Y coordinate for this Npc.',
+            'real_name.required' => 'Enter an NPC name.',
+            'real_name.max' => 'The NPC name may not be longer than 255 characters.',
+            'type.required' => 'Select an NPC type.',
+            'type.integer' => 'The selected NPC type is invalid.',
+            'x_position.required' => 'Select an X coordinate for this NPC.',
+            'y_position.required' => 'Select a Y coordinate for this NPC.',
         ];
     }
 }

@@ -6,18 +6,18 @@ use App\Admin\Import\Affixes\AffixesImport;
 use App\Admin\Import\Classes\ClassImport;
 use App\Admin\Import\ClassSpecials\ClassSpecialsImport;
 use App\Admin\Import\GuideQuests\GuideQuests;
-use App\Admin\Import\Items\ItemsImport;
 use App\Admin\Import\ItemSkills\ItemSkillsImport;
 use App\Admin\Import\Kingdoms\KingdomsImport;
-use App\Admin\Import\Locations\LocationsImport;
 use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
 use App\Admin\Import\Monsters\MonstersImport;
-use App\Admin\Import\Npcs\NpcsImport;
 use App\Admin\Import\PassiveSkills\PassiveSkillsImport;
 use App\Admin\Import\Quests\QuestsImport;
 use App\Admin\Import\Races\RacesImport;
 use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Import\Skills\SkillsImport;
+use App\Admin\Items\Imports\ItemsImport;
+use App\Admin\Locations\Imports\LocationsImport;
+use App\Admin\Npcs\Imports\NpcsImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExcelMapper

@@ -54,9 +54,12 @@ const ModifiersSection = ({ item, showSeparator }: ModifiersSectionProps) => {
     >
       {renderModifierRow(
         'Fight Timeout Modifier',
-        item.fight_time_out_mod_bonus
+        item.fight_time_out_mod_bonus ?? 0
       )}
-      {renderModifierRow('Move Timeout Modifier', item.move_time_out_mod_bonus)}
+      {renderModifierRow(
+        'Move Timeout Modifier',
+        item.move_time_out_mod_bonus ?? 0
+      )}
     </Section>
   );
 };

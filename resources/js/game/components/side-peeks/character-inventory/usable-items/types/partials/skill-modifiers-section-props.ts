@@ -1,7 +1,7 @@
-import BaseUsableItemDefinition from '../../../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
+import UsableItemFactualDefinition from '../../../../../../reusable-components/usable-item/types/usable-item-factual-definition';
 
 export default interface SkillModifiersSectionProps {
-  item: BaseUsableItemDefinition;
+  item: UsableItemFactualDefinition;
   showSeparator: boolean;
   showTitleSeparator?: boolean;
 }

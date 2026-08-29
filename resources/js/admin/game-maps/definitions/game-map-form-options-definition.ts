@@ -1,7 +1,4 @@
-export interface GameMapEventTypeOptionDefinition {
-  value: number;
-  label: string;
-}
+import { GameMapEventType } from '../enums/game-map-event-type';
 
 export interface GameMapLocationOptionDefinition {
   id: number;
@@ -9,6 +6,6 @@ export interface GameMapLocationOptionDefinition {
 }
 
 export default interface GameMapFormOptionsDefinition {
-  event_types: GameMapEventTypeOptionDefinition[];
+  event_types: GameMapEventType[];
   locations: GameMapLocationOptionDefinition[];
 }
