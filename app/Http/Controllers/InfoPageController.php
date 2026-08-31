@@ -269,18 +269,27 @@ class InfoPageController extends Controller
         ]);
     }
 
-    public function viewQuest(Quest $quest)
+    /**
+     * Show the public, read-only Quest detail page for the given Quest.
+     *
+     * @param  Quest  $quest  Quest to view.
+     * @return View Quest detail view.
+     */
+    public function viewQuest(Quest $quest): View
     {
-        $skill = null;
-
-        if ($quest->unlocks_skill) {
-            $skill = GameSkill::where('type', $quest->unlocks_skill_type)->where('is_locked', true)->first();
-        }
-
         return view('information.quests.quest', [
             'quest' => $quest,
-            'lockedSkill' => $skill,
         ]);
+    }
+
+    /**
+     * Show the public, read-only factual Quest tree page.
+     *
+     * @return View Quest tree view.
+     */
+    public function viewQuestTree(): View
+    {
+        return view('information.quests.quests');
     }
 
     public function viewPassiveSkill(PassiveSkill $passiveSkill)

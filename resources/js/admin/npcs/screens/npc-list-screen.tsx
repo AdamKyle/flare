@@ -1,18 +1,16 @@
 import React, { ReactNode, useState } from 'react';
 
+import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import NpcListDefinition from '../api/definitions/npc-list-definition';
 import { useNpcs } from '../api/hooks/use-npcs';
 import { NPC_LIST_COLUMNS } from '../definitions/npc-list-columns';
 import { NpcImportCopy } from '../enums/npc-import-copy';
 import { NpcScreens } from '../screen-manager/npc-screen-constants';
 import { useNpcScreenNavigation } from '../screen-manager/npc-screen-kit';
-
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
-
-import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';

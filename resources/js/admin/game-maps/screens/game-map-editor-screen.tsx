@@ -1,7 +1,15 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useCallback, useState } from 'react';
 
-import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
+import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
+import { useCloseSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
+import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminBackButton from '../../shared/components/admin-back-button';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import GameMapKingdomMarkerDefinition from '../api/definitions/game-map-kingdom-marker-definition';
+import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
 import { useGameMapEditor } from '../api/hooks/use-game-map-editor';
 import GameMapEditorCanvas from '../components/game-map-editor-canvas';
 import GameMapEditorLegend from '../components/game-map-editor-legend';
@@ -9,20 +17,11 @@ import GameMapEditorToolbar from '../components/game-map-editor-toolbar';
 import { GameMapMoveStateDefinition } from '../events/definitions/game-map-move-event-map';
 import { useOwnGameMapMove } from '../events/hooks/use-own-game-map-move';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
-import AdminBackButton from '../../shared/components/admin-back-button';
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import CoordinateDefinition from '../types/coordinate-definition';
 import GameMapEditorScreenProps from '../types/game-map-editor-screen-props';
 import SelectedCoordinateDefinition from '../types/selected-coordinate-definition';
 import { resolveMovingRecordTypeLabel } from '../utils/resolve-moving-record-type-label';
 
-import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
-import { useCloseSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
-import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
-
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -298,42 +297,50 @@ const GameMapEditorScreen = ({
       width={AdminPageWidth.Workspace}
       header_actions={<AdminBackButton on_click={handleBack} />}
     >
-      <div className="mb-4">
-        <GameMapEditorLegend />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="mb-4 flex-none">
+          <GameMapEditorLegend />
+        </div>
+
+        <p className="sr-only" role="status" aria-live="polite">
+          {announcement}
+        </p>
+
+        <div className="flex-none">{renderMovingBanner()}</div>
+
+        {move.move_error && (
+          <div className="flex-none">
+            <ApiErrorAlert
+              apiError={move.move_error.message}
+              closable
+              on_close={move.clear_move_error}
+            />
+          </div>
+        )}
+
+        <div className="flex-none">
+          <GameMapEditorToolbar
+            selected_label={selectedLabel}
+            on_reset_view={handleResetView}
+          />
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-hidden">
+          <GameMapEditorCanvas
+            editor={editor}
+            selected_coordinate={selectedCoordinate}
+            on_select_coordinate={handleSelectCoordinate}
+            moving_record={move.moving_record}
+            on_move_target_selected={handleMoveTargetSelected}
+            on_cancel_active_mode={handleCancelActiveMode}
+            reset_token={resetToken}
+            focus_token={focusToken}
+            on_location_selected={openLocationSidePeek}
+            on_npc_selected={openNpcSidePeek}
+            on_kingdom_selected={openKingdomSidePeek}
+          />
+        </div>
       </div>
-
-      <p className="sr-only" role="status" aria-live="polite">
-        {announcement}
-      </p>
-
-      {renderMovingBanner()}
-
-      {move.move_error && (
-        <ApiErrorAlert
-          apiError={move.move_error.message}
-          closable
-          on_close={move.clear_move_error}
-        />
-      )}
-
-      <GameMapEditorToolbar
-        selected_label={selectedLabel}
-        on_reset_view={handleResetView}
-      />
-
-      <GameMapEditorCanvas
-        editor={editor}
-        selected_coordinate={selectedCoordinate}
-        on_select_coordinate={handleSelectCoordinate}
-        moving_record={move.moving_record}
-        on_move_target_selected={handleMoveTargetSelected}
-        on_cancel_active_mode={handleCancelActiveMode}
-        reset_token={resetToken}
-        focus_token={focusToken}
-        on_location_selected={openLocationSidePeek}
-        on_npc_selected={openNpcSidePeek}
-        on_kingdom_selected={openKingdomSidePeek}
-      />
     </AdminPage>
   );
 };

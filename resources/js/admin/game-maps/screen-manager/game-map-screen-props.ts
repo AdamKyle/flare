@@ -1,6 +1,6 @@
 import { GameMapScreens } from './game-map-screen-constants';
-import { GameMapFormScreenProps } from '../types/game-map-form-screen-props';
 import GameMapEditorScreenProps from '../types/game-map-editor-screen-props';
+import { GameMapFormScreenProps } from '../types/game-map-form-screen-props';
 
 export type GameMapListScreenProps = Record<string, never>;
 

@@ -422,13 +422,20 @@ test('quest show page renders without an unlocked skill', function () {
 
 test('quest show page renders with its unlocked skill', function () {
     $npc = $this->createNpc();
-    $lockedSkill = $this->createGameSkill(['type' => 1, 'is_locked' => true]);
+    $this->createGameSkill(['type' => 1, 'is_locked' => true]);
     $quest = $this->createQuest(['npc_id' => $npc->id, 'unlocks_skill' => true, 'unlocks_skill_type' => 1]);
 
     $response = $this->get(route('info.page.quest', $quest));
 
     $response->assertOk();
-    $response->assertViewHas('lockedSkill', fn ($skill) => $skill->id === $lockedSkill->id);
+});
+
+test('quest tree page renders', function () {
+    $this->createQuest(['name' => 'Tree Page Quest']);
+
+    $response = $this->get(route('info.page.quest.tree'));
+
+    $response->assertOk();
 });
 
 test('passive skill show page renders', function () {

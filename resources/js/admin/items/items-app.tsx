@@ -10,7 +10,6 @@ import {
   ItemScreenProvider,
   useItemScreenNavigation,
 } from './screen-manager/item-screen-kit';
-
 import BaseSidePeek from '../../game/components/side-peeks/base/base-side-peek';
 
 const ItemListInitializer = (): null => {

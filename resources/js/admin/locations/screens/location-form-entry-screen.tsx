@@ -1,15 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 
 import LocationFormScreen from './location-form-screen';
-import { LocationScreens } from '../screen-manager/location-screen-constants';
-import { useLocationScreenNavigation } from '../screen-manager/location-screen-kit';
-import { LocationFormScreenEntryProps } from '../screen-manager/location-screen-props';
-
 import { useGameMaps } from '../../game-maps/api/hooks/use-game-maps';
-
 import AdminBackButton from '../../shared/components/admin-back-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
+import { useLocationScreenNavigation } from '../screen-manager/location-screen-kit';
+import { LocationFormScreenEntryProps } from '../screen-manager/location-screen-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';

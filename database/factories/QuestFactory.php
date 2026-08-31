@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Game\Skills\Values\SkillTypeValue;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -24,7 +25,7 @@ class QuestFactory extends Factory
     {
         return [
             'name' => 'Test',
-            'npc_id' => null,
+            'npc_id' => Npc::factory()->create()->id,
             'item_id' => null,
             'gold_dust_cost' => 100,
             'shard_cost' => 100,

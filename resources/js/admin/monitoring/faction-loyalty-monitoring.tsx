@@ -4,8 +4,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ServiceContainer } from 'service-container-provider/service-container';
 
-import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 import FactionLoyaltyDashboard from './faction-loyalty-monitoring/components/faction-loyalty-dashboard';
+import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 
 const el = document.getElementById('faction-loyalty-monitoring');
 

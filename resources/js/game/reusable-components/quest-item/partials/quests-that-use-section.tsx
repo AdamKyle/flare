@@ -10,6 +10,7 @@ import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 const QuestsThatUseSection = ({
   item,
   showSeparator,
+  navigation,
 }: QuestsThatUseSectionProps) => {
   const single = item.required_quest != null;
   const list = item.required_quests || [];
@@ -27,21 +28,18 @@ const QuestsThatUseSection = ({
         This quest item is used in the following quests as a required item.
       </Alert>
     );
-  } else if (
-    item.required_quest &&
-    item.required_quest.npc &&
-    item.required_quest.map
-  ) {
+  } else if (item.required_quest && item.required_quest.npc) {
     lead = (
       <Alert variant={AlertVariant.INFO}>
-        The NPC {item.required_quest.npc} lives on this map:{' '}
-        {item.required_quest.map}.
+        The NPC {item.required_quest.npc.name} lives on this map:{' '}
+        {item.required_quest.npc.game_map.name}.
       </Alert>
     );
-  } else if (list.length === 1 && list[0].npc && list[0].map) {
+  } else if (list.length === 1 && list[0].npc) {
     lead = (
       <Alert variant={AlertVariant.INFO}>
-        The NPC {list[0].npc} lives on this map: {list[0].map}.
+        The NPC {list[0].npc.name} lives on this map:{' '}
+        {list[0].npc.game_map.name}.
       </Alert>
     );
   }
@@ -55,9 +53,10 @@ const QuestsThatUseSection = ({
       {item.required_quest ? (
         <QuestRows
           heading="Used In Quest"
-          name={item.required_quest.name}
-          npc={item.required_quest.npc}
-          map={item.required_quest.map}
+          quest={item.required_quest}
+          on_open_quest={navigation.on_open_quest}
+          on_open_npc={navigation.on_open_npc}
+          on_open_map={navigation.on_open_map}
         />
       ) : null}
 
@@ -66,9 +65,10 @@ const QuestsThatUseSection = ({
             <QuestRows
               key={`required-quest-${requiredQuest.id}`}
               heading="Used In Quest"
-              name={requiredQuest.name}
-              npc={requiredQuest.npc}
-              map={requiredQuest.map}
+              quest={requiredQuest}
+              on_open_quest={navigation.on_open_quest}
+              on_open_npc={navigation.on_open_npc}
+              on_open_map={navigation.on_open_map}
             />
           ))
         : null}

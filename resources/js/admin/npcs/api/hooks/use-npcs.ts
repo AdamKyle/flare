@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { useState } from 'react';
 
 import UseNpcsDefinition from './definitions/use-npcs-definition';
 import NpcListDefinition from '../definitions/npc-list-definition';

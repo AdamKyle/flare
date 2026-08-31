@@ -1,9 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import ItemFormSidePeekProps from './types/item-form-side-peek-props';
-import ItemFormContent from '../forms/item-form-content';
-
 import { useCloseSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
+import ItemFormContent from '../forms/item-form-content';
 
 const ItemFormSidePeek = ({
   item_id: itemId,

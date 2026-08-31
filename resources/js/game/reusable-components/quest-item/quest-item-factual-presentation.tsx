@@ -17,6 +17,7 @@ import Separator from 'ui/separator/separator';
 const QuestItemFactualPresentation = ({
   item,
   title_class_name: titleClassName,
+  navigation,
 }: QuestItemFactualPresentationProps): ReactNode => {
   return (
     <div className="flex flex-col gap-2 px-4">
@@ -28,7 +29,7 @@ const QuestItemFactualPresentation = ({
         titleClassName={titleClassName}
       />
       <Separator />
-      <QuestItemDetails item={item} />
+      <QuestItemDetails item={item} navigation={navigation} />
     </div>
   );
 };

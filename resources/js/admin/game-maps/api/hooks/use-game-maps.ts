@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { useState } from 'react';
 
 import UseGameMapsDefinition from './definitions/use-game-maps-definition';
 import GameMapDefinition from '../definitions/game-map-definition';

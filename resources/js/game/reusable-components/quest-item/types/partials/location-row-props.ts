@@ -1,5 +1,8 @@
+import { LocationIdentityDefinition } from '../quest-item-factual-definition';
+
 export default interface LocationRowProps {
   heading: string;
-  name: string;
-  map?: string | null;
+  location: LocationIdentityDefinition;
+  on_open_location?: (id: number) => void;
+  on_open_map?: (id: number) => void;
 }

@@ -1,8 +1,8 @@
-import { GameMapMarkerVariant } from '../enums/game-map-marker-variant';
-import GameMapEditorDefinition from '../api/definitions/game-map-editor-definition';
-import GameMapKingdomMarkerDefinition from '../api/definitions/game-map-kingdom-marker-definition';
 import CoordinateDefinition from './coordinate-definition';
 import SelectedCoordinateDefinition from './selected-coordinate-definition';
+import GameMapEditorDefinition from '../api/definitions/game-map-editor-definition';
+import GameMapKingdomMarkerDefinition from '../api/definitions/game-map-kingdom-marker-definition';
+import { GameMapMarkerVariant } from '../enums/game-map-marker-variant';
 
 export interface MovingRecordDefinition {
   kind: GameMapMarkerVariant.Location | GameMapMarkerVariant.Npc;

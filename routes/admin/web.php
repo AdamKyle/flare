@@ -53,16 +53,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/location-gems/export', ['as' => 'admin.location-gems.export', 'uses' => 'LocationGemsController@export']);
     Route::post('/admin/location-gems/import', ['as' => 'admin.location-gems.import', 'uses' => 'LocationGemsController@importData']);
 
-    Route::get('/admin/monsters/export-monsters', ['as' => 'monsters.export', 'uses' => 'MonstersController@exportItems']);
-    Route::get('/admin/monsters/import-monsters', ['as' => 'monsters.import', 'uses' => 'MonstersController@importItems']);
-    Route::post('/admin/monsters/export-data', ['as' => 'monsters.export-data', 'uses' => 'MonstersController@export']);
-    Route::post('/admin/monsters/import-data', ['as' => 'monsters.import-data', 'uses' => 'MonstersController@importData']);
-
-    Route::redirect('/admin/monsters', '/admin')->name('monsters.list');
-    Route::get('/admin/monsters/create', ['as' => 'monsters.create', 'uses' => 'MonstersController@create']);
-    Route::get('/admin/monsters/{monster}/edit', ['as' => 'monster.edit', 'uses' => 'MonstersController@edit']);
-    Route::post('/admin/monsters/store', ['as' => 'monster.store', 'uses' => 'MonstersController@store']);
-
     Route::get('/admin/affixes/export-affixes', ['as' => 'affixes.export', 'uses' => 'AffixesController@exportItems']);
     Route::get('/admin/affixes/import-affixes', ['as' => 'affixes.import', 'uses' => 'AffixesController@importItems']);
     Route::post('/admin/affixes/export-data', ['as' => 'affixes.export-data', 'uses' => 'AffixesController@export']);
@@ -160,18 +150,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/kingdoms/import', ['as' => 'kingdoms.import', 'uses' => 'KingdomsController@import']);
     Route::post('/admin/kingdoms/export-data', ['as' => 'kingdoms.export-data', 'uses' => 'KingdomsController@export']);
     Route::post('/admin/kingdoms/import-data', ['as' => 'kingdoms.import-data', 'uses' => 'KingdomsController@importData']);
-
-    Route::get('/admin/quests/export-quests', ['as' => 'quests.export', 'uses' => 'QuestsController@exportQuests']);
-    Route::get('/admin/quests/import-quests', ['as' => 'quests.import', 'uses' => 'QuestsController@importQuests']);
-    Route::post('/admin/quests/export-data', ['as' => 'quests.export-data', 'uses' => 'QuestsController@export']);
-    Route::post('/admin/quests/import-data', ['as' => 'quests.import-data', 'uses' => 'QuestsController@import']);
-
-    Route::post('/admin/quests/store', ['as' => 'quest.store', 'uses' => 'QuestsController@store']);
-
-    Route::redirect('/admin/quests/index', '/admin')->name('quests.index');
-    Route::get('/admin/quests/create', ['as' => 'quests.create', 'uses' => 'QuestsController@create']);
-    Route::get('/admin/quests/edit/{quest}', ['as' => 'quests.edit', 'uses' => 'QuestsController@edit']);
-    Route::get('/admin/quests/{quest}', ['as' => 'quests.show', 'uses' => 'QuestsController@show']);
 
     Route::post('/admin/guide-quests/store', ['as' => 'admin.guide-quests.store', 'uses' => 'GuideQuestsController@store']);
     Route::post('/admin/guide-quests/{guideQuest}/delete', ['as' => 'admin.guide-quests.delete', 'uses' => 'GuideQuestsController@delete']);

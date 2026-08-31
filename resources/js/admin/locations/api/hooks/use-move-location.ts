@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
+import axios from 'axios';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import UseMoveLocationDefinition from './definitions/use-move-location-definition';
 import { parseValidationErrors } from '../../../../utils/parse-validation-errors';

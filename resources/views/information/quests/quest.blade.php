@@ -9,13 +9,10 @@
             color="primary"
         ></x-core.page.title>
 
-        <div class="m-auto">
-            <x-core.cards.card>
-                @include('admin.quests.partials.show', ['quest' => $quest, 'lockedSkill' => $lockedSkill])
-            </x-core.cards.card>
-            <x-core.cards.card-with-title title="Before Completion Text">
-                <p>{!! nl2br($quest->before_completion_description) !!}</p>
-            </x-core.cards.card-with-title>
-        </div>
+        <div class="m-auto" id="quest-info-app" data-quest-id="{{ $quest->id }}"></div>
     </x-core.layout.info-container>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/information/quests/quests-info-app.tsx')
+@endpush

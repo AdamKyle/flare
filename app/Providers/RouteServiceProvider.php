@@ -81,6 +81,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminLocationsWebRoutes();
         $this->mapAdminNpcsWebRoutes();
         $this->mapAdminItemsWebRoutes();
+        $this->mapAdminQuestsWebRoutes();
         $this->mapQuestRoutes();
         $this->mapGuideQuestsRoutes();
         $this->mapGameMarketRoutes();
@@ -96,6 +97,10 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminLocationsApiRoutes();
         $this->mapAdminNpcsApiRoutes();
         $this->mapAdminItemsApiRoutes();
+        $this->mapAdminQuestsApiRoutes();
+        $this->mapAdminMonstersWebRoutes();
+        $this->mapAdminMonstersApiRoutes();
+        $this->mapInformationApiRoutes();
 
         // Game Core Api Routes:
         $this->mapGemRoutes();
@@ -453,6 +458,69 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Admin\Items\Controllers')
             ->group(base_path('routes/admin/items/api.php'));
+    }
+
+    /**
+     * Define the Admin Quests web routes.
+     *
+     * @return void Registers the Admin Quests web routes.
+     */
+    protected function mapAdminQuestsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Quests\Controllers')
+            ->group(base_path('routes/admin/quests/web.php'));
+    }
+
+    /**
+     * Define the Admin Quests api routes.
+     *
+     * @return void Registers the Admin Quests api routes.
+     */
+    protected function mapAdminQuestsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Quests\Controllers')
+            ->group(base_path('routes/admin/quests/api.php'));
+    }
+
+    /**
+     * Define the Admin Monsters web routes.
+     *
+     * @return void Registers the Admin Monsters web routes.
+     */
+    protected function mapAdminMonstersWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Monsters\Controllers')
+            ->group(base_path('routes/admin/monsters/web.php'));
+    }
+
+    /**
+     * Define the Admin Monsters api routes.
+     *
+     * @return void Registers the Admin Monsters api routes.
+     */
+    protected function mapAdminMonstersApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Monsters\Controllers')
+            ->group(base_path('routes/admin/monsters/api.php'));
+    }
+
+    /**
+     * Define the public Information api routes.
+     *
+     * @return void Registers the public, read-only Information api routes.
+     */
+    protected function mapInformationApiRoutes(): void
+    {
+        Route::prefix('api/information')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Info\Controllers\Api')
+            ->group(base_path('routes/information/api.php'));
     }
 
     /**

@@ -27,22 +27,28 @@ const AdminPage = ({
     <div
       className={clsx(
         'flex w-full min-w-0 flex-1 flex-col py-6 sm:px-4',
-        !isWorkspace && 'md:justify-center'
+        !isWorkspace && 'md:justify-center',
+        isWorkspace && 'min-h-0'
       )}
     >
       <div
         className={clsx(
           'mx-auto w-full min-w-0',
-          ADMIN_PAGE_WIDTH_STYLES[width]
+          ADMIN_PAGE_WIDTH_STYLES[width],
+          isWorkspace && 'flex min-h-0 flex-1 flex-col'
         )}
       >
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 px-2 sm:px-0">
+        <div className="mb-6 flex flex-none flex-wrap items-center justify-between gap-3 px-2 sm:px-0">
           <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
             {title}
           </h1>
           {renderHeaderActions()}
         </div>
-        {children}
+        {isWorkspace ? (
+          <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+        ) : (
+          children
+        )}
       </div>
     </div>
   );

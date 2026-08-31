@@ -4,10 +4,10 @@ import {
   SetStateAction,
 } from 'react';
 
-import { GameMapEditorValues } from '../enums/game-map-editor-values';
-import GameMapKeyboardNavigationDefinition from '../types/game-map-keyboard-navigation-definition';
-import CoordinateDefinition from '../types/coordinate-definition';
 import { coordinateAtIndex } from './resolve-pointer-coordinate';
+import { GameMapEditorValues } from '../enums/game-map-editor-values';
+import CoordinateDefinition from '../types/coordinate-definition';
+import GameMapKeyboardNavigationDefinition from '../types/game-map-keyboard-navigation-definition';
 
 export const resolveGameMapKeyboardNavigation = (
   xValues: number[],

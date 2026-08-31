@@ -1,18 +1,16 @@
 import React, { ReactNode, useState } from 'react';
 
+import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import LocationListDefinition from '../api/definitions/location-list-definition';
 import { useLocations } from '../api/hooks/use-locations';
 import { LOCATION_LIST_COLUMNS } from '../definitions/location-list-columns';
 import { LocationImportCopy } from '../enums/location-import-copy';
 import { LocationScreens } from '../screen-manager/location-screen-constants';
 import { useLocationScreenNavigation } from '../screen-manager/location-screen-kit';
-
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
-
-import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';

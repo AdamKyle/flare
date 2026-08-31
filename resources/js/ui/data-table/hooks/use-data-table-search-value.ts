@@ -1,8 +1,8 @@
 import UseDataTableSearchValueDefinition from './definitions/use-data-table-search-value-definition';
 import { useDataTableSearchNotification } from './use-data-table-search-notification';
 import { useSynchronizedDataTableSearchInput } from './use-synchronized-data-table-search-input';
-import { DataTableValues } from '../enums/data-table-values';
 import { useDebouncedValue } from '../../../utils/hooks/use-debounced-value';
+import { DataTableValues } from '../enums/data-table-values';
 
 export const useDataTableSearchValue = (
   searchValue: string,

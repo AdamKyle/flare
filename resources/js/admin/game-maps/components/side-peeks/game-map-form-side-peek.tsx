@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 
 import GameMapFormContent from '../forms/game-map-form-content';
 import GameMapFormSidePeekProps from './types/game-map-form-side-peek-props';
-
 import { useCloseSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
 
 const GameMapFormSidePeek = ({

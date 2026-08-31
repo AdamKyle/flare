@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 
 import CharacterQueueTable from './character-queue-table';
 import RequestHistory from './request-history';
@@ -6,159 +6,37 @@ import StaleQueueAlert from './stale-queue-alert';
 import StaleQueueView from './stale-queue-view';
 import StatusVolumeChart from './status-volume-chart';
 import SummaryCards from './summary-cards';
-import {
-  CharacterRow,
-  ChartPoint,
-  ChartsResponse,
-  RequestFiltersType,
-  RewardRequest,
-  Summary,
-} from '../api/definitions/reward-queue-definition';
-import { useRewardQueueApi } from '../api/hooks/use-reward-queue-api';
-import useRewardQueueLiveRefresh from '../hooks/use-reward-queue-live-refresh';
-import useStaleRewardQueues from '../hooks/use-stale-reward-queues';
-import rewardQueuePaginationAdapter from '../utils/reward-queue-pagination-adapter';
-
-const emptySummary: Summary = {
-  queued: 0,
-  pending: 0,
-  processing: 0,
-  resumable: 0,
-  completed: 0,
-  failed: 0,
-};
+import useRewardQueueDashboard from '../hooks/use-reward-queue-dashboard';
 
 export default function RewardQueueDashboard() {
   const {
-    fetchRewardQueueSummary,
-    fetchRewardQueueCharts,
-    fetchRewardQueueCharacters,
-    fetchRewardQueueStatusVolume,
-    fetchCharacterRewardQueue,
-    fetchRewardQueueRequests,
-  } = useRewardQueueApi();
-
-  const [summary, setSummary] = useState(emptySummary);
-  const [charts, setCharts] = useState<ChartsResponse>({
-    last_hour: [],
-    last_7_days: [],
-    previous_7_days: [],
-  });
-  const [characters, setCharacters] = useState(
-    rewardQueuePaginationAdapter<CharacterRow>({
-      data: [],
-      current_page: 1,
-      last_page: 1,
-      total: 0,
-    })
-  );
-  const [requests, setRequests] = useState(
-    rewardQueuePaginationAdapter<RewardRequest>({
-      data: [],
-      current_page: 1,
-      last_page: 1,
-      total: 0,
-    })
-  );
-  const [selectedCharacter, setSelectedCharacter] =
-    useState<CharacterRow | null>(null);
-  const [detailCharts, setDetailCharts] = useState<
-    Record<string, ChartPoint[]>
-  >({});
-  const [globalChart, setGlobalChart] = useState<ChartPoint[]>([]);
-  const [range, setRange] = useState('7');
-  const [characterPage, setCharacterPage] = useState(1);
-  const [requestPage, setRequestPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
-  const [showStaleView, setShowStaleView] = useState(false);
-  const [filters, setFilters] = useState<RequestFiltersType>({
-    status: '',
-    priority: '',
-    source_type: '',
-    date_from: '',
-    date_to: '',
-    character_name: '',
-    failed_reason: '',
-    source_id: '',
-  });
-  const requestHistoryRef = useRef<HTMLDivElement>(null);
-  const { staleQueues, repairing, refreshStaleQueues, repair } =
-    useStaleRewardQueues();
-
-  const refresh = useCallback(async () => {
-    setError('');
-
-    try {
-      const [summaryData, chartsData, charactersData, globalData, requestData] =
-        await Promise.all([
-          fetchRewardQueueSummary(),
-          fetchRewardQueueCharts(),
-          fetchRewardQueueCharacters(characterPage),
-          fetchRewardQueueStatusVolume(range),
-          selectedCharacter
-            ? fetchCharacterRewardQueue(
-                selectedCharacter.character_id,
-                filters,
-                requestPage
-              )
-            : fetchRewardQueueRequests(filters, requestPage),
-          refreshStaleQueues(),
-        ]);
-
-      setSummary(summaryData);
-      setCharts(chartsData);
-      setCharacters(charactersData);
-      setGlobalChart(globalData);
-
-      if ('requests' in requestData) {
-        setRequests(requestData.requests);
-        setDetailCharts(requestData.charts);
-      } else {
-        setRequests(requestData);
-        setDetailCharts({});
-      }
-    } catch {
-      setError('Reward queue data could not be loaded.');
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    characterPage,
-    fetchCharacterRewardQueue,
-    fetchRewardQueueCharacters,
-    fetchRewardQueueCharts,
-    fetchRewardQueueRequests,
-    fetchRewardQueueStatusVolume,
-    fetchRewardQueueSummary,
-    filters,
+    loading,
+    error,
+    message,
+    summary,
+    charts,
+    characters,
+    requests,
+    selected_character: selectedCharacter,
+    select_character: selectCharacter,
+    clear_selected_character: clearSelectedCharacter,
+    detail_charts: detailCharts,
+    global_chart: globalChart,
     range,
-    refreshStaleQueues,
-    requestPage,
-    selectedCharacter,
-  ]);
+    set_range: setRange,
+    set_character_page: setCharacterPage,
+    update_filters: updateFilters,
+    filter_by_status: filterByStatus,
+    filters,
+    set_request_page: setRequestPage,
+    show_stale_view: showStaleView,
+    set_show_stale_view: setShowStaleView,
+    stale_queues: staleQueues,
+    repairing,
+    repair_queues: repairQueues,
+  } = useRewardQueueDashboard();
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
-  useRewardQueueLiveRefresh(refresh);
-
-  const repairQueues = async () => {
-    setError('');
-    setMessage('');
-
-    try {
-      const result = await repair();
-      setMessage(
-        `Recovered ${result.repaired_queue_state_count} queue states. Resumed ${result.resumed_processing_request_count} ledger-backed requests, marked ${result.legacy_failed_processing_request_count} legacy requests failed, and restarted ${result.restarted_processor_count} processors.`
-      );
-      await refresh();
-    } catch {
-      setError('Stale reward queues could not be repaired.');
-    }
-  };
+  const requestHistoryRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="space-y-5 pb-16 text-gray-900 dark:text-gray-100">
@@ -204,10 +82,7 @@ export default function RewardQueueDashboard() {
           )}
           <SummaryCards
             summary={summary}
-            onFilter={(status) => {
-              setFilters((prev) => ({ ...prev, status }));
-              setRequestPage(1);
-            }}
+            onFilter={(status) => filterByStatus(status)}
           />
           <div className="grid gap-4 xl:grid-cols-3">
             <StatusVolumeChart
@@ -228,10 +103,7 @@ export default function RewardQueueDashboard() {
           </div>
           <CharacterQueueTable
             characters={characters}
-            onSelect={(character) => {
-              setSelectedCharacter(character);
-              setRequestPage(1);
-            }}
+            onSelect={selectCharacter}
             onPageChange={setCharacterPage}
           />
           {selectedCharacter &&
@@ -248,14 +120,8 @@ export default function RewardQueueDashboard() {
               selectedCharacter={selectedCharacter}
               requests={requests}
               filters={filters}
-              onFiltersChange={(nextFilters) => {
-                setFilters(nextFilters);
-                setRequestPage(1);
-              }}
-              onClearCharacter={() => {
-                setSelectedCharacter(null);
-                setRequestPage(1);
-              }}
+              onFiltersChange={updateFilters}
+              onClearCharacter={clearSelectedCharacter}
               onPageChange={setRequestPage}
             />
           </div>

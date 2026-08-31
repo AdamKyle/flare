@@ -8,6 +8,7 @@ import QuestsThatUseSection from './partials/quests-that-use-section';
 import RewardLocationsSection from './partials/reward-location-section';
 import RewardQuestsSection from './partials/reward-quests-section';
 import QuestItemDetailsProps from './types/quest-item-details-props';
+import { QuestItemFactualNavigationDefinition } from './types/quest-item-factual-definition';
 
 type SectionCommonProps = {
   item: QuestItemDetailsProps['item'];
@@ -19,10 +20,14 @@ type SectionCandidate = {
   node: React.ReactElement<SectionCommonProps>;
 };
 
-const QuestItemDetails = ({ item }: QuestItemDetailsProps) => {
+const EMPTY_NAVIGATION: QuestItemFactualNavigationDefinition = {};
+
+const QuestItemDetails = ({ item, navigation }: QuestItemDetailsProps) => {
+  const resolvedNavigation = navigation ?? EMPTY_NAVIGATION;
   const hasModifiers =
     item.move_time_out_mod_bonus !== 0 || item.fight_time_out_mod_bonus !== 0;
-  const hasMonsterDrops = item.required_monster != null;
+  const monsterDrops = item.required_monsters || [];
+  const hasMonsterDrops = monsterDrops.length > 0;
   const requiredQuests = item.required_quests || [];
   const hasRequiredQuestSingle = item.required_quest != null;
   const hasRequiredQuestsList = requiredQuests.length > 0;
@@ -42,27 +47,69 @@ const QuestItemDetails = ({ item }: QuestItemDetailsProps) => {
     },
     {
       enabled: hasMonsterDrops,
-      node: <MonsterDropsSection key="mdrop" item={item} showSeparator />,
+      node: (
+        <MonsterDropsSection
+          key="mdrop"
+          item={item}
+          showSeparator
+          navigation={resolvedNavigation}
+        />
+      ),
     },
     {
       enabled: hasQuestsThatUse,
-      node: <QuestsThatUseSection key="quse" item={item} showSeparator />,
+      node: (
+        <QuestsThatUseSection
+          key="quse"
+          item={item}
+          showSeparator
+          navigation={resolvedNavigation}
+        />
+      ),
     },
     {
       enabled: hasLocationsRequire,
-      node: <LocationsRequireSection key="lreq" item={item} showSeparator />,
+      node: (
+        <LocationsRequireSection
+          key="lreq"
+          item={item}
+          showSeparator
+          navigation={resolvedNavigation}
+        />
+      ),
     },
     {
       enabled: hasRewardLocations,
-      node: <RewardLocationsSection key="lrew" item={item} showSeparator />,
+      node: (
+        <RewardLocationsSection
+          key="lrew"
+          item={item}
+          showSeparator
+          navigation={resolvedNavigation}
+        />
+      ),
     },
     {
       enabled: hasRewardQuests,
-      node: <RewardQuestsSection key="qrew" item={item} showSeparator />,
+      node: (
+        <RewardQuestsSection
+          key="qrew"
+          item={item}
+          showSeparator
+          navigation={resolvedNavigation}
+        />
+      ),
     },
     {
       enabled: hasDrop,
-      node: <DropSection key="drop" item={item} showSeparator />,
+      node: (
+        <DropSection
+          key="drop"
+          item={item}
+          showSeparator
+          navigation={resolvedNavigation}
+        />
+      ),
     },
   ];
 

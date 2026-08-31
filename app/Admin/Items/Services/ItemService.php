@@ -43,6 +43,7 @@ class ItemService
     {
         $searchText = $request->validated('search_text');
         $profile = ItemProfile::from($request->validated('profile'));
+        $subtype = $request->validated('subtype');
         $sortKey = $request->validated('sort_key');
         $sortDirection = $request->validated('sort_direction');
 
@@ -56,6 +57,10 @@ class ItemService
 
         if (! is_null($types)) {
             $query->whereIn('type', $types);
+        }
+
+        if (! is_null($subtype)) {
+            $query->where('type', $subtype);
         }
 
         if ($profile->requiresSpecialtyType()) {
@@ -172,107 +177,41 @@ class ItemService
     /**
      * Determine whether the given catalog Item can be safely deleted.
      *
-     * A catalog Item is only safe to delete when nothing currently
-     * references it: player inventories/sets, market activity, Item Skill
-     * progression, holy stacks, sockets, generated child Items, Quest/
-     * Location relationships, Monster/Raid/Guide Quest rewards or
-     * requirements, character Boons, Alchemy bag slots, Faction Loyalty
-     * automation failed-crafting state, global event crafting inventory,
-     * and character battle reward messages must all be free of the Item.
+     * Built from the same structured blocker categories as `usage()` so
+     * the deletion preflight and the read-only usage report can never
+     * disagree about what currently references the Item.
      *
      * @param  Item  $item  Item to audit.
      * @return array{deletable: bool, blockers: array<int, string>} Deletion safety result.
      */
     public function deletionBlockers(Item $item): array
     {
-        $blockers = [];
-
-        if (InventorySlot::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is held in a character inventory or equipment slot.';
-        }
-
-        if (SetSlot::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is assigned to a character inventory set.';
-        }
-
-        if (MarketBoard::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item has an active market listing.';
-        }
-
-        if (MarketHistory::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item has market sale history.';
-        }
-
-        if (ItemSkillProgression::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item has Item Skill progression recorded against it.';
-        }
-
-        if (ItemSocket::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item has sockets recorded against it.';
-        }
-
-        if (HolyStack::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item has holy stacks recorded against it.';
-        }
-
-        if (Item::where('parent_id', $item->id)->exists()) {
-            $blockers[] = 'This Item has generated child Items.';
-        }
-
-        if (! is_null($item->parent_id)) {
-            $blockers[] = 'This Item is a generated variant of another Item.';
-        }
-
-        if (Quest::where('item_id', $item->id)
-            ->orWhere('secondary_required_item', $item->id)
-            ->orWhere('reward_item', $item->id)
-            ->exists()) {
-            $blockers[] = 'This Item is referenced by a Quest.';
-        }
-
-        if (Location::where('quest_reward_item_id', $item->id)
-            ->orWhere('required_quest_item_id', $item->id)
-            ->exists()) {
-            $blockers[] = 'This Item is referenced by a Location quest reward or requirement.';
-        }
-
-        if (Monster::where('quest_item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is referenced by a Monster quest Item drop.';
-        }
-
-        if (Raid::where('artifact_item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is referenced by a Raid artifact reward.';
-        }
-
-        if (GuideQuest::where('required_quest_item_id', $item->id)
-            ->orWhere('secondary_quest_item_id', $item->id)
-            ->exists()) {
-            $blockers[] = 'This Item is referenced by a Guide Quest requirement.';
-        }
-
-        if (CharacterBoon::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is referenced by a character Boon.';
-        }
-
-        if (AlchemyBagSlot::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is held in a character Alchemy bag slot.';
-        }
-
-        if (FactionLoyaltyAutomation::where('failed_crafting_item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is referenced by Faction Loyalty automation failed-crafting state.';
-        }
-
-        if (GlobalEventCraftingInventorySlot::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is held in a global event crafting inventory slot.';
-        }
-
-        if (CharacterBattleRewardRequestMessage::where('item_id', $item->id)->exists()) {
-            $blockers[] = 'This Item is referenced by a character battle reward message.';
-        }
+        $activeCategories = collect($this->blockerCategories($item))
+            ->filter(fn (array $category) => $category['count'] > 0);
 
         return [
-            'deletable' => empty($blockers),
-            'blockers' => $blockers,
+            'deletable' => $activeCategories->isEmpty(),
+            'blockers' => $activeCategories->pluck('label')->values()->all(),
+        ];
+    }
+
+    /**
+     * Build the read-only Item deletion-impact usage report: which blocker
+     * categories currently reference the Item, their counts, and useful
+     * low-volume related entity identities where a stable identity exists.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array{deletable: bool, total_blocker_categories: int, blockers: array<int, array{key: string, label: string, count: int, related_entities?: array<int, array{id: int, name: string, resource: string}>}>} Usage report.
+     */
+    public function usage(Item $item): array
+    {
+        $categories = $this->blockerCategories($item);
+        $activeCategories = collect($categories)->filter(fn (array $category) => $category['count'] > 0);
+
+        return [
+            'deletable' => $activeCategories->isEmpty(),
+            'total_blocker_categories' => $activeCategories->count(),
+            'blockers' => $activeCategories->values()->all(),
         ];
     }
 
@@ -291,6 +230,184 @@ class ItemService
         }
 
         return $safety;
+    }
+
+    /**
+     * Build every deletion-blocker category for the given Item, each with
+     * its key, human-facing label, current count, and, for low-volume
+     * relationships with a stable factual identity, the related entities
+     * themselves. High-volume Character-owned relationships expose counts
+     * only. This is the single structured source both `deletionBlockers()`
+     * and `usage()` consume so they can never diverge.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array<int, array{key: string, label: string, count: int, related_entities?: array<int, array{id: int, name: string, resource: string}>}> Blocker categories.
+     */
+    private function blockerCategories(Item $item): array
+    {
+        return [
+            $this->countCategory('inventory_slots', 'This Item is held in a character inventory or equipment slot.', InventorySlot::where('item_id', $item->id)->count()),
+            $this->countCategory('set_slots', 'This Item is assigned to a character inventory set.', SetSlot::where('item_id', $item->id)->count()),
+            $this->countCategory('market_listings', 'This Item has an active market listing.', MarketBoard::where('item_id', $item->id)->count()),
+            $this->countCategory('market_history', 'This Item has market sale history.', MarketHistory::where('item_id', $item->id)->count()),
+            $this->countCategory('item_skill_progression', 'This Item has Item Skill progression recorded against it.', ItemSkillProgression::where('item_id', $item->id)->count()),
+            $this->countCategory('item_sockets', 'This Item has sockets recorded against it.', ItemSocket::where('item_id', $item->id)->count()),
+            $this->countCategory('holy_stacks', 'This Item has holy stacks recorded against it.', HolyStack::where('item_id', $item->id)->count()),
+            $this->countCategory('generated_child_items', 'This Item has generated child Items.', Item::where('parent_id', $item->id)->count()),
+            $this->countCategory('generated_parent_item', 'This Item is a generated variant of another Item.', is_null($item->parent_id) ? 0 : 1),
+            $this->questBlockerCategory($item),
+            $this->locationBlockerCategory($item),
+            $this->monsterBlockerCategory($item),
+            $this->raidBlockerCategory($item),
+            $this->guideQuestBlockerCategory($item),
+            $this->countCategory('character_boons', 'This Item is referenced by a character Boon.', CharacterBoon::where('item_id', $item->id)->count()),
+            $this->countCategory('alchemy_bag_slots', 'This Item is held in a character Alchemy bag slot.', AlchemyBagSlot::where('item_id', $item->id)->count()),
+            $this->countCategory('faction_loyalty_automation', 'This Item is referenced by Faction Loyalty automation failed-crafting state.', FactionLoyaltyAutomation::where('failed_crafting_item_id', $item->id)->count()),
+            $this->countCategory('global_event_crafting_inventory', 'This Item is held in a global event crafting inventory slot.', GlobalEventCraftingInventorySlot::where('item_id', $item->id)->count()),
+            $this->countCategory('battle_reward_messages', 'This Item is referenced by a character battle reward message.', CharacterBattleRewardRequestMessage::where('item_id', $item->id)->count()),
+        ];
+    }
+
+    /**
+     * Build a count-only blocker category with no related entity identities.
+     *
+     * @param  string  $key  Blocker category key.
+     * @param  string  $label  Human-facing blocker label.
+     * @param  int  $count  Current reference count.
+     * @return array{key: string, label: string, count: int} Count-only blocker category.
+     */
+    private function countCategory(string $key, string $label, int $count): array
+    {
+        return [
+            'key' => $key,
+            'label' => $label,
+            'count' => $count,
+        ];
+    }
+
+    /**
+     * Build the Quest blocker category, including the referencing Quests'
+     * stable factual identities.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Quest blocker category.
+     */
+    private function questBlockerCategory(Item $item): array
+    {
+        $quests = Quest::where('item_id', $item->id)
+            ->orWhere('secondary_required_item', $item->id)
+            ->orWhere('reward_item', $item->id)
+            ->orderBy('name')
+            ->get();
+
+        return [
+            'key' => 'quests',
+            'label' => 'This Item is referenced by a Quest.',
+            'count' => $quests->count(),
+            'related_entities' => $quests->map(fn (Quest $quest) => [
+                'id' => $quest->id,
+                'name' => $quest->name,
+                'resource' => 'quest',
+            ])->values()->all(),
+        ];
+    }
+
+    /**
+     * Build the Location blocker category, including the referencing
+     * Locations' stable factual identities.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Location blocker category.
+     */
+    private function locationBlockerCategory(Item $item): array
+    {
+        $locations = Location::where('quest_reward_item_id', $item->id)
+            ->orWhere('required_quest_item_id', $item->id)
+            ->orderBy('name')
+            ->get();
+
+        return [
+            'key' => 'locations',
+            'label' => 'This Item is referenced by a Location quest reward or requirement.',
+            'count' => $locations->count(),
+            'related_entities' => $locations->map(fn (Location $location) => [
+                'id' => $location->id,
+                'name' => $location->name,
+                'resource' => 'location',
+            ])->values()->all(),
+        ];
+    }
+
+    /**
+     * Build the Monster blocker category, including the referencing
+     * Monsters' stable factual identities.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Monster blocker category.
+     */
+    private function monsterBlockerCategory(Item $item): array
+    {
+        $monsters = Monster::where('quest_item_id', $item->id)->orderBy('name')->get();
+
+        return [
+            'key' => 'monster_drops',
+            'label' => 'This Item is referenced by a Monster quest Item drop.',
+            'count' => $monsters->count(),
+            'related_entities' => $monsters->map(fn (Monster $monster) => [
+                'id' => $monster->id,
+                'name' => $monster->name,
+                'resource' => 'monster',
+            ])->values()->all(),
+        ];
+    }
+
+    /**
+     * Build the Raid blocker category, including the referencing Raids'
+     * stable factual identities.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Raid blocker category.
+     */
+    private function raidBlockerCategory(Item $item): array
+    {
+        $raids = Raid::where('artifact_item_id', $item->id)->orderBy('name')->get();
+
+        return [
+            'key' => 'raid_artifact',
+            'label' => 'This Item is referenced by a Raid artifact reward.',
+            'count' => $raids->count(),
+            'related_entities' => $raids->map(fn (Raid $raid) => [
+                'id' => $raid->id,
+                'name' => $raid->name,
+                'resource' => 'raid',
+            ])->values()->all(),
+        ];
+    }
+
+    /**
+     * Build the Guide Quest blocker category, including the referencing
+     * Guide Quests' stable factual identities.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Guide Quest blocker category.
+     */
+    private function guideQuestBlockerCategory(Item $item): array
+    {
+        $guideQuests = GuideQuest::where('required_quest_item_id', $item->id)
+            ->orWhere('secondary_quest_item_id', $item->id)
+            ->orderBy('name')
+            ->get();
+
+        return [
+            'key' => 'guide_quests',
+            'label' => 'This Item is referenced by a Guide Quest requirement.',
+            'count' => $guideQuests->count(),
+            'related_entities' => $guideQuests->map(fn (GuideQuest $guideQuest) => [
+                'id' => $guideQuest->id,
+                'name' => $guideQuest->name,
+                'resource' => 'guide_quest',
+            ])->values()->all(),
+        ];
     }
 
     /**

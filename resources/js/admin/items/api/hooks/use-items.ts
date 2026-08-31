@@ -1,19 +1,19 @@
+import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
 import { useState } from 'react';
 
-import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
-
 import UseItemsDefinition from './definitions/use-items-definition';
-import ItemDefinition from '../definitions/item-definition';
-import { ItemListResponseDefinition } from '../definitions/item-list-response-definition';
-import { ItemApiUrls } from '../enums/item-api-urls';
-import { ItemPagination } from '../enums/item-pagination';
 import {
   ITEM_PROFILE_DEFAULT_SORT_KEY,
   ItemProfile,
 } from '../../enums/item-profile';
+import ItemDefinition from '../definitions/item-definition';
+import { ItemListResponseDefinition } from '../definitions/item-list-response-definition';
+import { ItemApiUrls } from '../enums/item-api-urls';
+import { ItemPagination } from '../enums/item-pagination';
 
 export const useItems = (): UseItemsDefinition => {
   const [profile, setProfileState] = useState<ItemProfile>(ItemProfile.ALL);
+  const [subtype, setSubtypeState] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState(
     ITEM_PROFILE_DEFAULT_SORT_KEY[ItemProfile.ALL]
   );
@@ -28,6 +28,7 @@ export const useItems = (): UseItemsDefinition => {
       url: ItemApiUrls.LIST,
       additionalParams: {
         profile,
+        subtype,
         sort_key: sortKey,
         sort_direction: sortDirection,
       },
@@ -38,8 +39,14 @@ export const useItems = (): UseItemsDefinition => {
 
   const setProfile = (nextProfile: ItemProfile): void => {
     setProfileState(nextProfile);
+    setSubtypeState(null);
     setSortKey(ITEM_PROFILE_DEFAULT_SORT_KEY[nextProfile]);
     setSortDirection('asc');
+    paginated.setPage(1);
+  };
+
+  const setSubtype = (nextSubtype: string | null): void => {
+    setSubtypeState(nextSubtype);
     paginated.setPage(1);
   };
 
@@ -75,6 +82,8 @@ export const useItems = (): UseItemsDefinition => {
     set_page: paginated.setPage,
     profile,
     set_profile: setProfile,
+    subtype,
+    set_subtype: setSubtype,
     sort_key: sortKey,
     sort_direction: sortDirection,
     set_sort: setSort,

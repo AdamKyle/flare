@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
+import axios from 'axios';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import UseLocationDetailDefinition from './definitions/use-location-detail-definition';
 import LocationDetailDefinition from '../definitions/location-detail-definition';

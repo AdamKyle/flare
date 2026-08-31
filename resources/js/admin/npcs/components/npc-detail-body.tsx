@@ -1,17 +1,19 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode } from 'react';
 
 import NpcDetailBodyProps from './types/npc-detail-body-props';
-import { NpcApiMessages } from '../api/enums/npc-api-messages';
+import ReadOnlyItemCard from '../../../game/components/side-peeks/components/items/read-only-item-card';
+import AdminQuestItemPresentationDefinition from '../../items/api/definitions/admin-quest-item-presentation-definition';
 import { NpcQuestRelatedItemDefinition } from '../api/definitions/npc-quest-definition';
+import { NpcApiMessages } from '../api/enums/npc-api-messages';
 import { NPC_TYPE_LABELS } from '../enums/npc-type';
 
-import AdminQuestItemPresentationDefinition from '../../items/api/definitions/admin-quest-item-presentation-definition';
-
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import Card from 'ui/cards/card';
 import DataTablePagination from 'ui/data-table/data-table-pagination';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
+import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 /**
@@ -26,7 +28,41 @@ const NpcDetailBody = ({
   quests,
   reward_items: rewardItems,
   on_open_item: onOpenItem,
+  on_open_quest: onOpenQuest,
+  on_open_map: onOpenMap,
 }: NpcDetailBodyProps): ReactNode => {
+  const renderMap = (): ReactNode => {
+    if (!onOpenMap) {
+      return npc.game_map.name;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenMap(npc.game_map.id)}
+        className="text-danube-600 dark:text-danube-300 focus-visible:ring-danube-400 rounded-sm font-medium hover:underline focus:outline-none focus-visible:ring-2"
+      >
+        {npc.game_map.name}
+      </button>
+    );
+  };
+
+  const renderQuestName = (quest: { id: number; name: string }): ReactNode => {
+    if (!onOpenQuest) {
+      return quest.name;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenQuest(quest.id)}
+        className="text-danube-600 dark:text-danube-300 focus-visible:ring-danube-400 rounded-sm hover:underline focus:outline-none focus-visible:ring-2"
+      >
+        {quest.name}
+      </button>
+    );
+  };
+
   const renderItemLink = (
     item: NpcQuestRelatedItemDefinition | null
   ): ReactNode => {
@@ -74,7 +110,7 @@ const NpcDetailBody = ({
           {quests.data.map((quest) => (
             <li key={quest.id} className="space-y-1 px-2 py-3">
               <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-                {quest.name}
+                {renderQuestName(quest)}
               </p>
               <div className="text-glacier-700 dark:text-glacier-300 flex flex-wrap gap-x-6 gap-y-1 text-sm">
                 <span>Required: {renderItemLink(quest.required_item)}</span>
@@ -94,6 +130,16 @@ const NpcDetailBody = ({
         />
       </>
     );
+  };
+
+  const handleRewardItemsScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.currentTarget;
+    const nearBottom =
+      target.scrollHeight - target.scrollTop - target.clientHeight < 100;
+
+    if (nearBottom) {
+      rewardItems.on_end_reached();
+    }
   };
 
   const renderRewardItems = (): ReactNode => {
@@ -118,65 +164,66 @@ const NpcDetailBody = ({
     }
 
     return (
-      <>
-        <ul className="divide-glacier-200 dark:divide-glacier-800 divide-y">
-          {rewardItems.data.map(
-            (item: AdminQuestItemPresentationDefinition) => (
-              <li key={item.item_id}>
-                <button
-                  type="button"
-                  onClick={() => onOpenItem(item.item_id, item.name)}
-                  className="hover:bg-glacier-50 dark:hover:bg-glacier-900 focus-visible:ring-glacier-400 flex w-full items-center justify-between gap-3 px-2 py-3 text-left focus:outline-none focus-visible:ring-2"
-                >
-                  <span className="text-glacier-900 dark:text-glacier-100 font-medium">
-                    {item.name}
-                  </span>
-                </button>
-              </li>
-            )
-          )}
-        </ul>
-        <DataTablePagination
-          current_page={rewardItems.page}
-          total_pages={rewardItems.total_pages}
-          total_records={rewardItems.total_records}
-          on_page_change={rewardItems.set_page}
-        />
-      </>
+      <div className="h-[500px] max-h-[500px]">
+        <InfiniteScroll handle_scroll={handleRewardItemsScroll}>
+          <div className="flex flex-col gap-3">
+            {rewardItems.data.map(
+              (item: AdminQuestItemPresentationDefinition) => (
+                <ReadOnlyItemCard
+                  key={item.item_id}
+                  item_id={item.item_id}
+                  name={item.name}
+                  description={item.description}
+                  effect={item.effect}
+                  usable={item.usable}
+                  on_click={() => onOpenItem(item.item_id, item.name)}
+                />
+              )
+            )}
+            {rewardItems.is_loading_more && <InfiniteLoader />}
+          </div>
+        </InfiniteScroll>
+      </div>
     );
   };
 
   return (
     <div className="flex flex-col gap-6">
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Identity
-        </h2>
-        <Dl>
-          <Dt>Map</Dt>
-          <Dd>{npc.game_map.name}</Dd>
-          <Dt>Type</Dt>
-          <Dd>{NPC_TYPE_LABELS[npc.type]}</Dd>
-          <Dt>Coordinates</Dt>
-          <Dd>
-            X {npc.x_position}, Y {npc.y_position}
-          </Dd>
-        </Dl>
-      </section>
+      <Card>
+        <section>
+          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+            NPC Details
+          </h2>
+          <Dl>
+            <Dt>Map</Dt>
+            <Dd>{renderMap()}</Dd>
+            <Dt>Type</Dt>
+            <Dd>{NPC_TYPE_LABELS[npc.type]}</Dd>
+            <Dt>Coordinates</Dt>
+            <Dd>
+              X {npc.x_position}, Y {npc.y_position}
+            </Dd>
+          </Dl>
+        </section>
+      </Card>
 
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Quests ({npc.quest_count})
-        </h2>
-        {renderQuests()}
-      </section>
+      <Card>
+        <section>
+          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+            Quests ({npc.quest_count})
+          </h2>
+          {renderQuests()}
+        </section>
+      </Card>
 
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Quest Items Given by This NPC ({npc.reward_item_count})
-        </h2>
-        {renderRewardItems()}
-      </section>
+      <Card>
+        <section>
+          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+            Quest Items Given by This NPC ({npc.reward_item_count})
+          </h2>
+          {renderRewardItems()}
+        </section>
+      </Card>
     </div>
   );
 };

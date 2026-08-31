@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 
 import UseLocationFormDefinition from './definitions/use-location-form-definition';
 import { useLocationValidation } from './use-location-validation';
+import LocationDefinition from '../api/definitions/location-definition';
 import { useLocation } from '../api/hooks/use-location';
 import { useLocationFormOptions } from '../api/hooks/use-location-form-options';
 import { useSaveLocation } from '../api/hooks/use-save-location';
-import LocationDefinition from '../api/definitions/location-definition';
 import LocationFormState from '../types/location-form-state';
 import { buildLocationRequest } from '../utils/build-location-request';
 import { createLocationFormState } from '../utils/create-location-form-state';

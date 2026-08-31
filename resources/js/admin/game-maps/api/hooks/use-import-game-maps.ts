@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
-
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 import UseImportGameMapsDefinition from './definitions/use-import-game-maps-definition';
 import GameMapImportResponseDefinition from '../definitions/game-map-import-response-definition';

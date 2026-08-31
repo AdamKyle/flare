@@ -1,7 +1,7 @@
 import { isValidNumericString } from './is-valid-numeric-string';
-import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-definition';
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
+import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 
 /**
  * Validate the Game Map wizard's Bonuses step: each percentage field must be a

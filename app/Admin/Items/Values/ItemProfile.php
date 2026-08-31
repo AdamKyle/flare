@@ -44,6 +44,22 @@ enum ItemProfile: string
     }
 
     /**
+     * Return the valid `items.type` subtype values for this profile's
+     * secondary subtype filter, or null when this profile does not support
+     * a subtype filter. Only the Weapons and Armour profiles support one.
+     *
+     * @return array<int, string>|null Valid subtype values, or null when unsupported.
+     */
+    public function subtypes(): ?array
+    {
+        return match ($this) {
+            self::WEAPONS => ItemType::validWeapons(),
+            self::ARMOUR => ArmourType::allTypes(),
+            default => null,
+        };
+    }
+
+    /**
      * Whether this profile filters the catalog by having a non-null `specialty_type`.
      *
      * @return bool Whether this profile requires a non-null `specialty_type`.

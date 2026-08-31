@@ -1,5 +1,5 @@
-import ItemFormStateDefinition from '../definitions/item-form-state-definition';
 import ItemFormDefinition from '../api/definitions/item-form-definition';
+import ItemFormStateDefinition from '../definitions/item-form-state-definition';
 
 const toStringValue = (value: number | null): string =>
   value === null ? '' : String(value);

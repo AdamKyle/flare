@@ -59,7 +59,7 @@ const ItemCombatFields = ({
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <NumberField
           id="item-str-mod"
           label="Strength Modifier"

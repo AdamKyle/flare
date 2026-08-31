@@ -4,7 +4,7 @@ import LocationRow from './location-row';
 import Section from '../../viewable-sections/section';
 import DropSectionProps from '../types/partials/drop-section-props';
 
-const DropSection = ({ item, showSeparator }: DropSectionProps) => {
+const DropSection = ({ item, showSeparator, navigation }: DropSectionProps) => {
   if (item.drop_location == null) {
     return null;
   }
@@ -13,8 +13,9 @@ const DropSection = ({ item, showSeparator }: DropSectionProps) => {
     <Section title="Drop" showSeparator={showSeparator}>
       <LocationRow
         heading="Drops At"
-        name={item.drop_location.name}
-        map={item.drop_location.map}
+        location={item.drop_location}
+        on_open_location={navigation.on_open_location}
+        on_open_map={navigation.on_open_map}
       />
     </Section>
   );

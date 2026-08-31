@@ -1,108 +1,39 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React from 'react';
 
 import ActiveExplorersTable from './active-explorers-table';
 import ExplorationLogsTable from './exploration-logs-table';
 import MonitoringCard from './monitoring-card';
 import MonitoringStatusChart from '../../components/monitoring-status-chart';
+import useScrollToElement from '../../hooks/use-scroll-to-element';
 import { ADMIN_MONITORING_CHART_COLORS } from '../../values/admin-monitoring-chart-colors';
-import {
-  ActiveExplorer,
-  ExplorationChartPoint,
-  ExplorationFilters,
-  ExplorationLogRow,
-  ExplorationSummary,
-} from '../api/definitions/exploration-monitoring-definition';
-import { useExplorationApi } from '../api/hooks/use-exploration-api';
-import useExplorationLiveRefresh from '../hooks/use-exploration-live-refresh';
-import explorationPaginationAdapter from '../utils/exploration-pagination-adapter';
-import { DAY_OPTIONS } from '../values/filter-options';
+import useExplorationDashboard from '../hooks/use-exploration-dashboard';
 
-const emptySummary: ExplorationSummary = {
-  total_runs: 0,
-  stopped_by_player: 0,
-  total_kills: 0,
-  total_xp_gained: 0,
-  total_skill_xp_gained: 0,
-};
-
-const defaultFilters: ExplorationFilters = {
-  character_name: '',
-  stopped_reason: '',
-  stopped_by_player: false,
-  date_from: '',
-  date_to: '',
-  days: '7',
-};
+const LOGS_TABLE_ELEMENT_ID = 'exploration-logs-table';
 
 export default function ExplorationDashboard() {
   const {
-    fetchExplorationActive,
-    fetchExplorationLogs,
-    fetchExplorationSummary,
-    fetchExplorationChart,
-  } = useExplorationApi();
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [activeExplorers, setActiveExplorers] = useState<ActiveExplorer[]>([]);
-  const [logs, setLogs] = useState(
-    explorationPaginationAdapter<ExplorationLogRow>({
-      data: [],
-      current_page: 1,
-      last_page: 1,
-      total: 0,
-    })
-  );
-  const [summary, setSummary] = useState<ExplorationSummary>(emptySummary);
-  const [chart, setChart] = useState<ExplorationChartPoint[]>([]);
-  const [filters, setFilters] = useState<ExplorationFilters>(defaultFilters);
-  const [logPage, setLogPage] = useState(1);
-  const [days, setDays] = useState('7');
-
-  const refresh = useCallback(async () => {
-    setError('');
-
-    try {
-      const [active, logsData, summaryData, chartData] = await Promise.all([
-        fetchExplorationActive(),
-        fetchExplorationLogs(filters, logPage),
-        fetchExplorationSummary(days),
-        fetchExplorationChart(days),
-      ]);
-
-      setActiveExplorers(active);
-      setLogs(logsData);
-      setSummary(summaryData);
-      setChart(chartData);
-    } catch {
-      setError('Exploration monitoring data could not be loaded.');
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    days,
-    fetchExplorationActive,
-    fetchExplorationChart,
-    fetchExplorationLogs,
-    fetchExplorationSummary,
+    loading,
+    error,
+    active_explorers: activeExplorers,
+    logs,
+    summary,
+    chart,
     filters,
-    logPage,
-  ]);
+    update_filters: updateFilters,
+    apply_table_filter: applyTableFilterData,
+    set_log_page: setLogPage,
+    days,
+    set_days: setDays,
+    day_options: DAY_OPTIONS,
+  } = useExplorationDashboard();
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const { scroll_to_element: scrollToElement } = useScrollToElement();
 
-  useExplorationLiveRefresh(refresh);
-
-  const applyTableFilter = (nextFilters: Partial<ExplorationFilters>) => {
-    setFilters({ ...defaultFilters, ...nextFilters });
-    setLogPage(1);
-    window.setTimeout(() => {
-      document
-        .getElementById('exploration-logs-table')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 0);
+  const applyTableFilter = (
+    nextFilters: Parameters<typeof applyTableFilterData>[0]
+  ) => {
+    applyTableFilterData(nextFilters);
+    scrollToElement(LOGS_TABLE_ELEMENT_ID);
   };
 
   return (
@@ -227,10 +158,7 @@ export default function ExplorationDashboard() {
       <ExplorationLogsTable
         logs={logs}
         filters={filters}
-        onFiltersChange={(nextFilters) => {
-          setFilters(nextFilters);
-          setLogPage(1);
-        }}
+        onFiltersChange={updateFilters}
         onPageChange={setLogPage}
       />
     </div>

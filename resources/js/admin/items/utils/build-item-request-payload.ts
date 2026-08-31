@@ -1,6 +1,6 @@
+import ItemRequestDefinition from '../api/definitions/item-request-definition';
 import ItemFormStateDefinition from '../definitions/item-form-state-definition';
 import { isItemCatalogType } from '../enums/item-catalog-type';
-import ItemRequestDefinition from '../api/definitions/item-request-definition';
 
 const toNullableNumber = (value: string): number | null => {
   if (value.trim() === '') {

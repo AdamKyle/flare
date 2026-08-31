@@ -1,5 +1,6 @@
 import React from 'react';
 
+import FactualLink from './factual-link';
 import DefinitionRow from '../../viewable-sections/definition-row';
 import InfoAlerts from '../../viewable-sections/info-alert';
 import InfoLabel from '../../viewable-sections/info-label';
@@ -9,6 +10,7 @@ import RewardLocationsSectionProps from '../types/partials/location-reward-secti
 const RewardLocationsSection = ({
   item,
   showSeparator,
+  navigation,
 }: RewardLocationsSectionProps) => {
   const rewardLocations = item.reward_locations || [];
 
@@ -39,21 +41,23 @@ const RewardLocationsSection = ({
           <DefinitionRow
             left={<InfoLabel label={rowLabel} />}
             right={
-              <span className="text-gray-800 dark:text-gray-200">
-                {rewardLocation.name}
-              </span>
+              <FactualLink
+                id={rewardLocation.id}
+                label={rewardLocation.name}
+                on_click={navigation.on_open_location}
+              />
             }
           />
-          {rewardLocation.map ? (
-            <DefinitionRow
-              left={<InfoLabel label="While On Map" />}
-              right={
-                <span className="text-gray-800 dark:text-gray-200">
-                  {rewardLocation.map}
-                </span>
-              }
-            />
-          ) : null}
+          <DefinitionRow
+            left={<InfoLabel label="While On Map" />}
+            right={
+              <FactualLink
+                id={rewardLocation.game_map.id}
+                label={rewardLocation.game_map.name}
+                on_click={navigation.on_open_map}
+              />
+            }
+          />
         </React.Fragment>
       ))}
     </Section>

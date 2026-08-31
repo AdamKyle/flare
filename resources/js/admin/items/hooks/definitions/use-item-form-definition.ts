@@ -1,9 +1,9 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
+import ItemFormDefinition from '../../api/definitions/item-form-definition';
 import ItemFormOptionsDefinition from '../../api/definitions/item-form-options-definition';
 import ItemFormErrorsDefinition from '../../definitions/item-form-errors-definition';
 import ItemFormStateDefinition from '../../definitions/item-form-state-definition';
-import ItemFormDefinition from '../../api/definitions/item-form-definition';
 
 export default interface UseItemFormDefinition {
   form_state: ItemFormStateDefinition;

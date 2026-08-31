@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
-import GameMapImageFieldProps from '../../types/game-map-image-field-props';
 import { GameMapImageReplacementCopy } from '../../enums/game-map-image-replacement-copy';
+import GameMapImageFieldProps from '../../types/game-map-image-field-props';
 
 import ImageUploader from 'ui/file-upload/image-uploader';
 import CheckboxField from 'ui/forms/checkbox-field';

@@ -1,23 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import MonitoringStatusChart from '../../components/monitoring-status-chart';
-import { ADMIN_MONITORING_CHART_COLORS } from '../../values/admin-monitoring-chart-colors';
 import AdminPaginationControls from '../../../shared/components/admin-pagination-controls';
-import {
-  ActiveFactionLoyaltyRunner,
-  FactionLoyaltyChartPoint,
-  FactionLoyaltyFilters,
-  FactionLoyaltyRunRow,
-  FactionLoyaltySummary,
-} from '../api/definitions/faction-loyalty-monitoring-definition';
-import { useFactionLoyaltyApi } from '../api/hooks/use-faction-loyalty-api';
-import useFactionLoyaltyLiveRefresh from '../hooks/use-faction-loyalty-live-refresh';
+import MonitoringStatusChart from '../../components/monitoring-status-chart';
+import useScrollToElement from '../../hooks/use-scroll-to-element';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../values/admin-monitoring-chart-colors';
+import useFactionLoyaltyDashboard from '../hooks/use-faction-loyalty-dashboard';
 import {
   LogDetailsProps,
   MonitorCardProps,
 } from '../types/dashboard-component-props';
-import factionLoyaltyPaginationAdapter from '../utils/faction-loyalty-pagination-adapter';
-import { DAY_OPTIONS } from '../values/filter-options';
 
 function MonitorCard({ children, onClick, ariaLabel }: MonitorCardProps) {
   const classes =
@@ -91,87 +82,31 @@ function LogDetails({ log }: LogDetailsProps) {
   );
 }
 
-const defaultFilters: FactionLoyaltyFilters = {
-  character_name: '',
-  date_from: '',
-  date_to: '',
-  status: '',
-  days: '7',
-};
-
 export default function FactionLoyaltyDashboard() {
   const {
-    fetchFactionLoyaltyActive,
-    fetchFactionLoyaltyRuns,
-    fetchFactionLoyaltySummary,
-    fetchFactionLoyaltyChart,
-  } = useFactionLoyaltyApi();
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [active, setActive] = useState<ActiveFactionLoyaltyRunner[]>([]);
-  const [runs, setRuns] = useState(
-    factionLoyaltyPaginationAdapter<FactionLoyaltyRunRow>({
-      data: [],
-      current_page: 1,
-      last_page: 1,
-      total: 0,
-    })
-  );
-  const [summary, setSummary] = useState<FactionLoyaltySummary>({
-    total_runs: 0,
-    active: 0,
-    completed: 0,
-  });
-  const [chart, setChart] = useState<FactionLoyaltyChartPoint[]>([]);
-  const [filters, setFilters] = useState<FactionLoyaltyFilters>(defaultFilters);
-  const [page, setPage] = useState(1);
-  const [days, setDays] = useState('7');
-
-  const refresh = useCallback(async () => {
-    setError('');
-
-    try {
-      const [activeData, runsData, summaryData, chartData] = await Promise.all([
-        fetchFactionLoyaltyActive(),
-        fetchFactionLoyaltyRuns(filters, page),
-        fetchFactionLoyaltySummary(days),
-        fetchFactionLoyaltyChart(days),
-      ]);
-
-      setActive(activeData);
-      setRuns(runsData);
-      setSummary(summaryData);
-      setChart(chartData);
-    } catch {
-      setError('Faction loyalty monitoring data could not be loaded.');
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    days,
-    fetchFactionLoyaltyActive,
-    fetchFactionLoyaltyChart,
-    fetchFactionLoyaltyRuns,
-    fetchFactionLoyaltySummary,
+    loading,
+    error,
+    active,
+    runs,
+    summary,
+    chart,
     filters,
-    page,
-  ]);
+    update_filters: updateFilters,
+    apply_table_filter: applyTableFilterData,
+    set_page: setPage,
+    days,
+    set_days: setDays,
+    day_options: DAY_OPTIONS,
+  } = useFactionLoyaltyDashboard();
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const { scroll_to_element: scrollToElement } = useScrollToElement();
+  const runsTableElementId = 'faction-loyalty-runs-table';
 
-  useFactionLoyaltyLiveRefresh(refresh);
-
-  const applyTableFilter = (nextFilters: Partial<FactionLoyaltyFilters>) => {
-    setFilters({ ...defaultFilters, ...nextFilters });
-    setPage(1);
-    window.setTimeout(() => {
-      document
-        .getElementById('faction-loyalty-runs-table')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 0);
+  const applyTableFilter = (
+    nextFilters: Parameters<typeof applyTableFilterData>[0]
+  ) => {
+    applyTableFilterData(nextFilters);
+    scrollToElement(runsTableElementId);
   };
 
   return (
@@ -337,7 +272,7 @@ export default function FactionLoyaltyDashboard() {
         )}
       </MonitorCard>
 
-      <div id="faction-loyalty-runs-table">
+      <div id={runsTableElementId}>
         <MonitorCard>
           <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
             Recent Runs
@@ -350,11 +285,10 @@ export default function FactionLoyaltyDashboard() {
                 type="text"
                 value={filters.character_name}
                 onChange={(e) => {
-                  setFilters({
+                  updateFilters({
                     ...filters,
                     character_name: e.target.value,
                   });
-                  setPage(1);
                 }}
               />
             </label>
@@ -365,11 +299,10 @@ export default function FactionLoyaltyDashboard() {
                 type="date"
                 value={filters.date_from}
                 onChange={(e) => {
-                  setFilters({
+                  updateFilters({
                     ...filters,
                     date_from: e.target.value,
                   });
-                  setPage(1);
                 }}
               />
             </label>
@@ -380,11 +313,10 @@ export default function FactionLoyaltyDashboard() {
                 type="date"
                 value={filters.date_to}
                 onChange={(e) => {
-                  setFilters({
+                  updateFilters({
                     ...filters,
                     date_to: e.target.value,
                   });
-                  setPage(1);
                 }}
               />
             </label>

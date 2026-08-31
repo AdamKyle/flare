@@ -4,8 +4,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ServiceContainer } from 'service-container-provider/service-container';
 
-import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 import RewardQueueDashboard from './battle-reward-queue/components/reward-queue-dashboard';
+import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 
 const rewardQueueElement = document.getElementById('character-reward-queue');
 

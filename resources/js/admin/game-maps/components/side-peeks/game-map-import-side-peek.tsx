@@ -1,12 +1,11 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ChangeEvent, FormEvent, ReactNode, useState } from 'react';
 
 import GameMapImportSidePeekProps from './types/game-map-import-side-peek-props';
+import { useCloseSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
 import { useImportGameMaps } from '../../api/hooks/use-import-game-maps';
 import { GameMapImportCopy } from '../../enums/game-map-import-copy';
 
-import { useCloseSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
-
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 

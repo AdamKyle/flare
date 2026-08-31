@@ -1,17 +1,19 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import LocationDetailBodyProps from './types/location-detail-body-props';
+import ReadOnlyItemCard from '../../../game/components/side-peeks/components/items/read-only-item-card';
 import { LocationApiMessages } from '../api/enums/location-api-messages';
 import { LOCATION_TYPE_LABELS } from '../enums/location-type';
 
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
-import DataTablePagination from 'ui/data-table/data-table-pagination';
+import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
+import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const relatedItemButtonClasses =
@@ -29,7 +31,24 @@ const LocationDetailBody = ({
   quest_items: questItems,
   on_open_related_item: onOpenRelatedItem,
   on_open_quest_item: onOpenQuestItem,
+  on_open_map: onOpenMap,
 }: LocationDetailBodyProps): ReactNode => {
+  const renderMap = (): ReactNode => {
+    if (!onOpenMap) {
+      return location.game_map.name;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenMap(location.game_map.id)}
+        className={relatedItemButtonClasses}
+      >
+        {location.game_map.name}
+      </button>
+    );
+  };
+
   const renderDropModeNotice = (): ReactNode => {
     if (location.is_cave_of_memories) {
       return (
@@ -93,6 +112,16 @@ const LocationDetailBody = ({
     );
   };
 
+  const handleQuestItemsScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.currentTarget;
+    const nearBottom =
+      target.scrollHeight - target.scrollTop - target.clientHeight < 100;
+
+    if (nearBottom) {
+      questItems.on_end_reached();
+    }
+  };
+
   const renderQuestItems = (): ReactNode => {
     if (questItems.loading) {
       return <InfiniteLoader />;
@@ -117,101 +146,99 @@ const LocationDetailBody = ({
     }
 
     return (
-      <>
-        <ul className="divide-glacier-200 dark:divide-glacier-800 divide-y">
-          {questItems.data.map((item) => (
-            <li key={item.item_id}>
-              <button
-                type="button"
-                onClick={() => onOpenQuestItem(item)}
-                className="hover:bg-glacier-50 dark:hover:bg-glacier-900 focus-visible:ring-glacier-400 flex w-full items-center justify-between gap-3 px-2 py-3 text-left focus:outline-none focus-visible:ring-2"
-              >
-                <span className="text-glacier-900 dark:text-glacier-100 font-medium">
-                  {item.name}
-                </span>
-                <span className="text-glacier-600 dark:text-glacier-400 text-sm">
-                  {item.effect ?? 'View details'}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-        <DataTablePagination
-          current_page={questItems.page}
-          total_pages={questItems.total_pages}
-          total_records={questItems.total_records}
-          on_page_change={questItems.set_page}
-        />
-      </>
+      <div className="h-[500px] max-h-[500px]">
+        <InfiniteScroll handle_scroll={handleQuestItemsScroll}>
+          <div className="flex flex-col gap-3">
+            {questItems.data.map((item) => (
+              <ReadOnlyItemCard
+                key={item.item_id}
+                item_id={item.item_id}
+                name={item.name}
+                description={item.description}
+                effect={item.effect}
+                usable={item.usable}
+                on_click={() => onOpenQuestItem(item)}
+              />
+            ))}
+            {questItems.is_loading_more && <InfiniteLoader />}
+          </div>
+        </InfiniteScroll>
+      </div>
     );
   };
 
   return (
     <div className="flex flex-col gap-6">
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Identity
-        </h2>
-        <Dl>
-          <Dt>Map</Dt>
-          <Dd>{location.game_map.name}</Dd>
-          <Dt>Type</Dt>
-          <Dd>
-            {location.type === null
-              ? 'None'
-              : LOCATION_TYPE_LABELS[location.type]}
-          </Dd>
-          <Dt>Coordinates</Dt>
-          <Dd>
-            X {location.x}, Y {location.y}
-          </Dd>
-        </Dl>
-      </section>
+      <Card>
+        <div className="flex flex-col gap-6">
+          <section>
+            <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+              Location Details
+            </h2>
+            <Dl>
+              <Dt>Map</Dt>
+              <Dd>{renderMap()}</Dd>
+              <Dt>Type</Dt>
+              <Dd>
+                {location.type === null
+                  ? 'None'
+                  : LOCATION_TYPE_LABELS[location.type]}
+              </Dd>
+              <Dt>Coordinates</Dt>
+              <Dd>
+                X {location.x}, Y {location.y}
+              </Dd>
+            </Dl>
+          </section>
 
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-          Description
-        </h2>
-        {location.description ? (
-          <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
-            <ReactMarkdown>{location.description}</ReactMarkdown>
-          </div>
-        ) : (
-          <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-            No description.
-          </p>
-        )}
-      </section>
+          <section>
+            <h3 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
+              Description
+            </h3>
+            {location.description ? (
+              <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
+                <ReactMarkdown>{location.description}</ReactMarkdown>
+              </div>
+            ) : (
+              <p className="text-glacier-700 dark:text-glacier-300 text-sm">
+                No description.
+              </p>
+            )}
+          </section>
 
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Rules
-        </h2>
-        <Dl>
-          <Dt>Is Port</Dt>
-          <Dd>{location.is_port ? 'Yes' : 'No'}</Dd>
-          <Dt>Players May Enter</Dt>
-          <Dd>{location.can_players_enter ? 'Yes' : 'No'}</Dd>
-          <Dt>Auto Battle Allowed</Dt>
-          <Dd>{location.can_auto_battle ? 'Yes' : 'No'}</Dd>
-          <Dt>Required Quest Item</Dt>
-          <Dd>{renderRequiredQuestItem()}</Dd>
-          <Dt>Quest Reward Item</Dt>
-          <Dd>{renderQuestRewardItem()}</Dd>
-          <Dt>Hours to Drop</Dt>
-          <Dd>{location.hours_to_drop ?? 'None'}</Dd>
-          <Dt>Minutes Between Delve Fights</Dt>
-          <Dd>{location.minutes_between_delve_fights ?? 'None'}</Dd>
-        </Dl>
-      </section>
+          <section>
+            <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+              Rules
+            </h3>
+            <Dl>
+              <Dt>Is Port</Dt>
+              <Dd>{location.is_port ? 'Yes' : 'No'}</Dd>
+              <Dt>Players May Enter</Dt>
+              <Dd>{location.can_players_enter ? 'Yes' : 'No'}</Dd>
+              <Dt>Auto Battle Allowed</Dt>
+              <Dd>{location.can_auto_battle ? 'Yes' : 'No'}</Dd>
+              <Dt>Required Quest Item</Dt>
+              <Dd>{renderRequiredQuestItem()}</Dd>
+              <Dt>Quest Reward Item</Dt>
+              <Dd>{renderQuestRewardItem()}</Dd>
+              <Dt>Hours to Drop</Dt>
+              <Dd>{location.hours_to_drop ?? 'None'}</Dd>
+              <Dt>Minutes Between Delve Fights</Dt>
+              <Dd>{location.minutes_between_delve_fights ?? 'None'}</Dd>
+            </Dl>
+          </section>
+        </div>
+      </Card>
 
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Quest Items Dropped Here ({location.quest_item_drop_count})
-        </h2>
-        {renderDropModeNotice()}
-        <div className="mt-3">{renderQuestItems()}</div>
-      </section>
+      <Card>
+        <section>
+          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+            Quest Items Dropped Here ({location.quest_item_drop_count})
+          </h2>
+          {renderDropModeNotice()}
+          <div className="mt-3">{renderQuestItems()}</div>
+        </section>
+      </Card>
     </div>
   );
 };

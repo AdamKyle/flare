@@ -17,4 +17,3 @@ export interface ItemScreenPropsMap {
 }
 
 export type ItemScreenName = keyof ItemScreenPropsMap;
-export type ItemScreenPropsOf<K extends ItemScreenName> = ItemScreenPropsMap[K];

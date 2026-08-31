@@ -4,8 +4,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ServiceContainer } from 'service-container-provider/service-container';
 
-import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 import ExplorationDashboard from './exploration-monitoring/components/exploration-dashboard';
+import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 
 const element = document.getElementById('exploration-monitoring');
 

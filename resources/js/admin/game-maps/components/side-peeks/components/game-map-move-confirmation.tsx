@@ -1,8 +1,8 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode } from 'react';
 
 import GameMapMoveConfirmationProps from '../types/game-map-move-confirmation-props';
 
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';

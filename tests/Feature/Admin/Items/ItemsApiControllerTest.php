@@ -87,6 +87,76 @@ class ItemsApiControllerTest extends TestCase
         $this->assertNotContains('Fire Bolt', $names);
     }
 
+    public function test_weapons_profile_with_valid_subtype_only_includes_that_subtype(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createItem(['name' => 'Iron Sword', 'type' => 'sword']);
+        $this->createItem(['name' => 'War Hammer', 'type' => 'hammer']);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/items?profile=weapons&subtype=sword');
+        $data = json_decode($response->getContent(), true);
+        $names = array_column($data['data'], 'name');
+
+        $this->assertContains('Iron Sword', $names);
+        $this->assertNotContains('War Hammer', $names);
+    }
+
+    public function test_armour_profile_with_invalid_weapon_subtype_is_rejected(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $response = $this->actingAs($admin)->call(
+            'GET',
+            '/api/admin/items?profile=armour&subtype=sword',
+            [], [], [], ['HTTP_ACCEPT' => 'application/json'],
+        );
+
+        $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_weapons_profile_with_invalid_armour_subtype_is_rejected(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $response = $this->actingAs($admin)->call(
+            'GET',
+            '/api/admin/items?profile=weapons&subtype=body',
+            [], [], [], ['HTTP_ACCEPT' => 'application/json'],
+        );
+
+        $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_profile_without_subtype_support_rejects_a_subtype(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $response = $this->actingAs($admin)->call(
+            'GET',
+            '/api/admin/items?profile=rings&subtype=sword',
+            [], [], [], ['HTTP_ACCEPT' => 'application/json'],
+        );
+
+        $this->assertSame(422, $response->getStatusCode());
+    }
+
+    public function test_armour_profile_with_valid_subtype_composes_with_search_and_sort(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createItem(['name' => 'Aged Body Armour', 'type' => 'body']);
+        $this->createItem(['name' => 'Aged Helmet', 'type' => 'helmet']);
+        $this->createItem(['name' => 'Fresh Body Armour', 'type' => 'body']);
+
+        $response = $this->actingAs($admin)->call(
+            'GET',
+            '/api/admin/items?profile=armour&subtype=body&search_text=Aged&sort_key=name&sort_direction=asc'
+        );
+        $data = json_decode($response->getContent(), true);
+        $names = array_column($data['data'], 'name');
+
+        $this->assertSame(['Aged Body Armour'], $names);
+    }
+
     public function test_quest_items_profile_only_includes_quest_type(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());

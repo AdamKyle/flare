@@ -10,7 +10,6 @@ const ItemScreenKit = createScreenManager<ItemScreenPropsMap>();
 export const {
   ScreenManagerProvider: ItemScreenManagerProvider,
   useScreenNavigation: useItemScreenNavigation,
-  useBindScreen: useBindItemScreen,
   ScreenHost: ItemScreenHost,
 } = ItemScreenKit;
 

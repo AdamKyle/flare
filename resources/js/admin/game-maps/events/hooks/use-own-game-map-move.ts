@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import UseOwnGameMapMoveDefinition from './definitions/use-own-game-map-move-definition';
 import UseOwnGameMapMoveOptions from './types/use-own-game-map-move-options';
 import { useGameMapMoveEmitter } from './use-game-map-move-emitter';
+import { useGameMapMoveOrchestration } from '../../hooks/use-game-map-move-orchestration';
 import { GameMapMoveEventMap } from '../definitions/game-map-move-event-map';
 import { GameMapMoveEvent } from '../enums/game-map-move-event';
-import { useGameMapMoveOrchestration } from '../../hooks/use-game-map-move-orchestration';
 
 export const useOwnGameMapMove = ({
   game_map_id: gameMapId,

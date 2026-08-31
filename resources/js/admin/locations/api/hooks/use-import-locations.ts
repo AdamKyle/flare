@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
-
 import { useActivityTimeout } from 'api-handler/hooks/use-activity-timeout';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 import UseImportLocationsDefinition from './definitions/use-import-locations-definition';
 import LocationImportResponseDefinition from '../definitions/location-import-response-definition';

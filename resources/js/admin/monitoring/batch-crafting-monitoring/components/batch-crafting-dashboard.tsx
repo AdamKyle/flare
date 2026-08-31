@@ -1,148 +1,46 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React from 'react';
 
 import MonitorCard from './monitor-card';
 import MonitoringStatusChart from '../../components/monitoring-status-chart';
-import { ADMIN_MONITORING_CHART_COLORS } from '../../values/admin-monitoring-chart-colors';
-import BatchCraftingLogsPage from '../api/definitions/batch-crafting-logs-page-definition';
-import { BatchCraftingMonitoringMessages } from '../api/enums/batch-crafting-monitoring-messages';
-import {
-  ActiveBatchCrafter,
-  BatchCraftingChartPoint,
-  BatchCraftingFilters,
-  BatchCraftingRunRow,
-  BatchCraftingSummary,
-  Paginated,
-} from '../api/definitions/batch-crafting-monitoring-definition';
-import { useBatchCraftingApi } from '../api/hooks/use-batch-crafting-api';
-import useBatchCraftingLiveRefresh from '../hooks/use-batch-crafting-live-refresh';
-import useBatchCraftingRefresh from '../hooks/use-batch-crafting-refresh';
+import useScrollToElement from '../../hooks/use-scroll-to-element';
+import useBatchCraftingDashboard from '../hooks/use-batch-crafting-dashboard';
 import BatchCraftingSummaryCard from '../types/batch-crafting-summary-card';
-import createEmptyBatchCraftingLogsPage from '../utils/create-empty-batch-crafting-logs-page';
-import createEmptyBatchCraftingPage from '../utils/create-empty-batch-crafting-page';
 import humanizeBatchCraftingStatus from '../utils/humanize-batch-crafting-status';
 import { DAY_OPTIONS } from '../values/day-options';
-import { DEFAULT_BATCH_CRAFTING_FILTERS } from '../values/default-batch-crafting-filters';
-import { EMPTY_BATCH_CRAFTING_SUMMARY } from '../values/empty-batch-crafting-summary';
 
 export default function BatchCraftingDashboard() {
   const {
-    fetchBatchCraftingActive,
-    fetchBatchCraftingChart,
-    fetchBatchCraftingLogs,
-    fetchBatchCraftingRuns,
-    fetchBatchCraftingSummary,
-  } = useBatchCraftingApi();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [days, setDays] = useState('7');
-  const [summary, setSummary] = useState<BatchCraftingSummary>(
-    EMPTY_BATCH_CRAFTING_SUMMARY
-  );
-  const [chartData, setChartData] = useState<BatchCraftingChartPoint[]>([]);
-  const [active, setActive] = useState<ActiveBatchCrafter[]>([]);
-  const [runs, setRuns] = useState<Paginated<BatchCraftingRunRow>>(
-    createEmptyBatchCraftingPage()
-  );
-  const [filters, setFiltersState] = useState<BatchCraftingFilters>(
-    DEFAULT_BATCH_CRAFTING_FILTERS
-  );
-  const [page, setPage] = useState(1);
-  const [logs, setLogs] = useState<BatchCraftingLogsPage>(
-    createEmptyBatchCraftingLogsPage()
-  );
-  const [logPage, setLogPage] = useState(1);
-  const [logSeverity, setLogSeverityState] = useState('');
-
-  const refresh = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const [summaryData, chart, activeData, runsData, logsData] =
-        await Promise.all([
-          fetchBatchCraftingSummary(days),
-          fetchBatchCraftingChart(days),
-          fetchBatchCraftingActive(),
-          fetchBatchCraftingRuns(filters, page),
-          fetchBatchCraftingLogs(logPage, logSeverity),
-        ]);
-
-      setSummary(summaryData);
-      setChartData(chart);
-      setActive(activeData);
-      setRuns(runsData);
-      setLogs(logsData);
-    } catch {
-      setError(BatchCraftingMonitoringMessages.Load);
-    } finally {
-      setLoading(false);
-    }
-  }, [
+    loading,
+    error,
     days,
-    fetchBatchCraftingActive,
-    fetchBatchCraftingChart,
-    fetchBatchCraftingLogs,
-    fetchBatchCraftingRuns,
-    fetchBatchCraftingSummary,
+    set_days: setDays,
+    summary,
+    chart_points: chartPoints,
+    chart_series: chartSeries,
+    active,
+    runs,
     filters,
-    logPage,
-    logSeverity,
-    page,
-  ]);
+    update_filters: updateFilters,
+    apply_table_filter: applyTableFilter,
+    set_page: setPage,
+    logs,
+    set_log_page: setLogPage,
+    log_severity: logSeverity,
+    update_log_severity: updateLogSeverity,
+  } = useBatchCraftingDashboard();
 
-  useBatchCraftingRefresh(refresh);
-  useBatchCraftingLiveRefresh(refresh);
+  const { scroll_to_element: scrollToElement } = useScrollToElement();
+  const runsTableElementId = 'batch-crafting-runs-table';
 
-  const chartPoints = useMemo(
-    () =>
-      chartData.map((point) => ({
-        period: point.period,
-        runs: point.runs,
-        crafted: point.crafted,
-        failed: point.failed,
-      })),
-    [chartData]
-  );
-  const chartSeries = useMemo(
-    () => [
-      {
-        key: 'runs',
-        label: 'Runs',
-        color: ADMIN_MONITORING_CHART_COLORS.indigo,
-      },
-      {
-        key: 'crafted',
-        label: 'Crafted',
-        color: ADMIN_MONITORING_CHART_COLORS.emerald,
-      },
-      {
-        key: 'failed',
-        label: 'Failed',
-        color: ADMIN_MONITORING_CHART_COLORS.rose,
-      },
-    ],
-    []
-  );
+  const handleSummaryFilter = (
+    filter: Partial<typeof filters> | null
+  ): void => {
+    if (filter === null) {
+      return;
+    }
 
-  const applyTableFilter = (nextFilters: Partial<BatchCraftingFilters>) => {
-    setFiltersState({ ...DEFAULT_BATCH_CRAFTING_FILTERS, ...nextFilters });
-    setPage(1);
-    window.setTimeout(() => {
-      document.getElementById('batch-crafting-runs-table')?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }, 0);
-  };
-
-  const updateFilters = (nextFilters: BatchCraftingFilters) => {
-    setFiltersState(nextFilters);
-    setPage(1);
-  };
-
-  const updateLogSeverity = (severity: string) => {
-    setLogSeverityState(severity);
-    setLogPage(1);
+    applyTableFilter(filter);
+    scrollToElement(runsTableElementId);
   };
 
   const levelColor = (level: string): string => {
@@ -403,7 +301,7 @@ export default function BatchCraftingDashboard() {
             <MonitorCard
               key={label}
               onClick={
-                filter !== null ? () => applyTableFilter(filter) : undefined
+                filter !== null ? () => handleSummaryFilter(filter) : undefined
               }
               ariaLabel={
                 filter !== null ? `Filter recent runs by ${label}` : undefined
@@ -445,7 +343,7 @@ export default function BatchCraftingDashboard() {
 
       {renderActiveBatches()}
 
-      <div id="batch-crafting-runs-table">
+      <div id={runsTableElementId}>
         <MonitorCard>
           <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
             Recent Runs

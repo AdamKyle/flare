@@ -1,5 +1,5 @@
-import GameMapFormOptionsDefinition from '../definitions/game-map-form-options-definition';
 import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-definition';
+import GameMapFormOptionsDefinition from '../definitions/game-map-form-options-definition';
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 
 export default interface GameMapAccessFieldsProps {

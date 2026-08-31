@@ -1,6 +1,9 @@
+import { QuestIdentityDefinition } from '../quest-item-factual-definition';
+
 export default interface QuestRowsProps {
   heading: string;
-  name: string;
-  npc?: string | null;
-  map?: string | null;
+  quest: QuestIdentityDefinition;
+  on_open_quest?: (id: number) => void;
+  on_open_npc?: (id: number) => void;
+  on_open_map?: (id: number) => void;
 }

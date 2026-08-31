@@ -7,6 +7,7 @@ import LocationRequirementsSectionProps from '../types/partials/location-require
 const LocationsRequireSection = ({
   item,
   showSeparator,
+  navigation,
 }: LocationRequirementsSectionProps) => {
   const requiredLocations = item.required_locations || [];
 
@@ -23,8 +24,9 @@ const LocationsRequireSection = ({
         <LocationRow
           key={`required-location-${requiredLocation.id}`}
           heading="Required Location"
-          name={requiredLocation.name}
-          map={requiredLocation.map}
+          location={requiredLocation}
+          on_open_location={navigation.on_open_location}
+          on_open_map={navigation.on_open_map}
         />
       ))}
     </Section>

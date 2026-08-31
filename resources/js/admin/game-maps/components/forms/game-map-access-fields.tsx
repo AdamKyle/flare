@@ -1,10 +1,10 @@
 import React, { ReactNode } from 'react';
 
-import GameMapAccessFieldsProps from '../../types/game-map-access-fields-props';
 import {
   GAME_MAP_EVENT_TYPE_LABELS,
   isGameMapEventType,
 } from '../../enums/game-map-event-type';
+import GameMapAccessFieldsProps from '../../types/game-map-access-fields-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';

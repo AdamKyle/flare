@@ -1,5 +1,5 @@
-import { AnimatePresence } from 'framer-motion';
 import { useEventSystem } from 'event-system/hooks/use-event-system';
+import { AnimatePresence } from 'framer-motion';
 import React, { ReactNode, useEffect, useState } from 'react';
 
 import GameMapEntitySelector from './components/game-map-entity-selector';
@@ -7,15 +7,15 @@ import GameMapMoveConfirmation from './components/game-map-move-confirmation';
 import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import { GameMapSidePeekView } from './enums/game-map-side-peek-view';
 import GameMapCoordinateSidePeekProps from './types/game-map-coordinate-side-peek-props';
-import { useManageGameMapMove } from '../../events/hooks/use-manage-game-map-move';
+import LocationFormScreen from '../../../locations/screens/location-form-screen';
+import NpcFormScreen from '../../../npcs/screens/npc-form-screen';
+import { GameMapMarkerVariant } from '../../enums/game-map-marker-variant';
 import { GameMapMoveEventMap } from '../../events/definitions/game-map-move-event-map';
 import { GameMapMoveEvent } from '../../events/enums/game-map-move-event';
-import { GameMapMarkerVariant } from '../../enums/game-map-marker-variant';
+import { useManageGameMapMove } from '../../events/hooks/use-manage-game-map-move';
 import { buildPlainCoordinate } from '../../utils/build-plain-coordinate';
 import { findMarkersAtCoordinate } from '../../utils/find-markers-at-coordinate';
 import { resolveMovingRecordTypeLabel } from '../../utils/resolve-moving-record-type-label';
-import LocationFormScreen from '../../../locations/screens/location-form-screen';
-import NpcFormScreen from '../../../npcs/screens/npc-form-screen';
 
 import StackedCard from 'ui/cards/stacked-card';
 

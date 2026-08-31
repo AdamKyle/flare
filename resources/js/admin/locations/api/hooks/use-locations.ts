@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
 import UsePaginatedApiHandler from 'api-handler/hooks/use-paginated-api-handler';
+import { useState } from 'react';
 
 import UseLocationsDefinition from './definitions/use-locations-definition';
 import LocationListDefinition from '../definitions/location-list-definition';

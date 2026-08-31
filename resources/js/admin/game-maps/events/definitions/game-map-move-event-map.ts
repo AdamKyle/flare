@@ -1,8 +1,8 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import { GameMapMoveEvent } from '../enums/game-map-move-event';
 import CoordinateDefinition from '../../types/coordinate-definition';
 import { MovingRecordDefinition } from '../../types/game-map-editor-canvas-props';
+import { GameMapMoveEvent } from '../enums/game-map-move-event';
 
 export interface GameMapMoveStateDefinition {
   moving_record: MovingRecordDefinition | null;

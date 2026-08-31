@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
-import UsableItemEffects from './usable-item-effects';
 import UsableItemFactualPresentationProps from './types/usable-item-factual-presentation-props';
+import UsableItemEffects from './usable-item-effects';
 import ItemMetaSection from '../../components/side-peeks/character-inventory/inventory-item/partials/item-view/item-meta-tsx';
 
 import Separator from 'ui/separator/separator';

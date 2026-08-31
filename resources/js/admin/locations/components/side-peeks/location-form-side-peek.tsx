@@ -1,9 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import LocationFormSidePeekProps from './types/location-form-side-peek-props';
-import LocationFormScreen from '../../screens/location-form-screen';
-
 import { useCloseSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
+import LocationFormScreen from '../../screens/location-form-screen';
 
 const LocationFormSidePeek = ({
   game_map_id: gameMapId,

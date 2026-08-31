@@ -1,8 +1,8 @@
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { useGameMapMoveEmitter } from './use-game-map-move-emitter';
 import UseManageGameMapMoveDefinition from './definitions/use-manage-game-map-move-definition';
+import { useGameMapMoveEmitter } from './use-game-map-move-emitter';
 import {
   GameMapMoveEventMap,
   GameMapMoveStateDefinition,

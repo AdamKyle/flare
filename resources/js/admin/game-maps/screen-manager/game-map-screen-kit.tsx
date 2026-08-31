@@ -10,7 +10,6 @@ const GameMapScreenKit = createScreenManager<GameMapScreenPropsMap>();
 export const {
   ScreenManagerProvider: GameMapScreenManagerProvider,
   useScreenNavigation: useGameMapScreenNavigation,
-  useBindScreen: useBindGameMapScreen,
   ScreenHost: GameMapScreenHost,
 } = GameMapScreenKit;
 

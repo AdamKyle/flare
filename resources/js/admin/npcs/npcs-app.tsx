@@ -10,7 +10,6 @@ import {
   NpcScreenProvider,
   useNpcScreenNavigation,
 } from './screen-manager/npc-screen-kit';
-
 import BaseSidePeek from '../../game/components/side-peeks/base/base-side-peek';
 
 const NpcListInitializer = (): null => {

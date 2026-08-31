@@ -10,7 +10,6 @@ import {
   LocationScreenProvider,
   useLocationScreenNavigation,
 } from './screen-manager/location-screen-kit';
-
 import BaseSidePeek from '../../game/components/side-peeks/base/base-side-peek';
 
 const LocationListInitializer = (): null => {

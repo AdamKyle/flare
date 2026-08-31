@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 
-import { GameMapKingdomOwnerType } from '../../api/enums/game-map-kingdom-owner-type';
 import GameMapKingdomSidePeekProps from './types/game-map-kingdom-side-peek-props';
+import { GameMapKingdomOwnerType } from '../../api/enums/game-map-kingdom-owner-type';
 
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';

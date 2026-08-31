@@ -1,24 +1,22 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 
 import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import GameMapLocationSidePeekProps from './types/game-map-location-side-peek-props';
-import { LocationApiMessages } from '../../../locations/api/enums/location-api-messages';
-import { LocationDetailRelatedItemDefinition } from '../../../locations/api/definitions/location-detail-definition';
-import { useLocationDetail } from '../../../locations/api/hooks/use-location-detail';
-import { useLocationQuestItems } from '../../../locations/api/hooks/use-location-quest-items';
-import LocationDetailBody from '../../../locations/components/location-detail-body';
-import LocationDefinition from '../../../locations/api/definitions/location-definition';
-import LocationFormScreen from '../../../locations/screens/location-form-screen';
-
-import AdminQuestItemPresentationDefinition from '../../../items/api/definitions/admin-quest-item-presentation-definition';
-
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminQuestItemPresentationDefinition from '../../../items/api/definitions/admin-quest-item-presentation-definition';
+import LocationDefinition from '../../../locations/api/definitions/location-definition';
+import { LocationDetailRelatedItemDefinition } from '../../../locations/api/definitions/location-detail-definition';
+import { LocationApiMessages } from '../../../locations/api/enums/location-api-messages';
+import { useLocationDetail } from '../../../locations/api/hooks/use-location-detail';
+import { useLocationQuestItems } from '../../../locations/api/hooks/use-location-quest-items';
+import LocationDetailBody from '../../../locations/components/location-detail-body';
+import LocationFormScreen from '../../../locations/screens/location-form-screen';
 
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import StackedCard from 'ui/cards/stacked-card';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const GameMapLocationSidePeek = ({
   game_map_id: gameMapId,
@@ -59,7 +57,7 @@ const GameMapLocationSidePeek = ({
       SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
       {
         is_open: true,
-        title: item.name,
+        title: 'Item Details',
         allow_clicking_outside: true,
         item_id: item.item_id,
         on_item_changed: () => questItems.refresh(),
@@ -75,10 +73,23 @@ const GameMapLocationSidePeek = ({
       SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
       {
         is_open: true,
-        title: item.name,
+        title: 'Item Details',
         allow_clicking_outside: true,
         item_id: item.id,
         on_item_changed: () => refresh(),
+      }
+    );
+  };
+
+  const handleOpenMap = (id: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
+      {
+        is_open: true,
+        title: 'Game Map Details',
+        allow_clicking_outside: true,
+        game_map_id: id,
       }
     );
   };
@@ -118,6 +129,7 @@ const GameMapLocationSidePeek = ({
           quest_items={questItems}
           on_open_related_item={handleOpenRelatedItem}
           on_open_quest_item={handleOpenQuestItem}
+          on_open_map={handleOpenMap}
         />
       </div>
     );

@@ -4,8 +4,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ServiceContainer } from 'service-container-provider/service-container';
 
-import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 import BatchCraftingDashboard from './batch-crafting-monitoring/components/batch-crafting-dashboard';
+import { EchoHandlerProvider } from '../../websocket-handler/components/echo-handler-provider';
 
 const element = document.getElementById('batch-crafting-monitoring');
 

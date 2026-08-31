@@ -1,20 +1,43 @@
 import React from 'react';
 
+import FactualLink from './factual-link';
 import QuestMapRow from './quest-map-row';
 import DefinitionRow from '../../viewable-sections/definition-row';
 import InfoLabel from '../../viewable-sections/info-label';
-import TextRow from '../../viewable-sections/text-row';
 import QuestRowsProps from '../types/partials/quest-rows-props';
 
-const QuestRows = ({ heading, name, npc, map }: QuestRowsProps) => {
+const QuestRows = ({
+  heading,
+  quest,
+  on_open_quest: onOpenQuest,
+  on_open_npc: onOpenNpc,
+  on_open_map: onOpenMap,
+}: QuestRowsProps) => {
   return (
     <>
       <DefinitionRow
         left={<InfoLabel label={heading} />}
-        right={<span className="text-gray-800 dark:text-gray-200">{name}</span>}
+        right={
+          <FactualLink
+            id={quest.id}
+            label={quest.name}
+            on_click={onOpenQuest}
+          />
+        }
       />
-      <TextRow label="For NPC" value={npc} />
-      <QuestMapRow map={map} />
+      {quest.npc ? (
+        <DefinitionRow
+          left={<InfoLabel label="For NPC" />}
+          right={
+            <FactualLink
+              id={quest.npc.id}
+              label={quest.npc.name}
+              on_click={onOpenNpc}
+            />
+          }
+        />
+      ) : null}
+      <QuestMapRow game_map={quest.game_map} on_open_map={onOpenMap} />
     </>
   );
 };

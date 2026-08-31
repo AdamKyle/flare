@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import UseLogDashboardDataDefinition from './definitions/use-log-dashboard-data-definition';
 import UseLogDashboardDataParams from './definitions/use-log-dashboard-data-params';
+import BugChartPointDefinition from '../api/definitions/bug-chart-point-definition';
 import { LogsDashboardMessages } from '../api/enums/logs-dashboard-messages';
 import {
   LogEntriesPage,
@@ -9,7 +10,6 @@ import {
   SystemBugReport,
 } from '../types/logs-dashboard';
 import createEmptyLogEntriesPage from '../utils/create-empty-log-entries-page';
-import BugChartPointDefinition from '../api/definitions/bug-chart-point-definition';
 
 export default function useLogDashboardData({
   selected_file,

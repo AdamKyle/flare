@@ -1,18 +1,28 @@
 import React from 'react';
 
+import FactualLink from './factual-link';
 import DefinitionRow from '../../viewable-sections/definition-row';
 import InfoLabel from '../../viewable-sections/info-label';
 import QuestMapRowProps from '../types/partials/quest-map-row-props';
 
-const QuestMapRow = ({ map }: QuestMapRowProps) => {
-  if (map == null) {
+const QuestMapRow = ({
+  game_map: gameMap,
+  on_open_map: onOpenMap,
+}: QuestMapRowProps) => {
+  if (gameMap == null) {
     return null;
   }
 
   return (
     <DefinitionRow
       left={<InfoLabel label="While On Map" />}
-      right={<span className="text-gray-800 dark:text-gray-200">{map}</span>}
+      right={
+        <FactualLink
+          id={gameMap.id}
+          label={gameMap.name}
+          on_click={onOpenMap}
+        />
+      }
     />
   );
 };

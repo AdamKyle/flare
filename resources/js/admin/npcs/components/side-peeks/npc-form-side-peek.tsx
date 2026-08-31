@@ -1,9 +1,8 @@
 import React, { ReactNode } from 'react';
 
 import NpcFormSidePeekProps from './types/npc-form-side-peek-props';
-import NpcFormScreen from '../../screens/npc-form-screen';
-
 import { useCloseSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-close-side-peek-emitter';
+import NpcFormScreen from '../../screens/npc-form-screen';
 
 const NpcFormSidePeek = ({
   game_map_id: gameMapId,

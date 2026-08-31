@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import UseLogFilesDefinition from './definitions/use-log-files-definition';
-import { LogsDashboardMessages } from '../api/enums/logs-dashboard-messages';
 import LogFileInfoDefinition from '../api/definitions/log-file-info-definition';
+import { LogsDashboardMessages } from '../api/enums/logs-dashboard-messages';
 
 export default function useLogFiles(
   fetch_log_files: () => Promise<LogFileInfoDefinition[]>

@@ -1,11 +1,12 @@
 import React, { ReactNode } from 'react';
 
-import ItemFormFieldsProps from '../../types/item-form-fields-props';
 import { ItemCatalogType } from '../../enums/item-catalog-type';
 import {
   ITEM_EFFECT_TYPE_LABELS,
   isItemEffectType,
 } from '../../enums/item-effect-type';
+import ItemFormFieldsProps from '../../types/item-form-fields-props';
+import { parseNumberOption } from '../../utils/parse-item-dropdown-value';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
@@ -38,32 +39,57 @@ const ItemQuestEffectFields = ({
 
   const isQuestItem = state.type === ItemCatalogType.QUEST;
 
+  const renderQuestEffectField = (): ReactNode => {
+    if (!isQuestItem) {
+      return null;
+    }
+
+    return (
+      <FieldWrapper id="item-effect" label="Quest Effect">
+        {(describedBy) => (
+          <Dropdown
+            id="item-effect"
+            aria_label="Quest Effect"
+            aria_described_by={describedBy}
+            items={effectItems}
+            pre_selected_item={effectItems.find(
+              (item) => item.value === state.effect
+            )}
+            on_select={(item) => {
+              if (!isItemEffectType(item.value)) {
+                return;
+              }
+
+              onChange('effect', item.value);
+            }}
+            on_clear={() => onChange('effect', '')}
+            selection_placeholder="None"
+          />
+        )}
+      </FieldWrapper>
+    );
+  };
+
+  const renderResurrectionChanceField = (): ReactNode => {
+    if (!state.can_resurrect) {
+      return null;
+    }
+
+    return (
+      <NumberField
+        id="item-resurrection-chance"
+        label="Resurrection Chance"
+        value={state.resurrection_chance}
+        on_change={(value) => onChange('resurrection_chance', value)}
+        error={errors.resurrection_chance}
+        min={0}
+      />
+    );
+  };
+
   return (
     <div className="space-y-4">
-      {isQuestItem && (
-        <FieldWrapper id="item-effect" label="Quest Effect">
-          {(describedBy) => (
-            <Dropdown
-              id="item-effect"
-              aria_label="Quest Effect"
-              aria_described_by={describedBy}
-              items={effectItems}
-              pre_selected_item={effectItems.find(
-                (item) => item.value === state.effect
-              )}
-              on_select={(item) => {
-                if (!isItemEffectType(item.value)) {
-                  return;
-                }
-
-                onChange('effect', item.value);
-              }}
-              on_clear={() => onChange('effect', '')}
-              selection_placeholder="None"
-            />
-          )}
-        </FieldWrapper>
-      )}
+      {renderQuestEffectField()}
 
       <FieldWrapper id="item-drop-location" label="Drop Location">
         {(describedBy) => (
@@ -77,7 +103,7 @@ const ItemQuestEffectFields = ({
               (item) => item.value === state.drop_location_id
             )}
             on_select={(item) =>
-              onChange('drop_location_id', Number(item.value))
+              onChange('drop_location_id', parseNumberOption(item.value))
             }
             on_clear={() => onChange('drop_location_id', null)}
             selection_placeholder="None"
@@ -96,7 +122,7 @@ const ItemQuestEffectFields = ({
               (item) => item.value === state.unlocks_class_id
             )}
             on_select={(item) =>
-              onChange('unlocks_class_id', Number(item.value))
+              onChange('unlocks_class_id', parseNumberOption(item.value))
             }
             on_clear={() => onChange('unlocks_class_id', null)}
             selection_placeholder="None"
@@ -114,7 +140,9 @@ const ItemQuestEffectFields = ({
             pre_selected_item={itemSkillItems.find(
               (item) => item.value === state.item_skill_id
             )}
-            on_select={(item) => onChange('item_skill_id', Number(item.value))}
+            on_select={(item) =>
+              onChange('item_skill_id', parseNumberOption(item.value))
+            }
             on_clear={() => onChange('item_skill_id', null)}
             selection_placeholder="None"
           />
@@ -184,16 +212,7 @@ const ItemQuestEffectFields = ({
         on_change={(value) => onChange('can_resurrect', value)}
       />
 
-      {state.can_resurrect && (
-        <NumberField
-          id="item-resurrection-chance"
-          label="Resurrection Chance"
-          value={state.resurrection_chance}
-          on_change={(value) => onChange('resurrection_chance', value)}
-          error={errors.resurrection_chance}
-          min={0}
-        />
-      )}
+      {renderResurrectionChanceField()}
 
       <div className="grid gap-4 md:grid-cols-3">
         <NumberField

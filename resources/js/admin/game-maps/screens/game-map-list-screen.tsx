@@ -1,18 +1,16 @@
 import React, { ReactNode, useState } from 'react';
 
+import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import GameMapDefinition from '../api/definitions/game-map-definition';
 import { useGameMaps } from '../api/hooks/use-game-maps';
 import { GAME_MAP_LIST_COLUMNS } from '../definitions/game-map-list-columns';
 import { GameMapImportCopy } from '../enums/game-map-import-copy';
 import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
-
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
-
-import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';

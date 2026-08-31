@@ -1,10 +1,9 @@
 @extends('layouts.information')
 
 @section('content')
-    @include(
-        'admin.monsters.partials.monster',
-        [
-            'monster' => $monster,
-        ]
-)
+    <div class="m-auto" id="monster-info-app" data-monster-id="{{ $monster->id }}"></div>
 @endsection
+
+@push('scripts')
+    @vite('resources/js/information/monsters/monsters-info-app.tsx')
+@endpush

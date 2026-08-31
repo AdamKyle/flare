@@ -1,7 +1,7 @@
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
-import GameMapFormOptionsDefinition from '../../definitions/game-map-form-options-definition';
 import GameMapFormErrorsDefinition from '../../definitions/game-map-form-errors-definition';
+import GameMapFormOptionsDefinition from '../../definitions/game-map-form-options-definition';
 import GameMapFormResponseDefinition from '../../definitions/game-map-form-response-definition';
 import GameMapFormStateDefinition from '../../definitions/game-map-form-state-definition';
 

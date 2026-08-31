@@ -92,7 +92,7 @@
         </a>
         <hr />
         <h6 class="uppercase">Quests</h6>
-        <a href="{{ route('quests.create') }}">
+        <a href="{{ route('admin.quests.index') }}">
             <span class="fas fa-plus"></span>
             Create New Quest
         </a>
@@ -114,15 +114,15 @@
         </a>
         <hr />
         <h6 class="uppercase">Monsters</h6>
-        <a href="{{ route('monsters.create') }}">
+        <a href="{{ route('admin.monsters.index') }}">
             <span class="fas fa-plus"></span>
             Create New Monster
         </a>
-        <a href="{{ route('monsters.export') }}">
+        <a href="{{ route('admin.monsters.export') }}">
             <span class="fas fa-file-export"></span>
             Export Data
         </a>
-        <a href="{{ route('monsters.import') }}">
+        <a href="{{ route('admin.monsters.index') }}">
             <span class="fas fa-file-import"></span>
             Import Data
         </a>

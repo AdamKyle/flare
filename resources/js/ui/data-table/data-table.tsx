@@ -1,6 +1,5 @@
-import React, { ReactNode } from 'react';
-
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import React, { ReactNode } from 'react';
 
 import DataTableFilters from 'ui/data-table/data-table-filters';
 import DataTablePagination from 'ui/data-table/data-table-pagination';

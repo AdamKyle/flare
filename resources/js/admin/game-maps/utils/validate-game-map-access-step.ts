@@ -1,7 +1,7 @@
-import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-definition';
 import GameMapFormOptionsDefinition from '../definitions/game-map-form-options-definition';
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
+import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 
 /**
  * Validate the Game Map wizard's Access step: a selected required Location must

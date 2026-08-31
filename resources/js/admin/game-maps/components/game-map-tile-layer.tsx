@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
-import { MapTileSize } from 'game-utils/map-tile-size';
-
 import GameMapTileLayerProps from '../types/game-map-tile-layer-props';
+
+import { MapTileSize } from 'game-utils/map-tile-size';
 
 const GameMapTileLayer = ({ tiles }: GameMapTileLayerProps): ReactNode => (
   <>

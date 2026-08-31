@@ -1,6 +1,6 @@
-import LocationFormOptionsDefinition from '../api/definitions/location-form-options-definition';
 import LocationFormErrors from './location-form-errors';
 import LocationFormState from './location-form-state';
+import LocationFormOptionsDefinition from '../api/definitions/location-form-options-definition';
 
 export default interface LocationRulesFieldsProps {
   state: LocationFormState;

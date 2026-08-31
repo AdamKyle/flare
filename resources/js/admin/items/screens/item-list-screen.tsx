@@ -1,23 +1,23 @@
 import React, { ReactNode, useState } from 'react';
 
+import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import ItemDefinition from '../api/definitions/item-definition';
 import { useItems } from '../api/hooks/use-items';
+import { ITEM_CATALOG_TYPE_LABELS } from '../enums/item-catalog-type';
 import { ItemImportCopy } from '../enums/item-import-copy';
 import {
   ITEM_PROFILE_LABELS,
   ITEM_PROFILE_VALUES,
   isItemProfile,
 } from '../enums/item-profile';
+import { subtypesForProfile } from '../enums/item-subtype';
 import { ItemScreens } from '../screen-manager/item-screen-constants';
 import { useItemScreenNavigation } from '../screen-manager/item-screen-kit';
 import { buildItemListColumns } from '../utils/build-item-list-columns';
-
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
-
-import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -45,6 +45,8 @@ const ItemListScreen = (): ReactNode => {
     set_page: setPage,
     profile,
     set_profile: setProfile,
+    subtype,
+    set_subtype: setSubtype,
     sort_key: sortKey,
     sort_direction: sortDirection,
     set_sort: setSort,
@@ -80,6 +82,36 @@ const ItemListScreen = (): ReactNode => {
   const totalPages = response?.meta.pagination.total_pages ?? 0;
   const totalRecords = response?.meta.pagination.total ?? 0;
   const columns = buildItemListColumns(profile);
+
+  const subtypeOptions = subtypesForProfile(profile);
+  const subtypeItems: DropdownItem[] = (subtypeOptions ?? []).map(
+    (subtypeOption) => ({
+      label: ITEM_CATALOG_TYPE_LABELS[subtypeOption],
+      value: subtypeOption,
+    })
+  );
+
+  const renderSubtypeFilter = (): ReactNode => {
+    if (!subtypeOptions) {
+      return null;
+    }
+
+    return (
+      <div className="w-full max-w-xs">
+        <Dropdown
+          id="item-subtype-select"
+          aria_label="Item subtype"
+          items={subtypeItems}
+          pre_selected_item={subtypeItems.find(
+            (item) => item.value === subtype
+          )}
+          on_select={(item) => setSubtype(String(item.value))}
+          on_clear={() => setSubtype(null)}
+          selection_placeholder="All subtypes"
+        />
+      </div>
+    );
+  };
 
   return (
     <AdminPage
@@ -118,6 +150,9 @@ const ItemListScreen = (): ReactNode => {
             selection_placeholder="Select an Item profile"
           />
         </div>
+
+        {renderSubtypeFilter()}
+
         <Button
           label={ItemImportCopy.Import}
           variant={ButtonVariant.PRIMARY}

@@ -1,24 +1,38 @@
 import React from 'react';
 
+import FactualLink from './factual-link';
 import DefinitionRow from '../../viewable-sections/definition-row';
 import InfoLabel from '../../viewable-sections/info-label';
 import LocationRowProps from '../types/partials/location-row-props';
 
-const LocationRow = ({ heading, name, map }: LocationRowProps) => {
+const LocationRow = ({
+  heading,
+  location,
+  on_open_location: onOpenLocation,
+  on_open_map: onOpenMap,
+}: LocationRowProps) => {
   return (
     <>
       <DefinitionRow
         left={<InfoLabel label={heading} />}
-        right={<span className="text-gray-800 dark:text-gray-200">{name}</span>}
+        right={
+          <FactualLink
+            id={location.id}
+            label={location.name}
+            on_click={onOpenLocation}
+          />
+        }
       />
-      {map ? (
-        <DefinitionRow
-          left={<InfoLabel label="While On Map" />}
-          right={
-            <span className="text-gray-800 dark:text-gray-200">{map}</span>
-          }
-        />
-      ) : null}
+      <DefinitionRow
+        left={<InfoLabel label="While On Map" />}
+        right={
+          <FactualLink
+            id={location.game_map.id}
+            label={location.game_map.name}
+            on_click={onOpenMap}
+          />
+        }
+      />
     </>
   );
 };

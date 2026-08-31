@@ -1,5 +1,9 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 
+import AdminBackButton from '../../shared/components/admin-back-button';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { LocationApiMessages } from '../api/enums/location-api-messages';
 import LocationBasicFields from '../components/location-basic-fields';
 import LocationRulesFields from '../components/location-rules-fields';
@@ -7,11 +11,6 @@ import { useFocusFirstInvalidLocationField } from '../hooks/use-focus-first-inva
 import { useLocationForm } from '../hooks/use-location-form';
 import LocationFormScreenProps from '../types/location-form-screen-props';
 
-import AdminBackButton from '../../shared/components/admin-back-button';
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
-
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import FormWizard from 'ui/form-wizard/form-wizard';
 import Step from 'ui/form-wizard/step';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';

@@ -1,15 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 
 import NpcFormScreen from './npc-form-screen';
-import { NpcScreens } from '../screen-manager/npc-screen-constants';
-import { useNpcScreenNavigation } from '../screen-manager/npc-screen-kit';
-import { NpcFormScreenEntryProps } from '../screen-manager/npc-screen-props';
-
 import { useGameMaps } from '../../game-maps/api/hooks/use-game-maps';
-
 import AdminBackButton from '../../shared/components/admin-back-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
+import { useNpcScreenNavigation } from '../screen-manager/npc-screen-kit';
+import { NpcFormScreenEntryProps } from '../screen-manager/npc-screen-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';

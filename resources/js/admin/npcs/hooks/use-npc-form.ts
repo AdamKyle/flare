@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 
 import UseNpcFormDefinition from './definitions/use-npc-form-definition';
 import { useNpcValidation } from './use-npc-validation';
+import NpcDefinition from '../api/definitions/npc-definition';
 import { useNpc } from '../api/hooks/use-npc';
 import { useNpcFormOptions } from '../api/hooks/use-npc-form-options';
 import { useSaveNpc } from '../api/hooks/use-save-npc';
-import NpcDefinition from '../api/definitions/npc-definition';
 import NpcFormState from '../types/npc-form-state';
 import { buildNpcRequest } from '../utils/build-npc-request';
 import { createNpcFormState } from '../utils/create-npc-form-state';

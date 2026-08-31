@@ -1,14 +1,12 @@
+import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 import { useCallback, useMemo, useState } from 'react';
 
-import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
-
 import UseGameMapMoveOrchestrationDefinition from './definitions/use-game-map-move-orchestration-definition';
+import { useMoveLocation } from '../../locations/api/hooks/use-move-location';
+import { useMoveNpc } from '../../npcs/api/hooks/use-move-npc';
 import { GameMapMarkerVariant } from '../enums/game-map-marker-variant';
 import CoordinateDefinition from '../types/coordinate-definition';
 import { MovingRecordDefinition } from '../types/game-map-editor-canvas-props';
-
-import { useMoveLocation } from '../../locations/api/hooks/use-move-location';
-import { useMoveNpc } from '../../npcs/api/hooks/use-move-npc';
 
 /**
  * Own the Location/Npc move-in-progress state for one Game Map move orchestration

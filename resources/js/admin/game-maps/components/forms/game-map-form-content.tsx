@@ -1,18 +1,16 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 
 import GameMapAccessFields from './game-map-access-fields';
 import GameMapBasicFields from './game-map-basic-fields';
 import GameMapBonusFields from './game-map-bonus-fields';
+import AdminBackButton from '../../../shared/components/admin-back-button';
+import AdminPage from '../../../shared/components/admin-page';
+import { AdminPageWidth } from '../../../shared/enums/admin-page-width';
 import { GameMapApiMessages } from '../../api/enums/game-map-api-messages';
 import { useGameMapForm } from '../../hooks/use-game-map-form';
 import GameMapFormContentProps from '../../types/game-map-form-content-props';
 import { resolveGameMapFormFinishLabel } from '../../utils/resolve-game-map-form-finish-label';
-
-import AdminBackButton from '../../../shared/components/admin-back-button';
-import AdminPage from '../../../shared/components/admin-page';
-import { AdminPageWidth } from '../../../shared/enums/admin-page-width';
-
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 
 import FormWizard from 'ui/form-wizard/form-wizard';
 import Step from 'ui/form-wizard/step';

@@ -1,6 +1,7 @@
+import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
+
 import CoordinateDefinition from '../../../types/coordinate-definition';
 import { MovingRecordDefinition } from '../../../types/game-map-editor-canvas-props';
-import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 
 export default interface UseManageGameMapMoveDefinition {
   moving_record: MovingRecordDefinition | null;

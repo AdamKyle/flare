@@ -1,6 +1,5 @@
 import React, { ReactNode } from 'react';
 
-import ItemFormFieldsProps from '../../types/item-form-fields-props';
 import {
   ITEM_ALCHEMY_TYPE_LABELS,
   isItemAlchemyType,
@@ -17,6 +16,7 @@ import {
   ITEM_SPECIALTY_TYPE_LABELS,
   isItemSpecialtyType,
 } from '../../enums/item-specialty-type';
+import ItemFormFieldsProps from '../../types/item-form-fields-props';
 
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';

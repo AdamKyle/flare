@@ -10,7 +10,6 @@ import {
   GameMapScreenProvider,
   useGameMapScreenNavigation,
 } from './screen-manager/game-map-screen-kit';
-
 import BaseSidePeek from '../../game/components/side-peeks/base/base-side-peek';
 
 const GameMapListInitializer = (): null => {

@@ -1,8 +1,7 @@
-import axios from 'axios';
-import { useEffect, useRef, useState } from 'react';
-
 import { AxiosErrorDefinition } from 'api-handler/definitions/axios-error-definition';
 import { useApiHandler } from 'api-handler/hooks/use-api-handler';
+import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
 
 import UseNpcDefinition from './definitions/use-npc-definition';
 import NpcDefinition from '../definitions/npc-definition';

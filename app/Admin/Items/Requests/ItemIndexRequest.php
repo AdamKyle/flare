@@ -31,6 +31,7 @@ class ItemIndexRequest extends FormRequest
             'page' => 'required|integer|min:1',
             'search_text' => 'nullable|string|max:255',
             'profile' => ['required', 'string', Rule::enum(ItemProfile::class)],
+            'subtype' => 'nullable|string',
             'sort_key' => 'required|string',
             'sort_direction' => 'required|string|in:asc,desc',
         ];
@@ -48,6 +49,7 @@ class ItemIndexRequest extends FormRequest
             'page' => $this->input('page', 1),
             'search_text' => $this->input('search_text', ''),
             'profile' => $this->input('profile', ItemProfile::ALL->value),
+            'subtype' => $this->input('subtype'),
             'sort_key' => $this->input('sort_key', 'name'),
             'sort_direction' => $this->input('sort_direction', 'asc'),
         ]);
@@ -62,16 +64,56 @@ class ItemIndexRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $validator): void {
-            $profile = ItemProfile::tryFrom($this->input('profile'));
-            $sortKey = $this->input('sort_key');
-
-            if (is_null($profile) || ! is_string($sortKey)) {
-                return;
-            }
-
-            if (! in_array($sortKey, $profile->allowedSortKeys(), true)) {
-                $validator->errors()->add('sort_key', 'The selected sort key is not allowed for this Item profile.');
-            }
+            $this->validateSortKey($validator);
+            $this->validateSubtype($validator);
         });
+    }
+
+    /**
+     * Reject a sort key that is not allowed for the requested Item profile.
+     *
+     * @param  Validator  $validator  Validator instance to add errors to.
+     */
+    private function validateSortKey(Validator $validator): void
+    {
+        $profile = ItemProfile::tryFrom($this->input('profile'));
+        $sortKey = $this->input('sort_key');
+
+        if (is_null($profile) || ! is_string($sortKey)) {
+            return;
+        }
+
+        if (! in_array($sortKey, $profile->allowedSortKeys(), true)) {
+            $validator->errors()->add('sort_key', 'The selected sort key is not allowed for this Item profile.');
+        }
+    }
+
+    /**
+     * Reject a subtype that is not a valid `items.type` value for the
+     * requested Item profile, and reject any subtype for a profile that
+     * does not support secondary subtype filtering.
+     *
+     * @param  Validator  $validator  Validator instance to add errors to.
+     */
+    private function validateSubtype(Validator $validator): void
+    {
+        $profile = ItemProfile::tryFrom($this->input('profile'));
+        $subtype = $this->input('subtype');
+
+        if (is_null($profile) || is_null($subtype)) {
+            return;
+        }
+
+        $allowedSubtypes = $profile->subtypes();
+
+        if (is_null($allowedSubtypes)) {
+            $validator->errors()->add('subtype', 'This Item profile does not support a subtype filter.');
+
+            return;
+        }
+
+        if (! in_array($subtype, $allowedSubtypes, true)) {
+            $validator->errors()->add('subtype', 'The selected subtype is not valid for this Item profile.');
+        }
     }
 }

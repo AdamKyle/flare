@@ -13,7 +13,7 @@
     "unused-files-check": "yarn unimported"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
+    "@eslint/js": "9",
     "@stylistic/eslint-plugin": "5.4.0",
     "@tailwindcss/postcss": "4.3.3",
     "@tailwindcss/typography": "0.5.19",
@@ -25,7 +25,7 @@
     "@typescript-eslint/eslint-plugin": "8.67.0",
     "@typescript-eslint/parser": "8.67.0",
     "@vitejs/plugin-react": "6.1.0",
-    "eslint": "10.9.0",
+    "eslint": "9",
     "eslint-import-resolver-alias": "1.1.2",
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jsx-a11y": "6.10.2",

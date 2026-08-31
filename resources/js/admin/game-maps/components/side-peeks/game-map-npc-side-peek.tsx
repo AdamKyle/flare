@@ -1,7 +1,11 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 
 import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import GameMapNpcSidePeekProps from './types/game-map-npc-side-peek-props';
+import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
+import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import NpcDefinition from '../../../npcs/api/definitions/npc-definition';
 import { NpcApiMessages } from '../../../npcs/api/enums/npc-api-messages';
 import { useNpcDetail } from '../../../npcs/api/hooks/use-npc-detail';
@@ -10,11 +14,6 @@ import { useNpcRewardItems } from '../../../npcs/api/hooks/use-npc-reward-items'
 import NpcDetailBody from '../../../npcs/components/npc-detail-body';
 import NpcFormScreen from '../../../npcs/screens/npc-form-screen';
 
-import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
-
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -50,19 +49,45 @@ const GameMapNpcSidePeek = ({
     onMoveRequested(npcId);
   };
 
-  const handleOpenItem = (itemId: number, itemName: string): void => {
+  const handleOpenItem = (itemId: number, _itemName: string): void => {
     sidePeekEmitter.emit(
       SidePeekEventType.SIDE_PEEK,
       SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
       {
         is_open: true,
-        title: itemName,
+        title: 'Item Details',
         allow_clicking_outside: true,
         item_id: itemId,
         on_item_changed: () => {
           quests.refresh();
           rewardItems.refresh();
         },
+      }
+    );
+  };
+
+  const handleOpenQuest = (questId: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL,
+      {
+        is_open: true,
+        title: 'Quest Details',
+        allow_clicking_outside: true,
+        quest_id: questId,
+      }
+    );
+  };
+
+  const handleOpenMap = (id: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
+      {
+        is_open: true,
+        title: 'Game Map Details',
+        allow_clicking_outside: true,
+        game_map_id: id,
       }
     );
   };
@@ -100,6 +125,8 @@ const GameMapNpcSidePeek = ({
           quests={quests}
           reward_items={rewardItems}
           on_open_item={handleOpenItem}
+          on_open_quest={handleOpenQuest}
+          on_open_map={handleOpenMap}
         />
       </div>
     );

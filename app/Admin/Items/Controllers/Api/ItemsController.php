@@ -111,6 +111,17 @@ class ItemsController extends Controller
     }
 
     /**
+     * Return the read-only deletion-impact usage report for the given Item.
+     *
+     * @param  Item  $item  Item to audit.
+     * @return JsonResponse Usage report JSON response.
+     */
+    public function usage(Item $item): JsonResponse
+    {
+        return response()->json($this->itemService->usage($item), 200);
+    }
+
+    /**
      * Delete the given catalog Item when it has no current dependencies.
      *
      * @param  Item  $item  Item to delete.

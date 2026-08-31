@@ -15,9 +15,9 @@ import { useGameMapCoordinateHighlight } from '../hooks/use-game-map-coordinate-
 import { useGameMapEditorPan } from '../hooks/use-game-map-editor-pan';
 import CoordinateDefinition from '../types/coordinate-definition';
 import GameMapEditorCanvasProps from '../types/game-map-editor-canvas-props';
-import { selectableCoordinateValues } from '../utils/selectable-coordinates';
-import { resolvePointerCoordinate } from '../utils/resolve-pointer-coordinate';
 import { resolveGameMapKeyboardNavigation } from '../utils/resolve-game-map-keyboard-navigation';
+import { resolvePointerCoordinate } from '../utils/resolve-pointer-coordinate';
+import { selectableCoordinateValues } from '../utils/selectable-coordinates';
 
 import { MapTileSize } from 'game-utils/map-tile-size';
 
@@ -125,7 +125,7 @@ const GameMapEditorCanvas = ({
   return (
     <div
       ref={containerRef}
-      className="relative h-[70vh] w-full touch-none overflow-hidden rounded-md border border-gray-300 bg-gray-900 dark:border-gray-700"
+      className="relative h-full w-full touch-none overflow-hidden rounded-md border border-gray-300 bg-gray-900 dark:border-gray-700"
     >
       <div
         ref={gridRef}

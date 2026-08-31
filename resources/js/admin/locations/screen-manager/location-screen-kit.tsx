@@ -10,7 +10,6 @@ const LocationScreenKit = createScreenManager<LocationScreenPropsMap>();
 export const {
   ScreenManagerProvider: LocationScreenManagerProvider,
   useScreenNavigation: useLocationScreenNavigation,
-  useBindScreen: useBindLocationScreen,
   ScreenHost: LocationScreenHost,
 } = LocationScreenKit;
 

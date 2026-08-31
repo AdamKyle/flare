@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
+import ReadOnlyItemCard from './read-only-item-card';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
@@ -39,20 +40,6 @@ const GenericItem = ({
   const getAc = (equippableItem: EquippableItemWithBase): number =>
     equippableItem.raw_ac ?? equippableItem.base_ac ?? 0;
 
-  const renderQuestDetails = (
-    questItem: BaseQuestItemDefinition
-  ): ReactNode => {
-    if (questItem.effect === null) {
-      return null;
-    }
-
-    return (
-      <span>
-        <strong>Effects</strong>: {questItem.effect}
-      </span>
-    );
-  };
-
   const renderEquippableDetails = (
     equippableItem: EquippableItemWithBase
   ): ReactNode => {
@@ -71,14 +58,6 @@ const GenericItem = ({
         </span>
       </>
     );
-  };
-
-  const renderItemDetails = (): ReactNode => {
-    if ('effect' in item) {
-      return renderQuestDetails(item as BaseQuestItemDefinition);
-    }
-
-    return renderEquippableDetails(item as EquippableItemWithBase);
   };
 
   const renderCheckbox = () => {
@@ -108,6 +87,27 @@ const GenericItem = ({
 
   const isQuest = item.type === InventoryItemTypes.QUEST;
 
+  const renderQuestItemCard = (
+    questItem: BaseQuestItemDefinition
+  ): ReactNode => (
+    <ReadOnlyItemCard
+      item_id={questItem.item_id}
+      name={questItem.name}
+      description={questItem.description}
+      effect={questItem.effect ? questItem.effect : null}
+      usable={questItem.usable}
+      on_click={handleViewItem}
+    />
+  );
+
+  if (isQuest) {
+    return (
+      <div className="grid grid-cols-1 items-start gap-3">
+        {renderQuestItemCard(item as BaseQuestItemDefinition)}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-[auto_1fr] items-start gap-3">
       {renderCheckbox()}
@@ -118,8 +118,7 @@ const GenericItem = ({
           backpackFocusRingStyles(item),
           backpackBorderStyles(item),
           backpackButtonBackground(item),
-          'w-full',
-          isQuest && 'col-span-2'
+          'w-full'
         )}
         onClick={handleViewItem}
         aria-labelledby={titleId}
@@ -135,7 +134,7 @@ const GenericItem = ({
           </div>
           <p className={clsx('my-2', itemColor)}>{item.description}</p>
           <div id={detailsId} className={clsx('text-sm', itemColor)}>
-            {renderItemDetails()}
+            {renderEquippableDetails(item as EquippableItemWithBase)}
           </div>
         </div>
       </button>

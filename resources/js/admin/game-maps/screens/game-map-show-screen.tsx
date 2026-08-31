@@ -1,26 +1,24 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-
-import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
-import { useGameMap } from '../api/hooks/use-game-map';
-import { GameMapCopy } from '../enums/game-map-copy';
-import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
-import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
-import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
-import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
-import { GameMapShowScreenProps } from '../screen-manager/game-map-screen-props';
-import { resolveRequiredQuestItemCopy } from '../utils/resolve-required-quest-item-copy';
-import { convertStoredBonusToPercentage } from '../utils/convert-stored-bonus-to-percentage';
-
-import AdminBackButton from '../../shared/components/admin-back-button';
-import AdminPage from '../../shared/components/admin-page';
-import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 
 import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminBackButton from '../../shared/components/admin-back-button';
+import AdminPage from '../../shared/components/admin-page';
+import { AdminPageWidth } from '../../shared/enums/admin-page-width';
+import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
+import { useGameMap } from '../api/hooks/use-game-map';
+import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
+import { GameMapCopy } from '../enums/game-map-copy';
+import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
+import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
+import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
+import { GameMapShowScreenProps } from '../screen-manager/game-map-screen-props';
+import { convertStoredBonusToPercentage } from '../utils/convert-stored-bonus-to-percentage';
+import { resolveRequiredQuestItemCopy } from '../utils/resolve-required-quest-item-copy';
 
-import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';

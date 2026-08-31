@@ -1,23 +1,14 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import MonitoringStatusChart from '../../components/monitoring-status-chart';
-import { ADMIN_MONITORING_CHART_COLORS } from '../../values/admin-monitoring-chart-colors';
 import AdminPaginationControls from '../../../shared/components/admin-pagination-controls';
-import {
-  ActiveDelveRunner,
-  DelveChartPoint,
-  DelveFilters,
-  DelveRunRow,
-  DelveSummary,
-} from '../api/definitions/delve-monitoring-definition';
-import { useDelveApi } from '../api/hooks/use-delve-api';
-import useDelveMonitoringLiveRefresh from '../hooks/use-delve-live-refresh';
+import MonitoringStatusChart from '../../components/monitoring-status-chart';
+import useScrollToElement from '../../hooks/use-scroll-to-element';
+import { ADMIN_MONITORING_CHART_COLORS } from '../../values/admin-monitoring-chart-colors';
+import useDelveDashboard from '../hooks/use-delve-dashboard';
 import {
   MonitorCardProps,
   RunLogDetailsProps,
 } from '../types/dashboard-component-props';
-import delvePaginationAdapter from '../utils/delve-pagination-adapter';
-import { DAY_OPTIONS } from '../values/filter-options';
 
 function MonitorCard({ children, onClick, ariaLabel }: MonitorCardProps) {
   const classes =
@@ -115,90 +106,31 @@ function RunLogDetails({ logs }: RunLogDetailsProps) {
   );
 }
 
-const defaultFilters: DelveFilters = {
-  character_name: '',
-  date_from: '',
-  date_to: '',
-  status: '',
-  outcome: '',
-};
-
 export default function DelveDashboard() {
   const {
-    fetchDelveActive,
-    fetchDelveRuns,
-    fetchDelveSummary,
-    fetchDelveChart,
-  } = useDelveApi();
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [active, setActive] = useState<ActiveDelveRunner[]>([]);
-  const [runs, setRuns] = useState(
-    delvePaginationAdapter<DelveRunRow>({
-      data: [],
-      current_page: 1,
-      last_page: 1,
-      total: 0,
-    })
-  );
-  const [summary, setSummary] = useState<DelveSummary>({
-    total_runs: 0,
-    active: 0,
-    completed: 0,
-    total_survived: 0,
-    total_died: 0,
-    total_timeout: 0,
-  });
-  const [chart, setChart] = useState<DelveChartPoint[]>([]);
-  const [filters, setFilters] = useState<DelveFilters>(defaultFilters);
-  const [page, setPage] = useState(1);
-  const [days, setDays] = useState('7');
-
-  const refresh = useCallback(async () => {
-    setError('');
-
-    try {
-      const [activeData, runsData, summaryData, chartData] = await Promise.all([
-        fetchDelveActive(),
-        fetchDelveRuns(filters, page),
-        fetchDelveSummary(days),
-        fetchDelveChart(days),
-      ]);
-
-      setActive(activeData);
-      setRuns(runsData);
-      setSummary(summaryData);
-      setChart(chartData);
-    } catch {
-      setError('Delve monitoring data could not be loaded.');
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    days,
-    fetchDelveActive,
-    fetchDelveChart,
-    fetchDelveRuns,
-    fetchDelveSummary,
+    loading,
+    error,
+    active,
+    runs,
+    summary,
+    chart,
     filters,
-    page,
-  ]);
+    update_filters: updateFilters,
+    apply_table_filter: applyTableFilterData,
+    set_page: setPage,
+    days,
+    set_days: setDays,
+    day_options: DAY_OPTIONS,
+  } = useDelveDashboard();
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
+  const { scroll_to_element: scrollToElement } = useScrollToElement();
+  const runsTableElementId = 'delve-runs-table';
 
-  useDelveMonitoringLiveRefresh(refresh);
-
-  const applyTableFilter = (nextFilters: Partial<DelveFilters>) => {
-    setFilters({ ...defaultFilters, ...nextFilters });
-    setPage(1);
-    window.setTimeout(() => {
-      document
-        .getElementById('delve-runs-table')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 0);
+  const applyTableFilter = (
+    nextFilters: Parameters<typeof applyTableFilterData>[0]
+  ) => {
+    applyTableFilterData(nextFilters);
+    scrollToElement(runsTableElementId);
   };
 
   return (
@@ -396,7 +328,7 @@ export default function DelveDashboard() {
         )}
       </MonitorCard>
 
-      <div id="delve-runs-table">
+      <div id={runsTableElementId}>
         <MonitorCard>
           <h2 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
             Recent Runs
@@ -409,11 +341,10 @@ export default function DelveDashboard() {
                 type="text"
                 value={filters.character_name}
                 onChange={(e) => {
-                  setFilters({
+                  updateFilters({
                     ...filters,
                     character_name: e.target.value,
                   });
-                  setPage(1);
                 }}
               />
             </label>
@@ -424,11 +355,10 @@ export default function DelveDashboard() {
                 type="date"
                 value={filters.date_from}
                 onChange={(e) => {
-                  setFilters({
+                  updateFilters({
                     ...filters,
                     date_from: e.target.value,
                   });
-                  setPage(1);
                 }}
               />
             </label>
@@ -439,11 +369,10 @@ export default function DelveDashboard() {
                 type="date"
                 value={filters.date_to}
                 onChange={(e) => {
-                  setFilters({
+                  updateFilters({
                     ...filters,
                     date_to: e.target.value,
                   });
-                  setPage(1);
                 }}
               />
             </label>

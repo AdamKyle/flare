@@ -2,13 +2,13 @@ import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { useCallback, useMemo } from 'react';
 
 import UseGameMapMoveEmitterDefinition from './definitions/use-game-map-move-emitter-definition';
+import CoordinateDefinition from '../../types/coordinate-definition';
 import {
   GameMapMoveStartCommandDefinition,
   GameMapMoveEventMap,
   GameMapMoveStateDefinition,
   GameMapMoveSucceededDefinition,
 } from '../definitions/game-map-move-event-map';
-import CoordinateDefinition from '../../types/coordinate-definition';
 import { GameMapMoveEvent } from '../enums/game-map-move-event';
 
 export const useGameMapMoveEmitter = (): UseGameMapMoveEmitterDefinition => {

@@ -10,7 +10,6 @@ const NpcScreenKit = createScreenManager<NpcScreenPropsMap>();
 export const {
   ScreenManagerProvider: NpcScreenManagerProvider,
   useScreenNavigation: useNpcScreenNavigation,
-  useBindScreen: useBindNpcScreen,
   ScreenHost: NpcScreenHost,
 } = NpcScreenKit;
 

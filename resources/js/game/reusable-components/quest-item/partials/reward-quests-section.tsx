@@ -7,6 +7,7 @@ import RewardQuestsSectionProps from '../types/partials/reward-quest-section-pro
 const RewardQuestsSection = ({
   item,
   showSeparator,
+  navigation,
 }: RewardQuestsSectionProps) => {
   const rewardQuests = item.reward_quests || [];
 
@@ -23,9 +24,10 @@ const RewardQuestsSection = ({
         <QuestRows
           key={`reward-quest-${rewardQuest.id}`}
           heading="Reward Quest"
-          name={rewardQuest.name}
-          npc={rewardQuest.npc}
-          map={rewardQuest.map}
+          quest={rewardQuest}
+          on_open_quest={navigation.on_open_quest}
+          on_open_npc={navigation.on_open_npc}
+          on_open_map={navigation.on_open_map}
         />
       ))}
     </Section>
