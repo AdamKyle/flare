@@ -1,44 +1,66 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import FactualLink from './factual-link';
-import QuestMapRow from './quest-map-row';
-import DefinitionRow from '../../viewable-sections/definition-row';
-import InfoLabel from '../../viewable-sections/info-label';
+import { relationshipRowClassName } from './relationship-row-styles';
 import QuestRowsProps from '../types/partials/quest-rows-props';
 
+/**
+ * Compact clickable Quest relationship row: the Quest name is the primary
+ * row title, with the relationship label, Quest Giver NPC, and Game Map
+ * shown as independently clickable identities on a secondary line.
+ */
 const QuestRows = ({
   heading,
   quest,
   on_open_quest: onOpenQuest,
   on_open_npc: onOpenNpc,
   on_open_map: onOpenMap,
-}: QuestRowsProps) => {
-  return (
-    <>
-      <DefinitionRow
-        left={<InfoLabel label={heading} />}
-        right={
-          <FactualLink
-            id={quest.id}
-            label={quest.name}
-            on_click={onOpenQuest}
-          />
-        }
-      />
-      {quest.npc ? (
-        <DefinitionRow
-          left={<InfoLabel label="For NPC" />}
-          right={
-            <FactualLink
-              id={quest.npc.id}
-              label={quest.npc.name}
-              on_click={onOpenNpc}
-            />
-          }
+}: QuestRowsProps): ReactNode => {
+  const renderNpc = (): ReactNode => {
+    if (!quest.npc) {
+      return null;
+    }
+
+    return (
+      <>
+        {' · '}
+        <FactualLink
+          id={quest.npc.id}
+          label={quest.npc.name}
+          on_click={onOpenNpc}
         />
-      ) : null}
-      <QuestMapRow game_map={quest.game_map} on_open_map={onOpenMap} />
-    </>
+      </>
+    );
+  };
+
+  const renderMap = (): ReactNode => {
+    if (!quest.game_map) {
+      return null;
+    }
+
+    return (
+      <>
+        {' · '}
+        <FactualLink
+          id={quest.game_map.id}
+          label={quest.game_map.name}
+          on_click={onOpenMap}
+        />
+      </>
+    );
+  };
+
+  return (
+    <div className={relationshipRowClassName}>
+      <p className="text-glacier-900 dark:text-glacier-100 font-medium">
+        <FactualLink id={quest.id} label={quest.name} on_click={onOpenQuest} />
+      </p>
+      <p className="text-glacier-600 dark:text-glacier-400 text-xs">
+        {heading}
+        {renderNpc()}
+        {renderMap()}
+      </p>
+    </div>
   );
 };
 

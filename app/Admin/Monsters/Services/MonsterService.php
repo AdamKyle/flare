@@ -5,10 +5,12 @@ namespace App\Admin\Monsters\Services;
 use App\Admin\Monsters\Requests\MonsterIndexRequest;
 use App\Admin\Monsters\Requests\StoreMonsterRequest;
 use App\Admin\Monsters\Requests\UpdateMonsterRequest;
+use App\Admin\Monsters\Values\MonsterListCategory;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Monster;
 use App\Game\Core\Items\Values\ItemCatalogType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -35,6 +37,8 @@ class MonsterService
             $query->where('game_map_id', $filters['game_map_id']);
         }
 
+        $this->applyCategoryFilter($query, $filters['category'] ?? null, $filters['location_type'] ?? null);
+
         $query->orderBy($request->validated('sort_key'), $request->validated('sort_direction'))
             ->orderBy('id');
 
@@ -44,6 +48,54 @@ class MonsterService
             'page',
             $request->validated('page')
         );
+    }
+
+    /**
+     * Apply the Admin Monster list category filter, and its optional Location
+     * Type refinement, to the given query.
+     *
+     * @param  Builder<Monster>  $query  Monster query to constrain.
+     * @param  string|null  $category  Validated MonsterListCategory value, if any.
+     * @param  int|null  $locationType  Validated LocationType value, if any.
+     */
+    private function applyCategoryFilter(Builder $query, ?string $category, ?int $locationType): void
+    {
+        if (is_null($category) || $category === MonsterListCategory::ALL->value) {
+            return;
+        }
+
+        match (MonsterListCategory::from($category)) {
+            MonsterListCategory::REGULAR => $query->where('is_celestial_entity', false)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->whereNull('only_for_location_type'),
+            MonsterListCategory::RAID_MONSTER => $query->where('is_celestial_entity', false)
+                ->where('is_raid_monster', true)
+                ->where('is_raid_boss', false)
+                ->whereNull('only_for_location_type'),
+            MonsterListCategory::RAID_BOSS => $query->where('is_celestial_entity', false)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', true)
+                ->whereNull('only_for_location_type'),
+            MonsterListCategory::CELESTIAL => $query->where('is_celestial_entity', true)
+                ->whereNull('only_for_location_type'),
+            MonsterListCategory::SPECIAL_LOCATION => $query->where('is_celestial_entity', false)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->whereNotNull('only_for_location_type')
+                ->when(
+                    ! is_null($locationType),
+                    fn (Builder $subQuery) => $subQuery->where('only_for_location_type', $locationType)
+                ),
+            MonsterListCategory::WEEKLY_FIGHT => $query->where('is_celestial_entity', false)
+                ->where('is_raid_monster', false)
+                ->where('is_raid_boss', false)
+                ->when(
+                    ! is_null($locationType),
+                    fn (Builder $subQuery) => $subQuery->where('only_for_location_type', $locationType),
+                    fn (Builder $subQuery) => $subQuery->whereIn('only_for_location_type', MonsterListCategory::weeklyFightLocationTypes())
+                ),
+        };
     }
 
     /**

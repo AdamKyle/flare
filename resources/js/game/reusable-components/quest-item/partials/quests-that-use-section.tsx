@@ -1,7 +1,7 @@
 import React from 'react';
 
 import QuestRows from './quest-rows';
-import Section from '../../viewable-sections/section';
+import RelationshipGroup from './relationship-group';
 import QuestsThatUseSectionProps from '../types/partials/quest-that-use-section-props';
 
 import { Alert } from 'ui/alerts/alert';
@@ -45,14 +45,14 @@ const QuestsThatUseSection = ({
   }
 
   return (
-    <Section
+    <RelationshipGroup
       title="Quests That Use This Item"
-      showSeparator={showSeparator}
+      show_separator={showSeparator}
       lead={lead}
     >
       {item.required_quest ? (
         <QuestRows
-          heading="Used In Quest"
+          heading="Required by quest"
           quest={item.required_quest}
           on_open_quest={navigation.on_open_quest}
           on_open_npc={navigation.on_open_npc}
@@ -64,7 +64,7 @@ const QuestsThatUseSection = ({
         ? list.map((requiredQuest) => (
             <QuestRows
               key={`required-quest-${requiredQuest.id}`}
-              heading="Used In Quest"
+              heading="Required by quest"
               quest={requiredQuest}
               on_open_quest={navigation.on_open_quest}
               on_open_npc={navigation.on_open_npc}
@@ -72,7 +72,7 @@ const QuestsThatUseSection = ({
             />
           ))
         : null}
-    </Section>
+    </RelationshipGroup>
   );
 };
 

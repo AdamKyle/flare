@@ -9,6 +9,11 @@ import GameMapImportSidePeek from '../../../../../admin/game-maps/components/sid
 import GameMapKingdomSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-kingdom-side-peek';
 import GameMapLocationSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-location-side-peek';
 import GameMapNpcSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-npc-side-peek';
+import GameMapRelatedLocationsSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-related-locations-side-peek';
+import GameMapRelatedMonstersSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-related-monsters-side-peek';
+import GameMapRelatedNpcsSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-related-npcs-side-peek';
+import GameMapRelatedQuestItemsSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-related-quest-items-side-peek';
+import GameMapRelatedQuestsSidePeek from '../../../../../admin/game-maps/components/side-peeks/game-map-related-quests-side-peek';
 import AdminGameMapDetailSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/admin-game-map-detail-side-peek-props';
 import GameMapCoordinateSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-coordinate-side-peek-props';
 import GameMapFormSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-form-side-peek-props';
@@ -16,6 +21,11 @@ import GameMapImportSidePeekProps from '../../../../../admin/game-maps/component
 import GameMapKingdomSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-kingdom-side-peek-props';
 import GameMapLocationSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-location-side-peek-props';
 import GameMapNpcSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-npc-side-peek-props';
+import GameMapRelatedLocationsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-locations-side-peek-props';
+import GameMapRelatedMonstersSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-monsters-side-peek-props';
+import GameMapRelatedNpcsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-npcs-side-peek-props';
+import GameMapRelatedQuestItemsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-quest-items-side-peek-props';
+import GameMapRelatedQuestsSidePeekProps from '../../../../../admin/game-maps/components/side-peeks/types/game-map-related-quests-side-peek-props';
 import AdminItemDetailSidePeek from '../../../../../admin/items/components/side-peeks/admin-item-detail-side-peek';
 import ItemFormSidePeek from '../../../../../admin/items/components/side-peeks/item-form-side-peek';
 import ItemImportSidePeek from '../../../../../admin/items/components/side-peeks/item-import-side-peek';
@@ -162,6 +172,26 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL]: {
     component: AdminGameMapDetailSidePeek,
     props: {} as AdminGameMapDetailSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_LOCATIONS]: {
+    component: GameMapRelatedLocationsSidePeek,
+    props: {} as GameMapRelatedLocationsSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_NPCS]: {
+    component: GameMapRelatedNpcsSidePeek,
+    props: {} as GameMapRelatedNpcsSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_MONSTERS]: {
+    component: GameMapRelatedMonstersSidePeek,
+    props: {} as GameMapRelatedMonstersSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_QUESTS]: {
+    component: GameMapRelatedQuestsSidePeek,
+    props: {} as GameMapRelatedQuestsSidePeekProps,
+  },
+  [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_QUEST_ITEMS]: {
+    component: GameMapRelatedQuestItemsSidePeek,
+    props: {} as GameMapRelatedQuestItemsSidePeekProps,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_FORM]: {
     component: LocationFormSidePeek,

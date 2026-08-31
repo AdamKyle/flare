@@ -1,9 +1,8 @@
 import React from 'react';
 
 import FactualLink from './factual-link';
-import DefinitionRow from '../../viewable-sections/definition-row';
-import InfoLabel from '../../viewable-sections/info-label';
-import Section from '../../viewable-sections/section';
+import RelationshipGroup from './relationship-group';
+import { relationshipRowClassName } from './relationship-row-styles';
 import MonsterDropsSectionProps from '../types/partials/monster-drop-section-props';
 
 import { Alert } from 'ui/alerts/alert';
@@ -31,36 +30,35 @@ const MonsterDropsSection = ({
   );
 
   return (
-    <Section
+    <RelationshipGroup
       title={isPlural ? 'Monsters That Drop It' : 'Monster That Drops It'}
-      showSeparator={showSeparator}
+      show_separator={showSeparator}
       lead={lead}
     >
       {monsters.map((monster) => (
-        <React.Fragment key={`required-monster-${monster.id}`}>
-          <DefinitionRow
-            left={<InfoLabel label="Monster" />}
-            right={
-              <FactualLink
-                id={monster.id}
-                label={monster.name}
-                on_click={navigation.on_open_monster}
-              />
-            }
-          />
-          <DefinitionRow
-            left={<InfoLabel label="While On Map" />}
-            right={
-              <FactualLink
-                id={monster.game_map.id}
-                label={monster.game_map.name}
-                on_click={navigation.on_open_map}
-              />
-            }
-          />
-        </React.Fragment>
+        <div
+          key={`required-monster-${monster.id}`}
+          className={relationshipRowClassName}
+        >
+          <p className="text-glacier-900 dark:text-glacier-100 font-medium">
+            <FactualLink
+              id={monster.id}
+              label={monster.name}
+              on_click={navigation.on_open_monster}
+            />
+          </p>
+          <p className="text-glacier-600 dark:text-glacier-400 text-xs">
+            While on map
+            {' · '}
+            <FactualLink
+              id={monster.game_map.id}
+              label={monster.game_map.name}
+              on_click={navigation.on_open_map}
+            />
+          </p>
+        </div>
       ))}
-    </Section>
+    </RelationshipGroup>
   );
 };
 

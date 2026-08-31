@@ -1,10 +1,8 @@
 import React from 'react';
 
-import FactualLink from './factual-link';
-import DefinitionRow from '../../viewable-sections/definition-row';
+import LocationRow from './location-row';
+import RelationshipGroup from './relationship-group';
 import InfoAlerts from '../../viewable-sections/info-alert';
-import InfoLabel from '../../viewable-sections/info-label';
-import Section from '../../viewable-sections/section';
 import RewardLocationsSectionProps from '../types/partials/location-reward-section-props';
 
 const RewardLocationsSection = ({
@@ -22,12 +20,11 @@ const RewardLocationsSection = ({
   const sectionTitle = isPlural
     ? 'Locations That Reward for Visiting'
     : 'Location That Rewards for Visiting';
-  const rowLabel = isPlural ? 'Reward Location(s)' : 'Reward Location';
 
   return (
-    <Section
+    <RelationshipGroup
       title={sectionTitle}
-      showSeparator={showSeparator}
+      show_separator={showSeparator}
       lead={
         <InfoAlerts
           messages={[
@@ -37,30 +34,15 @@ const RewardLocationsSection = ({
       }
     >
       {rewardLocations.map((rewardLocation) => (
-        <React.Fragment key={`reward-location-${rewardLocation.id}`}>
-          <DefinitionRow
-            left={<InfoLabel label={rowLabel} />}
-            right={
-              <FactualLink
-                id={rewardLocation.id}
-                label={rewardLocation.name}
-                on_click={navigation.on_open_location}
-              />
-            }
-          />
-          <DefinitionRow
-            left={<InfoLabel label="While On Map" />}
-            right={
-              <FactualLink
-                id={rewardLocation.game_map.id}
-                label={rewardLocation.game_map.name}
-                on_click={navigation.on_open_map}
-              />
-            }
-          />
-        </React.Fragment>
+        <LocationRow
+          key={`reward-location-${rewardLocation.id}`}
+          heading="Reward at location"
+          location={rewardLocation}
+          on_open_location={navigation.on_open_location}
+          on_open_map={navigation.on_open_map}
+        />
       ))}
-    </Section>
+    </RelationshipGroup>
   );
 };
 

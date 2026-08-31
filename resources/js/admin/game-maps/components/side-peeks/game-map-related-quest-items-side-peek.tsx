@@ -1,0 +1,119 @@
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import React, { ReactNode, useState } from 'react';
+
+import GameMapRelatedQuestItemsSidePeekProps from './types/game-map-related-quest-items-side-peek-props';
+import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
+import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import ReadOnlyItemCard from '../../../../game/components/side-peeks/components/items/read-only-item-card';
+import { useGameMapRelatedQuestItems } from '../../api/hooks/use-game-map-related-quest-items';
+
+import StackedCard from 'ui/cards/stacked-card';
+import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
+
+/**
+ * Bounded, append-paginated browser for the unique quest Items connected to
+ * a Game Map, opened from the Game Map's "Related Game Data" hub. Reuses
+ * the canonical `ReadOnlyItemCard` (no new Item card). Each result opens
+ * the canonical Item detail inside a `StackedCard` while preserving this
+ * relationship browser underneath (mounted, with its scroll position
+ * intact) rather than replacing it through the global SidePeek emitter.
+ */
+const GameMapRelatedQuestItemsSidePeek = ({
+  game_map_id: gameMapId,
+}: GameMapRelatedQuestItemsSidePeekProps): ReactNode => {
+  const questItems = useGameMapRelatedQuestItems(gameMapId);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+
+  const handleOpenItem = (id: number): void => {
+    setSelectedItemId(id);
+  };
+
+  const handleCloseItem = (): void => {
+    setSelectedItemId(null);
+  };
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>): void => {
+    const target = event.currentTarget;
+    const nearBottom =
+      target.scrollHeight - target.scrollTop - target.clientHeight < 100;
+
+    if (nearBottom) {
+      questItems.on_end_reached();
+    }
+  };
+
+  const renderSelectedItem = (): ReactNode => {
+    if (selectedItemId === null) {
+      return null;
+    }
+
+    const AdminItemDetail = resolveSidePeekComponent(
+      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
+    );
+
+    return (
+      <StackedCard on_close={handleCloseItem} aria_label="Item Details">
+        <AdminItemDetail
+          is_open
+          title="Item Details"
+          item_id={selectedItemId}
+        />
+      </StackedCard>
+    );
+  };
+
+  const renderContent = (): ReactNode => {
+    if (questItems.loading) {
+      return <InfiniteLoader />;
+    }
+
+    if (questItems.error) {
+      return (
+        <div className="px-4">
+          <ApiErrorAlert
+            apiError={questItems.error.message ?? 'Unable to load Quest Items.'}
+          />
+        </div>
+      );
+    }
+
+    if (questItems.data.length === 0) {
+      return (
+        <p className="text-glacier-700 dark:text-glacier-300 px-4 text-sm">
+          No quest Items are connected to this Game Map.
+        </p>
+      );
+    }
+
+    return (
+      <div className="h-[500px] max-h-[500px] px-4">
+        <InfiniteScroll handle_scroll={handleScroll}>
+          <div className="flex flex-col gap-3">
+            {questItems.data.map((item) => (
+              <ReadOnlyItemCard
+                key={item.item_id}
+                item_id={item.item_id}
+                name={item.name}
+                description={item.description}
+                effect={item.effect}
+                usable={item.usable}
+                on_click={handleOpenItem}
+              />
+            ))}
+            {questItems.is_loading_more && <InfiniteLoader />}
+          </div>
+        </InfiniteScroll>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
+      {renderContent()}
+      {renderSelectedItem()}
+    </div>
+  );
+};
+
+export default GameMapRelatedQuestItemsSidePeek;

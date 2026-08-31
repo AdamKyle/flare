@@ -19,7 +19,12 @@ const QuestTreeMobile = ({
   on_key_down: onKeyDown,
 }: QuestTreeLayoutProps): ReactNode => (
   <div className="md:hidden">
-    <ul role="tree" aria-label="Quest tree" onKeyDown={onKeyDown}>
+    <ul
+      role="tree"
+      aria-label="Quest tree"
+      onKeyDown={onKeyDown}
+      className="space-y-3"
+    >
       {quests.map((quest) => (
         <QuestNode
           key={quest.id}

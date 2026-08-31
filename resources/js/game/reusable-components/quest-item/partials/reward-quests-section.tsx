@@ -1,7 +1,7 @@
 import React from 'react';
 
 import QuestRows from './quest-rows';
-import Section from '../../viewable-sections/section';
+import RelationshipGroup from './relationship-group';
 import RewardQuestsSectionProps from '../types/partials/reward-quest-section-props';
 
 const RewardQuestsSection = ({
@@ -16,21 +16,21 @@ const RewardQuestsSection = ({
   }
 
   return (
-    <Section
+    <RelationshipGroup
       title="Quests That Reward for Completing"
-      showSeparator={showSeparator}
+      show_separator={showSeparator}
     >
       {rewardQuests.map((rewardQuest) => (
         <QuestRows
           key={`reward-quest-${rewardQuest.id}`}
-          heading="Reward Quest"
+          heading="Rewarded by quest"
           quest={rewardQuest}
           on_open_quest={navigation.on_open_quest}
           on_open_npc={navigation.on_open_npc}
           on_open_map={navigation.on_open_map}
         />
       ))}
-    </Section>
+    </RelationshipGroup>
   );
 };
 

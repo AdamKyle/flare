@@ -2,6 +2,9 @@
 
 namespace App\Admin\Monsters\Requests;
 
+use App\Admin\Monsters\Values\MonsterListCategory;
+use App\Game\Maps\Values\LocationType;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MonsterIndexRequest extends FormRequest
@@ -31,7 +34,51 @@ class MonsterIndexRequest extends FormRequest
             'sort_direction' => 'required|string|in:asc,desc',
             'filters' => 'nullable|array',
             'filters.game_map_id' => 'nullable|integer|exists:game_maps,id',
+            'filters.category' => 'nullable|string|in:'.implode(',', MonsterListCategory::values()),
+            'filters.location_type' => 'nullable|integer|in:'.implode(',', LocationType::values()),
         ];
+    }
+
+    /**
+     * Cross-field validation tying the Location Type filter to the Monster Category filter.
+     *
+     * @param  Validator  $validator  The validator instance to extend.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $filters = $this->input('filters', []);
+            $category = $filters['category'] ?? null;
+            $locationType = $filters['location_type'] ?? null;
+
+            if (is_null($locationType)) {
+                return;
+            }
+
+            $categoriesAllowingLocationType = [
+                MonsterListCategory::SPECIAL_LOCATION->value,
+                MonsterListCategory::WEEKLY_FIGHT->value,
+            ];
+
+            if (! in_array($category, $categoriesAllowingLocationType, true)) {
+                $validator->errors()->add(
+                    'filters.location_type',
+                    'The Location Type filter is only valid for the Special Location or Weekly Fight category.'
+                );
+
+                return;
+            }
+
+            if (
+                $category === MonsterListCategory::WEEKLY_FIGHT->value
+                && ! in_array($locationType, MonsterListCategory::weeklyFightLocationTypes(), true)
+            ) {
+                $validator->errors()->add(
+                    'filters.location_type',
+                    'The selected Location Type is not part of the Weekly Fight category.'
+                );
+            }
+        });
     }
 
     /**

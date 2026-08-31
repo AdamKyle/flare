@@ -1,59 +1,36 @@
 import React, { ReactNode } from 'react';
-import ReactMarkdown from 'react-markdown';
 
+import QuestStoryPanel from './quest-story-panel';
 import QuestDetailProps from '../types/quest-detail-props';
 
-import Card from 'ui/cards/card';
+import PillTabs from 'ui/tabs/pill-tabs';
 
+/**
+ * Quest story presentation: Before/After Completion tabs, each a bounded,
+ * internally-scrollable prose panel (max 400px), rather than one long wall
+ * of text.
+ */
 const QuestStorySection = ({ quest }: QuestDetailProps): ReactNode => {
-  const renderBeforeCompletion = (): ReactNode => {
-    if (!quest.story.before_completion_markdown) {
-      return (
-        <p className="text-glacier-500 dark:text-glacier-400 text-sm">None.</p>
-      );
-    }
-
-    return (
-      <div className="text-glacier-700 dark:text-glacier-300 text-sm break-words">
-        <ReactMarkdown>{quest.story.before_completion_markdown}</ReactMarkdown>
-      </div>
-    );
-  };
-
-  const renderAfterCompletion = (): ReactNode => {
-    if (!quest.story.after_completion_markdown) {
-      return (
-        <p className="text-glacier-500 dark:text-glacier-400 text-sm">None.</p>
-      );
-    }
-
-    return (
-      <div className="text-glacier-700 dark:text-glacier-300 text-sm break-words">
-        <ReactMarkdown>{quest.story.after_completion_markdown}</ReactMarkdown>
-      </div>
-    );
-  };
+  const tabs = [
+    {
+      label: 'Before Completion',
+      component: QuestStoryPanel,
+      props: { markdown: quest.story.before_completion_markdown },
+    },
+    {
+      label: 'After Completion',
+      component: QuestStoryPanel,
+      props: { markdown: quest.story.after_completion_markdown },
+    },
+  ] as const;
 
   return (
-    <Card>
+    <div>
       <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
         Story
       </h2>
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-glacier-700 dark:text-glacier-300 text-xs font-semibold tracking-wide uppercase">
-            Before Completion
-          </h3>
-          {renderBeforeCompletion()}
-        </div>
-        <div>
-          <h3 className="text-glacier-700 dark:text-glacier-300 text-xs font-semibold tracking-wide uppercase">
-            After Completion
-          </h3>
-          {renderAfterCompletion()}
-        </div>
-      </div>
-    </Card>
+      <PillTabs tabs={tabs} ariaLabel="Quest story" />
+    </div>
   );
 };
 

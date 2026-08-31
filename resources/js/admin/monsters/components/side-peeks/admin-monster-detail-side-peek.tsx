@@ -2,13 +2,13 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 
 import AdminMonsterDetailSidePeekProps from './types/admin-monster-detail-side-peek-props';
+import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import MonsterDetail from '../../../../game/reusable-components/monster/components/monster-detail';
 import { MonsterApiMessages } from '../../api/enums/monster-api-messages';
 import { useMonsterDetail } from '../../api/hooks/use-monster-detail';
 import MonsterFormContent from '../forms/monster-form-content';
+import { MonsterNestedSelection } from '../types/monster-nested-selection';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -18,15 +18,19 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 /**
  * Admin Monster detail side-peek: stacks the shared, permission-neutral factual Monster
  * presentation with an Admin-only Edit action and relationship navigation into other modernized
- * Admin resources.
+ * Admin resources. Relationship navigation opens the target's canonical detail inside a
+ * `StackedCard` over this content (rather than replacing it through the global SidePeek
+ * emitter), so this component can itself be reused as nested `StackedCard` content and its own
+ * relationship clicks never destroy an ancestor's stack.
  */
 const AdminMonsterDetailSidePeek = ({
   monster_id: monsterId,
   on_monster_changed: onMonsterChanged,
 }: AdminMonsterDetailSidePeekProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
   const { monster, loading, error, refresh } = useMonsterDetail(monsterId);
   const [showEdit, setShowEdit] = useState(false);
+  const [nestedSelection, setNestedSelection] =
+    useState<MonsterNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   const handleEdit = (): void => {
@@ -44,29 +48,43 @@ const AdminMonsterDetailSidePeek = ({
     setAnnouncement('Monster saved.');
   };
 
-  const handleOpenItem = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
-      {
-        is_open: true,
-        title: 'Item Details',
-        allow_clicking_outside: true,
-        item_id: id,
-      }
-    );
+  const handleCloseNested = (): void => {
+    setNestedSelection(null);
   };
 
-  const handleOpenMap = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
-      {
-        is_open: true,
-        title: 'Game Map Details',
-        allow_clicking_outside: true,
-        game_map_id: id,
-      }
+  const renderNestedDetail = (): ReactNode => {
+    if (!nestedSelection) {
+      return null;
+    }
+
+    if (nestedSelection.type === 'item') {
+      const NestedItemDetail = resolveSidePeekComponent(
+        SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
+      );
+
+      return (
+        <StackedCard on_close={handleCloseNested} aria_label="Item Details">
+          <NestedItemDetail
+            is_open
+            title="Item Details"
+            item_id={nestedSelection.id}
+          />
+        </StackedCard>
+      );
+    }
+
+    const NestedGameMapDetail = resolveSidePeekComponent(
+      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
+    );
+
+    return (
+      <StackedCard on_close={handleCloseNested} aria_label="Game Map Details">
+        <NestedGameMapDetail
+          is_open
+          title="Game Map Details"
+          game_map_id={nestedSelection.id}
+        />
+      </StackedCard>
     );
   };
 
@@ -97,8 +115,8 @@ const AdminMonsterDetailSidePeek = ({
         <MonsterDetail
           monster={monster}
           navigation={{
-            on_open_item: handleOpenItem,
-            on_open_map: handleOpenMap,
+            on_open_item: (id) => setNestedSelection({ type: 'item', id }),
+            on_open_map: (id) => setNestedSelection({ type: 'map', id }),
           }}
         />
       </div>
@@ -129,6 +147,7 @@ const AdminMonsterDetailSidePeek = ({
       </p>
       {renderContent()}
       {renderEdit()}
+      {renderNestedDetail()}
     </>
   );
 };

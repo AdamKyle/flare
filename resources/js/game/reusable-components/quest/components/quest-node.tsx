@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import {
   QUEST_TREE_STATE_ICON,
   QUEST_TREE_STATE_LABELS,
+  QUEST_TREE_STATE_SHORT_LABELS,
   QuestTreeState,
 } from '../enums/quest-tree-state';
 import QuestNodeProps from '../types/quest-node-props';
@@ -65,12 +66,24 @@ const QuestNode = ({
     return (
       <button
         type="button"
-        aria-label={isExpanded ? 'Collapse' : 'Expand'}
+        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${quest.name}`}
         onClick={handleToggle}
         className="text-gray-500 dark:text-gray-400"
       >
         <span aria-hidden="true">{isExpanded ? '▾' : '▸'}</span>
       </button>
+    );
+  };
+
+  const renderChildCount = (): ReactNode => {
+    if (!hasChildren) {
+      return null;
+    }
+
+    return (
+      <span className="text-glacier-500 dark:text-glacier-500 text-xs">
+        ({quest.children.length})
+      </span>
     );
   };
 
@@ -82,7 +95,7 @@ const QuestNode = ({
     return (
       <ul
         role="group"
-        className="border-danube-200 dark:border-danube-800 ml-3 border-l pl-3"
+        className="border-danube-200 dark:border-danube-800 bg-glacier-50/50 dark:bg-glacier-900/20 mt-2 ml-3 space-y-2 border-l pl-3"
       >
         {quest.children.map((child) => (
           <QuestNode
@@ -140,12 +153,15 @@ const QuestNode = ({
           {quest.name}
         </span>
 
+        {renderChildCount()}
+
         <span className="sr-only">{QUEST_TREE_STATE_LABELS[state]}</span>
 
         <span
-          className={`hidden rounded-full px-2 py-0.5 text-xs font-medium sm:inline-flex ${STATE_BADGE_CLASSES[state]}`}
+          aria-hidden="true"
+          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${STATE_BADGE_CLASSES[state]}`}
         >
-          {QUEST_TREE_STATE_LABELS[state]}
+          {QUEST_TREE_STATE_SHORT_LABELS[state]}
         </span>
       </div>
 

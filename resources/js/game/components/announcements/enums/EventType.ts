@@ -13,6 +13,26 @@ export enum EventType {
   FEEDBACK_EVENT = 9,
 }
 
+const EVENT_TYPE_VALUES: EventType[] = [
+  EventType.WEEKLY_CELESTIALS,
+  EventType.WEEKLY_CURRENCY_DROPS,
+  EventType.RAID_EVENT,
+  EventType.WINTER_EVENT,
+  EventType.PURGATORY_SMITH_HOUSE,
+  EventType.GOLD_MINES,
+  EventType.THE_OLD_CHURCH,
+  EventType.DELUSIONAL_MEMORIES_EVENT,
+  EventType.WEEKLY_FACTION_LOYALTY_EVENT,
+  EventType.FEEDBACK_EVENT,
+];
+
+/**
+ * Narrow a factual `number` value down to a known Event type, without a
+ * forced type assertion at each call site.
+ */
+export const isEventType = (value: number): value is EventType =>
+  EVENT_TYPE_VALUES.some((eventType) => eventType === value);
+
 export const getEventTypeName = (eventType: EventType): string =>
   match(eventType)
     .with(EventType.WEEKLY_CELESTIALS, () => 'Weekly Celestials')

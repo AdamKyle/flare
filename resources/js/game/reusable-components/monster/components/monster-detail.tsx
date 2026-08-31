@@ -18,6 +18,10 @@ const MonsterDetail = ({
   navigation,
 }: MonsterDetailProps): ReactNode => (
   <div className="flex flex-col gap-6">
+    <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+      {monster.identity.name}
+    </h1>
+
     <MonsterIdentitySection monster={monster} navigation={navigation} />
     <MonsterCombatSection monster={monster} navigation={navigation} />
     <MonsterSpellSection monster={monster} navigation={navigation} />

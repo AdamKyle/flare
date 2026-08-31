@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import FactualLink from '../../quest-item/partials/factual-link';
 import QuestDetailProps from '../types/quest-detail-props';
 
-import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -93,10 +92,10 @@ const QuestRequirementsSection = ({
   };
 
   return (
-    <Card>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+    <div>
+      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
         Requirements
-      </h2>
+      </h3>
       <Dl>
         <Dt>Primary Quest Item</Dt>
         <Dd>{renderPrimaryItem()}</Dd>
@@ -119,7 +118,7 @@ const QuestRequirementsSection = ({
         <Dt>Copper Coins</Dt>
         <Dd>{requirements.currencies.copper_coins ?? 0}</Dd>
       </Dl>
-    </Card>
+    </div>
   );
 };
 

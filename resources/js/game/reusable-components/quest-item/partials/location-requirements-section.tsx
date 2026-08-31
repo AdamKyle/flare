@@ -1,7 +1,7 @@
 import React from 'react';
 
 import LocationRow from './location-row';
-import Section from '../../viewable-sections/section';
+import RelationshipGroup from './relationship-group';
 import LocationRequirementsSectionProps from '../types/partials/location-requirements-section-props';
 
 const LocationsRequireSection = ({
@@ -16,20 +16,20 @@ const LocationsRequireSection = ({
   }
 
   return (
-    <Section
+    <RelationshipGroup
       title="Locations That Require This Item"
-      showSeparator={showSeparator}
+      show_separator={showSeparator}
     >
       {requiredLocations.map((requiredLocation) => (
         <LocationRow
           key={`required-location-${requiredLocation.id}`}
-          heading="Required Location"
+          heading="Required at location"
           location={requiredLocation}
           on_open_location={navigation.on_open_location}
           on_open_map={navigation.on_open_map}
         />
       ))}
-    </Section>
+    </RelationshipGroup>
   );
 };
 

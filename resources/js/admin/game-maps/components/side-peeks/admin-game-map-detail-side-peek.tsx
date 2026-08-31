@@ -13,6 +13,7 @@ import { GameMapCopy } from '../../enums/game-map-copy';
 import { GAME_MAP_EVENT_TYPE_LABELS } from '../../enums/game-map-event-type';
 import { convertStoredBonusToPercentage } from '../../utils/convert-stored-bonus-to-percentage';
 import { resolveRequiredQuestItemCopy } from '../../utils/resolve-required-quest-item-copy';
+import GameMapRelatedDataActions from '../game-map-related-data-actions';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -135,6 +136,10 @@ const AdminGameMapDetailSidePeek = ({
 
     return (
       <div className="space-y-4 px-4">
+        <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+          {gameMap.name}
+        </h1>
+
         <div className="flex justify-center py-2">
           <Button
             label="Edit Game Map"
@@ -208,6 +213,8 @@ const AdminGameMapDetailSidePeek = ({
             </Dd>
           </Dl>
         </section>
+
+        <GameMapRelatedDataActions game_map_id={gameMapId} />
       </div>
     );
   };

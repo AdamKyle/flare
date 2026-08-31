@@ -3,10 +3,8 @@ import React, { ReactNode } from 'react';
 import FactualLink from '../../quest-item/partials/factual-link';
 import QuestDetailProps from '../types/quest-detail-props';
 
-import Card from 'ui/cards/card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
+const fieldLabelClassName =
+  'text-glacier-600 dark:text-glacier-400 text-xs font-semibold tracking-wide uppercase';
 
 const QuestDependenciesSection = ({
   quest,
@@ -68,9 +66,12 @@ const QuestDependenciesSection = ({
     }
 
     return (
-      <ol className="list-decimal space-y-1 pl-4">
-        {structure.required_quest_chain.map((required) => (
-          <li key={required.id}>
+      <ol className="space-y-1">
+        {structure.required_quest_chain.map((required, index) => (
+          <li key={required.id} className="flex items-baseline gap-2">
+            <span className="text-glacier-500 dark:text-glacier-500 text-xs">
+              {index + 1}.
+            </span>
             <FactualLink
               id={required.id}
               label={required.name}
@@ -83,21 +84,39 @@ const QuestDependenciesSection = ({
   };
 
   return (
-    <Card>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+    <div className="flex flex-col gap-4">
+      <h3 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
         Structure &amp; Dependencies
-      </h2>
-      <Dl>
-        <Dt>Parent Quest</Dt>
-        <Dd>{renderParentQuest()}</Dd>
-        <Dt>Child Quests</Dt>
-        <Dd>{renderChildQuests()}</Dd>
-        <Dt>Required Quest</Dt>
-        <Dd>{renderRequiredQuest()}</Dd>
-        <Dt>Required Quest Chain</Dt>
-        <Dd>{renderRequiredQuestChain()}</Dd>
-      </Dl>
-    </Card>
+      </h3>
+
+      <div>
+        <p className={fieldLabelClassName}>Parent Quest</p>
+        <div className="text-glacier-800 dark:text-glacier-200 mt-1 text-sm">
+          {renderParentQuest()}
+        </div>
+      </div>
+
+      <div>
+        <p className={fieldLabelClassName}>Child Quests</p>
+        <div className="text-glacier-800 dark:text-glacier-200 mt-1 text-sm">
+          {renderChildQuests()}
+        </div>
+      </div>
+
+      <div>
+        <p className={fieldLabelClassName}>Required Quest</p>
+        <div className="text-glacier-800 dark:text-glacier-200 mt-1 text-sm">
+          {renderRequiredQuest()}
+        </div>
+      </div>
+
+      <div>
+        <p className={fieldLabelClassName}>Required Quest Chain</p>
+        <div className="text-glacier-800 dark:text-glacier-200 mt-1 text-sm">
+          {renderRequiredQuestChain()}
+        </div>
+      </div>
+    </div>
   );
 };
 

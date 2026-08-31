@@ -169,6 +169,10 @@ const LocationDetailBody = ({
 
   return (
     <div className="flex flex-col gap-6">
+      <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+        {location.name}
+      </h1>
+
       <Card>
         <div className="flex flex-col gap-6">
           <section>

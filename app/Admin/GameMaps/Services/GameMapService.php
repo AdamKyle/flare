@@ -5,20 +5,24 @@ namespace App\Admin\GameMaps\Services;
 use App\Admin\GameMaps\Jobs\GenerateGameMapTilesJob;
 use App\Admin\GameMaps\Jobs\ReplaceGameMapTilesJob;
 use App\Admin\GameMaps\Requests\GameMapIndexRequest;
+use App\Admin\GameMaps\Requests\GameMapRelationIndexRequest;
 use App\Flare\MapGenerator\Services\MapTileGenerationService;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Flare\Models\Kingdom;
 use App\Flare\Models\Location;
+use App\Flare\Models\Monster;
 use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Contracts\CoordinatesQuery;
 use App\Game\Maps\Values\Coordinates;
+use App\Game\Quests\Values\QuestKind;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -118,6 +122,234 @@ class GameMapService
                 ->orderBy('id')
                 ->get(),
         ];
+    }
+
+    /**
+     * Paginate the Locations belonging to the given Game Map.
+     *
+     * @param  GameMap  $gameMap  Game Map whose Locations are being listed.
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @return LengthAwarePaginator Paginated Locations on the Game Map.
+     */
+    public function paginateRelatedLocations(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
+    {
+        $query = Location::where('game_map_id', $gameMap->id);
+
+        $this->applySearch($query, 'name', $request->validated('search_text'));
+
+        return $query->orderBy('name')
+            ->orderBy('id')
+            ->paginate(
+                $request->validated('per_page'),
+                ['*'],
+                'page',
+                $request->validated('page')
+            );
+    }
+
+    /**
+     * Paginate the NPCs belonging to the given Game Map.
+     *
+     * @param  GameMap  $gameMap  Game Map whose NPCs are being listed.
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @return LengthAwarePaginator Paginated NPCs on the Game Map.
+     */
+    public function paginateRelatedNpcs(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
+    {
+        $query = Npc::where('game_map_id', $gameMap->id);
+
+        $this->applySearch($query, 'real_name', $request->validated('search_text'));
+
+        return $query->orderBy('real_name')
+            ->orderBy('id')
+            ->paginate(
+                $request->validated('per_page'),
+                ['*'],
+                'page',
+                $request->validated('page')
+            );
+    }
+
+    /**
+     * Paginate the Quests whose Quest-giver NPC belongs to the given Game Map.
+     *
+     * A Quest is related to a Map when its Quest-giver NPC lives there; the Quest's own
+     * `access_to_map_id`/`faction_game_map_id` are unrelated availability requirements, not its
+     * primary location, and are deliberately not used here.
+     *
+     * @param  GameMap  $gameMap  Game Map whose Quests are being listed.
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @return LengthAwarePaginator Paginated Quests given by an NPC on the Game Map.
+     */
+    public function paginateRelatedQuests(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
+    {
+        $query = Quest::whereHas('npc', fn ($npcQuery) => $npcQuery->where('game_map_id', $gameMap->id))
+            ->with('npc');
+
+        $this->applySearch($query, 'name', $request->validated('search_text'));
+
+        $paginator = $query->orderBy('name')
+            ->orderBy('id')
+            ->paginate(
+                $request->validated('per_page'),
+                ['*'],
+                'page',
+                $request->validated('page')
+            );
+
+        $this->attachResolvedKind($paginator->getCollection());
+
+        return $paginator;
+    }
+
+    /**
+     * Paginate the Monsters actually available on the given Game Map: those persisted directly
+     * on the Map, plus special-location Monsters whose `only_for_location_type` matches a
+     * Location type that actually exists on the Map.
+     *
+     * @param  GameMap  $gameMap  Game Map whose Monsters are being listed.
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @return LengthAwarePaginator Paginated Monsters available on the Game Map.
+     */
+    public function paginateRelatedMonsters(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
+    {
+        $presentLocationTypes = $this->presentLocationTypes($gameMap);
+
+        $query = Monster::where(function ($monsterQuery) use ($gameMap, $presentLocationTypes) {
+            $monsterQuery->where('game_map_id', $gameMap->id);
+
+            if ($presentLocationTypes->isNotEmpty()) {
+                $monsterQuery->orWhereIn('only_for_location_type', $presentLocationTypes);
+            }
+        });
+
+        $this->applySearch($query, 'name', $request->validated('search_text'));
+
+        return $query->orderBy('name')
+            ->orderBy('id')
+            ->paginate(
+                $request->validated('per_page'),
+                ['*'],
+                'page',
+                $request->validated('page')
+            );
+    }
+
+    /**
+     * Paginate the unique quest Items connected to the given Game Map through its required
+     * Item, its Locations' drop/required/reward Items, its Quests' primary/secondary/reward
+     * Items, and its available Monsters' quest Item drops.
+     *
+     * @param  GameMap  $gameMap  Game Map whose quest Items are being listed.
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @return LengthAwarePaginator Paginated, deduplicated quest Items connected to the Game Map.
+     */
+    public function paginateRelatedQuestItems(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
+    {
+        $query = Item::whereIn('id', $this->relatedQuestItemIds($gameMap))
+            ->where('type', 'quest');
+
+        $this->applySearch($query, 'name', $request->validated('search_text'));
+
+        return $query->orderBy('name')
+            ->orderBy('id')
+            ->paginate(
+                $request->validated('per_page'),
+                ['*'],
+                'page',
+                $request->validated('page')
+            );
+    }
+
+    /**
+     * Apply a case-insensitive `LIKE` search filter to a query when search text is present.
+     *
+     * @param  mixed  $query  Query builder to filter.
+     * @param  string  $column  Column to search.
+     * @param  string|null  $searchText  Raw search text, when supplied.
+     * @return void The query is filtered in place.
+     */
+    private function applySearch($query, string $column, ?string $searchText): void
+    {
+        if (! empty($searchText)) {
+            $query->where($column, 'LIKE', '%'.$searchText.'%');
+        }
+    }
+
+    /**
+     * Resolve the distinct, non-null Location types actually present on the given Game Map.
+     *
+     * @param  GameMap  $gameMap  Game Map to inspect.
+     * @return SupportCollection<int, int> Distinct Location types present on the Game Map.
+     */
+    private function presentLocationTypes(GameMap $gameMap): SupportCollection
+    {
+        return Location::where('game_map_id', $gameMap->id)
+            ->whereNotNull('type')
+            ->distinct()
+            ->pluck('type');
+    }
+
+    /**
+     * Attach a `resolved_kind` property to each Quest in the collection, resolved from its
+     * current persisted relationships via the canonical `QuestKind::resolve()`.
+     *
+     * @param  Collection<int, Quest>  $quests  Quests to annotate in place.
+     * @return void Each Quest gains a `resolved_kind` property.
+     */
+    private function attachResolvedKind(Collection $quests): void
+    {
+        $childParentIds = Quest::whereIn('parent_quest_id', $quests->pluck('id'))
+            ->pluck('parent_quest_id')
+            ->unique();
+
+        $quests->each(function (Quest $quest) use ($childParentIds) {
+            $quest->resolved_kind = QuestKind::resolve($quest, $childParentIds->contains($quest->id));
+        });
+    }
+
+    /**
+     * Resolve every unique, non-null quest Item id connected to the given Game Map.
+     *
+     * @param  GameMap  $gameMap  Game Map to resolve quest Item ids for.
+     * @return SupportCollection<int, int> Unique quest Item ids connected to the Game Map.
+     */
+    private function relatedQuestItemIds(GameMap $gameMap): SupportCollection
+    {
+        $locationIds = Location::where('game_map_id', $gameMap->id)->pluck('id');
+
+        $ids = collect([optional($gameMap->requiredItem())->id]);
+
+        $ids = $ids->merge(Item::whereIn('drop_location_id', $locationIds)->pluck('id'));
+
+        $ids = $ids->merge(
+            Location::whereIn('id', $locationIds)->whereNotNull('required_quest_item_id')->pluck('required_quest_item_id')
+        );
+
+        $ids = $ids->merge(
+            Location::whereIn('id', $locationIds)->whereNotNull('quest_reward_item_id')->pluck('quest_reward_item_id')
+        );
+
+        $mapQuests = Quest::whereHas('npc', fn ($npcQuery) => $npcQuery->where('game_map_id', $gameMap->id))
+            ->get(['item_id', 'secondary_required_item', 'reward_item']);
+
+        $ids = $ids->merge($mapQuests->pluck('item_id'));
+        $ids = $ids->merge($mapQuests->pluck('secondary_required_item'));
+        $ids = $ids->merge($mapQuests->pluck('reward_item'));
+
+        $presentLocationTypes = $this->presentLocationTypes($gameMap);
+
+        $monsterQuestItemIds = Monster::where(function ($monsterQuery) use ($gameMap, $presentLocationTypes) {
+            $monsterQuery->where('game_map_id', $gameMap->id);
+
+            if ($presentLocationTypes->isNotEmpty()) {
+                $monsterQuery->orWhereIn('only_for_location_type', $presentLocationTypes);
+            }
+        })->whereNotNull('quest_item_id')->pluck('quest_item_id');
+
+        $ids = $ids->merge($monsterQuestItemIds);
+
+        return $ids->filter()->unique()->values();
     }
 
     /**

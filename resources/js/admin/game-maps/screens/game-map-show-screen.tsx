@@ -10,6 +10,7 @@ import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
 import { useGameMap } from '../api/hooks/use-game-map';
+import GameMapRelatedDataActions from '../components/game-map-related-data-actions';
 import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
 import { GameMapCopy } from '../enums/game-map-copy';
 import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
@@ -256,9 +257,15 @@ const GameMapShowScreen = ({
     }
 
     return (
-      <div className="grid gap-6 md:grid-cols-2">
-        {renderMapPreview()}
-        {renderDetails()}
+      <div className="flex flex-col gap-6">
+        <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+          {gameMap.name}
+        </h1>
+        <div className="grid gap-6 md:grid-cols-2">
+          {renderMapPreview()}
+          {renderDetails()}
+        </div>
+        <GameMapRelatedDataActions game_map_id={gameMapId} />
       </div>
     );
   };

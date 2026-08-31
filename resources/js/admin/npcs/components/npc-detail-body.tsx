@@ -9,7 +9,6 @@ import { NpcApiMessages } from '../api/enums/npc-api-messages';
 import { NPC_TYPE_LABELS } from '../enums/npc-type';
 
 import Card from 'ui/cards/card';
-import DataTablePagination from 'ui/data-table/data-table-pagination';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -83,6 +82,16 @@ const NpcDetailBody = ({
     );
   };
 
+  const handleQuestsScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.currentTarget;
+    const nearBottom =
+      target.scrollHeight - target.scrollTop - target.clientHeight < 100;
+
+    if (nearBottom) {
+      quests.on_end_reached();
+    }
+  };
+
   const renderQuests = (): ReactNode => {
     if (quests.loading) {
       return <InfiniteLoader />;
@@ -105,30 +114,30 @@ const NpcDetailBody = ({
     }
 
     return (
-      <>
-        <ul className="divide-glacier-200 dark:divide-glacier-800 divide-y">
-          {quests.data.map((quest) => (
-            <li key={quest.id} className="space-y-1 px-2 py-3">
-              <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-                {renderQuestName(quest)}
-              </p>
-              <div className="text-glacier-700 dark:text-glacier-300 flex flex-wrap gap-x-6 gap-y-1 text-sm">
-                <span>Required: {renderItemLink(quest.required_item)}</span>
-                <span>
-                  Secondary: {renderItemLink(quest.secondary_required_item)}
-                </span>
-                <span>Reward: {renderItemLink(quest.reward_item)}</span>
+      <div className="h-[500px] max-h-[500px]">
+        <InfiniteScroll handle_scroll={handleQuestsScroll}>
+          <div className="flex flex-col gap-2">
+            {quests.data.map((quest) => (
+              <div
+                key={quest.id}
+                className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 rounded-md border px-3 py-2"
+              >
+                <p className="text-glacier-900 dark:text-glacier-100 font-medium">
+                  {renderQuestName(quest)}
+                </p>
+                <div className="text-glacier-600 dark:text-glacier-400 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                  <span>Required: {renderItemLink(quest.required_item)}</span>
+                  <span>
+                    Secondary: {renderItemLink(quest.secondary_required_item)}
+                  </span>
+                  <span>Reward: {renderItemLink(quest.reward_item)}</span>
+                </div>
               </div>
-            </li>
-          ))}
-        </ul>
-        <DataTablePagination
-          current_page={quests.page}
-          total_pages={quests.total_pages}
-          total_records={quests.total_records}
-          on_page_change={quests.set_page}
-        />
-      </>
+            ))}
+            {quests.is_loading_more && <InfiniteLoader />}
+          </div>
+        </InfiniteScroll>
+      </div>
     );
   };
 
@@ -189,6 +198,10 @@ const NpcDetailBody = ({
 
   return (
     <div className="flex flex-col gap-6">
+      <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+        {npc.real_name}
+      </h1>
+
       <Card>
         <section>
           <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">

@@ -11,7 +11,6 @@ export const useNpcQuests = (npcId: number): UseNpcQuestsDefinition => {
     {
       url: NpcApiUrls.QUESTS,
       urlParams: { npc: npcId },
-      paginationMode: 'replace',
     },
     PER_PAGE
   );
@@ -23,11 +22,9 @@ export const useNpcQuests = (npcId: number): UseNpcQuestsDefinition => {
   return {
     data: paginated.data,
     loading: paginated.loading,
+    is_loading_more: paginated.isLoadingMore,
     error: paginated.error,
-    page: paginated.page,
-    set_page: paginated.setPage,
-    total_pages: paginated.response?.meta.pagination.total_pages ?? 0,
-    total_records: paginated.response?.meta.pagination.total ?? 0,
+    on_end_reached: paginated.onEndReached,
     refresh,
   };
 };

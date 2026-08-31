@@ -3,6 +3,7 @@
 namespace App\Admin\GameMaps\Controllers\Api;
 
 use App\Admin\GameMaps\Requests\GameMapIndexRequest;
+use App\Admin\GameMaps\Requests\GameMapRelationIndexRequest;
 use App\Admin\GameMaps\Requests\StoreGameMapRequest;
 use App\Admin\GameMaps\Requests\UpdateGameMapRequest;
 use App\Admin\GameMaps\Services\GameMapService;
@@ -11,8 +12,13 @@ use App\Admin\GameMaps\Transformers\GameMapEditorTransformer;
 use App\Admin\GameMaps\Transformers\GameMapFormOptionsTransformer;
 use App\Admin\GameMaps\Transformers\GameMapFormTransformer;
 use App\Admin\GameMaps\Transformers\GameMapListTransformer;
+use App\Admin\GameMaps\Transformers\GameMapRelatedLocationTransformer;
+use App\Admin\GameMaps\Transformers\GameMapRelatedMonsterTransformer;
+use App\Admin\GameMaps\Transformers\GameMapRelatedNpcTransformer;
+use App\Admin\GameMaps\Transformers\GameMapRelatedQuestTransformer;
 use App\Flare\Models\GameMap;
 use App\Flare\Pagination\Pagination;
+use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
@@ -26,6 +32,11 @@ class GameMapsController extends Controller
      * @param  GameMapEditorTransformer  $gameMapEditorTransformer  Editor transformer.
      * @param  GameMapFormOptionsTransformer  $gameMapFormOptionsTransformer  Form-options transformer.
      * @param  GameMapFormTransformer  $gameMapFormTransformer  Form-value transformer.
+     * @param  GameMapRelatedLocationTransformer  $gameMapRelatedLocationTransformer  Related-Location transformer.
+     * @param  GameMapRelatedNpcTransformer  $gameMapRelatedNpcTransformer  Related-NPC transformer.
+     * @param  GameMapRelatedMonsterTransformer  $gameMapRelatedMonsterTransformer  Related-Monster transformer.
+     * @param  GameMapRelatedQuestTransformer  $gameMapRelatedQuestTransformer  Related-Quest transformer.
+     * @param  QuestItemTransformer  $questItemTransformer  Canonical quest Item transformer.
      */
     public function __construct(
         private readonly GameMapService $gameMapService,
@@ -35,6 +46,11 @@ class GameMapsController extends Controller
         private readonly GameMapEditorTransformer $gameMapEditorTransformer,
         private readonly GameMapFormOptionsTransformer $gameMapFormOptionsTransformer,
         private readonly GameMapFormTransformer $gameMapFormTransformer,
+        private readonly GameMapRelatedLocationTransformer $gameMapRelatedLocationTransformer,
+        private readonly GameMapRelatedNpcTransformer $gameMapRelatedNpcTransformer,
+        private readonly GameMapRelatedMonsterTransformer $gameMapRelatedMonsterTransformer,
+        private readonly GameMapRelatedQuestTransformer $gameMapRelatedQuestTransformer,
+        private readonly QuestItemTransformer $questItemTransformer,
     ) {}
 
     /**
@@ -99,6 +115,86 @@ class GameMapsController extends Controller
     public function edit(GameMap $gameMap): JsonResponse
     {
         return response()->json($this->gameMapFormTransformer->transform($gameMap), 200);
+    }
+
+    /**
+     * Return the paginated Locations belonging to the given Game Map.
+     *
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @param  GameMap  $gameMap  Game Map whose Locations are being listed.
+     * @return JsonResponse Paginated Locations JSON response.
+     */
+    public function relatedLocations(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
+    {
+        $paginator = $this->gameMapService->paginateRelatedLocations($gameMap, $request);
+
+        return response()->json(
+            $this->pagination->transformLengthAwarePaginator($paginator, $this->gameMapRelatedLocationTransformer)
+        );
+    }
+
+    /**
+     * Return the paginated NPCs belonging to the given Game Map.
+     *
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @param  GameMap  $gameMap  Game Map whose NPCs are being listed.
+     * @return JsonResponse Paginated NPCs JSON response.
+     */
+    public function relatedNpcs(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
+    {
+        $paginator = $this->gameMapService->paginateRelatedNpcs($gameMap, $request);
+
+        return response()->json(
+            $this->pagination->transformLengthAwarePaginator($paginator, $this->gameMapRelatedNpcTransformer)
+        );
+    }
+
+    /**
+     * Return the paginated Monsters available on the given Game Map.
+     *
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @param  GameMap  $gameMap  Game Map whose Monsters are being listed.
+     * @return JsonResponse Paginated Monsters JSON response.
+     */
+    public function relatedMonsters(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
+    {
+        $paginator = $this->gameMapService->paginateRelatedMonsters($gameMap, $request);
+
+        return response()->json(
+            $this->pagination->transformLengthAwarePaginator($paginator, $this->gameMapRelatedMonsterTransformer)
+        );
+    }
+
+    /**
+     * Return the paginated Quests whose Quest-giver NPC belongs to the given Game Map.
+     *
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @param  GameMap  $gameMap  Game Map whose Quests are being listed.
+     * @return JsonResponse Paginated Quests JSON response.
+     */
+    public function relatedQuests(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
+    {
+        $paginator = $this->gameMapService->paginateRelatedQuests($gameMap, $request);
+
+        return response()->json(
+            $this->pagination->transformLengthAwarePaginator($paginator, $this->gameMapRelatedQuestTransformer)
+        );
+    }
+
+    /**
+     * Return the paginated, deduplicated quest Items connected to the given Game Map.
+     *
+     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
+     * @param  GameMap  $gameMap  Game Map whose quest Items are being listed.
+     * @return JsonResponse Paginated quest Items JSON response.
+     */
+    public function relatedQuestItems(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
+    {
+        $paginator = $this->gameMapService->paginateRelatedQuestItems($gameMap, $request);
+
+        return response()->json(
+            $this->pagination->transformLengthAwarePaginator($paginator, $this->questItemTransformer)
+        );
     }
 
     /**

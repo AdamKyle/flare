@@ -2,13 +2,13 @@ import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
 
 import AdminQuestDetailSidePeekProps from './types/admin-quest-detail-side-peek-props';
+import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import QuestDetail from '../../../../game/reusable-components/quest/components/quest-detail';
 import { QuestApiMessages } from '../../api/enums/quest-api-messages';
 import { useQuestDetail } from '../../api/hooks/use-quest-detail';
 import QuestFormContent from '../forms/quest-form-content';
+import { QuestNestedSelection } from '../types/quest-nested-selection';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -18,15 +18,19 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 /**
  * Admin Quest detail side-peek: stacks the shared, permission-neutral factual Quest
  * presentation with Admin-only Edit/Add-Child actions and relationship navigation into other
- * modernized Admin resources.
+ * modernized Admin resources. Relationship navigation opens the target's canonical detail
+ * inside a `StackedCard` over this content (rather than replacing it through the global
+ * SidePeek emitter), so this component can itself be reused as nested `StackedCard` content
+ * and its own relationship clicks never destroy an ancestor's stack.
  */
 const AdminQuestDetailSidePeek = ({
   quest_id: questId,
   on_quest_changed: onQuestChanged,
 }: AdminQuestDetailSidePeekProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
   const { quest, loading, error, refresh } = useQuestDetail(questId);
   const [formMode, setFormMode] = useState<'edit' | 'add-child' | null>(null);
+  const [nestedSelection, setNestedSelection] =
+    useState<QuestNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   const handleEdit = (): void => {
@@ -48,69 +52,102 @@ const AdminQuestDetailSidePeek = ({
     setAnnouncement('Quest saved.');
   };
 
-  const handleOpenQuest = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL,
-      {
-        is_open: true,
-        title: 'Quest Details',
-        allow_clicking_outside: true,
-        quest_id: id,
-      }
-    );
+  const handleCloseNested = (): void => {
+    setNestedSelection(null);
   };
 
-  const handleOpenItem = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
-      {
-        is_open: true,
-        title: 'Item Details',
-        allow_clicking_outside: true,
-        item_id: id,
-      }
-    );
-  };
+  const renderNestedDetail = (): ReactNode => {
+    if (!nestedSelection) {
+      return null;
+    }
 
-  const handleOpenMonster = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_MONSTER_DETAIL,
-      {
-        is_open: true,
-        title: 'Monster Details',
-        allow_clicking_outside: true,
-        monster_id: id,
-      }
-    );
-  };
+    switch (nestedSelection.type) {
+      case 'quest': {
+        const NestedQuestDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL
+        );
 
-  const handleOpenNpc = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_NPC_DETAIL,
-      {
-        is_open: true,
-        title: 'NPC Details',
-        allow_clicking_outside: true,
-        npc_id: id,
+        return (
+          <StackedCard on_close={handleCloseNested} aria_label="Quest Details">
+            <NestedQuestDetail
+              is_open
+              title="Quest Details"
+              quest_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
       }
-    );
-  };
 
-  const handleOpenMap = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
-      {
-        is_open: true,
-        title: 'Game Map Details',
-        allow_clicking_outside: true,
-        game_map_id: id,
+      case 'item': {
+        const NestedItemDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
+        );
+
+        return (
+          <StackedCard on_close={handleCloseNested} aria_label="Item Details">
+            <NestedItemDetail
+              is_open
+              title="Item Details"
+              item_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
       }
-    );
+
+      case 'monster': {
+        const NestedMonsterDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_MONSTER_DETAIL
+        );
+
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Monster Details"
+          >
+            <NestedMonsterDetail
+              is_open
+              title="Monster Details"
+              monster_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
+
+      case 'npc': {
+        const NestedNpcDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_NPC_DETAIL
+        );
+
+        return (
+          <StackedCard on_close={handleCloseNested} aria_label="NPC Details">
+            <NestedNpcDetail
+              is_open
+              title="NPC Details"
+              npc_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
+
+      default: {
+        const NestedGameMapDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
+        );
+
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Game Map Details"
+          >
+            <NestedGameMapDetail
+              is_open
+              title="Game Map Details"
+              game_map_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
+    }
   };
 
   const renderContent = (): ReactNode => {
@@ -146,11 +183,12 @@ const AdminQuestDetailSidePeek = ({
         <QuestDetail
           quest={quest}
           navigation={{
-            on_open_quest: handleOpenQuest,
-            on_open_item: handleOpenItem,
-            on_open_monster: handleOpenMonster,
-            on_open_npc: handleOpenNpc,
-            on_open_map: handleOpenMap,
+            on_open_quest: (id) => setNestedSelection({ type: 'quest', id }),
+            on_open_item: (id) => setNestedSelection({ type: 'item', id }),
+            on_open_monster: (id) =>
+              setNestedSelection({ type: 'monster', id }),
+            on_open_npc: (id) => setNestedSelection({ type: 'npc', id }),
+            on_open_map: (id) => setNestedSelection({ type: 'map', id }),
           }}
         />
       </div>
@@ -185,6 +223,7 @@ const AdminQuestDetailSidePeek = ({
       </p>
       {renderContent()}
       {renderForm()}
+      {renderNestedDetail()}
     </>
   );
 };

@@ -205,6 +205,28 @@ class QuestsApiControllerTest extends TestCase
         $this->assertSame(['Child Quest'], array_column($data['structure']['child_quests'], 'name'));
     }
 
+    public function test_show_reports_raid_kind_and_raid_identity_consistently(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $npc = $this->createNpc();
+        $raidBoss = $this->createMonster(['name' => 'Consistency Raid Boss']);
+        $raidLocation = $this->createLocation(['name' => 'Consistency Raid Location']);
+        $raid = $this->createRaid([
+            'name' => 'Consistency Raid',
+            'raid_boss_id' => $raidBoss->id,
+            'raid_boss_location_id' => $raidLocation->id,
+        ]);
+        $quest = $this->createQuest(['name' => 'Raid Kind Quest', 'npc_id' => $npc->id, 'raid_id' => $raid->id]);
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/quests/{$quest->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame('raid', $data['kind']);
+        $this->assertNotNull($data['availability']['raid']);
+        $this->assertSame($raid->id, $data['availability']['raid']['id']);
+        $this->assertSame('Consistency Raid', $data['availability']['raid']['name']);
+    }
+
     public function test_store_creates_a_quest_from_every_field_group_and_sets_parent_is_parent_flag(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());

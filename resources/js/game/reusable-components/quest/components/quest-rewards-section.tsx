@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react';
 import FactualLink from '../../quest-item/partials/factual-link';
 import QuestDetailProps from '../types/quest-detail-props';
 
-import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -43,10 +42,10 @@ const QuestRewardsSection = ({
   };
 
   return (
-    <Card>
-      <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+    <div>
+      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
         Rewards
-      </h2>
+      </h3>
       <Dl>
         <Dt>Item</Dt>
         <Dd>{renderRewardItem()}</Dd>
@@ -65,7 +64,7 @@ const QuestRewardsSection = ({
         <Dt>Unlocks Passive</Dt>
         <Dd>{renderPassive()}</Dd>
       </Dl>
-    </Card>
+    </div>
   );
 };
 

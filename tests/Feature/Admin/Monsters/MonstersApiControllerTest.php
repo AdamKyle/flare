@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Monsters;
 
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -227,5 +228,251 @@ class MonstersApiControllerTest extends TestCase
 
         $response->assertStatus(201);
         $response->assertJsonPath('quest_item_drop_chance', 0);
+    }
+
+    public function test_list_filters_by_game_map_id(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $mapOne = $this->createGameMap(['name' => 'Map One']);
+        $mapTwo = $this->createGameMap(['name' => 'Map Two']);
+        $this->createMonster(['name' => 'On Map One', 'game_map_id' => $mapOne->id]);
+        $this->createMonster(['name' => 'On Map Two', 'game_map_id' => $mapTwo->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['game_map_id' => $mapOne->id],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame('On Map One', $data[0]['name']);
+    }
+
+    public function test_list_category_filter_regular_excludes_special_monsters(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createMonster(['name' => 'Regular Monster']);
+        $this->createMonster(['name' => 'Raid Monster', 'is_raid_monster' => true]);
+        $this->createMonster(['name' => 'Raid Boss', 'is_raid_boss' => true]);
+        $this->createMonster(['name' => 'Celestial Monster', 'is_celestial_entity' => true]);
+        $this->createMonster(['name' => 'Special Location Monster', 'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'regular'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame('Regular Monster', $data[0]['name']);
+    }
+
+    public function test_list_category_filter_raid_monster(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createMonster(['name' => 'Regular Monster']);
+        $raidMonster = $this->createMonster(['name' => 'Raid Monster', 'is_raid_monster' => true]);
+        $this->createMonster(['name' => 'Raid Boss', 'is_raid_boss' => true]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'raid_monster'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($raidMonster->id, $data[0]['id']);
+    }
+
+    public function test_list_category_filter_raid_boss(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createMonster(['name' => 'Raid Monster', 'is_raid_monster' => true]);
+        $raidBoss = $this->createMonster(['name' => 'Raid Boss', 'is_raid_boss' => true]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'raid_boss'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($raidBoss->id, $data[0]['id']);
+    }
+
+    public function test_list_category_filter_celestial(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $celestial = $this->createMonster(['name' => 'Celestial Monster', 'is_celestial_entity' => true]);
+        $this->createMonster(['name' => 'Regular Monster']);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'celestial'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($celestial->id, $data[0]['id']);
+    }
+
+    public function test_list_category_filter_special_location_includes_cave_of_memories(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $caveMonster = $this->createMonster([
+            'name' => 'Cave Monster',
+            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+        ]);
+        $this->createMonster(['name' => 'Regular Monster']);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'special_location'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($caveMonster->id, $data[0]['id']);
+    }
+
+    public function test_list_category_filter_weekly_fight_excludes_cave_of_memories(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createMonster([
+            'name' => 'Cave Monster',
+            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+        ]);
+        $weeklyMonster = $this->createMonster([
+            'name' => 'Alchemy Church Monster',
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'weekly_fight'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($weeklyMonster->id, $data[0]['id']);
+    }
+
+    public function test_list_special_location_category_with_exact_location_type(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $caveMonster = $this->createMonster([
+            'name' => 'Cave Monster',
+            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+        ]);
+        $this->createMonster([
+            'name' => 'Alchemy Church Monster',
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => [
+                'category' => 'special_location',
+                'location_type' => LocationType::CAVE_OF_MEMORIES->value,
+            ],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($caveMonster->id, $data[0]['id']);
+    }
+
+    public function test_list_weekly_fight_category_with_valid_weekly_type(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $alchemyMonster = $this->createMonster([
+            'name' => 'Alchemy Church Monster',
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+        $this->createMonster([
+            'name' => 'Broken Anvil Monster',
+            'only_for_location_type' => LocationType::BROKEN_ANVIL->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => [
+                'category' => 'weekly_fight',
+                'location_type' => LocationType::ALCHEMY_CHURCH->value,
+            ],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($alchemyMonster->id, $data[0]['id']);
+    }
+
+    public function test_list_rejects_invalid_location_type(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => [
+                'category' => 'special_location',
+                'location_type' => 999,
+            ],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('filters.location_type');
+    }
+
+    public function test_list_rejects_location_type_for_regular_category(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => [
+                'category' => 'regular',
+                'location_type' => LocationType::ALCHEMY_CHURCH->value,
+            ],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('filters.location_type');
+    }
+
+    public function test_list_composes_search_map_category_location_and_sort_filters(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Weekly Map']);
+        $otherMap = $this->createGameMap(['name' => 'Other Map']);
+
+        $matching = $this->createMonster([
+            'name' => 'Zeta Weekly Fighter',
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value,
+        ]);
+        $this->createMonster([
+            'name' => 'Alpha Weekly Fighter',
+            'game_map_id' => $otherMap->id,
+            'only_for_location_type' => LocationType::LORDS_STRONG_HOLD->value,
+        ]);
+        $this->createMonster([
+            'name' => 'Zeta Weekly Fighter Two',
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'search_text' => 'Zeta Weekly Fighter',
+            'sort_key' => 'name',
+            'sort_direction' => 'asc',
+            'filters' => [
+                'game_map_id' => $gameMap->id,
+                'category' => 'weekly_fight',
+                'location_type' => LocationType::LORDS_STRONG_HOLD->value,
+            ],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($matching->id, $data[0]['id']);
     }
 }
