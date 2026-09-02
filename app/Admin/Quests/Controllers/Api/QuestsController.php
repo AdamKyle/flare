@@ -55,6 +55,16 @@ class QuestsController extends Controller
     }
 
     /**
+     * Return the factual Quest browse options for the Admin Quest browser.
+     *
+     * @return JsonResponse Quest browse-options JSON response.
+     */
+    public function browseOptions(): JsonResponse
+    {
+        return response()->json($this->questReadService->browseOptions(), 200);
+    }
+
+    /**
      * Return the full factual detail representation for the given Quest.
      *
      * @param  Quest  $quest  Quest to transform.

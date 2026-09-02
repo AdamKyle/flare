@@ -3,6 +3,7 @@
 Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/quests/tree', ['uses' => 'Api\QuestsController@tree']);
     Route::get('/admin/quests/options', ['uses' => 'Api\QuestsController@options']);
+    Route::get('/admin/quests/browse-options', ['uses' => 'Api\QuestsController@browseOptions']);
     Route::post('/admin/quests', ['uses' => 'Api\QuestsController@store']);
     Route::post('/admin/quests/import', ['uses' => 'Api\QuestImportController']);
     Route::get('/admin/quests/{quest}/edit', ['uses' => 'Api\QuestsController@edit']);

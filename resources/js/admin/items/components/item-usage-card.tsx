@@ -58,7 +58,7 @@ const ItemUsageCard = ({
           onClick={() =>
             onOpenRelatedEntity(relatedEntity.resource, relatedEntity.id)
           }
-          className="text-danube-600 hover:text-danube-500 focus-visible:ring-danube-400 dark:text-danube-300 dark:hover:text-danube-200 rounded-sm underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2"
+          className="text-danube-700 hover:text-danube-600 dark:text-danube-200 dark:hover:text-danube-100 decoration-danube-400 dark:decoration-danube-500 focus-visible:ring-danube-400 rounded-sm underline underline-offset-2 focus:outline-none focus-visible:ring-2"
         >
           {relatedEntity.name}
         </button>

@@ -1,5 +1,7 @@
+import clsx from 'clsx';
 import React, { useId, useMemo, useState } from 'react';
 
+import { PillTabsAlignment } from 'ui/tabs/enums/pill-tabs-alignment';
 import TabsList from 'ui/tabs/tabs-list';
 import TabsPanels from 'ui/tabs/tabs-panels';
 import PillTabsProps from 'ui/tabs/types/pill-tabs-props';
@@ -10,6 +12,7 @@ const PillTabs = <PTuple extends readonly object[]>({
   initialIndex = 0,
   additional_tab_css,
   onActiveIndexChange,
+  alignment = PillTabsAlignment.CENTER,
 }: PillTabsProps<PTuple>) => {
   const [activeIndex, setActiveIndex] = useState<number>(initialIndex);
 
@@ -49,7 +52,12 @@ const PillTabs = <PTuple extends readonly object[]>({
     }
 
     return (
-      <div className="flex w-full flex-col items-center">
+      <div
+        className={clsx(
+          'flex w-full flex-col',
+          alignment === PillTabsAlignment.START ? 'items-start' : 'items-center'
+        )}
+      >
         <TabsList
           tabs={tabs}
           ariaLabel={ariaLabel}

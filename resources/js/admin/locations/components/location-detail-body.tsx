@@ -17,7 +17,7 @@ import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const relatedItemButtonClasses =
-  'text-danube-700 hover:text-danube-600 dark:text-danube-300 dark:hover:text-danube-200 focus-visible:ring-danube-400 rounded font-medium underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2';
+  'text-danube-700 hover:text-danube-600 dark:text-danube-200 dark:hover:text-danube-100 decoration-danube-400 dark:decoration-danube-500 focus-visible:ring-danube-400 rounded font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2';
 
 /**
  * Render the canonical read-only Location detail body: Identity,
@@ -78,7 +78,7 @@ const LocationDetailBody = ({
 
   const renderRequiredQuestItem = (): ReactNode => {
     if (!location.required_quest_item) {
-      return 'None';
+      return null;
     }
 
     const requiredQuestItem = location.required_quest_item;
@@ -96,7 +96,7 @@ const LocationDetailBody = ({
 
   const renderQuestRewardItem = (): ReactNode => {
     if (!location.quest_reward_item) {
-      return 'None';
+      return null;
     }
 
     const questRewardItem = location.quest_reward_item;
@@ -138,32 +138,29 @@ const LocationDetailBody = ({
     }
 
     if (questItems.data.length === 0) {
-      return (
-        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-          No quest Items drop at this Location.
-        </p>
-      );
+      return null;
     }
 
     return (
-      <div className="h-[500px] max-h-[500px]">
-        <InfiniteScroll handle_scroll={handleQuestItemsScroll}>
-          <div className="flex flex-col gap-3">
-            {questItems.data.map((item) => (
-              <ReadOnlyItemCard
-                key={item.item_id}
-                item_id={item.item_id}
-                name={item.name}
-                description={item.description}
-                effect={item.effect}
-                usable={item.usable}
-                on_click={() => onOpenQuestItem(item)}
-              />
-            ))}
-            {questItems.is_loading_more && <InfiniteLoader />}
-          </div>
-        </InfiniteScroll>
-      </div>
+      <InfiniteScroll
+        handle_scroll={handleQuestItemsScroll}
+        height_class="h-auto max-h-[500px]"
+      >
+        <div className="flex flex-col gap-3">
+          {questItems.data.map((item) => (
+            <ReadOnlyItemCard
+              key={item.item_id}
+              item_id={item.item_id}
+              name={item.name}
+              description={item.description}
+              effect={item.effect}
+              usable={item.usable}
+              on_click={() => onOpenQuestItem(item)}
+            />
+          ))}
+          {questItems.is_loading_more && <InfiniteLoader />}
+        </div>
+      </InfiniteScroll>
     );
   };
 
@@ -182,12 +179,12 @@ const LocationDetailBody = ({
             <Dl>
               <Dt>Map</Dt>
               <Dd>{renderMap()}</Dd>
-              <Dt>Type</Dt>
-              <Dd>
-                {location.type === null
-                  ? 'None'
-                  : LOCATION_TYPE_LABELS[location.type]}
-              </Dd>
+              {location.type !== null && (
+                <>
+                  <Dt>Type</Dt>
+                  <Dd>{LOCATION_TYPE_LABELS[location.type]}</Dd>
+                </>
+              )}
               <Dt>Coordinates</Dt>
               <Dd>
                 X {location.x}, Y {location.y}
@@ -195,54 +192,80 @@ const LocationDetailBody = ({
             </Dl>
           </section>
 
-          <section>
-            <h3 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-              Description
-            </h3>
-            {location.description ? (
+          {location.description && (
+            <section>
+              <h3 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
+                Description
+              </h3>
               <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
                 <ReactMarkdown>{location.description}</ReactMarkdown>
               </div>
-            ) : (
-              <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-                No description.
-              </p>
-            )}
-          </section>
+            </section>
+          )}
 
           <section>
             <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
               Rules
             </h3>
             <Dl>
-              <Dt>Is Port</Dt>
-              <Dd>{location.is_port ? 'Yes' : 'No'}</Dd>
-              <Dt>Players May Enter</Dt>
-              <Dd>{location.can_players_enter ? 'Yes' : 'No'}</Dd>
-              <Dt>Auto Battle Allowed</Dt>
-              <Dd>{location.can_auto_battle ? 'Yes' : 'No'}</Dd>
-              <Dt>Required Quest Item</Dt>
-              <Dd>{renderRequiredQuestItem()}</Dd>
-              <Dt>Quest Reward Item</Dt>
-              <Dd>{renderQuestRewardItem()}</Dd>
-              <Dt>Hours to Drop</Dt>
-              <Dd>{location.hours_to_drop ?? 'None'}</Dd>
-              <Dt>Minutes Between Delve Fights</Dt>
-              <Dd>{location.minutes_between_delve_fights ?? 'None'}</Dd>
+              {location.is_port && (
+                <>
+                  <Dt>Is Port</Dt>
+                  <Dd>Yes</Dd>
+                </>
+              )}
+              {location.can_players_enter && (
+                <>
+                  <Dt>Players May Enter</Dt>
+                  <Dd>Yes</Dd>
+                </>
+              )}
+              {location.can_auto_battle && (
+                <>
+                  <Dt>Auto Battle Allowed</Dt>
+                  <Dd>Yes</Dd>
+                </>
+              )}
+              {location.required_quest_item && (
+                <>
+                  <Dt>Required Quest Item</Dt>
+                  <Dd>{renderRequiredQuestItem()}</Dd>
+                </>
+              )}
+              {location.quest_reward_item && (
+                <>
+                  <Dt>Quest Reward Item</Dt>
+                  <Dd>{renderQuestRewardItem()}</Dd>
+                </>
+              )}
+              {location.hours_to_drop !== null && (
+                <>
+                  <Dt>Hours to Drop</Dt>
+                  <Dd>{location.hours_to_drop}</Dd>
+                </>
+              )}
+              {location.minutes_between_delve_fights !== null && (
+                <>
+                  <Dt>Minutes Between Delve Fights</Dt>
+                  <Dd>{location.minutes_between_delve_fights}</Dd>
+                </>
+              )}
             </Dl>
           </section>
         </div>
       </Card>
 
-      <Card>
-        <section>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-            Quest Items Dropped Here ({location.quest_item_drop_count})
-          </h2>
-          {renderDropModeNotice()}
-          <div className="mt-3">{renderQuestItems()}</div>
-        </section>
-      </Card>
+      {location.quest_item_drop_count > 0 && (
+        <Card>
+          <section>
+            <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+              Quest Items Dropped Here ({location.quest_item_drop_count})
+            </h2>
+            {renderDropModeNotice()}
+            <div className="mt-3">{renderQuestItems()}</div>
+          </section>
+        </Card>
+      )}
     </div>
   );
 };

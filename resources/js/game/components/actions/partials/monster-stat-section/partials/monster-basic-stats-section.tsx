@@ -5,6 +5,7 @@ import MonsterSectionProps from '../types/partials/monster-section-props';
 import {
   formatPercent,
   formatNumberWithCommas,
+  formatRangeWithCommas,
 } from 'game-utils/format-number';
 import { isNilOrZeroValue } from 'game-utils/general-util';
 
@@ -41,28 +42,6 @@ const MonsterBasicStatsSection = ({ monster }: MonsterSectionProps) => {
         <span className="whitespace-nowrap">{label}:</span>
       </div>
     );
-  };
-
-  const formatRangeWithCommas = (range: string): string => {
-    const parts = range.split('-').map((p) => p.trim());
-
-    if (parts.length !== 2) {
-      return range;
-    }
-
-    const [lowRaw, highRaw] = parts;
-
-    const lowNum = Number(lowRaw.replace(/,/g, ''));
-    const highNum = Number(highRaw.replace(/,/g, ''));
-
-    const low = Number.isFinite(lowNum)
-      ? formatNumberWithCommas(lowNum)
-      : lowRaw;
-    const high = Number.isFinite(highNum)
-      ? formatNumberWithCommas(highNum)
-      : highRaw;
-
-    return `${low} - ${high}`;
   };
 
   const renderHealthRange = () => {

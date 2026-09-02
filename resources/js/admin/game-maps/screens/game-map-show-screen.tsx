@@ -10,14 +10,13 @@ import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
 import { useGameMap } from '../api/hooks/use-game-map';
-import GameMapRelatedDataActions from '../components/game-map-related-data-actions';
+import GameMapRelatedDataNavigation from '../components/game-map-related-data-navigation';
 import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
-import { GameMapCopy } from '../enums/game-map-copy';
 import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
 import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
 import { GameMapShowScreenProps } from '../screen-manager/game-map-screen-props';
-import { convertStoredBonusToPercentage } from '../utils/convert-stored-bonus-to-percentage';
+import { resolveGameMapBonusEntries } from '../utils/resolve-game-map-bonus-entries';
 import { resolveRequiredQuestItemCopy } from '../utils/resolve-required-quest-item-copy';
 
 import { Alert } from 'ui/alerts/alert';
@@ -86,21 +85,8 @@ const GameMapShowScreen = ({
   };
 
   const renderRequiredQuestItem = (): ReactNode => {
-    if (!gameMap) {
+    if (!gameMap?.required_quest_item) {
       return null;
-    }
-
-    if (!gameMap.required_quest_item) {
-      return (
-        <section>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-            Required Quest Item
-          </h2>
-          <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-            {resolveRequiredQuestItemCopy(null)}
-          </p>
-        </section>
-      );
     }
 
     return (
@@ -120,17 +106,18 @@ const GameMapShowScreen = ({
 
   const renderDescription = (): ReactNode => {
     if (!gameMap?.description) {
-      return (
-        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-          {GameMapCopy.NoDescription}
-        </p>
-      );
+      return null;
     }
 
     return (
-      <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
-        <ReactMarkdown>{gameMap.description}</ReactMarkdown>
-      </div>
+      <section>
+        <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
+          Description
+        </h2>
+        <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
+          <ReactMarkdown>{gameMap.description}</ReactMarkdown>
+        </div>
+      </section>
     );
   };
 
@@ -161,6 +148,91 @@ const GameMapShowScreen = ({
     );
   };
 
+  const renderAccessConfiguration = (): ReactNode => {
+    if (!gameMap) {
+      return null;
+    }
+
+    const hasRows =
+      gameMap.default ||
+      gameMap.can_traverse ||
+      gameMap.event_restriction !== null ||
+      gameMap.required_location !== null ||
+      Boolean(gameMap.kingdom_color);
+
+    if (!hasRows) {
+      return null;
+    }
+
+    return (
+      <section>
+        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+          Access and Configuration
+        </h2>
+        <Dl>
+          {gameMap.default && (
+            <>
+              <Dt>Default map</Dt>
+              <Dd>Yes</Dd>
+            </>
+          )}
+          {gameMap.can_traverse && (
+            <>
+              <Dt>Can traverse</Dt>
+              <Dd>Yes</Dd>
+            </>
+          )}
+          {gameMap.event_restriction !== null && (
+            <>
+              <Dt>Event restriction</Dt>
+              <Dd>{GAME_MAP_EVENT_TYPE_LABELS[gameMap.event_restriction]}</Dd>
+            </>
+          )}
+          {gameMap.required_location && (
+            <>
+              <Dt>Required Location</Dt>
+              <Dd>{gameMap.required_location.name}</Dd>
+            </>
+          )}
+          {gameMap.kingdom_color && (
+            <>
+              <Dt>Kingdom color</Dt>
+              <Dd>{gameMap.kingdom_color}</Dd>
+            </>
+          )}
+        </Dl>
+      </section>
+    );
+  };
+
+  const renderMapBonuses = (): ReactNode => {
+    if (!gameMap) {
+      return null;
+    }
+
+    const bonusEntries = resolveGameMapBonusEntries(gameMap);
+
+    if (bonusEntries.length === 0) {
+      return null;
+    }
+
+    return (
+      <section>
+        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+          Map Bonuses
+        </h2>
+        <Dl>
+          {bonusEntries.map((entry) => (
+            <React.Fragment key={entry.label}>
+              <Dt>{entry.label}</Dt>
+              <Dd>{entry.percentage}%</Dd>
+            </React.Fragment>
+          ))}
+        </Dl>
+      </section>
+    );
+  };
+
   const renderDetails = (): ReactNode => {
     if (!gameMap) {
       return null;
@@ -168,79 +240,13 @@ const GameMapShowScreen = ({
 
     return (
       <div className="flex flex-col gap-6">
-        <div className="flex justify-end gap-3">
-          <Button
-            label="Edit Map"
-            variant={ButtonVariant.PRIMARY}
-            on_click={handleEditMap}
-          />
-          {renderEditorAction()}
-        </div>
+        {renderDescription()}
 
-        {renderProcessingStatus()}
-
-        <section>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-            Description
-          </h2>
-          {renderDescription()}
-        </section>
-
-        <section>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-            Access and Configuration
-          </h2>
-          <Dl>
-            <Dt>Default map</Dt>
-            <Dd>{gameMap.default ? 'Yes' : 'No'}</Dd>
-            <Dt>Can traverse</Dt>
-            <Dd>{gameMap.can_traverse ? 'Yes' : 'No'}</Dd>
-            <Dt>Event restriction</Dt>
-            <Dd>
-              {gameMap.event_restriction === null
-                ? 'None'
-                : GAME_MAP_EVENT_TYPE_LABELS[gameMap.event_restriction]}
-            </Dd>
-            <Dt>Required Location</Dt>
-            <Dd>{gameMap.required_location?.name ?? 'None'}</Dd>
-            <Dt>Kingdom color</Dt>
-            <Dd>{gameMap.kingdom_color}</Dd>
-          </Dl>
-        </section>
+        {renderAccessConfiguration()}
 
         {renderRequiredQuestItem()}
 
-        <section>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-            Map Bonuses
-          </h2>
-          <Dl>
-            <Dt>XP Bonus</Dt>
-            <Dd>{convertStoredBonusToPercentage(gameMap.xp_bonus ?? 0)}%</Dd>
-            <Dt>Skill XP Bonus</Dt>
-            <Dd>
-              {convertStoredBonusToPercentage(
-                gameMap.skill_training_bonus ?? 0
-              )}
-              %
-            </Dd>
-            <Dt>Drop Chance Bonus</Dt>
-            <Dd>
-              {convertStoredBonusToPercentage(gameMap.drop_chance_bonus ?? 0)}%
-            </Dd>
-            <Dt>Enemy Stat Increase</Dt>
-            <Dd>
-              {convertStoredBonusToPercentage(gameMap.enemy_stat_bonus ?? 0)}%
-            </Dd>
-            <Dt>Character Damage Deduction</Dt>
-            <Dd>
-              {convertStoredBonusToPercentage(
-                gameMap.character_attack_reduction ?? 0
-              )}
-              %
-            </Dd>
-          </Dl>
-        </section>
+        {renderMapBonuses()}
       </div>
     );
   };
@@ -258,14 +264,26 @@ const GameMapShowScreen = ({
 
     return (
       <div className="flex flex-col gap-6">
-        <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
-          {gameMap.name}
-        </h1>
-        <div className="grid gap-6 md:grid-cols-2">
-          {renderMapPreview()}
-          {renderDetails()}
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            label="Edit Map"
+            variant={ButtonVariant.PRIMARY}
+            on_click={handleEditMap}
+          />
+          {renderEditorAction()}
         </div>
-        <GameMapRelatedDataActions game_map_id={gameMapId} />
+
+        {renderProcessingStatus()}
+
+        <div className="lg:flex lg:items-start lg:gap-6">
+          <GameMapRelatedDataNavigation game_map_id={gameMapId} />
+          <div className="min-w-0 lg:flex-1">
+            <div className="grid gap-6 md:grid-cols-2">
+              {renderMapPreview()}
+              {renderDetails()}
+            </div>
+          </div>
+        </div>
       </div>
     );
   };

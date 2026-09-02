@@ -13,33 +13,23 @@ const QuestRewardsSection = ({
 }: QuestDetailProps): ReactNode => {
   const { rewards } = quest;
 
-  const renderRewardItem = (): ReactNode => {
-    if (!rewards.item) {
-      return 'None';
-    }
+  const currencyRows: { label: string; value: number }[] = [
+    { label: 'Gold', value: rewards.gold ?? 0 },
+    { label: 'Gold Dust', value: rewards.gold_dust ?? 0 },
+    { label: 'Shards', value: rewards.shards ?? 0 },
+    { label: 'XP', value: rewards.xp ?? 0 },
+  ].filter((row) => row.value !== 0);
 
-    return (
-      <FactualLink
-        id={rewards.item.item_id}
-        label={rewards.item.name}
-        on_click={navigation?.on_open_item}
-      />
-    );
-  };
+  const hasRows =
+    Boolean(rewards.item) ||
+    currencyRows.length > 0 ||
+    Boolean(rewards.skill) ||
+    Boolean(rewards.feature) ||
+    Boolean(rewards.passive);
 
-  const renderPassive = (): ReactNode => {
-    if (!rewards.passive) {
-      return 'None';
-    }
-
-    return (
-      <FactualLink
-        id={rewards.passive.id}
-        label={rewards.passive.name}
-        on_click={navigation?.on_open_passive}
-      />
-    );
-  };
+  if (!hasRows) {
+    return null;
+  }
 
   return (
     <div>
@@ -47,22 +37,48 @@ const QuestRewardsSection = ({
         Rewards
       </h3>
       <Dl>
-        <Dt>Item</Dt>
-        <Dd>{renderRewardItem()}</Dd>
-        <Dt>Gold</Dt>
-        <Dd>{rewards.gold ?? 0}</Dd>
-        <Dt>Gold Dust</Dt>
-        <Dd>{rewards.gold_dust ?? 0}</Dd>
-        <Dt>Shards</Dt>
-        <Dd>{rewards.shards ?? 0}</Dd>
-        <Dt>XP</Dt>
-        <Dd>{rewards.xp ?? 0}</Dd>
-        <Dt>Unlocks Skill</Dt>
-        <Dd>{rewards.skill ? rewards.skill.name : 'None'}</Dd>
-        <Dt>Unlocks Feature</Dt>
-        <Dd>{rewards.feature ?? 'None'}</Dd>
-        <Dt>Unlocks Passive</Dt>
-        <Dd>{renderPassive()}</Dd>
+        {rewards.item && (
+          <>
+            <Dt>Item</Dt>
+            <Dd>
+              <FactualLink
+                id={rewards.item.item_id}
+                label={rewards.item.name}
+                on_click={navigation?.on_open_item}
+              />
+            </Dd>
+          </>
+        )}
+        {currencyRows.map((row) => (
+          <React.Fragment key={row.label}>
+            <Dt>{row.label}</Dt>
+            <Dd>{row.value}</Dd>
+          </React.Fragment>
+        ))}
+        {rewards.skill && (
+          <>
+            <Dt>Unlocks Skill</Dt>
+            <Dd>{rewards.skill.name}</Dd>
+          </>
+        )}
+        {rewards.feature && (
+          <>
+            <Dt>Unlocks Feature</Dt>
+            <Dd>{rewards.feature}</Dd>
+          </>
+        )}
+        {rewards.passive && (
+          <>
+            <Dt>Unlocks Passive</Dt>
+            <Dd>
+              <FactualLink
+                id={rewards.passive.id}
+                label={rewards.passive.name}
+                on_click={navigation?.on_open_passive}
+              />
+            </Dd>
+          </>
+        )}
       </Dl>
     </div>
   );

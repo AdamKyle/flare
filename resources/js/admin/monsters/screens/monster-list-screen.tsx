@@ -1,10 +1,11 @@
-import React, { ReactNode, useRef, useState } from 'react';
+import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
+import { useAdminGameMapFilterOptions } from '../../shared/api/hooks/use-admin-game-map-filter-options';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import MonsterListDefinition from '../api/definitions/monster-list-definition';
 import { useImportMonsters } from '../api/hooks/use-import-monsters';
-import { useMonsterFormOptions } from '../api/hooks/use-monster-form-options';
 import { useMonsters } from '../api/hooks/use-monsters';
 import {
   MONSTER_LIST_CATEGORIES_WITH_LOCATION_TYPE,
@@ -23,13 +24,19 @@ import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import DataTable from 'ui/data-table/data-table';
 import Dropdown from 'ui/drop-down/drop-down';
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
+import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const MonsterListScreen = (): ReactNode => {
   const navigation = useMonsterScreenNavigation();
   const [announcement, setAnnouncement] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasInitializedMapRef = useRef(false);
 
-  const { form_options: formOptions } = useMonsterFormOptions();
+  const {
+    options: mapOptions,
+    loading: mapOptionsLoading,
+    error: mapOptionsError,
+  } = useAdminGameMapFilterOptions();
   const { import_monsters: importMonsters, importing } = useImportMonsters();
 
   const {
@@ -53,7 +60,20 @@ const MonsterListScreen = (): ReactNode => {
     refresh_first_page: refreshFirstPage,
   } = useMonsters();
 
-  const gameMapItems: DropdownItem[] = formOptions?.game_maps ?? [];
+  useEffect(() => {
+    if (hasInitializedMapRef.current || !mapOptions) {
+      return;
+    }
+
+    hasInitializedMapRef.current = true;
+    setGameMapId(mapOptions.default_game_map_id);
+  }, [mapOptions, setGameMapId]);
+
+  const gameMapItems: DropdownItem[] =
+    mapOptions?.game_maps.map((gameMap) => ({
+      label: gameMap.name,
+      value: gameMap.id,
+    })) ?? [];
   const columns = buildMonsterListColumns();
 
   const categoryItems: DropdownItem[] = MONSTER_LIST_CATEGORY_VALUES.map(
@@ -100,26 +120,16 @@ const MonsterListScreen = (): ReactNode => {
   const totalPages = response?.meta.pagination.total_pages ?? 0;
   const totalRecords = response?.meta.pagination.total ?? 0;
 
-  return (
-    <AdminPage
-      title="Monsters"
-      width={AdminPageWidth.Standard}
-      header_actions={
-        <>
-          <a
-            href="/admin"
-            className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-          >
-            Back
-          </a>
-          <Button
-            label="Create Monster"
-            variant={ButtonVariant.PRIMARY}
-            on_click={handleCreate}
-          />
-        </>
-      }
-    >
+  const renderFilters = (): ReactNode => {
+    if (mapOptionsLoading && !hasInitializedMapRef.current) {
+      return <InfiniteLoader />;
+    }
+
+    if (mapOptionsError) {
+      return <ApiErrorAlert apiError={mapOptionsError.message} />;
+    }
+
+    return (
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="w-full max-w-xs">
           <Dropdown
@@ -193,6 +203,30 @@ const MonsterListScreen = (): ReactNode => {
           Export
         </a>
       </div>
+    );
+  };
+
+  return (
+    <AdminPage
+      title="Monsters"
+      width={AdminPageWidth.Standard}
+      header_actions={
+        <>
+          <a
+            href="/admin"
+            className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
+          >
+            Back
+          </a>
+          <Button
+            label="Create Monster"
+            variant={ButtonVariant.PRIMARY}
+            on_click={handleCreate}
+          />
+        </>
+      }
+    >
+      {renderFilters()}
 
       <DataTable<MonsterListDefinition>
         id_prefix="monsters"
@@ -202,7 +236,7 @@ const MonsterListScreen = (): ReactNode => {
         columns={columns}
         loading={loading}
         error={error?.message ?? null}
-        empty_message="No Monsters match the current search."
+        empty_message="No Monsters match the current search and filters."
         search_label="Search Monsters"
         search_value={searchText}
         on_search_change={setSearchText}

@@ -18,8 +18,12 @@ const GameMapKingdomSidePeek = ({
       <Dd>
         {kingdom.owner_type === GameMapKingdomOwnerType.Npc ? 'Npc' : 'Player'}
       </Dd>
-      <Dt>Npc Owned</Dt>
-      <Dd>{kingdom.npc_owned ? 'Yes' : 'No'}</Dd>
+      {kingdom.npc_owned && (
+        <>
+          <Dt>Npc Owned</Dt>
+          <Dd>Yes</Dd>
+        </>
+      )}
       <Dt>X Coordinate</Dt>
       <Dd>{kingdom.x_position}</Dd>
       <Dt>Y Coordinate</Dt>

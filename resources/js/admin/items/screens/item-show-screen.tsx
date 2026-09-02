@@ -13,12 +13,8 @@ import { useDeleteItem } from '../api/hooks/use-delete-item';
 import { useItemDetail } from '../api/hooks/use-item-detail';
 import { useItemUsage } from '../api/hooks/use-item-usage';
 import AdminItemPresentation from '../components/admin-item-presentation';
+import ItemManagementDetails from '../components/item-management-details';
 import ItemUsageCard from '../components/item-usage-card';
-import { ITEM_ALCHEMY_TYPE_LABELS } from '../enums/item-alchemy-type';
-import { ITEM_CATALOG_TYPE_LABELS } from '../enums/item-catalog-type';
-import { ITEM_CRAFTING_TYPE_LABELS } from '../enums/item-crafting-type';
-import { ITEM_DEFAULT_POSITION_LABELS } from '../enums/item-default-position';
-import { ITEM_SPECIALTY_TYPE_LABELS } from '../enums/item-specialty-type';
 import { ItemScreens } from '../screen-manager/item-screen-constants';
 import { useItemScreenNavigation } from '../screen-manager/item-screen-kit';
 import { ItemShowScreenProps } from '../screen-manager/item-screen-props';
@@ -28,9 +24,6 @@ import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Card from 'ui/cards/card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const ItemShowScreen = ({
@@ -275,49 +268,10 @@ const ItemShowScreen = ({
         </Card>
 
         <Card>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-            Catalog Management
-          </h2>
-          <Dl>
-            <Dt>Type</Dt>
-            <Dd>{ITEM_CATALOG_TYPE_LABELS[item.type]}</Dd>
-            <Dt>Craftable</Dt>
-            <Dd>{item.management.can_craft ? 'Yes' : 'No'}</Dd>
-            <Dt>Crafting Type</Dt>
-            <Dd>
-              {item.management.crafting_type === null
-                ? 'None'
-                : ITEM_CRAFTING_TYPE_LABELS[item.management.crafting_type]}
-            </Dd>
-            <Dt>Market Sellable</Dt>
-            <Dd>{item.management.market_sellable ? 'Yes' : 'No'}</Dd>
-            <Dt>Can Drop</Dt>
-            <Dd>{item.management.can_drop ? 'Yes' : 'No'}</Dd>
-            <Dt>Default Position</Dt>
-            <Dd>
-              {item.management.default_position === null
-                ? 'None'
-                : ITEM_DEFAULT_POSITION_LABELS[
-                    item.management.default_position
-                  ]}
-            </Dd>
-            <Dt>Specialty Type</Dt>
-            <Dd>
-              {item.management.specialty_type === null
-                ? 'None'
-                : ITEM_SPECIALTY_TYPE_LABELS[item.management.specialty_type]}
-            </Dd>
-            <Dt>Alchemy Type</Dt>
-            <Dd>
-              {item.management.alchemy_type === null
-                ? 'None'
-                : ITEM_ALCHEMY_TYPE_LABELS[item.management.alchemy_type]}
-            </Dd>
-            <Dt>Unlocks Class</Dt>
-            <Dd>{item.management.unlocks_class?.name ?? 'None'}</Dd>
-            <Dt>Item Skill</Dt>
-            <Dd>{item.management.item_skill?.name ?? 'None'}</Dd>
-          </Dl>
+          <ItemManagementDetails
+            type={item.type}
+            management={item.management}
+          />
         </Card>
 
         <ItemUsageCard

@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import { formatNumberWithCommas } from '../../../util/format-number';
 import {
   isRaidAttackType,
   RAID_ATTACK_TYPE_LABELS,
@@ -14,15 +15,24 @@ import Dt from 'ui/dl/dt';
 const MonsterRaidSection = ({ monster }: MonsterDetailProps): ReactNode => {
   const { raid_and_special: raid } = monster;
 
-  const renderAttackType = (): ReactNode => {
-    if (raid.raid_special_attack_type === null) {
-      return 'None';
-    }
+  const renderAttackTypeLabel = (value: number): ReactNode =>
+    isRaidAttackType(value) ? RAID_ATTACK_TYPE_LABELS[value] : value;
 
-    return isRaidAttackType(raid.raid_special_attack_type)
-      ? RAID_ATTACK_TYPE_LABELS[raid.raid_special_attack_type]
-      : raid.raid_special_attack_type;
-  };
+  const atonementRows: { label: string; value: number }[] = [
+    { label: 'Fire Atonement', value: raid.fire_atonement ?? 0 },
+    { label: 'Ice Atonement', value: raid.ice_atonement ?? 0 },
+    { label: 'Water Atonement', value: raid.water_atonement ?? 0 },
+  ].filter((row) => row.value > 0);
+
+  const hasRows =
+    raid.is_raid_monster ||
+    raid.is_raid_boss ||
+    raid.raid_special_attack_type !== null ||
+    atonementRows.length > 0;
+
+  if (!hasRows) {
+    return null;
+  }
 
   return (
     <Card>
@@ -30,18 +40,30 @@ const MonsterRaidSection = ({ monster }: MonsterDetailProps): ReactNode => {
         Raid &amp; Special Rules
       </h2>
       <Dl>
-        <Dt>Raid Monster</Dt>
-        <Dd>{raid.is_raid_monster ? 'Yes' : 'No'}</Dd>
-        <Dt>Raid Boss</Dt>
-        <Dd>{raid.is_raid_boss ? 'Yes' : 'No'}</Dd>
-        <Dt>Special Attack Type</Dt>
-        <Dd>{renderAttackType()}</Dd>
-        <Dt>Fire Atonement</Dt>
-        <Dd>{raid.fire_atonement ?? 0}</Dd>
-        <Dt>Ice Atonement</Dt>
-        <Dd>{raid.ice_atonement ?? 0}</Dd>
-        <Dt>Water Atonement</Dt>
-        <Dd>{raid.water_atonement ?? 0}</Dd>
+        {raid.is_raid_monster && (
+          <>
+            <Dt>Raid Monster</Dt>
+            <Dd>Yes</Dd>
+          </>
+        )}
+        {raid.is_raid_boss && (
+          <>
+            <Dt>Raid Boss</Dt>
+            <Dd>Yes</Dd>
+          </>
+        )}
+        {raid.raid_special_attack_type !== null && (
+          <>
+            <Dt>Special Attack Type</Dt>
+            <Dd>{renderAttackTypeLabel(raid.raid_special_attack_type)}</Dd>
+          </>
+        )}
+        {atonementRows.map((row) => (
+          <React.Fragment key={row.label}>
+            <Dt>{row.label}</Dt>
+            <Dd>{formatNumberWithCommas(row.value)}</Dd>
+          </React.Fragment>
+        ))}
       </Dl>
     </Card>
   );

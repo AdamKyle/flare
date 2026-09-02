@@ -1,21 +1,22 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import AdminLocationDetailSidePeekProps from './types/admin-location-detail-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import AdminQuestItemPresentationDefinition from '../../../items/api/definitions/admin-quest-item-presentation-definition';
 import { LocationDetailRelatedItemDefinition } from '../../api/definitions/location-detail-definition';
 import { LocationApiMessages } from '../../api/enums/location-api-messages';
 import { useLocationDetail } from '../../api/hooks/use-location-detail';
 import { useLocationQuestItems } from '../../api/hooks/use-location-quest-items';
+import LocationFormScreen from '../../screens/location-form-screen';
 import LocationDetailBody from '../location-detail-body';
 import { LocationNestedSelection } from '../types/location-nested-selection';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -29,41 +30,34 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
  * canonical detail inside a `StackedCard` over this content (rather than
  * replacing it through the global SidePeek emitter), so this component can
  * itself be reused as nested `StackedCard` content and its own relationship
- * clicks never destroy an ancestor's stack. Edit still uses the global
- * SidePeek emitter, matching every other Admin Location entry point.
+ * clicks never destroy an ancestor's stack. Edit is composed locally via
+ * `StackedCard` and the embeddable `LocationFormScreen`, so opening Edit
+ * from a nested context never destroys an ancestor's own stack.
  */
 const AdminLocationDetailSidePeek = ({
   location_id: locationId,
   on_location_changed: onLocationChanged,
 }: AdminLocationDetailSidePeekProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
   const { location, loading, error, refresh } = useLocationDetail(locationId);
   const questItems = useLocationQuestItems(locationId);
+  const [showEdit, setShowEdit] = useState(false);
   const [nestedSelection, setNestedSelection] =
     useState<LocationNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   const handleEdit = (): void => {
-    if (!location) {
-      return;
-    }
+    setShowEdit(true);
+  };
 
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_LOCATION_FORM,
-      {
-        is_open: true,
-        title: 'Edit Location',
-        allow_clicking_outside: true,
-        game_map_id: location.game_map.id,
-        location_id: locationId,
-        on_saved: () => {
-          refresh();
-          onLocationChanged?.();
-          setAnnouncement('Location saved.');
-        },
-      }
-    );
+  const handleCloseEdit = (): void => {
+    setShowEdit(false);
+  };
+
+  const handleSaved = (): void => {
+    refresh();
+    onLocationChanged?.();
+    setShowEdit(false);
+    setAnnouncement('Location saved.');
   };
 
   const handleOpenQuestItem = (
@@ -105,7 +99,11 @@ const AdminLocationDetailSidePeek = ({
       );
 
       return (
-        <StackedCard on_close={handleCloseNested} aria_label="Item Details">
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Item Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
           <NestedItemDetail
             is_open
             title="Item Details"
@@ -121,7 +119,11 @@ const AdminLocationDetailSidePeek = ({
     );
 
     return (
-      <StackedCard on_close={handleCloseNested} aria_label="Game Map Details">
+      <StackedCard
+        on_close={handleCloseNested}
+        aria_label="Game Map Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
         <NestedGameMapDetail
           is_open
           title="Game Map Details"
@@ -138,16 +140,12 @@ const AdminLocationDetailSidePeek = ({
 
     if (error || !location) {
       return (
-        <div className="px-4">
-          <ApiErrorAlert
-            apiError={error?.message ?? LocationApiMessages.Load}
-          />
-        </div>
+        <ApiErrorAlert apiError={error?.message ?? LocationApiMessages.Load} />
       );
     }
 
     return (
-      <div className="space-y-4 px-4">
+      <div className="space-y-4">
         <div className="flex justify-center py-2">
           <Button
             label="Edit Location"
@@ -168,14 +166,44 @@ const AdminLocationDetailSidePeek = ({
     );
   };
 
+  const renderEdit = (): ReactNode => {
+    if (!showEdit || !location) {
+      return null;
+    }
+
+    return (
+      <StackedCard on_close={handleCloseEdit} aria_label="Edit Location">
+        <LocationFormScreen
+          game_map_id={location.game_map.id}
+          location_id={locationId}
+          initial_x={null}
+          initial_y={null}
+          on_saved={handleSaved}
+          on_cancel={handleCloseEdit}
+          embedded
+        />
+      </StackedCard>
+    );
+  };
+
+  const isStackActive = showEdit || nestedSelection !== null;
+
   return (
-    <>
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
-      {renderContent()}
+      <div
+        className={clsx(
+          'min-h-0 flex-1 px-4 py-4 sm:px-5',
+          isStackActive ? 'overflow-hidden' : 'overflow-y-auto'
+        )}
+      >
+        {renderContent()}
+      </div>
+      {renderEdit()}
       {renderNestedDetail()}
-    </>
+    </div>
   );
 };
 

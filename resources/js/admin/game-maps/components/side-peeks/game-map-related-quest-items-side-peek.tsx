@@ -7,6 +7,7 @@ import { SidePeekComponentRegistrationEnum } from '../../../../game/components/s
 import ReadOnlyItemCard from '../../../../game/components/side-peeks/components/items/read-only-item-card';
 import { useGameMapRelatedQuestItems } from '../../api/hooks/use-game-map-related-quest-items';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -53,7 +54,11 @@ const GameMapRelatedQuestItemsSidePeek = ({
     );
 
     return (
-      <StackedCard on_close={handleCloseItem} aria_label="Item Details">
+      <StackedCard
+        on_close={handleCloseItem}
+        aria_label="Item Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
         <AdminItemDetail
           is_open
           title="Item Details"
@@ -70,7 +75,7 @@ const GameMapRelatedQuestItemsSidePeek = ({
 
     if (questItems.error) {
       return (
-        <div className="px-4">
+        <div className="px-4 py-3">
           <ApiErrorAlert
             apiError={questItems.error.message ?? 'Unable to load Quest Items.'}
           />
@@ -80,16 +85,19 @@ const GameMapRelatedQuestItemsSidePeek = ({
 
     if (questItems.data.length === 0) {
       return (
-        <p className="text-glacier-700 dark:text-glacier-300 px-4 text-sm">
+        <p className="text-glacier-700 dark:text-glacier-300 px-4 py-3 text-sm">
           No quest Items are connected to this Game Map.
         </p>
       );
     }
 
     return (
-      <div className="h-[500px] max-h-[500px] px-4">
-        <InfiniteScroll handle_scroll={handleScroll}>
-          <div className="flex flex-col gap-3">
+      <div className="min-h-0 flex-1 px-2 py-2">
+        <InfiniteScroll
+          handle_scroll={handleScroll}
+          height_class="h-full min-h-0"
+        >
+          <div className="flex flex-col gap-2">
             {questItems.data.map((item) => (
               <ReadOnlyItemCard
                 key={item.item_id}
@@ -109,7 +117,7 @@ const GameMapRelatedQuestItemsSidePeek = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       {renderContent()}
       {renderSelectedItem()}
     </div>

@@ -13,7 +13,6 @@ import FactualLink from '../../quest-item/partials/factual-link';
 import { QUEST_KIND_LABELS } from '../enums/quest-kind';
 import QuestDetailProps from '../types/quest-detail-props';
 
-import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -25,13 +24,48 @@ import Separator from 'ui/separator/separator';
  * is entirely driven by the optional callbacks in `navigation`.
  */
 const QuestDetail = ({ quest, navigation }: QuestDetailProps): ReactNode => {
+  const hasStory = Boolean(
+    quest.story.before_completion_markdown ||
+    quest.story.after_completion_markdown
+  );
+
+  const hasQuestGiver = Boolean(quest.npc);
+
+  const hasDependencies =
+    Boolean(quest.structure.parent_quest) ||
+    quest.structure.child_quests.length > 0 ||
+    Boolean(quest.structure.required_quest) ||
+    quest.structure.required_quest_chain.length > 0;
+
+  const hasRequirements =
+    Boolean(quest.requirements.primary_item) ||
+    Boolean(quest.requirements.secondary_item) ||
+    quest.requirements.reincarnated_times !== null ||
+    Boolean(quest.requirements.access_to_map) ||
+    Boolean(quest.requirements.faction) ||
+    Boolean(quest.requirements.faction_loyalty) ||
+    (quest.requirements.currencies.gold ?? 0) !== 0 ||
+    (quest.requirements.currencies.gold_dust ?? 0) !== 0 ||
+    (quest.requirements.currencies.shards ?? 0) !== 0 ||
+    (quest.requirements.currencies.copper_coins ?? 0) !== 0;
+
+  const hasRewards =
+    Boolean(quest.rewards.item) ||
+    Boolean(quest.rewards.skill) ||
+    Boolean(quest.rewards.feature) ||
+    Boolean(quest.rewards.passive) ||
+    (quest.rewards.gold ?? 0) !== 0 ||
+    (quest.rewards.gold_dust ?? 0) !== 0 ||
+    (quest.rewards.shards ?? 0) !== 0 ||
+    (quest.rewards.xp ?? 0) !== 0;
+
   const hasRestrictions =
     quest.availability.raid !== null ||
     quest.availability.only_for_event !== null;
 
   const renderRaid = (): ReactNode => {
     if (!quest.availability.raid) {
-      return 'None';
+      return null;
     }
 
     return (
@@ -47,7 +81,7 @@ const QuestDetail = ({ quest, navigation }: QuestDetailProps): ReactNode => {
     const eventValue = quest.availability.only_for_event;
 
     if (eventValue === null) {
-      return 'None';
+      return null;
     }
 
     return isEventType(eventValue)
@@ -55,35 +89,70 @@ const QuestDetail = ({ quest, navigation }: QuestDetailProps): ReactNode => {
       : String(eventValue);
   };
 
-  const renderRestrictions = (): ReactNode => {
-    if (!hasRestrictions) {
-      return null;
-    }
+  const renderRestrictionsContent = (): ReactNode => (
+    <div>
+      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+        Restrictions
+      </h3>
+      <Dl>
+        {quest.availability.raid && (
+          <>
+            <Dt>Raid</Dt>
+            <Dd>{renderRaid()}</Dd>
+          </>
+        )}
+        {quest.availability.only_for_event !== null && (
+          <>
+            <Dt>Event Restriction</Dt>
+            <Dd>{renderEventRestriction()}</Dd>
+          </>
+        )}
+      </Dl>
+    </div>
+  );
 
-    return (
-      <>
-        <Separator />
-        <div>
-          <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-            Restrictions
-          </h3>
-          <Dl>
-            {quest.availability.raid && (
-              <>
-                <Dt>Raid</Dt>
-                <Dd>{renderRaid()}</Dd>
-              </>
-            )}
-            {quest.availability.only_for_event !== null && (
-              <>
-                <Dt>Event Restriction</Dt>
-                <Dd>{renderEventRestriction()}</Dd>
-              </>
-            )}
-          </Dl>
-        </div>
-      </>
-    );
+  const sections: { present: boolean; node: ReactNode }[] = [
+    {
+      present: hasStory,
+      node: <QuestStorySection quest={quest} navigation={navigation} />,
+    },
+    {
+      present: hasQuestGiver,
+      node: <QuestGiverSection quest={quest} navigation={navigation} />,
+    },
+    {
+      present: hasDependencies,
+      node: <QuestDependenciesSection quest={quest} navigation={navigation} />,
+    },
+    {
+      present: hasRequirements,
+      node: <QuestRequirementsSection quest={quest} navigation={navigation} />,
+    },
+    {
+      present: hasRewards,
+      node: <QuestRewardsSection quest={quest} navigation={navigation} />,
+    },
+    { present: hasRestrictions, node: renderRestrictionsContent() },
+  ];
+
+  const renderSections = (): ReactNode => {
+    let hasRenderedSection = false;
+
+    return sections.map((section, index) => {
+      if (!section.present) {
+        return null;
+      }
+
+      const showSeparator = hasRenderedSection;
+      hasRenderedSection = true;
+
+      return (
+        <React.Fragment key={index}>
+          {showSeparator && <Separator />}
+          {section.node}
+        </React.Fragment>
+      );
+    });
   };
 
   return (
@@ -97,25 +166,7 @@ const QuestDetail = ({ quest, navigation }: QuestDetailProps): ReactNode => {
         </p>
       </div>
 
-      <Card>
-        <QuestStorySection quest={quest} navigation={navigation} />
-      </Card>
-
-      <Card>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-4 text-sm font-semibold">
-          Quest Details
-        </h2>
-        <div className="flex flex-col gap-4">
-          <QuestGiverSection quest={quest} navigation={navigation} />
-          <Separator />
-          <QuestDependenciesSection quest={quest} navigation={navigation} />
-          <Separator />
-          <QuestRequirementsSection quest={quest} navigation={navigation} />
-          <Separator />
-          <QuestRewardsSection quest={quest} navigation={navigation} />
-          {renderRestrictions()}
-        </div>
-      </Card>
+      {renderSections()}
     </div>
   );
 };

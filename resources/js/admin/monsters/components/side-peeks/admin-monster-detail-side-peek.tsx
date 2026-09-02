@@ -1,4 +1,5 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import AdminMonsterDetailSidePeekProps from './types/admin-monster-detail-side-peek-props';
@@ -12,6 +13,7 @@ import { MonsterNestedSelection } from '../types/monster-nested-selection';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -63,7 +65,11 @@ const AdminMonsterDetailSidePeek = ({
       );
 
       return (
-        <StackedCard on_close={handleCloseNested} aria_label="Item Details">
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Item Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
           <NestedItemDetail
             is_open
             title="Item Details"
@@ -78,7 +84,11 @@ const AdminMonsterDetailSidePeek = ({
     );
 
     return (
-      <StackedCard on_close={handleCloseNested} aria_label="Game Map Details">
+      <StackedCard
+        on_close={handleCloseNested}
+        aria_label="Game Map Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
         <NestedGameMapDetail
           is_open
           title="Game Map Details"
@@ -95,9 +105,7 @@ const AdminMonsterDetailSidePeek = ({
 
     if (error || !monster) {
       return (
-        <div className="px-4">
-          <ApiErrorAlert apiError={error?.message ?? MonsterApiMessages.Load} />
-        </div>
+        <ApiErrorAlert apiError={error?.message ?? MonsterApiMessages.Load} />
       );
     }
 
@@ -140,15 +148,24 @@ const AdminMonsterDetailSidePeek = ({
     );
   };
 
+  const isStackActive = showEdit || nestedSelection !== null;
+
   return (
-    <>
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
-      {renderContent()}
+      <div
+        className={clsx(
+          'min-h-0 flex-1 px-4 py-4 sm:px-5',
+          isStackActive ? 'overflow-hidden' : 'overflow-y-auto'
+        )}
+      >
+        {renderContent()}
+      </div>
       {renderEdit()}
       {renderNestedDetail()}
-    </>
+    </div>
   );
 };
 

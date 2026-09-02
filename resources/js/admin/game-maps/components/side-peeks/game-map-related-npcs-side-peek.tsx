@@ -8,6 +8,7 @@ import { isNpcType, NPC_TYPE_LABELS } from '../../../npcs/enums/npc-type';
 import GameMapRelatedNpcDefinition from '../../api/definitions/game-map-related-npc-definition';
 import { useGameMapRelatedNpcs } from '../../api/hooks/use-game-map-related-npcs';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
@@ -51,7 +52,8 @@ const GameMapRelatedNpcsSidePeek = ({
       key={npc.id}
       type="button"
       onClick={() => handleOpenNpc(npc.id)}
-      className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 hover:bg-glacier-100 dark:hover:bg-glacier-900 focus-visible:ring-danube-400 w-full rounded-md border px-3 py-2 text-left focus:outline-none focus-visible:ring-2"
+      aria-label={`Open NPC details for ${npc.name}`}
+      className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 hover:bg-glacier-100 dark:hover:bg-glacier-900 focus-visible:ring-danube-400 w-full rounded-lg border p-3 text-left shadow-sm focus:outline-none focus-visible:ring-2"
     >
       <p className="text-glacier-900 dark:text-glacier-100 font-medium">
         {npc.name}
@@ -72,7 +74,11 @@ const GameMapRelatedNpcsSidePeek = ({
     );
 
     return (
-      <StackedCard on_close={handleCloseNpc} aria_label="NPC Details">
+      <StackedCard
+        on_close={handleCloseNpc}
+        aria_label="NPC Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
         <AdminNpcDetail is_open title="NPC Details" npc_id={selectedNpcId} />
       </StackedCard>
     );
@@ -85,7 +91,7 @@ const GameMapRelatedNpcsSidePeek = ({
 
     if (npcs.error) {
       return (
-        <div className="px-4">
+        <div className="px-4 py-3">
           <ApiErrorAlert
             apiError={npcs.error.message ?? 'Unable to load NPCs.'}
           />
@@ -95,15 +101,18 @@ const GameMapRelatedNpcsSidePeek = ({
 
     if (npcs.data.length === 0) {
       return (
-        <p className="text-glacier-700 dark:text-glacier-300 px-4 text-sm">
+        <p className="text-glacier-700 dark:text-glacier-300 px-4 py-3 text-sm">
           This Game Map has no NPCs.
         </p>
       );
     }
 
     return (
-      <div className="h-[500px] max-h-[500px] px-4">
-        <InfiniteScroll handle_scroll={handleScroll}>
+      <div className="min-h-0 flex-1 px-2 py-2">
+        <InfiniteScroll
+          handle_scroll={handleScroll}
+          height_class="h-full min-h-0"
+        >
           <div className="flex flex-col gap-2">
             {npcs.data.map(renderRow)}
             {npcs.is_loading_more && <InfiniteLoader />}
@@ -114,7 +123,7 @@ const GameMapRelatedNpcsSidePeek = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       {renderContent()}
       {renderSelectedNpc()}
     </div>

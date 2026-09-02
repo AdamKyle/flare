@@ -11,9 +11,7 @@ import { normalizeQuestStoryMarkdown } from '../utils/normalize-quest-story-mark
  */
 const QuestStoryPanel = ({ markdown }: QuestStoryPanelProps): ReactNode => {
   if (!markdown) {
-    return (
-      <p className="text-glacier-500 dark:text-glacier-400 text-sm">None.</p>
-    );
+    return null;
   }
 
   return (

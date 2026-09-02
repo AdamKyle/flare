@@ -13,30 +13,15 @@ const QuestGiverSection = ({
 }: QuestDetailProps): ReactNode => {
   const npc = quest.npc;
 
-  const renderGameMap = (): ReactNode => {
-    if (!npc?.game_map) {
-      return 'None';
-    }
+  if (!npc) {
+    return null;
+  }
 
-    return (
-      <FactualLink
-        id={npc.game_map.id}
-        label={npc.game_map.name}
-        on_click={navigation?.on_open_map}
-      />
-    );
-  };
-
-  const renderQuestGiver = (): ReactNode => {
-    if (!npc) {
-      return (
-        <p className="text-glacier-500 dark:text-glacier-400 text-sm">
-          No Quest Giver NPC set.
-        </p>
-      );
-    }
-
-    return (
+  return (
+    <div>
+      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
+        Quest Giver
+      </h3>
       <Dl>
         <Dt>NPC</Dt>
         <Dd>
@@ -46,20 +31,25 @@ const QuestGiverSection = ({
             on_click={navigation?.on_open_npc}
           />
         </Dd>
-        <Dt>Game Map</Dt>
-        <Dd>{renderGameMap()}</Dd>
-        <Dt>Must Be At Same Location</Dt>
-        <Dd>{npc.must_be_at_same_location ? 'Yes' : 'No'}</Dd>
+        {npc.game_map && (
+          <>
+            <Dt>Game Map</Dt>
+            <Dd>
+              <FactualLink
+                id={npc.game_map.id}
+                label={npc.game_map.name}
+                on_click={navigation?.on_open_map}
+              />
+            </Dd>
+          </>
+        )}
+        {npc.must_be_at_same_location && (
+          <>
+            <Dt>Must Be At Same Location</Dt>
+            <Dd>Yes</Dd>
+          </>
+        )}
       </Dl>
-    );
-  };
-
-  return (
-    <div>
-      <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-        Quest Giver
-      </h3>
-      {renderQuestGiver()}
     </div>
   );
 };

@@ -1,33 +1,44 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import GameMapNpcSidePeekProps from './types/game-map-npc-side-peek-props';
+import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import NpcDefinition from '../../../npcs/api/definitions/npc-definition';
 import { NpcApiMessages } from '../../../npcs/api/enums/npc-api-messages';
 import { useNpcDetail } from '../../../npcs/api/hooks/use-npc-detail';
 import { useNpcQuests } from '../../../npcs/api/hooks/use-npc-quests';
 import { useNpcRewardItems } from '../../../npcs/api/hooks/use-npc-reward-items';
 import NpcDetailBody from '../../../npcs/components/npc-detail-body';
+import { NpcNestedSelection } from '../../../npcs/components/types/npc-nested-selection';
 import NpcFormScreen from '../../../npcs/screens/npc-form-screen';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
+/**
+ * Game Map NPC side-peek: stacks the shared, permission-neutral factual NPC
+ * presentation with Game-Map-context Edit/Move actions. Relationship
+ * navigation opens the target's canonical detail inside a local
+ * `StackedCard` over this content instead of replacing this contextual
+ * SidePeek through the global emitter, so this SidePeek's own Move/Edit
+ * affordances and scroll position stay intact underneath.
+ */
 const GameMapNpcSidePeek = ({
   game_map_id: gameMapId,
   npc_id: npcId,
   on_editor_changed: onEditorChanged,
   on_move_requested: onMoveRequested,
 }: GameMapNpcSidePeekProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
   const { npc, loading, error, refresh } = useNpcDetail(npcId);
   const quests = useNpcQuests(npcId);
   const rewardItems = useNpcRewardItems(npcId);
   const [showEdit, setShowEdit] = useState(false);
+  const [nestedSelection, setNestedSelection] =
+    useState<NpcNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   const handleEdit = (): void => {
@@ -49,46 +60,91 @@ const GameMapNpcSidePeek = ({
     onMoveRequested(npcId);
   };
 
-  const handleOpenItem = (itemId: number, _itemName: string): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
-      {
-        is_open: true,
-        title: 'Item Details',
-        allow_clicking_outside: true,
-        item_id: itemId,
-        on_item_changed: () => {
-          quests.refresh();
-          rewardItems.refresh();
-        },
-      }
-    );
+  const handleOpenItem = (itemId: number): void => {
+    setNestedSelection({
+      type: 'item',
+      id: itemId,
+      on_changed: () => {
+        quests.refresh();
+        rewardItems.refresh();
+      },
+    });
   };
 
   const handleOpenQuest = (questId: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL,
-      {
-        is_open: true,
-        title: 'Quest Details',
-        allow_clicking_outside: true,
-        quest_id: questId,
-      }
-    );
+    setNestedSelection({ type: 'quest', id: questId });
   };
 
   const handleOpenMap = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
-      {
-        is_open: true,
-        title: 'Game Map Details',
-        allow_clicking_outside: true,
-        game_map_id: id,
-      }
+    setNestedSelection({ type: 'map', id });
+  };
+
+  const handleCloseNested = (): void => {
+    setNestedSelection(null);
+  };
+
+  const renderNestedDetail = (): ReactNode => {
+    if (!nestedSelection) {
+      return null;
+    }
+
+    if (nestedSelection.type === 'quest') {
+      const NestedQuestDetail = resolveSidePeekComponent(
+        SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL
+      );
+
+      return (
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Quest Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
+          <NestedQuestDetail
+            is_open
+            title="Quest Details"
+            quest_id={nestedSelection.id}
+          />
+        </StackedCard>
+      );
+    }
+
+    if (nestedSelection.type === 'item') {
+      const NestedItemDetail = resolveSidePeekComponent(
+        SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
+      );
+
+      return (
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Item Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
+          <NestedItemDetail
+            is_open
+            title="Item Details"
+            item_id={nestedSelection.id}
+            on_item_changed={nestedSelection.on_changed}
+          />
+        </StackedCard>
+      );
+    }
+
+    const NestedGameMapDetail = resolveSidePeekComponent(
+      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
+    );
+
+    return (
+      <StackedCard
+        on_close={handleCloseNested}
+        aria_label="Game Map Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <NestedGameMapDetail
+          is_open
+          title="Game Map Details"
+          game_map_id={nestedSelection.id}
+        />
+      </StackedCard>
     );
   };
 
@@ -102,7 +158,7 @@ const GameMapNpcSidePeek = ({
     }
 
     return (
-      <div className="space-y-4 px-4">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -152,14 +208,24 @@ const GameMapNpcSidePeek = ({
     );
   };
 
+  const isStackActive = showEdit || nestedSelection !== null;
+
   return (
-    <>
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
-      {renderContent()}
+      <div
+        className={clsx(
+          'min-h-0 flex-1 px-4 py-4',
+          isStackActive ? 'overflow-hidden' : 'overflow-y-auto'
+        )}
+      >
+        {renderContent()}
+      </div>
       {renderEdit()}
-    </>
+      {renderNestedDetail()}
+    </div>
   );
 };
 

@@ -585,6 +585,210 @@ class QuestsApiControllerTest extends TestCase
         $this->assertDatabaseHas('quests', ['id' => $parent->id, 'is_parent' => false]);
     }
 
+    public function test_tree_map_filter_returns_full_chain_when_root_belongs_to_selected_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $other = $this->createGameMap(['name' => 'Other Map']);
+        $rootNpc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Root Giver']);
+        $childNpc = $this->createNpc(['game_map_id' => $other->id, 'real_name' => 'Child Giver']);
+
+        $root = $this->createQuest(['name' => 'Root On Surface', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
+        $this->createQuest(['name' => 'Child Elsewhere', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Root On Surface', $data[0]['name']);
+        $this->assertCount(1, $data[0]['children']);
+        $this->assertSame('Child Elsewhere', $data[0]['children'][0]['name']);
+    }
+
+    public function test_tree_map_filter_returns_full_chain_when_child_belongs_to_selected_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $other = $this->createGameMap(['name' => 'Other Map']);
+        $rootNpc = $this->createNpc(['game_map_id' => $other->id, 'real_name' => 'Root Giver']);
+        $childNpc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Child Giver']);
+
+        $root = $this->createQuest(['name' => 'Root Elsewhere', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Child On Surface', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Root Elsewhere', $data[0]['name']);
+        $this->assertSame($child->id, $data[0]['children'][0]['id']);
+    }
+
+    public function test_tree_map_filter_returns_full_chain_when_grandchild_belongs_to_selected_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $other = $this->createGameMap(['name' => 'Other Map']);
+        $rootNpc = $this->createNpc(['game_map_id' => $other->id]);
+        $childNpc = $this->createNpc(['game_map_id' => $other->id]);
+        $grandchildNpc = $this->createNpc(['game_map_id' => $surface->id]);
+
+        $root = $this->createQuest(['name' => 'Root Elsewhere', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Child Elsewhere', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id, 'is_parent' => true]);
+        $grandchild = $this->createQuest(['name' => 'Grandchild On Surface', 'npc_id' => $grandchildNpc->id, 'parent_quest_id' => $child->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame($root->id, $data[0]['id']);
+        $this->assertSame($child->id, $data[0]['children'][0]['id']);
+        $this->assertSame($grandchild->id, $data[0]['children'][0]['children'][0]['id']);
+    }
+
+    public function test_tree_map_filter_excludes_chain_when_no_member_belongs_to_selected_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $other = $this->createGameMap(['name' => 'Other Map']);
+        $rootNpc = $this->createNpc(['game_map_id' => $other->id]);
+        $childNpc = $this->createNpc(['game_map_id' => $other->id]);
+
+        $root = $this->createQuest(['name' => 'Root Never Surface', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
+        $this->createQuest(['name' => 'Child Never Surface', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(0, $data);
+    }
+
+    public function test_tree_map_filter_one_off_matches_only_its_own_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $other = $this->createGameMap(['name' => 'Other Map']);
+        $surfaceNpc = $this->createNpc(['game_map_id' => $surface->id]);
+        $otherNpc = $this->createNpc(['game_map_id' => $other->id]);
+
+        $this->createQuest(['name' => 'Surface One Off', 'npc_id' => $surfaceNpc->id]);
+        $this->createQuest(['name' => 'Other One Off', 'npc_id' => $otherNpc->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'one_off'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Surface One Off', $data[0]['name']);
+    }
+
+    public function test_tree_map_filter_raid_uses_raid_location_map_instead_of_quest_giver_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $hell = $this->createGameMap(['name' => 'Hell']);
+        $raidBoss = $this->createMonster(['name' => 'Filter Raid Boss']);
+        $surfaceRaidLocation = $this->createLocation(['name' => 'Surface Raid Location', 'game_map_id' => $surface->id]);
+        $hellRaidLocation = $this->createLocation(['name' => 'Hell Raid Location', 'game_map_id' => $hell->id]);
+        $surfaceRaid = $this->createRaid(['name' => 'Surface Raid', 'raid_boss_id' => $raidBoss->id, 'raid_boss_location_id' => $surfaceRaidLocation->id]);
+        $hellRaid = $this->createRaid(['name' => 'Hell Raid', 'raid_boss_id' => $raidBoss->id, 'raid_boss_location_id' => $hellRaidLocation->id]);
+
+        $surfaceRaidNpc = $this->createNpc(['game_map_id' => $hell->id]);
+        $hellRaidNpc = $this->createNpc(['game_map_id' => $surface->id]);
+        $surfaceRaidQuest = $this->createQuest(['name' => 'Surface Raid Quest', 'npc_id' => $surfaceRaidNpc->id, 'raid_id' => $surfaceRaid->id]);
+        $this->createQuest(['name' => 'Hell Raid Quest', 'npc_id' => $hellRaidNpc->id, 'raid_id' => $hellRaid->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'raid'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame($surfaceRaidQuest->id, $data[0]['id']);
+    }
+
+    public function test_tree_map_filter_raid_matches_corrupted_location_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $selectedMap = $this->createGameMap(['name' => 'Selected Map']);
+        $otherMap = $this->createGameMap(['name' => 'Other Map']);
+        $raidBoss = $this->createMonster(['name' => 'Corrupted Raid Boss']);
+        $bossLocation = $this->createLocation(['name' => 'Boss Location', 'game_map_id' => $otherMap->id]);
+        $corruptedLocation = $this->createLocation(['name' => 'Corrupted Location', 'game_map_id' => $selectedMap->id]);
+        $raid = $this->createRaid([
+            'name' => 'Corrupted Raid',
+            'raid_boss_id' => $raidBoss->id,
+            'raid_boss_location_id' => $bossLocation->id,
+            'corrupted_location_ids' => [$corruptedLocation->id],
+        ]);
+
+        $raidNpc = $this->createNpc(['game_map_id' => $otherMap->id]);
+        $raidQuest = $this->createQuest(['name' => 'Corrupted Raid Quest', 'npc_id' => $raidNpc->id, 'raid_id' => $raid->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $selectedMap->id, 'kind' => 'raid'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame($raidQuest->id, $data[0]['id']);
+    }
+
+    public function test_tree_map_filter_raid_excludes_raid_whose_quest_npc_matches_but_locations_do_not(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $selectedMap = $this->createGameMap(['name' => 'Selected Map']);
+        $otherMap = $this->createGameMap(['name' => 'Other Map']);
+        $raidBoss = $this->createMonster(['name' => 'Elsewhere Raid Boss']);
+        $bossLocation = $this->createLocation(['name' => 'Elsewhere Boss Location', 'game_map_id' => $otherMap->id]);
+        $corruptedLocation = $this->createLocation(['name' => 'Elsewhere Corrupted Location', 'game_map_id' => $otherMap->id]);
+        $raid = $this->createRaid([
+            'name' => 'Elsewhere Raid',
+            'raid_boss_id' => $raidBoss->id,
+            'raid_boss_location_id' => $bossLocation->id,
+            'corrupted_location_ids' => [$corruptedLocation->id],
+        ]);
+
+        $misleadingNpc = $this->createNpc(['game_map_id' => $selectedMap->id]);
+        $this->createQuest(['name' => 'Misleading Raid Quest', 'npc_id' => $misleadingNpc->id, 'raid_id' => $raid->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $selectedMap->id, 'kind' => 'raid'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(0, $data);
+    }
+
+    public function test_browse_options_returns_default_game_map_and_ordered_maps(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createGameMap(['name' => 'Zeta Map', 'default' => false]);
+        $surface = $this->createGameMap(['name' => 'Surface', 'default' => true]);
+        $this->createGameMap(['name' => 'Alpha Map', 'default' => false]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertSame($surface->id, $data['default_game_map_id']);
+        $this->assertSame(['Alpha Map', 'Surface', 'Zeta Map'], array_column($data['game_maps'], 'name'));
+    }
+
+    public function test_browse_options_returns_null_default_when_no_default_map_exists(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $this->createGameMap(['name' => 'Non Default Map', 'default' => false]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $response->assertStatus(200);
+        $this->assertNull($data['default_game_map_id']);
+    }
+
+    public function test_non_admin_cannot_access_quest_browse_options(): void
+    {
+        $user = $this->createUser();
+
+        $response = $this->actingAs($user)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+
+        $response->assertStatus(403);
+    }
+
     public function test_previous_parent_becomes_false_when_final_childs_parent_is_cleared(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());

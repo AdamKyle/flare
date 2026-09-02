@@ -4,4 +4,5 @@ export default interface InfiniteScrollProps {
   handle_scroll: (e: React.UIEvent<HTMLDivElement>) => void;
   children: ReactNode;
   additional_css?: string;
+  height_class?: string;
 }

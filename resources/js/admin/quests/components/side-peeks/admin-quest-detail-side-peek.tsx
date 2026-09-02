@@ -1,4 +1,5 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import AdminQuestDetailSidePeekProps from './types/admin-quest-detail-side-peek-props';
@@ -12,6 +13,7 @@ import { QuestNestedSelection } from '../types/quest-nested-selection';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -68,7 +70,11 @@ const AdminQuestDetailSidePeek = ({
         );
 
         return (
-          <StackedCard on_close={handleCloseNested} aria_label="Quest Details">
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Quest Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
             <NestedQuestDetail
               is_open
               title="Quest Details"
@@ -84,7 +90,11 @@ const AdminQuestDetailSidePeek = ({
         );
 
         return (
-          <StackedCard on_close={handleCloseNested} aria_label="Item Details">
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Item Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
             <NestedItemDetail
               is_open
               title="Item Details"
@@ -103,6 +113,7 @@ const AdminQuestDetailSidePeek = ({
           <StackedCard
             on_close={handleCloseNested}
             aria_label="Monster Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
           >
             <NestedMonsterDetail
               is_open
@@ -119,7 +130,11 @@ const AdminQuestDetailSidePeek = ({
         );
 
         return (
-          <StackedCard on_close={handleCloseNested} aria_label="NPC Details">
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="NPC Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
             <NestedNpcDetail
               is_open
               title="NPC Details"
@@ -138,6 +153,7 @@ const AdminQuestDetailSidePeek = ({
           <StackedCard
             on_close={handleCloseNested}
             aria_label="Game Map Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
           >
             <NestedGameMapDetail
               is_open
@@ -157,9 +173,7 @@ const AdminQuestDetailSidePeek = ({
 
     if (error || !quest) {
       return (
-        <div className="px-4">
-          <ApiErrorAlert apiError={error?.message ?? QuestApiMessages.Load} />
-        </div>
+        <ApiErrorAlert apiError={error?.message ?? QuestApiMessages.Load} />
       );
     }
 
@@ -216,15 +230,24 @@ const AdminQuestDetailSidePeek = ({
     );
   };
 
+  const isStackActive = formMode !== null || nestedSelection !== null;
+
   return (
-    <>
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
-      {renderContent()}
+      <div
+        className={clsx(
+          'min-h-0 flex-1 px-4 py-4 sm:px-5',
+          isStackActive ? 'overflow-hidden' : 'overflow-y-auto'
+        )}
+      >
+        {renderContent()}
+      </div>
       {renderForm()}
       {renderNestedDetail()}
-    </>
+    </div>
   );
 };
 

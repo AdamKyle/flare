@@ -1,38 +1,41 @@
+import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import {
   QUEST_TREE_STATE_ICON,
   QUEST_TREE_STATE_LABELS,
   QUEST_TREE_STATE_SHORT_LABELS,
-  QuestTreeState,
 } from '../enums/quest-tree-state';
+import {
+  QUEST_TREE_NODE_STATE_TEXT_STYLES,
+  QUEST_TREE_STATE_BORDER_STYLES,
+  resolveQuestTreeChildrenSpacingClass,
+  resolveQuestTreeNodeLevelStyles,
+} from '../styles/quest-tree-node-styles';
 import QuestTreeDesktopNodeProps from '../types/quest-tree-desktop-node-props';
 import { resolveQuestTreeState } from '../utils/resolve-quest-tree-state';
 
-const STATE_BADGE_CLASSES: Record<QuestTreeState, string> = {
-  [QuestTreeState.COMPLETED]:
-    'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
-  [QuestTreeState.PARENT_LOCKED]:
-    'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
-  [QuestTreeState.PREREQUISITE_LOCKED]:
-    'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
-  [QuestTreeState.AVAILABLE]:
-    'bg-danube-100 text-danube-800 dark:bg-danube-900/40 dark:text-danube-300',
-};
-
-const CONNECTOR_CLASSES = 'bg-danube-300 dark:bg-danube-700';
+const CONNECTOR_CLASSES = 'bg-glacier-500/70 dark:bg-glacier-600/70';
+const CONNECTOR_BORDER_CLASSES =
+  'border-glacier-500/70 dark:border-glacier-600/70';
 
 /**
- * Desktop/tablet Quest tree node: the node is centered above its own
- * children, which are laid out horizontally beneath it with connector
- * lines indicating hierarchy. Recursion builds a real branching tree
- * rather than an indented list. Each child wrapper is `flex-1`/`min-w-0`,
- * so every subtree owns only a proportional share of its parent's
- * available width — the tree always fits the content region and never
- * needs horizontal scrolling; Quest names wrap instead. Connector lines
- * are decorative (`aria-hidden`); `role="treeitem"`/`aria-level`/
- * `aria-expanded` on each node and `role="group"` on a node's child region
- * carry the real accessible hierarchy.
+ * Desktop/tablet Quest tree node: the root centers above a connected
+ * two-column major-branch grid (`grid-cols-2`), with a single central
+ * vertical spine running through every major-branch row. Root children
+ * alternate left/right columns in API order (0/1, 2/3, ...), each
+ * connected to the spine by a short horizontal connector; an odd final
+ * branch spans both columns, centered, and connects to the spine with its
+ * own vertical stem. Every generation below a major branch renders
+ * vertically inside that branch's own lane (`max-w-sm`) with a left
+ * connector rail, so dense nested branches grow the page taller instead of
+ * collapsing into unreadably thin columns; the tree never scrolls or
+ * overflows horizontally. Connector lines are decorative (`aria-hidden`)
+ * and sit behind the cards; this node's own
+ * `role="treeitem"`/`aria-level`/`aria-expanded` wrapper directly contains
+ * its `role="group"` child region as a real DOM descendant, and
+ * click/keydown/focus handlers stop propagation so a descendant's
+ * activation/focus is never re-reported by an ancestor node.
  */
 const QuestTreeDesktopNode = ({
   quest,
@@ -46,65 +49,183 @@ const QuestTreeDesktopNode = ({
   const state = resolveQuestTreeState(quest, completedQuestIds);
   const hasChildren = quest.children.length > 0;
   const isFocused = focusedId === quest.id;
+  const levelStyles = resolveQuestTreeNodeLevelStyles(depth);
 
   const handleActivate = (): void => {
     onSelect(quest.id);
   };
 
+  const handleClick = (event: React.MouseEvent): void => {
+    event.stopPropagation();
+    handleActivate();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent): void => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      handleActivate();
+    }
+  };
+
+  const handleFocus = (event: React.FocusEvent): void => {
+    event.stopPropagation();
+    onFocusNode(quest.id);
+  };
+
   const renderNodeCard = (): ReactNode => (
     <div
-      ref={(element) => {
-        if (element) {
-          nodeRefs.current.set(quest.id, element);
-        } else {
-          nodeRefs.current.delete(quest.id);
-        }
-      }}
-      role="treeitem"
-      aria-level={depth + 1}
-      aria-expanded={hasChildren ? true : undefined}
-      tabIndex={isFocused ? 0 : -1}
-      onFocus={() => onFocusNode(quest.id)}
-      onClick={handleActivate}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          handleActivate();
-        }
-      }}
-      className="border-glacier-200 dark:border-glacier-800 bg-glacier-0 focus-visible:ring-danube-400 hover:border-danube-300 dark:hover:border-danube-700 flex max-w-full cursor-pointer flex-col items-center gap-1 rounded-md border px-2 py-1.5 text-center shadow-sm focus:outline-none focus-visible:ring-2 dark:bg-gray-900"
+      className={clsx(
+        'group-focus-visible:ring-glacier-500 flex w-full min-w-0 flex-col items-center gap-1 rounded-md border-2 text-center whitespace-normal transition-colors group-focus-visible:ring-2',
+        QUEST_TREE_STATE_BORDER_STYLES[state],
+        levelStyles.card,
+        depth === 0 && 'mx-auto'
+      )}
     >
       <span
-        aria-hidden="true"
-        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${STATE_BADGE_CLASSES[state]}`}
+        className={clsx(
+          'inline-flex items-center gap-1 text-xs font-medium',
+          QUEST_TREE_NODE_STATE_TEXT_STYLES[state]
+        )}
       >
-        {QUEST_TREE_STATE_ICON[state]} {QUEST_TREE_STATE_SHORT_LABELS[state]}
+        <span aria-hidden="true">{QUEST_TREE_STATE_ICON[state]}</span>
+        <span aria-hidden="true">{QUEST_TREE_STATE_SHORT_LABELS[state]}</span>
       </span>
-      <span className="text-sm font-medium break-words text-gray-900 dark:text-gray-100">
+      <span className={clsx('text-glacier-900 break-words', levelStyles.name)}>
         {quest.name}
       </span>
       <span className="sr-only">{QUEST_TREE_STATE_LABELS[state]}</span>
     </div>
   );
 
-  const renderChildWrapper = (
-    child: QuestTreeDesktopNodeProps['quest'],
-    index: number,
-    total: number
+  const renderMajorBranchLane = (
+    child: QuestTreeDesktopNodeProps['quest']
+  ): ReactNode => (
+    <QuestTreeDesktopNode
+      quest={child}
+      depth={depth + 1}
+      completed_quest_ids={completedQuestIds}
+      focused_id={focusedId}
+      on_select={onSelect}
+      on_focus_node={onFocusNode}
+      node_refs={nodeRefs}
+    />
+  );
+
+  const renderLeftMajorBranch = (
+    child: QuestTreeDesktopNodeProps['quest']
+  ): ReactNode => (
+    <div key={child.id} className="relative flex min-w-0 justify-end pr-6">
+      <div
+        aria-hidden="true"
+        className={clsx('absolute top-5 right-0 h-px w-6', CONNECTOR_CLASSES)}
+      />
+      <div
+        aria-hidden="true"
+        className={clsx(
+          'absolute top-5 -right-4 h-px w-4 xl:-right-6 xl:w-6',
+          CONNECTOR_CLASSES
+        )}
+      />
+      <div className="w-full max-w-sm min-w-0">
+        {renderMajorBranchLane(child)}
+      </div>
+    </div>
+  );
+
+  const renderRightMajorBranch = (
+    child: QuestTreeDesktopNodeProps['quest']
+  ): ReactNode => (
+    <div key={child.id} className="relative flex min-w-0 justify-start pl-6">
+      <div
+        aria-hidden="true"
+        className={clsx('absolute top-5 left-0 h-px w-6', CONNECTOR_CLASSES)}
+      />
+      <div
+        aria-hidden="true"
+        className={clsx(
+          'absolute top-5 -left-4 h-px w-4 xl:-left-6 xl:w-6',
+          CONNECTOR_CLASSES
+        )}
+      />
+      <div className="w-full max-w-sm min-w-0">
+        {renderMajorBranchLane(child)}
+      </div>
+    </div>
+  );
+
+  const renderCenteredMajorBranch = (
+    child: QuestTreeDesktopNodeProps['quest']
   ): ReactNode => (
     <div
       key={child.id}
-      className="relative flex min-w-0 flex-1 flex-col items-center px-1 sm:px-2"
+      className="col-span-2 flex w-full min-w-0 flex-col items-center"
     >
+      <div aria-hidden="true" className={clsx('h-6 w-px', CONNECTOR_CLASSES)} />
+      <div className="w-full max-w-sm min-w-0">
+        {renderMajorBranchLane(child)}
+      </div>
+    </div>
+  );
+
+  const renderMajorBranch = (
+    child: QuestTreeDesktopNodeProps['quest'],
+    index: number,
+    totalBranches: number
+  ): ReactNode => {
+    const isOddTotal = totalBranches % 2 === 1;
+    const isLastOddBranch = isOddTotal && index === totalBranches - 1;
+
+    if (isLastOddBranch) {
+      return renderCenteredMajorBranch(child);
+    }
+
+    return index % 2 === 0
+      ? renderLeftMajorBranch(child)
+      : renderRightMajorBranch(child);
+  };
+
+  const renderMajorBranches = (): ReactNode => {
+    const totalBranches = quest.children.length;
+
+    return (
+      <div
+        className={clsx(
+          'flex w-full min-w-0 flex-col items-center',
+          resolveQuestTreeChildrenSpacingClass(depth)
+        )}
+      >
+        <div
+          aria-hidden="true"
+          className={clsx('h-6 w-px', CONNECTOR_CLASSES)}
+        />
+        <div
+          role="group"
+          className="relative grid w-full min-w-0 grid-cols-2 gap-x-8 gap-y-10 xl:gap-x-12"
+        >
+          <div
+            aria-hidden="true"
+            className={clsx(
+              'absolute top-0 left-1/2 -z-10 h-full w-px -translate-x-1/2',
+              CONNECTOR_CLASSES
+            )}
+          />
+          {quest.children.map((child, index) =>
+            renderMajorBranch(child, index, totalBranches)
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  const renderNestedChildWrapper = (
+    child: QuestTreeDesktopNodeProps['quest']
+  ): ReactNode => (
+    <div key={child.id} className="relative w-full min-w-0">
       <div
         aria-hidden="true"
-        className={`absolute top-0 left-0 h-px w-1/2 ${CONNECTOR_CLASSES} ${index === 0 ? 'invisible' : ''}`}
+        className={clsx('absolute top-5 -left-4 h-px w-4', CONNECTOR_CLASSES)}
       />
-      <div
-        aria-hidden="true"
-        className={`absolute top-0 right-0 h-px w-1/2 ${CONNECTOR_CLASSES} ${index === total - 1 ? 'invisible' : ''}`}
-      />
-      <div aria-hidden="true" className={`h-4 w-px ${CONNECTOR_CLASSES}`} />
       <QuestTreeDesktopNode
         quest={child}
         depth={depth + 1}
@@ -117,25 +238,48 @@ const QuestTreeDesktopNode = ({
     </div>
   );
 
+  const renderNestedChildren = (): ReactNode => (
+    <div
+      className={clsx(
+        'mt-4 w-full min-w-0 border-l-2 pl-4',
+        CONNECTOR_BORDER_CLASSES
+      )}
+    >
+      <div role="group" className="flex w-full min-w-0 flex-col gap-4">
+        {quest.children.map(renderNestedChildWrapper)}
+      </div>
+    </div>
+  );
+
   const renderChildren = (): ReactNode => {
     if (!hasChildren) {
       return null;
     }
 
-    return (
-      <div className="flex w-full min-w-0 flex-col items-center">
-        <div aria-hidden="true" className={`h-4 w-px ${CONNECTOR_CLASSES}`} />
-        <div role="group" className="flex w-full min-w-0 items-start">
-          {quest.children.map((child, index) =>
-            renderChildWrapper(child, index, quest.children.length)
-          )}
-        </div>
-      </div>
-    );
+    return depth === 0 ? renderMajorBranches() : renderNestedChildren();
   };
 
   return (
-    <div className="flex w-full min-w-0 flex-col items-center">
+    <div
+      ref={(element) => {
+        if (element) {
+          nodeRefs.current.set(quest.id, element);
+        } else {
+          nodeRefs.current.delete(quest.id);
+        }
+      }}
+      role="treeitem"
+      aria-level={depth + 1}
+      aria-expanded={hasChildren ? true : undefined}
+      tabIndex={isFocused ? 0 : -1}
+      onFocus={handleFocus}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      className={clsx(
+        'group flex w-full min-w-0 cursor-pointer flex-col rounded-md focus:outline-none',
+        depth === 0 ? 'items-center' : 'items-start'
+      )}
+    >
       {renderNodeCard()}
       {renderChildren()}
     </div>

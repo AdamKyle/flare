@@ -172,3 +172,40 @@ export const formatIntWithPlus = (value: number): string => {
 export const formatFloat = (value: number): string => {
   return Number(value).toLocaleString('en-US', { maximumFractionDigits: 2 });
 };
+
+/**
+ * Formats a `"<low>-<high>"` range string with comma-separated thousands on
+ * each side (e.g. `"1000-25000"` → `"1,000 - 25,000"`).
+ *
+ * A malformed range (not exactly two `-`-separated parts, or a
+ * non-numeric side) is returned unchanged rather than thrown.
+ *
+ * @param {string} range - The raw range string to format.
+ * @returns {string} The comma-formatted range, or the original string if malformed.
+ *
+ * @example
+ * formatRangeWithCommas('100-200');       // "100 - 200"
+ * @example
+ * formatRangeWithCommas('1000-25000');    // "1,000 - 25,000"
+ * @example
+ * formatRangeWithCommas('1,000-25,000');  // "1,000 - 25,000"
+ */
+export const formatRangeWithCommas = (range: string): string => {
+  const parts = range.split('-').map((part) => part.trim());
+
+  if (parts.length !== 2) {
+    return range;
+  }
+
+  const [lowRaw, highRaw] = parts;
+
+  const lowNum = Number(lowRaw.replace(/,/g, ''));
+  const highNum = Number(highRaw.replace(/,/g, ''));
+
+  const low = Number.isFinite(lowNum) ? formatNumberWithCommas(lowNum) : lowRaw;
+  const high = Number.isFinite(highNum)
+    ? formatNumberWithCommas(highNum)
+    : highRaw;
+
+  return `${low} - ${high}`;
+};

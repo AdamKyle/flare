@@ -4,34 +4,14 @@ import React, { ReactNode, useState } from 'react';
 import GameMapRelatedMonstersSidePeekProps from './types/game-map-related-monsters-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import MonsterCard from '../../../../game/reusable-components/monster/components/monster-card';
 import GameMapRelatedMonsterDefinition from '../../api/definitions/game-map-related-monster-definition';
 import { useGameMapRelatedMonsters } from '../../api/hooks/use-game-map-related-monsters';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
-
-const resolveCategoryLabel = (
-  monster: GameMapRelatedMonsterDefinition
-): string => {
-  if (monster.is_celestial_entity) {
-    return 'Celestial';
-  }
-
-  if (monster.is_raid_boss) {
-    return 'Raid Boss';
-  }
-
-  if (monster.is_raid_monster) {
-    return 'Raid Monster';
-  }
-
-  if (monster.only_for_location_type !== null) {
-    return 'Special Location';
-  }
-
-  return 'Regular';
-};
 
 /**
  * Bounded, append-paginated browser for the Monsters available on a Game
@@ -68,19 +48,16 @@ const GameMapRelatedMonstersSidePeek = ({
   };
 
   const renderRow = (monster: GameMapRelatedMonsterDefinition): ReactNode => (
-    <button
+    <MonsterCard
       key={monster.id}
-      type="button"
-      onClick={() => handleOpenMonster(monster.id)}
-      className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 hover:bg-glacier-100 dark:hover:bg-glacier-900 focus-visible:ring-danube-400 w-full rounded-md border px-3 py-2 text-left focus:outline-none focus-visible:ring-2"
-    >
-      <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-        {monster.name}
-      </p>
-      <p className="text-glacier-600 dark:text-glacier-400 text-xs">
-        {resolveCategoryLabel(monster)}
-      </p>
-    </button>
+      monster_id={monster.id}
+      name={monster.name}
+      is_celestial_entity={monster.is_celestial_entity}
+      is_raid_boss={monster.is_raid_boss}
+      is_raid_monster={monster.is_raid_monster}
+      only_for_location_type={monster.only_for_location_type}
+      on_open_monster={handleOpenMonster}
+    />
   );
 
   const renderSelectedMonster = (): ReactNode => {
@@ -93,7 +70,11 @@ const GameMapRelatedMonstersSidePeek = ({
     );
 
     return (
-      <StackedCard on_close={handleCloseMonster} aria_label="Monster Details">
+      <StackedCard
+        on_close={handleCloseMonster}
+        aria_label="Monster Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
         <AdminMonsterDetail
           is_open
           title="Monster Details"
@@ -110,7 +91,7 @@ const GameMapRelatedMonstersSidePeek = ({
 
     if (monsters.error) {
       return (
-        <div className="px-4">
+        <div className="px-4 py-3">
           <ApiErrorAlert
             apiError={monsters.error.message ?? 'Unable to load Monsters.'}
           />
@@ -120,15 +101,18 @@ const GameMapRelatedMonstersSidePeek = ({
 
     if (monsters.data.length === 0) {
       return (
-        <p className="text-glacier-700 dark:text-glacier-300 px-4 text-sm">
+        <p className="text-glacier-700 dark:text-glacier-300 px-4 py-3 text-sm">
           No Monsters are available on this Game Map.
         </p>
       );
     }
 
     return (
-      <div className="h-[500px] max-h-[500px] px-4">
-        <InfiniteScroll handle_scroll={handleScroll}>
+      <div className="min-h-0 flex-1 px-2 py-2">
+        <InfiniteScroll
+          handle_scroll={handleScroll}
+          height_class="h-full min-h-0"
+        >
           <div className="flex flex-col gap-2">
             {monsters.data.map(renderRow)}
             {monsters.is_loading_more && <InfiniteLoader />}
@@ -139,7 +123,7 @@ const GameMapRelatedMonstersSidePeek = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       {renderContent()}
       {renderSelectedMonster()}
     </div>

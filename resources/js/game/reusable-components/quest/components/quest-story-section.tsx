@@ -6,23 +6,35 @@ import QuestDetailProps from '../types/quest-detail-props';
 import PillTabs from 'ui/tabs/pill-tabs';
 
 /**
- * Quest story presentation: Before/After Completion tabs, each a bounded,
- * internally-scrollable prose panel (max 400px), rather than one long wall
- * of text.
+ * Quest story presentation: a Before Completion tab, an After Completion
+ * tab, both, or neither, depending on which Markdown actually exists. Each
+ * tab is a bounded, internally-scrollable prose panel (max 400px). The
+ * whole section is omitted when the Quest has no story text at all.
  */
 const QuestStorySection = ({ quest }: QuestDetailProps): ReactNode => {
+  const hasBefore = Boolean(quest.story.before_completion_markdown);
+  const hasAfter = Boolean(quest.story.after_completion_markdown);
+
+  if (!hasBefore && !hasAfter) {
+    return null;
+  }
+
+  const beforeTab = {
+    label: 'Before Completion',
+    component: QuestStoryPanel,
+    props: { markdown: quest.story.before_completion_markdown },
+  } as const;
+
+  const afterTab = {
+    label: 'After Completion',
+    component: QuestStoryPanel,
+    props: { markdown: quest.story.after_completion_markdown },
+  } as const;
+
   const tabs = [
-    {
-      label: 'Before Completion',
-      component: QuestStoryPanel,
-      props: { markdown: quest.story.before_completion_markdown },
-    },
-    {
-      label: 'After Completion',
-      component: QuestStoryPanel,
-      props: { markdown: quest.story.after_completion_markdown },
-    },
-  ] as const;
+    ...(hasBefore ? [beforeTab] : []),
+    ...(hasAfter ? [afterTab] : []),
+  ];
 
   return (
     <div>

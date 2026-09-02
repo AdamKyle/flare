@@ -31,6 +31,16 @@ class QuestsController extends Controller
     }
 
     /**
+     * Return the public, read-only factual Quest browse options.
+     *
+     * @return JsonResponse Quest browse-options JSON response.
+     */
+    public function options(): JsonResponse
+    {
+        return response()->json($this->questReadService->browseOptions(), 200);
+    }
+
+    /**
      * Return the public, read-only full factual detail representation for the given Quest.
      *
      * @param  Quest  $quest  Quest to transform.

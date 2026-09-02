@@ -78,11 +78,13 @@ import TraversePropsDefinition from '../../map-actions/traverse/definitions/trav
 import Traverse from '../../map-actions/traverse/traverse';
 import ServerChatItem from '../../server-chat-item/server-chat-item';
 import ServerChatItemProps from '../../server-chat-item/types/server-chat-item-props';
+import { SidePeekContentScrollMode } from '../enums/side-peek-content-scroll-mode';
 
 export const SidePeekComponentRegistry: {
   [K in keyof SidePeekComponentPropsMap]: {
     component: React.ComponentType<SidePeekComponentPropsMap[K]>;
     props: SidePeekComponentPropsMap[K];
+    content_scroll_mode?: SidePeekContentScrollMode;
   };
 } = {
   [SidePeekComponentRegistrationEnum.BACKPACK]: {
@@ -152,10 +154,12 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_LOCATION]: {
     component: GameMapLocationSidePeek,
     props: {} as GameMapLocationSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_NPC]: {
     component: GameMapNpcSidePeek,
     props: {} as GameMapNpcSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_KINGDOM]: {
     component: GameMapKingdomSidePeek,
@@ -172,26 +176,32 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL]: {
     component: AdminGameMapDetailSidePeek,
     props: {} as AdminGameMapDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_LOCATIONS]: {
     component: GameMapRelatedLocationsSidePeek,
     props: {} as GameMapRelatedLocationsSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_NPCS]: {
     component: GameMapRelatedNpcsSidePeek,
     props: {} as GameMapRelatedNpcsSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_MONSTERS]: {
     component: GameMapRelatedMonstersSidePeek,
     props: {} as GameMapRelatedMonstersSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_QUESTS]: {
     component: GameMapRelatedQuestsSidePeek,
     props: {} as GameMapRelatedQuestsSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_RELATED_QUEST_ITEMS]: {
     component: GameMapRelatedQuestItemsSidePeek,
     props: {} as GameMapRelatedQuestItemsSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_FORM]: {
     component: LocationFormSidePeek,
@@ -204,6 +214,7 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_LOCATION_DETAIL]: {
     component: AdminLocationDetailSidePeek,
     props: {} as AdminLocationDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_NPC_FORM]: {
     component: NpcFormSidePeek,
@@ -216,10 +227,12 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_NPC_DETAIL]: {
     component: AdminNpcDetailSidePeek,
     props: {} as AdminNpcDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL]: {
     component: AdminItemDetailSidePeek,
     props: {} as AdminItemDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_ITEM_FORM]: {
     component: ItemFormSidePeek,
@@ -232,10 +245,12 @@ export const SidePeekComponentRegistry: {
   [SidePeekComponentRegistrationEnum.ADMIN_QUEST_DETAIL]: {
     component: AdminQuestDetailSidePeek,
     props: {} as AdminQuestDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   [SidePeekComponentRegistrationEnum.ADMIN_MONSTER_DETAIL]: {
     component: AdminMonsterDetailSidePeek,
     props: {} as AdminMonsterDetailSidePeekProps,
+    content_scroll_mode: SidePeekContentScrollMode.COMPONENT,
   },
   // Add more components here
 };

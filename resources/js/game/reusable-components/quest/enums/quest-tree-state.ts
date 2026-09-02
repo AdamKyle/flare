@@ -22,9 +22,9 @@ export const QUEST_TREE_STATE_LABELS: Record<QuestTreeState, string> = {
  * text instead of the primary visible label.
  */
 export const QUEST_TREE_STATE_SHORT_LABELS: Record<QuestTreeState, string> = {
-  [QuestTreeState.COMPLETED]: 'Completed',
-  [QuestTreeState.PARENT_LOCKED]: 'Parent locked',
-  [QuestTreeState.PREREQUISITE_LOCKED]: 'Prerequisite locked',
+  [QuestTreeState.COMPLETED]: 'Done',
+  [QuestTreeState.PARENT_LOCKED]: 'Cannot complete yet',
+  [QuestTreeState.PREREQUISITE_LOCKED]: 'Needs quests',
   [QuestTreeState.AVAILABLE]: 'Available',
 };
 

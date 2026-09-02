@@ -34,9 +34,20 @@ export const usePublicQuestTree = (
     const requestGeneration = requestGenerationRef.current;
 
     abortControllerRef.current?.abort();
+
+    if (mapId === null) {
+      abortControllerRef.current = null;
+      setQuests([]);
+      setError(null);
+      setLoading(false);
+
+      return;
+    }
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
 
+    setQuests([]);
     setLoading(true);
     setError(null);
 

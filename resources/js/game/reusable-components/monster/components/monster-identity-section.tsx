@@ -1,5 +1,9 @@
 import React, { ReactNode } from 'react';
 
+import {
+  formatNumberWithCommas,
+  formatRangeWithCommas,
+} from '../../../util/format-number';
 import FactualLink from '../../quest-item/partials/factual-link';
 import { isLocationType, LOCATION_TYPE_LABELS } from '../enums/location-type';
 import MonsterDetailProps from '../types/monster-detail-props';
@@ -9,35 +13,18 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 
+/**
+ * Monster name is already the outer `MonsterDetail` heading; this section
+ * never repeats it as a separate factual row.
+ */
 const MonsterIdentitySection = ({
   monster,
   navigation,
 }: MonsterDetailProps): ReactNode => {
   const { identity } = monster;
 
-  const renderLocationType = (): ReactNode => {
-    if (identity.only_for_location_type === null) {
-      return 'None';
-    }
-
-    return isLocationType(identity.only_for_location_type)
-      ? LOCATION_TYPE_LABELS[identity.only_for_location_type]
-      : identity.only_for_location_type;
-  };
-
-  const renderGameMap = (): ReactNode => {
-    if (!identity.game_map) {
-      return 'None';
-    }
-
-    return (
-      <FactualLink
-        id={identity.game_map.id}
-        label={identity.game_map.name}
-        on_click={navigation?.on_open_map}
-      />
-    );
-  };
+  const renderLocationTypeLabel = (value: number): ReactNode =>
+    isLocationType(value) ? LOCATION_TYPE_LABELS[value] : value;
 
   return (
     <Card>
@@ -45,26 +32,54 @@ const MonsterIdentitySection = ({
         Identity &amp; Placement
       </h2>
       <Dl>
-        <Dt>Name</Dt>
-        <Dd>{identity.name}</Dd>
         <Dt>Damage Stat</Dt>
         <Dd>{identity.damage_stat}</Dd>
-        <Dt>Game Map</Dt>
-        <Dd>{renderGameMap()}</Dd>
-        <Dt>Max Level</Dt>
-        <Dd>{identity.max_level}</Dd>
-        <Dt>XP</Dt>
-        <Dd>{identity.xp}</Dd>
-        <Dt>Gold</Dt>
-        <Dd>{identity.gold}</Dd>
+        {identity.game_map && (
+          <>
+            <Dt>Game Map</Dt>
+            <Dd>
+              <FactualLink
+                id={identity.game_map.id}
+                label={identity.game_map.name}
+                on_click={navigation?.on_open_map}
+              />
+            </Dd>
+          </>
+        )}
+        {identity.max_level > 0 && (
+          <>
+            <Dt>Max Level</Dt>
+            <Dd>{formatNumberWithCommas(identity.max_level)}</Dd>
+          </>
+        )}
+        {identity.xp > 0 && (
+          <>
+            <Dt>XP</Dt>
+            <Dd>{formatNumberWithCommas(identity.xp)}</Dd>
+          </>
+        )}
+        {identity.gold > 0 && (
+          <>
+            <Dt>Gold</Dt>
+            <Dd>{formatNumberWithCommas(identity.gold)}</Dd>
+          </>
+        )}
         <Dt>Health Range</Dt>
-        <Dd>{identity.health_range}</Dd>
+        <Dd>{formatRangeWithCommas(identity.health_range)}</Dd>
         <Dt>Attack Range</Dt>
-        <Dd>{identity.attack_range}</Dd>
-        <Dt>Drop Check</Dt>
-        <Dd>{identity.drop_check}</Dd>
-        <Dt>Only For Location Type</Dt>
-        <Dd>{renderLocationType()}</Dd>
+        <Dd>{formatRangeWithCommas(identity.attack_range)}</Dd>
+        {identity.drop_check > 0 && (
+          <>
+            <Dt>Drop Check</Dt>
+            <Dd>{formatNumberWithCommas(identity.drop_check)}</Dd>
+          </>
+        )}
+        {identity.only_for_location_type !== null && (
+          <>
+            <Dt>Only For Location Type</Dt>
+            <Dd>{renderLocationTypeLabel(identity.only_for_location_type)}</Dd>
+          </>
+        )}
       </Dl>
     </Card>
   );

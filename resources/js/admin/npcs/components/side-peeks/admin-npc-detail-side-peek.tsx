@@ -1,20 +1,21 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import AdminNpcDetailSidePeekProps from './types/admin-npc-detail-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import { NpcApiMessages } from '../../api/enums/npc-api-messages';
 import { useNpcDetail } from '../../api/hooks/use-npc-detail';
 import { useNpcQuests } from '../../api/hooks/use-npc-quests';
 import { useNpcRewardItems } from '../../api/hooks/use-npc-reward-items';
+import NpcFormScreen from '../../screens/npc-form-screen';
 import NpcDetailBody from '../npc-detail-body';
 import { NpcNestedSelection } from '../types/npc-nested-selection';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -28,42 +29,35 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
  * `StackedCard` over this content (rather than replacing it through the
  * global SidePeek emitter), so this component can itself be reused as
  * nested `StackedCard` content and its own relationship clicks never
- * destroy an ancestor's stack. Edit still uses the global SidePeek
- * emitter, matching every other Admin NPC entry point.
+ * destroy an ancestor's stack. Edit is composed locally via `StackedCard`
+ * and the embeddable `NpcFormScreen`, so opening Edit from a nested
+ * context never destroys an ancestor's own stack.
  */
 const AdminNpcDetailSidePeek = ({
   npc_id: npcId,
   on_npc_changed: onNpcChanged,
 }: AdminNpcDetailSidePeekProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
   const { npc, loading, error, refresh } = useNpcDetail(npcId);
   const quests = useNpcQuests(npcId);
   const rewardItems = useNpcRewardItems(npcId);
+  const [showEdit, setShowEdit] = useState(false);
   const [nestedSelection, setNestedSelection] =
     useState<NpcNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   const handleEdit = (): void => {
-    if (!npc) {
-      return;
-    }
+    setShowEdit(true);
+  };
 
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_NPC_FORM,
-      {
-        is_open: true,
-        title: 'Edit NPC',
-        allow_clicking_outside: true,
-        game_map_id: npc.game_map.id,
-        npc_id: npcId,
-        on_saved: () => {
-          refresh();
-          onNpcChanged?.();
-          setAnnouncement('NPC saved.');
-        },
-      }
-    );
+  const handleCloseEdit = (): void => {
+    setShowEdit(false);
+  };
+
+  const handleSaved = (): void => {
+    refresh();
+    onNpcChanged?.();
+    setShowEdit(false);
+    setAnnouncement('NPC saved.');
   };
 
   const handleOpenItem = (itemId: number): void => {
@@ -100,7 +94,11 @@ const AdminNpcDetailSidePeek = ({
       );
 
       return (
-        <StackedCard on_close={handleCloseNested} aria_label="Quest Details">
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Quest Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
           <NestedQuestDetail
             is_open
             title="Quest Details"
@@ -116,7 +114,11 @@ const AdminNpcDetailSidePeek = ({
       );
 
       return (
-        <StackedCard on_close={handleCloseNested} aria_label="Item Details">
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Item Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
           <NestedItemDetail
             is_open
             title="Item Details"
@@ -132,7 +134,11 @@ const AdminNpcDetailSidePeek = ({
     );
 
     return (
-      <StackedCard on_close={handleCloseNested} aria_label="Game Map Details">
+      <StackedCard
+        on_close={handleCloseNested}
+        aria_label="Game Map Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
         <NestedGameMapDetail
           is_open
           title="Game Map Details"
@@ -148,15 +154,11 @@ const AdminNpcDetailSidePeek = ({
     }
 
     if (error || !npc) {
-      return (
-        <div className="px-4">
-          <ApiErrorAlert apiError={error?.message ?? NpcApiMessages.Load} />
-        </div>
-      );
+      return <ApiErrorAlert apiError={error?.message ?? NpcApiMessages.Load} />;
     }
 
     return (
-      <div className="space-y-4 px-4">
+      <div className="space-y-4">
         <div className="flex justify-center py-2">
           <Button
             label="Edit NPC"
@@ -178,14 +180,44 @@ const AdminNpcDetailSidePeek = ({
     );
   };
 
+  const renderEdit = (): ReactNode => {
+    if (!showEdit || !npc) {
+      return null;
+    }
+
+    return (
+      <StackedCard on_close={handleCloseEdit} aria_label="Edit NPC">
+        <NpcFormScreen
+          game_map_id={npc.game_map.id}
+          npc_id={npcId}
+          initial_x={null}
+          initial_y={null}
+          on_saved={handleSaved}
+          on_cancel={handleCloseEdit}
+          embedded
+        />
+      </StackedCard>
+    );
+  };
+
+  const isStackActive = showEdit || nestedSelection !== null;
+
   return (
-    <>
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
-      {renderContent()}
+      <div
+        className={clsx(
+          'min-h-0 flex-1 px-4 py-4 sm:px-5',
+          isStackActive ? 'overflow-hidden' : 'overflow-y-auto'
+        )}
+      >
+        {renderContent()}
+      </div>
+      {renderEdit()}
       {renderNestedDetail()}
-    </>
+    </div>
   );
 };
 

@@ -33,9 +33,16 @@ const ItemDetails = ({ item_id }: ItemDetailsProps): ReactNode => {
     );
   }
 
-  const attack = data.raw_damage;
-  const ac = data.raw_ac ?? data.base_ac;
-  const healing = data.raw_healing ?? data.base_healing;
+  const attack = Number(data.raw_damage ?? 0);
+  const ac = Number(data.raw_ac ?? data.base_ac ?? 0);
+  const healing = Number(data.raw_healing ?? data.base_healing ?? 0);
+  const baseDamageMod = Number(data.base_damage_mod ?? 0);
+  const baseAcMod = Number(data.base_ac_mod ?? 0);
+  const baseHealingMod = Number(data.base_healing_mod ?? 0);
+  const ambushChance = Number(data.ambush_chance ?? 0);
+  const ambushResistChance = Number(data.ambush_resistance_chance ?? 0);
+  const counterChance = Number(data.counter_chance ?? 0);
+  const counterResistChance = Number(data.counter_resistance_chance ?? 0);
 
   return (
     <div className="flex flex-col gap-4 px-4">
@@ -49,17 +56,14 @@ const ItemDetails = ({ item_id }: ItemDetailsProps): ReactNode => {
       <Separator />
 
       <div className="space-y-4">
-        <AttackSection attack={attack} baseDamageMod={data.base_damage_mod} />
-        <DefenceSection ac={ac} baseAcMod={data.base_ac_mod} />
-        <HealingSection
-          healing={healing}
-          baseHealingMod={data.base_healing_mod}
-        />
+        <AttackSection attack={attack} baseDamageMod={baseDamageMod} />
+        <DefenceSection ac={ac} baseAcMod={baseAcMod} />
+        <HealingSection healing={healing} baseHealingMod={baseHealingMod} />
         <AmbushCounterSection
-          ambushChance={data.ambush_chance}
-          ambushResistChance={data.ambush_resistance_chance}
-          counterChance={data.counter_chance}
-          counterResistChance={data.counter_resistance_chance}
+          ambushChance={ambushChance}
+          ambushResistChance={ambushResistChance}
+          counterChance={counterChance}
+          counterResistChance={counterResistChance}
         />
         <StatsSection item={data} />
       </div>

@@ -1,9 +1,9 @@
 import ItemDefinition from '../api/definitions/item-definition';
+import { renderItemListIdentity } from '../components/item-list-identity';
 import { ITEM_ALCHEMY_TYPE_LABELS } from '../enums/item-alchemy-type';
 import { ITEM_CATALOG_TYPE_LABELS } from '../enums/item-catalog-type';
 import { ITEM_EFFECT_TYPE_LABELS } from '../enums/item-effect-type';
 import { ItemProfile } from '../enums/item-profile';
-import { ITEM_SPECIALTY_TYPE_LABELS } from '../enums/item-specialty-type';
 
 import DataTableColumnDefinition from 'ui/data-table/types/data-table-column-definition';
 
@@ -12,7 +12,7 @@ const nameColumn: DataTableColumnDefinition<ItemDefinition> = {
   header: 'Name',
   sortable: true,
   sort_key: 'name',
-  value: (row) => row.name,
+  value: (row) => renderItemListIdentity(row),
 };
 
 const yesNo = (value: boolean): string => (value ? 'Yes' : 'No');
@@ -220,16 +220,6 @@ export const buildItemListColumns = (
           value: (row) => row.item_skill?.name ?? '—',
         },
         {
-          key: 'specialty_type',
-          header: 'Specialty Type',
-          sortable: true,
-          sort_key: 'specialty_type',
-          value: (row) =>
-            row.specialty_type === null
-              ? '—'
-              : ITEM_SPECIALTY_TYPE_LABELS[row.specialty_type],
-        },
-        {
           key: 'cost',
           header: 'Gold Cost',
           sortable: true,
@@ -315,16 +305,6 @@ export const buildItemListColumns = (
     case ItemProfile.SPECIALTY:
       return [
         nameColumn,
-        {
-          key: 'specialty_type',
-          header: 'Specialty Type',
-          sortable: true,
-          sort_key: 'specialty_type',
-          value: (row) =>
-            row.specialty_type === null
-              ? '—'
-              : ITEM_SPECIALTY_TYPE_LABELS[row.specialty_type],
-        },
         {
           key: 'type',
           header: 'Item Type',

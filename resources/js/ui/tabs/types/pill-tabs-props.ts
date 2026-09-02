@@ -1,3 +1,4 @@
+import { PillTabsAlignment } from 'ui/tabs/enums/pill-tabs-alignment';
 import { TabTupleFromProps } from 'ui/tabs/types/tab-item';
 
 export default interface PillTabsProps<PTuple extends readonly object[]> {
@@ -6,4 +7,5 @@ export default interface PillTabsProps<PTuple extends readonly object[]> {
   initialIndex?: number;
   additional_tab_css?: string;
   onActiveIndexChange?: (index: number) => void;
+  alignment?: PillTabsAlignment;
 }

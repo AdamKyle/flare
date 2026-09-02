@@ -1,10 +1,10 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode } from 'react';
 
+import NpcQuestRelationshipCard from './npc-quest-relationship-card';
 import NpcDetailBodyProps from './types/npc-detail-body-props';
 import ReadOnlyItemCard from '../../../game/components/side-peeks/components/items/read-only-item-card';
 import AdminQuestItemPresentationDefinition from '../../items/api/definitions/admin-quest-item-presentation-definition';
-import { NpcQuestRelatedItemDefinition } from '../api/definitions/npc-quest-definition';
 import { NpcApiMessages } from '../api/enums/npc-api-messages';
 import { NPC_TYPE_LABELS } from '../enums/npc-type';
 
@@ -39,45 +39,9 @@ const NpcDetailBody = ({
       <button
         type="button"
         onClick={() => onOpenMap(npc.game_map.id)}
-        className="text-danube-600 dark:text-danube-300 focus-visible:ring-danube-400 rounded-sm font-medium hover:underline focus:outline-none focus-visible:ring-2"
+        className="text-danube-700 hover:text-danube-600 dark:text-danube-200 dark:hover:text-danube-100 decoration-danube-400 dark:decoration-danube-500 focus-visible:ring-danube-400 rounded-sm font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2"
       >
         {npc.game_map.name}
-      </button>
-    );
-  };
-
-  const renderQuestName = (quest: { id: number; name: string }): ReactNode => {
-    if (!onOpenQuest) {
-      return quest.name;
-    }
-
-    return (
-      <button
-        type="button"
-        onClick={() => onOpenQuest(quest.id)}
-        className="text-danube-600 dark:text-danube-300 focus-visible:ring-danube-400 rounded-sm hover:underline focus:outline-none focus-visible:ring-2"
-      >
-        {quest.name}
-      </button>
-    );
-  };
-
-  const renderItemLink = (
-    item: NpcQuestRelatedItemDefinition | null
-  ): ReactNode => {
-    if (!item) {
-      return (
-        <span className="text-glacier-600 dark:text-glacier-400">None</span>
-      );
-    }
-
-    return (
-      <button
-        type="button"
-        onClick={() => onOpenItem(item.id, item.name)}
-        className="text-danube-600 dark:text-danube-300 focus-visible:ring-danube-400 rounded-sm font-medium hover:underline focus:outline-none focus-visible:ring-2"
-      >
-        {item.name}
       </button>
     );
   };
@@ -114,30 +78,22 @@ const NpcDetailBody = ({
     }
 
     return (
-      <div className="h-[500px] max-h-[500px]">
-        <InfiniteScroll handle_scroll={handleQuestsScroll}>
-          <div className="flex flex-col gap-2">
-            {quests.data.map((quest) => (
-              <div
-                key={quest.id}
-                className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 rounded-md border px-3 py-2"
-              >
-                <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-                  {renderQuestName(quest)}
-                </p>
-                <div className="text-glacier-600 dark:text-glacier-400 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                  <span>Required: {renderItemLink(quest.required_item)}</span>
-                  <span>
-                    Secondary: {renderItemLink(quest.secondary_required_item)}
-                  </span>
-                  <span>Reward: {renderItemLink(quest.reward_item)}</span>
-                </div>
-              </div>
-            ))}
-            {quests.is_loading_more && <InfiniteLoader />}
-          </div>
-        </InfiniteScroll>
-      </div>
+      <InfiniteScroll
+        handle_scroll={handleQuestsScroll}
+        height_class="h-auto max-h-[500px]"
+      >
+        <div className="flex flex-col gap-2">
+          {quests.data.map((quest) => (
+            <NpcQuestRelationshipCard
+              key={quest.id}
+              quest={quest}
+              on_open_quest={onOpenQuest}
+              on_open_item={onOpenItem}
+            />
+          ))}
+          {quests.is_loading_more && <InfiniteLoader />}
+        </div>
+      </InfiniteScroll>
     );
   };
 
@@ -173,26 +129,27 @@ const NpcDetailBody = ({
     }
 
     return (
-      <div className="h-[500px] max-h-[500px]">
-        <InfiniteScroll handle_scroll={handleRewardItemsScroll}>
-          <div className="flex flex-col gap-3">
-            {rewardItems.data.map(
-              (item: AdminQuestItemPresentationDefinition) => (
-                <ReadOnlyItemCard
-                  key={item.item_id}
-                  item_id={item.item_id}
-                  name={item.name}
-                  description={item.description}
-                  effect={item.effect}
-                  usable={item.usable}
-                  on_click={() => onOpenItem(item.item_id, item.name)}
-                />
-              )
-            )}
-            {rewardItems.is_loading_more && <InfiniteLoader />}
-          </div>
-        </InfiniteScroll>
-      </div>
+      <InfiniteScroll
+        handle_scroll={handleRewardItemsScroll}
+        height_class="h-auto max-h-[500px]"
+      >
+        <div className="flex flex-col gap-3">
+          {rewardItems.data.map(
+            (item: AdminQuestItemPresentationDefinition) => (
+              <ReadOnlyItemCard
+                key={item.item_id}
+                item_id={item.item_id}
+                name={item.name}
+                description={item.description}
+                effect={item.effect}
+                usable={item.usable}
+                on_click={() => onOpenItem(item.item_id, item.name)}
+              />
+            )
+          )}
+          {rewardItems.is_loading_more && <InfiniteLoader />}
+        </div>
+      </InfiniteScroll>
     );
   };
 

@@ -1,11 +1,11 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
+import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
 
 import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import GameMapLocationSidePeekProps from './types/game-map-location-side-peek-props';
+import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
-import { SidePeek as SidePeekEventType } from '../../../../game/components/side-peeks/base/event-types/side-peek';
-import { useSidePeekEmitter } from '../../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
 import AdminQuestItemPresentationDefinition from '../../../items/api/definitions/admin-quest-item-presentation-definition';
 import LocationDefinition from '../../../locations/api/definitions/location-definition';
 import { LocationDetailRelatedItemDefinition } from '../../../locations/api/definitions/location-detail-definition';
@@ -13,21 +13,32 @@ import { LocationApiMessages } from '../../../locations/api/enums/location-api-m
 import { useLocationDetail } from '../../../locations/api/hooks/use-location-detail';
 import { useLocationQuestItems } from '../../../locations/api/hooks/use-location-quest-items';
 import LocationDetailBody from '../../../locations/components/location-detail-body';
+import { LocationNestedSelection } from '../../../locations/components/types/location-nested-selection';
 import LocationFormScreen from '../../../locations/screens/location-form-screen';
 
+import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
+/**
+ * Game Map Location side-peek: stacks the shared, permission-neutral
+ * factual Location presentation with Game-Map-context Edit/Move actions.
+ * Relationship navigation opens the target's canonical detail inside a
+ * local `StackedCard` over this content instead of replacing this
+ * contextual SidePeek through the global emitter, so this SidePeek's own
+ * Move/Edit affordances and scroll position stay intact underneath.
+ */
 const GameMapLocationSidePeek = ({
   game_map_id: gameMapId,
   location_id: locationId,
   on_editor_changed: onEditorChanged,
   on_move_requested: onMoveRequested,
 }: GameMapLocationSidePeekProps): ReactNode => {
-  const sidePeekEmitter = useSidePeekEmitter();
   const { location, loading, error, refresh } = useLocationDetail(locationId);
   const questItems = useLocationQuestItems(locationId);
   const [showEdit, setShowEdit] = useState(false);
+  const [nestedSelection, setNestedSelection] =
+    useState<LocationNestedSelection | null>(null);
   const [announcement, setAnnouncement] = useState('');
 
   const handleEdit = (): void => {
@@ -52,45 +63,73 @@ const GameMapLocationSidePeek = ({
   const handleOpenQuestItem = (
     item: AdminQuestItemPresentationDefinition
   ): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
-      {
-        is_open: true,
-        title: 'Item Details',
-        allow_clicking_outside: true,
-        item_id: item.item_id,
-        on_item_changed: () => questItems.refresh(),
-      }
-    );
+    setNestedSelection({
+      type: 'item',
+      id: item.item_id,
+      on_changed: () => questItems.refresh(),
+    });
   };
 
   const handleOpenRelatedItem = (
     item: LocationDetailRelatedItemDefinition
   ): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL,
-      {
-        is_open: true,
-        title: 'Item Details',
-        allow_clicking_outside: true,
-        item_id: item.id,
-        on_item_changed: () => refresh(),
-      }
-    );
+    setNestedSelection({
+      type: 'item',
+      id: item.id,
+      on_changed: () => refresh(),
+    });
   };
 
   const handleOpenMap = (id: number): void => {
-    sidePeekEmitter.emit(
-      SidePeekEventType.SIDE_PEEK,
-      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL,
-      {
-        is_open: true,
-        title: 'Game Map Details',
-        allow_clicking_outside: true,
-        game_map_id: id,
-      }
+    setNestedSelection({ type: 'map', id });
+  };
+
+  const handleCloseNested = (): void => {
+    setNestedSelection(null);
+  };
+
+  const renderNestedDetail = (): ReactNode => {
+    if (!nestedSelection) {
+      return null;
+    }
+
+    if (nestedSelection.type === 'item') {
+      const NestedItemDetail = resolveSidePeekComponent(
+        SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
+      );
+
+      return (
+        <StackedCard
+          on_close={handleCloseNested}
+          aria_label="Item Details"
+          content_mode={StackedCardContentMode.FULL_BLEED}
+        >
+          <NestedItemDetail
+            is_open
+            title="Item Details"
+            item_id={nestedSelection.id}
+            on_item_changed={nestedSelection.on_changed}
+          />
+        </StackedCard>
+      );
+    }
+
+    const NestedGameMapDetail = resolveSidePeekComponent(
+      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
+    );
+
+    return (
+      <StackedCard
+        on_close={handleCloseNested}
+        aria_label="Game Map Details"
+        content_mode={StackedCardContentMode.FULL_BLEED}
+      >
+        <NestedGameMapDetail
+          is_open
+          title="Game Map Details"
+          game_map_id={nestedSelection.id}
+        />
+      </StackedCard>
     );
   };
 
@@ -106,7 +145,7 @@ const GameMapLocationSidePeek = ({
     }
 
     return (
-      <div className="space-y-4 px-4">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -155,14 +194,24 @@ const GameMapLocationSidePeek = ({
     );
   };
 
+  const isStackActive = showEdit || nestedSelection !== null;
+
   return (
-    <>
+    <div className="relative flex h-full min-h-0 flex-col overflow-hidden">
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
-      {renderContent()}
+      <div
+        className={clsx(
+          'min-h-0 flex-1 px-4 py-4',
+          isStackActive ? 'overflow-hidden' : 'overflow-y-auto'
+        )}
+      >
+        {renderContent()}
+      </div>
       {renderEdit()}
-    </>
+      {renderNestedDetail()}
+    </div>
   );
 };
 
