@@ -133,7 +133,7 @@ const NpcDetailBody = ({
         handle_scroll={handleRewardItemsScroll}
         height_class="h-auto max-h-[500px]"
       >
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {rewardItems.data.map(
             (item: AdminQuestItemPresentationDefinition) => (
               <ReadOnlyItemCard

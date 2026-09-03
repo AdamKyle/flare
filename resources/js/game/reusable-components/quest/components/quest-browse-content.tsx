@@ -3,13 +3,14 @@ import React, { ReactNode, useMemo } from 'react';
 
 import QuestCard from './quest-card';
 import QuestTree from './quest-tree';
-import QuestTreeNodeDefinition from '../api/definitions/quest-tree-node-definition';
 import {
   QUEST_BROWSE_TAB_EMPTY_LABELS,
   QuestBrowseTab,
 } from '../enums/quest-browse-tab';
+import { QuestTreeState } from '../enums/quest-tree-state';
 import QuestBrowseContentProps from '../types/quest-browse-content-props';
-import { QuestTreeNavigationDefinition } from '../types/quest-node-props';
+import RaidGroupPanelProps from '../types/raid-group-panel-props';
+import { buildQuestTreeAccessibilityLabel } from '../utils/build-quest-tree-accessibility-label';
 import { groupQuestTreesByRaid } from '../utils/group-quest-trees-by-raid';
 import { resolveQuestTreeState } from '../utils/resolve-quest-tree-state';
 
@@ -17,31 +18,39 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import { PillTabsAlignment } from 'ui/tabs/enums/pill-tabs-alignment';
 import PillTabs from 'ui/tabs/pill-tabs';
 
-interface RaidGroupPanelProps {
-  quests: QuestTreeNodeDefinition[];
-  completed_quest_ids: number[];
-  navigation?: QuestTreeNavigationDefinition;
-}
-
 const RaidGroupPanel = ({
   quests,
   completed_quest_ids: completedQuestIds,
   navigation,
+  tree_mobile_mode: treeMobileMode,
+  accessibility_label: accessibilityLabel,
 }: RaidGroupPanelProps): ReactNode => (
   <QuestTree
     quests={quests}
     completed_quest_ids={completedQuestIds}
     navigation={navigation}
+    mobile_mode={treeMobileMode}
+    accessibility_label={accessibilityLabel}
   />
 );
+
+interface OneOffDisplayModel {
+  quest_id: number;
+  name: string;
+  state: QuestTreeState;
+  npc_name: string | null;
+}
 
 /**
  * Shared, permission-neutral Quest browse content: renders the currently
  * active Quest category's already-fetched Quest trees using the
- * presentation appropriate to that category — a branching tree for Base, a
- * single-column card list for One Offs, and Raid-grouped trees (nested
- * `PillTabs` when more than one Raid is present) for Raid. Never imports
- * Admin or Information code; the caller supplies data and navigation.
+ * presentation appropriate to that category — the real top-to-bottom Quest
+ * Tree for the normal parent/child story hierarchy, a compact single-column
+ * card list for One Offs, and Raid-grouped Trees for Raid Quests, always
+ * presented through nested `PillTabs` (even a single Raid gets its own
+ * one-tab `PillTabs`). Never imports Admin or Information code; the caller
+ * supplies data, navigation, and the factual selected Game Map name used to
+ * build contextual Tree accessibility labels.
  */
 const QuestBrowseContent = ({
   active_tab: activeTab,
@@ -50,26 +59,48 @@ const QuestBrowseContent = ({
   loading,
   error,
   navigation,
+  tree_mobile_mode: treeMobileMode,
+  selected_game_map_name: selectedGameMapName,
 }: QuestBrowseContentProps): ReactNode => {
+  const completedQuestIdSet = useMemo(
+    () => new Set(completedQuestIds),
+    [completedQuestIds]
+  );
+
   const raidGroups = useMemo(
     () =>
       activeTab === QuestBrowseTab.RAID ? groupQuestTreesByRaid(quests) : [],
     [activeTab, quests]
   );
 
+  const oneOffDisplayModels = useMemo((): OneOffDisplayModel[] => {
+    if (activeTab !== QuestBrowseTab.ONE_OFFS) {
+      return [];
+    }
+
+    return quests.map((quest) => ({
+      quest_id: quest.id,
+      name: quest.name,
+      state: resolveQuestTreeState(quest, completedQuestIdSet),
+      npc_name: quest.npc?.name ?? null,
+    }));
+  }, [activeTab, quests, completedQuestIdSet]);
+
+  const renderOneOffItem = (item: OneOffDisplayModel): ReactNode => (
+    <li key={item.quest_id}>
+      <QuestCard
+        quest_id={item.quest_id}
+        name={item.name}
+        state={item.state}
+        npc_name={item.npc_name}
+        on_open_quest={(id) => navigation?.on_open_quest?.(id)}
+      />
+    </li>
+  );
+
   const renderOneOffs = (): ReactNode => (
-    <ul className="space-y-3">
-      {quests.map((quest) => (
-        <li key={quest.id}>
-          <QuestCard
-            quest_id={quest.id}
-            name={quest.name}
-            state={resolveQuestTreeState(quest, new Set(completedQuestIds))}
-            npc_name={quest.npc?.name ?? null}
-            on_open_quest={(id) => navigation?.on_open_quest?.(id)}
-          />
-        </li>
-      ))}
+    <ul className="flex flex-col gap-2">
+      {oneOffDisplayModels.map(renderOneOffItem)}
     </ul>
   );
 
@@ -82,23 +113,6 @@ const QuestBrowseContent = ({
       );
     }
 
-    if (raidGroups.length === 1) {
-      const group = raidGroups[0];
-
-      return (
-        <div>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-3 text-sm font-semibold">
-            {group.raid_name}
-          </h2>
-          <RaidGroupPanel
-            quests={group.quests}
-            completed_quest_ids={completedQuestIds}
-            navigation={navigation}
-          />
-        </div>
-      );
-    }
-
     const tabs = raidGroups.map((group) => ({
       label: group.raid_name,
       component: RaidGroupPanel,
@@ -106,6 +120,11 @@ const QuestBrowseContent = ({
         quests: group.quests,
         completed_quest_ids: completedQuestIds,
         navigation,
+        tree_mobile_mode: treeMobileMode,
+        accessibility_label: buildQuestTreeAccessibilityLabel(
+          selectedGameMapName,
+          group.raid_name
+        ),
       },
     }));
 
@@ -113,7 +132,7 @@ const QuestBrowseContent = ({
       <PillTabs<RaidGroupPanelProps[]>
         tabs={tabs}
         ariaLabel="Raids"
-        alignment={PillTabsAlignment.START}
+        alignment={PillTabsAlignment.CENTER}
       />
     );
   };
@@ -140,6 +159,10 @@ const QuestBrowseContent = ({
         quests={quests}
         completed_quest_ids={completedQuestIds}
         navigation={navigation}
+        mobile_mode={treeMobileMode}
+        accessibility_label={buildQuestTreeAccessibilityLabel(
+          selectedGameMapName
+        )}
       />
     );
   };

@@ -1,153 +1,73 @@
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 
-import QuestMobileList from './quest-mobile-list';
-import QuestTreeDesktop from './quest-tree-desktop';
-import QuestTreeNodeDefinition from '../api/definitions/quest-tree-node-definition';
+import QuestTreeListNode from './quest-tree-list-node';
+import QuestTreeNode from './quest-tree-node';
+import QuestTreeNodeData from '../types/quest-tree-node-data';
 import QuestTreeProps from '../types/quest-tree-props';
+import { buildQuestTreeData } from '../utils/build-quest-tree-data';
 
-interface FlatEntry {
-  id: number;
-  parent_id: number | null;
-}
-
-const flattenVisible = (
-  quests: QuestTreeNodeDefinition[],
-  parentId: number | null = null
-): FlatEntry[] => {
-  const entries: FlatEntry[] = [];
-
-  quests.forEach((quest) => {
-    entries.push({ id: quest.id, parent_id: parentId });
-
-    if (quest.children.length > 0) {
-      entries.push(...flattenVisible(quest.children, quest.id));
-    }
-  });
-
-  return entries;
-};
+import TreeNodeDefinition from 'ui/tree/definitions/tree-node-definition';
+import Tree from 'ui/tree/tree';
 
 /**
- * Shared, permission-neutral Quest tree. Desktop/tablet renders a real
- * branching hierarchy with keyboard tree navigation; mobile renders the
- * same underlying data as a flat, vertically scrolling Quest-card list
- * (see `QuestMobileList`) rather than a recursive indented tree, so the
- * presentation stays usable on narrow viewports for Admin, public
- * Information, and a future Character/player adapter alike.
+ * Shared, permission-neutral Quest tree: a real top-to-bottom hierarchy
+ * rendered through the generic shared `Tree`. Mobile presentation defaults
+ * to the actual visual Tree; passing `TreeMobileMode.ONLY_WHATS_AVAILABLE`
+ * switches mobile to a card list of only currently available Quests (for a
+ * future Character adapter), using the presentational `QuestTreeListNode`
+ * for that mobile list — the generic Tree itself owns the single
+ * interactive activation target for every list item.
  */
 const QuestTree = ({
   quests,
   completed_quest_ids: completedQuestIdsList,
   navigation,
+  mobile_mode: mobileMode,
+  accessibility_label: accessibilityLabel,
 }: QuestTreeProps): ReactNode => {
   const completedQuestIds = useMemo(
     () => new Set(completedQuestIdsList),
     [completedQuestIdsList]
   );
 
-  const [focusedId, setFocusedId] = useState<number | null>(
-    quests[0]?.id ?? null
+  const treeData = useMemo(
+    () => buildQuestTreeData(quests, completedQuestIds),
+    [quests, completedQuestIds]
   );
 
-  const desktopNodeRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-
-  const handleSelect = (id: number): void => {
-    navigation?.on_open_quest?.(id);
-  };
-
-  const focusNode = (id: number): void => {
-    setFocusedId(id);
-    desktopNodeRefs.current.get(id)?.focus();
-  };
-
-  const handleDesktopKeyDown = (
-    event: React.KeyboardEvent<HTMLUListElement>
+  const handleActivate = (
+    node: TreeNodeDefinition<QuestTreeNodeData>
   ): void => {
-    if (focusedId === null) {
-      return;
-    }
-
-    const flat = flattenVisible(quests);
-    const currentIndex = flat.findIndex((entry) => entry.id === focusedId);
-
-    if (currentIndex === -1) {
-      return;
-    }
-
-    const currentEntry = flat[currentIndex];
-
-    switch (event.key) {
-      case 'ArrowDown': {
-        event.preventDefault();
-        const next = flat[currentIndex + 1];
-        if (next) {
-          focusNode(next.id);
-        }
-        break;
-      }
-      case 'ArrowUp': {
-        event.preventDefault();
-        const previous = flat[currentIndex - 1];
-        if (previous) {
-          focusNode(previous.id);
-        }
-        break;
-      }
-      case 'ArrowRight': {
-        event.preventDefault();
-        const next = flat[currentIndex + 1];
-        if (next) {
-          focusNode(next.id);
-        }
-        break;
-      }
-      case 'ArrowLeft': {
-        event.preventDefault();
-        if (currentEntry.parent_id !== null) {
-          focusNode(currentEntry.parent_id);
-        }
-        break;
-      }
-      case 'Home': {
-        event.preventDefault();
-        const first = flat[0];
-        if (first) {
-          focusNode(first.id);
-        }
-        break;
-      }
-      case 'End': {
-        event.preventDefault();
-        const last = flat[flat.length - 1];
-        if (last) {
-          focusNode(last.id);
-        }
-        break;
-      }
-      default:
-        break;
-    }
+    navigation?.on_open_quest?.(node.data.quest.id);
   };
+
+  const renderNode = (
+    node: TreeNodeDefinition<QuestTreeNodeData>
+  ): ReactNode => (
+    <QuestTreeNode quest={node.data.quest} state={node.data.state} />
+  );
+
+  const renderListNode = (
+    node: TreeNodeDefinition<QuestTreeNodeData>
+  ): ReactNode => (
+    <QuestTreeListNode quest={node.data.quest} state={node.data.state} />
+  );
 
   return (
-    <div>
-      <QuestTreeDesktop
-        quests={quests}
-        completed_quest_ids={completedQuestIds}
-        focused_id={focusedId}
-        on_select={handleSelect}
-        on_focus_node={setFocusedId}
-        node_refs={desktopNodeRefs}
-        on_key_down={handleDesktopKeyDown}
-      />
-      <div className="md:hidden">
-        <QuestMobileList
-          quests={quests}
-          completed_quest_ids={completedQuestIdsList}
-          navigation={navigation}
-        />
-      </div>
-    </div>
+    <Tree<QuestTreeNodeData>
+      nodes={treeData.nodes}
+      branches={treeData.branches}
+      render_node={renderNode}
+      render_list_node={renderListNode}
+      on_node_activate={navigation?.on_open_quest ? handleActivate : undefined}
+      accessibility_label={accessibilityLabel}
+      mobile_mode={mobileMode}
+      available_empty_state={
+        <p className="text-glacier-600 dark:text-glacier-400 text-sm">
+          No Quests are currently available.
+        </p>
+      }
+    />
   );
 };
 

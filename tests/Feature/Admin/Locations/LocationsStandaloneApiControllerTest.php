@@ -184,4 +184,20 @@ class LocationsStandaloneApiControllerTest extends TestCase
         $this->assertSame(3, $data['meta']['pagination']['total']);
         $this->assertSame(2, $data['meta']['pagination']['total_pages']);
     }
+
+    public function test_index_filters_locations_by_game_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $otherMap = $this->createGameMap(['name' => 'Other Map']);
+        $this->createLocation(['game_map_id' => $surface->id, 'name' => 'Surface Location']);
+        $this->createLocation(['game_map_id' => $otherMap->id, 'name' => 'Other Map Location']);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/locations', ['filters' => ['game_map_id' => $surface->id]], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertCount(1, $data['data']);
+        $this->assertSame('Surface Location', $data['data'][0]['name']);
+        $this->assertSame('Surface', $data['data'][0]['map_name']);
+    }
 }

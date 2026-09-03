@@ -1,7 +1,15 @@
 import clsx from 'clsx';
 import { motion, useIsPresent, useReducedMotion } from 'framer-motion';
-import React, { useEffect } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
+import StackedCardLayerContextDefinition from 'ui/cards/context/definitions/stacked-card-layer-context-definition';
+import StackedCardLayerContext from 'ui/cards/context/stacked-card-layer-context';
 import { useSidePeekAccessibility } from 'ui/side-peek/hooks/use-side-peek-accessibility';
 import { sidePeekPanelWidthStyles } from 'ui/side-peek/styles/side-peek-panel-styles';
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
@@ -16,6 +24,30 @@ const SidePeek = (props: SidePeekProps) => {
       allow_clicking_outside: props.allow_clicking_outside,
       on_close: props.on_close,
     });
+
+  const [hostElement, setHostElement] = useState<HTMLDivElement | null>(null);
+  const activeLayerCountRef = useRef(0);
+  const [activeLayerCount, setActiveLayerCount] = useState(0);
+
+  const registerLayer = useCallback((): (() => void) => {
+    activeLayerCountRef.current += 1;
+    setActiveLayerCount(activeLayerCountRef.current);
+
+    return () => {
+      activeLayerCountRef.current = Math.max(
+        0,
+        activeLayerCountRef.current - 1
+      );
+      setActiveLayerCount(activeLayerCountRef.current);
+    };
+  }, []);
+
+  const layerContextValue = useMemo<StackedCardLayerContextDefinition>(
+    () => ({ host_element: hostElement, register_layer: registerLayer }),
+    [hostElement, registerLayer]
+  );
+
+  const isBaseCovered = activeLayerCount > 0;
 
   useEffect(() => {
     const previousBodyOverflow = document.body.style.overflow;
@@ -72,26 +104,43 @@ const SidePeek = (props: SidePeekProps) => {
           'bg-white shadow-lg dark:bg-gray-800'
         )}
       >
-        <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={props.on_close}
-              disabled={!isPresent}
-              className="rounded px-2 py-1 text-gray-700 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-              aria-label="Close panel"
-            >
-              <i className="fas fa-angle-double-right" aria-hidden="true"></i>
-            </button>
-            <h2
-              id="sidepeek-title"
-              className="text-lg font-semibold text-gray-900 dark:text-white"
-            >
-              {props.title}
-            </h2>
-          </div>
-        </div>
+        <StackedCardLayerContext.Provider value={layerContextValue}>
+          <div
+            inert={isBaseCovered}
+            aria-hidden={isBaseCovered}
+            className="flex h-full min-h-0 w-full flex-col"
+          >
+            <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={props.on_close}
+                  disabled={!isPresent}
+                  className="focus-visible:ring-danube-500 dark:focus-visible:ring-danube-300 rounded px-2 py-1 text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:text-white dark:hover:bg-gray-700"
+                  aria-label="Close panel"
+                >
+                  <i
+                    className="fas fa-angle-double-right"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+                <h2
+                  id="sidepeek-title"
+                  className="text-lg font-semibold text-gray-900 dark:text-white"
+                >
+                  {props.title}
+                </h2>
+              </div>
+            </div>
 
-        <div className="min-h-0 flex-1">{props.children}</div>
+            <div className="min-h-0 flex-1">{props.children}</div>
+          </div>
+
+          <div
+            ref={setHostElement}
+            className="pointer-events-none absolute inset-0 z-10"
+          />
+        </StackedCardLayerContext.Provider>
       </motion.div>
     </>
   );

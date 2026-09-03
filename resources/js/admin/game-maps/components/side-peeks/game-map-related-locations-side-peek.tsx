@@ -4,6 +4,7 @@ import React, { ReactNode, useState } from 'react';
 import GameMapRelatedLocationsSidePeekProps from './types/game-map-related-locations-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import LocationCard from '../../../../game/reusable-components/location/components/location-card';
 import {
   isLocationType,
   LOCATION_TYPE_LABELS,
@@ -62,22 +63,15 @@ const GameMapRelatedLocationsSidePeek = ({
   };
 
   const renderRow = (location: GameMapRelatedLocationDefinition): ReactNode => (
-    <button
+    <LocationCard
       key={location.id}
-      type="button"
-      onClick={() => handleOpenLocation(location.id)}
-      aria-label={`Open Location details for ${location.name}`}
-      className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 hover:bg-glacier-100 dark:hover:bg-glacier-900 focus-visible:ring-danube-400 w-full rounded-lg border p-3 text-left shadow-sm focus:outline-none focus-visible:ring-2"
-    >
-      <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-        {location.name}
-      </p>
-      <p className="text-glacier-600 dark:text-glacier-400 text-xs">
-        {[renderLocationType(location), `X ${location.x}, Y ${location.y}`]
-          .filter(Boolean)
-          .join(' · ')}
-      </p>
-    </button>
+      location_id={location.id}
+      name={location.name}
+      type_label={renderLocationType(location)}
+      x={location.x}
+      y={location.y}
+      on_open_location={handleOpenLocation}
+    />
   );
 
   const renderSelectedLocation = (): ReactNode => {

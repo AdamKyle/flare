@@ -11,11 +11,6 @@ import LocationListDefinition from '../api/definitions/location-list-definition'
 import { useLocations } from '../api/hooks/use-locations';
 import { LOCATION_LIST_COLUMNS } from '../definitions/location-list-columns';
 import { LocationImportCopy } from '../enums/location-import-copy';
-import {
-  isLocationType,
-  LOCATION_TYPE_LABELS,
-  LOCATION_TYPE_VALUES,
-} from '../enums/location-type';
 import { LocationScreens } from '../screen-manager/location-screen-constants';
 import { useLocationScreenNavigation } from '../screen-manager/location-screen-kit';
 import { parseNumberOption } from '../utils/parse-location-dropdown-value';
@@ -50,8 +45,6 @@ const LocationListScreen = (): ReactNode => {
     set_page: setPage,
     game_map_id: gameMapId,
     set_game_map_id: setGameMapId,
-    type,
-    set_type: setType,
     sort_key: sortKey,
     sort_direction: sortDirection,
     set_sort: setSort,
@@ -72,13 +65,6 @@ const LocationListScreen = (): ReactNode => {
       label: gameMap.name,
       value: gameMap.id,
     })) ?? [];
-
-  const typeItems: DropdownItem[] = LOCATION_TYPE_VALUES.map(
-    (locationType) => ({
-      label: LOCATION_TYPE_LABELS[locationType],
-      value: locationType,
-    })
-  );
 
   const handleRowActivate = (location: LocationListDefinition): void => {
     navigation.navigateTo(LocationScreens.SHOW, { location_id: location.id });
@@ -133,25 +119,7 @@ const LocationListScreen = (): ReactNode => {
               (item) => item.value === gameMapId
             )}
             on_select={(item) => setGameMapId(parseNumberOption(item.value))}
-            on_clear={() => setGameMapId(null)}
-            selection_placeholder="All Maps"
-          />
-        </div>
-
-        <div className="w-full sm:max-w-xs">
-          <Dropdown
-            id="location-type-filter"
-            aria_label="Filter Locations by Type"
-            searchable
-            items={typeItems}
-            pre_selected_item={typeItems.find((item) => item.value === type)}
-            on_select={(item) => {
-              if (isLocationType(item.value)) {
-                setType(item.value);
-              }
-            }}
-            on_clear={() => setType(null)}
-            selection_placeholder="All Types"
+            selection_placeholder="Select Game Map"
           />
         </div>
 
@@ -167,6 +135,40 @@ const LocationListScreen = (): ReactNode => {
           Export
         </a>
       </div>
+    );
+  };
+
+  const renderTableOrPrompt = (): ReactNode => {
+    if (gameMapId === null) {
+      return (
+        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
+          Select a Game Map to view Locations.
+        </p>
+      );
+    }
+
+    return (
+      <DataTable<LocationListDefinition>
+        id_prefix="locations"
+        caption="Locations"
+        rows={data}
+        row_id={(row) => row.id}
+        columns={LOCATION_LIST_COLUMNS}
+        loading={loading}
+        error={error?.message ?? null}
+        empty_message="No Locations match the current search on this Game Map."
+        search_label="Search Locations"
+        search_value={searchText}
+        on_search_change={setSearchText}
+        current_page={page}
+        total_pages={totalPages}
+        total_records={totalRecords}
+        on_page_change={setPage}
+        sort_key={sortKey}
+        sort_direction={sortDirection}
+        on_sort_change={setSort}
+        on_row_activate={handleRowActivate}
+      />
     );
   };
 
@@ -191,27 +193,7 @@ const LocationListScreen = (): ReactNode => {
       }
     >
       {renderFilters()}
-      <DataTable<LocationListDefinition>
-        id_prefix="locations"
-        caption="Locations"
-        rows={data}
-        row_id={(row) => row.id}
-        columns={LOCATION_LIST_COLUMNS}
-        loading={loading}
-        error={error?.message ?? null}
-        empty_message="No Locations match the current search and filters."
-        search_label="Search Locations"
-        search_value={searchText}
-        on_search_change={setSearchText}
-        current_page={page}
-        total_pages={totalPages}
-        total_records={totalRecords}
-        on_page_change={setPage}
-        sort_key={sortKey}
-        sort_direction={sortDirection}
-        on_sort_change={setSort}
-        on_row_activate={handleRowActivate}
-      />
+      {renderTableOrPrompt()}
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>

@@ -46,7 +46,8 @@ class QuestsApiControllerTest extends TestCase
     public function test_public_quest_tree_can_be_filtered_by_kind(): void
     {
         $this->createQuest(['name' => 'A One Off']);
-        $this->createQuest(['name' => 'B Chain Root', 'is_parent' => true]);
+        $chainRoot = $this->createQuest(['name' => 'B Chain Root', 'is_parent' => true]);
+        $this->createQuest(['name' => 'B Chain Child', 'parent_quest_id' => $chainRoot->id]);
 
         $response = $this->call('GET', '/api/information/quests/tree', ['kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
@@ -56,7 +57,7 @@ class QuestsApiControllerTest extends TestCase
         $this->assertSame('B Chain Root', $data[0]['name']);
     }
 
-    public function test_public_quest_tree_map_filter_retains_full_chain_when_child_matches(): void
+    public function test_public_quest_tree_map_filter_excludes_chain_when_only_child_matches(): void
     {
         $surface = $this->createGameMap(['name' => 'Surface']);
         $other = $this->createGameMap(['name' => 'Other Map']);
@@ -64,7 +65,23 @@ class QuestsApiControllerTest extends TestCase
         $childNpc = $this->createNpc(['game_map_id' => $surface->id]);
 
         $root = $this->createQuest(['name' => 'Public Root Elsewhere', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
-        $child = $this->createQuest(['name' => 'Public Child On Surface', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
+        $this->createQuest(['name' => 'Public Child On Surface', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
+
+        $response = $this->call('GET', '/api/information/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(0, $data);
+    }
+
+    public function test_public_quest_tree_map_filter_returns_full_chain_when_root_matches(): void
+    {
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $other = $this->createGameMap(['name' => 'Other Map']);
+        $rootNpc = $this->createNpc(['game_map_id' => $surface->id]);
+        $childNpc = $this->createNpc(['game_map_id' => $other->id]);
+
+        $root = $this->createQuest(['name' => 'Public Root On Surface', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Public Child Elsewhere', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
 
         $response = $this->call('GET', '/api/information/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true)['quests'];
@@ -72,6 +89,64 @@ class QuestsApiControllerTest extends TestCase
         $this->assertCount(1, $data);
         $this->assertSame($root->id, $data[0]['id']);
         $this->assertSame($child->id, $data[0]['children'][0]['id']);
+    }
+
+    public function test_public_quest_tree_chain_returns_single_canonical_root_for_selected_map(): void
+    {
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $firstNpc = $this->createNpc(['game_map_id' => $surface->id]);
+        $secondNpc = $this->createNpc(['game_map_id' => $surface->id]);
+
+        $firstRoot = $this->createQuest(['name' => 'Public Alpha Root', 'npc_id' => $firstNpc->id, 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Public Alpha Child', 'npc_id' => $firstNpc->id, 'parent_quest_id' => $firstRoot->id]);
+        $this->createQuest(['name' => 'Public Beta Root', 'npc_id' => $secondNpc->id, 'is_parent' => true]);
+
+        $response = $this->call('GET', '/api/information/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Public Alpha Root', $data[0]['name']);
+        $this->assertSame($child->id, $data[0]['children'][0]['id']);
+    }
+
+    public function test_public_chain_tree_without_map_filter_returns_multiple_roots(): void
+    {
+        $alphaRoot = $this->createQuest(['name' => 'Public Alpha Chain Root', 'is_parent' => true]);
+        $this->createQuest(['name' => 'Public Alpha Chain Child', 'parent_quest_id' => $alphaRoot->id]);
+        $betaRoot = $this->createQuest(['name' => 'Public Beta Chain Root', 'is_parent' => true]);
+        $this->createQuest(['name' => 'Public Beta Chain Child', 'parent_quest_id' => $betaRoot->id]);
+
+        $response = $this->call('GET', '/api/information/quests/tree', ['kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(2, $data);
+        $this->assertSame('Public Alpha Chain Root', $data[0]['name']);
+        $this->assertSame('Public Beta Chain Root', $data[1]['name']);
+    }
+
+    public function test_public_top_level_parent_flagged_quest_without_children_is_one_off(): void
+    {
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $npc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Public Surface Giver']);
+        $quest = $this->createQuest(['name' => 'Public Surface Parent Flagged One Off', 'npc_id' => $npc->id, 'is_parent' => true]);
+
+        $response = $this->call('GET', '/api/information/quests/tree', ['map_id' => $surface->id, 'kind' => 'one_off'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame($quest->id, $data[0]['id']);
+    }
+
+    public function test_public_top_level_parent_flagged_quest_without_children_is_not_chain(): void
+    {
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $npc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Public Surface Giver']);
+        $this->createQuest(['name' => 'Public Surface Parent Flagged One Off', 'npc_id' => $npc->id, 'is_parent' => true]);
+
+        $response = $this->call('GET', '/api/information/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(0, $data);
     }
 
     public function test_public_quest_browse_options_are_available_without_auth(): void

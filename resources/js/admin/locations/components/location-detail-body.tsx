@@ -146,7 +146,7 @@ const LocationDetailBody = ({
         handle_scroll={handleQuestItemsScroll}
         height_class="h-auto max-h-[500px]"
       >
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
           {questItems.data.map((item) => (
             <ReadOnlyItemCard
               key={item.item_id}
@@ -262,7 +262,7 @@ const LocationDetailBody = ({
               Quest Items Dropped Here ({location.quest_item_drop_count})
             </h2>
             {renderDropModeNotice()}
-            <div className="mt-3">{renderQuestItems()}</div>
+            <div className="mt-2">{renderQuestItems()}</div>
           </section>
         </Card>
       )}

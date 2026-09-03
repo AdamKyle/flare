@@ -1,4 +1,4 @@
-import { QUEST_TREE_STATE_BORDER_STYLES } from './quest-tree-node-styles';
+import { QUEST_TREE_STATE_BORDER_STYLES } from './quest-tree-state-styles';
 import { QuestTreeState } from '../enums/quest-tree-state';
 
 /**

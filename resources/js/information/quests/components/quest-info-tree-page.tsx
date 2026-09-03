@@ -15,6 +15,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import { PillTabsAlignment } from 'ui/tabs/enums/pill-tabs-alignment';
 import PillTabs from 'ui/tabs/pill-tabs';
+import TreeMobileMode from 'ui/tree/enums/tree-mobile-mode';
 
 const navigateToQuest = (id: number): void => {
   window.location.href = `/information/quests/${id}`;
@@ -22,9 +23,9 @@ const navigateToQuest = (id: number): void => {
 
 /**
  * Public, read-only, plane-first Quest browse page. Reuses the same shared
- * factual Quest browse presentation as Admin (Base / One Offs / Raid tabs,
- * Quest cards, desktop tree, mobile list) without any mutation controls,
- * and never imports Admin code.
+ * factual Quest browse presentation as Admin (Quest Tree / One Offs / Raid
+ * Quests tabs, rendered through the generic shared Tree) without any
+ * mutation controls, and never imports Admin code.
  */
 const QuestInfoTreePage = (): ReactNode => {
   const [gameMapId, setGameMapId] = useState<number | null>(null);
@@ -60,6 +61,10 @@ const QuestInfoTreePage = (): ReactNode => {
       value: gameMap.id,
     })) ?? [];
 
+  const selectedGameMapName =
+    options?.game_maps.find((gameMap) => gameMap.id === gameMapId)?.name ??
+    null;
+
   const renderContent = (): ReactNode => {
     if (optionsLoading) {
       return <InfiniteLoader />;
@@ -83,13 +88,15 @@ const QuestInfoTreePage = (): ReactNode => {
       loading: treeLoading,
       error,
       navigation: { on_open_quest: navigateToQuest },
+      tree_mobile_mode: TreeMobileMode.TREE,
+      selected_game_map_name: selectedGameMapName,
     });
 
     return (
       <PillTabs
         tabs={tabs}
         ariaLabel="Quest category"
-        alignment={PillTabsAlignment.START}
+        alignment={PillTabsAlignment.CENTER}
         onActiveIndexChange={(index) =>
           setActiveTab(QUEST_BROWSE_TABS_ORDER[index])
         }

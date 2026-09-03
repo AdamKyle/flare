@@ -95,7 +95,8 @@ class QuestsApiControllerTest extends TestCase
         $admin = $this->createAdmin($this->createAdminRole());
 
         $this->createQuest(['name' => 'A One Off']);
-        $this->createQuest(['name' => 'B Chain Root', 'is_parent' => true]);
+        $chainRoot = $this->createQuest(['name' => 'B Chain Root', 'is_parent' => true]);
+        $this->createQuest(['name' => 'B Chain Child', 'parent_quest_id' => $chainRoot->id]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
@@ -605,7 +606,70 @@ class QuestsApiControllerTest extends TestCase
         $this->assertSame('Child Elsewhere', $data[0]['children'][0]['name']);
     }
 
-    public function test_tree_map_filter_returns_full_chain_when_child_belongs_to_selected_map(): void
+    public function test_tree_chain_returns_single_canonical_root_for_selected_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $firstNpc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Alpha Giver']);
+        $secondNpc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Beta Giver']);
+
+        $firstRoot = $this->createQuest(['name' => 'Alpha Root', 'npc_id' => $firstNpc->id, 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Alpha Child', 'npc_id' => $firstNpc->id, 'parent_quest_id' => $firstRoot->id]);
+        $this->createQuest(['name' => 'Beta Root', 'npc_id' => $secondNpc->id, 'is_parent' => true]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame('Alpha Root', $data[0]['name']);
+        $this->assertSame($child->id, $data[0]['children'][0]['id']);
+    }
+
+    public function test_chain_tree_without_map_filter_returns_multiple_roots(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+
+        $alphaRoot = $this->createQuest(['name' => 'Alpha Chain Root', 'is_parent' => true]);
+        $this->createQuest(['name' => 'Alpha Chain Child', 'parent_quest_id' => $alphaRoot->id]);
+        $betaRoot = $this->createQuest(['name' => 'Beta Chain Root', 'is_parent' => true]);
+        $this->createQuest(['name' => 'Beta Chain Child', 'parent_quest_id' => $betaRoot->id]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(2, $data);
+        $this->assertSame('Alpha Chain Root', $data[0]['name']);
+        $this->assertSame('Beta Chain Root', $data[1]['name']);
+    }
+
+    public function test_top_level_parent_flagged_quest_without_children_is_one_off(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $npc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Surface Giver']);
+        $quest = $this->createQuest(['name' => 'Surface Parent Flagged One Off', 'npc_id' => $npc->id, 'is_parent' => true]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'one_off'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(1, $data);
+        $this->assertSame($quest->id, $data[0]['id']);
+    }
+
+    public function test_top_level_parent_flagged_quest_without_children_is_not_chain(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $surface = $this->createGameMap(['name' => 'Surface']);
+        $npc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Surface Giver']);
+        $this->createQuest(['name' => 'Surface Parent Flagged One Off', 'npc_id' => $npc->id, 'is_parent' => true]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['quests'];
+
+        $this->assertCount(0, $data);
+    }
+
+    public function test_tree_map_filter_excludes_chain_when_only_child_belongs_to_selected_map(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $surface = $this->createGameMap(['name' => 'Surface']);
@@ -614,17 +678,15 @@ class QuestsApiControllerTest extends TestCase
         $childNpc = $this->createNpc(['game_map_id' => $surface->id, 'real_name' => 'Child Giver']);
 
         $root = $this->createQuest(['name' => 'Root Elsewhere', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
-        $child = $this->createQuest(['name' => 'Child On Surface', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
+        $this->createQuest(['name' => 'Child On Surface', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true)['quests'];
 
-        $this->assertCount(1, $data);
-        $this->assertSame('Root Elsewhere', $data[0]['name']);
-        $this->assertSame($child->id, $data[0]['children'][0]['id']);
+        $this->assertCount(0, $data);
     }
 
-    public function test_tree_map_filter_returns_full_chain_when_grandchild_belongs_to_selected_map(): void
+    public function test_tree_map_filter_excludes_chain_when_only_grandchild_belongs_to_selected_map(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
         $surface = $this->createGameMap(['name' => 'Surface']);
@@ -635,15 +697,12 @@ class QuestsApiControllerTest extends TestCase
 
         $root = $this->createQuest(['name' => 'Root Elsewhere', 'npc_id' => $rootNpc->id, 'is_parent' => true]);
         $child = $this->createQuest(['name' => 'Child Elsewhere', 'npc_id' => $childNpc->id, 'parent_quest_id' => $root->id, 'is_parent' => true]);
-        $grandchild = $this->createQuest(['name' => 'Grandchild On Surface', 'npc_id' => $grandchildNpc->id, 'parent_quest_id' => $child->id]);
+        $this->createQuest(['name' => 'Grandchild On Surface', 'npc_id' => $grandchildNpc->id, 'parent_quest_id' => $child->id]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/tree', ['map_id' => $surface->id, 'kind' => 'chain'], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true)['quests'];
 
-        $this->assertCount(1, $data);
-        $this->assertSame($root->id, $data[0]['id']);
-        $this->assertSame($child->id, $data[0]['children'][0]['id']);
-        $this->assertSame($grandchild->id, $data[0]['children'][0]['children'][0]['id']);
+        $this->assertCount(0, $data);
     }
 
     public function test_tree_map_filter_excludes_chain_when_no_member_belongs_to_selected_map(): void

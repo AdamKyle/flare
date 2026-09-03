@@ -30,9 +30,18 @@ class QuestReadService
     /**
      * Build the factual, optionally Map- and Kind-filtered Quest tree.
      *
-     * The Map and Kind filters narrow which root Quests are visible; a visible root Quest's
-     * full descendant chain is always rendered underneath it regardless of each descendant's
-     * own resolved kind, since a chain's members belong to the same navigable story.
+     * The Map filter is root-owned: a root Quest belongs to the requested Map only through its
+     * own Quest-giver NPC's Map (Chain and One Off roots) or the Raid's own factual Map ownership
+     * (Raid roots), never through a descendant's own Quest-giver NPC placement. Once a root
+     * matches, its full descendant chain is always rendered underneath it regardless of each
+     * descendant's own resolved kind or own Quest-giver NPC Map, since a chain's members belong
+     * to the same navigable story. The normal selected-Plane Chain browse (explicit
+     * `kind = QuestKind::CHAIN` together with a selected `$gameMapId`) intentionally has one
+     * canonical root: when more than one Chain root matches, only the first in the existing
+     * deterministic name/id order is returned. A generic Chain read with no selected Map
+     * (`$gameMapId` is `null`) preserves the previous behavior and may still return multiple
+     * roots. One Off, Raid, and the nullable-kind generic tree are unaffected and continue to
+     * return every matching root.
      *
      * @param  int|null  $gameMapId  Game Map id to filter root Quests by, when given.
      * @param  QuestKind|null  $kind  Quest kind to filter root Quests by, when given.
@@ -50,9 +59,11 @@ class QuestReadService
 
         $roots = $quests->filter(fn (Quest $quest) => $this->isRoot($quest, $quests))
             ->filter(fn (Quest $quest) => is_null($kind) || $kindByQuestId->get($quest->id) === $kind)
-            ->filter(fn (Quest $quest) => $this->rootMatchesGameMapFilter($quest, $gameMapId, $kind, $quests, $childIdsByParent, $raidIdsOnMap));
+            ->filter(fn (Quest $quest) => $this->rootMatchesGameMapFilter($quest, $gameMapId, $kind, $raidIdsOnMap));
 
-        return $this->sortQuests($roots)
+        $visibleRoots = $this->limitToCanonicalChainRoot($this->sortQuests($roots), $kind, $gameMapId);
+
+        return $visibleRoots
             ->map(fn (Quest $quest) => $this->buildNode($quest, $quests, $childIdsByParent, $kindByQuestId, []))
             ->values()
             ->all();
@@ -191,19 +202,15 @@ class QuestReadService
     }
 
     /**
-     * Determine whether a candidate root Quest belongs to the requested Game Map, using
-     * Map-membership semantics that depend on the requested Quest kind.
-     *
-     * Chain roots (and the nullable-kind generic tree) match when any Quest in the subtree has
-     * a Quest-giver NPC on the target Map. One Off roots match only through their own
-     * Quest-giver NPC. Raid roots match through the Raid's own factual Map ownership, resolved
-     * by `RaidMapConflictService`, regardless of any Quest-giver NPC placement.
+     * Determine whether a candidate root Quest belongs to the requested Game Map. Map ownership
+     * is root-owned: a Chain or One Off root (and the nullable-kind generic tree) matches only
+     * through its own Quest-giver NPC's Map, never through a descendant's own Quest-giver NPC
+     * placement. A Raid root matches through the Raid's own factual Map ownership, resolved by
+     * `RaidMapConflictService`, regardless of any Quest-giver NPC placement.
      *
      * @param  Quest  $quest  Candidate root Quest.
      * @param  int|null  $gameMapId  Game Map id to filter root Quests by, when given.
      * @param  QuestKind|null  $kind  Quest kind to filter root Quests by, when given.
-     * @param  Collection<int, Quest>  $quests  Every loaded Quest, keyed by id.
-     * @param  Collection<int, array<int, int>>  $childIdsByParent  Child Quest ids grouped by `parent_quest_id`.
      * @param  array<int, int>  $raidIdsOnMap  Raid ids that occupy the requested Game Map.
      * @return bool Whether the root Quest belongs to the requested Game Map.
      */
@@ -211,23 +218,17 @@ class QuestReadService
         Quest $quest,
         ?int $gameMapId,
         ?QuestKind $kind,
-        Collection $quests,
-        Collection $childIdsByParent,
         array $raidIdsOnMap,
     ): bool {
         if (is_null($gameMapId)) {
             return true;
         }
 
-        if ($kind === QuestKind::ONE_OFF) {
-            return $this->questBelongsToGameMap($quest, $gameMapId);
-        }
-
         if ($kind === QuestKind::RAID) {
             return ! is_null($quest->raid_id) && in_array($quest->raid_id, $raidIdsOnMap, true);
         }
 
-        return $this->subtreeContainsGameMap($quest, $quests, $childIdsByParent, $gameMapId, []);
+        return $this->questBelongsToGameMap($quest, $gameMapId);
     }
 
     /**
@@ -247,43 +248,6 @@ class QuestReadService
         }
 
         return $quest->npc->gameMap->id === $gameMapId;
-    }
-
-    /**
-     * Determine whether the given Quest or any Quest in its descendant subtree belongs to the
-     * target Game Map, using only the already-loaded Quest/NPC/GameMap data.
-     *
-     * Guards against malformed parent/child cycles in legacy data by tracking visited ids and
-     * stops recursing as soon as a match is found.
-     *
-     * @param  Quest  $quest  Quest to check, along with its descendants.
-     * @param  Collection<int, Quest>  $quests  Every loaded Quest, keyed by id.
-     * @param  Collection<int, array<int, int>>  $childIdsByParent  Child Quest ids grouped by `parent_quest_id`.
-     * @param  int  $gameMapId  Target Game Map id.
-     * @param  array<int, int>  $visitedIds  Quest ids already visited on this recursion path.
-     * @return bool Whether the Quest subtree contains a member belonging to the target Game Map.
-     */
-    private function subtreeContainsGameMap(Quest $quest, Collection $quests, Collection $childIdsByParent, int $gameMapId, array $visitedIds): bool
-    {
-        if (in_array($quest->id, $visitedIds, true)) {
-            return false;
-        }
-
-        if ($this->questBelongsToGameMap($quest, $gameMapId)) {
-            return true;
-        }
-
-        $visitedIds[] = $quest->id;
-
-        foreach ($childIdsByParent->get($quest->id, []) as $childId) {
-            $child = $quests->get($childId);
-
-            if (! is_null($child) && $this->subtreeContainsGameMap($child, $quests, $childIdsByParent, $gameMapId, $visitedIds)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -322,5 +286,26 @@ class QuestReadService
     private function sortQuests(Collection $quests): Collection
     {
         return $quests->sort(fn (Quest $a, Quest $b) => [$a->name, $a->id] <=> [$b->name, $b->id]);
+    }
+
+    /**
+     * Limit the normal selected-Plane Chain browse to its one canonical root, using the existing
+     * deterministic name/id ordering. The single-root rule is a selected-Map browsing rule: it
+     * applies only when a Game Map is actually selected, so a generic Chain read with no selected
+     * Map preserves its previous behavior and may still return multiple matching roots. Every
+     * other Quest kind returns every matching root unchanged regardless of the selected Map.
+     *
+     * @param  Collection<int, Quest>  $sortedRoots  Deterministically sorted, already-filtered root Quests.
+     * @param  QuestKind|null  $kind  Quest kind requested for this Quest tree read.
+     * @param  int|null  $gameMapId  Game Map id to filter root Quests by, when given.
+     * @return Collection<int, Quest> Root Quests to render, limited to one for a selected-Map Chain browse.
+     */
+    private function limitToCanonicalChainRoot(Collection $sortedRoots, ?QuestKind $kind, ?int $gameMapId): Collection
+    {
+        if ($kind !== QuestKind::CHAIN || is_null($gameMapId)) {
+            return $sortedRoots;
+        }
+
+        return $sortedRoots->take(1);
     }
 }

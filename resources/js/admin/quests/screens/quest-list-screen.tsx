@@ -22,6 +22,7 @@ import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 import { PillTabsAlignment } from 'ui/tabs/enums/pill-tabs-alignment';
 import PillTabs from 'ui/tabs/pill-tabs';
+import TreeMobileMode from 'ui/tree/enums/tree-mobile-mode';
 
 const QuestListScreen = (): ReactNode => {
   const navigation = useQuestScreenNavigation();
@@ -62,6 +63,10 @@ const QuestListScreen = (): ReactNode => {
       label: gameMap.name,
       value: gameMap.id,
     })) ?? [];
+
+  const selectedGameMapName =
+    options?.game_maps.find((gameMap) => gameMap.id === gameMapId)?.name ??
+    null;
 
   const handleCreate = (): void => {
     navigation.navigateTo(QuestScreens.FORM, {
@@ -119,13 +124,15 @@ const QuestListScreen = (): ReactNode => {
       loading: treeLoading,
       error,
       navigation: { on_open_quest: handleOpenQuest },
+      tree_mobile_mode: TreeMobileMode.TREE,
+      selected_game_map_name: selectedGameMapName,
     });
 
     return (
       <PillTabs
         tabs={tabs}
         ariaLabel="Quest category"
-        alignment={PillTabsAlignment.START}
+        alignment={PillTabsAlignment.CENTER}
         onActiveIndexChange={(index) =>
           setActiveTab(QUEST_BROWSE_TABS_ORDER[index])
         }

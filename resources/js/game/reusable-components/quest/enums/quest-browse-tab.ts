@@ -7,9 +7,9 @@ export enum QuestBrowseTab {
 }
 
 export const QUEST_BROWSE_TAB_LABELS: Record<QuestBrowseTab, string> = {
-  [QuestBrowseTab.BASE]: 'Base',
+  [QuestBrowseTab.BASE]: 'Quest Tree',
   [QuestBrowseTab.ONE_OFFS]: 'One Offs',
-  [QuestBrowseTab.RAID]: 'Raid',
+  [QuestBrowseTab.RAID]: 'Raid Quests',
 };
 
 /**
@@ -32,10 +32,11 @@ export const QUEST_BROWSE_TABS_ORDER: QuestBrowseTab[] = [
 /**
  * Category-aware empty-state copy for the Quest browser, avoiding a
  * generic "no results" message now that Kind filtering is a fixed tab
- * rather than a user-controlled dropdown.
+ * rather than a user-controlled dropdown. The first tab is the normal
+ * parent/child story Quest hierarchy, not a Raid tree.
  */
 export const QUEST_BROWSE_TAB_EMPTY_LABELS: Record<QuestBrowseTab, string> = {
-  [QuestBrowseTab.BASE]: 'No Base Quests are available for this plane.',
+  [QuestBrowseTab.BASE]: 'No Quests are available for this plane.',
   [QuestBrowseTab.ONE_OFFS]: 'No One Off Quests are available for this plane.',
   [QuestBrowseTab.RAID]: 'No Raid Quests are available for this plane.',
 };
