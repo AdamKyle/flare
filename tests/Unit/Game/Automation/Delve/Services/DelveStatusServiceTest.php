@@ -125,7 +125,7 @@ class DelveStatusServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
         $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,
@@ -151,7 +151,7 @@ class DelveStatusServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
         $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,
@@ -177,7 +177,7 @@ class DelveStatusServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
         $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,
@@ -221,7 +221,7 @@ class DelveStatusServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
         $location = $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,
@@ -322,7 +322,7 @@ class DelveStatusServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
         $location = $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,
@@ -365,7 +365,7 @@ class DelveStatusServiceTest extends TestCase
         $monster = $this->createMonster(['game_map_id' => $character->map->game_map_id]);
 
         $location = $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,

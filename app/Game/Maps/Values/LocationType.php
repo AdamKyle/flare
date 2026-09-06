@@ -15,8 +15,8 @@ enum LocationType: int
     case LORDS_STRONG_HOLD = 8;
     case BROKEN_ANVIL = 9;
     case TWISTED_MAIDENS_DUNGEONS = 10;
-    case CAVE_OF_MEMORIES = 11;
-    case THE_CELLAR = 12;
+    case CAVE_OF_SHADOWS = 11;
+    case CAVE_OF_MEMORIES = 12;
     case SPECIAL = 13;
 
     public function label(): string
@@ -33,8 +33,8 @@ enum LocationType: int
             self::LORDS_STRONG_HOLD => 'Lords Strong Hold',
             self::BROKEN_ANVIL => 'Hells Broken Anvil',
             self::TWISTED_MAIDENS_DUNGEONS => 'Twisted Maidens Dungeons',
+            self::CAVE_OF_SHADOWS => 'Cave of Shadows',
             self::CAVE_OF_MEMORIES => 'Cave of Memories',
-            self::THE_CELLAR => 'The Cellar',
             self::SPECIAL => 'Special',
         };
     }
@@ -58,6 +58,30 @@ enum LocationType: int
         );
     }
 
+    /**
+     * The authoritative set of Location Types that make up the Weekly Fight category.
+     * Cave of Memories is intentionally excluded.
+     *
+     * @return array<int, int>
+     */
+    public static function weeklyFightLocationTypes(): array
+    {
+        return [
+            self::ALCHEMY_CHURCH->value,
+            self::LORDS_STRONG_HOLD->value,
+            self::BROKEN_ANVIL->value,
+            self::TWISTED_MAIDENS_DUNGEONS->value,
+        ];
+    }
+
+    /**
+     * Determine whether this Location Type belongs to the authoritative Weekly Fight set.
+     */
+    public function isWeeklyFightLocationType(): bool
+    {
+        return in_array($this->value, self::weeklyFightLocationTypes(), true);
+    }
+
     public static function manualQuestDropValues(): array
     {
         return [
@@ -72,7 +96,6 @@ enum LocationType: int
             self::LORDS_STRONG_HOLD->value,
             self::BROKEN_ANVIL->value,
             self::TWISTED_MAIDENS_DUNGEONS->value,
-            self::THE_CELLAR->value,
             self::SPECIAL->value,
         ];
     }
@@ -117,11 +140,6 @@ enum LocationType: int
         return $this === self::TWISTED_GATE;
     }
 
-    public function isTheCellar(): bool
-    {
-        return $this === self::THE_CELLAR;
-    }
-
     public function isAlchemyChurch(): bool
     {
         return $this === self::ALCHEMY_CHURCH;
@@ -140,6 +158,11 @@ enum LocationType: int
     public function isTwistedMaidensDungeons(): bool
     {
         return $this === self::TWISTED_MAIDENS_DUNGEONS;
+    }
+
+    public function isCaveOfShadows(): bool
+    {
+        return $this === self::CAVE_OF_SHADOWS;
     }
 
     public function isCaveOfMemories(): bool

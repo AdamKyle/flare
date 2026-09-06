@@ -51,7 +51,7 @@ class DelveExplorationAutomationServiceTest extends TestCase
         $character = $this->character->getCharacter();
 
         $location = $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'minutes_between_delve_fights' => 3,
         ]);
@@ -61,7 +61,7 @@ class DelveExplorationAutomationServiceTest extends TestCase
             'is_celestial_entity' => false,
             'is_raid_monster' => false,
             'is_raid_boss' => false,
-            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+            'only_for_location_type' => LocationType::CAVE_OF_SHADOWS->value,
         ]);
 
         $this->delveExplorationAutomationService->beginAutomation($character, $location, [

@@ -10,6 +10,7 @@ use App\Game\Core\Services\CharactersOnline;
 use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Core\Services\DropCheckService;
 use App\Game\Core\Services\GoldRush;
+use App\Game\Gems\Services\AreaGemEffectService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 use League\Fractal\Manager;
 
@@ -37,7 +38,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(DropCheckService::class, function ($app) {
             return new DropCheckService(
                 $app->make(BattleDrop::class),
-                $app->make(BuildMythicItem::class)
+                $app->make(BuildMythicItem::class),
+                $app->make(AreaGemEffectService::class),
             );
         });
 

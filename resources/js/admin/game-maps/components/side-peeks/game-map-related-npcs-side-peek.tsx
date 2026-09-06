@@ -4,6 +4,7 @@ import React, { ReactNode, useState } from 'react';
 import GameMapRelatedNpcsSidePeekProps from './types/game-map-related-npcs-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import NpcCard from '../../../../game/reusable-components/npc/components/npc-card';
 import { isNpcType, NPC_TYPE_LABELS } from '../../../npcs/enums/npc-type';
 import GameMapRelatedNpcDefinition from '../../api/definitions/game-map-related-npc-definition';
 import { useGameMapRelatedNpcs } from '../../api/hooks/use-game-map-related-npcs';
@@ -48,20 +49,15 @@ const GameMapRelatedNpcsSidePeek = ({
     isNpcType(npc.type) ? NPC_TYPE_LABELS[npc.type] : String(npc.type);
 
   const renderRow = (npc: GameMapRelatedNpcDefinition): ReactNode => (
-    <button
+    <NpcCard
       key={npc.id}
-      type="button"
-      onClick={() => handleOpenNpc(npc.id)}
-      aria-label={`Open NPC details for ${npc.name}`}
-      className="border-glacier-200 dark:border-glacier-800 bg-glacier-50 dark:bg-glacier-900/40 hover:bg-glacier-100 dark:hover:bg-glacier-900 focus-visible:ring-danube-400 w-full rounded-lg border p-3 text-left shadow-sm focus:outline-none focus-visible:ring-2"
-    >
-      <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-        {npc.name}
-      </p>
-      <p className="text-glacier-600 dark:text-glacier-400 text-xs">
-        {renderNpcType(npc)} · X {npc.x_position}, Y {npc.y_position}
-      </p>
-    </button>
+      npc_id={npc.id}
+      name={npc.name}
+      type_label={renderNpcType(npc)}
+      x={npc.x_position}
+      y={npc.y_position}
+      on_open_npc={handleOpenNpc}
+    />
   );
 
   const renderSelectedNpc = (): ReactNode => {

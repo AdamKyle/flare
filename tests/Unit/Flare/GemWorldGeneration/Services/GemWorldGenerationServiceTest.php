@@ -318,7 +318,7 @@ class GemWorldGenerationServiceTest extends TestCase
         $delveLocation = Location::where('x', 2)->where('y', 2)->first();
 
         $this->assertSame(LocationType::SPECIAL->value, $specialLocation->type);
-        $this->assertSame(LocationType::CAVE_OF_MEMORIES->value, $delveLocation->type);
+        $this->assertSame(LocationType::CAVE_OF_SHADOWS->value, $delveLocation->type);
         $this->assertSame(5, $delveLocation->minutes_between_delve_fights);
     }
 

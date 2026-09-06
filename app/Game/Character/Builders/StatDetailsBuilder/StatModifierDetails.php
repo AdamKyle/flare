@@ -3,12 +3,14 @@
 namespace App\Game\Character\Builders\StatDetailsBuilder;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Builders\StatDetailsBuilder\Concerns\BasicItemDetails;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Services\AreaGemEffectService;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
 
@@ -20,7 +22,10 @@ class StatModifierDetails
 
     private ?Character $character = null;
 
-    public function __construct(private readonly CharacterStatBuilder $characterStatBuilder) {}
+    public function __construct(
+        private readonly CharacterStatBuilder $characterStatBuilder,
+        private readonly AreaGemEffectService $areaGemEffectService,
+    ) {}
 
     /**
      * Set the character.
@@ -241,38 +246,51 @@ class StatModifierDetails
     }
 
     /**
-     * Get map reductions that effect said stat.
+     * Get the combined legacy Map reduction and resolved Gem power reduction that effect the character, when any exists.
+     *
+     * @return array<string, mixed>|null
      */
     private function getMapCharacterReductionsDetails(): ?array
     {
         $map = $this->character->map->gameMap;
 
+        $legacyReduction = $this->resolveLegacyMapReduction($map);
+        $gemReduction = $this->areaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
+
+        $totalReduction = $legacyReduction + $gemReduction;
+
+        if ($totalReduction <= 0.0) {
+            return null;
+        }
+
+        return [
+            'map_name' => $map->name,
+            'reduction_amount' => $totalReduction,
+        ];
+    }
+
+    /**
+     * Resolve the legacy, non-Gem Map Character power reduction, when applicable.
+     */
+    private function resolveLegacyMapReduction(GameMap $map): float
+    {
         if (
             $map->mapType()->isHell() ||
             $map->mapType()->isPurgatory() ||
             $map->mapType()->isTwistedMemories()
         ) {
-            return [
-                'map_name' => $map->name,
-                'reduction_amount' => $map->character_attack_reduction,
-            ];
+            return $map->character_attack_reduction ?? 0.0;
         }
 
         $purgatoryQuestItem = $this->character->inventory->slots->filter(function ($slot) {
             return $slot->item->effect === ItemEffectType::PURGATORY->value;
         })->first();
 
-        if (! is_null($purgatoryQuestItem)) {
-
-            if ($map->mapType()->isTheIcePlane() || $map->mapType()->isDelusionalMemories()) {
-                return [
-                    'map_name' => $map->name,
-                    'reduction_amount' => $map->character_attack_reduction,
-                ];
-            }
+        if (! is_null($purgatoryQuestItem) && ($map->mapType()->isTheIcePlane() || $map->mapType()->isDelusionalMemories())) {
+            return $map->character_attack_reduction ?? 0.0;
         }
 
-        return null;
+        return 0.0;
     }
 
     /**

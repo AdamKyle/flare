@@ -1,0 +1,37 @@
+export default interface MapGemFormDefinition {
+  id: number;
+  game_map_id: number;
+  name: string;
+  description: string | null;
+  character_xp_bonus_range: string | null;
+  character_class_rank_xp_bonus_range: string | null;
+  kingdom_passive_training_reduction_range: string | null;
+  character_class_specialty_xp_gain_range: string | null;
+  crafting_skill_ids: number[];
+  crafting_skill_bonus_range: string | null;
+  gold_gain_range: string | null;
+  gold_dust_gain_range: string | null;
+  shards_gain_range: string | null;
+  copper_coin_gain_range: string | null;
+  item_drop_chance_increase_range: string | null;
+  unique_item_drop_chance_increase_range: string | null;
+  mythic_item_drop_chance_increase_range: string | null;
+  cosmic_item_drop_chance_increase_range: string | null;
+  character_power_reduction_range: string | null;
+  enemy_strength_increase_range: string | null;
+  enemy_healing_increase_range: string | null;
+  enemy_spell_evasion_range: string | null;
+  enemy_affix_resistance_range: string | null;
+  enemy_entrancing_chance_range: string | null;
+  enemy_devouring_light_chance_range: string | null;
+  enemy_devouring_darkness_chance_range: string | null;
+  enemy_ambush_chance_range: string | null;
+  enemy_ambush_resistance_range: string | null;
+  enemy_counter_chance_range: string | null;
+  enemy_counter_resistance_range: string | null;
+  enemy_quest_item_drop_chance_increase_range: string | null;
+  monster_xp_increase_range: string | null;
+  monster_gold_drop_increase_range: string | null;
+  monster_atonement: number | null;
+  monster_atonement_range: string | null;
+}

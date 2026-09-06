@@ -3,6 +3,7 @@ import React, { ReactNode, useState } from 'react';
 import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import AdminAnchorButton from '../../shared/components/admin-anchor-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import GameMapDefinition from '../api/definitions/game-map-definition';
@@ -70,12 +71,11 @@ const GameMapListScreen = (): ReactNode => {
       width={AdminPageWidth.Standard}
       header_actions={
         <>
-          <a
+          <AdminAnchorButton
             href="/admin"
-            className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-          >
-            Back
-          </a>
+            label="Back"
+            variant={ButtonVariant.DANGER}
+          />
           <Button
             label="Create"
             variant={ButtonVariant.PRIMARY}
@@ -93,12 +93,11 @@ const GameMapListScreen = (): ReactNode => {
           variant={ButtonVariant.PRIMARY}
           on_click={handleImport}
         />
-        <a
+        <AdminAnchorButton
           href="/admin/game-maps/export"
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-        >
-          Export
-        </a>
+          label="Export"
+          variant={ButtonVariant.PRIMARY}
+        />
       </div>
       <DataTable<GameMapDefinition>
         id_prefix="game-maps"

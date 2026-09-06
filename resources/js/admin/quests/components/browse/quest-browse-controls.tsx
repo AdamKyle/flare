@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 
 import QuestBrowseControlsProps from './types/quest-browse-controls-props';
+import AdminAnchorButton from '../../../shared/components/admin-anchor-button';
 import { parseNumberOption } from '../../utils/parse-quest-dropdown-value';
 
 import Button from 'ui/buttons/button';
@@ -41,12 +42,11 @@ const QuestBrowseControls = ({
         on_click={onImportClick}
         disabled={importing}
       />
-      <a
+      <AdminAnchorButton
         href="/admin/quests/export"
-        className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-      >
-        Export
-      </a>
+        label="Export"
+        variant={ButtonVariant.PRIMARY}
+      />
     </div>
   </div>
 );

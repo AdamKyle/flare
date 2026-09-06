@@ -13,13 +13,6 @@ class WeeklyBattleService
 {
     private LocationSpecialtyHandler $locationSpecialtyHandler;
 
-    private array $validLocationTypes = [
-        LocationType::ALCHEMY_CHURCH->value,
-        LocationType::LORDS_STRONG_HOLD->value,
-        LocationType::BROKEN_ANVIL->value,
-        LocationType::TWISTED_MAIDENS_DUNGEONS->value,
-    ];
-
     public function __construct(LocationSpecialtyHandler $locationSpecialtyHandler)
     {
         $this->locationSpecialtyHandler = $locationSpecialtyHandler;
@@ -30,7 +23,7 @@ class WeeklyBattleService
      */
     public function handleCharacterDeath(Character $character, Monster $monster): void
     {
-        if (! in_array($monster->only_for_location_type, $this->validLocationTypes)) {
+        if (! in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes())) {
             return;
         }
 
@@ -58,7 +51,7 @@ class WeeklyBattleService
      */
     public function handleMonsterDeath(Character $character, Monster $monster): Character
     {
-        if (! in_array($monster->only_for_location_type, $this->validLocationTypes)) {
+        if (! in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes())) {
             return $character;
         }
 
@@ -81,7 +74,7 @@ class WeeklyBattleService
 
     public function claimMonsterDeath(Character $character, Monster $monster): void
     {
-        if (! in_array($monster->only_for_location_type, $this->validLocationTypes)) {
+        if (! in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes())) {
             return;
         }
 
@@ -110,7 +103,7 @@ class WeeklyBattleService
 
     public function isWeeklyMonster(Monster $monster): bool
     {
-        return in_array($monster->only_for_location_type, $this->validLocationTypes, true);
+        return in_array($monster->only_for_location_type, LocationType::weeklyFightLocationTypes(), true);
     }
 
     /**
@@ -123,7 +116,7 @@ class WeeklyBattleService
 
         $locationType = LocationType::from($monster->only_for_location_type);
 
-        if ($locationType->isAlchemyChurch() || $locationType->isCaveOfMemories()) {
+        if ($locationType->isAlchemyChurch()) {
             $this->locationSpecialtyHandler->handleMonsterFromSpecialLocation($character, $weeklyMonsterFight);
         }
 

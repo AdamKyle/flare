@@ -7,5 +7,4 @@ export enum GameMapImportCopy {
   Importing = 'Importing Game Maps…',
   SuccessAnnouncement = 'Game Maps imported successfully. The table has been refreshed.',
   MissingFile = 'Select a Game Maps workbook before importing.',
-  SelectedFile = 'Selected file:',
 }

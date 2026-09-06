@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Flare\GameImporter;
 
-use App\Admin\Import\LocationGems\LocationGemsImport;
 use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
-use App\Admin\Import\MapGems\MapGemsImport;
+use App\Admin\LocationGems\Imports\LocationGemsImport;
+use App\Admin\MapGems\Imports\MapGemsImport;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;

@@ -12,6 +12,7 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Monsters\Services\MonsterListService;
 
 class SetSailService extends BaseMovementService
 {
@@ -26,6 +27,7 @@ class SetSailService extends BaseMovementService
         MovementService $movementService,
         PortService $portService,
         TraverseService $traverseService,
+        MonsterListService $monsterListService,
         ChanceCalculator $chanceCalculator,
     ) {
         parent::__construct(
@@ -34,6 +36,7 @@ class SetSailService extends BaseMovementService
             $conjureService,
             $movementService,
             $traverseService,
+            $monsterListService,
             $chanceCalculator,
         );
 

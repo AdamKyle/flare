@@ -16,6 +16,8 @@ use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
 use Exception;
@@ -24,7 +26,31 @@ class ClassRankService
 {
     use FetchEquipped, ResponseBuilder;
 
-    public function __construct(private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes, private BattleMessageHandler $battleMessageHandler) {}
+    public function __construct(
+        private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private BattleMessageHandler $battleMessageHandler,
+        private readonly AreaGemEffectService $areaGemEffectService,
+    ) {}
+
+    /**
+     * Resolve the Gem-adjusted Class Rank XP awarded per kill for the character.
+     */
+    private function resolveClassRankXpPerKill(Character $character): int
+    {
+        $bonus = $this->areaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_RANK_XP_BONUS);
+
+        return round(ClassRankValue::XP_PER_KILL * (1 + $bonus));
+    }
+
+    /**
+     * Resolve the Gem-adjusted Class Specialty XP awarded per kill for the character.
+     */
+    private function resolveClassSpecialtyXpPerKill(Character $character): int
+    {
+        $bonus = $this->areaGemEffectService->resolveForCharacter($character)->rewardEffect(AreaGemRewardEffect::CHARACTER_CLASS_SPECIALTY_XP_GAIN);
+
+        return round(ClassSpecialValue::XP_PER_KILL * (1 + $bonus));
+    }
 
     /**
      * Get the class specials for the character.
@@ -241,6 +267,8 @@ class ClassRankService
             return;
         }
 
+        $xpPerKill = $this->resolveClassRankXpPerKill($character);
+
         if ($killCount === 1) {
             $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
 
@@ -254,12 +282,12 @@ class ClassRankService
             }
 
             $classRank->update([
-                'current_xp' => $classRank->current_xp + ClassRankValue::XP_PER_KILL,
+                'current_xp' => $classRank->current_xp + $xpPerKill,
             ]);
 
             $classRank = $classRank->refresh();
 
-            $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_RANKS, $character->class->name, ClassRankValue::XP_PER_KILL, $classRank->current_xp);
+            $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_CLASS_RANKS, $character->class->name, $xpPerKill, $classRank->current_xp);
 
             if ($classRank->current_xp >= $classRank->required_xp) {
                 $classRank->update([
@@ -288,15 +316,15 @@ class ClassRankService
             return;
         }
 
-        $startingLevel = (int) $classRank->level;
+        $startingLevel = $classRank->level;
 
         [$newLevel, $newCurrentXp, $levelsGained] = $this->applyKillCountToProgression(
-            (int) $classRank->level,
-            (int) $classRank->current_xp,
-            (int) $classRank->required_xp,
-            (int) ClassRankValue::XP_PER_KILL,
+            $classRank->level,
+            $classRank->current_xp,
+            $classRank->required_xp,
+            $xpPerKill,
             $killCount,
-            (int) ClassRankValue::MAX_LEVEL
+            ClassRankValue::MAX_LEVEL
         );
 
         $classRank->update([
@@ -310,7 +338,7 @@ class ClassRankService
             $character->user,
             ClassRanksMessageTypes::XP_FOR_CLASS_RANKS,
             $character->class->name,
-            (int) ClassRankValue::XP_PER_KILL * $killCount,
+            $xpPerKill * $killCount,
             $classRank->current_xp
         );
 
@@ -338,6 +366,8 @@ class ClassRankService
             return;
         }
 
+        $xpPerKill = $this->resolveClassSpecialtyXpPerKill($character);
+
         if ($killCount === 1) {
             $equippedSpecials = $character->classSpecialsEquipped()->where('equipped', true)->get();
 
@@ -352,12 +382,12 @@ class ClassRankService
                 }
 
                 $special->update([
-                    'current_xp' => $special->current_xp + ClassSpecialValue::XP_PER_KILL,
+                    'current_xp' => $special->current_xp + $xpPerKill,
                 ]);
 
                 $special = $special->refresh();
 
-                $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS, $character->class->name, ClassSpecialValue::XP_PER_KILL, $special->current_xp, null, $special->gameClassSpecial->name);
+                $this->battleMessageHandler->handleClassRankMessage($character->user, ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS, $character->class->name, $xpPerKill, $special->current_xp, null, $special->gameClassSpecial->name);
 
                 if ($special->current_xp >= $special->required_xp) {
                     $special->update([
@@ -390,13 +420,13 @@ class ClassRankService
                 continue;
             }
 
-            $startingLevel = (int) $special->level;
+            $startingLevel = $special->level;
 
             [$newLevel, $newCurrentXp, $levelsGained] = $this->applyKillCountToProgression(
-                (int) $special->level,
-                (int) $special->current_xp,
-                (int) $special->required_xp,
-                ClassSpecialValue::XP_PER_KILL,
+                $special->level,
+                $special->current_xp,
+                $special->required_xp,
+                $xpPerKill,
                 $killCount,
                 ClassSpecialValue::MAX_LEVEL
             );
@@ -412,7 +442,7 @@ class ClassRankService
                 $character->user,
                 ClassRanksMessageTypes::XP_FOR_EQUIPPED_CLASS_SPECIALS,
                 $character->class->name,
-                ClassSpecialValue::XP_PER_KILL * $killCount,
+                $xpPerKill * $killCount,
                 $special->current_xp,
                 null,
                 $special->gameClassSpecial->name
@@ -545,12 +575,12 @@ class ClassRankService
                     continue;
                 }
 
-                $startingLevel = (int) $weaponMastery->level;
+                $startingLevel = $weaponMastery->level;
 
                 [$newLevel, $newCurrentXp, $levelsGained] = $this->applyKillCountToProgression(
-                    (int) $weaponMastery->level,
-                    (int) $weaponMastery->current_xp,
-                    (int) $weaponMastery->required_xp,
+                    $weaponMastery->level,
+                    $weaponMastery->current_xp,
+                    $weaponMastery->required_xp,
                     WeaponMasteryValue::XP_PER_KILL,
                     $killCount,
                     WeaponMasteryValue::MAX_LEVEL

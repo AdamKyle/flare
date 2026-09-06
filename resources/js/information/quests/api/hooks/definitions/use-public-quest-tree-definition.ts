@@ -6,4 +6,5 @@ export default interface UsePublicQuestTreeDefinition {
   quests: QuestTreeNodeDefinition[];
   loading: boolean;
   error: AxiosErrorDefinition | null;
+  query_key: string | null;
 }

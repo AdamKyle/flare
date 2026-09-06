@@ -9,12 +9,19 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LocationGemsTableDefinition
 {
+    /**
+     * Build the base query for the Location Gems Information table.
+     *
+     * @return Builder Location Gem table query, with its Location and Map relations eager loaded.
+     */
     public static function builder(): Builder
     {
         return GameLocationGemParamter::query()->with('location.map');
     }
 
     /**
+     * Build the Location Gems Information table columns, including the Admin `Manage` action.
+     *
      * @return TableColumn[]
      */
     public static function columns(): array
@@ -27,10 +34,8 @@ class LocationGemsTableDefinition
                 field: 'name',
                 searchable: true,
                 html: true,
-                render: function ($row) use ($isAdmin) {
-                    $route = $isAdmin
-                        ? route('admin.location-gems.show', ['gameLocationGemParamter' => $row->getRouteKey()])
-                        : route('info.page.location-gems.show', ['gameLocationGemParamter' => $row->getRouteKey()]);
+                render: function ($row) {
+                    $route = route('info.page.location-gems.show', ['gameLocationGemParamter' => $row->getRouteKey()]);
 
                     return '<a href="'.$route.'">'.e($row->name).'</a>';
                 },
@@ -84,7 +89,7 @@ class LocationGemsTableDefinition
             $columns[] = new TableColumn(
                 label: 'Actions',
                 html: true,
-                render: fn ($row) => '<a href="'.route('admin.location-gems.edit', ['gameLocationGemParamter' => $row->getRouteKey()]).'">Edit</a>',
+                render: fn ($row) => '<a href="'.route('admin.location-gems.index').'">Manage</a>',
             );
         }
 

@@ -17,11 +17,21 @@ class CharacterReincarnationService
 {
     use CharacterMaxLevel, ResponseBuilder;
 
+    /**
+     * @param  UpdateCharacterAttackTypesHandler  $updateCharacterAttackTypes  Character attack-type cache updater.
+     * @param  BaseStatCalculator  $baseStatValue  Class-based Character base stat calculator.
+     */
     public function __construct(
         private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         private readonly BaseStatCalculator $baseStatValue
     ) {}
 
+    /**
+     * Reincarnate the Character when every reincarnation eligibility requirement is met.
+     *
+     * @param  Character  $character  Character being reincarnated.
+     * @return array ResponseBuilder result payload: the reincarnation outcome on success, or the blocking eligibility reason on failure.
+     */
     public function reincarnate(Character $character): array
     {
 
@@ -63,13 +73,20 @@ class CharacterReincarnationService
         return $this->doReincarnation($character, $baseStatsToReincarnate);
     }
 
+    /**
+     * Apply the reincarnation stat increase and reset the Character's level/XP progress.
+     *
+     * @param  Character  $character  Character being reincarnated.
+     * @param  array|null  $baseStats  Optional precomputed base stats to reincarnate; when omitted, every base stat below the max is reincarnated.
+     * @return array ResponseBuilder result payload: the reincarnation success message, or the blocking reason when every stat is already maxed.
+     */
     public function doReincarnation(Character $character, ?array $baseStats = null): array
     {
         $skipMaxedStats = is_null($baseStats);
         $baseStats = $baseStats ?? ['str', 'dur', 'dex', 'chr', 'int', 'agi', 'focus'];
         $updatedStats = [];
         $lastReincarnatedStatBonus = 0;
-        $baseStat = $this->baseStatValue->setRace($character->race)->setClass($character->class);
+        $baseStat = $this->baseStatValue->setClass($character->class);
 
         foreach ($baseStats as $stat) {
 

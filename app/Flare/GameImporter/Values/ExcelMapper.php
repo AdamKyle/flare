@@ -2,9 +2,9 @@
 
 namespace App\Flare\GameImporter\Values;
 
+use App\Admin\Classes\Imports\ClassesImport;
+use App\Admin\ClassMasteries\Imports\ClassMasteriesImport;
 use App\Admin\Import\Affixes\AffixesImport;
-use App\Admin\Import\Classes\ClassImport;
-use App\Admin\Import\ClassSpecials\ClassSpecialsImport;
 use App\Admin\Import\GuideQuests\GuideQuests;
 use App\Admin\Import\ItemSkills\ItemSkillsImport;
 use App\Admin\Import\Kingdoms\KingdomsImport;
@@ -12,12 +12,12 @@ use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
 use App\Admin\Import\Monsters\MonstersImport;
 use App\Admin\Import\PassiveSkills\PassiveSkillsImport;
 use App\Admin\Import\Quests\QuestsImport;
-use App\Admin\Import\Races\RacesImport;
 use App\Admin\Import\Raids\RaidsImport;
 use App\Admin\Import\Skills\SkillsImport;
 use App\Admin\Items\Imports\ItemsImport;
 use App\Admin\Locations\Imports\LocationsImport;
 use App\Admin\Npcs\Imports\NpcsImport;
+use App\Admin\Races\Imports\RacesImport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ExcelMapper
@@ -28,8 +28,8 @@ class ExcelMapper
         'Affixes' => AffixesImport::class,
         'Core Imports' => [
             RacesImport::class,
-            ClassImport::class,
-            ClassSpecialsImport::class,
+            ClassesImport::class,
+            ClassMasteriesImport::class,
         ],
         'Items' => ItemsImport::class,
         'Weapons' => ItemsImport::class,

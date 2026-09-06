@@ -1,0 +1,38 @@
+export default interface AdminRolledGemDefinition {
+  id: number;
+  name: string;
+  domain: string;
+  roll_number: number;
+  is_active: boolean;
+  crafting_skills: { id: number; name: string }[];
+  monster_atonement: number | null;
+  monster_atonement_amount: number | null;
+  character_xp_bonus: number | null;
+  character_class_rank_xp_bonus: number | null;
+  kingdom_passive_training_reduction: number | null;
+  gold_gain: number | null;
+  gold_dust_gain: number | null;
+  shards_gain: number | null;
+  copper_coin_gain: number | null;
+  character_class_specialty_xp_gain: number | null;
+  crafting_skill_bonus: number | null;
+  item_drop_chance_increase: number | null;
+  unique_item_drop_chance_increase: number | null;
+  mythic_item_drop_chance_increase: number | null;
+  cosmic_item_drop_chance_increase: number | null;
+  character_power_reduction: number | null;
+  enemy_strength_increase: number | null;
+  enemy_healing_increase: number | null;
+  enemy_spell_evasion: number | null;
+  enemy_affix_resistance: number | null;
+  enemy_entrancing_chance: number | null;
+  enemy_devouring_light_chance: number | null;
+  enemy_devouring_darkness_chance: number | null;
+  enemy_ambush_chance: number | null;
+  enemy_ambush_resistance: number | null;
+  enemy_counter_chance: number | null;
+  enemy_counter_resistance: number | null;
+  enemy_quest_item_drop_chance_increase: number | null;
+  monster_xp_increase: number | null;
+  monster_gold_drop_increase: number | null;
+}

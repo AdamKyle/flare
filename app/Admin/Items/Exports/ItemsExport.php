@@ -3,10 +3,11 @@
 namespace App\Admin\Items\Exports;
 
 use App\Admin\Items\Exports\Sheets\ItemsSheet;
+use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ItemsExport implements WithMultipleSheets
+class ItemsExport implements Export, WithMultipleSheets
 {
     use Exportable;
 

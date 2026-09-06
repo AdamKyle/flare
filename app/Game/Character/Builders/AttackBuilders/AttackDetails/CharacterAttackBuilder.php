@@ -9,6 +9,7 @@ use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Combat\Values\AttackType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Services\AreaGemEffectService;
 use Exception;
 
 class CharacterAttackBuilder
@@ -21,8 +22,10 @@ class CharacterAttackBuilder
 
     private ?float $damageStatAmount = null;
 
-    public function __construct(CharacterStatBuilder $characterStatBuilder)
-    {
+    public function __construct(
+        CharacterStatBuilder $characterStatBuilder,
+        private readonly AreaGemEffectService $areaGemEffectService,
+    ) {
         $this->characterStatBuilder = $characterStatBuilder;
     }
 
@@ -116,7 +119,8 @@ class CharacterAttackBuilder
         $map = Map::where('character_id', $this->character->id)->first();
         $gameMap = GameMap::find($map->game_map_id);
 
-        $characterReduction = $gameMap->character_attack_reduction;
+        $characterReduction = ($gameMap->character_attack_reduction ?? 0.0)
+            + $this->areaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
 
         return [
             'attack_type' => $attackType,

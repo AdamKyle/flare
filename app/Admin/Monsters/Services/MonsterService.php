@@ -61,6 +61,11 @@ class MonsterService
     private function applyCategoryFilter(Builder $query, ?string $category, ?int $locationType): void
     {
         if (is_null($category) || $category === MonsterListCategory::ALL->value) {
+            $query->where(function (Builder $subQuery): void {
+                $subQuery->whereNull('only_for_location_type')
+                    ->orWhereIn('only_for_location_type', MonsterListCategory::allCategoryLocationTypes());
+            });
+
             return;
         }
 
@@ -79,14 +84,6 @@ class MonsterService
                 ->whereNull('only_for_location_type'),
             MonsterListCategory::CELESTIAL => $query->where('is_celestial_entity', true)
                 ->whereNull('only_for_location_type'),
-            MonsterListCategory::SPECIAL_LOCATION => $query->where('is_celestial_entity', false)
-                ->where('is_raid_monster', false)
-                ->where('is_raid_boss', false)
-                ->whereNotNull('only_for_location_type')
-                ->when(
-                    ! is_null($locationType),
-                    fn (Builder $subQuery) => $subQuery->where('only_for_location_type', $locationType)
-                ),
             MonsterListCategory::WEEKLY_FIGHT => $query->where('is_celestial_entity', false)
                 ->where('is_raid_monster', false)
                 ->where('is_raid_boss', false)

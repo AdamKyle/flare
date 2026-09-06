@@ -2,18 +2,31 @@
     'user' => null,
 ])
 
+@php
+    $profileAvatarUrl = ! $user->hasRole('Admin') && $user->character->race?->image_path
+        ? Storage::disk('public')->url($user->character->race->image_path)
+        : asset('character-images/knight-in-a-field.png');
+    $profileAvatarAlt = $user->hasRole('Admin')
+        ? 'Administrator avatar'
+        : ($user->character->race
+            ? $user->character->name.' — '.$user->character->race->name.' avatar'
+            : $user->character->name.' avatar');
+@endphp
+
 <div class="relative">
     @if ($user->hasRole('Admin'))
         <x-header.profile-drop-down-trigger
             :toggle="true"
-            image="{{ asset('character-images/knight-in-a-field.png') }}"
+            image="{{ $profileAvatarUrl }}"
+            alt="{{ $profileAvatarAlt }}"
         >
             Administrator
         </x-header.profile-drop-down-trigger>
     @else
         <x-header.profile-drop-down-trigger
             :toggle="true"
-            image="{{ asset('character-images/knight-in-a-field.png') }}"
+            image="{{ $profileAvatarUrl }}"
+            alt="{{ $profileAvatarAlt }}"
         >
             {{ $user->character->name }}
         </x-header.profile-drop-down-trigger>
@@ -24,7 +37,7 @@
         class="shadow-theme-lg absolute right-0 mt-[17px] hidden w-[260px] flex-col rounded-2xl border border-gray-200 bg-white p-3 dark:border-gray-800 dark:bg-gray-700"
     >
         @if ($user->hasRole('Admin'))
-            <x-header.profile-drop-down-trigger image="{{ asset('character-images/knight-in-a-field.png') }}">
+            <x-header.profile-drop-down-trigger image="{{ $profileAvatarUrl }}" alt="{{ $profileAvatarAlt }}">
                 Administrator
             </x-header.profile-drop-down-trigger>
         @else

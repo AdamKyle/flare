@@ -59,43 +59,87 @@ const AdminMonsterDetailSidePeek = ({
       return null;
     }
 
-    if (nestedSelection.type === 'item') {
-      const NestedItemDetail = resolveSidePeekComponent(
-        SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
-      );
+    switch (nestedSelection.type) {
+      case 'item': {
+        const NestedItemDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_ITEM_DETAIL
+        );
 
-      return (
-        <StackedCard
-          on_close={handleCloseNested}
-          aria_label="Item Details"
-          content_mode={StackedCardContentMode.FULL_BLEED}
-        >
-          <NestedItemDetail
-            is_open
-            title="Item Details"
-            item_id={nestedSelection.id}
-          />
-        </StackedCard>
-      );
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Item Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
+            <NestedItemDetail
+              is_open
+              title="Item Details"
+              item_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
+
+      case 'map_gem': {
+        const NestedMapGemDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_MAP_GEM_DETAIL
+        );
+
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Map Gem Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
+            <NestedMapGemDetail
+              is_open
+              title="Map Gem Details"
+              map_gem_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
+
+      case 'location_gem': {
+        const NestedLocationGemDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_LOCATION_GEM_DETAIL
+        );
+
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Location Gem Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
+            <NestedLocationGemDetail
+              is_open
+              title="Location Gem Details"
+              location_gem_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
+
+      default: {
+        const NestedGameMapDetail = resolveSidePeekComponent(
+          SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
+        );
+
+        return (
+          <StackedCard
+            on_close={handleCloseNested}
+            aria_label="Game Map Details"
+            content_mode={StackedCardContentMode.FULL_BLEED}
+          >
+            <NestedGameMapDetail
+              is_open
+              title="Game Map Details"
+              game_map_id={nestedSelection.id}
+            />
+          </StackedCard>
+        );
+      }
     }
-
-    const NestedGameMapDetail = resolveSidePeekComponent(
-      SidePeekComponentRegistrationEnum.ADMIN_GAME_MAP_DETAIL
-    );
-
-    return (
-      <StackedCard
-        on_close={handleCloseNested}
-        aria_label="Game Map Details"
-        content_mode={StackedCardContentMode.FULL_BLEED}
-      >
-        <NestedGameMapDetail
-          is_open
-          title="Game Map Details"
-          game_map_id={nestedSelection.id}
-        />
-      </StackedCard>
-    );
   };
 
   const renderContent = (): ReactNode => {
@@ -125,6 +169,10 @@ const AdminMonsterDetailSidePeek = ({
           navigation={{
             on_open_item: (id) => setNestedSelection({ type: 'item', id }),
             on_open_map: (id) => setNestedSelection({ type: 'map', id }),
+            on_open_map_gem: (id) =>
+              setNestedSelection({ type: 'map_gem', id }),
+            on_open_location_gem: (id) =>
+              setNestedSelection({ type: 'location_gem', id }),
           }}
         />
       </div>

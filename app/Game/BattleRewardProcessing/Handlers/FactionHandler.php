@@ -165,7 +165,7 @@ class FactionHandler
                 continue;
             }
 
-            $pointsPerKill += (int) $quest->faction_points_per_kill;
+            $pointsPerKill += $quest->faction_points_per_kill;
 
             break;
         }
@@ -221,7 +221,9 @@ class FactionHandler
             $this->handleFactionLevelUp($character, $faction, $map->name);
 
             return;
-        } elseif (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
+        }
+
+        if (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
             $this->handleFactionMaxedOut($character, $faction, $map->name);
 
             return;
@@ -261,7 +263,9 @@ class FactionHandler
             $this->handleFactionLevelUp($character, $faction, $map->name);
 
             return;
-        } elseif (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
+        }
+
+        if (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
             $this->handleFactionMaxedOut($character, $faction, $map->name);
 
             return;
@@ -304,7 +308,9 @@ class FactionHandler
             $this->handleFactionLevelUp($character, $faction, $gameMap->name);
 
             return;
-        } elseif (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
+        }
+
+        if (FactionLevel::isMaxLevel($faction->current_level) && ! $faction->maxed) {
             $this->handleFactionMaxedOut($character, $faction, $gameMap->name);
 
             return;

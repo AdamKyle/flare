@@ -15,6 +15,7 @@ use App\Game\Character\CharacterSheet\Transformers\CharacterSheetBaseInfoTransfo
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Items\Values\ItemEffectType;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Maps\Events\MoveTimeOutEvent;
 use App\Game\Maps\Events\UpdateMap;
 use App\Game\Maps\Events\UpdateMonsterList;
@@ -50,9 +51,6 @@ class TraverseService
 
     private MonsterListService $monsterListService;
 
-    /**
-     * TraverseService constructor.
-     */
     public function __construct(
         Manager $manager,
         CharacterSheetBaseInfoTransformer $characterSheetBaseInfoTransformer,
@@ -62,6 +60,7 @@ class TraverseService
         LocationService $locationService,
         MapTileValue $mapTileValue,
         private readonly RandomNumberGenerator $randomNumberGenerator,
+        private readonly AreaGemEffectService $areaGemEffectService,
     ) {
         $this->manager = $manager;
         $this->characterSheetBaseInfoTransformer = $characterSheetBaseInfoTransformer;
@@ -359,28 +358,38 @@ class TraverseService
      */
     protected function updateActionsForMap(GameMap $gameMap, GameMap $oldGameMap, Character $character): void
     {
-        if ($gameMap->mapType()->isShadowPlane()) {
-            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } elseif ($gameMap->mapType()->isHell()) {
-            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } elseif ($gameMap->mapType()->isPurgatory()) {
-            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } elseif ($gameMap->mapType()->isTheIcePlane()) {
-            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } elseif ($gameMap->mapType()->isTwistedMemories()) {
-            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } elseif ($gameMap->mapType()->isDelusionalMemories()) {
-            $this->updateActionTypeCache($character, $gameMap->character_attack_reduction);
-        } elseif (
-            $oldGameMap->mapType()->isPurgatory() ||
-            $oldGameMap->mapType()->isHell() ||
-            $oldGameMap->mapType()->isShadowPlane() ||
-            $oldGameMap->mapType()->isTheIcePlane() ||
-            $oldGameMap->mapType()->isTwistedMemories() ||
-            $oldGameMap->mapType()->isDelusionalMemories()
-        ) {
-            $this->updateActionTypeCache($character, 0.0);
+        $gemReduction = $this->areaGemEffectService->resolveForGameMap($gameMap)->characterPowerReduction();
+
+        if ($this->isCharacterReductionMapType($gameMap)) {
+            $this->updateActionTypeCache($character, ($gameMap->character_attack_reduction ?? 0.0) + $gemReduction);
+
+            return;
         }
+
+        if ($this->isCharacterReductionMapType($oldGameMap)) {
+            $this->updateActionTypeCache($character, $gemReduction);
+
+            return;
+        }
+
+        if ($gemReduction > 0.0) {
+            $this->updateActionTypeCache($character, $gemReduction);
+        }
+    }
+
+    /**
+     * Determine whether the given Game Map belongs to the closed set of Map types that apply a
+     * Character attack reduction (Shadow Plane, Hell, Purgatory, The Ice Plane, Twisted Memories,
+     * and Delusional Memories).
+     */
+    private function isCharacterReductionMapType(GameMap $gameMap): bool
+    {
+        return $gameMap->mapType()->isShadowPlane()
+            || $gameMap->mapType()->isHell()
+            || $gameMap->mapType()->isPurgatory()
+            || $gameMap->mapType()->isTheIcePlane()
+            || $gameMap->mapType()->isTwistedMemories()
+            || $gameMap->mapType()->isDelusionalMemories();
     }
 
     protected function getMonstersForMap(Map $characterMap, int $mapId): array

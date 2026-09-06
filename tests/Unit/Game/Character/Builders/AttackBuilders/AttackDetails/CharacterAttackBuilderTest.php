@@ -11,13 +11,15 @@ use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class CharacterAttackBuilderTest extends TestCase
 {
-    use CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -46,6 +48,20 @@ class CharacterAttackBuilderTest extends TestCase
         $attack = $this->characterAttackBuilder->setCharacter($character)->buildAttack();
 
         $this->assertGreaterThan(0, $attack['weapon_damage']);
+    }
+
+    public function test_damage_deduction_includes_the_rolled_map_gem_character_power_reduction(): void
+    {
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
+        $gameMap = $character->map->gameMap;
+
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['character_power_reduction' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $attack = $this->characterAttackBuilder->setCharacter($character->refresh())->buildAttack();
+
+        $this->assertSame(0.2, $attack['damage_deduction']);
     }
 
     public function test_build_attack_weapon_damage_includes_gun_damage()

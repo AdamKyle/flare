@@ -8,6 +8,7 @@ import {
   QuestBrowseTab,
 } from '../../../game/reusable-components/quest/enums/quest-browse-tab';
 import { buildQuestBrowseTabs } from '../../../game/reusable-components/quest/utils/build-quest-browse-tabs';
+import { buildQuestTreeQueryKey } from '../../../game/reusable-components/quest/utils/build-quest-tree-query-key';
 import { usePublicQuestBrowseOptions } from '../api/hooks/use-public-quest-browse-options';
 import { usePublicQuestTree } from '../api/hooks/use-public-quest-tree';
 
@@ -40,11 +41,24 @@ const QuestInfoTreePage = (): ReactNode => {
     loading: optionsLoading,
     error: optionsError,
   } = usePublicQuestBrowseOptions();
+
+  const activeKind = QUEST_BROWSE_TAB_KIND[activeTab];
+  const activeTabIndex = QUEST_BROWSE_TABS_ORDER.indexOf(activeTab);
+
   const {
     quests,
     loading: treeLoading,
     error,
-  } = usePublicQuestTree(gameMapId, QUEST_BROWSE_TAB_KIND[activeTab]);
+    query_key: resultQueryKey,
+  } = usePublicQuestTree(gameMapId, activeKind);
+
+  const currentQueryKey = buildQuestTreeQueryKey(gameMapId, activeKind);
+  const hasCurrentQueryResult = resultQueryKey === currentQueryKey;
+
+  const visibleQuests = hasCurrentQueryResult ? quests : [];
+  const visibleError = hasCurrentQueryResult ? error : null;
+  const visibleLoading =
+    treeLoading || (currentQueryKey !== null && !hasCurrentQueryResult);
 
   useEffect(() => {
     if (hasInitializedMapRef.current || !options) {
@@ -65,6 +79,16 @@ const QuestInfoTreePage = (): ReactNode => {
     options?.game_maps.find((gameMap) => gameMap.id === gameMapId)?.name ??
     null;
 
+  const handleActiveTabChange = (index: number): void => {
+    const selectedTab = QUEST_BROWSE_TABS_ORDER[index];
+
+    if (!selectedTab) {
+      return;
+    }
+
+    setActiveTab(selectedTab);
+  };
+
   const renderContent = (): ReactNode => {
     if (optionsLoading) {
       return <InfiniteLoader />;
@@ -83,10 +107,10 @@ const QuestInfoTreePage = (): ReactNode => {
     }
 
     const tabs = buildQuestBrowseTabs({
-      quests,
+      quests: visibleQuests,
       completed_quest_ids: [],
-      loading: treeLoading,
-      error,
+      loading: visibleLoading,
+      error: visibleError,
       navigation: { on_open_quest: navigateToQuest },
       tree_mobile_mode: TreeMobileMode.TREE,
       selected_game_map_name: selectedGameMapName,
@@ -97,9 +121,8 @@ const QuestInfoTreePage = (): ReactNode => {
         tabs={tabs}
         ariaLabel="Quest category"
         alignment={PillTabsAlignment.CENTER}
-        onActiveIndexChange={(index) =>
-          setActiveTab(QUEST_BROWSE_TABS_ORDER[index])
-        }
+        activeIndex={activeTabIndex}
+        onActiveIndexChange={handleActiveTabChange}
       />
     );
   };

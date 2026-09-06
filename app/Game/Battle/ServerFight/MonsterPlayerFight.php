@@ -3,7 +3,6 @@
 namespace App\Game\Battle\ServerFight;
 
 use App\Flare\Models\Character;
-use App\Flare\Models\Location;
 use App\Flare\Models\Map;
 use App\Game\Battle\ServerFight\Fight\Ambush;
 use App\Game\Battle\ServerFight\Fight\Attack;
@@ -12,10 +11,11 @@ use App\Game\Battle\ServerFight\Monster\BuildMonster;
 use App\Game\Battle\ServerFight\Monster\ServerMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Core\Combat\Values\ElementAttackData;
-use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Exploration\Services\DelveMonsterService;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\MonsterListService;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Support\Facades\Cache;
 
 class MonsterPlayerFight
@@ -54,6 +54,8 @@ class MonsterPlayerFight
 
     private ElementAttackData $elementAttackData;
 
+    private MonsterListService $monsterListService;
+
     public function __construct(
         BuildMonster $buildMonster,
         CharacterCacheData $characterCacheData,
@@ -63,6 +65,7 @@ class MonsterPlayerFight
         Attack $attack,
         BuildMonsterCacheService $buildMonsterCacheService,
         ElementAttackData $elementAttackData,
+        MonsterListService $monsterListService,
     ) {
         $this->buildMonster = $buildMonster;
         $this->characterCacheData = $characterCacheData;
@@ -72,6 +75,7 @@ class MonsterPlayerFight
         $this->attack = $attack;
         $this->buildMonsterCacheService = $buildMonsterCacheService;
         $this->elementAttackData = $elementAttackData;
+        $this->monsterListService = $monsterListService;
         $this->battleMessages = [];
         $this->tookTooLong = false;
     }
@@ -101,7 +105,7 @@ class MonsterPlayerFight
     {
 
         $this->character = $character;
-        $this->monster = $params['cached_monster'] ?? $this->fetchMonster($character->map, $params['selected_monster_id']);
+        $this->monster = $params['cached_monster'] ?? $this->fetchMonster($character, $params['selected_monster_id']);
 
         $this->attackType = $params['attack_type'];
         $this->forcedCurrentMonsterHealth = $params['current_monster_health'] ?? null;
@@ -345,76 +349,38 @@ class MonsterPlayerFight
     }
 
     /**
-     * Fetch the monster.
+     * Fetch the Monster the Character is fighting, using the same contextual cache as the Monster list.
      */
-    private function fetchMonster(Map $map, int $monsterId): array
+    private function fetchMonster(Character $character, int $monsterId): array
     {
-        $regularMonster = $this->fetchRegularMonster($map, $monsterId);
+        $regularMonster = $this->monsterListService->getMonsterForFight($character, $monsterId);
 
         if (! is_null($regularMonster)) {
-            return $regularMonster;
+            return $this->augmentWithElementalData($regularMonster);
         }
 
-        $celestial = $this->fetchCelestial($map, $monsterId);
+        $celestial = $this->fetchCelestial($character->map, $monsterId);
 
         if (! is_null($celestial)) {
             return $celestial;
-        }
-
-        $locationBasedMonster = $this->fetchLocationTypeSpecialMonster($map, $monsterId);
-
-        if (! is_null($locationBasedMonster)) {
-
-            return $locationBasedMonster;
         }
 
         return [];
     }
 
     /**
-     * Fetches a regular monster.
+     * Augment a cached Monster payload with the elemental atonement data needed for combat.
      */
-    private function fetchRegularMonster(Map $map, int $monsterId): ?array
+    private function augmentWithElementalData(array $monster): array
     {
-        if (! Cache::has('monsters')) {
-            $this->buildMonsterCacheService->buildCache();
-        }
+        $serverMonster = $this->buildMonster->setServerMonster($monster);
 
-        $gameMap = $map->gameMap;
+        $elementalData = $serverMonster->getElementData();
 
-        if (is_null($gameMap)) {
-            return null;
-        }
+        $monster['elemental_atonement'] = $elementalData;
+        $monster['highest_element'] = $this->elementAttackData->getHighestElementName($elementalData, $this->elementAttackData->getHighestElementDamage($elementalData));
 
-        $mapName = $gameMap->name;
-
-        $monsters = Cache::get('monsters')[$mapName]['data'];
-
-        if ($gameMap->mapType()->isTheIcePlane() || $gameMap->mapType()->isDelusionalMemories()) {
-            $canAccessPurgatory = $this->character->inventory->slots->where('item.effect', ItemEffectType::PURGATORY->value)->count() > 0;
-
-            if ($canAccessPurgatory) {
-                $monsters = $monsters['regular'];
-            } else {
-                $monsters = $monsters['easier'];
-            }
-        }
-
-        foreach ($monsters as $monster) {
-            if ($monster['id'] === $monsterId) {
-
-                $serverMonster = $this->buildMonster->setServerMonster($monster);
-
-                $elementalData = $serverMonster->getElementData();
-
-                $monster['elemental_atonement'] = $elementalData;
-                $monster['highest_element'] = $this->elementAttackData->getHighestElementName($elementalData, $this->elementAttackData->getHighestElementDamage($elementalData));
-
-                return $monster;
-            }
-        }
-
-        return null;
+        return $monster;
     }
 
     /**
@@ -422,48 +388,17 @@ class MonsterPlayerFight
      */
     private function fetchCelestial(Map $map, int $monsterId): ?array
     {
-        if (! Cache::has('celestials')) {
-            $this->buildMonsterCacheService->buildCelesetialCache();
+        if (! Cache::has(MonsterCacheKey::CELESTIALS->value)) {
+            $this->buildMonsterCacheService->buildCelestialCache();
         }
 
         $mapName = $map->gameMap->name;
 
-        $monsters = Cache::get('celestials')[$mapName]['data'];
+        $monsters = Cache::get(MonsterCacheKey::CELESTIALS->value)[$mapName]['data'];
 
         foreach ($monsters as $monster) {
             if ($monster['id'] === $monsterId) {
                 return $monster;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Fetch monster for a special location.
-     */
-    private function fetchLocationTypeSpecialMonster(Map $map, int $monsterId): ?array
-    {
-
-        $locationWithType = Location::whereNotNull('type')
-            ->where('x', $map->character_position_x)
-            ->where('y', $map->character_position_y)
-            ->where('game_map_id', $map->game_map_id)
-            ->first();
-
-        if (is_null($locationWithType)) {
-            return null;
-        }
-
-        $monstersForLocation = Cache::get('special-location-monsters');
-
-        if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-            $monsters = $monstersForLocation['location-type-'.$locationWithType->type];
-
-            foreach ($monsters as $monster) {
-                if ($monster['id'] === $monsterId) {
-                    return $monster;
-                }
             }
         }
 

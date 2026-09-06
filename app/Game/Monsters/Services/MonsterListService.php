@@ -6,12 +6,16 @@ use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Maps\Values\LocationType;
+use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Support\Facades\Cache;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class MonsterListService
 {
     use ResponseBuilder;
+
+    public function __construct(private readonly BuildMonsterCacheService $buildMonsterCacheService) {}
 
     /*
      * Build a simple list payload of monsters for the character's current context.
@@ -42,162 +46,176 @@ class MonsterListService
     /**
      * Get the monster the character should fight.
      */
-    public function getMonsterForFight(Character $character, int $monsterId): array
+    public function getMonsterForFight(Character $character, int $monsterId): ?array
     {
-        $monsters = $this->resolveMonsterDataSetForCharacter($character)['data'];
+        $monsters = $this->resolveMonsterDataSetForCharacter($character)['data'] ?? [];
 
         return collect($monsters)->where('id', $monsterId)->first();
     }
 
-    /*
-     * Resolve the full monsters dataset for the character based on map and location rules.
+    /**
+     * Resolve the full Monster dataset for the Character's current Map/Location Gem context.
      *
-     * @param Character $character
+     * The resolution order is: ensure required caches exist, prefer a Weekly Fight
+     * Location's cache, otherwise a Gem-bearing Location's cache, otherwise the
+     * normal current Game Map cache, preserving the existing event-map override.
+     *
+     * @return array<string, mixed>
+     *
      * @throws InvalidArgumentException
-     * @return array
      */
     public function resolveMonsterDataSetForCharacter(Character $character): array
     {
+        $characterMap = $character->map;
+        $gameMap = $characterMap->gameMap;
+
         $this->ensureMonsterCache();
 
-        $characterMap = $character->map;
-
-        $locationWithType = $this->findLocationWithType(
+        $currentLocation = $this->findCurrentLocation(
             $characterMap->character_position_x,
             $characterMap->character_position_y,
             $characterMap->game_map_id
         );
 
-        $isTheIcePlane = $character->map->gameMap->mapType()->isTheIcePlane();
+        $weeklyMonsters = $this->resolveWeeklyMonsters($currentLocation);
 
-        $isDelusionalMemories = $character->map->gameMap->mapType()->isDelusionalMemories();
+        if (! is_null($weeklyMonsters)) {
+            return $weeklyMonsters;
+        }
 
-        $hasPurgatoryAccess = $this->characterHasPurgatoryAccess($character);
+        $locationMonsters = $this->resolveLocationGemMonsters($currentLocation);
 
-        $monstersCache = Cache::get('monsters');
+        if (! is_null($locationMonsters)) {
+            return $locationMonsters;
+        }
 
-        $monstersKey = $character->map->gameMap->name;
+        $monstersKey = $gameMap->name;
+        $monsters = $this->baseMonsters($monstersKey);
 
-        $monsters = $this->baseMonsters($monstersCache, $monstersKey);
-
-        $monsters = $this->applyMapTierOverrides(
-            $monstersCache,
+        return $this->applyMapTierOverrides(
             $monsters,
-            $isTheIcePlane,
-            $isDelusionalMemories,
-            $hasPurgatoryAccess,
-            $monstersKey
-        );
-
-        return $this->applySpecialLocationOverride(
-            $monsters,
-            $locationWithType
+            $monstersKey,
+            $gameMap->mapType()->isTheIcePlane(),
+            $gameMap->mapType()->isDelusionalMemories(),
+            $this->characterHasPurgatoryAccess($character)
         );
     }
 
-    /*
-     * Ensure the base monster cache exists; build it if missing.
+    /**
+     * Ensure the required regular/Location/Weekly Monster caches exist for the Character's current context.
      *
      * @throws InvalidArgumentException
-     * @return void
      */
     private function ensureMonsterCache(): void
     {
-        if (! Cache::has('monsters')) {
-            resolve(BuildMonsterCacheService::class)->buildCache();
+        if (! Cache::has(MonsterCacheKey::MONSTERS->value)) {
+            $this->buildMonsterCacheService->buildCache();
+        }
+
+        if (! Cache::has(MonsterCacheKey::WEEKLY_MONSTERS->value)) {
+            $this->buildMonsterCacheService->buildWeeklyFightCache();
+        }
+
+        if (! Cache::has(MonsterCacheKey::LOCATION_MONSTERS->value)) {
+            $this->buildMonsterCacheService->buildLocationCache();
         }
     }
 
-    /*
-     * Find a location at the given coordinates that has a special location type.
-     *
-     * @param int $x
-     * @param int $y
-     * @param int $gameMapId
-     * @return Location|null
+    /**
+     * Find the actual Location at the given coordinates, regardless of Location Type.
      */
-    private function findLocationWithType(int $x, int $y, int $gameMapId): ?Location
+    private function findCurrentLocation(int $x, int $y, int $gameMapId): ?Location
     {
-        return Location::whereNotNull('type')
-            ->where('x', $x)
+        return Location::where('x', $x)
             ->where('y', $y)
             ->where('game_map_id', $gameMapId)
             ->first();
     }
 
+    /**
+     * Resolve the Weekly Fight Monster dataset for the current Location, when applicable.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function resolveWeeklyMonsters(?Location $currentLocation): ?array
+    {
+        if (is_null($currentLocation) || is_null($currentLocation->type)) {
+            return null;
+        }
+
+        if (! LocationType::from($currentLocation->type)->isWeeklyFightLocationType()) {
+            return null;
+        }
+
+        $weeklyCache = Cache::get(MonsterCacheKey::WEEKLY_MONSTERS->value);
+        $dataset = $weeklyCache['location-type-'.$currentLocation->type] ?? null;
+
+        if (is_null($dataset) || count($dataset['data'] ?? []) === 0) {
+            return null;
+        }
+
+        return $dataset;
+    }
+
+    /**
+     * Resolve the Location Gem-affected Monster dataset for the current Location, when it has a rolled Location Gem cache.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function resolveLocationGemMonsters(?Location $currentLocation): ?array
+    {
+        if (is_null($currentLocation)) {
+            return null;
+        }
+
+        $locationCache = Cache::get(MonsterCacheKey::LOCATION_MONSTERS->value);
+        $dataset = $locationCache['location-'.$currentLocation->id] ?? null;
+
+        if (is_null($dataset) || count($dataset['data'] ?? []) === 0) {
+            return null;
+        }
+
+        return $dataset;
+    }
+
     /*
      * Get the base monsters list for the given map key.
      *
-     * @param array $monstersCache
      * @param string $monstersKey
      * @return array
      */
-    private function baseMonsters(array $monstersCache, string $monstersKey): array
+    private function baseMonsters(string $monstersKey): array
     {
+        $monstersCache = Cache::get(MonsterCacheKey::MONSTERS->value);
+
         return $monstersCache[$monstersKey] ?? ['data' => []];
     }
 
     /*
      * Apply map-tier overrides (regular vs easier) for special maps and Purgatory access.
      *
-     * @param array $monstersCache
      * @param array $current
+     * @param string $monstersKey
      * @param bool $isTheIcePlane
      * @param bool $isDelusionalMemories
      * @param bool $hasPurgatoryAccess
-     * @param string $monstersKey
      * @return array
      */
     private function applyMapTierOverrides(
-        array $monstersCache,
         array $current,
+        string $monstersKey,
         bool $isTheIcePlane,
         bool $isDelusionalMemories,
-        bool $hasPurgatoryAccess,
-        string $monstersKey
+        bool $hasPurgatoryAccess
     ): array {
-        if ($isTheIcePlane && $hasPurgatoryAccess) {
-            $current = $monstersCache[$monstersKey]['regular'] ?? $current;
-        } elseif ($isTheIcePlane && ! $hasPurgatoryAccess) {
-            $current = $monstersCache[$monstersKey]['easier'] ?? $current;
+        if (! $isTheIcePlane && ! $isDelusionalMemories) {
+            return $current;
         }
 
-        if ($isDelusionalMemories && $hasPurgatoryAccess) {
-            $current = $monstersCache[$monstersKey]['regular'] ?? $current;
-        } elseif ($isDelusionalMemories && ! $hasPurgatoryAccess) {
-            $current = $monstersCache[$monstersKey]['easier'] ?? $current;
-        }
+        $monstersCache = Cache::get(MonsterCacheKey::MONSTERS->value);
+        $tier = $hasPurgatoryAccess ? 'regular' : 'easier';
 
-        return $current;
-    }
-
-    /*
-     * If standing on a special location type, override with that location-type monster list.
-     *
-     * @param array $current
-     * @param Location|null $locationWithType
-     * @return array
-     */
-    private function applySpecialLocationOverride(
-        array $current,
-        ?Location $locationWithType
-    ): array {
-        if (! is_null($locationWithType)) {
-            $monstersForLocation = Cache::get('special-location-monsters');
-
-            $monstersForLocationType = [];
-
-            if (isset($monstersForLocation['location-type-'.$locationWithType->type])) {
-
-                $monstersForLocationType = $monstersForLocation['location-type-'.$locationWithType->type];
-            }
-
-            if (count($monstersForLocationType['data'] ?? []) > 0) {
-                $current = $monstersForLocationType;
-            }
-        }
-
-        return $current;
+        return $monstersCache[$monstersKey][$tier] ?? $current;
     }
 
     /*

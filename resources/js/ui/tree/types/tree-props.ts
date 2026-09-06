@@ -18,4 +18,6 @@ export default interface TreeProps<TData> {
   default_node_width?: number;
   default_node_height?: number;
   default_branch_color?: TreeColor;
+  default_zoom?: number;
+  default_focus_node_id?: string;
 }

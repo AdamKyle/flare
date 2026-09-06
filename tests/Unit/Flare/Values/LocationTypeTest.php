@@ -39,10 +39,45 @@ class LocationTypeTest extends TestCase
         $this->assertSame('Special', LocationType::getNamedValues()[LocationType::SPECIAL->value]);
     }
 
-    public function test_manual_quest_drop_values_exclude_cave_of_memories(): void
+    public function test_type_eleven_is_cave_of_shadows(): void
+    {
+        $this->assertSame(11, LocationType::CAVE_OF_SHADOWS->value);
+        $this->assertSame('Cave of Shadows', LocationType::CAVE_OF_SHADOWS->label());
+        $this->assertTrue(LocationType::CAVE_OF_SHADOWS->isCaveOfShadows());
+    }
+
+    public function test_type_twelve_is_cave_of_memories(): void
+    {
+        $this->assertSame(12, LocationType::CAVE_OF_MEMORIES->value);
+        $this->assertSame('Cave of Memories', LocationType::CAVE_OF_MEMORIES->label());
+        $this->assertTrue(LocationType::CAVE_OF_MEMORIES->isCaveOfMemories());
+    }
+
+    public function test_weekly_fight_location_types_are_exactly_seven_through_ten(): void
+    {
+        $this->assertSame([
+            LocationType::ALCHEMY_CHURCH->value,
+            LocationType::LORDS_STRONG_HOLD->value,
+            LocationType::BROKEN_ANVIL->value,
+            LocationType::TWISTED_MAIDENS_DUNGEONS->value,
+        ], LocationType::weeklyFightLocationTypes());
+    }
+
+    public function test_cave_of_memories_is_not_a_weekly_fight_location_type(): void
+    {
+        $this->assertFalse(LocationType::CAVE_OF_MEMORIES->isWeeklyFightLocationType());
+    }
+
+    public function test_manual_quest_drop_values_exclude_both_cave_location_types(): void
     {
         $this->assertContains(LocationType::SPECIAL->value, LocationType::manualQuestDropValues());
+        $this->assertNotContains(LocationType::CAVE_OF_SHADOWS->value, LocationType::manualQuestDropValues());
         $this->assertNotContains(LocationType::CAVE_OF_MEMORIES->value, LocationType::manualQuestDropValues());
+    }
+
+    public function test_cave_of_shadows_cannot_drop_manual_quest_items(): void
+    {
+        $this->assertFalse(LocationType::CAVE_OF_SHADOWS->canDropManualQuestItems());
     }
 
     public function test_cave_of_memories_cannot_drop_manual_quest_items(): void

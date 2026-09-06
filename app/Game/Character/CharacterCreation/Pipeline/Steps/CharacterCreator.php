@@ -11,6 +11,9 @@ class CharacterCreator
 {
     private BaseStatCalculator $baseStatValue;
 
+    /**
+     * @param  BaseStatCalculator  $baseStatValue  Class-based Character base stat calculator.
+     */
     public function __construct(BaseStatCalculator $baseStatValue)
     {
         $this->baseStatValue = $baseStatValue;
@@ -18,6 +21,10 @@ class CharacterCreator
 
     /**
      * Create the Character with base stats and store it on the state.
+     *
+     * @param  CharacterBuildState  $state  Current Character build pipeline state.
+     * @param  Closure  $next  Next pipeline stage callback.
+     * @return CharacterBuildState Build state carrying the created Character, or unchanged when the state is not yet ready.
      */
     public function process(CharacterBuildState $state, Closure $next): CharacterBuildState
     {
@@ -29,7 +36,7 @@ class CharacterCreator
             return $next($state);
         }
 
-        $baseStat = $this->baseStatValue->setRace($race)->setClass($class);
+        $baseStat = $this->baseStatValue->setClass($class);
 
         $name = $state->getCharacterName() ?? 'Adventurer';
 

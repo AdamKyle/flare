@@ -2,9 +2,9 @@
 
 namespace App\Flare\GameImporter\Console\Commands;
 
-use App\Admin\Import\LocationGems\LocationGemsImport;
 use App\Admin\Import\LocationTemplates\LocationTemplatesImport;
-use App\Admin\Import\MapGems\MapGemsImport;
+use App\Admin\LocationGems\Imports\LocationGemsImport;
+use App\Admin\MapGems\Imports\MapGemsImport;
 use App\Flare\GameImporter\Values\ExcelMapper;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\InfoPage;
@@ -35,6 +35,9 @@ class ImportGameData extends Command
 
     /**
      * Execute the console command.
+     *
+     * @param  ExcelMapper  $excelMapper  Mapper used to resolve spreadsheet import definitions.
+     * @return void Re-imports a single named directory when one is given, otherwise runs the full ordered import.
      */
     public function handle(ExcelMapper $excelMapper)
     {
@@ -126,7 +129,7 @@ class ImportGameData extends Command
         $this->line('Importing Information section ...');
 
         // Import the information wiki
-        $this->importInformationSection();
+        // $this->importInformationSection();
 
         $this->line('All done! :D - Enjoy!');
     }
@@ -136,6 +139,8 @@ class ImportGameData extends Command
      *
      * The mapper used to import these files expect the file list to be in a specific
      * order, in some instances, so we sort and make sure the admin section is reversed.
+     *
+     * @return array<string, array<int, string>> Workbook file paths grouped by import directory, with Core Imports custom-ordered and Kingdoms reversed.
      */
     protected function fetchFiles(): array
     {
@@ -172,6 +177,10 @@ class ImportGameData extends Command
 
     /**
      * Sort files by an explicit import order.
+     *
+     * @param  array<int, string>  $files  Source file list to sort.
+     * @param  array<int, string>  $order  Ordering keys naming the required file sequence.
+     * @return array<int, string> Files sorted to match the given order, with unmatched files placed last.
      */
     protected function sortFilesByCustomOrder(array $files, array $order): array
     {
@@ -195,6 +204,11 @@ class ImportGameData extends Command
 
     /**
      * Import th excel files.
+     *
+     * @param  ExcelMapper  $excelMapper  Mapper used to resolve spreadsheet import definitions.
+     * @param  array<int, string>  $files  Workbook file paths to import, in import order.
+     * @param  string  $directoryName  Import directory name the files belong to.
+     * @return void Imports each file in the given directory through the supplied mapper.
      */
     protected function import(ExcelMapper $excelMapper, array $files, string $directoryName): void
     {
@@ -207,6 +221,8 @@ class ImportGameData extends Command
 
     /**
      * Import the information section.
+     *
+     * @return void Replaces existing information pages and copies their images into public storage.
      */
     protected function importInformationSection(): void
     {
@@ -232,6 +248,8 @@ class ImportGameData extends Command
 
     /**
      * Import world map gems.
+     *
+     * @return void Imports the World Gems map-gems workbook.
      */
     protected function importWorldMapGems(): void
     {
@@ -242,6 +260,8 @@ class ImportGameData extends Command
 
     /**
      * Import world location gems.
+     *
+     * @return void Imports the World Gems location-gems workbook.
      */
     protected function importWorldLocationGems(): void
     {
@@ -250,6 +270,11 @@ class ImportGameData extends Command
         Excel::import(new LocationGemsImport(), $path);
     }
 
+    /**
+     * Import the Location Templates workbook.
+     *
+     * @return void Imports the Location Templates workbook.
+     */
     protected function importLocationTemplates(): void
     {
         $path = resource_path('data-imports').'/Location Templates/location_templates.xlsx';
@@ -259,6 +284,8 @@ class ImportGameData extends Command
 
     /**
      * Import both world gem files in dependency order.
+     *
+     * @return void Imports the map-gems and location-gems workbooks, or reports the missing file and stops when either is absent.
      */
     protected function importWorldGems(): void
     {
@@ -283,6 +310,8 @@ class ImportGameData extends Command
 
     /**
      * Import the game maps.
+     *
+     * @return void Creates or updates each Game Map record with its stored image path.
      *
      * @throws Exception
      */

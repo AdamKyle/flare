@@ -1,16 +1,8 @@
 @php
-    $editUrl = route('classes.edit', ['class' => $class->id]);
-    $backUrl = route('classes.list');
-    $buttons = 'true';
+    $backUrl = '/information/races-and-classes';
 
-    if (is_null(auth()->user())) {
-        $backUrl = '/information/races-and-classes';
-    } elseif (
-        ! auth()
-            ->user()
-            ->hasRole('Admin')
-    ) {
-        $backUrl = '/information/races-and-classes';
+    if (auth()->user()?->hasRole('Admin')) {
+        $backUrl = route('admin.classes.index');
     }
 @endphp
 
@@ -18,12 +10,15 @@
     <x-core.cards.card-with-title
         title="{{ $class->name }}"
         css="mt-20 mb-10 w-full lg:w-1/2 m-auto"
-        editUrl="{{ $editUrl }}"
         backUrl="{{ $backUrl }}"
-        buttons="{{ $buttons }}"
+        buttons="true"
     >
         <div class="-mx-2 mb-8 flex flex-wrap">
             <div class="mb-4 w-full px-2 md:w-1/2">
+                @if (! is_null($class->description))
+                    <p class="my-2">{{ $class->description }}</p>
+                    <div class="my-3 border-b-2 border-b-gray-200 dark:border-b-gray-600"></div>
+                @endif
                 <dl class="mb-4">
                     <dt>Strength Mofidfier</dt>
                     <dd>+ {{ $class->str_mod > 0 ? $class->str_mod : 0 }} pts.</dd>
@@ -38,7 +33,7 @@
                     <dt>Focus Modifier</dt>
                     <dd>+ {{ $class->focus_mod > 0 ? $class->focus_mod : 0 }} pts.</dd>
                     <dt>Agility Modifier</dt>
-                    <dd>+ {{ $class->aglity_modifier > 0 ? $class->aglity_modifier : 0 }} pts.</dd>
+                    <dd>+ {{ $class->agi_mod > 0 ? $class->agi_mod : 0 }} pts.</dd>
                     <dt>Accuracy Modifier</dt>
                     <dd>+ {{ $class->accuracy_mod * 100 }} %</dd>
                     <dt>Dodge Modifier</dt>
@@ -76,24 +71,13 @@
                 <p class="mb-4">
                     {{ $classBonus['description'] ?? 'No class attack bonus has been configured for this class yet.' }}
                 </p>
-                <dl className="mt-4">
+                <dl class="mt-4">
                     <dt>Type:</dt>
                     <dd>{{ $classBonus['type'] ?? 'N/A' }}</dd>
                     <dt>Base Chance:</dt>
                     <dd>{{ isset($classBonus['base_chance']) ? $classBonus['base_chance'] * 100 : 0 }}%</dd>
                     <dt>Requirements:</dt>
                     <dd>{{ $classBonus['requires'] ?? 'N/A' }}</dd>
-                </dl>
-
-                <h5 class="mt-2 mb-2">Class Attack Bonus</h5>
-                <p class="mb-4">{{ $classBonus['description'] }}</p>
-                <dl className="mt-4">
-                    <dt>Type:</dt>
-                    <dd>{{ $classBonus['type'] }}</dd>
-                    <dt>Base Chance:</dt>
-                    <dd>{{ $classBonus['base_chance'] * 100 }}%</dd>
-                    <dt>Requirements:</dt>
-                    <dd>{{ $classBonus['requires'] }}</dd>
                 </dl>
 
                 <div class="my-3 border-b-2 border-b-gray-200 dark:border-b-gray-600"></div>

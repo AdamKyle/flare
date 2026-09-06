@@ -16,6 +16,7 @@ use App\Game\Character\Concerns\Boons;
 use App\Game\Character\Concerns\FetchEquipped;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Services\AreaGemEffectService;
 use Exception;
 use Facades\App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ItemSkillAttribute;
 use Illuminate\Support\Collection;
@@ -56,7 +57,8 @@ class CharacterStatBuilder
         HealingBuilder $healingBuilder,
         HolyBuilder $holyBuilder,
         ReductionsBuilder $reductionsBuilder,
-        ElementalAtonement $elementalAtonement
+        ElementalAtonement $elementalAtonement,
+        private readonly AreaGemEffectService $areaGemEffectService,
     ) {
         $this->defenceBuilder = $defenceBuilder;
         $this->damageBuilder = $damageBuilder;
@@ -208,7 +210,7 @@ class CharacterStatBuilder
     }
 
     /**
-     * Get map reductions for characters.
+     * Get the combined legacy Map reduction and resolved Gem power reduction for the character.
      */
     protected function getMapCharacterReductions(): float
     {
@@ -220,11 +222,20 @@ class CharacterStatBuilder
             return 0;
         }
 
+        return $this->getLegacyMapCharacterReductions()
+            + $this->areaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
+    }
+
+    /**
+     * Get the legacy, non-Gem Map reduction for characters.
+     */
+    private function getLegacyMapCharacterReductions(): float
+    {
         if ($this->map->mapType()->isHell() ||
             $this->map->mapType()->isPurgatory() ||
             $this->map->mapType()->isTwistedMemories()
         ) {
-            return $this->map->character_attack_reduction;
+            return $this->map->character_attack_reduction ?? 0.0;
         }
 
         $purgatoryQuestItem = $this->character->inventory->slots->filter(function ($slot) {
@@ -234,11 +245,11 @@ class CharacterStatBuilder
         if (! is_null($purgatoryQuestItem)) {
 
             if ($this->map->mapType()->isTheIcePlane() || $this->map->mapType()->isDelusionalMemories()) {
-                return $this->map->character_attack_reduction;
+                return $this->map->character_attack_reduction ?? 0.0;
             }
         }
 
-        return 0;
+        return 0.0;
     }
 
     /**

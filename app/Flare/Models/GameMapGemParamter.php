@@ -6,6 +6,7 @@ use Database\Factories\GameMapGemParamterFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GameMapGemParamter extends Model
@@ -30,7 +31,6 @@ class GameMapGemParamter extends Model
         'unique_item_drop_chance_increase_range',
         'mythic_item_drop_chance_increase_range',
         'cosmic_item_drop_chance_increase_range',
-        'ascended_item_drop_chance_increase_range',
         'character_power_reduction_range',
         'enemy_strength_increase_range',
         'enemy_healing_increase_range',
@@ -46,7 +46,6 @@ class GameMapGemParamter extends Model
         'enemy_quest_item_drop_chance_increase_range',
         'monster_xp_increase_range',
         'monster_gold_drop_increase_range',
-        'faction_point_increase_range',
         'monster_atonement',
         'monster_atonement_range',
         'rolled_gem_id',
@@ -61,21 +60,41 @@ class GameMapGemParamter extends Model
         'roll_count' => 'integer',
     ];
 
+    /**
+     * Get the parent Game Map this Gem profile belongs to.
+     */
     public function gameMap(): BelongsTo
     {
         return $this->belongsTo(GameMap::class);
     }
 
+    /**
+     * Get the currently active rolled Gem for this profile.
+     */
     public function rolledGem(): BelongsTo
     {
         return $this->belongsTo(Gem::class, 'rolled_gem_id');
     }
 
+    /**
+     * Get every Gem roll ever created for this profile, active and historical.
+     */
+    public function gemRolls(): HasMany
+    {
+        return $this->hasMany(Gem::class, 'game_map_gem_paramters_id');
+    }
+
+    /**
+     * Get the generated Gem World Game Map produced from this profile, when one exists.
+     */
     public function generatedMap(): HasOne
     {
         return $this->hasOne(GameMap::class, 'game_map_gem_paramter_id');
     }
 
+    /**
+     * Return the fillable range field names this profile can roll a Gem value from.
+     */
     public function rollableRangeFields(): array
     {
         return array_values(array_filter(
@@ -85,6 +104,9 @@ class GameMapGemParamter extends Model
         ));
     }
 
+    /**
+     * Get the factory instance for this model.
+     */
     protected static function newFactory(): GameMapGemParamterFactory
     {
         return GameMapGemParamterFactory::new();

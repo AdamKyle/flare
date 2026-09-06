@@ -3,11 +3,14 @@
 namespace Tests\Unit\Game\Reincarnation\Services;
 
 use App\Flare\Models\MaxLevelConfiguration;
+use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Values\FeatureType;
 use App\Game\Reincarnate\Services\CharacterReincarnationService;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateGameSkill;
@@ -33,7 +36,12 @@ class CharacterReincarnationServiceTest extends TestCase
             ]),
             5
         )->givePlayerLocation();
-        $this->reincarnationService = resolve(CharacterReincarnationService::class);
+        $updateCharacterAttackTypes = Mockery::mock(UpdateCharacterAttackTypesHandler::class);
+        $updateCharacterAttackTypes->shouldReceive('updateCache')->zeroOrMoreTimes();
+        $this->reincarnationService = new CharacterReincarnationService(
+            $updateCharacterAttackTypes,
+            new BaseStatCalculator
+        );
 
         MaxLevelConfiguration::create([
             'max_level' => 2000,
@@ -253,10 +261,6 @@ class CharacterReincarnationServiceTest extends TestCase
 
         $character = (new CharacterFactory)
             ->createBaseCharacter(
-                raceOptions: [
-                    'str_mod' => 11,
-                    'focus_mod' => 11,
-                ],
                 classOptions: ['damage_stat' => 'dex']
             )
             ->givePlayerLocation()
@@ -292,7 +296,7 @@ class CharacterReincarnationServiceTest extends TestCase
         $character = $character->refresh();
 
         $this->assertEquals(200, $result['status']);
-        $this->assertSame(143, $character->str);
+        $this->assertSame(132, $character->str);
         $this->assertSame(122, $character->reincarnated_stat_increase);
         $this->assertSame(50000, $character->copper_coins);
         $this->assertSame(1, $character->level);

@@ -26,6 +26,7 @@ use App\Game\Maps\Services\Common\LiveCharacterCount;
 use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Transformers\CondensedKingdomTransformer;
 use App\Game\Maps\Transformers\LocationsTransformer;
+use App\Game\Monsters\Services\MonsterListService;
 use Illuminate\Support\Facades\Storage;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection as LeagueCollection;
@@ -53,6 +54,7 @@ class LocationService
         private readonly PlainDataSerializer $plainArraySerializer,
         private readonly Pagination $pagination,
         private readonly Manager $manager,
+        private readonly MonsterListService $monsterListService,
     ) {}
 
     /**
@@ -249,11 +251,7 @@ class LocationService
         // Update location based event goals
         event(new UpdateLocationBasedEventGoals($character->user));
 
-        if ($this->updateMonstersForRaid($character, $this->location)) {
-            return;
-        }
-
-        $this->updateMonsterForLocationType($character, $this->location);
+        $this->updateMonstersList($character, $this->location);
     }
 
     /**

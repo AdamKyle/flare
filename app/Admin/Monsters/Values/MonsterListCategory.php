@@ -15,7 +15,6 @@ enum MonsterListCategory: string
     case RAID_MONSTER = 'raid_monster';
     case RAID_BOSS = 'raid_boss';
     case CELESTIAL = 'celestial';
-    case SPECIAL_LOCATION = 'special_location';
     case WEEKLY_FIGHT = 'weekly_fight';
 
     /**
@@ -30,18 +29,25 @@ enum MonsterListCategory: string
     }
 
     /**
-     * The fixed set of Location Types that make up the Weekly Fight category.
-     * Cave of Memories is intentionally excluded and remains under Special Location.
+     * The authoritative set of Location Types that make up the Weekly Fight category.
+     * Cave of Memories is intentionally excluded.
      *
      * @return array<int, int> Valid LocationType values for the Weekly Fight category.
      */
     public static function weeklyFightLocationTypes(): array
     {
-        return [
-            LocationType::ALCHEMY_CHURCH->value,
-            LocationType::LORDS_STRONG_HOLD->value,
-            LocationType::BROKEN_ANVIL->value,
-            LocationType::TWISTED_MAIDENS_DUNGEONS->value,
-        ];
+        return LocationType::weeklyFightLocationTypes();
+    }
+
+    /**
+     * The dedicated Location Types that remain factually visible under the "All" category
+     * without owning a dedicated category tab: the Weekly Fight set plus the Cave of
+     * Memories dedicated Monster population.
+     *
+     * @return array<int, int> Valid LocationType values visible under the "All" category.
+     */
+    public static function allCategoryLocationTypes(): array
+    {
+        return array_merge(LocationType::weeklyFightLocationTypes(), [LocationType::CAVE_OF_MEMORIES->value]);
     }
 }

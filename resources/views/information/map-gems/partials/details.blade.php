@@ -15,7 +15,6 @@
                 'character_xp_bonus_range' => ['Character XP Bonus Range', 'text-green-700 dark:text-green-400'],
                 'character_class_rank_xp_bonus_range' => ['Character Class Rank XP Bonus Range', 'text-green-700 dark:text-green-400'],
                 'character_class_specialty_xp_gain_range' => ['Character Class Specialty XP Gain Range', 'text-green-700 dark:text-green-400'],
-                'faction_point_increase_range' => ['Faction Point Increase Range', 'text-green-700 dark:text-green-400'],
                 'kingdom_passive_training_reduction_range' => ['Kingdom Passive Training Reduction Range', 'text-green-700 dark:text-green-400'],
                 'crafting_skill_bonus_range' => ['Crafting Skill Bonus Range', 'text-green-700 dark:text-green-400'],
                 'character_power_reduction_range' => ['Character Power Reduction Range', 'text-red-700 dark:text-red-400'],
@@ -33,7 +32,6 @@
                 'unique_item_drop_chance_increase_range' => ['Unique Item Drop Chance Increase Range', 'text-green-700 dark:text-green-400'],
                 'mythic_item_drop_chance_increase_range' => ['Mythic Item Drop Chance Increase Range', 'text-green-700 dark:text-green-400'],
                 'cosmic_item_drop_chance_increase_range' => ['Cosmic Item Drop Chance Increase Range', 'text-green-700 dark:text-green-400'],
-                'ascended_item_drop_chance_increase_range' => ['Ascended Item Drop Chance Increase Range', 'text-green-700 dark:text-green-400'],
             ],
         ],
         'Enemy Combat' => [

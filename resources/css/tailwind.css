@@ -198,6 +198,32 @@
   --color-glacier-900: #2c3e4d;
   --color-glacier-950: #192733;
 
+  /*- Terracotta -*/
+  --color-terracotta-50: #fdf4f3;
+  --color-terracotta-100: #fce7e4;
+  --color-terracotta-200: #fbd3cd;
+  --color-terracotta-300: #f6b4ab;
+  --color-terracotta-400: #ef897a;
+  --color-terracotta-500: #e6705f;
+  --color-terracotta-600: #d04632;
+  --color-terracotta-700: #af3726;
+  --color-terracotta-800: #913123;
+  --color-terracotta-900: #782f24;
+  --color-terracotta-950: #41140e;
+
+  /*- Mulled Wine -*/
+  --color-mulled-wine-50: #f9f8fb;
+  --color-mulled-wine-100: #f3f0f7;
+  --color-mulled-wine-200: #e5e0ee;
+  --color-mulled-wine-300: #d2c8df;
+  --color-mulled-wine-400: #b7a7cb;
+  --color-mulled-wine-500: #9882b3;
+  --color-mulled-wine-600: #7b6495;
+  --color-mulled-wine-700: #65507a;
+  --color-mulled-wine-800: #544365;
+  --color-mulled-wine-900: #483a55;
+  --color-mulled-wine-950: #2a1e34;
+
 
 
   /*— Spacing (Aspect-Ratio keys) —*/

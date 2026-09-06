@@ -53,7 +53,6 @@ class Gem extends Model
         'unique_item_drop_chance_increase',
         'mythic_item_drop_chance_increase',
         'cosmic_item_drop_chance_increase',
-        'ascended_item_drop_chance_increase',
         'character_power_reduction',
         'enemy_strength_increase',
         'enemy_healing_increase',
@@ -69,7 +68,6 @@ class Gem extends Model
         'enemy_quest_item_drop_chance_increase',
         'monster_xp_increase',
         'monster_gold_drop_increase',
-        'faction_point_increase',
         'monster_atonement',
         'monster_atonement_amount',
     ];
@@ -106,7 +104,6 @@ class Gem extends Model
         'unique_item_drop_chance_increase' => 'float',
         'mythic_item_drop_chance_increase' => 'float',
         'cosmic_item_drop_chance_increase' => 'float',
-        'ascended_item_drop_chance_increase' => 'float',
         'character_power_reduction' => 'float',
         'enemy_strength_increase' => 'float',
         'enemy_healing_increase' => 'float',
@@ -122,7 +119,6 @@ class Gem extends Model
         'enemy_quest_item_drop_chance_increase' => 'float',
         'monster_xp_increase' => 'float',
         'monster_gold_drop_increase' => 'float',
-        'faction_point_increase' => 'float',
         'monster_atonement' => 'integer',
         'monster_atonement_amount' => 'float',
     ];

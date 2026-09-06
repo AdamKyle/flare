@@ -9,11 +9,12 @@ use App\Console\AfterDeployment\BackfillCompletedPanelDismissals;
 use App\Console\AfterDeployment\CleanDanglingCharacterData;
 use App\Console\AfterDeployment\CleanDuplicateQuestInventorySlots;
 use App\Console\AfterDeployment\CreateMonsterCache;
+use App\Console\AfterDeployment\FlagUsersWithMissingCharacterInventories;
 use App\Console\AfterDeployment\MoveAlchemyAndGemsToBags;
+use App\Console\AfterDeployment\RemoveRacialStatBonuses;
 use App\Console\AfterDeployment\RepairQuestFeatureRewards;
 use App\Console\AfterDeployment\RepairStuckExplorationLogs;
 use App\Console\AfterDeployment\ResumeInterruptedRewardProcessing;
-use App\Console\AfterDevelopment\FlagUsersWithMissingCharacterInventories;
 use App\Console\DevelopmentCommands\AssignTopEndGearToPlayer;
 use App\Console\DevelopmentCommands\CompleteGuideQuestForCharacter;
 use App\Console\DevelopmentCommands\CreateCharacter;
@@ -56,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
             RepairStuckExplorationLogs::class,
             ResumeInterruptedRewardProcessing::class,
             FlagUsersWithMissingCharacterInventories::class,
+            RemoveRacialStatBonuses::class,
 
             // Development Commands:
             CreateCharacter::class,

@@ -13,6 +13,7 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilde
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackDataTransformer;
+use App\Game\Gems\Services\AreaGemEffectService;
 use League\Fractal\Manager;
 
 class CharacterCacheDataFactory
@@ -30,6 +31,7 @@ class CharacterCacheDataFactory
                 new HolyBuilder(),
                 new ReductionsBuilder(),
                 resolve(ElementalAtonement::class),
+                resolve(AreaGemEffectService::class),
             ),
         );
     }

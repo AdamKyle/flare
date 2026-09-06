@@ -5,6 +5,7 @@ export default interface PillTabsProps<PTuple extends readonly object[]> {
   tabs: Readonly<TabTupleFromProps<PTuple>>;
   ariaLabel?: string;
   initialIndex?: number;
+  activeIndex?: number;
   additional_tab_css?: string;
   onActiveIndexChange?: (index: number) => void;
   alignment?: PillTabsAlignment;

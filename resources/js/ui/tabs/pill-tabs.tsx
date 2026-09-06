@@ -10,11 +10,17 @@ const PillTabs = <PTuple extends readonly object[]>({
   tabs,
   ariaLabel = 'Tabs',
   initialIndex = 0,
+  activeIndex,
   additional_tab_css,
   onActiveIndexChange,
   alignment = PillTabsAlignment.CENTER,
 }: PillTabsProps<PTuple>) => {
-  const [activeIndex, setActiveIndex] = useState<number>(initialIndex);
+  const [internalActiveIndex, setInternalActiveIndex] =
+    useState<number>(initialIndex);
+
+  const isControlled = activeIndex !== undefined;
+  const resolvedActiveIndex =
+    activeIndex !== undefined ? activeIndex : internalActiveIndex;
 
   const groupId = useId();
 
@@ -37,7 +43,9 @@ const PillTabs = <PTuple extends readonly object[]>({
       return;
     }
 
-    setActiveIndex(index);
+    if (!isControlled) {
+      setInternalActiveIndex(index);
+    }
 
     if (onActiveIndexChange) {
       onActiveIndexChange(index);
@@ -61,7 +69,7 @@ const PillTabs = <PTuple extends readonly object[]>({
         <TabsList
           tabs={tabs}
           ariaLabel={ariaLabel}
-          activeIndex={activeIndex}
+          activeIndex={resolvedActiveIndex}
           onSelect={handleSelectTab}
           tabIds={tabIds}
           panelIds={panelIds}
@@ -69,7 +77,7 @@ const PillTabs = <PTuple extends readonly object[]>({
         />
         <TabsPanels
           tabs={tabs}
-          activeIndex={activeIndex}
+          activeIndex={resolvedActiveIndex}
           tabIds={tabIds}
           panelIds={panelIds}
         />

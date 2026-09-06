@@ -4,6 +4,7 @@ import React, { ReactNode, useState } from 'react';
 import GameMapRelatedQuestItemsSidePeekProps from './types/game-map-related-quest-items-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import ReadOnlyItemCardDensity from '../../../../game/components/side-peeks/components/items/enums/read-only-item-card-density';
 import ReadOnlyItemCard from '../../../../game/components/side-peeks/components/items/read-only-item-card';
 import { useGameMapRelatedQuestItems } from '../../api/hooks/use-game-map-related-quest-items';
 
@@ -106,6 +107,7 @@ const GameMapRelatedQuestItemsSidePeek = ({
                 description={item.description}
                 effect={item.effect}
                 usable={item.usable}
+                density={ReadOnlyItemCardDensity.COMPACT}
                 on_click={handleOpenItem}
               />
             ))}

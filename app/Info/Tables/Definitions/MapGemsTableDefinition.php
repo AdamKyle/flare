@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MapGemsTableDefinition
 {
+    /**
+     * Build the base query for the Map Gems Information table.
+     *
+     * @return Builder Map Gem table query, with its Game Map relation eager loaded.
+     */
     public static function builder(): Builder
     {
         return GameMapGemParamter::query()->with('gameMap');
@@ -29,10 +34,8 @@ class MapGemsTableDefinition
                 field: 'name',
                 searchable: true,
                 html: true,
-                render: function ($row) use ($isAdmin) {
-                    $route = $isAdmin
-                        ? route('admin.map-gems.show', ['gameMapGemParamter' => $row->getRouteKey()])
-                        : route('info.page.map-gems.show', ['gameMapGemParamter' => $row->getRouteKey()]);
+                render: function ($row) {
+                    $route = route('info.page.map-gems.show', ['gameMapGemParamter' => $row->getRouteKey()]);
 
                     return '<a href="'.$route.'">'.e($row->name).'</a>';
                 },
@@ -74,7 +77,7 @@ class MapGemsTableDefinition
             $columns[] = new TableColumn(
                 label: 'Actions',
                 html: true,
-                render: fn ($row) => '<a href="'.route('admin.map-gems.edit', ['gameMapGemParamter' => $row->getRouteKey()]).'">Edit</a>',
+                render: fn ($row) => '<a href="'.route('admin.map-gems.index').'">Manage</a>',
             );
         }
 

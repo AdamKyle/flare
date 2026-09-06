@@ -20,7 +20,6 @@ use App\Admin\Services\MonitoredBugReportService;
 use App\Admin\Services\QuestService;
 use App\Admin\Services\SiteStatisticsService;
 use App\Admin\Services\SuggestionAndBugsService;
-use App\Admin\Services\UpdateCharacterStatsService;
 use App\Admin\Services\UserService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -37,10 +36,6 @@ class ServiceProvider extends ApplicationServiceProvider
 
         $this->app->bind(AssignSkillService::class, function ($app) {
             return new AssignSkillService;
-        });
-
-        $this->app->bind(UpdateCharacterStatsService::class, function ($app) {
-            return new UpdateCharacterStatsService;
         });
 
         $this->app->bind(UserService::class, function ($app) {

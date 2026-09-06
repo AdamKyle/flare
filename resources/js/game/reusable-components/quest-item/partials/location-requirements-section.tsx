@@ -1,7 +1,7 @@
 import React from 'react';
 
-import LocationRow from './location-row';
 import RelationshipGroup from './relationship-group';
+import LocationCard from '../../location/components/location-card';
 import LocationRequirementsSectionProps from '../types/partials/location-requirements-section-props';
 
 const LocationsRequireSection = ({
@@ -21,12 +21,12 @@ const LocationsRequireSection = ({
       show_separator={showSeparator}
     >
       {requiredLocations.map((requiredLocation) => (
-        <LocationRow
+        <LocationCard
           key={`required-location-${requiredLocation.id}`}
-          heading="Required at location"
-          location={requiredLocation}
+          location_id={requiredLocation.id}
+          name={requiredLocation.name}
+          game_map_name={requiredLocation.game_map.name}
           on_open_location={navigation.on_open_location}
-          on_open_map={navigation.on_open_map}
         />
       ))}
     </RelationshipGroup>

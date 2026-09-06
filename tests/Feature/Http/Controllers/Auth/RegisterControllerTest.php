@@ -58,7 +58,7 @@ test('can register a new user and character', function () {
         'kingdom_color' => '#ffffff',
     ]);
 
-    $race = $this->createRace(['dex_mod' => 2]);
+    $race = $this->createRace();
     $class = $this->createClass(['str_mod' => 2, 'damage_stat' => 'str']);
 
     $response = $this->post('/register', [
@@ -90,7 +90,7 @@ test('cannot register when banned', function () {
 
     $this->createUser(['is_banned' => true]);
 
-    $race = $this->createRace(['dex_mod' => 2]);
+    $race = $this->createRace();
     $class = $this->createClass(['str_mod' => 2, 'damage_stat' => 'str']);
 
     $response = $this->post('/register', [
@@ -117,7 +117,7 @@ test('cannot register while registration and login is disabled for an unrecogniz
     ]);
     config(['app.disabled_reg_and_login' => true]);
 
-    $race = $this->createRace(['dex_mod' => 2]);
+    $race = $this->createRace();
     $class = $this->createClass(['str_mod' => 2, 'damage_stat' => 'str']);
 
     $response = $this->post('/register', [
@@ -135,7 +135,7 @@ test('cannot register while registration and login is disabled for an unrecogniz
 });
 
 test('cannot register when no default game map exists', function () {
-    $race = $this->createRace(['dex_mod' => 2]);
+    $race = $this->createRace();
     $class = $this->createClass(['str_mod' => 2, 'damage_stat' => 'str']);
 
     $response = $this->post('/register', [
@@ -160,7 +160,7 @@ test('cannot register when character name already exists', function () {
         'kingdom_color' => '#ffffff',
     ]);
 
-    $race = $this->createRace(['dex_mod' => 2]);
+    $race = $this->createRace();
     $class = $this->createClass(['str_mod' => 2, 'damage_stat' => 'str']);
 
     $character = (new CharacterFactory)->createBaseCharacter()->getCharacter();
@@ -188,7 +188,7 @@ test('cannot register more than ten accounts from the same ip', function () {
 
     $this->createUsersWithIp(10, '127.0.0.1');
 
-    $race = $this->createRace(['dex_mod' => 2]);
+    $race = $this->createRace();
     $class = $this->createClass(['str_mod' => 2, 'damage_stat' => 'str']);
 
     $response = $this->post('/register', [

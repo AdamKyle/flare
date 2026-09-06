@@ -1,7 +1,5 @@
 <?php
 
-// @codeCoverageIgnoreStart
-
 namespace App\Flare\GameImporter\Console\Commands;
 
 use App\Flare\Models\GameMap;
@@ -10,6 +8,7 @@ use App\Game\Maps\Values\MapName;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Http\File;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 
 class MassImportCustomData extends Command
@@ -30,6 +29,10 @@ class MassImportCustomData extends Command
 
     /**
      * Execute the console command.
+     *
+     * @return void Runs the racial-stat-bonus removal command, then imports Game Maps outside production.
+     *
+     * @throws Exception
      */
     public function handle()
     {
@@ -40,6 +43,8 @@ class MassImportCustomData extends Command
         //        Artisan::call('backfill:completed-panel-dismissals --apply');
         //        Artisan::call('cleanup:duplicate-quest-inventory-slots --apply');
 
+        Artisan::call('remove:racial-stat-bonuses');
+
         // $this->importInformationSection();
 
         if (config('app.env') !== 'production') {
@@ -49,6 +54,8 @@ class MassImportCustomData extends Command
 
     /**
      * Import the information section
+     *
+     * @return void Replaces existing information pages and copies their images into public storage.
      */
     private function importInformationSection(): void
     {
@@ -87,6 +94,8 @@ class MassImportCustomData extends Command
 
     /**
      * Import the game maps
+     *
+     * @return void Creates or updates each Game Map record with its stored image path.
      *
      * @throws Exception
      */
@@ -142,4 +151,3 @@ class MassImportCustomData extends Command
         }
     }
 }
-// @codeCoverageIgnoreEnd

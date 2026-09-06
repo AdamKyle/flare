@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 
 import NpcQuestRelationshipCard from './npc-quest-relationship-card';
 import NpcDetailBodyProps from './types/npc-detail-body-props';
+import ReadOnlyItemCardDensity from '../../../game/components/side-peeks/components/items/enums/read-only-item-card-density';
 import ReadOnlyItemCard from '../../../game/components/side-peeks/components/items/read-only-item-card';
 import AdminQuestItemPresentationDefinition from '../../items/api/definitions/admin-quest-item-presentation-definition';
 import { NpcApiMessages } from '../api/enums/npc-api-messages';
@@ -143,6 +144,7 @@ const NpcDetailBody = ({
                 description={item.description}
                 effect={item.effect}
                 usable={item.usable}
+                density={ReadOnlyItemCardDensity.COMPACT}
                 on_click={() => onOpenItem(item.item_id, item.name)}
               />
             )

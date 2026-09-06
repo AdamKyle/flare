@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 
 import {
   formatNumberWithCommas,
+  formatPercent,
   formatRangeWithCommas,
 } from '../../../util/format-number';
 import FactualLink from '../../quest-item/partials/factual-link';
@@ -71,7 +72,7 @@ const MonsterIdentitySection = ({
         {identity.drop_check > 0 && (
           <>
             <Dt>Drop Check</Dt>
-            <Dd>{formatNumberWithCommas(identity.drop_check)}</Dd>
+            <Dd>{formatPercent(identity.drop_check)}</Dd>
           </>
         )}
         {identity.only_for_location_type !== null && (

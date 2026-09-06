@@ -1,5 +1,5 @@
 @extends('layouts.information')
 
 @section('content')
-    @include('admin.class-specials.partials.class-special', ['classSpecial' => $classSpecial])
+    @include('information.class-specialties.partials.specialty', ['classSpecial' => $classSpecial])
 @endsection

@@ -47,7 +47,7 @@ class DelveExplorationAutomationService
             ->where('is_raid_monster', false)
             ->where('is_raid_boss', false)
             ->where('game_map_id', $character->map->game_map_id)
-            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_MEMORIES->value])
+            ->whereIn('only_for_location_type', [LocationType::CAVE_OF_SHADOWS->value])
             ->whereNull('raid_special_attack_type')
             ->inRandomOrder()
             ->first()

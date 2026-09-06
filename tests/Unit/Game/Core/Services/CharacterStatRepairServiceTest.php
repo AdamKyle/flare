@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Game\Core\Services;
 
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Core\Services\CharacterStatRepairService;
 use App\Game\Reincarnate\Values\MaxReincarnationStats;
 use Carbon\Carbon;
@@ -39,7 +40,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'focus' => 10,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -70,7 +71,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'focus' => 18,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -101,7 +102,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'focus' => 34,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -127,7 +128,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'dex' => 4,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -148,7 +149,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'dex' => MaxReincarnationStats::MAX_STATS - 1,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -171,44 +172,20 @@ class CharacterStatRepairServiceTest extends TestCase
             'dex' => 6,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
         $updatedAtAfterFirstRepair = $character->updated_at;
 
         Carbon::setTestNow(Carbon::parse('2026-05-23 10:00:00'));
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
         $this->assertSame(18, $character->str);
         $this->assertSame(23, $character->dex);
         $this->assertTrue($updatedAtAfterFirstRepair->eq($character->updated_at));
-    }
-
-    public function test_race_base_stats_are_included_in_repaired_floor(): void
-    {
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(
-                raceOptions: ['str_mod' => 5],
-                classOptions: ['damage_stat' => 'dex'],
-                assignBaseSkill: false,
-                assignPassiveSkills: false
-            )
-            ->getCharacter();
-
-        $character->update([
-            'level' => 2,
-            'reincarnated_stat_increase' => 1,
-            'str' => 1,
-        ]);
-
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
-
-        $character = $character->refresh();
-
-        $this->assertSame(17, $character->str);
     }
 
     public function test_class_base_stats_are_included_in_repaired_floor(): void
@@ -230,7 +207,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'str' => 1,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -250,7 +227,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'dex' => 1,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -271,7 +248,7 @@ class CharacterStatRepairServiceTest extends TestCase
             'dex' => 1,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
@@ -293,25 +270,12 @@ class CharacterStatRepairServiceTest extends TestCase
             'dex' => 30,
         ]);
 
-        resolve(CharacterStatRepairService::class)->repair($character->refresh());
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character->refresh());
 
         $character = $character->refresh();
 
         $this->assertSame(18, $character->str);
         $this->assertSame(30, $character->dex);
-    }
-
-    public function test_missing_race_relation_throws_existing_base_stat_type_error(): void
-    {
-        $character = (new CharacterFactory)
-            ->createBaseCharacter(classOptions: ['damage_stat' => 'dex'], assignBaseSkill: false, assignPassiveSkills: false)
-            ->getCharacter();
-
-        $character->setRelation('race', null);
-
-        $this->expectException(TypeError::class);
-
-        resolve(CharacterStatRepairService::class)->repair($character);
     }
 
     public function test_missing_class_relation_throws_existing_base_stat_type_error(): void
@@ -324,6 +288,6 @@ class CharacterStatRepairServiceTest extends TestCase
 
         $this->expectException(TypeError::class);
 
-        resolve(CharacterStatRepairService::class)->repair($character);
+        (new CharacterStatRepairService(new BaseStatCalculator))->repair($character);
     }
 }

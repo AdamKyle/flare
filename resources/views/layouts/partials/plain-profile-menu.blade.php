@@ -1,5 +1,16 @@
 @props(['user'])
 
+@php
+    $profileAvatarUrl = ! $user->hasRole('Admin') && $user->character->race?->image_path
+        ? Storage::disk('public')->url($user->character->race->image_path)
+        : asset('character-images/knight-in-a-field.png');
+    $profileAvatarAlt = $user->hasRole('Admin')
+        ? 'Administrator avatar'
+        : ($user->character->race
+            ? $user->character->name.' — '.$user->character->race->name.' avatar'
+            : $user->character->name.' avatar');
+@endphp
+
 <div class="relative">
     <button
         type="button"
@@ -11,11 +22,7 @@
         class="flex items-center text-gray-700 dark:text-gray-400"
     >
         <span class="mr-3 h-11 w-11 overflow-hidden rounded-full">
-            <img
-                src="{{ asset('character-images/knight-in-a-field.png') }}"
-                alt="User"
-                class="h-full w-full object-cover"
-            />
+            <img src="{{ $profileAvatarUrl }}" alt="{{ $profileAvatarAlt }}" class="h-full w-full object-cover" />
         </span>
 
         <span class="text-theme-sm mr-1 block font-medium">

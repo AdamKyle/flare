@@ -2,8 +2,8 @@
 
 namespace App\Admin\Monsters\Requests;
 
+use App\Admin\Monsters\Values\MonsterListCategory;
 use App\Game\Core\Values\CoreStatType;
-use App\Game\Maps\Values\LocationType;
 use App\Game\Raids\Values\RaidAttackType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -38,7 +38,7 @@ class StoreMonsterRequest extends FormRequest
             'health_range' => 'required|string|max:255',
             'attack_range' => 'required|string|max:255',
             'drop_check' => 'required|numeric|min:0',
-            'only_for_location_type' => ['nullable', 'integer', Rule::enum(LocationType::class)],
+            'only_for_location_type' => ['nullable', 'integer', Rule::in(MonsterListCategory::allCategoryLocationTypes())],
 
             'str' => 'required|integer|min:0',
             'dur' => 'required|integer|min:0',

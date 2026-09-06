@@ -9,6 +9,8 @@ use App\Flare\Models\Map;
 use App\Flare\Models\Monster;
 use App\Game\Battle\Services\BattleDrop;
 use App\Game\Core\Items\Builders\BuildMythicItem;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Maps\Values\LocationType;
 use Exception;
 use Facades\App\Game\Core\Chance\DropCheckCalculator;
@@ -37,14 +39,22 @@ class DropCheckService
 
     private float $gameMapBonus = 0.0;
 
-    public function __construct(BattleDrop $battleDrop, BuildMythicItem $buildMythicItem)
-    {
+    private float $mythicItemDropBonus = 0.0;
+
+    private float $questItemDropBonus = 0.0;
+
+    public function __construct(
+        BattleDrop $battleDrop,
+        BuildMythicItem $buildMythicItem,
+        private readonly AreaGemEffectService $areaGemEffectService,
+    ) {
         $this->battleDrop = $battleDrop;
         $this->buildMythicItem = $buildMythicItem;
     }
 
     /**
      * Process the drop check.
+     *
      *
      * @throws Exception
      */
@@ -62,6 +72,11 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
+        $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($character);
+        $this->gameMapBonus += $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ITEM_DROP_CHANCE_INCREASE);
+        $this->mythicItemDropBonus = $resolvedAreaGemEffects->rarityEffects()->mythic();
+        $this->questItemDropBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE);
+
         $this->findLocationWithEffect($characterMap);
         $this->findManualQuestItemLocation($characterMap);
 
@@ -69,6 +84,7 @@ class DropCheckService
             ->setSpecialLocation($this->locationWithEffect)
             ->setManualQuestItemLocation($this->manualQuestItemLocation)
             ->setGameMapBonus($this->gameMapBonus)
+            ->setQuestItemDropBonus($this->questItemDropBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
 
@@ -95,6 +111,9 @@ class DropCheckService
         return $this->battleDrop->rewardTotals();
     }
 
+    /**
+     * Plan the drops for a batch of kills without persisting them.
+     */
     public function planDrops(Character $character, Monster $monster, int $killCount = 1, ?float $lootingChance = null): array
     {
         $this->gameMapBonus = 0.0;
@@ -108,6 +127,11 @@ class DropCheckService
             $this->gameMapBonus = $gameMap->drop_chance_bonus;
         }
 
+        $resolvedAreaGemEffects = $this->areaGemEffectService->resolveForCharacter($character);
+        $this->gameMapBonus += $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ITEM_DROP_CHANCE_INCREASE);
+        $this->mythicItemDropBonus = $resolvedAreaGemEffects->rarityEffects()->mythic();
+        $this->questItemDropBonus = $resolvedAreaGemEffects->rewardEffect(AreaGemRewardEffect::ENEMY_QUEST_ITEM_DROP_CHANCE_INCREASE);
+
         $this->findLocationWithEffect($characterMap);
         $this->findManualQuestItemLocation($characterMap);
 
@@ -115,6 +139,7 @@ class DropCheckService
             ->setSpecialLocation($this->locationWithEffect)
             ->setManualQuestItemLocation($this->manualQuestItemLocation)
             ->setGameMapBonus($this->gameMapBonus)
+            ->setQuestItemDropBonus($this->questItemDropBonus)
             ->setLootingChance($this->lootingChance)
             ->resetRewardTotals();
 
@@ -319,10 +344,10 @@ class DropCheckService
                 $chance = 0.15;
             }
 
-            return DropCheckCalculator::fetchDifficultItemChance($chance);
+            return DropCheckCalculator::fetchDifficultItemChance($chance + $this->mythicItemDropBonus);
         }
 
-        return DropCheckCalculator::fetchDifficultItemChance();
+        return DropCheckCalculator::fetchDifficultItemChance($this->mythicItemDropBonus);
     }
 
     /**

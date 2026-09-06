@@ -80,6 +80,8 @@ class Monster extends Model
         'dex' => 'integer',
         'chr' => 'integer',
         'int' => 'integer',
+        'agi' => 'integer',
+        'focus' => 'integer',
         'ac' => 'integer',
         'gold' => 'integer',
         'celestial_type' => 'integer',

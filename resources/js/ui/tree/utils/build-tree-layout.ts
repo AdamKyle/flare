@@ -130,6 +130,7 @@ export const buildTreeLayout = <TData>({
         selectable: false,
         focusable: false,
         deletable: false,
+        ariaRole: 'presentation',
         data: {
           content: renderNode(node),
           color: node.color,
@@ -159,6 +160,8 @@ export const buildTreeLayout = <TData>({
       selectable: false,
       deletable: false,
       reconnectable: false,
+      ariaRole: 'presentation',
+      domAttributes: { 'aria-hidden': true },
       data: {
         color: branch.color ?? defaultBranchColor,
       },

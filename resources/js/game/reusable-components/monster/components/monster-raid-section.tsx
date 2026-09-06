@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import { formatNumberWithCommas } from '../../../util/format-number';
+import { formatPercent } from '../../../util/format-number';
 import {
   isRaidAttackType,
   RAID_ATTACK_TYPE_LABELS,
@@ -61,7 +61,7 @@ const MonsterRaidSection = ({ monster }: MonsterDetailProps): ReactNode => {
         {atonementRows.map((row) => (
           <React.Fragment key={row.label}>
             <Dt>{row.label}</Dt>
-            <Dd>{formatNumberWithCommas(row.value)}</Dd>
+            <Dd>{formatPercent(row.value)}</Dd>
           </React.Fragment>
         ))}
       </Dl>

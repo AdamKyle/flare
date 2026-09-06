@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import UsePublicQuestTreeDefinition from './definitions/use-public-quest-tree-definition';
 import QuestTreeNodeDefinition from '../../../../game/reusable-components/quest/api/definitions/quest-tree-node-definition';
 import { QuestKind } from '../../../../game/reusable-components/quest/enums/quest-kind';
+import { buildQuestTreeQueryKey } from '../../../../game/reusable-components/quest/utils/build-quest-tree-query-key';
 import QuestInfoTreeResponseDefinition from '../definitions/quest-info-tree-response-definition';
 import { QuestInfoApiUrls } from '../enums/quest-info-api-urls';
 
@@ -25,6 +26,7 @@ export const usePublicQuestTree = (
   const [loading, setLoading] = useState(true);
   const [error, setError] =
     useState<UsePublicQuestTreeDefinition['error']>(null);
+  const [queryKey, setQueryKey] = useState<string | null>(null);
 
   const requestGenerationRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -35,11 +37,14 @@ export const usePublicQuestTree = (
 
     abortControllerRef.current?.abort();
 
+    const requestQueryKey = buildQuestTreeQueryKey(mapId, kind);
+
     if (mapId === null) {
       abortControllerRef.current = null;
       setQuests([]);
       setError(null);
       setLoading(false);
+      setQueryKey(null);
 
       return;
     }
@@ -50,6 +55,7 @@ export const usePublicQuestTree = (
     setQuests([]);
     setLoading(true);
     setError(null);
+    setQueryKey(null);
 
     try {
       const result = await apiHandler.get<
@@ -68,6 +74,7 @@ export const usePublicQuestTree = (
       }
 
       setQuests(result.quests);
+      setQueryKey(requestQueryKey);
     } catch (errorInstance) {
       if (axios.isCancel(errorInstance)) {
         return;
@@ -82,11 +89,13 @@ export const usePublicQuestTree = (
           message:
             errorInstance.response?.data?.message ?? errorInstance.message,
         });
+        setQueryKey(requestQueryKey);
 
         return;
       }
 
       setError({ message: 'Unable to load the Quest tree.' });
+      setQueryKey(requestQueryKey);
     } finally {
       if (requestGenerationRef.current === requestGeneration) {
         setLoading(false);
@@ -102,5 +111,5 @@ export const usePublicQuestTree = (
     };
   }, [fetchTree]);
 
-  return { quests, loading, error };
+  return { quests, loading, error, query_key: queryKey };
 };

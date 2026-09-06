@@ -9,6 +9,7 @@ use App\Game\Skills\Values\SkillTypeValue;
 use Database\Factories\SkillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 class Skill extends Model
@@ -55,31 +56,62 @@ class Skill extends Model
         'class_id',
     ];
 
+    /**
+     * Resolve this Skill's type from its base Game Skill.
+     *
+     * @return SkillTypeValue Domain type classification of this Skill's base Game Skill.
+     */
     public function type(): SkillTypeValue
     {
         return $this->baseSkill->skillType();
     }
 
+    /**
+     * The Game Skill this Character Skill is based on.
+     *
+     * @return BelongsTo
+     */
     public function baseSkill()
     {
         return $this->belongsTo(GameSkill::class, 'game_skill_id', 'id');
     }
 
+    /**
+     * The Character who owns this Skill.
+     *
+     * @return BelongsTo
+     */
     public function character()
     {
         return $this->belongsTo(Character::class);
     }
 
+    /**
+     * Build the list of equipped/quest items contributing to this Skill's bonus.
+     *
+     * @param  string  $skillAttribute  Skill attribute whose contributing items are being resolved.
+     * @return array Item bonus breakdown entries, each describing the contributing item and its bonus amount.
+     */
     public function getItemSkillBreakdown(string $skillAttribute = 'skill_bonus'): array
     {
         return $this->getItemBonusBreakDown($this->baseSkill, $skillAttribute);
     }
 
+    /**
+     * Resolve this Skill's display name from its base Game Skill.
+     *
+     * @return string
+     */
     public function getNameAttribute()
     {
         return $this->baseSkill->name;
     }
 
+    /**
+     * Resolve this Skill's total Class bonus for its current level.
+     *
+     * @return float|int
+     */
     public function getClassBonusAttribute()
     {
 
@@ -90,6 +122,11 @@ class Skill extends Model
         return $this->baseSkill->class_bonus * $this->level;
     }
 
+    /**
+     * Resolve the Game Class id associated with this Skill's base Game Skill.
+     *
+     * @return int|null
+     */
     public function getClassIdAttribute()
     {
         if (is_null($this->baseSkill->game_class_id)) {
@@ -99,21 +136,41 @@ class Skill extends Model
         return $this->baseSkill->game_class_id;
     }
 
+    /**
+     * Resolve this Skill's description from its base Game Skill.
+     *
+     * @return string|null
+     */
     public function getDescriptionAttribute()
     {
         return $this->baseSkill->description;
     }
 
+    /**
+     * Resolve this Skill's max level from its base Game Skill.
+     *
+     * @return int
+     */
     public function getMaxLevelAttribute()
     {
         return $this->baseSkill->max_level;
     }
 
+    /**
+     * Resolve whether this Skill can be trained from its base Game Skill.
+     *
+     * @return bool
+     */
     public function getCanTrainAttribute()
     {
         return $this->baseSkill->can_train;
     }
 
+    /**
+     * Determine whether this Skill reduces fight time at its current level.
+     *
+     * @return bool
+     */
     public function getReducesTimeAttribute()
     {
         $value = $this->baseSkill->fight_time_out_mod_bonus_per_level;
@@ -129,21 +186,41 @@ class Skill extends Model
         return true;
     }
 
+    /**
+     * Resolve this Skill's total unit time reduction at its current level.
+     *
+     * @return float|int
+     */
     public function getUnitTimeReductionAttribute()
     {
         return $this->baseSkill->unit_time_reduction * $this->level;
     }
 
+    /**
+     * Resolve this Skill's total building time reduction at its current level.
+     *
+     * @return float|int
+     */
     public function getBuildingTimeReductionAttribute()
     {
         return $this->baseSkill->building_time_reduction * $this->level;
     }
 
+    /**
+     * Resolve this Skill's total unit movement time reduction at its current level.
+     *
+     * @return float|int
+     */
     public function getUnitMovementTimeReductionAttribute()
     {
         return $this->baseSkill->unit_movement_time_reduction * $this->level;
     }
 
+    /**
+     * Determine whether this Skill reduces movement time at its current level.
+     *
+     * @return bool
+     */
     public function getReducesMovementTimeAttribute()
     {
 
@@ -160,6 +237,11 @@ class Skill extends Model
         return true;
     }
 
+    /**
+     * Resolve this Skill's total base damage modifier from its base bonus and item bonuses.
+     *
+     * @return float
+     */
     public function getBaseDamageModAttribute()
     {
 
@@ -180,6 +262,11 @@ class Skill extends Model
         return $itemBonus + $baseBonus;
     }
 
+    /**
+     * Resolve this Skill's total base healing modifier from its base bonus and item bonuses.
+     *
+     * @return float
+     */
     public function getBaseHealingModAttribute()
     {
         $value = $this->baseSkill->base_healing_mod_bonus_per_level;
@@ -199,6 +286,11 @@ class Skill extends Model
         return $itemBonus + $baseBonus;
     }
 
+    /**
+     * Resolve this Skill's total base AC modifier from its base bonus and item bonuses.
+     *
+     * @return float
+     */
     public function getBaseACModAttribute()
     {
         $value = $this->baseSkill->base_ac_mod_bonus_per_level;
@@ -218,6 +310,11 @@ class Skill extends Model
         return $itemBonus + $baseBonus;
     }
 
+    /**
+     * Resolve this Skill's fight timeout modifier, capped at its maximum allowed reduction.
+     *
+     * @return float
+     */
     public function getFightTimeOutModAttribute()
     {
         $value = $this->baseSkill->fight_time_out_mod_bonus_per_level;
@@ -238,6 +335,11 @@ class Skill extends Model
         return $total;
     }
 
+    /**
+     * Resolve this Skill's move timeout modifier, capped at its maximum allowed reduction.
+     *
+     * @return float
+     */
     public function getMoveTimeOutModAttribute()
     {
 
@@ -260,6 +362,12 @@ class Skill extends Model
         return $totalBonus;
     }
 
+    /**
+     * Resolve this Skill's total bonus for its current level, including item, boon, and Class
+     * specific training bonuses.
+     *
+     * @return float
+     */
     public function getSkillBonusAttribute()
     {
         if (is_null($this->baseSkill->skill_bonus_per_level)) {
@@ -305,6 +413,12 @@ class Skill extends Model
         return $totalBonus;
     }
 
+    /**
+     * Resolve this Skill's total training bonus from item bonuses, boons, and Class specific
+     * training bonuses.
+     *
+     * @return float
+     */
     public function getSkillTrainingBonusAttribute()
     {
         $bonus = 0.0;
@@ -316,14 +430,24 @@ class Skill extends Model
         return $bonus;
     }
 
+    /**
+     * Resolve the Character's Class modifier bonus for a named Skill.
+     *
+     * @param  Character  $character  Character being evaluated.
+     * @param  string  $name  Requested Class skill-bonus key/name.
+     * @return float Character's Class modifier bonus for the named Skill.
+     */
     private function getCharacterSkillBonus(Character $character, string $name): float
     {
-        $raceSkillBonusValue = $character->race->{Str::snake($name.'_mod')};
-        $classSkillBonusValue = $character->class->{Str::snake($name.'_mod')};
-
-        return $raceSkillBonusValue + $classSkillBonusValue;
+        return $character->class->{Str::snake($name.'_mod')};
     }
 
+    /**
+     * Resolve the flat training bonus granted for a Class specific crafting Skill.
+     *
+     * @param  Character  $character  Character whose Class-specific training bonus is being calculated.
+     * @return float Calculated Class-specific training bonus.
+     */
     private function getClassSpecificTrainingBonus(Character $character): float
     {
         $skillBonusSources = $this->getSkillBonusSources();
@@ -340,6 +464,14 @@ class Skill extends Model
         return 0.0;
     }
 
+    /**
+     * Resolve the total Skill bonus contributed by equipped and, optionally, quest items.
+     *
+     * @param  GameSkill  $skill  Base Game Skill whose item bonuses are being resolved.
+     * @param  string  $skillAttribute  Requested Skill attribute to sum bonuses for.
+     * @param  bool  $equippedOnly  Whether to restrict the bonus to equipped items only.
+     * @return float Total Skill bonus contributed by the matching items.
+     */
     private function getItemBonuses(GameSkill $skill, string $skillAttribute = 'skill_bonus', bool $equippedOnly = false): float
     {
         $skillBonusSources = $this->getSkillBonusSources();
@@ -358,6 +490,13 @@ class Skill extends Model
         return $bonus;
     }
 
+    /**
+     * Build the list of equipped/quest items contributing a positive bonus for the given Skill attribute.
+     *
+     * @param  GameSkill  $skill  Base Game Skill whose contributing items are being resolved.
+     * @param  string  $skillAttribute  Requested Skill attribute to build the breakdown for.
+     * @return array Item bonus breakdown entries, each describing the contributing item and its bonus amount.
+     */
     private function getItemBonusBreakDown(GameSkill $skill, string $skillAttribute = 'skill_bonus'): array
     {
         $skillBonusSources = $this->getSkillBonusSources();
@@ -406,6 +545,12 @@ class Skill extends Model
         return $itemsThatEffectBonus;
     }
 
+    /**
+     * Resolve the total bonus contributed by the Character's active Boons for the given attribute.
+     *
+     * @param  string  $skillBonusAttribute  Requested Skill bonus attribute to sum across active Boons.
+     * @return float Total bonus contributed by the Character's active Boons for the given attribute.
+     */
     private function getCharacterBoonsBonus(string $skillBonusAttribute)
     {
         $skillBonusSources = $this->getSkillBonusSources();
@@ -432,11 +577,25 @@ class Skill extends Model
         return $newBonus;
     }
 
+    /**
+     * Resolve the factory used to create new Skill instances.
+     *
+     * @return SkillFactory Factory used to create new Skill instances.
+     */
     protected static function newFactory(): SkillFactory
     {
         return SkillFactory::new();
     }
 
+    /**
+     * Resolve the Skill bonus context service for this Skill instance.
+     *
+     * Eloquent accessor boundary: constructor injection is not available on a Model, so this
+     * narrow, documented container resolution is the permitted exception rather than a general
+     * service-locator pattern.
+     *
+     * @return SkillBonusContextService Skill bonus context service scoped to this Skill instance.
+     */
     private function getSkillBonusSources(): SkillBonusContextService
     {
         $skillBonusSources = resolve(SkillBonusContextService::class);

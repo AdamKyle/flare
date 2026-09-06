@@ -18,13 +18,15 @@ use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateClass;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 
 class CharacterStatBuilderTest extends TestCase
 {
-    use CreateCharacterBoon, CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, RefreshDatabase;
+    use CreateCharacterBoon, CreateCharacterClassSpecialitiesEquipped, CreateClass, CreateGameClassSpecial, CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, RefreshDatabase;
 
     private ?CharacterStatBuilder $characterStatBuilder;
 
@@ -296,6 +298,23 @@ class CharacterStatBuilderTest extends TestCase
         $result = $this->characterStatBuilder->setCharacter($factory->getCharacter())->statMod('str');
 
         $this->assertSame(50.0, $result);
+    }
+
+    public function test_stat_mod_applies_the_rolled_map_gem_character_power_reduction(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['damage_stat' => 'dur']))
+            ->givePlayerLocation()
+            ->updateCharacter(['str' => 100])
+            ->getCharacter();
+
+        $gameMap = $character->map->gameMap;
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['character_power_reduction' => 0.3]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $result = $this->characterStatBuilder->setCharacter($character->refresh())->statMod('str');
+
+        $this->assertSame(70.0, $result);
     }
 
     public function test_get_map_character_reductions_returns_zero_when_map_is_null(): void

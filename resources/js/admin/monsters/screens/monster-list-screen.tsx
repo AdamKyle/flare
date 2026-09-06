@@ -1,7 +1,8 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
 
 import { useAdminGameMapFilterOptions } from '../../shared/api/hooks/use-admin-game-map-filter-options';
+import AdminAnchorButton from '../../shared/components/admin-anchor-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import MonsterListDefinition from '../api/definitions/monster-list-definition';
@@ -30,7 +31,6 @@ const MonsterListScreen = (): ReactNode => {
   const navigation = useMonsterScreenNavigation();
   const [announcement, setAnnouncement] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const hasInitializedMapRef = useRef(false);
 
   const {
     options: mapOptions,
@@ -60,15 +60,6 @@ const MonsterListScreen = (): ReactNode => {
     refresh_first_page: refreshFirstPage,
   } = useMonsters();
 
-  useEffect(() => {
-    if (hasInitializedMapRef.current || !mapOptions) {
-      return;
-    }
-
-    hasInitializedMapRef.current = true;
-    setGameMapId(mapOptions.default_game_map_id);
-  }, [mapOptions, setGameMapId]);
-
   const gameMapItems: DropdownItem[] =
     mapOptions?.game_maps.map((gameMap) => ({
       label: gameMap.name,
@@ -84,8 +75,7 @@ const MonsterListScreen = (): ReactNode => {
   );
   const showLocationTypeFilter =
     MONSTER_LIST_CATEGORIES_WITH_LOCATION_TYPE.includes(category);
-  const locationTypeItems: DropdownItem[] =
-    buildMonsterLocationTypeItems(category);
+  const locationTypeItems: DropdownItem[] = buildMonsterLocationTypeItems();
 
   const handleRowActivate = (monster: MonsterListDefinition): void => {
     navigation.navigateTo(MonsterScreens.SHOW, { monster_id: monster.id });
@@ -121,7 +111,7 @@ const MonsterListScreen = (): ReactNode => {
   const totalRecords = response?.meta.pagination.total ?? 0;
 
   const renderFilters = (): ReactNode => {
-    if (mapOptionsLoading && !hasInitializedMapRef.current) {
+    if (mapOptionsLoading) {
       return <InfiniteLoader />;
     }
 
@@ -196,12 +186,11 @@ const MonsterListScreen = (): ReactNode => {
           aria-label="Import Monsters workbook"
           onChange={(event) => void handleFileSelected(event)}
         />
-        <a
+        <AdminAnchorButton
           href="/admin/monsters/export"
-          className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-        >
-          Export
-        </a>
+          label="Export"
+          variant={ButtonVariant.PRIMARY}
+        />
       </div>
     );
   };
@@ -212,12 +201,11 @@ const MonsterListScreen = (): ReactNode => {
       width={AdminPageWidth.Standard}
       header_actions={
         <>
-          <a
+          <AdminAnchorButton
             href="/admin"
-            className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-          >
-            Back
-          </a>
+            label="Back"
+            variant={ButtonVariant.DANGER}
+          />
           <Button
             label="Create Monster"
             variant={ButtonVariant.PRIMARY}

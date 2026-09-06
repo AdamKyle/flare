@@ -15,6 +15,7 @@ import { GameMapRelatedDataKey } from '../../types/game-map-related-data-entry';
 import { resolveGameMapBonusEntries } from '../../utils/resolve-game-map-bonus-entries';
 import { resolveRequiredQuestItemCopy } from '../../utils/resolve-required-quest-item-copy';
 import GameMapFormContent from '../forms/game-map-form-content';
+import GameMapKingdomColorSwatch from '../game-map-kingdom-color-swatch';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
@@ -170,7 +171,9 @@ const AdminGameMapDetailSidePeek = ({
           {gameMap.kingdom_color && (
             <>
               <Dt>Kingdom color</Dt>
-              <Dd>{gameMap.kingdom_color}</Dd>
+              <Dd>
+                <GameMapKingdomColorSwatch color={gameMap.kingdom_color} />
+              </Dd>
             </>
           )}
         </Dl>

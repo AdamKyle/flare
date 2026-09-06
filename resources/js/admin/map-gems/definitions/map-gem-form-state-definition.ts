@@ -1,0 +1,36 @@
+export default interface MapGemFormStateDefinition {
+  game_map_id: number | null;
+  name: string;
+  description: string;
+  character_xp_bonus_range: string;
+  character_class_rank_xp_bonus_range: string;
+  kingdom_passive_training_reduction_range: string;
+  character_class_specialty_xp_gain_range: string;
+  crafting_skill_ids: number[];
+  crafting_skill_bonus_range: string;
+  gold_gain_range: string;
+  gold_dust_gain_range: string;
+  shards_gain_range: string;
+  copper_coin_gain_range: string;
+  item_drop_chance_increase_range: string;
+  unique_item_drop_chance_increase_range: string;
+  mythic_item_drop_chance_increase_range: string;
+  cosmic_item_drop_chance_increase_range: string;
+  character_power_reduction_range: string;
+  enemy_strength_increase_range: string;
+  enemy_healing_increase_range: string;
+  enemy_spell_evasion_range: string;
+  enemy_affix_resistance_range: string;
+  enemy_entrancing_chance_range: string;
+  enemy_devouring_light_chance_range: string;
+  enemy_devouring_darkness_chance_range: string;
+  enemy_ambush_chance_range: string;
+  enemy_ambush_resistance_range: string;
+  enemy_counter_chance_range: string;
+  enemy_counter_resistance_range: string;
+  enemy_quest_item_drop_chance_increase_range: string;
+  monster_xp_increase_range: string;
+  monster_gold_drop_increase_range: string;
+  monster_atonement: number | null;
+  monster_atonement_range: string;
+}

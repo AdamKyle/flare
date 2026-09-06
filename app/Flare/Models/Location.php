@@ -80,14 +80,25 @@ class Location extends Model
     }
 
     /**
-     * Scope Locations to those eligible to receive a Location Gem parameter.
+     * Scope Locations to those eligible to receive a Location Gem parameter: they must have a
+     * quest Item drop or a Location Type, must not be a Weekly Fight or Cave of Memories
+     * Location, and must not belong to a generated Gem World Map.
      */
     public function scopeEligibleForLocationGems(Builder $query): Builder
     {
+        $excludedTypes = array_merge(
+            LocationType::weeklyFightLocationTypes(),
+            [LocationType::CAVE_OF_MEMORIES->value]
+        );
+
         return $query->where(function (Builder $query) {
             $query->whereHas('questItemDrops')
                 ->orWhereNotNull('type');
-        });
+        })
+            ->where(function (Builder $query) use ($excludedTypes) {
+                $query->whereNull('type')->orWhereNotIn('type', $excludedTypes);
+            })
+            ->whereHas('map', fn (Builder $mapQuery) => $mapQuery->whereNull('generated_map_type'));
     }
 
     /**

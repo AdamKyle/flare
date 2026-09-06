@@ -8,5 +8,5 @@ export default interface QuestCardProps {
   npc_name?: string | null;
   child_count?: number;
   context_label?: string;
-  on_open_quest: (id: number) => void;
+  on_open_quest?: (id: number) => void;
 }

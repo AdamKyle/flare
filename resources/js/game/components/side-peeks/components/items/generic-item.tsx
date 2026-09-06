@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
 import ReadOnlyItemCard from './read-only-item-card';
+import GenericItemComponentProps from './types/generic-item-component-props';
 import { EquippableItemWithBase } from '../../../../api-definitions/items/equippable-item-definitions/base-equippable-item-definition';
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { InventoryItemTypes } from '../../../character-sheet/partials/character-inventory/enums/inventory-item-types';
@@ -12,7 +13,6 @@ import {
   backpackFocusRingStyles,
   backpackItemTextColors,
 } from '../../../character-sheet/partials/character-inventory/styles/backpack-item-styles';
-import BackpackItemProps from '../../../character-sheet/partials/character-inventory/types/backpack-item-props';
 
 const GenericItem = ({
   item,
@@ -20,7 +20,8 @@ const GenericItem = ({
   is_selected,
   on_item_selected,
   is_selection_disabled,
-}: BackpackItemProps): ReactNode => {
+  quest_item_ownership_state: questItemOwnershipState,
+}: GenericItemComponentProps): ReactNode => {
   const itemColor = backpackItemTextColors(item);
   const checkboxId = 'select-' + item.slot_id;
   const titleId = 'item-title-' + item.slot_id;
@@ -96,6 +97,7 @@ const GenericItem = ({
       description={questItem.description}
       effect={questItem.effect ? questItem.effect : null}
       usable={questItem.usable}
+      ownership_state={questItemOwnershipState}
       on_click={handleViewItem}
     />
   );

@@ -17,38 +17,15 @@ class GameRace extends Model
      */
     protected $fillable = [
         'name',
-        'str_mod',
-        'dur_mod',
-        'dex_mod',
-        'chr_mod',
-        'int_mod',
-        'agi_mod',
-        'focus_mod',
-        'accuracy_mod',
-        'dodge_mod',
-        'defense_mod',
-        'looting_mod',
+        'description',
+        'image_path',
     ];
 
     /**
-     * The attributes that should be cast to native types.
+     * Resolve the factory used to create new Race instances.
      *
-     * @var array
+     * @return GameRaceFactory
      */
-    protected $casts = [
-        'str_mod' => 'integer',
-        'dur_mod' => 'integer',
-        'dex_mod' => 'integer',
-        'chr_mod' => 'integer',
-        'int_mod' => 'integer',
-        'agi_mod' => 'integer',
-        'focus_mod' => 'integer',
-        'accuracy_mod' => 'float',
-        'dodge_mod' => 'float',
-        'defense_mod' => 'float',
-        'looting_mod' => 'float',
-    ];
-
     protected static function newFactory()
     {
         return GameRaceFactory::new();

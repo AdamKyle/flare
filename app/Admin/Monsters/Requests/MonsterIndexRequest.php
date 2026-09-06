@@ -55,24 +55,16 @@ class MonsterIndexRequest extends FormRequest
                 return;
             }
 
-            $categoriesAllowingLocationType = [
-                MonsterListCategory::SPECIAL_LOCATION->value,
-                MonsterListCategory::WEEKLY_FIGHT->value,
-            ];
-
-            if (! in_array($category, $categoriesAllowingLocationType, true)) {
+            if ($category !== MonsterListCategory::WEEKLY_FIGHT->value) {
                 $validator->errors()->add(
                     'filters.location_type',
-                    'The Location Type filter is only valid for the Special Location or Weekly Fight category.'
+                    'The Location Type filter is only valid for the Weekly Fight category.'
                 );
 
                 return;
             }
 
-            if (
-                $category === MonsterListCategory::WEEKLY_FIGHT->value
-                && ! in_array($locationType, MonsterListCategory::weeklyFightLocationTypes(), true)
-            ) {
+            if (! in_array($locationType, MonsterListCategory::weeklyFightLocationTypes(), true)) {
                 $validator->errors()->add(
                     'filters.location_type',
                     'The selected Location Type is not part of the Weekly Fight category.'

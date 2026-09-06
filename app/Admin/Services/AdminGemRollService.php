@@ -68,9 +68,23 @@ class AdminGemRollService
         return $gem;
     }
 
+    /**
+     * Resolve a stored Gem roll range into a rolled value, treating a zero-only scalar or a
+     * zero-only range (for example "0", "0.0", or "0-0") as an absent optional range rather than
+     * a range to roll, so legacy stored/imported zero values do not abort rolling.
+     *
+     * @param  string|null  $range  Stored range string, a zero-only scalar, or null.
+     * @return float|null Rolled value, or null when the range is absent/zero-only.
+     */
     private function rollRange(?string $range): ?float
     {
         if (is_null($range) || trim($range) === '') {
+            return null;
+        }
+
+        $range = trim($range);
+
+        if ($this->isZeroOnlyScalar($range)) {
             return null;
         }
 
@@ -87,10 +101,26 @@ class AdminGemRollService
             throw new InvalidArgumentException('Invalid gem roll range: '.$range);
         }
 
+        if ($this->isZeroOnlyScalar($firstValue) && $this->isZeroOnlyScalar($secondValue)) {
+            return null;
+        }
+
         $lower = min($firstValue, $secondValue);
         $upper = max($firstValue, $secondValue);
         $percentage = $this->randomNumberGenerator->numberBetween(0, 1_000_000) / 1_000_000;
 
         return round($lower + (($upper - $lower) * $percentage), 8);
+    }
+
+    /**
+     * Determine whether a trimmed scalar string represents only zero, such as "0", "0.0", or
+     * "0.00", with no other digits.
+     *
+     * @param  string  $value  Trimmed scalar string.
+     * @return bool Whether the value is a zero-only representation.
+     */
+    private function isZeroOnlyScalar(string $value): bool
+    {
+        return preg_match('/^0+(?:\.0+)?$/', $value) === 1;
     }
 }

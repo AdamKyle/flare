@@ -29,9 +29,6 @@ class CreateMonsterCache extends Command
      */
     public function handle(BuildMonsterCacheService $buildMonsterCacheService): void
     {
-        $buildMonsterCacheService->buildCache();
-        $buildMonsterCacheService->buildCelesetialCache();
-        $buildMonsterCacheService->buildRaidCache();
-        $buildMonsterCacheService->buildSpecialLocationMonsterList();
+        $buildMonsterCacheService->buildAll();
     }
 }

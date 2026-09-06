@@ -5,7 +5,6 @@ namespace App\Game\Core\Controllers;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameRace;
 use App\Flare\Models\User;
-use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\Values\NameTag;
 use App\Game\Core\Requests\CosmeticTextRequest;
@@ -14,16 +13,24 @@ use App\Game\Core\Requests\RaceChangerRequest;
 use App\Game\Core\Values\FeatureType;
 use App\Http\Controllers\Controller;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\View\View;
 
 class SettingsController extends Controller
 {
-    public function __construct(private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypesHandler)
+    public function __construct()
     {
         $this->middleware('auth');
     }
 
+    /**
+     * Display the Settings page for the authenticated User.
+     *
+     * @param  User  $user  Authenticated User whose Settings page is being displayed.
+     * @return View
+     */
     public function index(User $user)
     {
 
@@ -44,6 +51,13 @@ class SettingsController extends Controller
         ]);
     }
 
+    /**
+     * Update the authenticated User's chat message display preferences.
+     *
+     * @param  Request  $request  Request containing chat-setting changes.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function chatSettings(Request $request, User $user)
     {
 
@@ -71,6 +85,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated chat preferences.');
     }
 
+    /**
+     * Update the authenticated User's auto-disenchant preferences.
+     *
+     * @param  Request  $request  Request containing auto-disenchant setting changes.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function autoDisenchantSettings(Request $request, User $user)
     {
         if (filter_var($request->auto_disenchant, FILTER_VALIDATE_BOOLEAN) === false) {
@@ -92,6 +113,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated auto disenchant preferences.');
     }
 
+    /**
+     * Update the authenticated User's attack type pop-over preference.
+     *
+     * @param  Request  $request  Request containing the attack type pop-over setting change.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function disableAttackTypePopOvers(Request $request, User $user)
     {
 
@@ -104,6 +132,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated Attack Popover Preferences');
     }
 
+    /**
+     * Update the authenticated User's Character name.
+     *
+     * @param  Request  $request  Request containing the new Character name.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function characterSettings(Request $request, User $user)
     {
         $request->validate([
@@ -117,6 +152,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated character name.');
     }
 
+    /**
+     * Update the authenticated User's guide enabled preference.
+     *
+     * @param  Request  $request  Request containing the guide-enabled setting change.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function guideSettings(Request $request, User $user)
     {
 
@@ -131,6 +173,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated character guide setting.');
     }
 
+    /**
+     * Update the authenticated User's cosmetic chat text options.
+     *
+     * @param  CosmeticTextRequest  $request  Request containing cosmetic text options.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function cosmeticText(CosmeticTextRequest $request, User $user)
     {
 
@@ -147,6 +196,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated Cosmetic Text options');
     }
 
+    /**
+     * Update the authenticated User's cosmetic name tag option.
+     *
+     * @param  NameTagRequest  $request  Request containing the nametag setting.
+     * @param  User  $user  Authenticated User being updated.
+     * @return RedirectResponse
+     */
     public function cosmeticNametag(NameTagRequest $request, User $user)
     {
 
@@ -169,6 +225,13 @@ class SettingsController extends Controller
         return redirect()->back()->with('success', 'Updated Name Tag options');
     }
 
+    /**
+     * Update the authenticated User's Character Race via the cosmetic Race changer.
+     *
+     * @param  RaceChangerRequest  $request  Request containing the Race selection.
+     * @param  User  $user  Authenticated User whose Character Race is changed.
+     * @return RedirectResponse
+     */
     public function cosmeticRaceChanger(RaceChangerRequest $request, User $user)
     {
 
@@ -178,33 +241,11 @@ class SettingsController extends Controller
 
         $character = $user->character;
 
-        $stats = ['str', 'dex', 'chr', 'int', 'agi', 'dur', 'focus'];
-
-        foreach ($stats as $stat) {
-            if ($character->race->{$stat.'_mod'} > 0) {
-                $character->{$stat} -= $character->race->{$stat.'_mod'};
-            }
-        }
-
-        $character->save();
-
-        $character = $character->refresh();
-
         $gameRace = GameRace::find($request->race_id);
-
-        foreach ($stats as $stat) {
-            if ($gameRace->{$stat.'_mod'} > 0) {
-                $character->{$stat} += $gameRace->{$stat.'_mod'};
-            }
-        }
 
         $character->game_race_id = $gameRace->id;
 
         $character->save();
-
-        $character = $character->refresh();
-
-        $this->updateCharacterAttackTypesHandler->updateCache($character);
 
         return redirect()->back()->with('success', 'Your race has been changed!');
     }

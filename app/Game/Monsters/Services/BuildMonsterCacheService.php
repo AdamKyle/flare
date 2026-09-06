@@ -5,45 +5,62 @@ namespace App\Game\Monsters\Services;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Monster;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
+use App\Game\Maps\Values\LocationType;
 use App\Game\Monsters\Transformers\MonsterTransformer;
+use App\Game\Monsters\Values\MonsterCacheKey;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 
+/**
+ * Builds the Monster fight/list caches. Regular Map and Location Monster
+ * caches are transformed using the current rolled Map/Location Gem effects
+ * for their gameplay context; Raid, Weekly Fight, and Celestial Monsters
+ * remain Gem-neutral.
+ */
 class BuildMonsterCacheService
 {
-    public function __construct(private readonly Manager $manager, private MonsterTransformer $monster) {}
+    public function __construct(
+        private readonly Manager $manager,
+        private readonly MonsterTransformer $monsterTransformer,
+        private readonly AreaGemEffectService $areaGemEffectService,
+    ) {}
 
     /**
-     * Builds monster cache.
+     * Build every Monster cache used by gameplay.
+     */
+    public function buildAll(): void
+    {
+        $this->buildCache();
+        $this->buildLocationCache();
+        $this->buildWeeklyFightCache();
+        $this->buildRaidCache();
+        $this->buildCelestialCache();
+    }
+
+    /**
+     * Build the regular per-Game-Map Monster cache, applying the current rolled Map Gem
+     * effects for each Game Map's actual gameplay context (including generated Gem Worlds).
      */
     public function buildCache(): void
     {
+        Cache::delete(MonsterCacheKey::MONSTERS->value);
+
         $monstersCache = [];
-
-        Cache::delete('monsters');
-
-        $this->monster = $this->monster->setIsMonsterSpecial(true);
 
         foreach (GameMap::all() as $gameMap) {
             $monsterSourceMap = $gameMap->monsterSourceGameMap();
-            $enemyIncrease = $gameMap->enemy_stat_bonus ?? $monsterSourceMap->enemy_stat_bonus ?? 0.0;
-            $enemyDropBonus = $gameMap->drop_chance_bonus ?? $monsterSourceMap->drop_chance_bonus ?? 0.0;
 
-            $this->monster->withEnemyIncrease($enemyIncrease)
-                ->withDropChanceIncrease($enemyDropBonus);
             $monsters = new Collection(
-                Monster::where('is_celestial_entity', false)
-                    ->where('is_raid_monster', false)
-                    ->where('is_raid_boss', false)
-                    ->whereNull('only_for_location_type')
-                    ->where('game_map_id', $monsterSourceMap->id)
-                    ->get(),
-                $this->monster
+                $this->regularMonsterQuery($monsterSourceMap->id)->get(),
+                $this->transformerForGameMap($gameMap)
             );
 
             if (! is_null($monsterSourceMap->only_during_event_type)) {
-                $monstersCache[$gameMap->name] = $this->createMonstersForEventMaps($monsters);
+                $monstersCache[$gameMap->name] = $this->createMonstersForEventMaps($gameMap, $monsters);
 
                 continue;
             }
@@ -51,17 +68,62 @@ class BuildMonsterCacheService
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
 
-        Cache::put('monsters', $monstersCache);
+        Cache::put(MonsterCacheKey::MONSTERS->value, $monstersCache);
     }
 
     /**
-     * Builds raid monster cache.
+     * Build the per-Location Monster cache: every nongenerated Location with a currently
+     * rolled Location Gem (reusing the parent Map's regular Monster population), plus the
+     * Cave of Memories dedicated Monster population, which is always Gem-neutral.
+     */
+    public function buildLocationCache(): void
+    {
+        Cache::delete(MonsterCacheKey::LOCATION_MONSTERS->value);
+
+        $cache = array_merge(
+            $this->buildGemAffectedLocationCache(),
+            $this->buildCaveOfMemoriesLocationCache()
+        );
+
+        Cache::put(MonsterCacheKey::LOCATION_MONSTERS->value, $cache);
+    }
+
+    /**
+     * Build the Weekly Fight Monster cache for each authoritative Weekly Fight Location Type.
+     * Weekly Fight Monsters never receive Map/Location Gem effects.
+     */
+    public function buildWeeklyFightCache(): void
+    {
+        Cache::delete(MonsterCacheKey::WEEKLY_MONSTERS->value);
+
+        $cache = [];
+        $transformer = $this->noEffectTransformer();
+
+        foreach (LocationType::weeklyFightLocationTypes() as $locationType) {
+            $monsters = new Collection(
+                Monster::where('is_celestial_entity', false)
+                    ->where('is_raid_monster', false)
+                    ->where('is_raid_boss', false)
+                    ->where('only_for_location_type', $locationType)
+                    ->get(),
+                $transformer
+            );
+
+            $cache['location-type-'.$locationType] = $this->manager->createData($monsters)->toArray();
+        }
+
+        Cache::put(MonsterCacheKey::WEEKLY_MONSTERS->value, $cache);
+    }
+
+    /**
+     * Build the Raid Monster/Boss cache. Raid Monsters never receive Map/Location Gem effects.
      */
     public function buildRaidCache(): void
     {
-        $monstersCache = [];
+        Cache::delete(MonsterCacheKey::RAID_MONSTERS->value);
 
-        Cache::delete('raid-monsters');
+        $monstersCache = [];
+        $transformer = $this->noEffectTransformer();
 
         foreach (GameMap::all() as $gameMap) {
             $monsterSourceMap = $gameMap->monsterSourceGameMap();
@@ -80,111 +142,158 @@ class BuildMonsterCacheService
                 ->whereNull('only_for_location_type')
                 ->get();
 
-            $monsters = new Collection(
-                $raidBosses->merge($raidCritters),
-                $this->monster
-            );
+            $monsters = new Collection($raidBosses->merge($raidCritters), $transformer);
 
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
 
-        Cache::put('raid-monsters', $monstersCache);
+        Cache::put(MonsterCacheKey::RAID_MONSTERS->value, $monstersCache);
     }
 
     /**
-     * Build special location monsters
+     * Build the Celestial Monster cache. Celestials never receive Map/Location Gem effects.
      */
-    public function buildSpecialLocationMonsterList(): void
+    public function buildCelestialCache(): void
     {
-        $locations = Location::whereNotNull('type')->get();
+        Cache::delete(MonsterCacheKey::CELESTIALS->value);
 
-        $cache = [];
-
-        foreach ($locations as $location) {
-
-            $enemyIncrease = $location->map->enemy_stat_bonus ?? 0.0;
-            $dropChanceIncrease = $location->map->drop_chance_bonus ?? 0.0;
-
-            $transformer = $this->monster
-                ->setIsMonsterSpecial(true)
-                ->withEnemyIncrease($enemyIncrease)
-                ->withDropChanceIncrease($dropChanceIncrease);
-
-            $monsters = new Collection(
-                Monster::where('is_celestial_entity', false)
-                    ->where('is_raid_monster', false)
-                    ->where('is_raid_boss', false)
-                    ->where('only_for_location_type', $location->type)
-                    ->get(),
-                $transformer
-            );
-
-            $monsters = $this->manager->createData($monsters)->toArray();
-
-            $cache['location-type-'.$location->type] = $monsters;
-        }
-
-        Cache::put('special-location-monsters', $cache);
-    }
-
-    /**
-     * Builds celestial cache.
-     */
-    public function buildCelesetialCache(): void
-    {
         $monstersCache = [];
-
-        Cache::delete('celestials');
-
-        $this->monster = $this->monster->setIsMonsterSpecial(true);
+        $transformer = $this->noEffectTransformer();
 
         foreach (GameMap::all() as $gameMap) {
             $monsterSourceMap = $gameMap->monsterSourceGameMap();
+
             $monsters = new Collection(
                 Monster::where('is_celestial_entity', true)
                     ->where('game_map_id', $monsterSourceMap->id)
                     ->whereNull('only_for_location_type')
                     ->get(),
-                $this->monster
+                $transformer
             );
 
             $monstersCache[$gameMap->name] = $this->manager->createData($monsters)->toArray();
         }
 
-        Cache::put('celestials', $monstersCache);
+        Cache::put(MonsterCacheKey::CELESTIALS->value, $monstersCache);
     }
 
-    public function createNewHealthRange(Monster $monster, int $increaseStatsBy): string
+    /**
+     * Delete only the Monster caches whose contents are affected by a Map/Location Gem roll.
+     */
+    public function invalidateGemAffectedCaches(): void
     {
-        $monsterHealthRangeParts = explode('-', $monster->health_range);
-
-        $minHealth = intval($monsterHealthRangeParts[0]) + $increaseStatsBy;
-        $maxHealth = intval($monsterHealthRangeParts[1]) + $increaseStatsBy;
-
-        return $minHealth.'-'.$maxHealth;
+        Cache::delete(MonsterCacheKey::MONSTERS->value);
+        Cache::delete(MonsterCacheKey::LOCATION_MONSTERS->value);
     }
 
-    public function createNewAttackRange(Monster $monster, int $increaseStatsBy): string
+    /**
+     * Build the Gem-affected per-Location Monster cache entries for every nongenerated Location
+     * with a currently rolled Location Gem, reusing the parent Map's regular Monster population.
+     *
+     * @return array<string, array>
+     */
+    private function buildGemAffectedLocationCache(): array
     {
-        $monsterAttackParts = explode('-', $monster->attack_range);
+        $cache = [];
 
-        $minAttack = intval($monsterAttackParts[0]) + $increaseStatsBy;
-        $maxAttack = intval($monsterAttackParts[1]) + $increaseStatsBy;
+        $locations = Location::whereHas('gemParamters', fn ($query) => $query->whereNotNull('rolled_gem_id'))
+            ->with('gemParamters')
+            ->get();
 
-        return $minAttack.'-'.$maxAttack;
+        foreach ($locations as $location) {
+            $gameMap = $location->map;
+
+            if (is_null($gameMap) || $gameMap->isGeneratedGemMap()) {
+                continue;
+            }
+
+            $monsterSourceMap = $gameMap->monsterSourceGameMap();
+
+            $monsters = new Collection(
+                $this->regularMonsterQuery($monsterSourceMap->id)->get(),
+                $this->monsterTransformer->withAreaGemEffects(
+                    $this->areaGemEffectService->resolveForGameMap($gameMap, $location)
+                )
+            );
+
+            $cache['location-'.$location->id] = $this->manager->createData($monsters)->toArray();
+        }
+
+        return $cache;
     }
 
-    private function createMonstersForEventMaps(Collection $monsters): array
+    /**
+     * Build the Cave of Memories dedicated Monster population cache entries, keyed by the
+     * actual Cave of Memories Location id. These Monsters never receive Map/Location Gem
+     * combat effects.
+     *
+     * @return array<string, array>
+     */
+    private function buildCaveOfMemoriesLocationCache(): array
+    {
+        $cache = [];
+        $transformer = $this->noEffectTransformer();
+
+        $monsters = new Collection(
+            Monster::where('only_for_location_type', LocationType::CAVE_OF_MEMORIES->value)->get(),
+            $transformer
+        );
+
+        $locations = Location::where('type', LocationType::CAVE_OF_MEMORIES->value)->get();
+
+        foreach ($locations as $location) {
+            $cache['location-'.$location->id] = $this->manager->createData($monsters)->toArray();
+        }
+
+        return $cache;
+    }
+
+    /**
+     * Build the query for the regular, non-exempt persisted Monster population for a source Game Map.
+     *
+     * @return Builder<Monster>
+     */
+    private function regularMonsterQuery(int $gameMapId): Builder
+    {
+        return Monster::where('is_celestial_entity', false)
+            ->where('is_raid_monster', false)
+            ->where('is_raid_boss', false)
+            ->whereNull('only_for_location_type')
+            ->where('game_map_id', $gameMapId);
+    }
+
+    /**
+     * Configure the shared Monster transformer with the resolved Gem effects for the actual current Game Map.
+     */
+    private function transformerForGameMap(GameMap $gameMap): MonsterTransformer
+    {
+        return $this->monsterTransformer->withAreaGemEffects(
+            $this->areaGemEffectService->resolveForGameMap($gameMap)
+        );
+    }
+
+    /**
+     * Configure the shared Monster transformer with no Gem effects, for Gem-neutral Monster classes.
+     */
+    private function noEffectTransformer(): MonsterTransformer
+    {
+        return $this->monsterTransformer->withAreaGemEffects(ResolvedAreaGemEffects::none());
+    }
+
+    /**
+     * Build the regular/easier Monster tiers for an event Game Map, applying the actual
+     * current Game Map's resolved Gem context to both the event Map's own Monsters and
+     * the easier Surface-derived Monsters.
+     *
+     * @return array<string, array>
+     */
+    private function createMonstersForEventMaps(GameMap $gameMap, Collection $monsters): array
     {
         $surface = GameMap::where('default', true)->first();
 
         $easierMonsters = new Collection(
-            Monster::where('is_celestial_entity', false)
-                ->where('is_raid_monster', false)
-                ->where('is_raid_boss', false)
-                ->where('game_map_id', $surface->id)
-                ->get(),
-            $this->monster
+            $this->regularMonsterQuery($surface->id)->get(),
+            $this->transformerForGameMap($gameMap)
         );
 
         return [

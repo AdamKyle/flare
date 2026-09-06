@@ -7,6 +7,8 @@ import {
   QuestBrowseTab,
 } from '../../../game/reusable-components/quest/enums/quest-browse-tab';
 import { buildQuestBrowseTabs } from '../../../game/reusable-components/quest/utils/build-quest-browse-tabs';
+import { buildQuestTreeQueryKey } from '../../../game/reusable-components/quest/utils/build-quest-tree-query-key';
+import AdminAnchorButton from '../../shared/components/admin-anchor-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { useImportQuests } from '../api/hooks/use-import-quests';
@@ -39,15 +41,28 @@ const QuestListScreen = (): ReactNode => {
     loading: optionsLoading,
     error: optionsError,
   } = useQuestBrowseOptions();
+
+  const activeKind = QUEST_BROWSE_TAB_KIND[activeTab];
+  const activeTabIndex = QUEST_BROWSE_TABS_ORDER.indexOf(activeTab);
+
   const {
     quests,
     loading: treeLoading,
     error,
     refresh,
-  } = useQuestTree(gameMapId, QUEST_BROWSE_TAB_KIND[activeTab]);
+    query_key: resultQueryKey,
+  } = useQuestTree(gameMapId, activeKind);
   const { import_quests: importQuests, importing } = useImportQuests();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const currentQueryKey = buildQuestTreeQueryKey(gameMapId, activeKind);
+  const hasCurrentQueryResult = resultQueryKey === currentQueryKey;
+
+  const visibleQuests = hasCurrentQueryResult ? quests : [];
+  const visibleError = hasCurrentQueryResult ? error : null;
+  const visibleLoading =
+    treeLoading || (currentQueryKey !== null && !hasCurrentQueryResult);
 
   useEffect(() => {
     if (hasInitializedMapRef.current || !options) {
@@ -81,6 +96,16 @@ const QuestListScreen = (): ReactNode => {
 
   const handleImportClick = (): void => {
     fileInputRef.current?.click();
+  };
+
+  const handleActiveTabChange = (index: number): void => {
+    const selectedTab = QUEST_BROWSE_TABS_ORDER[index];
+
+    if (!selectedTab) {
+      return;
+    }
+
+    setActiveTab(selectedTab);
   };
 
   const handleFileSelected = async (
@@ -119,10 +144,10 @@ const QuestListScreen = (): ReactNode => {
     }
 
     const tabs = buildQuestBrowseTabs({
-      quests,
+      quests: visibleQuests,
       completed_quest_ids: [],
-      loading: treeLoading,
-      error,
+      loading: visibleLoading,
+      error: visibleError,
       navigation: { on_open_quest: handleOpenQuest },
       tree_mobile_mode: TreeMobileMode.TREE,
       selected_game_map_name: selectedGameMapName,
@@ -133,9 +158,8 @@ const QuestListScreen = (): ReactNode => {
         tabs={tabs}
         ariaLabel="Quest category"
         alignment={PillTabsAlignment.CENTER}
-        onActiveIndexChange={(index) =>
-          setActiveTab(QUEST_BROWSE_TABS_ORDER[index])
-        }
+        activeIndex={activeTabIndex}
+        onActiveIndexChange={handleActiveTabChange}
       />
     );
   };
@@ -146,12 +170,11 @@ const QuestListScreen = (): ReactNode => {
       width={AdminPageWidth.Workspace}
       header_actions={
         <>
-          <a
+          <AdminAnchorButton
             href="/admin"
-            className="focus-visible:ring-glacier-400 border-glacier-300 text-glacier-700 hover:bg-glacier-50 dark:border-glacier-700 dark:bg-glacier-950 dark:text-glacier-200 dark:hover:bg-glacier-900 rounded-md border bg-white px-3 py-1.5 text-sm font-medium focus:outline-none focus-visible:ring-2"
-          >
-            Back
-          </a>
+            label="Back"
+            variant={ButtonVariant.DANGER}
+          />
           <Button
             label="Create Quest"
             variant={ButtonVariant.PRIMARY}

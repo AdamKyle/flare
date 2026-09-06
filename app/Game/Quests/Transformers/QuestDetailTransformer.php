@@ -21,7 +21,7 @@ class QuestDetailTransformer
      *
      * @param  Quest  $quest  Quest to transform; expects its full relation set eager-loaded via `loadRelations()` plus `childQuests`, `raid`, `factionLoyaltyNpc.gameMap`.
      * @param  QuestKind  $kind  Already-resolved factual Quest kind.
-     * @param  array<int, array{id: int, name: string}>  $requiredQuestChain  Already-resolved required Quest chain identities, in stored order.
+     * @param  array<int, array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}>  $requiredQuestChain  Already-resolved required Quest chain dependency identities, in stored order.
      * @param  array{id: int, name: string, type: int}|null  $unlockedSkill  Already-resolved unlocked Game Skill identity.
      * @return array<string, mixed> Full factual Quest detail representation.
      */
@@ -86,15 +86,15 @@ class QuestDetailTransformer
      * Build the hierarchy/dependency structure section.
      *
      * @param  Quest  $quest  Quest to describe.
-     * @param  array<int, array{id: int, name: string}>  $requiredQuestChain  Already-resolved required Quest chain identities, in stored order.
+     * @param  array<int, array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}>  $requiredQuestChain  Already-resolved required Quest chain dependency identities, in stored order.
      * @return array<string, mixed> Structure section.
      */
     private function structure(Quest $quest, array $requiredQuestChain): array
     {
         return [
-            'parent_quest' => $this->questIdentity($quest->parent),
-            'child_quests' => $quest->childQuests->map(fn (Quest $child) => $this->questIdentity($child))->values()->all(),
-            'required_quest' => $this->questIdentity($quest->requiredQuest),
+            'parent_quest' => $this->questDependencyIdentity($quest->parent),
+            'child_quests' => $quest->childQuests->map(fn (Quest $child) => $this->questDependencyIdentity($child))->values()->all(),
+            'required_quest' => $this->questDependencyIdentity($quest->requiredQuest),
             'required_quest_chain' => $requiredQuestChain,
             'compatibility_parent_chain_quest_id' => $quest->parent_chain_quest_id,
         ];
@@ -205,18 +205,25 @@ class QuestDetailTransformer
     }
 
     /**
-     * Build the compact factual identity of a related Quest.
+     * Build the compact factual Quest dependency identity, including the structural state facts
+     * the canonical frontend Quest-state resolver needs.
      *
      * @param  Quest|null  $quest  Related Quest, when one is set.
-     * @return array{id: int, name: string}|null Compact Quest identity.
+     * @return array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}|null Compact Quest dependency identity.
      */
-    private function questIdentity(?Quest $quest): ?array
+    private function questDependencyIdentity(?Quest $quest): ?array
     {
         if (is_null($quest)) {
             return null;
         }
 
-        return ['id' => $quest->id, 'name' => $quest->name];
+        return [
+            'id' => $quest->id,
+            'name' => $quest->name,
+            'parent_quest_id' => $quest->parent_quest_id,
+            'required_quest_id' => $quest->required_quest_id,
+            'required_quest_chain_ids' => $quest->required_quest_chain ?? [],
+        ];
     }
 
     /**

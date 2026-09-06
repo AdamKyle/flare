@@ -8,16 +8,21 @@ use App\Game\Battle\ServerFight\Fight\Voidance;
 use App\Game\Battle\ServerFight\Monster\BuildMonster;
 use App\Game\Character\Builders\AttackBuilders\CharacterCacheData;
 use App\Game\Exploration\Services\DelveMonsterService;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Mockery;
 use Tests\Setup\Battle\ServerFight\MonsterPlayerFightFactory;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
+use Tests\Traits\CreateGameLocationGemParamter;
+use Tests\Traits\CreateGem;
+use Tests\Traits\CreateLocation;
+use Tests\Traits\CreateMonster;
 
 class MonsterPlayerFightTest extends TestCase
 {
-    use RefreshDatabase;
+    use CreateGameLocationGemParamter, CreateGem, CreateLocation, CreateMonster, RefreshDatabase;
 
     public function test_set_character_resets_forced_health_and_stores_the_character(): void
     {
@@ -438,5 +443,112 @@ class MonsterPlayerFightTest extends TestCase
         ]);
 
         $this->assertFalse($result);
+    }
+
+    public function test_set_up_fight_retrieves_the_same_location_gem_cached_monster_as_monster_list_service(): void
+    {
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+        $factory = new MonsterPlayerFightFactory();
+
+        $location = $this->createLocation([
+            'game_map_id' => $gameMap->id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => null,
+        ]);
+        $locationProfile = $this->createGameLocationGemParamter(['location_id' => $location->id]);
+        $locationGem = $this->createLocationGeneratedGem($locationProfile, ['enemy_strength_increase' => 0.5]);
+        $locationProfile->update(['rolled_gem_id' => $locationGem->id]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 10]);
+
+        $buildMonster = Mockery::mock(BuildMonster::class);
+        $buildMonster->shouldReceive('setServerMonster')->once()->andReturnUsing(function ($monsterArray) use ($factory) {
+            return $factory->buildServerMonster($monsterArray);
+        });
+
+        $fight = $factory->build(buildMonster: $buildMonster);
+        $fight->setUpFight($character->refresh(), [
+            'selected_monster_id' => $monster->id,
+            'attack_type' => 'attack',
+        ]);
+
+        $this->assertSame(15, $fight->getMonster()['str']);
+    }
+
+    public function test_set_up_fight_retrieves_a_cave_of_memories_monster_from_the_location_cache(): void
+    {
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+        $factory = new MonsterPlayerFightFactory();
+
+        $this->createLocation([
+            'game_map_id' => $gameMap->id,
+            'x' => $character->map->character_position_x,
+            'y' => $character->map->character_position_y,
+            'type' => LocationType::CAVE_OF_MEMORIES->value,
+        ]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+        ]);
+
+        $buildMonster = Mockery::mock(BuildMonster::class);
+        $buildMonster->shouldReceive('setServerMonster')->once()->andReturnUsing(function ($monsterArray) use ($factory) {
+            return $factory->buildServerMonster($monsterArray);
+        });
+
+        $fight = $factory->build(buildMonster: $buildMonster);
+        $fight->setUpFight($character->refresh(), [
+            'selected_monster_id' => $monster->id,
+            'attack_type' => 'attack',
+        ]);
+
+        $this->assertSame($monster->id, $fight->getMonster()['id']);
+    }
+
+    public function test_set_up_fight_no_longer_reads_the_old_special_location_monsters_cache(): void
+    {
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+
+        Cache::put('special-location-monsters', [
+            'location-type-999' => ['data' => [['id' => 777, 'name' => 'Ghost Monster']]],
+        ]);
+        Cache::put('monsters', [$gameMap->name => ['data' => []]]);
+        Cache::put('weekly-monsters', []);
+        Cache::put('location-monsters', []);
+        Cache::put('celestials', [$gameMap->name => ['data' => []]]);
+
+        $fight = (new MonsterPlayerFightFactory())->build();
+        $fight->setUpFight($character->refresh(), [
+            'selected_monster_id' => 777,
+            'attack_type' => 'attack',
+        ]);
+
+        $this->assertSame([], $fight->getMonster());
+    }
+
+    public function test_set_up_fight_retrieves_a_celestial_monster_from_the_celestial_cache(): void
+    {
+        $character = (new CharacterFactory())->createBaseCharacter()->givePlayerLocation()->getCharacter();
+        $gameMap = $character->map->gameMap;
+
+        Cache::put('monsters', [$gameMap->name => ['data' => []]]);
+        Cache::put('weekly-monsters', []);
+        Cache::put('location-monsters', []);
+        Cache::put('celestials', [
+            $gameMap->name => ['data' => [['id' => 555, 'name' => 'Celestial Being']]],
+        ]);
+
+        $fight = (new MonsterPlayerFightFactory())->build();
+        $fight->setUpFight($character->refresh(), [
+            'selected_monster_id' => 555,
+            'attack_type' => 'attack',
+        ]);
+
+        $this->assertSame(555, $fight->getMonster()['id']);
     }
 }

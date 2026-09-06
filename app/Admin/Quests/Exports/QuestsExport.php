@@ -3,10 +3,11 @@
 namespace App\Admin\Quests\Exports;
 
 use App\Admin\Quests\Exports\Sheets\QuestsSheet;
+use Maatwebsite\Excel\Concerns\Export;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class QuestsExport implements WithMultipleSheets
+class QuestsExport implements Export, WithMultipleSheets
 {
     use Exportable;
 

@@ -87,14 +87,34 @@ class AdminLayoutTest extends TestCase
         $this->assertStringContainsString('id="admin-sidebar-backdrop"', $content);
     }
 
-    public function test_admin_sidebar_contains_a_game_maps_link(): void
+    public function test_admin_sidebar_contains_all_modern_manage_links(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
 
         $response = $this->actingAs($admin)->call('GET', '/admin');
 
         $response->assertSee(route('admin.game-maps.index'), false);
+        $response->assertSee(route('admin.locations.index'), false);
+        $response->assertSee(route('admin.npcs.index'), false);
+        $response->assertSee(route('admin.monsters.index'), false);
+        $response->assertSee(route('admin.items.index'), false);
+        $response->assertSee(route('admin.quests.index'), false);
+        $response->assertSee(route('admin.classes.index'), false);
+        $response->assertSee(route('admin.races.index'), false);
+        $response->assertSee(route('admin.class-masteries.index'), false);
+        $response->assertSee(route('admin.map-gems.index'), false);
+        $response->assertSee(route('admin.location-gems.index'), false);
         $response->assertSee('Game Maps');
+        $response->assertSee('Locations');
+        $response->assertSee('NPCs');
+        $response->assertSee('Monsters');
+        $response->assertSee('Items');
+        $response->assertSee('Quests');
+        $response->assertSee('Classes');
+        $response->assertSee('Races');
+        $response->assertSee('Class Masteries');
+        $response->assertSee('Map Gems');
+        $response->assertSee('Location Gems');
     }
 
     public function test_admin_sidebar_does_not_contain_template_placeholder_links(): void

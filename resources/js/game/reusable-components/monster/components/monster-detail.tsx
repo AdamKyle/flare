@@ -1,33 +1,59 @@
 import React, { ReactNode } from 'react';
 
-import MonsterCombatSection from './monster-combat-section';
-import MonsterIdentitySection from './monster-identity-section';
-import MonsterQuestCelestialSection from './monster-quest-celestial-section';
-import MonsterRaidSection from './monster-raid-section';
-import MonsterSpellSection from './monster-spell-section';
+import MonsterNormalTabPanel from './monster-normal-tab-panel';
+import MonsterSpecialLocationEffectsTabPanel from './monster-special-location-effects-tab-panel';
 import MonsterDetailProps from '../types/monster-detail-props';
 
+import PillTabs from 'ui/tabs/pill-tabs';
+
 /**
- * Shared, permission-neutral factual Monster detail presentation. Every
- * value is the Monster's persisted base value; no combat/map scaling is
- * applied. Never checks Admin permission, imports Admin APIs, or mutates
- * data; navigation is entirely driven by the optional `navigation` callbacks.
+ * Shared, permission-neutral factual Monster detail presentation. The
+ * Normal tab is every value's persisted base value; no combat/map scaling
+ * is applied there. When cached Gem effect contexts exist for this Monster,
+ * a second Special Location Effects tab shows the cached, already
+ * Gem-transformed values for each context. Never checks Admin permission,
+ * imports Admin APIs, or mutates data; navigation is entirely driven by the
+ * optional `navigation` callbacks.
  */
 const MonsterDetail = ({
   monster,
   navigation,
-}: MonsterDetailProps): ReactNode => (
-  <div className="flex flex-col gap-6">
-    <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
-      {monster.identity.name}
-    </h1>
+}: MonsterDetailProps): ReactNode => {
+  const hasGemEffectContexts = monster.gem_effect_contexts.length > 0;
 
-    <MonsterIdentitySection monster={monster} navigation={navigation} />
-    <MonsterCombatSection monster={monster} navigation={navigation} />
-    <MonsterSpellSection monster={monster} navigation={navigation} />
-    <MonsterQuestCelestialSection monster={monster} navigation={navigation} />
-    <MonsterRaidSection monster={monster} navigation={navigation} />
-  </div>
-);
+  const renderBody = (): ReactNode => {
+    if (!hasGemEffectContexts) {
+      return (
+        <MonsterNormalTabPanel monster={monster} navigation={navigation} />
+      );
+    }
+
+    const normalTab = {
+      label: 'Normal',
+      component: MonsterNormalTabPanel,
+      props: { monster, navigation },
+    } as const;
+
+    const specialLocationEffectsTab = {
+      label: 'Special Location Effects',
+      component: MonsterSpecialLocationEffectsTabPanel,
+      props: { contexts: monster.gem_effect_contexts, navigation },
+    } as const;
+
+    const tabs = [normalTab, specialLocationEffectsTab] as const;
+
+    return <PillTabs tabs={tabs} ariaLabel="Monster detail" />;
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <h1 className="text-glacier-900 dark:text-glacier-100 text-xl font-semibold">
+        {monster.identity.name}
+      </h1>
+
+      {renderBody()}
+    </div>
+  );
+};
 
 export default MonsterDetail;

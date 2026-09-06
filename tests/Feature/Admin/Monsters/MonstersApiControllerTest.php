@@ -3,9 +3,12 @@
 namespace Tests\Feature\Admin\Monsters;
 
 use App\Game\Maps\Values\LocationType;
+use App\Game\Monsters\Services\BuildMonsterCacheService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateMonster;
 use Tests\Traits\CreateMonsterFormPayload;
@@ -14,7 +17,7 @@ use Tests\Traits\CreateUser;
 
 class MonstersApiControllerTest extends TestCase
 {
-    use CreateGameMap, CreateItem, CreateMonster, CreateMonsterFormPayload, CreateRole, CreateUser, RefreshDatabase;
+    use CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateItem, CreateMonster, CreateMonsterFormPayload, CreateRole, CreateUser, RefreshDatabase;
 
     public function test_non_admin_cannot_access_monster_list(): void
     {
@@ -83,6 +86,104 @@ class MonstersApiControllerTest extends TestCase
         // Static persisted values only — no per-map/combat scaling applied by this contract.
         $this->assertSame($monster->str, $data['combat']['str']);
         $this->assertArrayNotHasKey('can_use_artifacts', $data);
+    }
+
+    public function test_show_includes_gem_effect_contexts_for_a_regular_monster_on_a_rolled_map_gem_map(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Gem Effect Detail Map']);
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'str' => 10]);
+
+        resolve(BuildMonsterCacheService::class)->buildCache();
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertNotEmpty($data['gem_effect_contexts']);
+        $this->assertSame('map', $data['gem_effect_contexts'][0]['type']);
+        $this->assertSame($profile->id, $data['gem_effect_contexts'][0]['sources'][0]['profile_id']);
+    }
+
+    public function test_show_returns_empty_gem_effect_contexts_for_a_raid_monster(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Raid Detail Map']);
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_raid_monster' => true]);
+
+        resolve(BuildMonsterCacheService::class)->buildAll();
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame([], $data['gem_effect_contexts']);
+    }
+
+    public function test_show_returns_empty_gem_effect_contexts_for_a_weekly_fight_monster(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Weekly Detail Map']);
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildAll();
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame([], $data['gem_effect_contexts']);
+    }
+
+    public function test_show_returns_empty_gem_effect_contexts_for_a_cave_of_memories_monster(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Cave Detail Map']);
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster([
+            'game_map_id' => $gameMap->id,
+            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+        ]);
+
+        resolve(BuildMonsterCacheService::class)->buildAll();
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame([], $data['gem_effect_contexts']);
+    }
+
+    public function test_show_returns_empty_gem_effect_contexts_for_a_celestial_monster(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $gameMap = $this->createGameMap(['name' => 'Celestial Detail Map']);
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['enemy_strength_increase' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_celestial_entity' => true]);
+
+        resolve(BuildMonsterCacheService::class)->buildAll();
+
+        $response = $this->actingAs($admin)->call('GET', "/api/admin/monsters/{$monster->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame([], $data['gem_effect_contexts']);
     }
 
     public function test_store_creates_a_monster_from_every_field_group(): void
@@ -267,6 +368,40 @@ class MonstersApiControllerTest extends TestCase
         $this->assertSame('Regular Monster', $data[0]['name']);
     }
 
+    public function test_list_all_category_excludes_legacy_nonweekly_special_location_monsters(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $regularMonster = $this->createMonster(['name' => 'Regular Monster']);
+        $this->createMonster(['name' => 'Legacy Special Monster', 'only_for_location_type' => LocationType::CAVE_OF_SHADOWS->value]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'all'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $data);
+        $this->assertSame($regularMonster->id, $data[0]['id']);
+    }
+
+    public function test_list_all_category_includes_cave_of_memories_monsters(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $regularMonster = $this->createMonster(['name' => 'Regular Monster']);
+        $caveMonster = $this->createMonster(['name' => 'Memory Eater', 'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
+            'filters' => ['category' => 'all'],
+        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true)['data'];
+
+        $expectedIds = collect([$caveMonster->id, $regularMonster->id])->sort()->values()->all();
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $data);
+        $this->assertSame($expectedIds, collect($data)->pluck('id')->sort()->values()->all());
+    }
+
     public function test_list_category_filter_raid_monster(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
@@ -316,25 +451,6 @@ class MonstersApiControllerTest extends TestCase
         $this->assertSame($celestial->id, $data[0]['id']);
     }
 
-    public function test_list_category_filter_special_location_includes_cave_of_memories(): void
-    {
-        $admin = $this->createAdmin($this->createAdminRole());
-        $caveMonster = $this->createMonster([
-            'name' => 'Cave Monster',
-            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
-        ]);
-        $this->createMonster(['name' => 'Regular Monster']);
-
-        $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
-            'filters' => ['category' => 'special_location'],
-        ], [], [], ['HTTP_ACCEPT' => 'application/json']);
-        $data = json_decode($response->getContent(), true)['data'];
-
-        $response->assertStatus(200);
-        $this->assertCount(1, $data);
-        $this->assertSame($caveMonster->id, $data[0]['id']);
-    }
-
     public function test_list_category_filter_weekly_fight_excludes_cave_of_memories(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
@@ -357,29 +473,23 @@ class MonstersApiControllerTest extends TestCase
         $this->assertSame($weeklyMonster->id, $data[0]['id']);
     }
 
-    public function test_list_special_location_category_with_exact_location_type(): void
+    public function test_list_rejects_cave_of_memories_location_type_for_weekly_fight_category(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $caveMonster = $this->createMonster([
-            'name' => 'Cave Monster',
-            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
-        ]);
         $this->createMonster([
-            'name' => 'Alchemy Church Monster',
-            'only_for_location_type' => LocationType::ALCHEMY_CHURCH->value,
+            'name' => 'Memory Eater',
+            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
         ]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
             'filters' => [
-                'category' => 'special_location',
+                'category' => 'weekly_fight',
                 'location_type' => LocationType::CAVE_OF_MEMORIES->value,
             ],
         ], [], [], ['HTTP_ACCEPT' => 'application/json']);
-        $data = json_decode($response->getContent(), true)['data'];
 
-        $response->assertStatus(200);
-        $this->assertCount(1, $data);
-        $this->assertSame($caveMonster->id, $data[0]['id']);
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('filters.location_type');
     }
 
     public function test_list_weekly_fight_category_with_valid_weekly_type(): void
@@ -413,7 +523,7 @@ class MonstersApiControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/monsters', [
             'filters' => [
-                'category' => 'special_location',
+                'category' => 'weekly_fight',
                 'location_type' => 999,
             ],
         ], [], [], ['HTTP_ACCEPT' => 'application/json']);

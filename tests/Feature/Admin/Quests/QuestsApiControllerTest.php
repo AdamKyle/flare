@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin\Quests;
 
+use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -162,10 +163,22 @@ class QuestsApiControllerTest extends TestCase
         $this->assertSame($gameMap->id, $data['npc']['game_map']['id']);
         $this->assertSame('Parent Quest', $data['structure']['parent_quest']['name']);
         $this->assertSame($parent->id, $data['structure']['parent_quest']['id']);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['parent_quest']);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['parent_quest']);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['parent_quest']);
         $this->assertSame('Required Quest', $data['structure']['required_quest']['name']);
         $this->assertSame($requiredQuest->id, $data['structure']['required_quest']['id']);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['required_quest']);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['required_quest']);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['required_quest']);
         $this->assertSame(['Chain One', 'Chain Two'], array_column($data['structure']['required_quest_chain'], 'name'));
         $this->assertSame([$chainOne->id, $chainTwo->id], array_column($data['structure']['required_quest_chain'], 'id'));
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['required_quest_chain'][0]);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['required_quest_chain'][0]);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['required_quest_chain'][0]);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['required_quest_chain'][1]);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['required_quest_chain'][1]);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['required_quest_chain'][1]);
         $this->assertSame('Primary Quest Item', $data['requirements']['primary_item']['name']);
         $this->assertSame($primaryItem->id, $data['requirements']['primary_item']['item_id']);
         $this->assertSame('Secondary Quest Item', $data['requirements']['secondary_item']['name']);
@@ -204,6 +217,9 @@ class QuestsApiControllerTest extends TestCase
 
         $this->assertSame([$child->id], array_column($data['structure']['child_quests'], 'id'));
         $this->assertSame(['Child Quest'], array_column($data['structure']['child_quests'], 'name'));
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['child_quests'][0]);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['child_quests'][0]);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['child_quests'][0]);
     }
 
     public function test_show_reports_raid_kind_and_raid_identity_consistently(): void
@@ -846,6 +862,71 @@ class QuestsApiControllerTest extends TestCase
         $response = $this->actingAs($user)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
 
         $response->assertStatus(403);
+    }
+
+    public function test_browse_options_exclude_generated_game_maps(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $canonical = $this->createGameMap(['name' => 'Canonical Selectable Map', 'default' => false]);
+        $generated = $this->createGameMap([
+            'name' => 'Generated Child Map',
+            'default' => false,
+            'generated_parent_game_map_id' => $canonical->id,
+            'generated_map_type' => GeneratedGemMapType::MAP_GEM->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $mapIds = array_column($data['game_maps'], 'id');
+        $mapNames = array_column($data['game_maps'], 'name');
+
+        $this->assertContains($canonical->id, $mapIds);
+        $this->assertContains('Canonical Selectable Map', $mapNames);
+        $this->assertNotContains($generated->id, $mapIds);
+        $this->assertNotContains('Generated Child Map', $mapNames);
+    }
+
+    public function test_browse_options_do_not_use_generated_map_as_default(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $canonical = $this->createGameMap(['name' => 'Canonical Fallback Map', 'default' => false]);
+        $generated = $this->createGameMap([
+            'name' => 'Generated Default Map',
+            'default' => true,
+            'generated_parent_game_map_id' => $canonical->id,
+            'generated_map_type' => GeneratedGemMapType::LOCATION_GEM->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $mapIds = array_column($data['game_maps'], 'id');
+
+        $this->assertNotContains($generated->id, $mapIds);
+        $this->assertNull($data['default_game_map_id']);
+    }
+
+    public function test_browse_options_return_only_canonical_map_when_generated_map_has_same_name(): void
+    {
+        $admin = $this->createAdmin($this->createAdminRole());
+        $canonical = $this->createGameMap(['name' => 'Surface Test', 'default' => false]);
+        $this->createGameMap([
+            'name' => 'Surface Test',
+            'default' => false,
+            'generated_parent_game_map_id' => $canonical->id,
+            'generated_map_type' => GeneratedGemMapType::MAP_GEM->value,
+        ]);
+
+        $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $matchingIds = array_values(array_column(
+            array_filter($data['game_maps'], fn (array $gameMap) => $gameMap['name'] === 'Surface Test'),
+            'id'
+        ));
+
+        $this->assertSame([$canonical->id], $matchingIds);
     }
 
     public function test_previous_parent_becomes_false_when_final_childs_parent_is_cleared(): void

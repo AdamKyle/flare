@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @return void
+     * @param  Schedule  $schedule  Laravel's scheduler receiving the application's scheduled tasks.
+     * @return void Registers every scheduled command against the supplied scheduler.
      */
     protected function schedule(Schedule $schedule)
     {
@@ -91,6 +92,9 @@ class Kernel extends ConsoleKernel
      * Spatties short scheduler
      *
      * This allows commands to run very fast, as opposed to every minute at the least.
+     *
+     * @param  ShortSchedule  $schedule  Short-schedule registry receiving short-interval jobs.
+     * @return void Registers every short-interval command against the supplied short scheduler.
      */
     protected function shortSchedule(ShortSchedule $schedule)
     {
@@ -100,7 +104,7 @@ class Kernel extends ConsoleKernel
     /**
      * Register the commands for the application.
      *
-     * @return void
+     * @return void Loads the application's command directories and registers the console routes file.
      */
     protected function commands()
     {

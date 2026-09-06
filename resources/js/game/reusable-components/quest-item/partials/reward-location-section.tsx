@@ -1,7 +1,7 @@
 import React from 'react';
 
-import LocationRow from './location-row';
 import RelationshipGroup from './relationship-group';
+import LocationCard from '../../location/components/location-card';
 import InfoAlerts from '../../viewable-sections/info-alert';
 import RewardLocationsSectionProps from '../types/partials/location-reward-section-props';
 
@@ -34,12 +34,12 @@ const RewardLocationsSection = ({
       }
     >
       {rewardLocations.map((rewardLocation) => (
-        <LocationRow
+        <LocationCard
           key={`reward-location-${rewardLocation.id}`}
-          heading="Reward at location"
-          location={rewardLocation}
+          location_id={rewardLocation.id}
+          name={rewardLocation.name}
+          game_map_name={rewardLocation.game_map.name}
           on_open_location={navigation.on_open_location}
-          on_open_map={navigation.on_open_map}
         />
       ))}
     </RelationshipGroup>

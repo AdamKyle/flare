@@ -209,3 +209,62 @@ export const formatRangeWithCommas = (range: string): string => {
 
   return `${low} - ${high}`;
 };
+
+/**
+ * Formats a `"<low>-<high>"` proportion range as a percentage range using
+ * {@link formatPercent} for each endpoint (e.g. `"0.2625-0.399"` →
+ * `"26.25% - 39.90%"`).
+ *
+ * A malformed range (not exactly two `-`-separated parts, or a
+ * non-numeric side) is returned unchanged rather than thrown.
+ *
+ * @param {string} range - The raw nonnegative proportion range string to format.
+ * @returns {string} The formatted percentage range, or the original string if malformed.
+ *
+ * @example
+ * formatPercentRange('0.2625-0.399'); // "26.25% - 39.90%"
+ * @example
+ * formatPercentRange('0-0.15');       // "0.00% - 15.00%"
+ */
+export const formatPercentRange = (range: string): string => {
+  const parts = range.split('-').map((part) => part.trim());
+
+  if (parts.length !== 2) {
+    return range;
+  }
+
+  const [lowRaw, highRaw] = parts;
+
+  const lowNum = Number(lowRaw);
+  const highNum = Number(highRaw);
+
+  if (!Number.isFinite(lowNum) || !Number.isFinite(highNum)) {
+    return range;
+  }
+
+  return `${formatPercent(lowNum)} - ${formatPercent(highNum)}`;
+};
+
+/**
+ * Determines whether a `"<low>-<high>"` proportion range has at least one
+ * positive endpoint, and is therefore meaningful to display.
+ *
+ * @param {string | null} range - The raw nonnegative proportion range string, or `null` when absent.
+ * @returns {boolean} Whether the range has at least one positive endpoint.
+ *
+ * @example
+ * hasPositiveRangeValue('0-0.15'); // true
+ * @example
+ * hasPositiveRangeValue('0-0');    // false
+ * @example
+ * hasPositiveRangeValue(null);     // false
+ */
+export const hasPositiveRangeValue = (range: string | null): boolean => {
+  if (!range) {
+    return false;
+  }
+
+  const parts = range.split('-').map((part) => Number(part.trim()));
+
+  return parts.some((part) => Number.isFinite(part) && part > 0);
+};

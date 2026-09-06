@@ -35,6 +35,8 @@ class BattleDrop
 
     private float $gameMapBonus;
 
+    private float $questItemDropBonus = 0.0;
+
     private float $lootingChance;
 
     private array $rewardTotals = [
@@ -79,6 +81,16 @@ class BattleDrop
     public function setGameMapBonus(float $gameMapBonus = 0.0): BattleDrop
     {
         $this->gameMapBonus = $gameMapBonus;
+
+        return $this;
+    }
+
+    /**
+     * Set the resolved Gem quest item drop chance bonus for the Monster's own quest item drop check.
+     */
+    public function setQuestItemDropBonus(float $questItemDropBonus = 0.0): BattleDrop
+    {
+        $this->questItemDropBonus = $questItemDropBonus;
 
         return $this;
     }
@@ -147,16 +159,21 @@ class BattleDrop
      */
     public function handleMonsterQuestDrop(Character $character, bool $returnItem = false): ?Item
     {
-        if (! is_null($this->monster->quest_item_id)) {
-
-            $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $this->lootingChance, $this->gameMapBonus);
-
-            if ($canGetQuestItem && ! $returnItem) {
-                $this->attemptToPickUpItem($character, $this->monster->questItem);
-            } elseif ($canGetQuestItem && $returnItem) {
-                return $this->monster->questItem;
-            }
+        if (is_null($this->monster->quest_item_id)) {
+            return null;
         }
+
+        $canGetQuestItem = DropCheckCalculator::fetchQuestItemDropCheck($this->monster, $this->lootingChance, $this->gameMapBonus + $this->questItemDropBonus);
+
+        if (! $canGetQuestItem) {
+            return null;
+        }
+
+        if ($returnItem) {
+            return $this->monster->questItem;
+        }
+
+        $this->attemptToPickUpItem($character, $this->monster->questItem);
 
         return null;
     }
@@ -169,7 +186,7 @@ class BattleDrop
             return null;
         }
 
-        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES->value)
+        $location = Location::where('type', LocationType::CAVE_OF_SHADOWS->value)
             ->where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
@@ -213,7 +230,7 @@ class BattleDrop
             return;
         }
 
-        $location = Location::where('type', LocationType::CAVE_OF_MEMORIES->value)
+        $location = Location::where('type', LocationType::CAVE_OF_SHADOWS->value)
             ->where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)

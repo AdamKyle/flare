@@ -22,7 +22,7 @@ class LocationServiceTest extends TestCase
 {
     use CreateCelestials, CreateLocation, CreateMonster, CreateRaid, CreateScheduledEvent, RefreshDatabase;
 
-    public function test_raid_monsters_not_overwritten_by_special_location_monsters(): void
+    public function test_raid_monsters_not_overwritten_by_location_gem_monsters(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
@@ -35,8 +35,8 @@ class LocationServiceTest extends TestCase
             'type' => LocationType::GOLD_MINES->value,
         ]);
 
-        Cache::put('special-location-monsters', [
-            'location-type-'.LocationType::GOLD_MINES->value => [['id' => 1, 'name' => 'Gold Mine Monster']],
+        Cache::put('location-monsters', [
+            'location-'.$location->id => ['data' => [['id' => 1, 'name' => 'Gold Mine Monster', 'max_level' => 1]]],
         ]);
 
         $raidBoss = $this->createMonster(['game_map_id' => $gameMap->id]);
@@ -60,21 +60,21 @@ class LocationServiceTest extends TestCase
         Event::assertNotDispatched(UpdateMonsterList::class);
     }
 
-    public function test_non_raid_special_location_updates_monsters(): void
+    public function test_non_raid_location_gem_location_updates_monsters(): void
     {
         $character = (new CharacterFactory)->createBaseCharacter()->givePlayerLocation()->getCharacter();
 
         $gameMap = $character->map->gameMap;
 
-        $this->createLocation([
+        $location = $this->createLocation([
             'x' => 16,
             'y' => 16,
             'game_map_id' => $gameMap->id,
             'type' => LocationType::GOLD_MINES->value,
         ]);
 
-        Cache::put('special-location-monsters', [
-            'location-type-'.LocationType::GOLD_MINES->value => [['id' => 1, 'name' => 'Gold Mine Monster']],
+        Cache::put('location-monsters', [
+            'location-'.$location->id => ['data' => [['id' => 1, 'name' => 'Gold Mine Monster', 'max_level' => 1]]],
         ]);
 
         Event::fake();

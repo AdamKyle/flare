@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin\Monsters;
 
 use App\Admin\Monsters\Imports\Sheets\MonstersSheet;
 use App\Flare\Models\Monster;
+use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -134,6 +135,58 @@ class MonstersImportTest extends TestCase
         $this->createGameMap(['name' => 'Import Map']);
 
         $row = $this->minimalMonsterImportRow(['only_for_location_type' => 999]);
+
+        $rows = collect([
+            collect(self::HEADERS),
+            collect(array_map(fn ($header) => $row[$header] ?? null, self::HEADERS)),
+        ]);
+
+        $sheet = new MonstersSheet;
+        $sheet->collection($rows);
+
+        $this->assertFalse($sheet->wasSuccessful());
+        $this->assertSame(0, Monster::count());
+    }
+
+    public function test_alchemy_church_location_type_is_accepted(): void
+    {
+        $this->createGameMap(['name' => 'Import Map']);
+
+        $row = $this->minimalMonsterImportRow(['only_for_location_type' => LocationType::ALCHEMY_CHURCH->value]);
+
+        $rows = collect([
+            collect(self::HEADERS),
+            collect(array_map(fn ($header) => $row[$header] ?? null, self::HEADERS)),
+        ]);
+
+        $sheet = new MonstersSheet;
+        $sheet->collection($rows);
+
+        $this->assertTrue($sheet->wasSuccessful());
+    }
+
+    public function test_cave_of_memories_location_type_is_accepted(): void
+    {
+        $this->createGameMap(['name' => 'Import Map']);
+
+        $row = $this->minimalMonsterImportRow(['only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value]);
+
+        $rows = collect([
+            collect(self::HEADERS),
+            collect(array_map(fn ($header) => $row[$header] ?? null, self::HEADERS)),
+        ]);
+
+        $sheet = new MonstersSheet;
+        $sheet->collection($rows);
+
+        $this->assertTrue($sheet->wasSuccessful());
+    }
+
+    public function test_cave_of_shadows_location_type_is_rejected(): void
+    {
+        $this->createGameMap(['name' => 'Import Map']);
+
+        $row = $this->minimalMonsterImportRow(['only_for_location_type' => LocationType::CAVE_OF_SHADOWS->value]);
 
         $rows = collect([
             collect(self::HEADERS),

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Info\Quests;
 
+use App\Flare\GemWorldGeneration\Values\GeneratedGemMapType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateGameMap;
@@ -162,6 +163,41 @@ class QuestsApiControllerTest extends TestCase
         $this->assertSame(['Surface', 'Zeta Map'], array_column($data['game_maps'], 'name'));
     }
 
+    public function test_public_quest_browse_options_exclude_generated_game_maps(): void
+    {
+        $canonical = $this->createGameMap(['name' => 'Public Canonical Selectable Map', 'default' => false]);
+        $generated = $this->createGameMap([
+            'name' => 'Public Generated Child Map',
+            'default' => false,
+            'generated_parent_game_map_id' => $canonical->id,
+            'generated_map_type' => GeneratedGemMapType::MAP_GEM->value,
+        ]);
+
+        $response = $this->call('GET', '/api/information/quests/options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $mapIds = array_column($data['game_maps'], 'id');
+
+        $this->assertContains($canonical->id, $mapIds);
+        $this->assertNotContains($generated->id, $mapIds);
+    }
+
+    public function test_public_quest_browse_options_do_not_use_generated_map_as_default(): void
+    {
+        $canonical = $this->createGameMap(['name' => 'Public Canonical Fallback Map', 'default' => false]);
+        $this->createGameMap([
+            'name' => 'Public Generated Default Map',
+            'default' => true,
+            'generated_parent_game_map_id' => $canonical->id,
+            'generated_map_type' => GeneratedGemMapType::LOCATION_GEM->value,
+        ]);
+
+        $response = $this->call('GET', '/api/information/quests/options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertNull($data['default_game_map_id']);
+    }
+
     public function test_public_quest_tree_raid_map_filter_uses_raid_location_map_instead_of_quest_giver_map(): void
     {
         $surface = $this->createGameMap(['name' => 'Surface']);
@@ -192,5 +228,62 @@ class QuestsApiControllerTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertSame('Detail Quest', json_decode($response->getContent(), true)['name']);
+    }
+
+    public function test_public_quest_detail_returns_required_quest_dependency_structural_facts(): void
+    {
+        $requiredQuest = $this->createQuest(['name' => 'Public Required Quest']);
+        $chainOne = $this->createQuest(['name' => 'Public Chain One']);
+        $chainTwo = $this->createQuest(['name' => 'Public Chain Two']);
+        $quest = $this->createQuest([
+            'name' => 'Public Dependency Quest',
+            'required_quest_id' => $requiredQuest->id,
+            'required_quest_chain' => [$chainOne->id, $chainTwo->id],
+        ]);
+
+        $response = $this->call('GET', "/api/information/quests/{$quest->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame($requiredQuest->id, $data['structure']['required_quest']['id']);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['required_quest']);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['required_quest']);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['required_quest']);
+        $this->assertSame([$chainOne->id, $chainTwo->id], array_column($data['structure']['required_quest_chain'], 'id'));
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['required_quest_chain'][0]);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['required_quest_chain'][0]);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['required_quest_chain'][0]);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['required_quest_chain'][1]);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['required_quest_chain'][1]);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['required_quest_chain'][1]);
+    }
+
+    public function test_public_quest_detail_returns_parent_quest_structural_facts(): void
+    {
+        $parent = $this->createQuest(['name' => 'Public Structural Parent Quest', 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Public Structural Child Quest', 'parent_quest_id' => $parent->id]);
+
+        $response = $this->call('GET', "/api/information/quests/{$child->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame($parent->id, $data['structure']['parent_quest']['id']);
+        $this->assertSame('Public Structural Parent Quest', $data['structure']['parent_quest']['name']);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['parent_quest']);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['parent_quest']);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['parent_quest']);
+    }
+
+    public function test_public_quest_detail_returns_child_quest_structural_facts(): void
+    {
+        $parent = $this->createQuest(['name' => 'Public Structural Children Parent Quest', 'is_parent' => true]);
+        $child = $this->createQuest(['name' => 'Public Structural Children Child Quest', 'parent_quest_id' => $parent->id]);
+
+        $response = $this->call('GET', "/api/information/quests/{$parent->id}", [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $data = json_decode($response->getContent(), true);
+
+        $this->assertSame($child->id, $data['structure']['child_quests'][0]['id']);
+        $this->assertSame('Public Structural Children Child Quest', $data['structure']['child_quests'][0]['name']);
+        $this->assertArrayHasKey('parent_quest_id', $data['structure']['child_quests'][0]);
+        $this->assertArrayHasKey('required_quest_id', $data['structure']['child_quests'][0]);
+        $this->assertArrayHasKey('required_quest_chain_ids', $data['structure']['child_quests'][0]);
     }
 }

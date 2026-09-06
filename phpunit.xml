@@ -47,6 +47,7 @@
       <directory suffix=".php">./app/Flare/Models</directory>
       <directory suffix=".php">./app/Admin/Import</directory>
       <directory suffix=".php">./app/Admin/Exports</directory>
+      <directory suffix=".php">./app/Flare/GameImporter</directory>
     </exclude>
   </source>
 </phpunit>

@@ -16,6 +16,7 @@ import { MonsterShowScreenProps } from '../screen-manager/monster-screen-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const MonsterShowScreen = ({
@@ -59,6 +60,32 @@ const MonsterShowScreen = ({
     );
   };
 
+  const handleOpenMapGem = (profileId: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_MAP_GEM_DETAIL,
+      {
+        is_open: true,
+        title: 'Map Gem Details',
+        allow_clicking_outside: true,
+        map_gem_id: profileId,
+      }
+    );
+  };
+
+  const handleOpenLocationGem = (profileId: number): void => {
+    sidePeekEmitter.emit(
+      SidePeekEventType.SIDE_PEEK,
+      SidePeekComponentRegistrationEnum.ADMIN_LOCATION_GEM_DETAIL,
+      {
+        is_open: true,
+        title: 'Location Gem Details',
+        allow_clicking_outside: true,
+        location_gem_id: profileId,
+      }
+    );
+  };
+
   const renderContent = (): ReactNode => {
     if (loading) {
       return <InfiniteLoader />;
@@ -81,13 +108,17 @@ const MonsterShowScreen = ({
           />
         </div>
 
-        <MonsterDetail
-          monster={monster}
-          navigation={{
-            on_open_item: handleOpenItem,
-            on_open_map: handleOpenMap,
-          }}
-        />
+        <Card>
+          <MonsterDetail
+            monster={monster}
+            navigation={{
+              on_open_item: handleOpenItem,
+              on_open_map: handleOpenMap,
+              on_open_map_gem: handleOpenMapGem,
+              on_open_location_gem: handleOpenLocationGem,
+            }}
+          />
+        </Card>
       </div>
     );
   };

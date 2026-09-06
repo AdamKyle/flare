@@ -18,6 +18,7 @@ use App\Game\Maps\Services\Common\UpdateRaidMonstersForLocation;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Maps\Values\MapName;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Monsters\Services\MonsterListService;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 
@@ -41,6 +42,7 @@ class BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        protected readonly MonsterListService $monsterListService,
         protected readonly ChanceCalculator $chanceCalculator,
     ) {
 

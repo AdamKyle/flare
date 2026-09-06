@@ -8,6 +8,7 @@ use App\Game\Battle\Services\ConjureService;
 use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Values\MapTileValue;
+use App\Game\Monsters\Services\MonsterListService;
 
 class UpdateRaidMonsters extends BaseMovementService
 {
@@ -17,6 +18,7 @@ class UpdateRaidMonsters extends BaseMovementService
         ConjureService $conjureService,
         MovementService $movementService,
         TraverseService $traverseService,
+        MonsterListService $monsterListService,
         ChanceCalculator $chanceCalculator,
     ) {
         parent::__construct(
@@ -25,10 +27,14 @@ class UpdateRaidMonsters extends BaseMovementService
             $conjureService,
             $movementService,
             $traverseService,
+            $monsterListService,
             $chanceCalculator,
         );
     }
 
+    /**
+     * Update the monster list for the raid at the given Location for the Character.
+     */
     public function updateMonstersForRaidLocations(Character $character, Location $location): void
     {
         $this->updateMonstersList($character, $location);

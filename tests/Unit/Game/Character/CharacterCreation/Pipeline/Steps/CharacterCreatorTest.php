@@ -3,6 +3,7 @@
 namespace Tests\Unit\Game\Character\CharacterCreation\Pipeline\Steps;
 
 use App\Flare\Models\Character;
+use App\Game\Character\CharacterCreation\Calculators\BaseStatCalculator;
 use App\Game\Character\CharacterCreation\Pipeline\Steps\CharacterCreator;
 use App\Game\Character\CharacterCreation\State\CharacterBuildState;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,20 +18,11 @@ class CharacterCreatorTest extends TestCase
 
     public function test_creates_character_with_base_stats_and_stores_on_state(): void
     {
-        $state = app(CharacterBuildState::class);
+        $state = new CharacterBuildState;
 
         $user = $this->createUser();
 
-        $race = $this->createRace([
-            'str_mod' => 1,
-            'dex_mod' => 0,
-            'dur_mod' => 0,
-            'chr_mod' => 0,
-            'int_mod' => 0,
-            'agi_mod' => 0,
-            'focus_mod' => 0,
-            'defense_mod' => 0.0,
-        ]);
+        $race = $this->createRace(['name' => 'Test Race']);
 
         $class = $this->createClass([
             'str_mod' => 2,
@@ -52,7 +44,7 @@ class CharacterCreatorTest extends TestCase
             ->setCharacterName($characterName)
             ->setNow(now());
 
-        $step = app(CharacterCreator::class);
+        $step = new CharacterCreator(new BaseStatCalculator);
 
         $result = $step->process($state, function (CharacterBuildState $s) {
             return $s;
@@ -74,7 +66,7 @@ class CharacterCreatorTest extends TestCase
         $this->assertSame(100, $reloaded->xp_next);
         $this->assertSame(1000, $reloaded->gold);
 
-        $this->assertSame(13, $character->str);
+        $this->assertSame(12, $character->str);
         $this->assertSame(10, $character->dex);
         $this->assertSame(10, $character->dur);
         $this->assertSame(10, $character->chr);
@@ -86,9 +78,9 @@ class CharacterCreatorTest extends TestCase
 
     public function test_no_op_when_state_missing_data(): void
     {
-        $state = app(CharacterBuildState::class);
+        $state = new CharacterBuildState;
 
-        $step = app(CharacterCreator::class);
+        $step = new CharacterCreator(new BaseStatCalculator);
 
         $result = $step->process($state, function (CharacterBuildState $s) {
             return $s;

@@ -7,4 +7,5 @@ export default interface UseQuestTreeDefinition {
   loading: boolean;
   error: AxiosErrorDefinition | null;
   refresh: () => void;
+  query_key: string | null;
 }

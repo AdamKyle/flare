@@ -13,6 +13,7 @@ use App\Game\Battle\Request\CelestialFightRequest;
 use App\Game\Battle\Request\ConjureRequest;
 use App\Game\Battle\Services\CelestialFightService;
 use App\Game\Battle\Services\ConjureService;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
 use App\Game\Messages\Builders\NpcServerMessageBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\NpcMessageTypes;
@@ -65,7 +66,7 @@ class CelestialBattleController extends Controller
             ], 422);
         }
 
-        $monsterData = $this->monsterTransformer->setIsMonsterSpecial(true)->transform($monster);
+        $monsterData = $this->monsterTransformer->withAreaGemEffects(ResolvedAreaGemEffects::none())->transform($monster);
 
         return response()->json([
             'monster' => $monsterData,

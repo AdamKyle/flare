@@ -1,11 +1,21 @@
 import React from 'react';
 
-import QuestRows from './quest-rows';
 import RelationshipGroup from './relationship-group';
+import QuestCard from '../../quest/components/quest-card';
 import QuestsThatUseSectionProps from '../types/partials/quest-that-use-section-props';
+import { QuestIdentityDefinition } from '../types/quest-item-factual-definition';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
+
+/**
+ * Build the canonical "Required by quest" context label, including the
+ * factual Map name when the Quest identity carries one.
+ */
+const buildRequiredByContextLabel = (quest: QuestIdentityDefinition): string =>
+  quest.game_map
+    ? `Required by quest on ${quest.game_map.name}`
+    : 'Required by quest';
 
 const QuestsThatUseSection = ({
   item,
@@ -51,24 +61,24 @@ const QuestsThatUseSection = ({
       lead={lead}
     >
       {item.required_quest ? (
-        <QuestRows
-          heading="Required by quest"
-          quest={item.required_quest}
+        <QuestCard
+          quest_id={item.required_quest.id}
+          name={item.required_quest.name}
+          npc_name={item.required_quest.npc?.name ?? null}
+          context_label={buildRequiredByContextLabel(item.required_quest)}
           on_open_quest={navigation.on_open_quest}
-          on_open_npc={navigation.on_open_npc}
-          on_open_map={navigation.on_open_map}
         />
       ) : null}
 
       {list.length > 0
         ? list.map((requiredQuest) => (
-            <QuestRows
+            <QuestCard
               key={`required-quest-${requiredQuest.id}`}
-              heading="Required by quest"
-              quest={requiredQuest}
+              quest_id={requiredQuest.id}
+              name={requiredQuest.name}
+              npc_name={requiredQuest.npc?.name ?? null}
+              context_label={buildRequiredByContextLabel(requiredQuest)}
               on_open_quest={navigation.on_open_quest}
-              on_open_npc={navigation.on_open_npc}
-              on_open_map={navigation.on_open_map}
             />
           ))
         : null}

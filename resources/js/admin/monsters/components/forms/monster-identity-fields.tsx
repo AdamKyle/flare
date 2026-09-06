@@ -177,11 +177,14 @@ const MonsterIdentityFields = ({
         error={errors.drop_check}
       />
 
-      <FieldWrapper id="monster-location-type" label="Only For Location Type">
+      <FieldWrapper
+        id="monster-location-type"
+        label="Weekly Fight Location Type"
+      >
         {(describedBy) => (
           <Dropdown
             id="monster-location-type"
-            aria_label="Only For Location Type"
+            aria_label="Weekly Fight Location Type"
             aria_described_by={describedBy}
             items={locationTypeItems}
             pre_selected_item={locationTypeItems.find(

@@ -27,7 +27,6 @@ $mapGemHeaders = [
     'unique_item_drop_chance_increase_range',
     'mythic_item_drop_chance_increase_range',
     'cosmic_item_drop_chance_increase_range',
-    'ascended_item_drop_chance_increase_range',
     'character_power_reduction_range',
     'enemy_strength_increase_range',
     'enemy_healing_increase_range',
@@ -43,7 +42,6 @@ $mapGemHeaders = [
     'enemy_quest_item_drop_chance_increase_range',
     'monster_xp_increase_range',
     'monster_gold_drop_increase_range',
-    'faction_point_increase_range',
     'monster_atonement',
     'monster_atonement_range',
 ];
@@ -84,17 +82,12 @@ $locations = [
     ['Federation Controlled Town', 'Delusional Memories'],
     ['Underwater Caves', 'Surface'],
     ['Gold Mine', 'Shadow Plane'],
-    ['Lords Stronghold', 'Shadow Plane'],
-    ['Hells Broken Anvil', 'Hell'],
     ['Tear in the Fabric of Time', 'Hell'],
     ['Twisted Dimensional Gate', 'Hell'],
-    ['Cave of Memories', 'Purgatory'],
     ['Purgatories Dungeons', 'Purgatory'],
     ['Purgatory Smiths House', 'Purgatory'],
     ['Cave of Shadows', 'Twisted Memories'],
-    ['Dungeons of the twisted maiden', 'Twisted Memories'],
     ['The Old Church', 'The Ice Plane'],
-    ['Alchemy Corrupted Church', 'Delusional Memories'],
 ];
 
 $generationSets = array_merge(
@@ -164,13 +157,11 @@ $generalFields = [
     'character_class_specialty_xp_gain_range',
     'crafting_skill_bonus_range',
     'item_drop_chance_increase_range',
-    'faction_point_increase_range',
 ];
 $rarityFields = [
     'unique_item_drop_chance_increase_range',
     'mythic_item_drop_chance_increase_range',
     'cosmic_item_drop_chance_increase_range',
-    'ascended_item_drop_chance_increase_range',
 ];
 $monsterFields = [
     'enemy_strength_increase_range',

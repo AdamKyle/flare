@@ -3,6 +3,8 @@ import MonsterDetailDefinition from '../api/definitions/monster-detail-definitio
 export interface MonsterNavigationDefinition {
   on_open_map?: (id: number) => void;
   on_open_item?: (id: number) => void;
+  on_open_map_gem?: (profile_id: number) => void;
+  on_open_location_gem?: (profile_id: number) => void;
 }
 
 export default interface MonsterDetailProps {

@@ -17,6 +17,7 @@ const GenericItemList = ({
   on_selection_change,
   is_selection_disabled,
   use_item_id,
+  quest_item_ownership_state: questItemOwnershipState,
 }: GenericItemListProps): ReactNode => {
   const [selection, setSelection] = useState<ItemSelectedType>({
     mode: 'include',
@@ -172,6 +173,7 @@ const GenericItemList = ({
           is_selected={isItemSelected(item.slot_id)}
           on_item_selected={handleSelectItem}
           is_selection_disabled={is_selection_disabled}
+          quest_item_ownership_state={questItemOwnershipState}
         />
       )
     );

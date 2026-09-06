@@ -24,7 +24,6 @@ class GameMapGemParamterFactory extends Factory
             'unique_item_drop_chance_increase_range' => '0.01-1.0',
             'mythic_item_drop_chance_increase_range' => '0.01-1.0',
             'cosmic_item_drop_chance_increase_range' => '0.01-1.0',
-            'ascended_item_drop_chance_increase_range' => '0.01-1.0',
             'character_power_reduction_range' => '0.01-1.0',
             'monster_atonement' => GemTypeValue::FIRE,
             'monster_atonement_range' => '0.01-1.0',

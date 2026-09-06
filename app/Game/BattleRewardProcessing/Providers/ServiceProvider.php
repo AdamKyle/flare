@@ -36,6 +36,7 @@ use App\Game\Events\Services\EventGoalsService;
 use App\Game\Events\Services\GlobalEventGoalEligibilityService;
 use App\Game\Events\Services\GlobalEventGoalProgressionService;
 use App\Game\Factions\FactionLoyalty\Services\FactionLoyaltyService;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\GuideQuests\Services\GuideQuestService;
 use App\Game\Skills\Services\SkillService;
 use App\Game\Tops\Services\BroadcastTopsUpdateService;
@@ -54,6 +55,7 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->singleton(CharacterCurrencyRewardService::class, fn ($app) => new CharacterCurrencyRewardService(
             $app->make(BattleMessageHandler::class),
             $app->make(RandomNumberGenerator::class),
+            $app->make(AreaGemEffectService::class),
         ));
         $this->app->bind(CharacterXPService::class, fn ($app) => new CharacterXPService(
             $app->make(CharacterService::class),
@@ -61,6 +63,7 @@ class ServiceProvider extends ApplicationServiceProvider
             $app->make(Manager::class),
             $app->make(CharacterSheetBaseInfoTransformer::class),
             $app->make(BattleMessageHandler::class),
+            $app->make(AreaGemEffectService::class),
         ));
         $this->app->bind(CharacterRewardService::class, fn ($app) => new CharacterRewardService(
             $app->make(CharacterXPService::class),
@@ -79,6 +82,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(GuideQuestService::class),
                 $app->make(BattleMessageHandler::class),
                 $app->make(ChanceCalculator::class),
+                $app->make(AreaGemEffectService::class),
             );
         });
 

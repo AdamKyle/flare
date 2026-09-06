@@ -49,12 +49,53 @@
                         <i class="fas fa-chevron-right ml-auto text-gray-500 dark:text-gray-400" aria-hidden="true"></i>
                     </button>
                     <ul id="admin-nav-manage" class="menu-dropdown mt-2 hidden flex-col gap-1 pl-9">
+                        <li class="px-2 pt-1 text-[11px] font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-500">
+                            Core
+                        </li>
+                        <li>
+                            <a
+                                href="{{ route('admin.races.index') }}"
+                                class="menu-dropdown-item menu-dropdown-item-inactive"
+                            >
+                                Races
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="{{ route('admin.classes.index') }}"
+                                class="menu-dropdown-item menu-dropdown-item-inactive"
+                            >
+                                Classes
+                            </a>
+                        </li>
+                        <li class="pl-4">
+                            <a
+                                href="{{ route('admin.class-masteries.index') }}"
+                                class="menu-dropdown-item menu-dropdown-item-inactive text-sm text-gray-500 dark:text-gray-400"
+                            >
+                                Class Masteries
+                            </a>
+                        </li>
+
+                        <li class="my-1 border-t border-gray-200 dark:border-gray-700" role="separator"></li>
+
+                        <li class="px-2 pt-1 text-[11px] font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-500">
+                            Maps
+                        </li>
                         <li>
                             <a
                                 href="{{ route('admin.game-maps.index') }}"
                                 class="menu-dropdown-item menu-dropdown-item-inactive"
                             >
                                 Game Maps
+                            </a>
+                        </li>
+                        <li class="pl-4">
+                            <a
+                                href="{{ route('admin.map-gems.index') }}"
+                                class="menu-dropdown-item menu-dropdown-item-inactive text-sm text-gray-500 dark:text-gray-400"
+                            >
+                                Map Gems
                             </a>
                         </li>
                         <li>
@@ -65,6 +106,14 @@
                                 Locations
                             </a>
                         </li>
+                        <li class="pl-4">
+                            <a
+                                href="{{ route('admin.location-gems.index') }}"
+                                class="menu-dropdown-item menu-dropdown-item-inactive text-sm text-gray-500 dark:text-gray-400"
+                            >
+                                Location Gems
+                            </a>
+                        </li>
                         <li>
                             <a
                                 href="{{ route('admin.npcs.index') }}"
@@ -73,14 +122,9 @@
                                 NPCs
                             </a>
                         </li>
-                        <li>
-                            <a
-                                href="{{ route('admin.monsters.index') }}"
-                                class="menu-dropdown-item menu-dropdown-item-inactive"
-                            >
-                                Monsters
-                            </a>
-                        </li>
+
+                        <li class="my-1 border-t border-gray-200 dark:border-gray-700" role="separator"></li>
+
                         <li>
                             <a
                                 href="{{ route('admin.items.index') }}"
@@ -95,6 +139,14 @@
                                 class="menu-dropdown-item menu-dropdown-item-inactive"
                             >
                                 Quests
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="{{ route('admin.monsters.index') }}"
+                                class="menu-dropdown-item menu-dropdown-item-inactive"
+                            >
+                                Monsters
                             </a>
                         </li>
                     </ul>

@@ -7,6 +7,7 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\ClassRanks\Console\Commands\AssignNewClassRanks;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Services\ManageClassService;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -25,7 +26,8 @@ class ServiceProvider extends ApplicationServiceProvider
         $this->app->bind(ClassRankService::class, function ($app) {
             return new ClassRankService(
                 $app->make(UpdateCharacterAttackTypesHandler::class),
-                $app->make(BattleMessageHandler::class)
+                $app->make(BattleMessageHandler::class),
+                $app->make(AreaGemEffectService::class),
             );
         });
 

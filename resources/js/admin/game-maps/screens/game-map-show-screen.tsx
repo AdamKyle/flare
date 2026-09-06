@@ -10,6 +10,7 @@ import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
 import { useGameMap } from '../api/hooks/use-game-map';
+import GameMapKingdomColorSwatch from '../components/game-map-kingdom-color-swatch';
 import GameMapRelatedDataNavigation from '../components/game-map-related-data-navigation';
 import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
 import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
@@ -23,6 +24,7 @@ import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -197,7 +199,9 @@ const GameMapShowScreen = ({
           {gameMap.kingdom_color && (
             <>
               <Dt>Kingdom color</Dt>
-              <Dd>{gameMap.kingdom_color}</Dd>
+              <Dd>
+                <GameMapKingdomColorSwatch color={gameMap.kingdom_color} />
+              </Dd>
             </>
           )}
         </Dl>
@@ -273,17 +277,21 @@ const GameMapShowScreen = ({
           {renderEditorAction()}
         </div>
 
-        {renderProcessingStatus()}
+        <Card>
+          <div className="flex flex-col gap-6">
+            {renderProcessingStatus()}
 
-        <div className="lg:flex lg:items-start lg:gap-6">
-          <GameMapRelatedDataNavigation game_map_id={gameMapId} />
-          <div className="min-w-0 lg:flex-1">
-            <div className="grid gap-6 md:grid-cols-2">
-              {renderMapPreview()}
-              {renderDetails()}
+            <div className="lg:flex lg:items-start lg:gap-6">
+              <GameMapRelatedDataNavigation game_map_id={gameMapId} />
+              <div className="min-w-0 lg:flex-1">
+                <div className="grid gap-6 md:grid-cols-2">
+                  {renderMapPreview()}
+                  {renderDetails()}
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     );
   };

@@ -327,7 +327,7 @@ class GemWorldGenerationService
         }
 
         if ($template->type === LocationTemplateType::DELVE->value) {
-            return LocationType::CAVE_OF_MEMORIES->value;
+            return LocationType::CAVE_OF_SHADOWS->value;
         }
 
         return null;

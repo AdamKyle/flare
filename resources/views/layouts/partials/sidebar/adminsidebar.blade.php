@@ -64,19 +64,19 @@
 
     <div class="menu-detail" data-menu="manage-game">
         <h6 class="uppercase">Races and Classes</h6>
-        <a href="{{ route('races.create') }}">
-            <span class="fas fa-plus"></span>
-            Create New Race
+        <a href="{{ route('admin.classes.index') }}">
+            <span class="ra ra-sword"></span>
+            Classes
         </a>
 
-        <a href="{{ route('classes.create') }}">
-            <span class="fas fa-plus"></span>
-            Create New Class
+        <a href="{{ route('admin.races.index') }}">
+            <span class="ra ra-hood"></span>
+            Races
         </a>
 
-        <a href="{{ route('class-specials.create') }}">
-            <span class="fas fa-plus"></span>
-            Create New Class Special
+        <a href="{{ route('admin.class-masteries.index') }}">
+            <span class="ra ra-perspective-dice-six"></span>
+            Class Masteries
         </a>
         <hr />
         <h6 class="uppercase">Maps</h6>
@@ -195,6 +195,16 @@
         <a href="{{ route('passive.skills.import') }}">
             <span class="fas fa-file-import"></span>
             Import Data
+        </a>
+        <hr />
+        <h6 class="uppercase">Gem Management</h6>
+        <a href="{{ route('admin.map-gems.index') }}">
+            <span class="ra ra-gem-pendant"></span>
+            Map Gems
+        </a>
+        <a href="{{ route('admin.location-gems.index') }}">
+            <span class="ra ra-gem-pendant"></span>
+            Location Gems
         </a>
     </div>
 </aside>

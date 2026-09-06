@@ -39,6 +39,7 @@ const TreeBranch = ({
       path={path}
       className={clsx('fill-none stroke-2', strokeClassName)}
       aria-hidden="true"
+      interactionWidth={0}
     />
   );
 };

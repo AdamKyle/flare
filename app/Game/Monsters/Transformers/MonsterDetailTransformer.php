@@ -4,14 +4,17 @@ namespace App\Game\Monsters\Transformers;
 
 use App\Flare\Models\Monster;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
+use App\Game\Monsters\Services\MonsterGemEffectContextService;
 
 class MonsterDetailTransformer
 {
     /**
      * @param  QuestItemTransformer  $questItemTransformer  Canonical quest Item factual transformer.
+     * @param  MonsterGemEffectContextService  $monsterGemEffectContextService  Cached Gem effect context reader.
      */
     public function __construct(
         private readonly QuestItemTransformer $questItemTransformer,
+        private readonly MonsterGemEffectContextService $monsterGemEffectContextService,
     ) {}
 
     /**
@@ -34,6 +37,7 @@ class MonsterDetailTransformer
             'spells_and_affixes' => $this->spellsAndAffixes($monster),
             'quest_and_celestial' => $this->questAndCelestial($monster),
             'raid_and_special' => $this->raidAndSpecial($monster),
+            'gem_effect_contexts' => $this->monsterGemEffectContextService->forMonster($monster),
         ];
     }
 

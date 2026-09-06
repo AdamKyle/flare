@@ -54,7 +54,7 @@ class DelveExplorationController extends Controller
         $location = Location::where('x', $character->map->character_position_x)
             ->where('y', $character->map->character_position_y)
             ->where('game_map_id', $character->map->game_map_id)
-            ->where('type', LocationType::CAVE_OF_MEMORIES->value)
+            ->where('type', LocationType::CAVE_OF_SHADOWS->value)
             ->first();
 
         if (is_null($location)) {

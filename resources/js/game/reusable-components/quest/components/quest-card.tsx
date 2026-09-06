@@ -18,12 +18,16 @@ import QuestCardProps from '../types/quest-card-props';
 /**
  * Canonical, permission-neutral Quest card: the Quest-domain counterpart to
  * the inventory Item card, sharing its density and shadow quality but using
- * the `glacier` palette. Renders as a single full-card `button` — every
- * consumer supplies no nested interactive controls, so the entire card is
- * one large click/keyboard target rather than only its title text. Used by
- * both the desktop-tree-adjacent relationship cards and the flattened
- * mobile Quest list, and is safe for a future Player adapter to reuse
- * as-is by supplying `state` from the player's completed Quest ids.
+ * the `glacier` palette. Renders as a single full-card `button` when
+ * `on_open_quest` is supplied — every interactive consumer supplies no
+ * nested interactive controls, so the entire card is one large
+ * click/keyboard target rather than only its title text — or as a
+ * semantically meaningful noninteractive `<article>` when no navigation
+ * callback is supplied, for permission-neutral factual contexts with no
+ * navigation available. Used by the desktop-tree-adjacent relationship
+ * cards, the flattened mobile Quest list, and the Required Quest/Required
+ * Quest Chain dependency cards, and is safe for a future Player adapter to
+ * reuse as-is by supplying `state` from the player's completed Quest ids.
  */
 const QuestCard = ({
   quest_id: questId,
@@ -76,13 +80,8 @@ const QuestCard = ({
     );
   };
 
-  return (
-    <button
-      type="button"
-      onClick={() => onOpenQuest(questId)}
-      aria-label={`Open Quest details for ${name}`}
-      className={`${questCardBaseStyles()} ${questCardThemeStyles()} ${questCardBorderStyles(state)} ${questCardFocusRingStyles()}`}
-    >
+  const renderCardContent = (): ReactNode => (
+    <>
       <i
         className={`ra ra-scroll-unfurled text-2xl ${questCardSecondaryTextStyles()}`}
         aria-hidden="true"
@@ -101,7 +100,29 @@ const QuestCard = ({
         {renderState()}
         {renderMeta()}
       </div>
-    </button>
+    </>
+  );
+
+  if (onOpenQuest) {
+    return (
+      <button
+        type="button"
+        onClick={() => onOpenQuest(questId)}
+        aria-label={`Open Quest details for ${name}`}
+        className={`${questCardBaseStyles()} ${questCardThemeStyles()} ${questCardBorderStyles(state)} ${questCardFocusRingStyles()}`}
+      >
+        {renderCardContent()}
+      </button>
+    );
+  }
+
+  return (
+    <article
+      aria-label={name}
+      className={`${questCardBaseStyles()} ${questCardThemeStyles()} ${questCardBorderStyles(state)}`}
+    >
+      {renderCardContent()}
+    </article>
   );
 };
 

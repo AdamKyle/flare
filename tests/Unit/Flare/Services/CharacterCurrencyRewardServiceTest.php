@@ -8,6 +8,7 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Currency\Services\CurrencyLimit;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Events\Values\EventType;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Maps\Values\LocationType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
@@ -15,6 +16,8 @@ use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterAutomation;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateLocation;
 use Tests\Traits\CreateMonster;
@@ -22,7 +25,7 @@ use Tests\Traits\CreateScheduledEvent;
 
 class CharacterCurrencyRewardServiceTest extends TestCase
 {
-    use CreateCharacterAutomation, CreateGameMap, CreateItem, CreateLocation, CreateMonster, CreateScheduledEvent, RefreshDatabase;
+    use CreateCharacterAutomation, CreateGameMap, CreateGameMapGemParamter, CreateGem, CreateItem, CreateLocation, CreateMonster, CreateScheduledEvent, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -232,6 +235,7 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $characterCurrencyRewardService = new CharacterCurrencyRewardService(
             resolve(BattleMessageHandler::class),
             $randomNumberGenerator,
+            resolve(AreaGemEffectService::class),
         );
 
         $characterCurrencyRewardService
@@ -740,5 +744,44 @@ class CharacterCurrencyRewardServiceTest extends TestCase
         $this->assertEquals(CurrencyLimit::MAX_SHARDS, $character->shards);
         $this->assertEquals(CurrencyLimit::MAX_GOLD_DUST, $character->gold_dust);
         $this->assertEquals(0, $character->copper_coins);
+    }
+
+    public function test_currency_event_reward_applies_copper_coin_gain_bonus_to_event_copper_coins(): void
+    {
+        $this->createScheduledEvent([
+            'event_type' => EventType::WEEKLY_CURRENCY_DROPS,
+            'currently_running' => true,
+        ]);
+
+        $copperCoinsItem = $this->createItem([
+            'effect' => ItemEffectType::GET_COPPER_COINS->value,
+            'type' => 'quest',
+        ]);
+
+        $character = $this->character->inventoryManagement()->giveItem($copperCoinsItem)->getCharacter();
+        $character->update(['copper_coins' => 0]);
+        $gameMap = $character->map->gameMap;
+
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['copper_coin_gain' => 1.0]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $monster = $this->createMonster(['game_map_id' => $gameMap->id, 'is_celestial_entity' => false]);
+
+        $randomNumberGenerator = Mockery::mock(RandomNumberGenerator::class);
+        $randomNumberGenerator->shouldReceive('numberBetween')->with(1, 375)->twice()->andReturn(100);
+        $randomNumberGenerator->shouldReceive('numberBetween')->with(1, 115)->once()->andReturn(100);
+
+        $service = new CharacterCurrencyRewardService(
+            resolve(BattleMessageHandler::class),
+            $randomNumberGenerator,
+            resolve(AreaGemEffectService::class),
+        );
+
+        $service->setCharacter($character->refresh())->currencyEventReward($monster);
+
+        $character = $service->getCharacter();
+
+        $this->assertSame(200, $character->copper_coins);
     }
 }

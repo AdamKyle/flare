@@ -18,18 +18,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/maps/process-upload', ['as' => 'upload.map', 'uses' => 'MapsController@upload']);
     Route::post('/admin/maps/{gameMap}/post-bonuses', ['as' => 'add.map.bonuses', 'uses' => 'MapsController@postBonuses']);
 
-    Route::redirect('/admin/map-gems', '/admin')->name('admin.map-gems.list');
-    Route::get('/admin/map-gems/create', ['as' => 'admin.map-gems.create', 'uses' => 'MapGemsController@create']);
-    Route::get('/admin/map-gems/export-data', ['as' => 'admin.map-gems.export-data', 'uses' => 'MapGemsController@exportMapGems']);
-    Route::get('/admin/map-gems/import-data', ['as' => 'admin.map-gems.import-data', 'uses' => 'MapGemsController@importMapGems']);
-    Route::get('/admin/map-gems/{gameMapGemParamter}/edit', ['as' => 'admin.map-gems.edit', 'uses' => 'MapGemsController@edit']);
-    Route::get('/admin/map-gems/{gameMapGemParamter}/rolled', ['as' => 'admin.map-gems.rolled', 'uses' => 'MapGemsController@rolled']);
-    Route::get('/admin/map-gems/{gameMapGemParamter}', ['as' => 'admin.map-gems.show', 'uses' => 'MapGemsController@show']);
-    Route::post('/admin/map-gems/store', ['as' => 'admin.map-gems.store', 'uses' => 'MapGemsController@store']);
-    Route::post('/admin/map-gems/{gameMapGemParamter}/roll', ['as' => 'admin.map-gems.roll', 'uses' => 'MapGemsController@roll']);
-    Route::post('/admin/map-gems/export', ['as' => 'admin.map-gems.export', 'uses' => 'MapGemsController@export']);
-    Route::post('/admin/map-gems/import', ['as' => 'admin.map-gems.import', 'uses' => 'MapGemsController@importData']);
-
     Route::redirect('/admin/location-templates', '/admin')->name('admin.location-templates.list');
     Route::get('/admin/location-templates/create', ['as' => 'admin.location-templates.create', 'uses' => 'LocationTemplatesController@create']);
     Route::get('/admin/location-templates/export-data', ['as' => 'admin.location-templates.export-data', 'uses' => 'LocationTemplatesController@exportLocationTemplates']);
@@ -40,18 +28,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::post('/admin/location-templates/{locationTemplate}/delete', ['as' => 'admin.location-templates.delete', 'uses' => 'LocationTemplatesController@delete']);
     Route::post('/admin/location-templates/export', ['as' => 'admin.location-templates.export', 'uses' => 'LocationTemplatesController@export']);
     Route::post('/admin/location-templates/import', ['as' => 'admin.location-templates.import', 'uses' => 'LocationTemplatesController@importData']);
-
-    Route::redirect('/admin/location-gems', '/admin')->name('admin.location-gems.list');
-    Route::get('/admin/location-gems/create', ['as' => 'admin.location-gems.create', 'uses' => 'LocationGemsController@create']);
-    Route::get('/admin/location-gems/export-data', ['as' => 'admin.location-gems.export-data', 'uses' => 'LocationGemsController@exportLocationGems']);
-    Route::get('/admin/location-gems/import-data', ['as' => 'admin.location-gems.import-data', 'uses' => 'LocationGemsController@importLocationGems']);
-    Route::get('/admin/location-gems/{gameLocationGemParamter}/edit', ['as' => 'admin.location-gems.edit', 'uses' => 'LocationGemsController@edit']);
-    Route::get('/admin/location-gems/{gameLocationGemParamter}/rolled', ['as' => 'admin.location-gems.rolled', 'uses' => 'LocationGemsController@rolled']);
-    Route::get('/admin/location-gems/{gameLocationGemParamter}', ['as' => 'admin.location-gems.show', 'uses' => 'LocationGemsController@show']);
-    Route::post('/admin/location-gems/store', ['as' => 'admin.location-gems.store', 'uses' => 'LocationGemsController@store']);
-    Route::post('/admin/location-gems/{gameLocationGemParamter}/roll', ['as' => 'admin.location-gems.roll', 'uses' => 'LocationGemsController@roll']);
-    Route::post('/admin/location-gems/export', ['as' => 'admin.location-gems.export', 'uses' => 'LocationGemsController@export']);
-    Route::post('/admin/location-gems/import', ['as' => 'admin.location-gems.import', 'uses' => 'LocationGemsController@importData']);
 
     Route::get('/admin/affixes/export-affixes', ['as' => 'affixes.export', 'uses' => 'AffixesController@exportItems']);
     Route::get('/admin/affixes/import-affixes', ['as' => 'affixes.import', 'uses' => 'AffixesController@importItems']);
@@ -95,44 +71,6 @@ Route::middleware(['auth', 'is.admin'])->group(function () {
     Route::get('/admin/passive-skill/{passiveSkill}/edit', ['as' => 'passive.skill.edit', 'uses' => 'PassiveSkillsController@edit']);
     Route::post('/admin/passive-skills/store', ['as' => 'passive.skill.store', 'uses' => 'PassiveSkillsController@store']);
     Route::post('/admin/passive-skills/{passiveSkill}/update', ['as' => 'passive.skill.update', 'uses' => 'PassiveSkillsController@update']);
-
-    Route::redirect('/admin/class-specials', '/admin')->name('class-specials.list');
-    Route::get('/admin/class-special/{gameClassSpecial}', ['as' => 'class-specials.show', 'uses' => 'ClassSpecialsController@show']);
-    Route::get('/admin/class-specials/create', ['as' => 'class-specials.create', 'uses' => 'ClassSpecialsController@create']);
-    Route::get('/admin/class-specials/{gameClassSpecial}/edit', ['as' => 'class-specials.edit', 'uses' => 'ClassSpecialsController@edit']);
-    Route::get('/admin/class-specials/export-class-specials', ['as' => 'class-specials.show-export', 'uses' => 'ClassSpecialsController@showExport']);
-    Route::get('/admin/class-specials/import-class-specials', ['as' => 'class-specials.show-import', 'uses' => 'ClassSpecialsController@showImport']);
-    Route::post('/admin/class-specials/export', ['as' => 'class-specials.export', 'uses' => 'ClassSpecialsController@export']);
-    Route::post('/admin/class-specials/import', ['as' => 'class-specials.import', 'uses' => 'ClassSpecialsController@import']);
-    Route::post('/admin/class-specials/store', ['as' => 'class-specials.store', 'uses' => 'ClassSpecialsController@store']);
-    Route::post('/admin/class-specials/store', ['as' => 'class-specials.store', 'uses' => 'ClassSpecialsController@store']);
-
-    Route::post('/admin/race/store', ['as' => 'races.store', 'uses' => 'RacesController@store']);
-
-    Route::redirect('/admin/races', '/admin')->name('races.list');
-
-    Route::get('/adamin/races/export-races', ['as' => 'races.export-view', 'uses' => 'RacesController@exportRaces']);
-    Route::get('/adamin/races/import-races', ['as' => 'races.import-view', 'uses' => 'RacesController@importRaces']);
-
-    Route::post('/adamin/races/export', ['as' => 'races.export', 'uses' => 'RacesController@export']);
-    Route::post('/adamin/races/import', ['as' => 'races.import', 'uses' => 'RacesController@import']);
-
-    Route::get('/admin/races/create', ['as' => 'races.create', 'uses' => 'RacesController@create']);
-    Route::get('/admin/races/{race}', ['as' => 'races.race', 'uses' => 'RacesController@show']);
-    Route::get('/admin/races/{race}/edit', ['as' => 'races.edit', 'uses' => 'RacesController@edit']);
-
-    Route::post('/admin/classes/store', ['as' => 'classes.store', 'uses' => 'ClassesController@store']);
-
-    Route::redirect('/admin/classes', '/admin')->name('classes.list');
-    Route::get('/admin/classes/export-classes', ['as' => 'classes.export-excel', 'uses' => 'ClassesController@exportClasses']);
-    Route::get('/admin/classes/import-classes', ['as' => 'classes.import-excel', 'uses' => 'ClassesController@importClasses']);
-
-    Route::post('/admin/classes/export-class-data', ['as' => 'classes.export-data', 'uses' => 'ClassesController@export']);
-    Route::post('/admin/classes/import-class-data', ['as' => 'classes.import-data', 'uses' => 'ClassesController@import']);
-
-    Route::get('/admin/classes/create', ['as' => 'classes.create', 'uses' => 'ClassesController@create']);
-    Route::get('/admin/classes/{class}', ['as' => 'classes.class', 'uses' => 'ClassesController@show']);
-    Route::get('/admin/classes/{class}/edit', ['as' => 'classes.edit', 'uses' => 'ClassesController@edit']);
 
     Route::get('/admin/kingdoms/buildings/create', ['as' => 'buildings.create', 'uses' => 'BuildingsController@create']);
     Route::redirect('/admin/kingdoms/buildings', '/admin')->name('buildings.list');

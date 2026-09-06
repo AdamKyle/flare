@@ -16,6 +16,7 @@ import { QuestShowScreenProps } from '../screen-manager/quest-screen-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const QuestShowScreen = ({
@@ -127,16 +128,18 @@ const QuestShowScreen = ({
           />
         </div>
 
-        <QuestDetail
-          quest={quest}
-          navigation={{
-            on_open_quest: handleOpenQuest,
-            on_open_item: handleOpenItem,
-            on_open_monster: handleOpenMonster,
-            on_open_npc: handleOpenNpc,
-            on_open_map: handleOpenMap,
-          }}
-        />
+        <Card>
+          <QuestDetail
+            quest={quest}
+            navigation={{
+              on_open_quest: handleOpenQuest,
+              on_open_item: handleOpenItem,
+              on_open_monster: handleOpenMonster,
+              on_open_npc: handleOpenNpc,
+              on_open_map: handleOpenMap,
+            }}
+          />
+        </Card>
       </div>
     );
   };

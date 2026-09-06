@@ -70,14 +70,22 @@ class QuestReadService
     }
 
     /**
-     * Return the factual Quest browse options: the ordered Game Maps a Quest browser may select
-     * from, and the currently configured default Game Map, when one exists.
+     * Return the factual Quest browse options: the ordered canonical/selectable Game Maps a
+     * Quest browser may select from, and the currently configured default Game Map, when one
+     * exists. Generated Gem World Maps (a non-null `generated_parent_game_map_id` or a non-null
+     * `generated_map_type`) are never selectable Quest Planes and are excluded before ordering,
+     * so a generated Map can never be returned as an option or become the default.
      *
      * @return array{default_game_map_id: int|null, game_maps: array<int, array{id: int, name: string}>} Quest browse options.
      */
     public function browseOptions(): array
     {
-        $gameMaps = GameMap::query()->orderBy('name')->orderBy('id')->get(['id', 'name', 'default']);
+        $gameMaps = GameMap::query()
+            ->whereNull('generated_parent_game_map_id')
+            ->whereNull('generated_map_type')
+            ->orderBy('name')
+            ->orderBy('id')
+            ->get(['id', 'name', 'default']);
 
         return $this->questBrowseOptionsTransformer->transform($gameMaps);
     }
@@ -104,10 +112,10 @@ class QuestReadService
     }
 
     /**
-     * Resolve the required Quest chain identities in stored order.
+     * Resolve the required Quest chain dependency identities in stored order.
      *
      * @param  Quest  $quest  Quest to resolve the required chain for.
-     * @return array<int, array{id: int, name: string}> Ordered required Quest chain identities.
+     * @return array<int, array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}> Ordered required Quest chain dependency identities.
      */
     private function resolveRequiredQuestChain(Quest $quest): array
     {
@@ -117,13 +125,32 @@ class QuestReadService
             return [];
         }
 
-        $quests = Quest::whereIn('id', $requiredIds)->get(['id', 'name'])->keyBy('id');
+        $quests = Quest::whereIn('id', $requiredIds)
+            ->get(['id', 'name', 'parent_quest_id', 'required_quest_id', 'required_quest_chain'])
+            ->keyBy('id');
 
         return collect($requiredIds)
-            ->map(fn (int $id) => $quests->has($id) ? ['id' => $id, 'name' => $quests->get($id)->name] : null)
+            ->map(fn (int $id) => $quests->has($id) ? $this->requiredQuestChainEntry($quests->get($id)) : null)
             ->filter()
             ->values()
             ->all();
+    }
+
+    /**
+     * Build one Required Quest Chain entry's factual dependency identity.
+     *
+     * @param  Quest  $quest  Required Quest chain member to describe.
+     * @return array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>} Required Quest Chain entry.
+     */
+    private function requiredQuestChainEntry(Quest $quest): array
+    {
+        return [
+            'id' => $quest->id,
+            'name' => $quest->name,
+            'parent_quest_id' => $quest->parent_quest_id,
+            'required_quest_id' => $quest->required_quest_id,
+            'required_quest_chain_ids' => $quest->required_quest_chain ?? [],
+        ];
     }
 
     /**

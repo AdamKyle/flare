@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import UseQuestTreeDefinition from './definitions/use-quest-tree-definition';
 import QuestTreeNodeDefinition from '../../../../game/reusable-components/quest/api/definitions/quest-tree-node-definition';
 import { QuestKind } from '../../../../game/reusable-components/quest/enums/quest-kind';
+import { buildQuestTreeQueryKey } from '../../../../game/reusable-components/quest/utils/build-quest-tree-query-key';
 import QuestTreeResponseDefinition from '../definitions/quest-tree-response-definition';
 import { QuestApiMessages } from '../enums/quest-api-messages';
 import { QuestApiUrls } from '../enums/quest-api-urls';
@@ -18,6 +19,7 @@ export const useQuestTree = (
   const [quests, setQuests] = useState<QuestTreeNodeDefinition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<UseQuestTreeDefinition['error']>(null);
+  const [queryKey, setQueryKey] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState(0);
 
   const requestGenerationRef = useRef(0);
@@ -29,11 +31,14 @@ export const useQuestTree = (
 
     abortControllerRef.current?.abort();
 
+    const requestQueryKey = buildQuestTreeQueryKey(mapId, kind);
+
     if (mapId === null) {
       abortControllerRef.current = null;
       setQuests([]);
       setError(null);
       setLoading(false);
+      setQueryKey(null);
 
       return;
     }
@@ -44,6 +49,7 @@ export const useQuestTree = (
     setQuests([]);
     setLoading(true);
     setError(null);
+    setQueryKey(null);
 
     try {
       const result = await apiHandler.get<
@@ -62,6 +68,7 @@ export const useQuestTree = (
       }
 
       setQuests(result.quests);
+      setQueryKey(requestQueryKey);
     } catch (errorInstance) {
       if (axios.isCancel(errorInstance)) {
         return;
@@ -76,11 +83,13 @@ export const useQuestTree = (
           message:
             errorInstance.response?.data?.message ?? errorInstance.message,
         });
+        setQueryKey(requestQueryKey);
 
         return;
       }
 
       setError({ message: QuestApiMessages.LoadTree });
+      setQueryKey(requestQueryKey);
     } finally {
       if (requestGenerationRef.current === requestGeneration) {
         setLoading(false);
@@ -100,5 +109,5 @@ export const useQuestTree = (
     setRefreshToken((value) => value + 1);
   };
 
-  return { quests, loading, error, refresh };
+  return { quests, loading, error, refresh, query_key: queryKey };
 };

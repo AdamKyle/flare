@@ -5,45 +5,26 @@ namespace App\Game\Maps\Services\Common;
 use App\Flare\Models\Character;
 use App\Flare\Models\Location;
 use App\Flare\Models\ScheduledEvent;
-use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Maps\Events\UpdateMonsterList;
 use App\Game\Maps\Events\UpdateRaidMonsters;
-use App\Game\Monsters\Services\MonsterListService;
-use Illuminate\Support\Facades\Cache;
 
 trait UpdateRaidMonstersForLocation
 {
     /**
-     * Updates the monster list when a player enters a special location.
+     * Updates the monster list when a player enters a Location, preferring an active Raid,
+     * then the current contextual (Weekly/Location Gem/normal) Monster list.
      */
     public function updateMonstersList(Character $character, ?Location $location = null): void
     {
-
         if (is_null($character->map)) {
             return;
-        }
-
-        $monsterListService = resolve(MonsterListService::class);
-
-        $monsters = $monsterListService->getMonstersForCharacterAsList($character);
-
-        $hasAccessToPurgatory = $character->inventory->slots->where('item.effect', ItemEffectType::PURGATORY->value)->count() > 0;
-
-        if (! is_null($character->map->gameMap->only_during_event_type)) {
-            if (! $hasAccessToPurgatory) {
-                $monsters = $monsters['easier'];
-            } else {
-                $monsters = $monsters['regular'];
-            }
         }
 
         if ($this->updateMonstersForRaid($character, $location)) {
             return;
         }
 
-        if ($this->updateMonsterForLocationType($character, $location)) {
-            return;
-        }
+        $monsters = $this->monsterListService->getMonstersForCharacterAsList($character);
 
         event(new UpdateMonsterList($monsters, $character->user));
         event(new UpdateRaidMonsters([], $character->user));
@@ -109,28 +90,5 @@ trait UpdateRaidMonstersForLocation
         }
 
         return false;
-    }
-
-    /**
-     * Update the monsters list for a special location type, if it has monsters.
-     */
-    private function updateMonsterForLocationType(Character $character, ?Location $location = null): bool
-    {
-        if (is_null($location)) {
-            return false;
-        }
-
-        $cache = Cache::get('special-location-monsters');
-
-        if (! isset($cache['location-type-'.$location->type])) {
-            return false;
-        }
-
-        $monsters = $cache['location-type-'.$location->type];
-
-        event(new UpdateMonsterList($monsters, $character->user));
-        event(new UpdateRaidMonsters([], $character->user));
-
-        return true;
     }
 }

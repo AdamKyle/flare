@@ -7,6 +7,7 @@ import QuestTreeProps from '../types/quest-tree-props';
 import { buildQuestTreeData } from '../utils/build-quest-tree-data';
 
 import TreeNodeDefinition from 'ui/tree/definitions/tree-node-definition';
+import TreeMobileMode from 'ui/tree/enums/tree-mobile-mode';
 import Tree from 'ui/tree/tree';
 
 /**
@@ -35,6 +36,14 @@ const QuestTree = ({
     [quests, completedQuestIds]
   );
 
+  const defaultFocusNodeId = useMemo(() => {
+    if (mobileMode !== TreeMobileMode.ONLY_WHATS_AVAILABLE) {
+      return undefined;
+    }
+
+    return treeData.nodes.find((node) => node.is_available)?.id;
+  }, [mobileMode, treeData.nodes]);
+
   const handleActivate = (
     node: TreeNodeDefinition<QuestTreeNodeData>
   ): void => {
@@ -62,6 +71,7 @@ const QuestTree = ({
       on_node_activate={navigation?.on_open_quest ? handleActivate : undefined}
       accessibility_label={accessibilityLabel}
       mobile_mode={mobileMode}
+      default_focus_node_id={defaultFocusNodeId}
       available_empty_state={
         <p className="text-glacier-600 dark:text-glacier-400 text-sm">
           No Quests are currently available.

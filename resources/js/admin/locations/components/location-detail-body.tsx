@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import LocationDetailBodyProps from './types/location-detail-body-props';
+import ReadOnlyItemCardDensity from '../../../game/components/side-peeks/components/items/enums/read-only-item-card-density';
 import ReadOnlyItemCard from '../../../game/components/side-peeks/components/items/read-only-item-card';
 import { LocationApiMessages } from '../api/enums/location-api-messages';
 import { LOCATION_TYPE_LABELS } from '../enums/location-type';
@@ -155,6 +156,7 @@ const LocationDetailBody = ({
               description={item.description}
               effect={item.effect}
               usable={item.usable}
+              density={ReadOnlyItemCardDensity.COMPACT}
               on_click={() => onOpenQuestItem(item)}
             />
           ))}

@@ -23,7 +23,11 @@ import Separator from 'ui/separator/separator';
  * checks Admin permission, imports Admin APIs, or mutates data; navigation
  * is entirely driven by the optional callbacks in `navigation`.
  */
-const QuestDetail = ({ quest, navigation }: QuestDetailProps): ReactNode => {
+const QuestDetail = ({
+  quest,
+  navigation,
+  completed_quest_ids: completedQuestIds,
+}: QuestDetailProps): ReactNode => {
   const hasStory = Boolean(
     quest.story.before_completion_markdown ||
     quest.story.after_completion_markdown
@@ -122,7 +126,13 @@ const QuestDetail = ({ quest, navigation }: QuestDetailProps): ReactNode => {
     },
     {
       present: hasDependencies,
-      node: <QuestDependenciesSection quest={quest} navigation={navigation} />,
+      node: (
+        <QuestDependenciesSection
+          quest={quest}
+          navigation={navigation}
+          completed_quest_ids={completedQuestIds}
+        />
+      ),
     },
     {
       present: hasRequirements,

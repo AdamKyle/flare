@@ -82,6 +82,11 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminNpcsWebRoutes();
         $this->mapAdminItemsWebRoutes();
         $this->mapAdminQuestsWebRoutes();
+        $this->mapAdminClassesWebRoutes();
+        $this->mapAdminRacesWebRoutes();
+        $this->mapAdminClassMasteriesWebRoutes();
+        $this->mapAdminMapGemsWebRoutes();
+        $this->mapAdminLocationGemsWebRoutes();
         $this->mapQuestRoutes();
         $this->mapGuideQuestsRoutes();
         $this->mapGameMarketRoutes();
@@ -100,6 +105,11 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapAdminQuestsApiRoutes();
         $this->mapAdminMonstersWebRoutes();
         $this->mapAdminMonstersApiRoutes();
+        $this->mapAdminClassesApiRoutes();
+        $this->mapAdminRacesApiRoutes();
+        $this->mapAdminClassMasteriesApiRoutes();
+        $this->mapAdminMapGemsApiRoutes();
+        $this->mapAdminLocationGemsApiRoutes();
         $this->mapInformationApiRoutes();
 
         // Game Core Api Routes:
@@ -508,6 +518,131 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Admin\Monsters\Controllers')
             ->group(base_path('routes/admin/monsters/api.php'));
+    }
+
+    /**
+     * Define the Admin Classes web routes.
+     *
+     * @return void Registers the Admin Classes web routes.
+     */
+    private function mapAdminClassesWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Classes\Controllers')
+            ->group(base_path('routes/admin/classes/web.php'));
+    }
+
+    /**
+     * Define the Admin Classes api routes.
+     *
+     * @return void Registers the Admin Classes api routes.
+     */
+    private function mapAdminClassesApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Classes\Controllers')
+            ->group(base_path('routes/admin/classes/api.php'));
+    }
+
+    /**
+     * Define the Admin Races web routes.
+     *
+     * @return void Registers the Admin Races web routes.
+     */
+    private function mapAdminRacesWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\Races\Controllers')
+            ->group(base_path('routes/admin/races/web.php'));
+    }
+
+    /**
+     * Define the Admin Races api routes.
+     *
+     * @return void Registers the Admin Races api routes.
+     */
+    private function mapAdminRacesApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\Races\Controllers')
+            ->group(base_path('routes/admin/races/api.php'));
+    }
+
+    /**
+     * Define the Admin Class Masteries web routes.
+     *
+     * @return void Registers the Admin Class Masteries web routes.
+     */
+    private function mapAdminClassMasteriesWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\ClassMasteries\Controllers')
+            ->group(base_path('routes/admin/class-masteries/web.php'));
+    }
+
+    /**
+     * Define the Admin Class Masteries api routes.
+     *
+     * @return void Registers the Admin Class Masteries api routes.
+     */
+    private function mapAdminClassMasteriesApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\ClassMasteries\Controllers')
+            ->group(base_path('routes/admin/class-masteries/api.php'));
+    }
+
+    /**
+     * Define the Admin Map Gems web routes.
+     *
+     * @return void Registers the Admin Map Gems web routes.
+     */
+    private function mapAdminMapGemsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\MapGems\Controllers')
+            ->group(base_path('routes/admin/map-gems/web.php'));
+    }
+
+    /**
+     * Define the Admin Map Gems api routes.
+     *
+     * @return void Registers the Admin Map Gems api routes.
+     */
+    private function mapAdminMapGemsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\MapGems\Controllers')
+            ->group(base_path('routes/admin/map-gems/api.php'));
+    }
+
+    /**
+     * Define the Admin Location Gems web routes.
+     *
+     * @return void Registers the Admin Location Gems web routes.
+     */
+    private function mapAdminLocationGemsWebRoutes(): void
+    {
+        Route::middleware('web')
+            ->namespace('App\Admin\LocationGems\Controllers')
+            ->group(base_path('routes/admin/location-gems/web.php'));
+    }
+
+    /**
+     * Define the Admin Location Gems api routes.
+     *
+     * @return void Registers the Admin Location Gems api routes.
+     */
+    private function mapAdminLocationGemsApiRoutes(): void
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Admin\LocationGems\Controllers')
+            ->group(base_path('routes/admin/location-gems/api.php'));
     }
 
     /**

@@ -2,7 +2,13 @@ import '@xyflow/react/dist/style.css';
 
 import { Node, ReactFlow, ReactFlowProvider } from '@xyflow/react';
 import clsx from 'clsx';
-import React, { ReactNode, useMemo, useRef, useState } from 'react';
+import React, {
+  ReactNode,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import TreeBranch from './components/tree-branch';
 import TreeControls from './components/tree-controls';
@@ -12,8 +18,10 @@ import TreeNode from './components/tree-node';
 import TreeScreenReaderSummary from './components/tree-screen-reader-summary';
 import TreeFlowNodeDataDefinition from './definitions/tree-flow-node-data-definition';
 import TreeLayoutDefinition from './definitions/tree-layout-definition';
+import TreeNodeDefinition from './definitions/tree-node-definition';
 import TreeStructureDefinition from './definitions/tree-structure-definition';
 import TreeMobileMode from './enums/tree-mobile-mode';
+import { useTreeDecorativeEdgeAccessibility } from './hooks/use-tree-decorative-edge-accessibility';
 import TreeProps from './types/tree-props';
 import { buildTreeLayout, DEFAULT_NODE_WIDTH } from './utils/build-tree-layout';
 import { resolveTreeStructure } from './utils/resolve-tree-structure';
@@ -109,6 +117,8 @@ const Tree = <TData,>({
   default_node_width: defaultNodeWidth,
   default_node_height: defaultNodeHeight,
   default_branch_color: defaultBranchColor,
+  default_zoom: defaultZoom = 1,
+  default_focus_node_id: defaultFocusNodeId,
 }: TreeProps<TData>): ReactNode => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -117,6 +127,33 @@ const Tree = <TData,>({
     () => isTreeStructureValid(nodes, branches),
     [nodes, branches]
   );
+
+  const handleNodeActivateWrapped = useCallback(
+    (node: TreeNodeDefinition<TData>): void => {
+      if (!onNodeActivate) {
+        return;
+      }
+
+      const container = containerRef.current;
+      const isTreeFullscreen = document.fullscreenElement === container;
+
+      if (!isTreeFullscreen) {
+        onNodeActivate(node);
+
+        return;
+      }
+
+      document
+        .exitFullscreen()
+        .then(() => onNodeActivate(node))
+        .catch(() => onNodeActivate(node));
+    },
+    [onNodeActivate]
+  );
+
+  const handleNodeActivate = onNodeActivate
+    ? handleNodeActivateWrapped
+    : undefined;
 
   const { structure, layout } = useMemo(() => {
     if (!isStructureValid) {
@@ -129,7 +166,7 @@ const Tree = <TData,>({
       branches,
       structure: resolvedStructure,
       render_node: renderNode,
-      on_node_activate: onNodeActivate,
+      on_node_activate: handleNodeActivate,
       default_node_width: defaultNodeWidth,
       default_node_height: defaultNodeHeight,
       default_branch_color: defaultBranchColor,
@@ -141,7 +178,7 @@ const Tree = <TData,>({
     nodes,
     branches,
     renderNode,
-    onNodeActivate,
+    handleNodeActivate,
     defaultNodeWidth,
     defaultNodeHeight,
     defaultBranchColor,
@@ -158,6 +195,35 @@ const Tree = <TData,>({
     return resolveRootAnchor(rootNodes, flowNodeById, defaultNodeWidth);
   }, [nodes, structure, layout.flow_nodes, defaultNodeWidth]);
 
+  const defaultAnchor = useMemo(() => {
+    if (defaultFocusNodeId === undefined) {
+      return rootAnchor;
+    }
+
+    const flowNodeById = new Map(
+      layout.flow_nodes.map((flowNode) => [flowNode.id, flowNode])
+    );
+
+    if (!flowNodeById.has(defaultFocusNodeId)) {
+      return rootAnchor;
+    }
+
+    const focusNodes = nodes.filter((node) => node.id === defaultFocusNodeId);
+
+    return resolveRootAnchor(focusNodes, flowNodeById, defaultNodeWidth);
+  }, [
+    defaultFocusNodeId,
+    nodes,
+    layout.flow_nodes,
+    defaultNodeWidth,
+    rootAnchor,
+  ]);
+
+  useTreeDecorativeEdgeAccessibility({
+    container_ref: containerRef,
+    edge_count: layout.flow_edges.length,
+  });
+
   const renderVisualTree = (): ReactNode => (
     <div
       ref={containerRef}
@@ -166,6 +232,12 @@ const Tree = <TData,>({
         isFullscreen ? 'h-screen w-screen' : 'h-96 md:h-128 lg:h-160'
       )}
     >
+      <TreeScreenReaderSummary
+        accessibility_label={accessibilityLabel}
+        total_nodes={nodes.length}
+        root_count={structure.root_count}
+        max_depth={structure.max_depth}
+      />
       <ReactFlowProvider>
         <ReactFlow
           nodes={layout.flow_nodes}
@@ -180,27 +252,26 @@ const Tree = <TData,>({
           edgesFocusable={false}
           edgesReconnectable={false}
           elementsSelectable={false}
+          disableKeyboardA11y
           panOnScroll
           zoomOnPinch
           proOptions={{ hideAttribution: true }}
         >
           <TreeInitialViewport
             container_ref={containerRef}
-            root_center_x={rootAnchor.center_x}
-            root_top_y={rootAnchor.top_y}
+            default_focus_center_x={defaultAnchor.center_x}
+            default_focus_top_y={defaultAnchor.top_y}
+            default_zoom={defaultZoom}
           />
           <TreeControls
             container_ref={containerRef}
+            default_focus_center_x={defaultAnchor.center_x}
+            default_focus_top_y={defaultAnchor.top_y}
+            default_zoom={defaultZoom}
             on_fullscreen_change={setIsFullscreen}
           />
         </ReactFlow>
       </ReactFlowProvider>
-      <TreeScreenReaderSummary
-        accessibility_label={accessibilityLabel}
-        total_nodes={nodes.length}
-        root_count={structure.root_count}
-        max_depth={structure.max_depth}
-      />
     </div>
   );
 
@@ -209,7 +280,7 @@ const Tree = <TData,>({
       nodes={nodes}
       render_node={renderNode}
       render_list_node={renderListNode}
-      on_node_activate={onNodeActivate}
+      on_node_activate={handleNodeActivate}
       available_empty_state={availableEmptyState}
     />
   );

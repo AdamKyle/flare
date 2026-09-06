@@ -93,7 +93,7 @@ class DelveExplorationControllerTest extends TestCase
         $character = $this->character->getCharacter();
 
         $this->createLocation([
-            'type' => LocationType::CAVE_OF_MEMORIES->value,
+            'type' => LocationType::CAVE_OF_SHADOWS->value,
             'game_map_id' => $character->map->game_map_id,
             'x' => $character->map->character_position_x,
             'y' => $character->map->character_position_y,
@@ -105,7 +105,7 @@ class DelveExplorationControllerTest extends TestCase
             'is_celestial_entity' => false,
             'is_raid_monster' => false,
             'is_raid_boss' => false,
-            'only_for_location_type' => LocationType::CAVE_OF_MEMORIES->value,
+            'only_for_location_type' => LocationType::CAVE_OF_SHADOWS->value,
         ]);
 
         $response = $this->actingAs($character->user)

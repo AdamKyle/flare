@@ -2,10 +2,10 @@
 
 namespace App\Admin\Monsters\Transformers;
 
+use App\Admin\Monsters\Values\MonsterListCategory;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Game\Core\Values\CoreStatType;
-use App\Game\Maps\Values\LocationType;
 use App\Game\Raids\Values\RaidAttackType;
 use Illuminate\Support\Collection;
 
@@ -29,7 +29,7 @@ class MonsterFormOptionsTransformer
                 'label' => $item->name,
             ])->values()->all(),
             'damage_stats' => array_map(fn (CoreStatType $type): string => $type->value, CoreStatType::cases()),
-            'location_types' => array_map(fn (LocationType $type): int => $type->value, LocationType::cases()),
+            'location_types' => MonsterListCategory::allCategoryLocationTypes(),
             'raid_special_attack_types' => array_map(fn (RaidAttackType $type): int => $type->value, RaidAttackType::cases()),
         ];
     }

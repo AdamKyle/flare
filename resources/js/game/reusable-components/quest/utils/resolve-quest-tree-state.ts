@@ -1,14 +1,16 @@
-import QuestTreeNodeDefinition from '../api/definitions/quest-tree-node-definition';
 import { QuestTreeState } from '../enums/quest-tree-state';
+import QuestStateResolvableDefinition from '../types/quest-state-resolvable-definition';
 
 /**
- * Resolve a Quest tree node's structural state from the current player's completed Quest ids.
+ * Resolve a Quest's structural state from the current player's completed Quest ids. Powers both
+ * Quest Tree nodes and Required Quest/Required Quest Chain dependency cards through the shared
+ * `QuestStateResolvableDefinition` contract, so there is exactly one Quest-state algorithm.
  *
  * Order matters: completion always wins, then a locked parent, then any locked prerequisite
  * (direct required Quest or required Quest chain), otherwise the Quest is available.
  */
 export const resolveQuestTreeState = (
-  quest: QuestTreeNodeDefinition,
+  quest: QuestStateResolvableDefinition,
   completedQuestIds: ReadonlySet<number>
 ): QuestTreeState => {
   if (completedQuestIds.has(quest.id)) {

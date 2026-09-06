@@ -1,3 +1,4 @@
+import QuestDependencyDefinition from './quest-dependency-definition';
 import QuestIdentityDefinition from './quest-identity-definition';
 import QuestItemFactualDefinition, {
   GameMapIdentityDefinition,
@@ -21,10 +22,10 @@ export interface QuestStoryDefinition {
 }
 
 export interface QuestStructureDefinition {
-  parent_quest: QuestIdentityDefinition | null;
-  child_quests: QuestIdentityDefinition[];
-  required_quest: QuestIdentityDefinition | null;
-  required_quest_chain: QuestIdentityDefinition[];
+  parent_quest: QuestDependencyDefinition | null;
+  child_quests: QuestDependencyDefinition[];
+  required_quest: QuestDependencyDefinition | null;
+  required_quest_chain: QuestDependencyDefinition[];
   compatibility_parent_chain_quest_id: number | null;
 }
 

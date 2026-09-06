@@ -13,6 +13,7 @@ use App\Game\Core\Chance\ChanceCalculator;
 use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Items\Transformers\QuestItemTransformer;
 use App\Game\Core\Services\GameTimerService;
+use App\Game\Gems\Services\AreaGemEffectService;
 use App\Game\Maps\Cache\CoordinatesCache;
 use App\Game\Maps\Calculations\DistanceCalculation;
 use App\Game\Maps\Console\Commands\UpdateMapCount;
@@ -70,6 +71,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(MonsterListService::class),
                 $app->make(ChanceCalculator::class),
                 $app->make(Manager::class),
                 $app->make(CharacterSheetBaseInfoTransformer::class),
@@ -84,6 +86,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(MonsterListService::class),
                 $app->make(ChanceCalculator::class),
             );
         });
@@ -95,6 +98,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(ConjureService::class),
                 $app->make(MovementService::class),
                 $app->make(TraverseService::class),
+                $app->make(MonsterListService::class),
                 $app->make(ChanceCalculator::class),
             );
         });
@@ -107,6 +111,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(MovementService::class),
                 $app->make(PortService::class),
                 $app->make(TraverseService::class),
+                $app->make(MonsterListService::class),
                 $app->make(ChanceCalculator::class),
             );
         });
@@ -132,6 +137,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(LocationService::class),
                 $app->make(MapTileValue::class),
                 $app->make(RandomNumberGenerator::class),
+                $app->make(AreaGemEffectService::class),
             );
         });
 
@@ -146,6 +152,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(PlainDataSerializer::class),
                 $app->make(Pagination::class),
                 $app->make(Manager::class),
+                $app->make(MonsterListService::class),
             );
         });
 

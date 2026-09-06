@@ -11,7 +11,9 @@ use Tests\Traits\CreateCharacterBoon;
 use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
 use Tests\Traits\CreateGameClassSpecial;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateGameMapGemParamter;
 use Tests\Traits\CreateGameSkill;
+use Tests\Traits\CreateGem;
 use Tests\Traits\CreateItem;
 use Tests\Traits\CreateItemAffix;
 use Tests\Traits\CreateItemSkill;
@@ -19,7 +21,7 @@ use Tests\Traits\CreateItemSkillProgression;
 
 class StatModifierDetailsTest extends TestCase
 {
-    use CreateCharacterBoon, CreateCharacterClassSpecialitiesEquipped, CreateGameClassSpecial, CreateGameMap, CreateGameSkill, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
+    use CreateCharacterBoon, CreateCharacterClassSpecialitiesEquipped, CreateGameClassSpecial, CreateGameMap, CreateGameMapGemParamter, CreateGameSkill, CreateGem, CreateItem, CreateItemAffix, CreateItemSkill, CreateItemSkillProgression, RefreshDatabase;
 
     private ?CharacterFactory $character;
 
@@ -228,6 +230,21 @@ class StatModifierDetailsTest extends TestCase
 
         $this->assertSame($iceMap->name, $details['map_reduction']['map_name']);
         $this->assertSame(0.3, $details['map_reduction']['reduction_amount']);
+    }
+
+    public function test_get_map_reduction_details_includes_the_rolled_map_gem_character_power_reduction(): void
+    {
+        $character = $this->character->getCharacter();
+        $gameMap = $character->map->gameMap;
+
+        $profile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $gem = $this->createMapGeneratedGem($profile, ['character_power_reduction' => 0.2]);
+        $profile->update(['rolled_gem_id' => $gem->id]);
+
+        $details = $this->statModifierDetails->setCharacter($character->refresh())->forStat('str');
+
+        $this->assertSame($gameMap->name, $details['map_reduction']['map_name']);
+        $this->assertSame(0.2, $details['map_reduction']['reduction_amount']);
     }
 
     public function test_build_specific_break_down_returns_health_break_down(): void

@@ -14,6 +14,7 @@ use App\Game\Core\Chance\RandomNumberGenerator;
 use App\Game\Core\Combat\Values\ElementAttackData;
 use App\Game\Exploration\Services\DelveMonsterService;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
+use App\Game\Monsters\Services\MonsterListService;
 use Mockery;
 
 class MonsterPlayerFightFactory
@@ -27,6 +28,7 @@ class MonsterPlayerFightFactory
         ?Attack $attack = null,
         ?BuildMonsterCacheService $buildMonsterCacheService = null,
         ?ElementAttackData $elementAttackData = null,
+        ?MonsterListService $monsterListService = null,
     ): MonsterPlayerFight {
         return new MonsterPlayerFight(
             $buildMonster ?? Mockery::mock(BuildMonster::class),
@@ -37,6 +39,7 @@ class MonsterPlayerFightFactory
             $attack ?? Mockery::mock(Attack::class),
             $buildMonsterCacheService ?? Mockery::mock(BuildMonsterCacheService::class),
             $elementAttackData ?? new ElementAttackData(),
+            $monsterListService ?? resolve(MonsterListService::class),
         );
     }
 
