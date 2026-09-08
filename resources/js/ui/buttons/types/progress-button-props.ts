@@ -9,4 +9,5 @@ export default interface ProgressButtonProps {
   disabled?: boolean;
   progress_fill_class?: string;
   aria_busy?: boolean;
+  announce_progress?: boolean;
 }

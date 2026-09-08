@@ -10,4 +10,6 @@ export const Screens = {
   ANNOUNCEMENT_DETAILS: 'announcements-details',
   DONATIONS: 'donations',
   GUIDE_QUESTS: 'guide-quests',
+  QUEST_LOG: 'quest-log',
+  CLASS_SPECIALTIES: 'class-specialties',
 } as const;

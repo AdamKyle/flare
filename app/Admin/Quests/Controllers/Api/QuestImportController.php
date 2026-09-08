@@ -9,18 +9,12 @@ use Illuminate\Http\JsonResponse;
 
 class QuestImportController extends Controller
 {
-    /**
-     * @param  QuestExcelService  $questExcelService  Quest Excel export/import service.
-     */
     public function __construct(
         private readonly QuestExcelService $questExcelService,
     ) {}
 
     /**
      * Import validated Quests and return the resulting success or failure response.
-     *
-     * @param  QuestImportRequest  $request  Validated Quest import request.
-     * @return JsonResponse Import result JSON response.
      */
     public function __invoke(QuestImportRequest $request): JsonResponse
     {

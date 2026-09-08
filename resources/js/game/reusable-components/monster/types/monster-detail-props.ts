@@ -10,4 +10,5 @@ export interface MonsterNavigationDefinition {
 export default interface MonsterDetailProps {
   monster: MonsterDetailDefinition;
   navigation?: MonsterNavigationDefinition;
+  initial_context_tab?: boolean;
 }

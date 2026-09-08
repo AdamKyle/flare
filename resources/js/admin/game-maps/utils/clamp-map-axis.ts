@@ -1,7 +1,3 @@
-/**
- * Clamp a single-axis map translation so the map never scrolls past its own bounds,
- * centering the map on that axis when it is smaller than the viewport.
- */
 export const clampMapAxis = (
   value: number,
   mapSize: number,

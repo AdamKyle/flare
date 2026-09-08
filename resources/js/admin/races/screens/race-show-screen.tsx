@@ -1,6 +1,7 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode } from 'react';
 
+import RaceDetail from '../../../game/reusable-components/race/components/race-detail';
 import AdminBackButton from '../../shared/components/admin-back-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
@@ -12,10 +13,6 @@ import { RaceShowScreenProps } from '../screen-manager/race-screen-props';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import Card from 'ui/cards/card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const RaceShowScreen = ({
@@ -54,26 +51,7 @@ const RaceShowScreen = ({
           />
         </div>
 
-        <Card>
-          <div className="flex flex-col gap-4 md:flex-row md:items-start">
-            <img
-              src={race.image_url}
-              alt={`${race.name} portrait`}
-              className="h-40 w-40 rounded-lg object-cover"
-            />
-            <div className="flex-1">
-              <Dl>
-                <Dt>Name</Dt>
-                <Dd>{race.name}</Dd>
-              </Dl>
-              {race.description && (
-                <p className="text-glacier-800 dark:text-glacier-200 mt-4">
-                  {race.description}
-                </p>
-              )}
-            </div>
-          </div>
-        </Card>
+        <RaceDetail race={race} />
       </div>
     );
   };

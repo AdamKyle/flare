@@ -8,9 +8,6 @@ class ClassMasteryFormTransformer
 {
     /**
      * Transform a Class Mastery into its Admin save-response / form-value representation.
-     *
-     * @param  GameClassSpecial  $gameClassSpecial  Class Mastery to transform.
-     * @return array{id: int, game_class_id: int, name: string, description: string|null, requires_class_rank_level: int, specialty_damage: int|null, increase_specialty_damage_per_level: int|null, specialty_damage_uses_damage_stat_amount: float|null, attack_type_required: string|null, base_damage_mod: float|null, base_ac_mod: float|null, base_healing_mod: float|null, base_spell_damage_mod: float|null, health_mod: float|null, base_damage_stat_increase: float|null, spell_evasion: float|null, affix_damage_reduction: float|null, healing_reduction: float|null, skill_reduction: float|null, resistance_reduction: float|null} Admin Class Mastery form-value representation.
      */
     public function transform(GameClassSpecial $gameClassSpecial): array
     {

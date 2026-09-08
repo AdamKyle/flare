@@ -19,11 +19,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class LocationGemService
 {
-    /**
-     * @param  AdminGemRollService  $adminGemRollService  Existing Gem roll service.
-     * @param  AdminGemRollTransformer  $adminGemRollTransformer  Shared Admin Gem roll transformer.
-     * @param  BuildMonsterCacheService  $buildMonsterCacheService  Monster cache invalidation service.
-     */
     public function __construct(
         private readonly AdminGemRollService $adminGemRollService,
         private readonly AdminGemRollTransformer $adminGemRollTransformer,
@@ -32,9 +27,6 @@ class LocationGemService
 
     /**
      * Paginate the Location Gems list for the validated Admin index request.
-     *
-     * @param  LocationGemIndexRequest  $request  Validated Location Gem list request.
-     * @return LengthAwarePaginator Paginated Location Gem records.
      */
     public function paginate(LocationGemIndexRequest $request): LengthAwarePaginator
     {
@@ -75,8 +67,6 @@ class LocationGemService
 
     /**
      * Build the internal Admin Location Gem form option data.
-     *
-     * @return array{locations: Collection<int, Location>, crafting_skills: Collection<int, GameSkill>} Internal Location Gem form option data.
      */
     public function formOptions(): array
     {
@@ -87,10 +77,7 @@ class LocationGemService
     }
 
     /**
-     * Resolve the Locations eligible to receive a Location Gem profile: eligible Locations whose
-     * parent Map is not a generated Gem World, ordered by special/normal, then plane, then name.
-     *
-     * @return Collection<int, Location> Eligible Locations, ordered for selection.
+     * Resolve Locations eligible to receive a Location Gem profile.
      */
     public function eligibleLocations(): Collection
     {
@@ -132,9 +119,6 @@ class LocationGemService
 
     /**
      * Create a new Location Gem profile from the validated form data.
-     *
-     * @param  StoreLocationGemRequest  $request  Validated Location Gem creation request.
-     * @return GameLocationGemParamter Created Location Gem profile.
      */
     public function create(StoreLocationGemRequest $request): GameLocationGemParamter
     {
@@ -143,10 +127,6 @@ class LocationGemService
 
     /**
      * Update an existing Location Gem profile from the validated form data.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to update.
-     * @param  UpdateLocationGemRequest  $request  Validated Location Gem update request.
-     * @return GameLocationGemParamter Updated Location Gem profile.
      */
     public function update(GameLocationGemParamter $gameLocationGemParamter, UpdateLocationGemRequest $request): GameLocationGemParamter
     {
@@ -157,10 +137,6 @@ class LocationGemService
 
     /**
      * Roll a new Gem for the given Location Gem profile using the existing Gem roll service.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to roll.
-     * @param  User  $admin  Admin performing the roll.
-     * @return Gem Rolled Gem.
      */
     public function roll(GameLocationGemParamter $gameLocationGemParamter, User $admin): Gem
     {
@@ -173,9 +149,6 @@ class LocationGemService
 
     /**
      * Roll a new Gem for every Location Gem profile, regardless of any previously rolled Gem.
-     *
-     * @param  User  $admin  Admin performing the bulk roll.
-     * @return array{rolled_count: int, rolled: array<int, array<string, mixed>>} Bulk roll result.
      */
     public function rollAll(User $admin): array
     {
@@ -203,12 +176,7 @@ class LocationGemService
     }
 
     /**
-     * Make an existing historical Gem roll the profile's currently active roll, without changing
-     * the roll count or regenerating the Gem World.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile whose active roll is changing.
-     * @param  Gem  $gem  Gem roll to activate.
-     * @return bool Whether the Gem belongs to this profile and was made/kept active.
+     * Activate an existing Location Gem roll without regenerating its Gem World.
      */
     public function activateRoll(GameLocationGemParamter $gameLocationGemParamter, Gem $gem): bool
     {
@@ -229,10 +197,6 @@ class LocationGemService
 
     /**
      * Build one Bulk Roll result row for a Location Gem profile.
-     *
-     * @param  GameLocationGemParamter  $profile  Location Gem profile the row describes.
-     * @param  Gem  $gem  Gem this bulk action rolled for the profile.
-     * @return array<string, mixed> Bulk roll result row.
      */
     private function bulkRollRow(GameLocationGemParamter $profile, Gem $gem): array
     {

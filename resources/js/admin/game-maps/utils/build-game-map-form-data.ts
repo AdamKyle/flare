@@ -2,9 +2,7 @@ import { convertPercentageToStoredBonus } from './convert-percentage-to-stored-b
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 
 /**
- * Build the multipart Game Map save request payload from validated wizard form state.
- * Update requests are sent as `POST` with a spoofed `_method=PUT` field so the map
- * image can be uploaded in the same multipart request.
+ * Updates use POST with `_method=PUT` so the image remains a multipart upload.
  */
 export const buildGameMapFormData = (
   state: GameMapFormStateDefinition,

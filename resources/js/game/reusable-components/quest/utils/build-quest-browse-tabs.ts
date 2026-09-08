@@ -9,18 +9,6 @@ import { TabTupleFromProps } from 'ui/tabs/types/tab-item';
 
 type SharedContentProps = Omit<QuestBrowseContentProps, 'active_tab'>;
 
-/**
- * Build the fixed Base / One Offs / Raid primary Quest browse tabs for the
- * shared `PillTabs` component. The caller supplies `content` already
- * confirmed to belong to the currently selected `{Game Map, Quest category}`
- * query, and controls which tab is active via `PillTabs`'s controlled
- * `activeIndex`; only the active tab's panel is ever mounted by `PillTabs`,
- * so `QuestBrowseContent` remains a presentation-only renderer of whatever
- * data the caller already confirmed is current.
- *
- * @param  content  Currently-selected-query Quest browse data and navigation, for the active category.
- * @return  The fixed 3-tuple of primary Quest browse tabs.
- */
 export const buildQuestBrowseTabs = (
   content: SharedContentProps
 ): Readonly<

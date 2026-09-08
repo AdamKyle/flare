@@ -10,8 +10,6 @@ class StoreGameMapRequest extends FormRequest
 {
     /**
      * Allow authorized Admin routing to submit a Game Map creation request.
-     *
-     * @return bool Whether the request is authorized.
      */
     public function authorize(): bool
     {
@@ -20,8 +18,6 @@ class StoreGameMapRequest extends FormRequest
 
     /**
      * Return the validation rules for creating a Game Map.
-     *
-     * @return array<string, mixed> Game Map creation validation rules.
      */
     public function rules(): array
     {
@@ -48,8 +44,6 @@ class StoreGameMapRequest extends FormRequest
 
     /**
      * Return the custom validation messages for Game Map creation.
-     *
-     * @return array<string, string> Game Map creation validation messages.
      */
     public function messages(): array
     {
@@ -79,8 +73,6 @@ class StoreGameMapRequest extends FormRequest
 
     /**
      * Normalize present multipart boolean fields before validation.
-     *
-     * @return void The request input is normalized in place.
      */
     protected function prepareForValidation(): void
     {

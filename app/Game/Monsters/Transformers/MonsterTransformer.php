@@ -33,8 +33,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Build the effective transformed Monster payload for the configured area Gem effects.
-     *
-     * @return array<string, mixed>
      */
     public function transform(Monster $monster): array
     {
@@ -193,10 +191,7 @@ class MonsterTransformer extends TransformerAbstract
     }
 
     /**
-     * Resolve the effective elemental atonement, applying the precedence rule that a
-     * Monster's own persisted positive atonement always wins over any Gem atonement.
-     *
-     * @return array{0: float, 1: float, 2: float}
+     * Resolve elemental atonement using the Monster-over-Gem precedence rule.
      */
     private function resolveAtonement(Monster $monster, ResolvedAreaGemAtonement $atonement): array
     {
@@ -222,8 +217,6 @@ class MonsterTransformer extends TransformerAbstract
 
     /**
      * Build the Gem effect context metadata describing why/how this Monster was transformed.
-     *
-     * @return array<string, mixed>
      */
     private function buildGemEffectContext(): array
     {

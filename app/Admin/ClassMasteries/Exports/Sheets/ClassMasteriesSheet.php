@@ -14,8 +14,6 @@ class ClassMasteriesSheet implements FromCollection, ShouldAutoSize, WithHeading
 {
     /**
      * Return every Class Mastery, ordered deterministically by name.
-     *
-     * @return Collection<int, GameClassSpecial> Class Masteries to export.
      */
     public function collection(): Collection
     {
@@ -25,8 +23,7 @@ class ClassMasteriesSheet implements FromCollection, ShouldAutoSize, WithHeading
     /**
      * Map a Class Mastery into its workbook row.
      *
-     * @param  GameClassSpecial  $gameClassSpecial  Class Mastery to map.
-     * @return array<int, mixed> Workbook row values.
+     * @param  mixed  $gameClassSpecial
      */
     public function map($gameClassSpecial): array
     {
@@ -56,8 +53,6 @@ class ClassMasteriesSheet implements FromCollection, ShouldAutoSize, WithHeading
 
     /**
      * Return the Class Masteries workbook column headings.
-     *
-     * @return array<int, string> Workbook column headings.
      */
     public function headings(): array
     {
@@ -72,8 +67,6 @@ class ClassMasteriesSheet implements FromCollection, ShouldAutoSize, WithHeading
 
     /**
      * Return the Class Masteries workbook sheet title.
-     *
-     * @return string Class Masteries workbook sheet title.
      */
     public function title(): string
     {

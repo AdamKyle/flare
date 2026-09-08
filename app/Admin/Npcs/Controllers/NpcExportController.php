@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class NpcExportController extends Controller
 {
-    /**
-     * @param  NpcExcelService  $npcExcelService  NPC Excel export/import service.
-     */
     public function __construct(
         private readonly NpcExcelService $npcExcelService,
     ) {}
@@ -18,7 +15,6 @@ class NpcExportController extends Controller
     /**
      * Download the NPCs workbook.
      *
-     * @return BinaryFileResponse NPCs workbook download response.
      *
      * @codeCoverageIgnore
      */

@@ -103,7 +103,7 @@ const StackedCard = ({
   };
 
   const renderFullBleedHeader = (): ReactNode => (
-    <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 dark:border-gray-700 dark:bg-gray-800">
+    <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-gray-800">
       <h2
         id={titleId}
         className="text-glacier-900 dark:text-glacier-100 text-base font-semibold"
@@ -181,7 +181,7 @@ const StackedCard = ({
               'relative flex h-full w-full flex-col bg-white focus:outline-none dark:bg-gray-800 dark:text-gray-400',
               isFullBleed
                 ? 'overflow-hidden rounded-none border-0'
-                : 'overflow-x-hidden overflow-y-auto rounded-sm border-1 border-gray-300 dark:border-gray-700'
+                : 'overflow-x-hidden overflow-y-auto rounded-sm'
             )}
           >
             {isFullBleed ? renderFullBleedHeader() : renderPaddedChrome()}

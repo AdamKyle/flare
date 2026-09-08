@@ -11,8 +11,6 @@ class MonsterIndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -21,8 +19,6 @@ class MonsterIndexRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -41,8 +37,6 @@ class MonsterIndexRequest extends FormRequest
 
     /**
      * Cross-field validation tying the Location Type filter to the Monster Category filter.
-     *
-     * @param  Validator  $validator  The validator instance to extend.
      */
     public function withValidator(Validator $validator): void
     {
@@ -75,8 +69,6 @@ class MonsterIndexRequest extends FormRequest
 
     /**
      * Apply the Monsters list defaults before validation runs.
-     *
-     * @return void Merges default list parameters into the request input.
      */
     protected function prepareForValidation(): void
     {

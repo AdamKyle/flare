@@ -12,15 +12,11 @@ use App\Game\Core\Items\Values\ItemDefaultPosition;
 use App\Game\Core\Items\Values\ItemEffectType;
 use App\Game\Core\Items\Values\ItemSpecialtyType;
 use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Database\Eloquent\Collection;
 
 class ItemFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Item form option data into its Admin API representation.
-     *
-     * @param  array{item_skills: Collection<int, ItemSkill>, locations: Collection<int, Location>, classes: Collection<int, GameClass>}  $formOptions  Internal Item form option data.
-     * @return array{types: array<int,string>, default_positions: array<int,string>, crafting_types: array<int,string>, alchemy_types: array<int,string>, specialty_types: array<int,string>, effects: array<int,string>, skill_types: array<int,int>, item_skills: array<int,array{value:int,label:string}>, locations: array<int,array{value:int,label:string}>, classes: array<int,array{value:int,label:string}>} Admin Item form-options representation.
      */
     public function transform(array $formOptions): array
     {

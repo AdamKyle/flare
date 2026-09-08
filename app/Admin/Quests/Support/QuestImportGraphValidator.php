@@ -11,10 +11,6 @@ class QuestImportGraphValidator
      */
     private array $questCache = [];
 
-    /**
-     * @param  array<string, int>  $nameToId  Every Quest name in the workbook or database, mapped to its resolved id (a negative synthetic id for a new workbook Quest).
-     * @param  array<int, array{parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain: array<int, int>}>  $rowsById  Every workbook row's resolved edges, keyed by its own resolved id.
-     */
     public function __construct(
         private readonly array $nameToId,
         private readonly array $rowsById,
@@ -23,8 +19,6 @@ class QuestImportGraphValidator
     /**
      * Validate the complete parent, required-Quest, and required-Quest-chain graphs formed by the
      * workbook rows, combined with existing database edges, for cycles.
-     *
-     * @return string|null Human-facing error message for the first invalid row found, or null when the whole graph is valid.
      */
     public function validate(): ?string
     {
@@ -43,10 +37,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve the parent-Quest-selection error for one workbook row, when its selection is invalid.
-     *
-     * @param  int  $id  Resolved id of the Quest owning this row.
-     * @param  int|null  $parentId  Row's resolved `parent_quest_id`.
-     * @return string|null Human-facing error message, or null when valid.
      */
     private function parentError(int $id, ?int $parentId): ?string
     {
@@ -67,10 +57,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve the required-Quest-selection error for one workbook row, when its selection is invalid.
-     *
-     * @param  int  $id  Resolved id of the Quest owning this row.
-     * @param  int|null  $requiredId  Row's resolved `required_quest_id`.
-     * @return string|null Human-facing error message, or null when valid.
      */
     private function requiredQuestError(int $id, ?int $requiredId): ?string
     {
@@ -91,10 +77,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve the required-Quest-chain error for one workbook row, when its chain is invalid.
-     *
-     * @param  int  $id  Resolved id of the Quest owning this row.
-     * @param  array<int, int>  $chainIds  Row's resolved `required_quest_chain`.
-     * @return string|null Human-facing error message, or null when valid.
      */
     private function requiredChainError(int $id, array $chainIds): ?string
     {
@@ -121,11 +103,6 @@ class QuestImportGraphValidator
 
     /**
      * Walk a Quest's required-Quest and required-Quest-chain links, looking for a target id.
-     *
-     * @param  int  $currentId  Quest id currently being inspected.
-     * @param  int  $targetId  Id to search for.
-     * @param  array<int, int>  $visited  Quest ids already visited on this recursion path.
-     * @return bool Whether the target id is transitively required by the Quest.
      */
     private function chainTransitivelyRequires(int $currentId, int $targetId, array $visited): bool
     {
@@ -151,11 +128,6 @@ class QuestImportGraphValidator
 
     /**
      * Walk a single-edge chain starting from an id, looking for a target id.
-     *
-     * @param  int  $startId  Id to start walking from.
-     * @param  int  $targetId  Id to search for.
-     * @param  callable(int): (int|null)  $edgeResolver  Resolves the next id in the chain for a given id.
-     * @return bool Whether the target id is reachable by walking the chain.
      */
     private function walks(int $startId, int $targetId, callable $edgeResolver): bool
     {
@@ -180,9 +152,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve a Quest id's `parent_quest_id` edge, preferring the workbook's own resolved value.
-     *
-     * @param  int  $id  Quest id to resolve the edge for.
-     * @return int|null Resolved parent Quest id, when set.
      */
     private function parentEdge(int $id): ?int
     {
@@ -195,9 +164,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve a Quest id's `required_quest_id` edge, preferring the workbook's own resolved value.
-     *
-     * @param  int  $id  Quest id to resolve the edge for.
-     * @return int|null Resolved required Quest id, when set.
      */
     private function requiredEdge(int $id): ?int
     {
@@ -210,9 +176,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve a Quest id's `required_quest_chain` edge, preferring the workbook's own resolved value.
-     *
-     * @param  int  $id  Quest id to resolve the edge for.
-     * @return array<int, int> Resolved required Quest chain ids.
      */
     private function chainEdge(int $id): array
     {
@@ -224,11 +187,7 @@ class QuestImportGraphValidator
     }
 
     /**
-     * Resolve and memoize an existing database Quest by id. A negative (workbook-synthetic) id
-     * never resolves to a database record.
-     *
-     * @param  int  $id  Quest id to resolve.
-     * @return Quest|null Resolved Quest, when it exists.
+     * Resolve and memoize a persisted Quest for graph validation.
      */
     private function quest(int $id): ?Quest
     {
@@ -245,9 +204,6 @@ class QuestImportGraphValidator
 
     /**
      * Resolve a Quest id's display name for an error message.
-     *
-     * @param  int  $id  Quest id to resolve the name for.
-     * @return string Resolved Quest name, or the id when no name is known.
      */
     private function nameFor(int $id): string
     {

@@ -13,13 +13,6 @@ class LocationsSheet implements ToCollection
 {
     /**
      * Import Location rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized and validated first; the workbook is written only when
-     * every meaningful row resolves successfully, so an invalid later row cannot leave an earlier
-     * row's write applied.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Locations are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -36,13 +29,6 @@ class LocationsSheet implements ToCollection
 
     /**
      * Normalize and validate every meaningful Location row before any row is written.
-     *
-     * A blank `name` marks the end of the workbook's meaningful data. Any other row that cannot be
-     * fully resolved (an unrecognized Game Map, quest Item, or Location type) invalidates the entire
-     * import.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>>|null Validated Location payloads, or null when any row is invalid.
      */
     private function normalizeAndValidateRows(Collection $rows): ?array
     {
@@ -74,9 +60,6 @@ class LocationsSheet implements ToCollection
 
     /**
      * Normalize a single raw Location row, resolving related records by name.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed>|null Normalized Location attributes, or null when the row is invalid.
      */
     private function normalizeRow(array $rawRow): ?array
     {
@@ -113,9 +96,6 @@ class LocationsSheet implements ToCollection
 
     /**
      * Resolve the Game Map and quest Item relationships referenced by name.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed>|null Row with relationships resolved to ids, or null when a referenced record does not exist.
      */
     private function resolveRowRelationships(array $rawRow): ?array
     {

@@ -14,7 +14,6 @@ class GameMapExcelService
     /**
      * Download the Game Maps settings workbook.
      *
-     * @return BinaryFileResponse Game Maps settings workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class GameMapExcelService
 
     /**
      * Import Game Map settings from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Game Maps workbook.
-     * @return void Persists the imported Game Map settings.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

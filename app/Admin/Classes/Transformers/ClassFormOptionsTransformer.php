@@ -4,15 +4,11 @@ namespace App\Admin\Classes\Transformers;
 
 use App\Flare\Models\GameClass;
 use App\Game\Core\Values\CoreStatType;
-use Illuminate\Database\Eloquent\Collection;
 
 class ClassFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Class form option data into its Admin API representation.
-     *
-     * @param  array{classes: Collection<int, GameClass>}  $formOptions  Internal Class form option data.
-     * @return array{stats: array<int,string>, classes: array<int,array{id:int,name:string}>} Admin Class form-options representation.
      */
     public function transform(array $formOptions): array
     {

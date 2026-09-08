@@ -8,8 +8,6 @@ class LocationQuestItemIndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -18,8 +16,6 @@ class LocationQuestItemIndexRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -32,8 +28,6 @@ class LocationQuestItemIndexRequest extends FormRequest
 
     /**
      * Apply the Location quest-item list defaults before validation runs.
-     *
-     * @return void Merges default list parameters into the request input.
      */
     protected function prepareForValidation(): void
     {

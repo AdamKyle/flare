@@ -8,12 +8,6 @@ class ItemFormTransformer
 {
     /**
      * Transform an Item into its Admin save-response / form-value representation.
-     *
-     * Returns every current static catalog field managed by the modern Item
-     * form. Runtime/generated instance fields are intentionally excluded.
-     *
-     * @param  Item  $item  Item to transform.
-     * @return array{id: int, name: string, type: string, description: string|null, default_position: string|null, market_sellable: bool, can_drop: bool, cost: int|null, gold_dust_cost: int|null, shards_cost: int|null, copper_coin_cost: int|null, gold_bars_cost: int|null, alchemy_type: string|null, specialty_type: string|null, base_damage: int|null, base_ac: int|null, base_healing: int|null, base_damage_mod: float|null, base_ac_mod: float|null, base_healing_mod: float|null, str_mod: float|null, dur_mod: float|null, dex_mod: float|null, chr_mod: float|null, int_mod: float|null, agi_mod: float|null, focus_mod: float|null, ambush_chance: float|null, ambush_resistance: float|null, counter_chance: float|null, counter_resistance: float|null, effect: string|null, drop_location_id: int|null, unlocks_class_id: int|null, item_skill_id: int|null, skill_name: string|null, skill_bonus: float|null, skill_training_bonus: float|null, fight_time_out_mod_bonus: float|null, move_time_out_mod_bonus: float|null, xp_bonus: float|null, ignores_caps: bool, can_resurrect: bool, resurrection_chance: float|null, spell_evasion: float|null, artifact_annulment: float|null, healing_reduction: float|null, affix_damage_reduction: float|null, devouring_light: float|null, devouring_darkness: float|null, can_craft: bool, craft_only: bool, crafting_type: string|null, skill_level_required: int|null, skill_level_trivial: int|null, usable: bool, can_stack: bool, lasts_for: int|null, stat_increase: bool, increase_stat_by: float|null, damages_kingdoms: bool, kingdom_damage: float|null, affects_skill_type: int|null, increase_skill_bonus_by: float|null, increase_skill_training_bonus_by: float|null, can_use_on_other_items: bool, holy_level: int|null, gains_additional_level: bool} Admin Item form-value representation.
      */
     public function transform(Item $item): array
     {

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useEventSystem } from 'event-system/hooks/use-event-system';
 import { AnimatePresence } from 'framer-motion';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { resolveSidePeekContentScrollMode } from './component-registration/side-peek-component-mapper';
 import { SidePeekContentScrollMode } from './enums/side-peek-content-scroll-mode';
@@ -9,8 +9,10 @@ import { CloseSidePeekEventMap } from './event-map/side-peek-event-map';
 import { SidePeek as SidePeekEventType } from './event-types/side-peek';
 import { useDynamicComponentVisibility } from './hooks/use-manage-side-peek-visibility';
 
-import Button from 'ui/buttons/button';
-import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
+import SidePeekOptionsFooter from 'ui/side-peek/options/components/side-peek-options-footer';
+import SidePeekOptionsContext from 'ui/side-peek/options/side-peek-options-context';
+import SidePeekOptionDefinition from 'ui/side-peek/options/types/side-peek-option-definition';
+import SidePeekOptionsContextDefinition from 'ui/side-peek/options/types/side-peek-options-context-definition';
 import SidePeek from 'ui/side-peek/side-peek';
 
 const BaseSidePeek = () => {
@@ -18,6 +20,10 @@ const BaseSidePeek = () => {
 
   const { ComponentToRender, componentKey, componentProps, closeSidePeek } =
     useDynamicComponentVisibility();
+
+  const [sidePeekOptions, setSidePeekOptions] = useState<
+    SidePeekOptionDefinition[]
+  >([]);
 
   const contentScrollMode = componentKey
     ? resolveSidePeekContentScrollMode(componentKey)
@@ -50,50 +56,22 @@ const BaseSidePeek = () => {
     };
   }, [eventSystem, closeSidePeek]);
 
-  const handleSecondaryActionClick = () => {
-    closeSidePeek();
+  useEffect(() => {
+    setSidePeekOptions([]);
+  }, [componentProps.is_open, componentKey]);
 
-    if (componentProps.footer_secondary_action) {
-      componentProps.footer_secondary_action();
-    }
-  };
+  const setOptions = useCallback((options: SidePeekOptionDefinition[]) => {
+    setSidePeekOptions(options);
+  }, []);
 
-  const renderFooterSecondaryAction = () => {
-    return (
-      <Button
-        on_click={handleSecondaryActionClick}
-        label={componentProps.footer_secondary_label || 'Cancel'}
-        variant={ButtonVariant.DANGER}
-      />
-    );
-  };
+  const clearOptions = useCallback(() => {
+    setSidePeekOptions([]);
+  }, []);
 
-  const renderFooterPrimaryAction = () => {
-    if (!componentProps.footer_primary_action) {
-      return;
-    }
-
-    return (
-      <Button
-        on_click={componentProps.footer_primary_action}
-        label={componentProps.footer_primary_label || ''}
-        variant={ButtonVariant.PRIMARY}
-      />
-    );
-  };
-
-  const renderFooter = () => {
-    if (!componentProps.has_footer) {
-      return null;
-    }
-
-    return (
-      <div className="flex justify-between border-t p-4">
-        {renderFooterSecondaryAction()}
-        {renderFooterPrimaryAction()}
-      </div>
-    );
-  };
+  const optionsContextValue = useMemo<SidePeekOptionsContextDefinition>(
+    () => ({ set_options: setOptions, clear_options: clearOptions }),
+    [setOptions, clearOptions]
+  );
 
   return (
     <AnimatePresence>
@@ -104,13 +82,19 @@ const BaseSidePeek = () => {
           is_open={componentProps.is_open}
           on_close={closeSidePeek}
           allow_clicking_outside={componentProps.allow_clicking_outside}
+          footer={
+            sidePeekOptions.length > 0 ? (
+              <SidePeekOptionsFooter options={sidePeekOptions} />
+            ) : undefined
+          }
         >
-          <div className={outerWrapperClassName}>
-            <div className={contentWrapperClassName}>
-              {ComponentToRender && <ComponentToRender {...componentProps} />}
+          <SidePeekOptionsContext.Provider value={optionsContextValue}>
+            <div className={outerWrapperClassName}>
+              <div className={contentWrapperClassName}>
+                {ComponentToRender && <ComponentToRender {...componentProps} />}
+              </div>
             </div>
-            {renderFooter()}
-          </div>
+          </SidePeekOptionsContext.Provider>
         </SidePeek>
       )}
     </AnimatePresence>

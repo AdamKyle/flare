@@ -12,8 +12,6 @@ class StoreClassRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -22,8 +20,6 @@ class StoreClassRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -52,8 +48,6 @@ class StoreClassRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
-     *
-     * @return array<string,string>
      */
     public function messages(): array
     {
@@ -66,9 +60,6 @@ class StoreClassRequest extends FormRequest
 
     /**
      * Configure the validator instance to enforce Class unlock requirement rules.
-     *
-     * @param  Validator  $validator  Validator instance to configure.
-     * @return void Registers the unlock-requirement validation callback.
      */
     public function withValidator(Validator $validator): void
     {
@@ -78,11 +69,7 @@ class StoreClassRequest extends FormRequest
     }
 
     /**
-     * Enforce that unlock requirements are either fully absent or fully populated, that the two
-     * prerequisite Classes differ, and that a Class cannot require itself.
-     *
-     * @param  Validator  $validator  Validator instance to add errors to.
-     * @return void Validation failures are registered through the supplied validator.
+     * Validate the Class unlock-requirement combination.
      */
     private function validateUnlockRequirements(Validator $validator): void
     {

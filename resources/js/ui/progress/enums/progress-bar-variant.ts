@@ -3,4 +3,5 @@ export enum ProgressBarVariant {
   SUMMER,
   PINK_MOON,
   ARTIC,
+  DE_YORK,
 }

@@ -153,6 +153,10 @@ class QuestsApiControllerTest extends TestCase
     public function test_public_quest_browse_options_are_available_without_auth(): void
     {
         $this->createGameMap(['name' => 'Zeta Map', 'default' => false]);
+        $this->createGameMap(['name' => 'Purgatory', 'default' => false]);
+        $this->createGameMap(['name' => 'Shadow Plane', 'default' => false]);
+        $this->createGameMap(['name' => 'Dungeons', 'default' => false]);
+        $this->createGameMap(['name' => 'Labyrinth', 'default' => false]);
         $surface = $this->createGameMap(['name' => 'Surface', 'default' => true]);
 
         $response = $this->call('GET', '/api/information/quests/options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
@@ -160,7 +164,14 @@ class QuestsApiControllerTest extends TestCase
 
         $response->assertStatus(200);
         $this->assertSame($surface->id, $data['default_game_map_id']);
-        $this->assertSame(['Surface', 'Zeta Map'], array_column($data['game_maps'], 'name'));
+        $this->assertSame([
+            'Surface',
+            'Labyrinth',
+            'Dungeons',
+            'Shadow Plane',
+            'Purgatory',
+            'Zeta Map',
+        ], array_column($data['game_maps'], 'name'));
     }
 
     public function test_public_quest_browse_options_exclude_generated_game_maps(): void

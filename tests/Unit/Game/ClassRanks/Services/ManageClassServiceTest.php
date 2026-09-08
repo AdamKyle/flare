@@ -2,9 +2,11 @@
 
 namespace Tests\Unit\Game\ClassRanks\Services;
 
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\ClassRanks\Services\ManageClassService;
 use App\Game\Skills\Builders\BaseSkillBuilder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateClass;
@@ -67,6 +69,8 @@ class ManageClassServiceTest extends TestCase
 
     public function test_switch_character_class()
     {
+        Event::fake([UpdateCharacterBaseDetailsEvent::class]);
+
         $character = $this->character->getCharacter();
         $skill = $this->createGameSkill(['name' => 'Class Skill', 'game_class_id' => $character->game_class_id]);
 
@@ -87,6 +91,10 @@ class ManageClassServiceTest extends TestCase
         $this->assertNotNull($character->skills->where('name', $gameSkill->name)->first());
         $this->assertEquals($character->game_class_id, $gameClass->id);
         $this->assertEquals($character->damage_stat, $gameClass->damage_stat);
+
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class, function (UpdateCharacterBaseDetailsEvent $event) use ($character) {
+            return $event->character->id === $character->id;
+        });
     }
 
     public function test_reactivate_skill()

@@ -9,15 +9,10 @@ import FactualLink from '../../quest-item/partials/factual-link';
 import { isLocationType, LOCATION_TYPE_LABELS } from '../enums/location-type';
 import MonsterDetailProps from '../types/monster-detail-props';
 
-import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 
-/**
- * Monster name is already the outer `MonsterDetail` heading; this section
- * never repeats it as a separate factual row.
- */
 const MonsterIdentitySection = ({
   monster,
   navigation,
@@ -28,7 +23,7 @@ const MonsterIdentitySection = ({
     isLocationType(value) ? LOCATION_TYPE_LABELS[value] : value;
 
   return (
-    <Card>
+    <div>
       <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
         Identity &amp; Placement
       </h2>
@@ -82,7 +77,7 @@ const MonsterIdentitySection = ({
           </>
         )}
       </Dl>
-    </Card>
+    </div>
   );
 };
 

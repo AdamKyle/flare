@@ -6,36 +6,24 @@ use App\Flare\Models\Character;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameSkill;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
-use Exception;
 
 class ManageClassService
 {
     use ResponseBuilder;
 
-    private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes;
-
-    private UpdateCharacterSkillsService $updateCharacterSkillsService;
-
-    private ClassRankService $classRankService;
-
-    public function __construct(UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        UpdateCharacterSkillsService $updateCharacterSkillsService,
-        ClassRankService $classRankService
-    ) {
-        $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
-        $this->updateCharacterSkillsService = $updateCharacterSkillsService;
-        $this->classRankService = $classRankService;
-    }
+    public function __construct(
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private readonly UpdateCharacterSkillsService $updateCharacterSkillsService,
+        private readonly ClassRankService $classRankService,
+        private readonly BaseSkillBuilder $baseSkillBuilder,
+    ) {}
 
     /**
-     * Switch character class.
-     *
-     * - Will hide the current class skill and un hide or add the new class special skill.
-     *
-     * @throws Exception
+     * Switch the character to the requested Class, hiding the old Class skill and unhiding or adding the new one.
      */
     public function switchClass(Character $character, GameClass $class): array
     {
@@ -63,7 +51,7 @@ class ManageClassService
         if (! is_null($characterSkill)) {
             $characterSkill->update(['is_hidden' => false]);
         } else {
-            $skillDetails = resolve(BaseSkillBuilder::class)->getBaseCharacterSkillValue($character, $skillToAdd);
+            $skillDetails = $this->baseSkillBuilder->getBaseCharacterSkillValue($character, $skillToAdd);
 
             $character->skills()->create($skillDetails);
         }
@@ -81,12 +69,17 @@ class ManageClassService
 
         $this->updateCharacterSkillsService->updateCharacterSkills($character);
 
+        event(new UpdateCharacterBaseDetailsEvent($character->refresh()));
+
         return $this->successResult([
             'message' => 'You have switched to: '.$class->name,
             'class_ranks' => $this->classRankService->getClassRanks($character)['class_ranks'],
         ]);
     }
 
+    /**
+     * Determine whether the given Class is locked for the character based on its prerequisite pair.
+     */
     protected function isClassLocked(Character $character, GameClass $gameClass): bool
     {
         if (! is_null($gameClass->primary_required_class_id) &&

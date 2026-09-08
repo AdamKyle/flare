@@ -16,8 +16,6 @@ class StoreQuestRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -26,8 +24,6 @@ class StoreQuestRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -71,8 +67,6 @@ class StoreQuestRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -86,8 +80,6 @@ class StoreQuestRequest extends FormRequest
 
     /**
      * Normalize present boolean fields before validation.
-     *
-     * @return void Merges normalized boolean values into the request input.
      */
     protected function prepareForValidation(): void
     {
@@ -98,8 +90,6 @@ class StoreQuestRequest extends FormRequest
 
     /**
      * Configure the validator instance to enforce Quest graph integrity.
-     *
-     * @param  Validator  $validator  Validator instance to configure.
      */
     public function withValidator(Validator $validator): void
     {

@@ -12,22 +12,29 @@ use League\Fractal\TransformerAbstract;
 class UsableItemTransformer extends TransformerAbstract
 {
     /**
-     * Gets the response data for the inventory sheet
+     * Transform a usable Item, or the inventory/Alchemy Bag/Set slot holding it, into its factual usable-item contract.
      */
     public function transform(InventorySlot|SetSlot|AlchemyBagSlot|Item $slot): array
     {
 
         $item = $slot;
         $slotId = null;
+        $amount = 1;
 
         if (! ($slot instanceof Item)) {
             $item = $slot->item;
             $slotId = $slot->id;
+
+            if ($slot instanceof AlchemyBagSlot) {
+                $amount = $slot->amount;
+            }
         }
 
         return [
+            'id' => $slotId ?? $item->id,
             'item_id' => $item->id,
             'slot_id' => $slotId,
+            'amount' => $amount,
             'name' => $item->affix_name,
             'type' => $item->type,
             'description' => $item->description,

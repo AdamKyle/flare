@@ -116,12 +116,6 @@ export const buildQuestRequestPayload = (
 
 type QuestFormErrors = Partial<Record<keyof QuestFormStateDefinition, string>>;
 
-/**
- * The exact Quest form state keys whose value is a numeric string validated
- * by `validateNonNegativeIntegerFields`. Kept narrow (rather than accepting
- * every `keyof QuestFormStateDefinition`) so `state[field]` is already
- * typed as `string` without a type assertion.
- */
 type QuestNumericStringField =
   | 'reincarnated_times'
   | 'required_faction_level'
@@ -162,13 +156,6 @@ const validateNonNegativeIntegerFields = (
   return errors;
 };
 
-/**
- * Validate the fields belonging to Step 1 (Quest & Story) before the wizard
- * advances. Relationship/select fields (`npc_id`, `raid_id`,
- * `only_for_event`) are already guaranteed to be a valid id or `null` by the
- * Dropdown's own `on_select`/`on_clear` contract, so only the required
- * fields need a runtime check.
- */
 export const validateQuestStoryStep = (
   state: QuestFormStateDefinition
 ): QuestFormErrors => {
@@ -185,20 +172,11 @@ export const validateQuestStoryStep = (
   return errors;
 };
 
-/**
- * Validate the fields belonging to Step 2 (Structure & Dependencies) before
- * the wizard advances. The backend remains authoritative for relationship
- * cycles; this only prevents an obviously invalid local numeric value.
- */
 export const validateQuestStructureStep = (
   state: QuestFormStateDefinition
 ): QuestFormErrors =>
   validateNonNegativeIntegerFields(state, ['reincarnated_times']);
 
-/**
- * Validate the fields belonging to Step 3 (Requirements) before the wizard
- * advances.
- */
 export const validateQuestRequirementsStep = (
   state: QuestFormStateDefinition
 ): QuestFormErrors =>
@@ -211,10 +189,6 @@ export const validateQuestRequirementsStep = (
     'copper_coin_cost',
   ]);
 
-/**
- * Validate the fields belonging to Step 4 (Rewards) before the wizard
- * advances.
- */
 export const validateQuestRewardsStep = (
   state: QuestFormStateDefinition
 ): QuestFormErrors =>
@@ -234,11 +208,6 @@ const QUEST_FORM_STEP_VALIDATORS: ReadonlyArray<
   validateQuestRewardsStep,
 ];
 
-/**
- * Validate the complete Quest form (every step's fields combined), used
- * before final submit so a field left invalid on an earlier, already-passed
- * step still blocks submission.
- */
 export const validateQuestForm = (
   state: QuestFormStateDefinition
 ): QuestFormErrors => {

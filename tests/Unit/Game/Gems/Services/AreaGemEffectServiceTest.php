@@ -73,7 +73,7 @@ class AreaGemEffectServiceTest extends TestCase
         $this->assertSame(0.1, round($result->characterPowerReduction(), 2));
     }
 
-    public function test_resolve_for_game_map_combines_map_and_location_gem_monster_effects_at_normal_multiplier(): void
+    public function test_resolve_for_game_map_with_rolled_location_gem_uses_location_gem_monster_effect_only(): void
     {
         $gameMap = $this->createGameMap(['name' => 'Combined Monster Map', 'default' => false]);
         $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
@@ -87,7 +87,22 @@ class AreaGemEffectServiceTest extends TestCase
 
         $result = $this->areaGemEffectService->resolveForGameMap($gameMap->refresh(), $location->refresh());
 
-        $this->assertSame(0.3, round($result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 2));
+        // Only the Location Gem's Monster effect applies; the Map Gem's 0.1 does not stack.
+        $this->assertSame(0.2, round($result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 2));
+    }
+
+    public function test_resolve_for_game_map_without_rolled_location_gem_falls_back_to_map_gem_monster_effect(): void
+    {
+        $gameMap = $this->createGameMap(['name' => 'Fallback Monster Map', 'default' => false]);
+        $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $gameMap->id]);
+        $mapGem = $this->createMapGeneratedGem($mapProfile, ['enemy_strength_increase' => 0.1]);
+        $mapProfile->update(['rolled_gem_id' => $mapGem->id]);
+
+        $location = $this->createLocation(['game_map_id' => $gameMap->id, 'type' => null]);
+
+        $result = $this->areaGemEffectService->resolveForGameMap($gameMap->refresh(), $location->refresh());
+
+        $this->assertSame(0.1, round($result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 2));
     }
 
     public function test_resolve_for_game_map_location_context_reduction_uses_only_map_gem(): void
@@ -170,7 +185,7 @@ class AreaGemEffectServiceTest extends TestCase
         $this->assertSame(0.15, round($result->characterPowerReduction(), 2));
     }
 
-    public function test_resolve_for_location_gem_world_combines_parent_map_and_location_monster_effects(): void
+    public function test_resolve_for_location_gem_world_with_rolled_location_gem_uses_location_gem_monster_effect_at_double_only(): void
     {
         $parentMap = $this->createGameMap(['name' => 'Parent Map Location Gem World Monster', 'default' => false]);
         $mapProfile = $this->createGameMapGemParamter(['game_map_id' => $parentMap->id]);
@@ -193,7 +208,8 @@ class AreaGemEffectServiceTest extends TestCase
 
         $result = $this->areaGemEffectService->resolveForGameMap($generatedMap->refresh());
 
-        $this->assertSame(0.51, round($result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 2));
+        // Only the Location Gem's Monster effect applies at x2; the parent Map Gem's 0.15 does not stack.
+        $this->assertSame(0.36, round($result->monsterEffect(AreaGemMonsterEffect::ENEMY_STRENGTH_INCREASE), 2));
     }
 
     public function test_resolve_for_location_gem_world_rewards_use_location_gem_only(): void

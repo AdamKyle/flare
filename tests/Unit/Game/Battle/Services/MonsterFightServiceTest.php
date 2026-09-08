@@ -124,12 +124,17 @@ class MonsterFightServiceTest extends TestCase
             'monster' => ['id' => $this->monster->id, 'name' => $this->monster->name],
         ], 900);
 
+        $attackMessages = [
+            ['message' => 'You attack the enemy for 10 damage!', 'type' => 'player-action'],
+            ['message' => 'The enemy attacks you for 5 damage!', 'type' => 'enemy-action'],
+        ];
+
         $monsterPlayerFight = Mockery::mock(MonsterPlayerFight::class);
         $monsterPlayerFight->shouldReceive('setCharacter')->once();
         $monsterPlayerFight->shouldReceive('fightMonster')->once();
         $monsterPlayerFight->shouldReceive('getCharacterHealth')->andReturn(50);
         $monsterPlayerFight->shouldReceive('getMonsterHealth')->andReturn(10);
-        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn([]);
+        $monsterPlayerFight->shouldReceive('getBattleMessages')->andReturn($attackMessages);
         $monsterPlayerFight->shouldReceive('getMonsterLastRolledAttack')->andReturn(5);
         $monsterPlayerFight->shouldReceive('getMonster')->andReturn(['id' => $this->monster->id]);
 
@@ -141,7 +146,9 @@ class MonsterFightServiceTest extends TestCase
 
         $service = resolve(MonsterFightService::class);
 
-        $service->fightMonster($this->character, AttackType::ATTACK->value);
+        $result = $service->fightMonster($this->character, AttackType::ATTACK->value);
+
+        $this->assertSame($attackMessages, $result['attack_messages']);
 
         Event::assertNotDispatched(ServerMessageEvent::class);
     }

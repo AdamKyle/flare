@@ -23,6 +23,7 @@ use App\Game\Skills\Transformers\SkillsTransformer;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection as SupportCollection;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
@@ -119,7 +120,10 @@ class CharacterSheetController extends Controller
         return response()->json();
     }
 
-    public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer, Manager $manager)
+    /**
+     * Return the character's currently active boon rows.
+     */
+    public function activeBoons(Character $character, UsableItemTransformer $usableItemTransformer): JsonResponse
     {
         return response()->json([
             'active_boons' => $this->activeBoonRows($character, $usableItemTransformer),
@@ -196,7 +200,10 @@ class CharacterSheetController extends Controller
         ], 200);
     }
 
-    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer, Manager $manager)
+    /**
+     * Cancel one active boon for the character.
+     */
+    public function cancelBoon(Character $character, CharacterBoon $boon, UseItemService $useItemService, UsableItemTransformer $usableItemTransformer): JsonResponse
     {
         if ($character->id !== $boon->character_id) {
             return response()->json(['message' => 'You cannot do that.'], 422);
@@ -230,13 +237,18 @@ class CharacterSheetController extends Controller
         ], $status);
     }
 
+    /**
+     * Build the active boon rows for the character, including source item and remaining Alchemy Bag amount.
+     *
+     * @return SupportCollection
+     */
     private function activeBoonRows(Character $character, UsableItemTransformer $usableItemTransformer)
     {
-        $characterBoons = $character->boons->load('itemUsed');
+        $characterBoons = $character->boons()->active()->with('itemUsed')->get();
 
         return $characterBoons->transform(function ($boon) use ($character, $usableItemTransformer) {
             $item = new Item($boon->itemUsed, $usableItemTransformer);
-            $item = (new Manager)->createData($item)->toArray();
+            $item = $this->manager->createData($item)->toArray();
 
             $item = $item['data'];
             $item['name'] = $boon->itemUsed->name;

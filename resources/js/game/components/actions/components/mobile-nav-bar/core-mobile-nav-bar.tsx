@@ -1,16 +1,22 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
+import { useManageQuestLogVisibility } from '../../../quests/hooks/use-manage-quest-log-visibility';
+import { useQuestLogVisibility } from '../../../quests/hooks/use-quest-log-visibility';
 import { useIsMobile } from '../../partials/actions/hooks/use-is-mobile';
 import { useManageCharacterCardVisibility } from '../../partials/floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../../partials/floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 import { useManageMapSectionVisibility } from '../../partials/floating-cards/map-section/hooks/use-manage-map-section-visibility';
 import { useManageShopVisibility } from '../../partials/floating-cards/map-section/hooks/use-manage-shop-visibility';
+import CharacterActiveBoonIndicator from '../../partials/icon-section/character-active-boon-indicator';
+import { useCharacterActiveBoonStatus } from '../../partials/icon-section/hooks/use-character-active-boon-status';
 
-type ActiveKey = 'character' | 'craft' | 'map' | 'shop' | null;
+type ActiveKey = 'character' | 'craft' | 'map' | 'shop' | 'quests' | null;
 
 const CoreMobileNavBar = (): ReactNode => {
   const { isMobile } = useIsMobile();
+
+  const { has_active_boons: hasActiveBoons } = useCharacterActiveBoonStatus();
 
   const { openCharacterCard, showCharacterCard } =
     useManageCharacterCardVisibility();
@@ -21,6 +27,9 @@ const CoreMobileNavBar = (): ReactNode => {
   const { openMapCard, showMapCard } = useManageMapSectionVisibility();
 
   const { openShop, showShopCard } = useManageShopVisibility();
+
+  const { showQuestLog } = useQuestLogVisibility();
+  const { openQuestLog } = useManageQuestLogVisibility();
 
   const getActiveKey = (): ActiveKey => {
     if (showCharacterCard) {
@@ -39,6 +48,10 @@ const CoreMobileNavBar = (): ReactNode => {
       return 'shop';
     }
 
+    if (showQuestLog) {
+      return 'quests';
+    }
+
     return null;
   };
 
@@ -47,7 +60,8 @@ const CoreMobileNavBar = (): ReactNode => {
     label: string,
     iconClass: string,
     onClick: () => void,
-    isActive: boolean
+    isActive: boolean,
+    statusIndicator?: ReactNode
   ): ReactNode => {
     return (
       <li className="flex items-stretch justify-center">
@@ -59,14 +73,21 @@ const CoreMobileNavBar = (): ReactNode => {
           className="w-full focus:outline-none"
         >
           <div className="flex h-full flex-col items-center justify-center">
-            <i
-              className={clsx(
-                iconClass,
-                'text-base',
-                isActive && 'text-blue-600 dark:text-blue-400'
+            <span className="relative inline-flex">
+              <i
+                className={clsx(
+                  iconClass,
+                  'text-base',
+                  isActive && 'text-blue-600 dark:text-blue-400'
+                )}
+                aria-hidden="true"
+              />
+              {statusIndicator && (
+                <span className="absolute -top-1 -right-1">
+                  {statusIndicator}
+                </span>
               )}
-              aria-hidden="true"
-            />
+            </span>
             <span
               className={clsx(
                 'mt-0.5 text-xs leading-3',
@@ -102,7 +123,8 @@ const CoreMobileNavBar = (): ReactNode => {
                 'Character',
                 'ra ra-player',
                 openCharacterCard,
-                activeKey === 'character'
+                activeKey === 'character',
+                <CharacterActiveBoonIndicator active={hasActiveBoons} />
               )}
               {renderItem(
                 'craft',
@@ -115,8 +137,8 @@ const CoreMobileNavBar = (): ReactNode => {
                 'quests',
                 'Quests',
                 'far fa-comments',
-                () => {},
-                false
+                openQuestLog,
+                activeKey === 'quests'
               )}
               {renderItem(
                 'map',

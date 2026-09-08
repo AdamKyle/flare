@@ -14,8 +14,6 @@ class RacesSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
 {
     /**
      * Return every Race, ordered deterministically by name.
-     *
-     * @return Collection<int, GameRace> Races to export.
      */
     public function collection(): Collection
     {
@@ -25,8 +23,7 @@ class RacesSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
     /**
      * Map a Race into its workbook row.
      *
-     * @param  GameRace  $gameRace  Race to map.
-     * @return array<int, mixed> Workbook row values.
+     * @param  mixed  $gameRace
      */
     public function map($gameRace): array
     {
@@ -39,8 +36,6 @@ class RacesSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
 
     /**
      * Return the Races workbook column headings.
-     *
-     * @return array<int, string> Workbook column headings.
      */
     public function headings(): array
     {
@@ -49,8 +44,6 @@ class RacesSheet implements FromCollection, ShouldAutoSize, WithHeadings, WithMa
 
     /**
      * Return the Races workbook sheet title.
-     *
-     * @return string Races workbook sheet title.
      */
     public function title(): string
     {

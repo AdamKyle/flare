@@ -18,7 +18,7 @@ enum MonsterListCategory: string
     case WEEKLY_FIGHT = 'weekly_fight';
 
     /**
-     * @return array<int, string> All valid category values, for validation rules.
+     * Values.
      */
     public static function values(): array
     {
@@ -29,10 +29,7 @@ enum MonsterListCategory: string
     }
 
     /**
-     * The authoritative set of Location Types that make up the Weekly Fight category.
-     * Cave of Memories is intentionally excluded.
-     *
-     * @return array<int, int> Valid LocationType values for the Weekly Fight category.
+     * Return the Location Types included in the Weekly Fight category.
      */
     public static function weeklyFightLocationTypes(): array
     {
@@ -40,11 +37,7 @@ enum MonsterListCategory: string
     }
 
     /**
-     * The dedicated Location Types that remain factually visible under the "All" category
-     * without owning a dedicated category tab: the Weekly Fight set plus the Cave of
-     * Memories dedicated Monster population.
-     *
-     * @return array<int, int> Valid LocationType values visible under the "All" category.
+     * Return dedicated Location Types included only in the All category.
      */
     public static function allCategoryLocationTypes(): array
     {

@@ -7,12 +7,17 @@ use App\Game\Tops\Services\FactionLoyaltyTopsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacter;
+use Tests\Traits\CreateCharacterAutomation;
+use Tests\Traits\CreateFaction;
+use Tests\Traits\CreateFactionLoyalty;
+use Tests\Traits\CreateFactionLoyaltyAutomation;
 use Tests\Traits\CreateGameMap;
+use Tests\Traits\CreateNpc;
 use Tests\Traits\CreateUser;
 
 class FactionLoyaltyTopsServiceTest extends TestCase
 {
-    use CreateCharacter, CreateGameMap, CreateUser, RefreshDatabase;
+    use CreateCharacter, CreateCharacterAutomation, CreateFaction, CreateFactionLoyalty, CreateFactionLoyaltyAutomation, CreateGameMap, CreateNpc, CreateUser, RefreshDatabase;
 
     public function test_faction_loyalty_tops_ranks_by_faction_progression(): void
     {
@@ -65,5 +70,45 @@ class FactionLoyaltyTopsServiceTest extends TestCase
         $this->assertSame($character->id, $currentMonth['rows'][0]['character_id']);
         $this->assertSame($currentMonth['rows'][0]['highest_faction_level'], $allTime['rows'][0]['highest_faction_level']);
         $this->assertSame(['highest_faction_level', 'total_faction_level', 'npcs_helped_count', 'total_npc_fame_level'], collect($currentMonth['available_metrics'])->pluck('key')->all());
+    }
+
+    public function test_detail_reports_automation_count_and_latest_action_and_outcome_without_loading_all_logs(): void
+    {
+        $user = $this->createUser();
+        $character = $this->createCharacter(['user_id' => $user->id]);
+
+        $map = $this->createGameMap();
+        $faction = $this->createFaction(['character_id' => $character->id, 'game_map_id' => $map->id]);
+        $factionLoyalty = $this->createFactionLoyalty(['character_id' => $character->id, 'faction_id' => $faction->id]);
+        $npc = $this->createNpc(['game_map_id' => $map->id]);
+        $factionLoyaltyNpc = $this->createFactionLoyaltyNpc(['faction_loyalty_id' => $factionLoyalty->id, 'npc_id' => $npc->id]);
+
+        $olderCharacterAutomation = $this->createCharacterAutomation(['character_id' => $character->id]);
+        $older = $this->createFactionLoyaltyAutomation([
+            'character_automation_id' => $olderCharacterAutomation->id,
+            'character_id' => $character->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'last_automation_action' => 'fighting',
+            'last_fight_outcome' => 'lost',
+            'last_automation_action_at' => now()->subHour(),
+        ]);
+        $this->createFactionLoyaltyAutomationLog(['faction_loyalty_automation_id' => $older->id]);
+
+        $latestCharacterAutomation = $this->createCharacterAutomation(['character_id' => $character->id]);
+        $latest = $this->createFactionLoyaltyAutomation([
+            'character_automation_id' => $latestCharacterAutomation->id,
+            'character_id' => $character->id,
+            'faction_loyalty_npc_id' => $factionLoyaltyNpc->id,
+            'last_automation_action' => 'training',
+            'last_fight_outcome' => 'won',
+            'last_automation_action_at' => now(),
+        ]);
+        $this->createFactionLoyaltyAutomationLog(['faction_loyalty_automation_id' => $latest->id]);
+
+        $detail = $this->app->make(FactionLoyaltyTopsService::class)->detail($character);
+
+        $this->assertSame(2, $detail['automation_summary']['count']);
+        $this->assertSame('training', $detail['automation_summary']['latest_action']);
+        $this->assertSame('won', $detail['automation_summary']['latest_outcome']);
     }
 }

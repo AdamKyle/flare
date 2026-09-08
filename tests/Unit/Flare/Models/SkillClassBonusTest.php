@@ -47,4 +47,16 @@ class SkillClassBonusTest extends TestCase
 
         $this->assertSame(0.10, $skill->skill_bonus);
     }
+
+    public function test_null_class_skill_modifier_contributes_zero(): void
+    {
+        $character = (new CharacterFactory)
+            ->createBaseCharacter(classOptions: ['accuracy_mod' => null], assignBaseSkill: false, assignPassiveSkills: false)
+            ->getCharacter();
+
+        $baseSkill = $this->createGameSkill(['name' => 'Accuracy', 'skill_bonus_per_level' => 0.0]);
+        $skill = $this->createSkill(['character_id' => $character->id, 'game_skill_id' => $baseSkill->id, 'level' => 1]);
+
+        $this->assertSame(0.0, $skill->skill_bonus);
+    }
 }

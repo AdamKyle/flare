@@ -1,8 +1,3 @@
-/**
- * Canonical Emerald Location-domain card visual language: a full-width
- * clickable card using the project's Emerald palette, distinct from the
- * Quest domain's Glacier cards.
- */
 export const locationCardBaseStyles = (): string =>
   'border-2 w-full flex items-start gap-3 p-4 rounded-lg shadow-md text-left transition-colors';
 

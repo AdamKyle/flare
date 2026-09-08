@@ -5,9 +5,6 @@ import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-def
 import GameMapFormOptionsDefinition from '../definitions/game-map-form-options-definition';
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 
-/**
- * Validate the single Game Map wizard step identified by `step_index`.
- */
 export const validateGameMapStep = (
   step_index: number,
   state: GameMapFormStateDefinition,
@@ -22,8 +19,6 @@ export const validateGameMapStep = (
     case 2:
       return validateGameMapAccessStep(state, options);
     default:
-      // The Game Map wizard only ever registers three steps (0-2); an index outside
-      // that range has no corresponding step to validate.
       return {};
   }
 };

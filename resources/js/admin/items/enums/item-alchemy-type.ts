@@ -31,10 +31,6 @@ export const ITEM_ALCHEMY_TYPE_VALUES: ItemAlchemyType[] = [
   ItemAlchemyType.INCREASE_ALCHEMY_SKILL,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item alchemy type, without a forced type assertion at each call site.
- */
 export const isItemAlchemyType = (
   value: string | number
 ): value is ItemAlchemyType => {

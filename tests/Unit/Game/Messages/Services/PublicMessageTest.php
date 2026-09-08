@@ -61,6 +61,21 @@ class PublicMessageTest extends TestCase
         $this->assertGreaterThan(0, Message::count());
     }
 
+    public function test_send_public_message_creates_exactly_one_message_row_for_sender_and_others(): void
+    {
+        Event::fake();
+
+        $character = $this->character->getCharacter();
+
+        Auth::login($character->user);
+
+        $this->publicMessage->postPublicMessage('Test');
+
+        Event::assertDispatched(MessageSentEvent::class, 1);
+
+        $this->assertSame(1, Message::count());
+    }
+
     public function test_send_public_message_for_surface_color()
     {
         Event::fake();

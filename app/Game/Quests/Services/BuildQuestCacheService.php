@@ -17,6 +17,9 @@ class BuildQuestCacheService
 {
     public function __construct(private QuestTransformer $questTransformer, private Manager $manager) {}
 
+    /**
+     * Build the cached Quest data.
+     */
     public function buildQuestCache(bool $sendOffEvent = false): void
     {
         $quests = Quest::where('is_parent', true)
@@ -44,6 +47,9 @@ class BuildQuestCacheService
         }
     }
 
+    /**
+     * Fetch the active event Quests.
+     */
     protected function fetchEventQuests(string $eventType): array
     {
         $event = Event::where('type', $eventType)->first();
@@ -63,6 +69,9 @@ class BuildQuestCacheService
         return $this->manager->createData($quests)->toArray();
     }
 
+    /**
+     * Build the cached Raid Quest data.
+     */
     public function buildRaidQuestCache(bool $sendOffEvent = false): void
     {
         $raids = Raid::all();
@@ -92,16 +101,25 @@ class BuildQuestCacheService
         }
     }
 
+    /**
+     * Return the regular cached Quests.
+     */
     public function getRegularQuests(): ?array
     {
         return Cache::get('game-quests');
     }
 
+    /**
+     * Return the cached Raid Quests.
+     */
     public function getRaidQuests(): ?array
     {
         return Cache::get('raid-quests');
     }
 
+    /**
+     * Fetch the Quests for the Raid.
+     */
     public function fetchQuestsForRaid(?Event $eventWithRaid = null): array
     {
         $eventQuests = [];
@@ -123,6 +141,9 @@ class BuildQuestCacheService
         return $raidQuests[$eventWithRaid->raid_id];
     }
 
+    /**
+     * Fetch Quests for the active Raids.
+     */
     public function fetchActiveRaidQuests(): array
     {
         $activeRaidQuests = [];

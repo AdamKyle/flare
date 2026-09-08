@@ -138,9 +138,6 @@ const isValidRequiredClassLevel = (value: string): boolean => {
   );
 };
 
-/**
- * Validate the fields belonging to the Basic step before the wizard advances.
- */
 export const validateClassBasicStep = (
   state: ClassFormStateDefinition
 ): ClassValidationResultDefinition => {
@@ -161,9 +158,6 @@ export const validateClassBasicStep = (
   return toValidationResult(errors);
 };
 
-/**
- * Validate the fields belonging to the Attributes step before the wizard advances.
- */
 type ClassIntegerStringField =
   | 'str_mod'
   | 'dur_mod'
@@ -199,9 +193,6 @@ export const validateClassAttributesStep = (
   return toValidationResult(errors);
 };
 
-/**
- * Validate the fields belonging to the Combat Modifiers step before the wizard advances.
- */
 export const validateClassCombatStep = (
   state: ClassFormStateDefinition
 ): ClassValidationResultDefinition => {
@@ -222,14 +213,6 @@ export const validateClassCombatStep = (
   return toValidationResult(errors);
 };
 
-/**
- * Validate the Unlock Requirements step: either all four fields are empty,
- * or all four are populated with valid values, and a Class cannot require
- * itself or the same prerequisite twice. Cross-field problems (an incomplete
- * set, a duplicated prerequisite, or self-reference) surface as a form-level
- * summary alongside field errors on the offending/missing fields so the
- * first invalid field can receive focus.
- */
 export const validateClassUnlockStep = (
   state: ClassFormStateDefinition,
   classId: number | null

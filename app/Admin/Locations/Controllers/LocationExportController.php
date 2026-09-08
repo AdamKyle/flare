@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LocationExportController extends Controller
 {
-    /**
-     * @param  LocationExcelService  $locationExcelService  Location Excel export/import service.
-     */
     public function __construct(
         private readonly LocationExcelService $locationExcelService,
     ) {}
@@ -18,7 +15,6 @@ class LocationExportController extends Controller
     /**
      * Download the Locations workbook.
      *
-     * @return BinaryFileResponse Locations workbook download response.
      *
      * @codeCoverageIgnore
      */

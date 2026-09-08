@@ -10,8 +10,6 @@ class ClassMasteriesImport implements Import, WithMultipleSheets
 {
     /**
      * Return the sheets included in the Class Masteries workbook.
-     *
-     * @return array<int, ClassMasteriesSheet> Class Masteries workbook sheets.
      */
     public function sheets(): array
     {

@@ -5,10 +5,6 @@ import GameMapFormStateDefinition from '../definitions/game-map-form-state-defin
 const numberToPercentageString = (value: number): string =>
   String(convertStoredBonusToPercentage(value));
 
-/**
- * Build the initial Game Map wizard form state for either a new Game Map, or an
- * existing Game Map being edited.
- */
 export const createGameMapFormState = (
   gameMap: GameMapFormResponseDefinition | null
 ): GameMapFormStateDefinition => {

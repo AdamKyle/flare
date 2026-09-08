@@ -17,23 +17,12 @@ class MonstersSheet implements ToCollection
 
     private ?string $validationError = null;
 
-    /**
-     * @param  MonsterService  $monsterService  Canonical Monster cross-field normalization service.
-     */
     public function __construct(
         private readonly MonsterService $monsterService = new MonsterService,
     ) {}
 
     /**
      * Import Monster rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized and validated against the complete current managed
-     * Monster field contract (the exact rules `StoreMonsterRequest` enforces for the live Admin
-     * form) before any row is written, so an invalid later row cannot leave an earlier row's write
-     * applied.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Monsters are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -69,8 +58,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Determine whether the import completed and wrote every workbook row.
-     *
-     * @return bool Whether the import succeeded.
      */
     public function wasSuccessful(): bool
     {
@@ -79,8 +66,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Resolve the human-facing validation error for a failed import, when one occurred.
-     *
-     * @return string|null Validation error message, or null when the import succeeded.
      */
     public function validationError(): ?string
     {
@@ -89,8 +74,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Record why the import failed. Zero rows are written once this is called.
-     *
-     * @param  string  $message  Human-facing validation error message.
      */
     private function fail(string $message): void
     {
@@ -99,9 +82,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Extract every meaningful row (up to the first blank Monster name) from the uploaded workbook.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>> Raw spreadsheet rows keyed by header.
      */
     private function extractMeaningfulRows(Collection $rows): array
     {
@@ -127,9 +107,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Resolve a single raw Monster row into normalized, validated Monster attributes.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed>|null Normalized Monster attributes, or null when the row is invalid.
      */
     private function resolveRow(array $rawRow): ?array
     {
@@ -156,9 +133,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Validate a resolved Monster row against the complete current managed field contract.
-     *
-     * @param  array<string, mixed>  $data  Row data with relationships already resolved to ids.
-     * @return bool Whether every managed field is valid.
      */
     private function hasValidManagedFields(array $data): bool
     {
@@ -169,11 +143,6 @@ class MonstersSheet implements ToCollection
 
     /**
      * Resolve a related record's id by its display-name column.
-     *
-     * @param  class-string  $modelClass  Related Eloquent model class.
-     * @param  string  $nameColumn  Column holding the record's display name.
-     * @param  string|null  $value  Raw display-name value from the spreadsheet.
-     * @return int|false|null Resolved id, null when blank, or false when unresolvable.
      */
     private function resolveByName(string $modelClass, string $nameColumn, ?string $value): int|false|null
     {
@@ -191,11 +160,7 @@ class MonstersSheet implements ToCollection
     }
 
     /**
-     * Convert every blank spreadsheet cell (except `name`) to `null` so nullable validation rules
-     * see an actual absent value rather than an empty string.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed> Row with blank cells normalized to null.
+     * Normalize blank Monster workbook cells to null.
      */
     private function normalizeBlanks(array $rawRow): array
     {
@@ -213,11 +178,7 @@ class MonstersSheet implements ToCollection
     }
 
     /**
-     * Normalize every boolean Monster column to a real boolean, treating only recognized truthy
-     * cell values as true rather than any non-empty string.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed> Row with boolean columns normalized to real booleans.
+     * Normalize Monster workbook boolean columns to booleans.
      */
     private function normalizeBooleans(array $rawRow): array
     {

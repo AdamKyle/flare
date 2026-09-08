@@ -15,9 +15,6 @@ const VALIDATABLE_GAME_MAP_FORM_FIELDS: readonly (keyof GameMapFormStateDefiniti
     'replacement_image_acknowledged',
   ];
 
-/**
- * Determine whether a Game Map wizard field participates in field-level validation.
- */
 export const isGameMapValidatableField = (
   field: keyof GameMapFormStateDefinition
 ): field is keyof GameMapFormErrorsDefinition &

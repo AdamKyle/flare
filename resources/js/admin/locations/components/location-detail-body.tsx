@@ -20,13 +20,6 @@ import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 const relatedItemButtonClasses =
   'text-danube-700 hover:text-danube-600 dark:text-danube-200 dark:hover:text-danube-100 decoration-danube-400 dark:decoration-danube-500 focus-visible:ring-danube-400 rounded font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2';
 
-/**
- * Render the canonical read-only Location detail body: Identity,
- * Description, Rules (with clickable required/reward Item identities), and
- * a paginated Quest Items Dropped Here relationship. Reused by both the
- * standalone Location show screen and the Game Map Location side-peek so
- * every entry point renders the same factual content.
- */
 const LocationDetailBody = ({
   location,
   quest_items: questItems,

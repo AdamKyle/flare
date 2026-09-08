@@ -10,8 +10,6 @@ class ClassesImport implements Import, WithMultipleSheets
 {
     /**
      * Return the sheets included in the Classes workbook.
-     *
-     * @return array<int, ClassesSheet> Classes workbook sheets.
      */
     public function sheets(): array
     {

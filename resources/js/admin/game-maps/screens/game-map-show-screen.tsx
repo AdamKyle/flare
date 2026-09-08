@@ -1,33 +1,26 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 
 import { SidePeekComponentRegistrationEnum } from '../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
 import { SidePeek as SidePeekEventType } from '../../../game/components/side-peeks/base/event-types/side-peek';
 import { useSidePeekEmitter } from '../../../game/components/side-peeks/base/hooks/use-side-peek-emitter';
+import GameMapDetail from '../../../game/reusable-components/game-map/components/game-map-detail';
 import AdminBackButton from '../../shared/components/admin-back-button';
 import AdminPage from '../../shared/components/admin-page';
 import { AdminPageWidth } from '../../shared/enums/admin-page-width';
 import { GameMapApiMessages } from '../api/enums/game-map-api-messages';
 import { useGameMap } from '../api/hooks/use-game-map';
-import GameMapKingdomColorSwatch from '../components/game-map-kingdom-color-swatch';
 import GameMapRelatedDataNavigation from '../components/game-map-related-data-navigation';
 import { GameMapSidePeekMessages } from '../components/side-peeks/enums/game-map-side-peek-messages';
-import { GAME_MAP_EVENT_TYPE_LABELS } from '../enums/game-map-event-type';
 import { GameMapScreens } from '../screen-manager/game-map-screen-constants';
 import { useGameMapScreenNavigation } from '../screen-manager/game-map-screen-kit';
 import { GameMapShowScreenProps } from '../screen-manager/game-map-screen-props';
-import { resolveGameMapBonusEntries } from '../utils/resolve-game-map-bonus-entries';
-import { resolveRequiredQuestItemCopy } from '../utils/resolve-required-quest-item-copy';
 
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Card from 'ui/cards/card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
 const GameMapShowScreen = ({
@@ -70,59 +63,6 @@ const GameMapShowScreen = ({
     );
   };
 
-  const renderMapPreview = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    return (
-      <div className="border-glacier-200 bg-glacier-950 dark:border-glacier-800 aspect-square w-full overflow-hidden rounded-md border">
-        <img
-          src={gameMap.map_url}
-          alt={`${gameMap.name} map`}
-          className="h-full w-full object-contain"
-        />
-      </div>
-    );
-  };
-
-  const renderRequiredQuestItem = (): ReactNode => {
-    if (!gameMap?.required_quest_item) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-          Required Quest Item
-        </h2>
-        <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-          {gameMap.required_quest_item.name}
-        </p>
-        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-          {resolveRequiredQuestItemCopy(gameMap.required_quest_item)}
-        </p>
-      </section>
-    );
-  };
-
-  const renderDescription = (): ReactNode => {
-    if (!gameMap?.description) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-          Description
-        </h2>
-        <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
-          <ReactMarkdown>{gameMap.description}</ReactMarkdown>
-        </div>
-      </section>
-    );
-  };
-
   const renderEditorAction = (): ReactNode => {
     if (!hasTiles) {
       return null;
@@ -147,111 +87,6 @@ const GameMapShowScreen = ({
         Map tile processing is not complete. The coordinate editor will be
         available after processing finishes and this page is refreshed.
       </Alert>
-    );
-  };
-
-  const renderAccessConfiguration = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    const hasRows =
-      gameMap.default ||
-      gameMap.can_traverse ||
-      gameMap.event_restriction !== null ||
-      gameMap.required_location !== null ||
-      Boolean(gameMap.kingdom_color);
-
-    if (!hasRows) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Access and Configuration
-        </h2>
-        <Dl>
-          {gameMap.default && (
-            <>
-              <Dt>Default map</Dt>
-              <Dd>Yes</Dd>
-            </>
-          )}
-          {gameMap.can_traverse && (
-            <>
-              <Dt>Can traverse</Dt>
-              <Dd>Yes</Dd>
-            </>
-          )}
-          {gameMap.event_restriction !== null && (
-            <>
-              <Dt>Event restriction</Dt>
-              <Dd>{GAME_MAP_EVENT_TYPE_LABELS[gameMap.event_restriction]}</Dd>
-            </>
-          )}
-          {gameMap.required_location && (
-            <>
-              <Dt>Required Location</Dt>
-              <Dd>{gameMap.required_location.name}</Dd>
-            </>
-          )}
-          {gameMap.kingdom_color && (
-            <>
-              <Dt>Kingdom color</Dt>
-              <Dd>
-                <GameMapKingdomColorSwatch color={gameMap.kingdom_color} />
-              </Dd>
-            </>
-          )}
-        </Dl>
-      </section>
-    );
-  };
-
-  const renderMapBonuses = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    const bonusEntries = resolveGameMapBonusEntries(gameMap);
-
-    if (bonusEntries.length === 0) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Map Bonuses
-        </h2>
-        <Dl>
-          {bonusEntries.map((entry) => (
-            <React.Fragment key={entry.label}>
-              <Dt>{entry.label}</Dt>
-              <Dd>{entry.percentage}%</Dd>
-            </React.Fragment>
-          ))}
-        </Dl>
-      </section>
-    );
-  };
-
-  const renderDetails = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    return (
-      <div className="flex flex-col gap-6">
-        {renderDescription()}
-
-        {renderAccessConfiguration()}
-
-        {renderRequiredQuestItem()}
-
-        {renderMapBonuses()}
-      </div>
     );
   };
 
@@ -284,10 +119,7 @@ const GameMapShowScreen = ({
             <div className="lg:flex lg:items-start lg:gap-6">
               <GameMapRelatedDataNavigation game_map_id={gameMapId} />
               <div className="min-w-0 lg:flex-1">
-                <div className="grid gap-6 md:grid-cols-2">
-                  {renderMapPreview()}
-                  {renderDetails()}
-                </div>
+                <GameMapDetail game_map={gameMap} split_layout />
               </div>
             </div>
           </div>

@@ -7,16 +7,12 @@ use App\Admin\ClassMasteries\Requests\StoreClassMasteryRequest;
 use App\Admin\ClassMasteries\Requests\UpdateClassMasteryRequest;
 use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClassMasteryService
 {
     /**
      * Paginate the Class Masteries list for the validated Admin index request.
-     *
-     * @param  ClassMasteryIndexRequest  $request  Validated Class Mastery list request.
-     * @return LengthAwarePaginator Paginated Class Mastery records.
      */
     public function paginate(ClassMasteryIndexRequest $request): LengthAwarePaginator
     {
@@ -52,8 +48,6 @@ class ClassMasteryService
 
     /**
      * Build the internal Admin Class Mastery form option data.
-     *
-     * @return array{classes: Collection<int, GameClass>} Internal Class Mastery form option data.
      */
     public function formOptions(): array
     {
@@ -64,9 +58,6 @@ class ClassMasteryService
 
     /**
      * Create a new Class Mastery from the validated form data.
-     *
-     * @param  StoreClassMasteryRequest  $request  Validated Class Mastery creation request.
-     * @return GameClassSpecial Created Class Mastery.
      */
     public function create(StoreClassMasteryRequest $request): GameClassSpecial
     {
@@ -75,10 +66,6 @@ class ClassMasteryService
 
     /**
      * Update an existing Class Mastery from the validated form data.
-     *
-     * @param  GameClassSpecial  $gameClassSpecial  Class Mastery to update.
-     * @param  UpdateClassMasteryRequest  $request  Validated Class Mastery update request.
-     * @return GameClassSpecial Updated Class Mastery.
      */
     public function update(GameClassSpecial $gameClassSpecial, UpdateClassMasteryRequest $request): GameClassSpecial
     {

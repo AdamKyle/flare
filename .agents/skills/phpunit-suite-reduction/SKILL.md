@@ -7,7 +7,7 @@ description: Use this skill when reducing, consolidating, reviewing, or removing
 
 ## Purpose
 
-Reduce the number and cost of tests while retaining meaningful behavioral confidence.
+Reduce the number and cost of tests while retaining meaningful behavioral confidence. Apply `phpunit-business-behavior-testing` to every retained or deleted test decision.
 
 The number of tests is not a quality metric by itself.
 
@@ -67,6 +67,8 @@ Remove tests that:
 - Use reflection or another visibility bypass to test implementation details.
 - Only resolve concrete classes or exercise provider `register()`, `boot()`, or `provides()` plumbing.
 - Assert constructor/property assignment, declared enum values, or a thin third-party factory's returned class without an application-owned contract.
+- Instantiate Maatwebsite Excel import/export adapters only to assert `Import`, `Export`, concern, or package-interface membership.
+- Use `assertInstanceOf()` where the asserted type is merely the class/interface declared by construction or framework/package wiring.
 - Use tautological assertions such as `assertTrue(true)`.
 - Recreate an already-authoritative scenario using a more expensive HTTP or job path.
 - Exercise the same formula using arbitrary examples when representative boundaries cover the formula.
@@ -79,16 +81,18 @@ For each test being reviewed:
 
 1. Read the test.
 2. Read the public production path it exercises.
-3. Identify the exact branch, mutation, contract, or boundary it covers.
-4. Find other tests covering the same behavior.
-5. Select the lowest stable authoritative layer.
-6. Keep one focused test for each materially distinct behavior.
-7. Keep only thin integration coverage in upper layers.
-8. Remove equivalent permutations.
-9. Do not merge unrelated behaviors into a large test.
-10. Do not use loops or data providers to hide the old test count.
-11. Do not retain a test solely because it already exists.
-12. Do not remove a unique critical behavior solely to reach a numeric target.
+3. State the application-owned observable behavior in one sentence.
+4. If no application-owned observable behavior exists, remove the test.
+5. Identify the exact branch, mutation, contract, or boundary it covers.
+6. Find other tests covering the same behavior.
+7. Select the lowest stable authoritative layer.
+8. Keep one focused test for each materially distinct behavior.
+9. Keep only thin integration coverage in upper layers.
+10. Remove equivalent permutations and framework/package-only structure.
+11. Do not merge unrelated behaviors into a large test.
+12. Do not use loops or data providers to hide the old test count.
+13. Do not retain a test solely because it already exists or contributes line coverage.
+14. Do not remove a unique critical behavior solely to reach a numeric target.
 
 The suite-wide target may guide the audit, but a quota alone is never the reason recorded for deleting a test. The reason must be duplication, equivalent branching, framework-only coverage, unnecessary permutation coverage, or lack of meaningful behavioral value.
 

@@ -10,8 +10,7 @@ const fieldLabelClassName =
   'text-glacier-600 dark:text-glacier-400 text-xs font-semibold tracking-wide uppercase';
 
 /**
- * No-op scroll handler for the Required Quest Chain's `InfiniteScroll`: the chain is already
- * fully loaded factual detail data, so there is no pagination/loading behavior to trigger.
+ * The chain is already fully loaded, so InfiniteScroll intentionally has no fetch callback.
  */
 const handleRequiredQuestChainScroll = (): void => {};
 

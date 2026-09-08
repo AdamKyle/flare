@@ -14,5 +14,6 @@ Route::middleware([
 
         Route::post('/equip-specialty/{character}/{gameClassSpecial}', ['uses' => 'Api\ClassRanksController@equipSpecial']);
         Route::post('/unequip-specialty/{character}/{classSpecialEquipped}', ['uses' => 'Api\ClassRanksController@unequipSpecial']);
+        Route::post('/swap-specialty/{character}/{gameClassSpecial}/{classSpecialEquipped}', ['uses' => 'Api\ClassRanksController@swapSpecial']);
     });
 });

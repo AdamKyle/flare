@@ -13,8 +13,6 @@ class LocationsController extends Controller
 {
     /**
      * Render the Admin Locations application shell.
-     *
-     * @return View Admin Locations application shell view.
      */
     public function index(): View
     {
@@ -23,9 +21,6 @@ class LocationsController extends Controller
 
     /**
      * Render the legacy informational Location page for the given Location.
-     *
-     * @param  Location  $location  Location to describe.
-     * @return View Legacy informational Location page view.
      */
     public function show(Location $location): View
     {
@@ -56,8 +51,6 @@ class LocationsController extends Controller
 
     /**
      * Redirect legacy Location edit links into the modern Admin Locations application.
-     *
-     * @return RedirectResponse Redirect to the Admin Locations application.
      */
     public function edit(): RedirectResponse
     {

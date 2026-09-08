@@ -154,6 +154,9 @@ class QuestHandlerService
         return false;
     }
 
+    /**
+     * Move the character to the Quest NPC location.
+     */
     public function moveCharacter(Character $character, Npc $npc): array|Character
     {
         $oldMapDetails = $character->map;
@@ -203,6 +206,9 @@ class QuestHandlerService
         return $character;
     }
 
+    /**
+     * Update the character map details after Quest movement.
+     */
     protected function updateMapDetails(Character $character): void
     {
         $monsters = Cache::get('monsters')[$character->map->gameMap->name];
@@ -212,6 +218,9 @@ class QuestHandlerService
         event(new UpdateRaidMonsters([], $character->user));
     }
 
+    /**
+     * Complete and hand in the Quest for the character.
+     */
     public function handInQuest(Character $character, Quest $quest)
     {
         $this->npcQuestsHandler->consumeQuestRequirements($character, $quest);

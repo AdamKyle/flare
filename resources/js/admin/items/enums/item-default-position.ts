@@ -26,10 +26,6 @@ export const ITEM_DEFAULT_POSITION_VALUES: ItemDefaultPosition[] = [
   ItemDefaultPosition.GLOVES,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item default position, without a forced type assertion at each call site.
- */
 export const isItemDefaultPosition = (
   value: string | number
 ): value is ItemDefaultPosition => {

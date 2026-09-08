@@ -10,15 +10,10 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class ItemsSheet implements FromView, ShouldAutoSize, WithTitle
 {
-    /**
-     * @param  array<int, string>  $itemTypes  Item `type`/`specialty_type` family values to export.
-     */
     public function __construct(private readonly array $itemTypes = []) {}
 
     /**
      * Build the export view with the requested catalog Item family.
-     *
-     * @return View Items workbook export view.
      */
     public function view(): View
     {
@@ -46,8 +41,6 @@ class ItemsSheet implements FromView, ShouldAutoSize, WithTitle
 
     /**
      * Return the Items workbook sheet title.
-     *
-     * @return string Items workbook sheet title.
      */
     public function title(): string
     {

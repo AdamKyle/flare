@@ -178,12 +178,6 @@ type MonsterFormErrors = Partial<
   Record<keyof MonsterFormStateDefinition, string>
 >;
 
-/**
- * The exact Monster form state keys whose value is a numeric string
- * validated by `validateIntegerFields`. Kept narrow (rather than accepting
- * every `keyof MonsterFormStateDefinition`) so `state[field]` is already
- * typed as `string` without a type assertion.
- */
 type MonsterIntegerStringField =
   | 'max_level'
   | 'xp'
@@ -203,10 +197,6 @@ type MonsterIntegerStringField =
   | 'gold_dust_cost'
   | 'shards';
 
-/**
- * The exact Monster form state keys whose value is a numeric (decimal
- * allowed) string validated by `validateNumberFields`.
- */
 type MonsterNumberStringField =
   | 'drop_check'
   | 'accuracy'
@@ -288,10 +278,6 @@ const validateNumberFields = (
   return errors;
 };
 
-/**
- * Validate the fields belonging to the Identity & Placement step before the
- * wizard advances.
- */
 export const validateMonsterIdentityStep = (
   state: MonsterFormStateDefinition
 ): MonsterFormErrors => {
@@ -324,10 +310,6 @@ export const validateMonsterIdentityStep = (
   };
 };
 
-/**
- * Validate the fields belonging to the Core Combat step (base stats and
- * probabilities) before the wizard advances.
- */
 export const validateMonsterCombatStep = (
   state: MonsterFormStateDefinition
 ): MonsterFormErrors => ({
@@ -352,10 +334,6 @@ export const validateMonsterCombatStep = (
   ]),
 });
 
-/**
- * Validate the fields belonging to the Spells & Affixes step before the
- * wizard advances.
- */
 export const validateMonsterSpellStep = (
   state: MonsterFormStateDefinition
 ): MonsterFormErrors => ({
@@ -372,10 +350,6 @@ export const validateMonsterSpellStep = (
   ]),
 });
 
-/**
- * Validate the fields belonging to the Quest & Celestial step before the
- * wizard advances.
- */
 export const validateMonsterQuestCelestialStep = (
   state: MonsterFormStateDefinition
 ): MonsterFormErrors => {
@@ -395,11 +369,6 @@ export const validateMonsterQuestCelestialStep = (
   return errors;
 };
 
-/**
- * Validate the fields belonging to the Raid & Special Rules step before the
- * wizard advances. The backend remains authoritative for relationship
- * cycles; this only prevents an obviously invalid local value.
- */
 export const validateMonsterRaidStep = (
   state: MonsterFormStateDefinition
 ): MonsterFormErrors => {
@@ -427,11 +396,6 @@ const MONSTER_FORM_STEP_VALIDATORS: ReadonlyArray<
   validateMonsterRaidStep,
 ];
 
-/**
- * Validate the complete Monster form (every step's fields combined), used
- * before final submit so a field left invalid on an earlier, already-passed
- * step still blocks submission.
- */
 export const validateMonsterForm = (
   state: MonsterFormStateDefinition
 ): MonsterFormErrors => {

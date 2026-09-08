@@ -20,14 +20,6 @@ import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Game Map Location side-peek: stacks the shared, permission-neutral
- * factual Location presentation with Game-Map-context Edit/Move actions.
- * Relationship navigation opens the target's canonical detail inside a
- * local `StackedCard` over this content instead of replacing this
- * contextual SidePeek through the global emitter, so this SidePeek's own
- * Move/Edit affordances and scroll position stay intact underneath.
- */
 const GameMapLocationSidePeek = ({
   game_map_id: gameMapId,
   location_id: locationId,

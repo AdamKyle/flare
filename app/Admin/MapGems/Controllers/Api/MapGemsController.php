@@ -19,14 +19,6 @@ use Illuminate\Http\Request;
 
 class MapGemsController extends Controller
 {
-    /**
-     * @param  MapGemService  $mapGemService  Admin Map Gem application service.
-     * @param  Pagination  $pagination  Paginator response transformer.
-     * @param  MapGemListTransformer  $mapGemListTransformer  List-record transformer.
-     * @param  MapGemDetailTransformer  $mapGemDetailTransformer  Detail transformer.
-     * @param  MapGemFormTransformer  $mapGemFormTransformer  Form-value transformer.
-     * @param  MapGemFormOptionsTransformer  $mapGemFormOptionsTransformer  Form-options transformer.
-     */
     public function __construct(
         private readonly MapGemService $mapGemService,
         private readonly Pagination $pagination,
@@ -38,9 +30,6 @@ class MapGemsController extends Controller
 
     /**
      * Return the paginated, searchable, Map-filtered Map Gems list.
-     *
-     * @param  MapGemIndexRequest  $request  Validated Map Gem list request.
-     * @return JsonResponse Paginated Map Gem list JSON response.
      */
     public function index(MapGemIndexRequest $request): JsonResponse
     {
@@ -53,8 +42,6 @@ class MapGemsController extends Controller
 
     /**
      * Return the Admin Map Gem form options.
-     *
-     * @return JsonResponse Map Gem form-options JSON response.
      */
     public function options(): JsonResponse
     {
@@ -65,9 +52,6 @@ class MapGemsController extends Controller
 
     /**
      * Return the Admin detail representation for the given Map Gem profile.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to transform.
-     * @return JsonResponse Map Gem detail JSON response.
      */
     public function show(GameMapGemParamter $gameMapGemParamter): JsonResponse
     {
@@ -76,9 +60,6 @@ class MapGemsController extends Controller
 
     /**
      * Return the current field values for the given Map Gem profile, for populating the edit form.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to populate.
-     * @return JsonResponse Map Gem form-value JSON response.
      */
     public function edit(GameMapGemParamter $gameMapGemParamter): JsonResponse
     {
@@ -87,9 +68,6 @@ class MapGemsController extends Controller
 
     /**
      * Create a new Map Gem profile from the validated request.
-     *
-     * @param  StoreMapGemRequest  $request  Validated Map Gem creation request.
-     * @return JsonResponse Created Map Gem profile JSON response.
      */
     public function store(StoreMapGemRequest $request): JsonResponse
     {
@@ -100,10 +78,6 @@ class MapGemsController extends Controller
 
     /**
      * Update an existing Map Gem profile from the validated request.
-     *
-     * @param  UpdateMapGemRequest  $request  Validated Map Gem update request.
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to update.
-     * @return JsonResponse Updated Map Gem profile JSON response.
      */
     public function update(UpdateMapGemRequest $request, GameMapGemParamter $gameMapGemParamter): JsonResponse
     {
@@ -114,10 +88,6 @@ class MapGemsController extends Controller
 
     /**
      * Roll a new Gem for the given Map Gem profile and return the updated detail state.
-     *
-     * @param  Request  $request  Current authenticated Admin request.
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to roll.
-     * @return JsonResponse Updated Map Gem detail JSON response.
      */
     public function roll(Request $request, GameMapGemParamter $gameMapGemParamter): JsonResponse
     {
@@ -128,9 +98,6 @@ class MapGemsController extends Controller
 
     /**
      * Roll a Gem for every Map Gem profile that does not currently have a rolled Gem.
-     *
-     * @param  Request  $request  Current authenticated Admin request.
-     * @return JsonResponse Bulk roll result JSON response.
      */
     public function rollAll(Request $request): JsonResponse
     {
@@ -141,10 +108,6 @@ class MapGemsController extends Controller
 
     /**
      * Activate an existing historical Gem roll as the given Map Gem profile's active roll.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile whose active roll is changing.
-     * @param  Gem  $gem  Gem roll to activate.
-     * @return JsonResponse Updated Map Gem detail JSON response, or a validation error response.
      */
     public function activateRoll(GameMapGemParamter $gameMapGemParamter, Gem $gem): JsonResponse
     {

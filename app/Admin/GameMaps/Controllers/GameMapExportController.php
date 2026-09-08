@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GameMapExportController extends Controller
 {
-    /**
-     * @param  GameMapExcelService  $gameMapExcelService  Game Map Excel export/import service.
-     */
     public function __construct(
         private readonly GameMapExcelService $gameMapExcelService,
     ) {}
@@ -18,7 +15,6 @@ class GameMapExportController extends Controller
     /**
      * Download the Game Maps settings workbook.
      *
-     * @return BinaryFileResponse Game Maps settings workbook download response.
      *
      * @codeCoverageIgnore
      */

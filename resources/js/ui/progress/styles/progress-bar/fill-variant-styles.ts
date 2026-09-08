@@ -14,5 +14,9 @@ export const fillVariantStyles = (variant: ProgressBarVariant): string => {
       () => 'bg-wisp-pink-500 dark:bg-wisp-pink-300'
     )
     .with(ProgressBarVariant.ARTIC, () => 'bg-glacier-500 dark:bg-glacier-300')
+    .with(
+      ProgressBarVariant.DE_YORK,
+      () => 'bg-de-york-500 dark:bg-de-york-300'
+    )
     .otherwise(() => '');
 };

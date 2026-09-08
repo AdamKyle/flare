@@ -11,14 +11,15 @@ use Illuminate\Http\JsonResponse;
 
 class ManageClassController extends Controller
 {
-    private ManageClassService $manageClassService;
+    public function __construct(
+        private readonly ManageClassService $manageClassService,
+        private readonly AutomationRestrictionService $automationRestrictionService,
+    ) {}
 
-    public function __construct(ManageClassService $manageClassService, private readonly AutomationRestrictionService $automationRestrictionService)
-    {
-        $this->manageClassService = $manageClassService;
-    }
-
-    public function switchClass(Character $character, GameClass $gameClass)
+    /**
+     * Switch the character to the requested Class.
+     */
+    public function switchClass(Character $character, GameClass $gameClass): JsonResponse
     {
         $restriction = $this->automationRestrictionJsonResponse($character);
 
@@ -34,6 +35,9 @@ class ManageClassController extends Controller
         return response()->json($response, $status);
     }
 
+    /**
+     * Build the blocked-automation JSON response for the character, or null when not restricted.
+     */
     private function automationRestrictionJsonResponse(Character $character): ?JsonResponse
     {
         $restriction = $this->automationRestrictionService->blockedContext($character, AutomationRestrictionService::CLASS_RANKS);

@@ -6,12 +6,14 @@ import { MonsterStatSection } from '../../game/components/actions/partials/monst
 import AnnouncementDetails from '../../game/components/announcements/announcement-details';
 import Announcements from '../../game/components/announcements/announcements';
 import CharacterSheet from '../../game/components/character-sheet/character-sheet';
+import ManageClassSpecialtiesScreen from '../../game/components/character-sheet/class-ranks/screens/manage-class-specialties-screen';
 import CharacterAttackTypeBreakdown from '../../game/components/character-sheet/partials/character-attack-details/character-attack-type-breakdown';
 import CharacterStatTypeBreakDown from '../../game/components/character-sheet/partials/character-stat-types/character-stat-type-breakdown';
 import Donations from '../../game/components/donations/dontations';
 import GoblinShopScreen from '../../game/components/goblin-shop/goblin-shop-screen';
 import GuideQuest from '../../game/components/guide-quests/guide-quest';
 import CharacterInventory from '../../game/components/partials/character-inventory';
+import QuestLogScreen from '../../game/components/quests/quest-log-screen';
 import ShopScreen from '../../game/components/shop/shop-screen';
 
 export const appScreenRegistry: {
@@ -28,4 +30,6 @@ export const appScreenRegistry: {
   [Screens.ANNOUNCEMENT_DETAILS]: AnnouncementDetails,
   [Screens.CHARACTER_STAT_DETAILS]: CharacterStatTypeBreakDown,
   [Screens.CHARACTER_ATTACK_DETAILS]: CharacterAttackTypeBreakdown,
+  [Screens.QUEST_LOG]: QuestLogScreen,
+  [Screens.CLASS_SPECIALTIES]: ManageClassSpecialtiesScreen,
 };

@@ -23,17 +23,26 @@ class NpcQuestsHandler
         $this->npcQuestRewardHandler = $npcQuestRewardHandler;
     }
 
+    /**
+     * Return the NPC Quest reward handler.
+     */
     public function questRewardHandler(): NpcQuestRewardHandler
     {
         return $this->npcQuestRewardHandler;
     }
 
+    /**
+     * Handle completion of the NPC Quest for the character.
+     */
     public function handleNpcQuest(Character $character, Quest $quest): void
     {
         $this->consumeQuestRequirements($character, $quest);
         $this->npcQuestRewardHandler->processNonXpRewards($quest, $quest->npc, $character);
     }
 
+    /**
+     * Consume the Quest requirements from the character.
+     */
     public function consumeQuestRequirements(Character $character, Quest $quest): void
     {
         $requiredItem = null;
@@ -84,6 +93,9 @@ class NpcQuestsHandler
         }
     }
 
+    /**
+     * Pay the Quest currency requirements from the character.
+     */
     public function payCurrencies(Character $character, Quest $quest)
     {
         $newGold = $character->gold - $quest->gold_cost;

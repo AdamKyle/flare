@@ -15,13 +15,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 
-/**
- * Reusable factual/detail body for a Location Gem profile, shared by the
- * Admin Show screen and the Admin Location Gem detail SidePeek. Presents
- * identity, the currently active Gem roll, roll history, profile
- * configuration ranges, and the generated Gem World, in that order of
- * importance.
- */
 const LocationGemDetailBody = ({
   location_gem: locationGem,
   on_activate_roll: onActivateRoll,

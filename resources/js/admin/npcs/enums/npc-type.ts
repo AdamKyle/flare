@@ -19,10 +19,6 @@ export const NPC_TYPE_VALUES: NpcType[] = [
   NpcType.SPECIAL_ENCHANTS,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known NPC type, without a forced type assertion at each call site.
- */
 export const isNpcType = (value: string | number): value is NpcType => {
   if (typeof value !== 'number') {
     return false;

@@ -5,20 +5,6 @@ import GameMapRelatedDataEntry, {
   GameMapRelatedDataKey,
 } from '../types/game-map-related-data-entry';
 
-/**
- * Build the factual Game Map "Related Game Data" navigation entries
- * (Locations, NPCs, Monsters, Quests, Quest Items). By default each entry
- * opens its already-registered relationship browser SidePeek through the
- * global emitter, for the standalone Game Map page. When `onOpenRelated` is
- * supplied (the Game Map factual SidePeek/StackedCard context), each entry
- * instead reports its key locally so the caller can push the same
- * relationship browser onto its own stack instead of replacing the global
- * SidePeek. Shared so neither caller duplicates relation metadata.
- *
- * @param  gameMapId       Game Map id to browse related data for.
- * @param  onOpenRelated   Optional local-stack open handler.
- * @return  Ordered Game Map related-data navigation entries.
- */
 export const useGameMapRelatedDataEntries = (
   gameMapId: number,
   onOpenRelated?: (key: GameMapRelatedDataKey) => void

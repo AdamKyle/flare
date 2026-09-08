@@ -10,15 +10,6 @@ import TreeNodeDefinition from 'ui/tree/definitions/tree-node-definition';
 import TreeMobileMode from 'ui/tree/enums/tree-mobile-mode';
 import Tree from 'ui/tree/tree';
 
-/**
- * Shared, permission-neutral Quest tree: a real top-to-bottom hierarchy
- * rendered through the generic shared `Tree`. Mobile presentation defaults
- * to the actual visual Tree; passing `TreeMobileMode.ONLY_WHATS_AVAILABLE`
- * switches mobile to a card list of only currently available Quests (for a
- * future Character adapter), using the presentational `QuestTreeListNode`
- * for that mobile list — the generic Tree itself owns the single
- * interactive activation target for every list item.
- */
 const QuestTree = ({
   quests,
   completed_quest_ids: completedQuestIdsList,

@@ -208,7 +208,7 @@ class CharacterSheetControllerTest extends TestCase
 
     public function test_active_boons_returns_boon_rows(): void
     {
-        $item = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+        $item = $this->createItem(['type' => 'alchemy', 'usable' => true, 'name' => 'Sample Boon Item']);
         $character = $this->character->getCharacter();
         $this->createCharacterBoon([
             'character_id' => $character->id,
@@ -224,6 +224,45 @@ class CharacterSheetControllerTest extends TestCase
 
         $response->assertOk();
         $this->assertCount(1, $response->json('active_boons'));
+
+        $boon = $response->json('active_boons.0');
+
+        $this->assertSame($item->id, $boon['boon_applied']['item_id']);
+        $this->assertSame($item->id, $boon['boon_applied']['id']);
+        $this->assertNull($boon['boon_applied']['slot_id']);
+        $this->assertSame($item->name, $boon['boon_applied']['name']);
+        $this->assertSame(1, $boon['amount_used']);
+        $this->assertArrayHasKey('complete', $boon);
+        $this->assertArrayHasKey('amount_left', $boon);
+    }
+
+    public function test_active_boons_excludes_expired_rows(): void
+    {
+        $item = $this->createItem(['type' => 'alchemy', 'usable' => true]);
+        $character = $this->character->getCharacter();
+        $activeBoon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'last_for_minutes' => 30,
+            'amount_used' => 1,
+            'started' => now(),
+            'complete' => now()->addMinutes(30),
+        ]);
+        $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'last_for_minutes' => 30,
+            'amount_used' => 1,
+            'started' => now()->subHour(),
+            'complete' => now()->subMinutes(5),
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->getJson('/api/character-sheet/'.$character->id.'/active-boons');
+
+        $response->assertOk();
+        $this->assertCount(1, $response->json('active_boons'));
+        $this->assertSame($activeBoon->id, $response->json('active_boons.0.id'));
     }
 
     public function test_active_boons_reports_zero_amount_left_when_character_has_no_alchemy_bag(): void

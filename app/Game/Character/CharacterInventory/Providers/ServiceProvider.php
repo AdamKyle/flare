@@ -5,6 +5,7 @@ namespace App\Game\Character\CharacterInventory\Providers;
 use App\Flare\Pagination\Pagination;
 use App\Flare\Transformers\Serializer\PlainDataSerializer;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
+use App\Game\Character\Builders\AttackBuilders\Services\BuildCharacterAttackTypes;
 use App\Game\Character\CharacterAttack\Transformers\CharacterAttackTransformer;
 use App\Game\Character\CharacterInventory\Builders\EquipManyBuilder;
 use App\Game\Character\CharacterInventory\Services\BatchCraftingSetService;
@@ -94,6 +95,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(CharacterSheetBaseInfoTransformer::class),
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(CharacterInventoryService::class),
+                $app->make(BuildCharacterAttackTypes::class),
             );
         });
 

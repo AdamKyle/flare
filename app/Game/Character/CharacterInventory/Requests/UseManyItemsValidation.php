@@ -7,8 +7,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class UseManyItemsValidation extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     *
      * @return bool
      */
     public function authorize()
@@ -17,17 +15,19 @@ class UseManyItemsValidation extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array
      */
     public function rules()
     {
         return [
-            'items_to_use' => 'required',
+            'items_to_use' => ['required', 'array', 'min:1'],
+            'items_to_use.*' => ['required', 'integer', 'min:1'],
         ];
     }
 
+    /**
+     * @return array
+     */
     public function messages()
     {
         return [

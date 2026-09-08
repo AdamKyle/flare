@@ -8,9 +8,6 @@ class GameMapNpcMarkerTransformer
 {
     /**
      * Transform an Npc into its Game Map editor marker representation.
-     *
-     * @param  Npc  $npc  NPC to transform.
-     * @return array{id: int, real_name: string, type: int, x_position: int, y_position: int} Game Map editor NPC marker representation.
      */
     public function transform(Npc $npc): array
     {

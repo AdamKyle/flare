@@ -4,15 +4,11 @@ namespace App\Admin\ClassMasteries\Transformers;
 
 use App\Flare\Models\GameClass;
 use App\Game\Core\Combat\Values\AttackType;
-use Illuminate\Database\Eloquent\Collection;
 
 class ClassMasteryFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Class Mastery form option data into its Admin API representation.
-     *
-     * @param  array{classes: Collection<int, GameClass>}  $formOptions  Internal Class Mastery form option data.
-     * @return array{classes: array<int,array{id:int,name:string}>, attack_types: array<int,string>} Admin Class Mastery form-options representation.
      */
     public function transform(array $formOptions): array
     {

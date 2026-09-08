@@ -17,7 +17,6 @@ class MonsterExcelService
     /**
      * Download the Monsters workbook.
      *
-     * @return BinaryFileResponse Monsters workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -28,9 +27,6 @@ class MonsterExcelService
 
     /**
      * Import Monsters from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Monsters workbook.
-     * @return array Import result: a success result, or an error result describing the exact validation failure.
      */
     public function import(UploadedFile $file): array
     {

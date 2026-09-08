@@ -14,7 +14,6 @@ class ClassMasteryExcelService
     /**
      * Download the Class Masteries workbook.
      *
-     * @return BinaryFileResponse Class Masteries workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class ClassMasteryExcelService
 
     /**
      * Import Class Masteries from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Class Masteries workbook.
-     * @return void Persists the imported Class Masteries.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
 
 class QuestsController extends Controller
 {
+    /**
+     * Render the completed Quests page for the authenticated character.
+     */
     public function index(Request $request, User $user)
     {
         $character = $user->character;
@@ -45,6 +48,9 @@ class QuestsController extends Controller
         ]);
     }
 
+    /**
+     * Render the requested completed Quest for the authenticated character.
+     */
     public function show(Character $character, QuestsCompleted $questsCompleted)
     {
         abort_unless($questsCompleted->character_id === $character->id, 404);

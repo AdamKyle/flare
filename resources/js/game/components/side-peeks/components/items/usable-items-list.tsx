@@ -2,8 +2,9 @@ import { isEmpty } from 'lodash';
 import React from 'react';
 
 import UsableItemsListProps from './types/usable-items-list-props';
-import UsableItem from './usable-item';
 import BaseUsableItemDefinition from '../../../../api-definitions/items/usable-item-definitions/base-usable-item-definition';
+import UsableAlchemyActionCard from '../../character-inventory/usable-items/components/usable-alchemy-action-card';
+import { resolveAlchemyLegalUseCount } from '../../character-inventory/usable-items/utils/resolve-alchemy-legal-use-count';
 
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 
@@ -11,7 +12,14 @@ const UsableItemsList = ({
   items,
   on_scroll_to_end,
   on_item_clicked,
+  active_boons: activeBoons,
+  using_slot_id: usingSlotId,
+  on_use_one: onUseOne,
+  on_use_quantity: onUseQuantity,
+  on_use_all: onUseAll,
 }: UsableItemsListProps) => {
+  const now = new Date();
+
   const renderUsableItemSlots = () => {
     if (isEmpty(items)) {
       return (
@@ -25,7 +33,16 @@ const UsableItemsList = ({
     }
 
     return items.map((item: BaseUsableItemDefinition) => (
-      <UsableItem key={item.slot_id} item={item} on_click={on_item_clicked} />
+      <UsableAlchemyActionCard
+        key={item.slot_id}
+        item={item}
+        legal_use_count={resolveAlchemyLegalUseCount(item, activeBoons, now)}
+        using_slot_id={usingSlotId}
+        on_click={on_item_clicked}
+        on_use_one={onUseOne}
+        on_use_quantity={onUseQuantity}
+        on_use_all={onUseAll}
+      />
     ));
   };
 

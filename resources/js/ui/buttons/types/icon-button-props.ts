@@ -10,5 +10,7 @@ export default interface IconButtonProps {
   disabled?: boolean;
   additional_css?: string;
   aria_label?: string;
+  aria_busy?: boolean;
   center_content?: boolean;
+  status_indicator?: ReactNode;
 }

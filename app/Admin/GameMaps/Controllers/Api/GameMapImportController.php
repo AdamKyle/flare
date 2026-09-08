@@ -9,20 +9,12 @@ use Illuminate\Http\JsonResponse;
 
 class GameMapImportController extends Controller
 {
-    /**
-     * @param  GameMapExcelService  $gameMapExcelService  Game Map Excel export/import service.
-     */
     public function __construct(
         private readonly GameMapExcelService $gameMapExcelService,
     ) {}
 
     /**
      * Import validated Game Map settings and return the success response.
-     *
-     * @param  GameMapImportRequest  $request  Validated Game Map import request.
-     * @return JsonResponse Import success JSON response.
-     *
-     * @codeCoverageIgnore
      */
     public function __invoke(GameMapImportRequest $request): JsonResponse
     {

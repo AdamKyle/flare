@@ -16,8 +16,6 @@ class StoreItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -26,13 +24,10 @@ class StoreItemRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
         return [
-            // Step 1: Basic / catalog.
             'name' => 'required|string|max:255',
             'type' => ['required', 'string', Rule::enum(ItemCatalogType::class)],
             'description' => 'required|string',
@@ -46,8 +41,6 @@ class StoreItemRequest extends FormRequest
             'gold_bars_cost' => 'nullable|integer|min:0',
             'alchemy_type' => ['nullable', 'string', Rule::enum(AlchemyItemType::class)],
             'specialty_type' => ['nullable', 'string', Rule::enum(ItemSpecialtyType::class)],
-
-            // Step 2: Base combat and attributes.
             'base_damage' => 'nullable|integer|min:0',
             'base_ac' => 'nullable|integer|min:0',
             'base_healing' => 'nullable|integer|min:0',
@@ -65,8 +58,6 @@ class StoreItemRequest extends FormRequest
             'ambush_resistance' => 'nullable|numeric|min:0',
             'counter_chance' => 'nullable|numeric|min:0',
             'counter_resistance' => 'nullable|numeric|min:0',
-
-            // Step 3: Quest / special effects.
             'effect' => ['nullable', 'string', Rule::enum(ItemEffectType::class)],
             'drop_location_id' => 'nullable|integer|exists:locations,id',
             'unlocks_class_id' => 'nullable|integer|exists:game_classes,id',
@@ -86,15 +77,11 @@ class StoreItemRequest extends FormRequest
             'affix_damage_reduction' => 'nullable|numeric|min:0',
             'devouring_light' => 'nullable|numeric|min:0',
             'devouring_darkness' => 'nullable|numeric|min:0',
-
-            // Step 4: Crafting.
             'can_craft' => 'required|boolean',
             'craft_only' => 'required|boolean',
             'crafting_type' => ['nullable', 'string', Rule::enum(ItemCraftingType::class)],
             'skill_level_required' => 'nullable|integer|min:0',
             'skill_level_trivial' => 'nullable|integer|min:0',
-
-            // Step 5: Usable / alchemy / boon behavior.
             'usable' => 'required|boolean',
             'can_stack' => 'required|boolean',
             'lasts_for' => 'nullable|integer|min:0',
@@ -113,8 +100,6 @@ class StoreItemRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
-     *
-     * @return array<string,string>
      */
     public function messages(): array
     {
@@ -131,8 +116,6 @@ class StoreItemRequest extends FormRequest
 
     /**
      * Normalize present boolean fields before validation.
-     *
-     * @return void Merges normalized boolean values into the request input.
      */
     protected function prepareForValidation(): void
     {

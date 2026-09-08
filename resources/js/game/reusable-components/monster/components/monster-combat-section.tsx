@@ -6,7 +6,6 @@ import {
 } from '../../../util/format-number';
 import MonsterDetailProps from '../types/monster-detail-props';
 
-import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
@@ -46,7 +45,7 @@ const MonsterCombatSection = ({ monster }: MonsterDetailProps): ReactNode => {
   }
 
   return (
-    <Card>
+    <div>
       <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
         Core Combat
       </h2>
@@ -64,7 +63,7 @@ const MonsterCombatSection = ({ monster }: MonsterDetailProps): ReactNode => {
           </React.Fragment>
         ))}
       </Dl>
-    </Card>
+    </div>
   );
 };
 

@@ -12,9 +12,6 @@ class GameMapDetailTransformer
 {
     /**
      * Transform the supplied internal Game Map detail data into its Admin detail representation.
-     *
-     * @param  array{game_map: GameMap, required_item: Item|null, required_quest: Quest|null, required_location: Location|null}  $detailData  Internal Game Map detail data.
-     * @return array{id: int, name: string, map_url: string, tiles: array<int, array<int, string>>, description: string|null, kingdom_color: string, default: bool, can_traverse: bool, event_restriction: int|null, xp_bonus: float|null, skill_training_bonus: float|null, drop_chance_bonus: float|null, enemy_stat_bonus: float|null, character_attack_reduction: float|null, required_location: array{id: int, name: string}|null, required_quest_item: array{id: int, name: string, quest: array{id: int, name: string}|null}|null} Admin Game Map detail representation.
      */
     public function transform(array $detailData): array
     {
@@ -52,9 +49,6 @@ class GameMapDetailTransformer
 
     /**
      * Transform the required Location into display data.
-     *
-     * @param  Location|null  $requiredLocation  Game Map's required access Location, when one is set.
-     * @return array{id: int, name: string}|null Compact Location identity.
      */
     private function transformRequiredLocation(?Location $requiredLocation): ?array
     {
@@ -70,10 +64,6 @@ class GameMapDetailTransformer
 
     /**
      * Transform the Game Map's required quest Item and its acquisition Quest, when present.
-     *
-     * @param  Item|null  $requiredItem  Required Game Map access Item.
-     * @param  Quest|null  $requiredQuest  Quest that rewards the required Item.
-     * @return array{id: int, name: string, quest: array{id: int, name: string}|null}|null Required Item representation.
      */
     private function transformRequiredQuestItem(?Item $requiredItem, ?Quest $requiredQuest): ?array
     {
@@ -90,9 +80,6 @@ class GameMapDetailTransformer
 
     /**
      * Transform the Quest that grants the required quest Item, when one exists.
-     *
-     * @param  Quest|null  $requiredQuest  Quest that rewards the required Item.
-     * @return array{id: int, name: string}|null Required Quest representation.
      */
     private function transformRequiredQuest(?Quest $requiredQuest): ?array
     {

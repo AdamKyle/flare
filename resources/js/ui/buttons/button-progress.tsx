@@ -33,9 +33,11 @@ const ProgressButton = (props: ProgressButtonProps): ReactNode => {
       style={{ position: 'relative' }}
     >
       <span className="relative z-10">{props.label}</span>
-      <span className="sr-only" role="status" aria-live="polite">
-        {props.label}
-      </span>
+      {(props.announce_progress ?? true) && (
+        <span className="sr-only" role="status" aria-live="polite">
+          {props.label}
+        </span>
+      )}
       <div className="absolute bottom-0 left-0 h-full w-full rounded-lg bg-white/20">
         <div
           className={clsx(

@@ -10,8 +10,6 @@ class NpcsImport implements Import, WithMultipleSheets
 {
     /**
      * Return the sheets included in the NPCs workbook.
-     *
-     * @return array<int, NpcsSheet> NPCs workbook sheets.
      */
     public function sheets(): array
     {

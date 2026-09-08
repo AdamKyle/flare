@@ -13,7 +13,9 @@ const IconButton = ({
   disabled,
   additional_css,
   aria_label,
+  aria_busy,
   center_content,
+  status_indicator,
 }: IconButtonProps) => {
   const hasIcon = Boolean(icon);
 
@@ -51,6 +53,7 @@ const IconButton = ({
       <div className={contentClassName}>
         {renderIcon()}
         {renderLabel()}
+        {status_indicator}
       </div>
     );
   };
@@ -66,6 +69,7 @@ const IconButton = ({
       )}
       aria-label={aria_label || label || 'Icon Button'}
       disabled={disabled}
+      aria-busy={aria_busy}
       role="button"
       type="button"
     >

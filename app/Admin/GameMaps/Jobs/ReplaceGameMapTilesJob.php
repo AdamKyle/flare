@@ -16,11 +16,6 @@ class ReplaceGameMapTilesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @param  int  $gameMapId  Persisted Game Map identifier.
-     * @param  string  $previousName  Game Map name before source replacement.
-     * @param  string  $previousPath  Source-image path before replacement.
-     */
     public function __construct(
         public readonly int $gameMapId,
         public readonly string $previousName,
@@ -29,10 +24,6 @@ class ReplaceGameMapTilesJob implements ShouldQueue
 
     /**
      * Generate and promote replacement tiles for the persisted Game Map.
-     *
-     * @param  GameMapService  $gameMapService  Canonical Game Map application service.
-     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile generation service.
-     * @return void Persists the promoted replacement tile set on the Game Map.
      */
     public function handle(
         GameMapService $gameMapService,

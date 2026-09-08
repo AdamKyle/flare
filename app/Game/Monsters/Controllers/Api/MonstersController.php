@@ -14,6 +14,9 @@ class MonstersController extends Controller
 {
     public function __construct(private readonly MonsterListService $monsterListService, private readonly MonsterStatsService $monsterStatsService) {}
 
+    /**
+     * Return the Monster list for the current game context.
+     */
     public function listMonsters(Character $character): JsonResponse
     {
         $response = $this->monsterListService->getMonstersForCharacter($character);
@@ -25,6 +28,9 @@ class MonstersController extends Controller
     }
 
     /**
+     * Return the selected Monster stats for the Character.
+     *
+     *
      * @throws InvalidArgumentException
      */
     public function getMonsterStats(Monster $monster, Character $character): JsonResponse

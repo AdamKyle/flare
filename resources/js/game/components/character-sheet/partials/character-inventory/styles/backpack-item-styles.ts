@@ -84,58 +84,60 @@ export const backpackButtonBackground = (item: BaseItemDetails) => {
     .with(
       { is_cosmic: true },
       () =>
-        'bg-cosmic-colors-200 dark:bg-cosmic-colors-100 hover:bg-cosmic-colors-300 dark:hover:bg-cosmic-colors-200'
+        'bg-cosmic-colors-200 hover:bg-cosmic-colors-300 dark:bg-cosmic-colors-950/60 dark:hover:bg-cosmic-colors-900/70'
     )
     .with(
       { is_mythic: true },
       () =>
-        'bg-amber-200 dark:bg-amber-100 hover:bg-amber-300 dark:hover:bg-amber-200'
+        'bg-amber-200 hover:bg-amber-300 dark:bg-amber-950/55 dark:hover:bg-amber-900/65'
     )
     .with(
       { is_unique: true },
       () =>
-        'bg-green-200 dark:bg-green-100 hover:bg-green-300 dark:hover:bg-green-200'
+        'bg-green-200 hover:bg-green-300 dark:bg-green-950/55 dark:hover:bg-green-900/65'
     )
     .when(
       (item) => item.holy_stacks_applied > 0,
-      () => 'bg-sky-200 dark:bg-sky-100 hover:bg-sky-300 dark:hover:bg-sky-200'
+      () =>
+        'bg-sky-200 hover:bg-sky-300 dark:bg-sky-950/55 dark:hover:bg-sky-900/65'
     )
 
     .with(
       { affix_count: 1 },
       () =>
-        'bg-blue-200 dark:bg-blue-100 hover:bg-blue-300 dark:hover:bg-blue-200'
+        'bg-blue-200 hover:bg-blue-300 dark:bg-blue-950/55 dark:hover:bg-blue-900/65'
     )
     .with(
       { affix_count: 2 },
       () =>
-        'bg-fuchsia-200 dark:bg-fuchsia-100 hover:bg-fuchsia-300 dark:hover:bg-fuchsia-200'
+        'bg-fuchsia-200 hover:bg-fuchsia-300 dark:bg-fuchsia-950/55 dark:hover:bg-fuchsia-900/65'
     )
 
     .with(
       { type: InventoryItemTypes.TRINKET },
-      () => 'bg-red-200 dark:bg-red-100 hover:bg-red-300 dark:hover:bg-red-200'
+      () =>
+        'bg-red-200 hover:bg-red-300 dark:bg-red-950/55 dark:hover:bg-red-900/65'
     )
     .with(
       { type: InventoryItemTypes.ARTIFACT },
       () =>
-        'bg-artifact-colors-200 dark:bg-artifact-colors-100 hover:bg-artifact-colors-300 dark:hover:bg-artifact-colors-200'
+        'bg-artifact-colors-200 hover:bg-artifact-colors-300 dark:bg-artifact-colors-950/60 dark:hover:bg-artifact-colors-900/70'
     )
     .with(
       { type: InventoryItemTypes.QUEST },
       () =>
-        'bg-marigold-200 dark:bg-marigold-100 hover:bg-marigold-300 dark:hover:bg-marigold-200'
+        'bg-marigold-200 hover:bg-marigold-300 dark:bg-marigold-950/55 dark:hover:bg-marigold-900/65'
     )
 
     .when(
       (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
       () =>
-        'bg-wisp-pink-200 dark:bg-wisp-pink-100 hover:bg-wisp-pink-300 dark:hover:bg-wisp-pink-200'
+        'bg-wisp-pink-200 hover:bg-wisp-pink-300 dark:bg-wisp-pink-950/55 dark:hover:bg-wisp-pink-900/65'
     )
     .otherwise(
       () =>
-        'bg-gray-200 dark:bg-gray-200 hover:bg-gray-300 dark:bg-gray-100 dark:hover:bg-gray-300'
+        'bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700'
     );
 };
 
@@ -145,30 +147,30 @@ export const backpackItemTextColors = (
   return match(item)
     .with(
       { is_cosmic: true },
-      () => 'text-cosmic-colors-700 dark:text-cosmic-colors-600'
+      () => 'text-cosmic-colors-700 dark:text-cosmic-colors-200'
     )
-    .with({ is_mythic: true }, () => 'text-amber-600 dark:text-amber-700')
-    .with({ is_unique: true }, () => 'text-green-700 dark:text-green-600')
+    .with({ is_mythic: true }, () => 'text-amber-600 dark:text-amber-200')
+    .with({ is_unique: true }, () => 'text-green-700 dark:text-green-200')
     .when(
       (item) => item.holy_stacks_applied > 0,
-      () => 'text-sky-700 dark:text-sky-700'
+      () => 'text-sky-700 dark:text-sky-200'
     )
-    .with({ affix_count: 1 }, () => 'text-blue-500')
-    .with({ affix_count: 2 }, () => 'text-fuchsia-800 dark:text-fuchsia-600')
+    .with({ affix_count: 1 }, () => 'text-blue-500 dark:text-blue-200')
+    .with({ affix_count: 2 }, () => 'text-fuchsia-800 dark:text-fuchsia-200')
 
-    .with({ type: 'trinket' }, () => 'text-red-700 dark:text-red-500')
+    .with({ type: 'trinket' }, () => 'text-red-700 dark:text-red-200')
     .with(
       { type: 'artifact' },
-      () => 'text-artifact-colors-800 dark:text-artifact-colors-800'
+      () => 'text-artifact-colors-800 dark:text-artifact-colors-200'
     )
-    .with({ type: 'quest' }, () => 'text-marigold-800 dark:text-marigold-700')
+    .with({ type: 'quest' }, () => 'text-marigold-800 dark:text-marigold-200')
 
     .when(
       (item) =>
         item.usable || (item.holy_level ?? 0) > 0 || item.damages_kingdoms,
-      () => 'text-wisp-pink-700 dark:text-wisp-pink-600'
+      () => 'text-wisp-pink-700 dark:text-wisp-pink-200'
     )
-    .otherwise(() => 'text-gray-600 dark:text-gray-700');
+    .otherwise(() => 'text-gray-600 dark:text-gray-200');
 };
 
 export const planeTextItemColors = (

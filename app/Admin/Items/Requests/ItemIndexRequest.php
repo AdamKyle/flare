@@ -11,8 +11,6 @@ class ItemIndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -21,8 +19,6 @@ class ItemIndexRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -39,8 +35,6 @@ class ItemIndexRequest extends FormRequest
 
     /**
      * Apply the Items list defaults before validation runs.
-     *
-     * @return void Merges default list parameters into the request input.
      */
     protected function prepareForValidation(): void
     {
@@ -57,9 +51,6 @@ class ItemIndexRequest extends FormRequest
 
     /**
      * Configure the validator instance to enforce profile-scoped sort keys.
-     *
-     * @param  Validator  $validator  Validator instance to configure.
-     * @return void Registers the profile-scoped sort-key validation callback.
      */
     public function withValidator(Validator $validator): void
     {
@@ -71,8 +62,6 @@ class ItemIndexRequest extends FormRequest
 
     /**
      * Reject a sort key that is not allowed for the requested Item profile.
-     *
-     * @param  Validator  $validator  Validator instance to add errors to.
      */
     private function validateSortKey(Validator $validator): void
     {
@@ -89,11 +78,7 @@ class ItemIndexRequest extends FormRequest
     }
 
     /**
-     * Reject a subtype that is not a valid `items.type` value for the
-     * requested Item profile, and reject any subtype for a profile that
-     * does not support secondary subtype filtering.
-     *
-     * @param  Validator  $validator  Validator instance to add errors to.
+     * Validate the requested Item subtype against the selected Item profile.
      */
     private function validateSubtype(Validator $validator): void
     {

@@ -13,8 +13,6 @@ class MonstersExport implements Export, WithMultipleSheets
 
     /**
      * Return the sheets included in the Monsters workbook.
-     *
-     * @return array<int, MonstersSheet> Monsters workbook sheets.
      */
     public function sheets(): array
     {

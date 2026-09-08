@@ -9,20 +9,12 @@ use Illuminate\Http\JsonResponse;
 
 class LocationImportController extends Controller
 {
-    /**
-     * @param  LocationExcelService  $locationExcelService  Location Excel export/import service.
-     */
     public function __construct(
         private readonly LocationExcelService $locationExcelService,
     ) {}
 
     /**
      * Import validated Locations and return the success response.
-     *
-     * @param  LocationImportRequest  $request  Validated Location import request.
-     * @return JsonResponse Import success JSON response.
-     *
-     * @codeCoverageIgnore
      */
     public function __invoke(LocationImportRequest $request): JsonResponse
     {

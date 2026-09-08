@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
+import { ProgressBarSize } from './enums/progress-bar-size';
 import {
   baseFillStyles,
   baseTrackStyles,
@@ -10,6 +11,7 @@ import { trackVariantStyles } from './styles/progress-bar/track-variant-styles';
 import ProgressBarProps from './types/progress-bar-props';
 
 const ProgressBar = (props: ProgressBarProps): ReactNode => {
+  const size = props.size ?? ProgressBarSize.DEFAULT;
   const clampedMax = props.max > 0 ? props.max : 1;
   const clampedValue = Math.min(Math.max(props.value, 0), clampedMax);
   const percentage = Math.min(
@@ -34,7 +36,10 @@ const ProgressBar = (props: ProgressBarProps): ReactNode => {
         aria-valuenow={clampedValue}
         aria-label={props.aria_label}
         aria-labelledby={props.aria_label ? undefined : labelId}
-        className={clsx(baseTrackStyles(), trackVariantStyles(props.variant))}
+        className={clsx(
+          baseTrackStyles(size),
+          trackVariantStyles(props.variant)
+        )}
       >
         <div
           className={clsx(baseFillStyles(), fillVariantStyles(props.variant))}

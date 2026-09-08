@@ -9,9 +9,6 @@ class GameMapFormTransformer
 {
     /**
      * Transform a Game Map into its Admin save-response representation.
-     *
-     * @param  GameMap  $gameMap  Game Map to transform.
-     * @return array{id: int, name: string, description: string|null, map_url: string, kingdom_color: string, default: bool, can_traverse: bool, only_during_event_type: int|null, xp_bonus: int|float, skill_training_bonus: int|float, drop_chance_bonus: int|float, enemy_stat_bonus: int|float, character_attack_reduction: int|float, required_location_id: int|null} Admin Game Map form-value representation.
      */
     public function transform(GameMap $gameMap): array
     {

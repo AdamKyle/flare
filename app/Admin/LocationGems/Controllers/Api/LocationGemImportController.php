@@ -9,20 +9,12 @@ use Illuminate\Http\JsonResponse;
 
 class LocationGemImportController extends Controller
 {
-    /**
-     * @param  LocationGemExcelService  $locationGemExcelService  Location Gem Excel export/import service.
-     */
     public function __construct(
         private readonly LocationGemExcelService $locationGemExcelService,
     ) {}
 
     /**
      * Import validated Location Gem profiles and return the success response.
-     *
-     * @param  LocationGemImportRequest  $request  Validated Location Gem import request.
-     * @return JsonResponse Import success JSON response.
-     *
-     * @codeCoverageIgnore
      */
     public function __invoke(LocationGemImportRequest $request): JsonResponse
     {

@@ -5,9 +5,6 @@ import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-def
 import GameMapFormOptionsDefinition from '../definitions/game-map-form-options-definition';
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 
-/**
- * Validate every Game Map wizard step and merge the combined field errors.
- */
 export const validateAllGameMapSteps = (
   state: GameMapFormStateDefinition,
   is_create: boolean,

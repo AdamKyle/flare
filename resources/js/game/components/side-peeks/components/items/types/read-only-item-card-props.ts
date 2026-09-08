@@ -9,5 +9,5 @@ export default interface ReadOnlyItemCardProps {
   usable: boolean;
   ownership_state?: QuestItemOwnershipState;
   density?: ReadOnlyItemCardDensity;
-  on_click: (item_id: number) => void;
+  on_click?: (item_id: number) => void;
 }

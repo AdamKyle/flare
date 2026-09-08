@@ -10,8 +10,6 @@ class ItemExportRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -20,8 +18,6 @@ class ItemExportRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -32,8 +28,6 @@ class ItemExportRequest extends FormRequest
 
     /**
      * Apply the Items export default profile before validation runs.
-     *
-     * @return void Merges the default export profile into the request input.
      */
     protected function prepareForValidation(): void
     {
@@ -44,8 +38,6 @@ class ItemExportRequest extends FormRequest
 
     /**
      * Resolve the validated Item export profile.
-     *
-     * @return ItemProfile Requested catalog Item export profile.
      */
     public function profile(): ItemProfile
     {

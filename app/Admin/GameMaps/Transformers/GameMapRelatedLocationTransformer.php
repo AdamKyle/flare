@@ -9,9 +9,6 @@ class GameMapRelatedLocationTransformer extends TransformerAbstract
 {
     /**
      * Transform a Location into its compact Game Map relationship representation.
-     *
-     * @param  Location  $location  Location to transform.
-     * @return array{id: int, name: string, type: int|null, x: int, y: int} Compact Location relationship representation.
      */
     public function transform(Location $location): array
     {

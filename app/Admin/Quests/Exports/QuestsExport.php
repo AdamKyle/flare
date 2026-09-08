@@ -13,8 +13,6 @@ class QuestsExport implements Export, WithMultipleSheets
 
     /**
      * Return the sheets included in the Quests workbook.
-     *
-     * @return array<int, QuestsSheet> Quests workbook sheets.
      */
     public function sheets(): array
     {

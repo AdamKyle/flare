@@ -28,16 +28,12 @@ use App\Flare\Models\Raid;
 use App\Flare\Models\SetSlot;
 use App\Game\Core\Items\Values\ItemCatalogType;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ItemService
 {
     /**
      * Paginate the catalog Items list for the validated Admin index request.
-     *
-     * @param  ItemIndexRequest  $request  Validated Item list request.
-     * @return LengthAwarePaginator Paginated catalog Item records.
      */
     public function paginate(ItemIndexRequest $request): LengthAwarePaginator
     {
@@ -80,8 +76,6 @@ class ItemService
 
     /**
      * Build the internal Admin form option data for Item management.
-     *
-     * @return array{item_skills: Collection<int, ItemSkill>, locations: Collection<int, Location>, classes: Collection<int, GameClass>} Internal Item form option data.
      */
     public function formOptions(): array
     {
@@ -94,9 +88,6 @@ class ItemService
 
     /**
      * Create a new catalog Item from the validated form data.
-     *
-     * @param  StoreItemRequest  $request  Validated Item creation request.
-     * @return Item Created Item.
      */
     public function create(StoreItemRequest $request): Item
     {
@@ -105,10 +96,6 @@ class ItemService
 
     /**
      * Update an existing catalog Item from the validated form data.
-     *
-     * @param  Item  $item  Item to update.
-     * @param  UpdateItemRequest  $request  Validated Item update request.
-     * @return Item Updated Item.
      */
     public function update(Item $item, UpdateItemRequest $request): Item
     {
@@ -119,12 +106,6 @@ class ItemService
 
     /**
      * Apply the current 2.0 cross-field catalog normalization rules to validated Item data.
-     *
-     * Shared by the Store/Update form path and the Item import Sheet so both mutation paths apply
-     * the exact same cross-field business rules.
-     *
-     * @param  array<string, mixed>  $data  Validated Item form data.
-     * @return array<string, mixed> Normalized Item attributes.
      */
     public function normalize(array $data): array
     {
@@ -176,13 +157,6 @@ class ItemService
 
     /**
      * Determine whether the given catalog Item can be safely deleted.
-     *
-     * Built from the same structured blocker categories as `usage()` so
-     * the deletion preflight and the read-only usage report can never
-     * disagree about what currently references the Item.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{deletable: bool, blockers: array<int, string>} Deletion safety result.
      */
     public function deletionBlockers(Item $item): array
     {
@@ -196,12 +170,7 @@ class ItemService
     }
 
     /**
-     * Build the read-only Item deletion-impact usage report: which blocker
-     * categories currently reference the Item, their counts, and useful
-     * low-volume related entity identities where a stable identity exists.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{deletable: bool, total_blocker_categories: int, blockers: array<int, array{key: string, label: string, count: int, related_entities?: array<int, array{id: int, name: string, resource: string}>}>} Usage report.
+     * Build the read-only Item deletion-impact report.
      */
     public function usage(Item $item): array
     {
@@ -217,9 +186,6 @@ class ItemService
 
     /**
      * Delete the given catalog Item after confirming it has no dependencies.
-     *
-     * @param  Item  $item  Item to delete.
-     * @return array{deletable: bool, blockers: array<int, string>} Deletion result; the Item is deleted only when safe.
      */
     public function delete(Item $item): array
     {
@@ -233,15 +199,7 @@ class ItemService
     }
 
     /**
-     * Build every deletion-blocker category for the given Item, each with
-     * its key, human-facing label, current count, and, for low-volume
-     * relationships with a stable factual identity, the related entities
-     * themselves. High-volume Character-owned relationships expose counts
-     * only. This is the single structured source both `deletionBlockers()`
-     * and `usage()` consume so they can never diverge.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array<int, array{key: string, label: string, count: int, related_entities?: array<int, array{id: int, name: string, resource: string}>}> Blocker categories.
+     * Build the Item deletion-blocker categories used by deletion checks and usage reporting.
      */
     private function blockerCategories(Item $item): array
     {
@@ -270,11 +228,6 @@ class ItemService
 
     /**
      * Build a count-only blocker category with no related entity identities.
-     *
-     * @param  string  $key  Blocker category key.
-     * @param  string  $label  Human-facing blocker label.
-     * @param  int  $count  Current reference count.
-     * @return array{key: string, label: string, count: int} Count-only blocker category.
      */
     private function countCategory(string $key, string $label, int $count): array
     {
@@ -286,11 +239,7 @@ class ItemService
     }
 
     /**
-     * Build the Quest blocker category, including the referencing Quests'
-     * stable factual identities.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Quest blocker category.
+     * Build the Quest blocker category, including the referencing Quests' stable factual identities.
      */
     private function questBlockerCategory(Item $item): array
     {
@@ -313,11 +262,7 @@ class ItemService
     }
 
     /**
-     * Build the Location blocker category, including the referencing
-     * Locations' stable factual identities.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Location blocker category.
+     * Build the Location blocker category, including the referencing Locations' stable factual identities.
      */
     private function locationBlockerCategory(Item $item): array
     {
@@ -339,11 +284,7 @@ class ItemService
     }
 
     /**
-     * Build the Monster blocker category, including the referencing
-     * Monsters' stable factual identities.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Monster blocker category.
+     * Build the Monster blocker category, including the referencing Monsters' stable factual identities.
      */
     private function monsterBlockerCategory(Item $item): array
     {
@@ -362,11 +303,7 @@ class ItemService
     }
 
     /**
-     * Build the Raid blocker category, including the referencing Raids'
-     * stable factual identities.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Raid blocker category.
+     * Build the Raid blocker category, including the referencing Raids' stable factual identities.
      */
     private function raidBlockerCategory(Item $item): array
     {
@@ -385,11 +322,7 @@ class ItemService
     }
 
     /**
-     * Build the Guide Quest blocker category, including the referencing
-     * Guide Quests' stable factual identities.
-     *
-     * @param  Item  $item  Item to audit.
-     * @return array{key: string, label: string, count: int, related_entities: array<int, array{id: int, name: string, resource: string}>} Guide Quest blocker category.
+     * Build the Guide Quest blocker category, including the referencing Guide Quests' stable factual identities.
      */
     private function guideQuestBlockerCategory(Item $item): array
     {
@@ -412,8 +345,6 @@ class ItemService
 
     /**
      * Build the base catalog query, excluding generated/affixed Item instances.
-     *
-     * @return Builder Query scoped to base catalog Items only.
      */
     private function catalogQuery(): Builder
     {

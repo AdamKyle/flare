@@ -10,15 +10,6 @@ import {
 } from '../styles/location-card-styles';
 import LocationCardProps from '../types/location-card-props';
 
-/**
- * Canonical, permission-neutral Emerald Location relationship card: showing
- * Location name, optional Type label, coordinates when both X and Y are
- * available, and an optional Game Map name. Renders as a single full-width
- * interactive `button` when `on_open_location` is supplied, or as a
- * semantically meaningful noninteractive `<article>` when no navigation
- * callback is supplied, for permission-neutral factual contexts with no
- * navigation available — matching the canonical `QuestCard` pattern.
- */
 const LocationCard = ({
   location_id: locationId,
   name,

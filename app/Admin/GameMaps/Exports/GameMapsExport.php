@@ -13,8 +13,6 @@ class GameMapsExport implements Export, WithMultipleSheets
 
     /**
      * Return the sheets included in the Game Maps workbook.
-     *
-     * @return array<int, GameMapsSheet>
      */
     public function sheets(): array
     {

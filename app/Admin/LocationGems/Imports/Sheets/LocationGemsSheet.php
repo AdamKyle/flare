@@ -14,13 +14,6 @@ class LocationGemsSheet implements ToCollection
 {
     /**
      * Import Location Gem profile rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized and validated first; the workbook is written only when
-     * every meaningful row resolves successfully, so an invalid later row cannot leave an earlier
-     * row's write applied.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Location Gem profiles are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -41,9 +34,6 @@ class LocationGemsSheet implements ToCollection
 
     /**
      * Normalize and validate every meaningful Location Gem profile row before any row is written.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>> Validated Location Gem profile payloads.
      */
     private function normalizeAndValidateRows(Collection $rows): array
     {
@@ -70,13 +60,7 @@ class LocationGemsSheet implements ToCollection
     }
 
     /**
-     * Normalize a single raw Location Gem profile row, resolving its Map/Location, crafting
-     * Skills, and atonement.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @param  string  $name  Resolved profile name.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return array<string, mixed> Normalized Location Gem profile attributes.
+     * Normalize a single raw Location Gem profile row, resolving its Map/Location, crafting Skills, and atonement.
      */
     private function normalizeRow(array $rawRow, string $name, int $rowNumber): array
     {
@@ -132,16 +116,7 @@ class LocationGemsSheet implements ToCollection
     }
 
     /**
-     * Resolve an optional Gem range cell, requiring the exact CRUD nonnegative range syntax
-     * when populated: two nonnegative numeric values separated by exactly one hyphen. A
-     * zero-only numeric/string scalar (for example 0, "0", or "0.00") or a zero-only range
-     * (for example "0-0") normalizes to null because it represents no effect, not a range to
-     * roll.
-     *
-     * @param  mixed  $value  Raw spreadsheet range cell value.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @param  string  $column  Spreadsheet column name.
-     * @return string|null Validated range string, or null when absent/zero-only.
+     * Resolve an optional Location Gem range cell using the CRUD range contract.
      */
     private function resolveRange(mixed $value, int $rowNumber, string $column): ?string
     {
@@ -173,11 +148,7 @@ class LocationGemsSheet implements ToCollection
     }
 
     /**
-     * Determine whether a scalar string represents only zero, such as "0", "0.0", or "0.00",
-     * with no other digits.
-     *
-     * @param  string  $value  Scalar string to check.
-     * @return bool Whether the value is a zero-only representation.
+     * Determine whether a scalar string represents only zero, such as "0", "0.0", or "0.00", with no other digits.
      */
     private function isZeroOnlyScalar(string $value): bool
     {
@@ -186,12 +157,6 @@ class LocationGemsSheet implements ToCollection
 
     /**
      * Resolve a required text cell, optionally treating a blank cell as the end of the workbook.
-     *
-     * @param  mixed  $value  Raw spreadsheet cell value.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @param  string  $column  Spreadsheet column name.
-     * @param  bool  $allowEndOfWorkbook  Whether a blank cell should return null instead of failing.
-     * @return string|null Trimmed required string, or null when the workbook has no more data.
      */
     private function resolveRequiredString(mixed $value, int $rowNumber, string $column, bool $allowEndOfWorkbook = false): ?string
     {
@@ -222,11 +187,6 @@ class LocationGemsSheet implements ToCollection
 
     /**
      * Resolve an optional text cell.
-     *
-     * @param  mixed  $value  Raw spreadsheet cell value.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @param  string  $column  Spreadsheet column name.
-     * @return string|null Trimmed optional string, or null when absent.
      */
     private function resolveNullableString(mixed $value, int $rowNumber, string $column): ?string
     {
@@ -243,10 +203,6 @@ class LocationGemsSheet implements ToCollection
 
     /**
      * Resolve a comma-separated crafting Skill name list into Skill ids.
-     *
-     * @param  mixed  $craftingSkillNames  Comma-separated crafting Skill names.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return array<int, int> Resolved crafting Skill ids.
      */
     private function resolveCraftingSkillIds(mixed $craftingSkillNames, int $rowNumber): array
     {
@@ -274,10 +230,6 @@ class LocationGemsSheet implements ToCollection
 
     /**
      * Resolve a monster atonement Gem type label into its integer value.
-     *
-     * @param  mixed  $atonementLabel  Monster atonement Gem type label.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return int|null Resolved Gem type value, or null when no atonement was given.
      */
     private function resolveAtonement(mixed $atonementLabel, int $rowNumber): ?int
     {

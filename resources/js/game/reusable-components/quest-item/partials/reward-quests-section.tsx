@@ -5,10 +5,6 @@ import QuestCard from '../../quest/components/quest-card';
 import RewardQuestsSectionProps from '../types/partials/reward-quest-section-props';
 import { QuestIdentityDefinition } from '../types/quest-item-factual-definition';
 
-/**
- * Build the canonical "Rewarded by quest" context label, including the
- * factual Map name when the Quest identity carries one.
- */
 const buildRewardedByContextLabel = (quest: QuestIdentityDefinition): string =>
   quest.game_map
     ? `Rewarded by quest on ${quest.game_map.name}`

@@ -8,12 +8,7 @@ use App\Flare\Models\Gem;
 class AdminGemRollTransformer
 {
     /**
-     * Transform one concrete Gem roll into its Admin HTTP representation, including whether it
-     * is the profile's currently active roll.
-     *
-     * @param  Gem  $gem  Gem roll to transform.
-     * @param  bool  $isActive  Whether this Gem is the profile's currently active roll.
-     * @return array<string, mixed> Admin Gem roll representation.
+     * Transform a Gem roll into its Admin HTTP representation.
      */
     public function transform(Gem $gem, bool $isActive): array
     {
@@ -59,9 +54,6 @@ class AdminGemRollTransformer
 
     /**
      * Transform the Gem roll's crafting Skills into their compact identity representation.
-     *
-     * @param  Gem  $gem  Gem roll to describe.
-     * @return array<int, array{id: int, name: string}> Rolled crafting Skills.
      */
     private function transformCraftingSkills(Gem $gem): array
     {

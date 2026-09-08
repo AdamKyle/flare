@@ -10,6 +10,7 @@ import React, {
 
 import StackedCardLayerContextDefinition from 'ui/cards/context/definitions/stacked-card-layer-context-definition';
 import StackedCardLayerContext from 'ui/cards/context/stacked-card-layer-context';
+import Separator from 'ui/separator/separator';
 import { useSidePeekAccessibility } from 'ui/side-peek/hooks/use-side-peek-accessibility';
 import { sidePeekPanelWidthStyles } from 'ui/side-peek/styles/side-peek-panel-styles';
 import SidePeekProps from 'ui/side-peek/types/side-peek-props';
@@ -110,7 +111,7 @@ const SidePeek = (props: SidePeekProps) => {
             aria-hidden={isBaseCovered}
             className="flex h-full min-h-0 w-full flex-col"
           >
-            <div className="flex items-center justify-between border-b p-4 dark:border-gray-700">
+            <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -133,7 +134,14 @@ const SidePeek = (props: SidePeekProps) => {
               </div>
             </div>
 
-            <div className="min-h-0 flex-1">{props.children}</div>
+            <Separator additional_css="my-0" />
+
+            <div className="min-h-0 flex-1 overflow-hidden">
+              {props.children}
+            </div>
+
+            {props.footer && <Separator additional_css="my-0" />}
+            {props.footer}
           </div>
 
           <div

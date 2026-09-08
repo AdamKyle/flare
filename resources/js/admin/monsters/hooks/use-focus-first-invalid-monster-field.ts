@@ -5,13 +5,6 @@ import { useMonsterFieldFocus } from './use-monster-field-focus';
 import MonsterFormErrorsDefinition from '../definitions/monster-form-errors-definition';
 import { resolveFirstInvalidMonsterField } from '../utils/resolve-first-invalid-monster-field';
 
-/**
- * Focus and scroll to the first invalid field on the current Monster form
- * step whenever `record_attempt()` is called after a blocked step
- * transition. Never fires while the user is simply typing: the attempt
- * only advances on an explicit call, and re-running the same attempt again
- * (e.g. a re-render with unchanged errors) is a no-op.
- */
 export const useFocusFirstInvalidMonsterField = (
   fieldErrors: MonsterFormErrorsDefinition,
   currentStepIndex: number

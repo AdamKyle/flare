@@ -12,9 +12,6 @@ class RaceService
 {
     /**
      * Paginate the Races list for the validated Admin index request.
-     *
-     * @param  RaceIndexRequest  $request  Validated Race list request.
-     * @return LengthAwarePaginator Paginated Race records.
      */
     public function paginate(RaceIndexRequest $request): LengthAwarePaginator
     {
@@ -44,10 +41,6 @@ class RaceService
 
     /**
      * Create a new Race from the validated form data and optional uploaded image.
-     *
-     * @param  array<string, mixed>  $validatedData  Validated Race form data.
-     * @param  UploadedFile|null  $image  Uploaded Race image, when supplied.
-     * @return GameRace Created Race.
      */
     public function create(array $validatedData, ?UploadedFile $image): GameRace
     {
@@ -61,13 +54,7 @@ class RaceService
     }
 
     /**
-     * Update an existing Race from the validated form data, replacing its image when one is
-     * supplied. The previous image is removed only after the record update succeeds.
-     *
-     * @param  GameRace  $gameRace  Race to update.
-     * @param  array<string, mixed>  $validatedData  Validated Race form data.
-     * @param  UploadedFile|null  $image  Replacement Race image, when supplied.
-     * @return GameRace Updated Race.
+     * Update a Race and replace its image when a new image is supplied.
      */
     public function update(GameRace $gameRace, array $validatedData, ?UploadedFile $image): GameRace
     {
@@ -89,9 +76,6 @@ class RaceService
 
     /**
      * Store an uploaded Race image under the `race-images/` public-disk directory.
-     *
-     * @param  UploadedFile  $image  Uploaded Race image.
-     * @return string Stored relative image path.
      */
     private function storeImage(UploadedFile $image): string
     {

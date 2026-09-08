@@ -3,6 +3,7 @@
 namespace App\Game\Maps\Controllers\Api;
 
 use App\Flare\Models\Character;
+use App\Flare\Models\GameMap;
 use App\Flare\Models\Location;
 use App\Flare\Models\Quest;
 use App\Flare\Pagination\Requests\PaginationRequest;
@@ -19,6 +20,7 @@ use App\Game\Maps\Services\PortService;
 use App\Game\Maps\Services\SetSailService;
 use App\Game\Maps\Services\TeleportService;
 use App\Game\Maps\Services\WalkingService;
+use App\Game\Maps\Transformers\GameMapDetailTransformer;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -33,9 +35,27 @@ class MapController extends Controller
         private readonly SetSailService $setSail,
         private readonly DistanceCalculation $distanceCalculation,
         private readonly LocationService $locationService,
-        private readonly PortService $portService
+        private readonly PortService $portService,
+        private readonly GameMapDetailTransformer $gameMapDetailTransformer
     ) {
         $this->middleware('is.character.dead')->except(['mapInformation', 'fetchQuests']);
+    }
+
+    /**
+     * Return the Player-safe factual detail representation for the given Game Map.
+     */
+    public function gameMapDetails(GameMap $gameMap): JsonResponse
+    {
+        $requiredItem = $gameMap->requiredItem();
+
+        $detailData = [
+            'game_map' => $gameMap,
+            'required_item' => $requiredItem,
+            'required_quest' => is_null($requiredItem) ? null : Quest::where('reward_item', $requiredItem->id)->first(),
+            'required_location' => $gameMap->requiredLocation,
+        ];
+
+        return response()->json($this->gameMapDetailTransformer->transform($detailData), 200);
     }
 
     public function mapInformation(Character $character): JsonResponse

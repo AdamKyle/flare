@@ -8,9 +8,6 @@ class LocationGemFormTransformer
 {
     /**
      * Transform a Location Gem profile into its Admin save-response / form-value representation.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to transform.
-     * @return array<string, mixed> Admin Location Gem form-value representation.
      */
     public function transform(GameLocationGemParamter $gameLocationGemParamter): array
     {

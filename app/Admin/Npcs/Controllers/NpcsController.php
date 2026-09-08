@@ -12,8 +12,6 @@ class NpcsController extends Controller
 {
     /**
      * Render the Admin NPCs application shell.
-     *
-     * @return View Admin NPCs application shell view.
      */
     public function index(): View
     {
@@ -22,9 +20,6 @@ class NpcsController extends Controller
 
     /**
      * Render the legacy informational NPC page for the given NPC.
-     *
-     * @param  Npc  $npc  NPC to describe.
-     * @return View Legacy informational NPC page view.
      */
     public function show(Npc $npc): View
     {
@@ -36,8 +31,6 @@ class NpcsController extends Controller
 
     /**
      * Redirect legacy NPC edit links into the modern Admin NPCs application.
-     *
-     * @return RedirectResponse Redirect to the Admin NPCs application.
      */
     public function edit(): RedirectResponse
     {

@@ -13,16 +13,10 @@ use App\Flare\Models\GameSkill;
 use App\Flare\Models\Gem;
 use App\Flare\Models\User;
 use App\Game\Monsters\Services\BuildMonsterCacheService;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class MapGemService
 {
-    /**
-     * @param  AdminGemRollService  $adminGemRollService  Existing Gem roll service.
-     * @param  AdminGemRollTransformer  $adminGemRollTransformer  Shared Admin Gem roll transformer.
-     * @param  BuildMonsterCacheService  $buildMonsterCacheService  Monster cache invalidation service.
-     */
     public function __construct(
         private readonly AdminGemRollService $adminGemRollService,
         private readonly AdminGemRollTransformer $adminGemRollTransformer,
@@ -31,9 +25,6 @@ class MapGemService
 
     /**
      * Paginate the Map Gems list for the validated Admin index request.
-     *
-     * @param  MapGemIndexRequest  $request  Validated Map Gem list request.
-     * @return LengthAwarePaginator Paginated Map Gem records.
      */
     public function paginate(MapGemIndexRequest $request): LengthAwarePaginator
     {
@@ -68,8 +59,6 @@ class MapGemService
 
     /**
      * Build the internal Admin Map Gem form option data.
-     *
-     * @return array{game_maps: Collection<int, GameMap>, crafting_skills: Collection<int, GameSkill>} Internal Map Gem form option data.
      */
     public function formOptions(): array
     {
@@ -81,9 +70,6 @@ class MapGemService
 
     /**
      * Create a new Map Gem profile from the validated form data.
-     *
-     * @param  StoreMapGemRequest  $request  Validated Map Gem creation request.
-     * @return GameMapGemParamter Created Map Gem profile.
      */
     public function create(StoreMapGemRequest $request): GameMapGemParamter
     {
@@ -92,10 +78,6 @@ class MapGemService
 
     /**
      * Update an existing Map Gem profile from the validated form data.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to update.
-     * @param  UpdateMapGemRequest  $request  Validated Map Gem update request.
-     * @return GameMapGemParamter Updated Map Gem profile.
      */
     public function update(GameMapGemParamter $gameMapGemParamter, UpdateMapGemRequest $request): GameMapGemParamter
     {
@@ -106,10 +88,6 @@ class MapGemService
 
     /**
      * Roll a new Gem for the given Map Gem profile using the existing Gem roll service.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to roll.
-     * @param  User  $admin  Admin performing the roll.
-     * @return Gem Rolled Gem.
      */
     public function roll(GameMapGemParamter $gameMapGemParamter, User $admin): Gem
     {
@@ -122,9 +100,6 @@ class MapGemService
 
     /**
      * Roll a new Gem for every Map Gem profile, regardless of any previously rolled Gem.
-     *
-     * @param  User  $admin  Admin performing the bulk roll.
-     * @return array{rolled_count: int, rolled: array<int, array<string, mixed>>} Bulk roll result.
      */
     public function rollAll(User $admin): array
     {
@@ -152,12 +127,7 @@ class MapGemService
     }
 
     /**
-     * Make an existing historical Gem roll the profile's currently active roll, without changing
-     * the roll count or regenerating the Gem World.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile whose active roll is changing.
-     * @param  Gem  $gem  Gem roll to activate.
-     * @return bool Whether the Gem belongs to this profile and was made/kept active.
+     * Activate an existing Map Gem roll without regenerating its Gem World.
      */
     public function activateRoll(GameMapGemParamter $gameMapGemParamter, Gem $gem): bool
     {
@@ -178,10 +148,6 @@ class MapGemService
 
     /**
      * Build one Bulk Roll result row for a Map Gem profile.
-     *
-     * @param  GameMapGemParamter  $profile  Map Gem profile the row describes.
-     * @param  Gem  $gem  Gem this bulk action rolled for the profile.
-     * @return array<string, mixed> Bulk roll result row.
      */
     private function bulkRollRow(GameMapGemParamter $profile, Gem $gem): array
     {

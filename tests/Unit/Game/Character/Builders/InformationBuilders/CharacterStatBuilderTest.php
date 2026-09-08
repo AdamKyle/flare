@@ -9,8 +9,14 @@ use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\HolyBuilde
 use App\Game\Character\Builders\InformationBuilders\AttributeBuilders\ReductionsBuilder;
 use App\Game\Character\Builders\InformationBuilders\CharacterStatBuilder;
 use App\Game\Character\Values\CharacterClass;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
+use App\Game\Gems\Values\ResolvedAreaGemMonsterEffects;
+use App\Game\Gems\Values\ResolvedAreaGemRewardEffects;
 use App\Game\Maps\Values\MapName;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterBoon;
@@ -1085,5 +1091,55 @@ class CharacterStatBuilderTest extends TestCase
         $result = $this->characterStatBuilder->setCharacter($character)->buildCounter('resistance');
 
         $this->assertSame(0.95, $result);
+    }
+
+    public function test_resolves_area_gem_character_power_reduction_once_per_set_character(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['damage_stat' => 'dur']))
+            ->givePlayerLocation()
+            ->updateCharacter(['str' => 100])
+            ->getCharacter();
+
+        $resolved = new ResolvedAreaGemEffects(
+            ResolvedAreaGemMonsterEffects::none(),
+            ResolvedAreaGemRewardEffects::none(),
+            0.25,
+        );
+
+        $this->instance(
+            AreaGemEffectService::class,
+            Mockery::mock(AreaGemEffectService::class, function (MockInterface $mock) use ($resolved) {
+                $mock->shouldReceive('resolveForCharacter')->once()->andReturn($resolved);
+            })
+        );
+
+        $characterStatBuilder = resolve(CharacterStatBuilder::class);
+        $characterStatBuilder->setCharacter($character);
+
+        $result = $characterStatBuilder->statMod('str');
+        $characterStatBuilder->statMod('dur');
+        $characterStatBuilder->buildDamage('sword');
+
+        $this->assertSame(75.0, $result);
+    }
+
+    public function test_ignoring_reductions_does_not_resolve_area_gem_character_power_reduction(): void
+    {
+        $character = (new CharacterFactory)->createBaseCharacter([], $this->createClass(['damage_stat' => 'dur']))
+            ->givePlayerLocation()
+            ->updateCharacter(['str' => 100])
+            ->getCharacter();
+
+        $this->instance(
+            AreaGemEffectService::class,
+            Mockery::mock(AreaGemEffectService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('resolveForCharacter')->never();
+            })
+        );
+
+        $characterStatBuilder = resolve(CharacterStatBuilder::class);
+        $result = $characterStatBuilder->setCharacter($character, true)->statMod('str');
+
+        $this->assertSame(100.0, $result);
     }
 }

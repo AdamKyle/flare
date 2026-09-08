@@ -9,11 +9,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 
-/**
- * Displays the actual result of a Map Gem Roll All bulk action: the real
- * randomized values rolled for every profile, as a scrollable feed of Gem
- * roll cards rather than a crushed profile-name list.
- */
 const MapGemBulkRollResultSidePeek = ({
   result,
 }: MapGemBulkRollResultSidePeekProps): ReactNode => (

@@ -1,51 +1,57 @@
 import clsx from 'clsx';
-import { intervalToDuration } from 'date-fns';
 import React, { useEffect, useState } from 'react';
-import { match, P } from 'ts-pattern';
 
 import TimerBarSize from 'ui/timer-bar/enums/timer-bar-size';
 import { timerBarSizeStyles } from 'ui/timer-bar/styles/timer-bar-size-styles';
 import TimerBarProps from 'ui/timer-bar/types/timer-bar-props';
+import {
+  formatDetailedRemainingTime,
+  formatRemainingTime,
+} from 'ui/timer-bar/util/format-remaining-time';
 import { getColorLevel } from 'ui/timer-bar/util/get-color-level';
 
-const pluralizeUnit = (value: number, unit: string): string =>
-  `${value} ${unit}${value === 1 ? '' : 's'}`;
+const resolveRemainingFromCompleteAt = (completeAt: string): number => {
+  const remainingMs = new Date(completeAt).getTime() - Date.now();
 
-const formatRemainingTime = (remainingSeconds: number): string => {
-  const duration = intervalToDuration({
-    start: 0,
-    end: remainingSeconds * 1000,
-  });
-
-  return match(duration)
-    .with(
-      P.when((d) => (d.days ?? 0) > 0),
-      (d) => pluralizeUnit(d.days ?? 0, 'day')
-    )
-    .with(
-      P.when((d) => (d.hours ?? 0) > 0),
-      (d) => pluralizeUnit(d.hours ?? 0, 'hour')
-    )
-    .with(
-      P.when((d) => (d.minutes ?? 0) > 0),
-      (d) => pluralizeUnit(d.minutes ?? 0, 'minute')
-    )
-    .otherwise((d) => pluralizeUnit(d.seconds ?? 0, 'second'));
+  return Math.max(0, Math.round(remainingMs / 1000));
 };
 
 const TimerBar = ({
   length,
   title,
   remaining: controlledRemaining,
+  complete_at: completeAt,
+  detailed_time: detailedTime = false,
   size = TimerBarSize.DEFAULT,
   additional_css,
 }: TimerBarProps) => {
   const [internalRemaining, setInternalRemaining] = useState(length);
+  const [completeAtRemaining, setCompleteAtRemaining] = useState(() =>
+    completeAt ? resolveRemainingFromCompleteAt(completeAt) : 0
+  );
 
-  const isControlled = controlledRemaining !== undefined;
+  const isCompleteAtControlled = Boolean(completeAt);
+  const isControlled =
+    !isCompleteAtControlled && controlledRemaining !== undefined;
 
   useEffect(() => {
-    if (isControlled) {
+    if (!completeAt) {
+      return;
+    }
+
+    setCompleteAtRemaining(resolveRemainingFromCompleteAt(completeAt));
+
+    const timerId = setInterval(() => {
+      setCompleteAtRemaining(resolveRemainingFromCompleteAt(completeAt));
+    }, 1000);
+
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [completeAt]);
+
+  useEffect(() => {
+    if (isControlled || isCompleteAtControlled) {
       return;
     }
 
@@ -70,11 +76,13 @@ const TimerBar = ({
     return () => {
       clearInterval(timerId);
     };
-  }, [isControlled, length]);
+  }, [isControlled, isCompleteAtControlled, length]);
 
-  const displayedRemaining = isControlled
-    ? controlledRemaining
-    : internalRemaining;
+  const displayedRemaining = isCompleteAtControlled
+    ? completeAtRemaining
+    : isControlled
+      ? (controlledRemaining as number)
+      : internalRemaining;
   const clampedRemaining = Math.min(Math.max(displayedRemaining, 0), length);
   const safeLength = length > 0 ? length : 1;
   const percent = Math.round((clampedRemaining / safeLength) * 100);
@@ -87,7 +95,9 @@ const TimerBar = ({
     darkBgClass
   );
 
-  const formattedRemaining = formatRemainingTime(clampedRemaining);
+  const formattedRemaining = detailedTime
+    ? formatDetailedRemainingTime(clampedRemaining)
+    : formatRemainingTime(clampedRemaining);
 
   return (
     <div className={clsx('w-full', additional_css)}>

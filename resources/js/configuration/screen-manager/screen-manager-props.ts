@@ -2,6 +2,7 @@ import { Screens } from './screen-manager-constants';
 import MonsterStatSectionProps from '../../game/components/actions/partials/monster-stat-section/types/monster-stat-section-props';
 import AnnouncementDetailsProps from '../../game/components/announcements/types/announcement-details-props';
 import AnnouncementsProps from '../../game/components/announcements/types/announcements-props';
+import ManageClassSpecialtiesScreenProps from '../../game/components/character-sheet/class-ranks/screens/types/manage-class-specialties-screen-props';
 import CharacterAttackTypeBreakdownProps from '../../game/components/character-sheet/partials/character-attack-details/types/character-attack-type-breakdown-props';
 import CharacterStatTypeBreakdownProps from '../../game/components/character-sheet/partials/character-stat-types/types/character-stat-type-breakdown-props';
 import CharacterSheetProps from '../../game/components/character-sheet/types/character-sheet-props';
@@ -9,6 +10,7 @@ import DonationsProps from '../../game/components/donations/types/donations-prop
 import GoblinShopProps from '../../game/components/goblin-shop/types/goblin-shop-props';
 import GuideQuestProps from '../../game/components/guide-quests/types/guide-quest-props';
 import CharacterInventoryProps from '../../game/components/partials/types/character-inventory-props';
+import QuestLogScreenProps from '../../game/components/quests/types/quest-log-screen-props';
 import ShopScreenProps from '../../game/components/shop/types/shop-screen-props';
 
 export interface AppScreenPropsMap {
@@ -23,6 +25,8 @@ export interface AppScreenPropsMap {
   [Screens.ANNOUNCEMENT_DETAILS]: AnnouncementDetailsProps;
   [Screens.CHARACTER_STAT_DETAILS]: CharacterStatTypeBreakdownProps;
   [Screens.CHARACTER_ATTACK_DETAILS]: CharacterAttackTypeBreakdownProps;
+  [Screens.QUEST_LOG]: QuestLogScreenProps;
+  [Screens.CLASS_SPECIALTIES]: ManageClassSpecialtiesScreenProps;
 }
 
 export type AppScreenName = keyof AppScreenPropsMap;

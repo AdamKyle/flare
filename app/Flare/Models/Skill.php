@@ -432,14 +432,10 @@ class Skill extends Model
 
     /**
      * Resolve the Character's Class modifier bonus for a named Skill.
-     *
-     * @param  Character  $character  Character being evaluated.
-     * @param  string  $name  Requested Class skill-bonus key/name.
-     * @return float Character's Class modifier bonus for the named Skill.
      */
     private function getCharacterSkillBonus(Character $character, string $name): float
     {
-        return $character->class->{Str::snake($name.'_mod')};
+        return $character->class->{Str::snake($name.'_mod')} ?? 0.0;
     }
 
     /**

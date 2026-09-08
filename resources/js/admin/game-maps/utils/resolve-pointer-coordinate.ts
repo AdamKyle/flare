@@ -2,11 +2,6 @@ import { findCoordinateIndex } from './find-coordinate-index';
 import { GameMapCoordinateSize } from '../enums/game-map-coordinate-size';
 import CoordinateDefinition from '../types/coordinate-definition';
 
-/**
- * Resolve the map coordinate grid cell containing a map-local pointer position.
- *
- * Returns `null` when the position falls outside the returned coordinate grid.
- */
 export const resolvePointerCoordinate = (
   localX: number,
   localY: number,
@@ -26,7 +21,7 @@ export const resolvePointerCoordinate = (
 };
 
 /**
- * Build the 16-by-16 coordinate grid cell rectangle for the given X/Y coordinate indexes.
+ * Build the 16-by-16 cell rectangle for the selected coordinate indexes.
  */
 export const coordinateAtIndex = (
   xIndex: number,

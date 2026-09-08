@@ -13,17 +13,6 @@ import QuestTreeNodeProps from '../types/quest-tree-node-props';
 
 import TREE_NODE_COLOR_STYLES from 'ui/tree/styles/tree-node-color-styles';
 
-/**
- * Quest-domain Tree node presentation: structural state icon/short label,
- * Quest name, and Quest Giver when present. The generic Tree owns the real
- * interactive button, its `group` hover/focus fill, and the structural
- * accessible name, so this component never creates its own nested button
- * and never checks permissions. Every text element inherits the generic
- * Tree's `group-hover`/`group-focus-visible` foreground for this Quest's
- * resolved `TreeColor` so it stays readable once the parent button's
- * background fills with that status color, instead of retaining a fixed
- * text color that would fight the fill.
- */
 const QuestTreeNode = ({ quest, state }: QuestTreeNodeProps): ReactNode => {
   const interactiveForeground =
     TREE_NODE_COLOR_STYLES[QUEST_TREE_STATE_TREE_COLOR[state]]

@@ -14,14 +14,6 @@ import StackedCard from 'ui/cards/stacked-card';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Bounded, append-paginated browser for the Quests whose Quest-giver NPC
- * belongs to a Game Map, opened from the Game Map's "Related Game Data"
- * hub. Each result opens the canonical Quest detail inside a `StackedCard`
- * while preserving this relationship browser underneath (mounted, with its
- * scroll position intact) rather than replacing it through the global
- * SidePeek emitter.
- */
 const GameMapRelatedQuestsSidePeek = ({
   game_map_id: gameMapId,
 }: GameMapRelatedQuestsSidePeekProps): ReactNode => {

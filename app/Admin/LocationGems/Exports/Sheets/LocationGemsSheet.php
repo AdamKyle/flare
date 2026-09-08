@@ -16,8 +16,6 @@ class LocationGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings,
 {
     /**
      * Return every Location Gem profile, ordered deterministically by name.
-     *
-     * @return Collection<int, GameLocationGemParamter> Location Gem profiles to export.
      */
     public function collection(): Collection
     {
@@ -27,8 +25,7 @@ class LocationGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings,
     /**
      * Map a Location Gem profile into its workbook row, using human-readable Map/Location/Skill/atonement names.
      *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to map.
-     * @return array<int, mixed> Workbook row values.
+     * @param  mixed  $gameLocationGemParamter
      */
     public function map($gameLocationGemParamter): array
     {
@@ -78,8 +75,6 @@ class LocationGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings,
 
     /**
      * Return the Location Gems workbook column headings.
-     *
-     * @return array<int, string> Workbook column headings.
      */
     public function headings(): array
     {
@@ -101,8 +96,6 @@ class LocationGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings,
 
     /**
      * Return the Location Gems workbook sheet title.
-     *
-     * @return string Location Gems workbook sheet title.
      */
     public function title(): string
     {

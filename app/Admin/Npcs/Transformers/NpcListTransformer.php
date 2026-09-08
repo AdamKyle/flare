@@ -9,9 +9,6 @@ class NpcListTransformer extends TransformerAbstract
 {
     /**
      * Transform an NPC into its Admin list-row representation.
-     *
-     * @param  Npc  $npc  NPC to transform.
-     * @return array{id: int, real_name: string, type: int, map_name: string|null, x_position: int, y_position: int} Admin NPC list-row representation.
      */
     public function transform(Npc $npc): array
     {

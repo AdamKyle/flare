@@ -9,13 +9,6 @@ import LocationGemDetailBody from '../location-gem-detail-body';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Admin Location Gem detail side-peek: a read-only view of the reusable
- * Location Gem detail body, addressable by profile ID, with roll activation
- * wired in. Used both for direct navigation and as nested `StackedCard`
- * content from other Admin detail surfaces (Bulk Roll results, Monster
- * detail Gem effect contexts).
- */
 const AdminLocationGemDetailSidePeek = ({
   location_gem_id: locationGemId,
 }: AdminLocationGemDetailSidePeekProps): ReactNode => {

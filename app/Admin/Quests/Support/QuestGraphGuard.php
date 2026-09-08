@@ -8,10 +8,6 @@ class QuestGraphGuard
 {
     /**
      * Resolve the parent-Quest-selection error, when the selection is invalid.
-     *
-     * @param  int|null  $parentQuestId  Proposed `parent_quest_id` value.
-     * @param  int|null  $excludeQuestId  Id of the Quest being updated, or null on create.
-     * @return string|null Human-facing error message, or null when valid.
      */
     public function parentCycleError(?int $parentQuestId, ?int $excludeQuestId): ?string
     {
@@ -32,10 +28,6 @@ class QuestGraphGuard
 
     /**
      * Resolve the required-Quest-selection error, when the selection is invalid.
-     *
-     * @param  int|null  $requiredQuestId  Proposed `required_quest_id` value.
-     * @param  int|null  $excludeQuestId  Id of the Quest being updated, or null on create.
-     * @return string|null Human-facing error message, or null when valid.
      */
     public function requiredQuestCycleError(?int $requiredQuestId, ?int $excludeQuestId): ?string
     {
@@ -56,10 +48,6 @@ class QuestGraphGuard
 
     /**
      * Resolve the required-Quest-chain error, when the chain is invalid.
-     *
-     * @param  array<int, int>|null  $chainIds  Proposed `required_quest_chain` value.
-     * @param  int|null  $excludeQuestId  Id of the Quest being updated, or null on create.
-     * @return string|null Human-facing error message, or null when valid.
      */
     public function requiredQuestChainError(?array $chainIds, ?int $excludeQuestId): ?string
     {
@@ -92,11 +80,6 @@ class QuestGraphGuard
 
     /**
      * Walk a single-column parent/requirement chain starting from an id, looking for a target id.
-     *
-     * @param  int  $startId  Id to start walking from.
-     * @param  string  $column  Single-value FK column to walk (`parent_quest_id` or `required_quest_id`).
-     * @param  int|null  $targetId  Id to search for; returns false immediately when null.
-     * @return bool Whether the target id is reachable by walking the chain.
      */
     private function walksInto(int $startId, string $column, ?int $targetId): bool
     {
@@ -125,11 +108,6 @@ class QuestGraphGuard
 
     /**
      * Walk a Quest's required-Quest and required-Quest-chain links, looking for a target id.
-     *
-     * @param  int  $questId  Quest id to inspect.
-     * @param  int  $targetId  Id to search for.
-     * @param  array<int, int>  $visited  Quest ids already visited on this recursion path.
-     * @return bool Whether the target id is transitively required by the Quest.
      */
     private function chainTransitivelyRequires(int $questId, int $targetId, array $visited): bool
     {

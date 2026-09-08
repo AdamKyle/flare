@@ -13,8 +13,6 @@ class MapGemsExport implements Export, WithMultipleSheets
 
     /**
      * Return the sheets included in the Map Gems workbook.
-     *
-     * @return array<int, MapGemsSheet> Map Gems workbook sheets.
      */
     public function sheets(): array
     {

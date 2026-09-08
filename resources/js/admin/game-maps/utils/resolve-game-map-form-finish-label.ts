@@ -1,6 +1,3 @@
-/**
- * Resolve the Game Map wizard's finish-step button label for the current save state.
- */
 export const resolveGameMapFormFinishLabel = (
   saving: boolean,
   game_map_id: number | null

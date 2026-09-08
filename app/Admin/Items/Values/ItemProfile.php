@@ -22,10 +22,6 @@ enum ItemProfile: string
 
     /**
      * Return the current 2.0 Item `type` values that belong to this profile.
-     *
-     * Returns null when the profile is not filtered by `type` (All Items and Specialty).
-     *
-     * @return array<int, string>|null Item type values for this profile.
      */
     public function types(): ?array
     {
@@ -44,11 +40,7 @@ enum ItemProfile: string
     }
 
     /**
-     * Return the valid `items.type` subtype values for this profile's
-     * secondary subtype filter, or null when this profile does not support
-     * a subtype filter. Only the Weapons and Armour profiles support one.
-     *
-     * @return array<int, string>|null Valid subtype values, or null when unsupported.
+     * Return the valid subtype values for profiles that support subtype filtering.
      */
     public function subtypes(): ?array
     {
@@ -61,8 +53,6 @@ enum ItemProfile: string
 
     /**
      * Whether this profile filters the catalog by having a non-null `specialty_type`.
-     *
-     * @return bool Whether this profile requires a non-null `specialty_type`.
      */
     public function requiresSpecialtyType(): bool
     {
@@ -71,8 +61,6 @@ enum ItemProfile: string
 
     /**
      * Return the Item list column sort keys allowed for this profile.
-     *
-     * @return array<int, string> Allowed sort keys.
      */
     public function allowedSortKeys(): array
     {

@@ -1,7 +1,7 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
-import QuestInfoBrowseControls from './quest-info-browse-controls';
+import QuestBrowseControls from '../../../game/reusable-components/quest/components/quest-browse-controls';
 import {
   QUEST_BROWSE_TAB_KIND,
   QUEST_BROWSE_TABS_ORDER,
@@ -22,12 +22,6 @@ const navigateToQuest = (id: number): void => {
   window.location.href = `/information/quests/${id}`;
 };
 
-/**
- * Public, read-only, plane-first Quest browse page. Reuses the same shared
- * factual Quest browse presentation as Admin (Quest Tree / One Offs / Raid
- * Quests tabs, rendered through the generic shared Tree) without any
- * mutation controls, and never imports Admin code.
- */
 const QuestInfoTreePage = (): ReactNode => {
   const [gameMapId, setGameMapId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<QuestBrowseTab>(
@@ -129,7 +123,8 @@ const QuestInfoTreePage = (): ReactNode => {
 
   return (
     <div>
-      <QuestInfoBrowseControls
+      <QuestBrowseControls
+        id="quest-info-plane-filter"
         game_maps={gameMapItems}
         selected_game_map_id={gameMapId}
         on_select_game_map={setGameMapId}

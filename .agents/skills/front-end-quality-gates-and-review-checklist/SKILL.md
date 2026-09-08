@@ -11,6 +11,8 @@ Use this skill before finishing frontend work.
 
 Do not stop after the code compiles.
 
+Apply `front-end-comments-and-documentation` and, for reusable game data, `front-end-factual-presentation-and-context-adapters`.
+
 Review the change for:
 
 - correct folder placement;
@@ -88,6 +90,11 @@ Verify:
 
 Verify:
 
+- feature/domain child components are presentational by default when props are sufficient;
+- factual bodies do not own API/auth/Character business state or mutation;
+- show pages and SidePeeks do not duplicate equivalent factual JSX;
+- local component state is genuinely presentation/accessibility state;
+
 - hooks are called before early returns;
 - large conditional JSX is in render helpers;
 - render helpers use early returns;
@@ -99,6 +106,15 @@ Verify:
 - JSX `.map()` callbacks remain visually trivial and render already-prepared data;
 - non-trivial mapped display state is derived before JSX and passed to a named render function or focused component;
 - mapped JSX does not contain nested ternaries or a cluster of local derived-state declarations.
+
+## Comments/documentation checklist
+
+Verify:
+
+- no narrative or implementation-history JSDoc remains in touched frontend code;
+- obvious JSX/state/handler behavior is not narrated with comments;
+- retained comments explain a current non-obvious domain, compatibility, accessibility, or integration constraint;
+- no stale TODO/task/phase commentary remains unless explicitly required.
 
 ## Accessibility checklist
 

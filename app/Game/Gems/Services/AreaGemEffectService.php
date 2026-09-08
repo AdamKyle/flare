@@ -96,7 +96,9 @@ class AreaGemEffectService
         }
 
         return new ResolvedAreaGemEffects(
-            monsterEffects: $this->combineMonsterEffects($mapGem, 1.0, $locationGem, 1.0),
+            monsterEffects: is_null($locationGem)
+                ? $this->combineMonsterEffects($mapGem, 1.0, null, 0.0)
+                : $this->combineMonsterEffects(null, 0.0, $locationGem, 1.0),
             rewardEffects: $this->combineRewardEffects($mapGem, 1.0, $locationGem, 1.0),
             characterPowerReduction: $this->resolveCharacterReduction($mapGem, 1.0),
             craftingSkillBonuses: $this->combineCraftingSkillBonuses($mapGem, 1.0, $locationGem, 1.0),
@@ -175,7 +177,9 @@ class AreaGemEffectService
         }
 
         return new ResolvedAreaGemEffects(
-            monsterEffects: $this->combineMonsterEffects($mapGem, 1.0, $locationGem, 2.0),
+            monsterEffects: is_null($locationGem)
+                ? $this->combineMonsterEffects($mapGem, 1.0, null, 0.0)
+                : $this->combineMonsterEffects(null, 0.0, $locationGem, 2.0),
             rewardEffects: $this->combineRewardEffects(null, 0.0, $locationGem, 2.0),
             characterPowerReduction: $this->resolveCharacterReduction($mapGem, 1.5),
             craftingSkillBonuses: $this->combineCraftingSkillBonuses(null, 0.0, $locationGem, 2.0),

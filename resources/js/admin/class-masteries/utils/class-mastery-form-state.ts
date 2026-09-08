@@ -106,9 +106,6 @@ export const buildClassMasteryRequestPayload = (
   resistance_reduction: toNumberOrNull(state.resistance_reduction),
 });
 
-/**
- * Validate the fields belonging to the Identity step before the wizard advances.
- */
 export const validateClassMasteryIdentityStep = (
   state: ClassMasteryFormStateDefinition
 ): ClassMasteryValidationResultDefinition => {

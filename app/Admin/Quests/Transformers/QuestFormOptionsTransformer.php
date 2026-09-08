@@ -11,15 +11,11 @@ use App\Flare\Models\Raid;
 use App\Game\Core\Values\FeatureType;
 use App\Game\Events\Values\EventType;
 use App\Game\Skills\Values\SkillTypeValue;
-use Illuminate\Support\Collection;
 
 class QuestFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Quest form option data into its Admin API representation.
-     *
-     * @param  array{npcs: Collection<int, Npc>, quest_items: Collection<int, Item>, quests: Collection<int, Quest>, game_maps: Collection<int, GameMap>, raids: Collection<int, Raid>, passive_skills: Collection<int, PassiveSkill>}  $formOptions  Internal Quest form option data.
-     * @return array<string, mixed> Admin Quest form-options representation.
      */
     public function transform(array $formOptions): array
     {

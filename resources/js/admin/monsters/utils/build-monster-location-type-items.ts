@@ -3,10 +3,6 @@ import { MONSTER_LIST_WEEKLY_FIGHT_LOCATION_TYPES } from '../enums/monster-list-
 
 import { DropdownItem } from 'ui/drop-down/types/drop-down-item';
 
-/**
- * Location Type options for the Monster list filter. Only the Weekly Fight
- * category exposes this filter, scoped to the fixed Weekly Fight subset.
- */
 export const buildMonsterLocationTypeItems = (): DropdownItem[] => {
   return MONSTER_LIST_WEEKLY_FIGHT_LOCATION_TYPES.map((locationType) => ({
     value: locationType,

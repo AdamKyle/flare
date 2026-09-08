@@ -8,10 +8,6 @@ use App\Game\Monsters\Services\MonsterGemEffectContextService;
 
 class MonsterDetailTransformer
 {
-    /**
-     * @param  QuestItemTransformer  $questItemTransformer  Canonical quest Item factual transformer.
-     * @param  MonsterGemEffectContextService  $monsterGemEffectContextService  Cached Gem effect context reader.
-     */
     public function __construct(
         private readonly QuestItemTransformer $questItemTransformer,
         private readonly MonsterGemEffectContextService $monsterGemEffectContextService,
@@ -19,15 +15,8 @@ class MonsterDetailTransformer
 
     /**
      * Transform a Monster into its full factual detail representation.
-     *
-     * Every value is the Monster's persisted base value; no combat/map scaling is applied.
-     * The combat `MonsterTransformer` is a gameplay concern and must never be used for this
-     * static factual contract.
-     *
-     * @param  Monster  $monster  Monster to transform; expects `gameMap`, `questItem` eager-loaded.
-     * @return array<string, mixed> Full factual Monster detail representation.
      */
-    public function transform(Monster $monster): array
+    public function transform(Monster $monster, ?array $gemEffectContexts = null): array
     {
         return [
             'id' => $monster->id,
@@ -37,15 +26,12 @@ class MonsterDetailTransformer
             'spells_and_affixes' => $this->spellsAndAffixes($monster),
             'quest_and_celestial' => $this->questAndCelestial($monster),
             'raid_and_special' => $this->raidAndSpecial($monster),
-            'gem_effect_contexts' => $this->monsterGemEffectContextService->forMonster($monster),
+            'gem_effect_contexts' => $gemEffectContexts ?? $this->monsterGemEffectContextService->forMonster($monster),
         ];
     }
 
     /**
      * Build the Identity & Placement section.
-     *
-     * @param  Monster  $monster  Monster to describe.
-     * @return array<string, mixed> Identity & Placement section.
      */
     private function identity(Monster $monster): array
     {
@@ -65,9 +51,6 @@ class MonsterDetailTransformer
 
     /**
      * Build the Core Combat section: base stats.
-     *
-     * @param  Monster  $monster  Monster to describe.
-     * @return array{str: int, dur: int, dex: int, chr: int, int: int, agi: int, focus: int, ac: int} Core Combat section.
      */
     private function combat(Monster $monster): array
     {
@@ -85,9 +68,6 @@ class MonsterDetailTransformer
 
     /**
      * Build the probability fields.
-     *
-     * @param  Monster  $monster  Monster to describe.
-     * @return array<string, float|null> Probability fields.
      */
     private function probabilities(Monster $monster): array
     {
@@ -104,9 +84,6 @@ class MonsterDetailTransformer
 
     /**
      * Build the Spells & Affixes section.
-     *
-     * @param  Monster  $monster  Monster to describe.
-     * @return array<string, mixed> Spells & Affixes section.
      */
     private function spellsAndAffixes(Monster $monster): array
     {
@@ -127,9 +104,6 @@ class MonsterDetailTransformer
 
     /**
      * Build the Quest/Celestial section.
-     *
-     * @param  Monster  $monster  Monster to describe.
-     * @return array<string, mixed> Quest/Celestial section.
      */
     private function questAndCelestial(Monster $monster): array
     {
@@ -146,9 +120,6 @@ class MonsterDetailTransformer
 
     /**
      * Build the Raid & Special Rules section.
-     *
-     * @param  Monster  $monster  Monster to describe.
-     * @return array<string, mixed> Raid & Special Rules section.
      */
     private function raidAndSpecial(Monster $monster): array
     {

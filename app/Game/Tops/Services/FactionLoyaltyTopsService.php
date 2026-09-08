@@ -63,7 +63,12 @@ class FactionLoyaltyTopsService
     public function detail(Character $character): array
     {
         $character->load(['factions.gameMap', 'factionLoyalties.faction', 'factionLoyalties.factionLoyaltyNpcs.npc']);
-        $automations = FactionLoyaltyAutomation::where('character_id', $character->id)->with('log')->latest('last_automation_action_at')->get();
+
+        $automationQuery = FactionLoyaltyAutomation::query()->where('character_id', $character->id);
+        $automationCount = (clone $automationQuery)->count();
+        $latestAutomation = (clone $automationQuery)
+            ->orderByDesc('last_automation_action_at')
+            ->first(['last_automation_action', 'last_fight_outcome', 'last_automation_action_at']);
 
         return [
             'character' => ['id' => $character->id, 'name' => $character->name, 'profile_url' => $this->characterProfileUrl($character->id)],
@@ -87,9 +92,9 @@ class FactionLoyaltyTopsService
                 'currently_helping' => $npc->currently_helping,
             ])->values()->all(),
             'automation_summary' => [
-                'count' => $automations->count(),
-                'latest_action' => $automations->first()?->last_automation_action,
-                'latest_outcome' => $automations->first()?->last_fight_outcome,
+                'count' => $automationCount,
+                'latest_action' => $latestAutomation?->last_automation_action,
+                'latest_outcome' => $latestAutomation?->last_fight_outcome,
             ],
         ];
     }

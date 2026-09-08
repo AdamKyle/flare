@@ -44,10 +44,6 @@ export interface QuestFactionLoyaltyRequirementDefinition {
   required_fame_level: number | null;
 }
 
-/**
- * The canonical factual Quest Item payload plus its identity, as returned
- * whenever a Quest requirement or reward embeds a quest Item.
- */
 export interface QuestRelatedItemDefinition extends QuestItemFactualDefinition {
   item_id: number;
 }

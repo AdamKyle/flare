@@ -11,8 +11,6 @@ class StoreMapGemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -21,8 +19,6 @@ class StoreMapGemRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -49,8 +45,6 @@ class StoreMapGemRequest extends FormRequest
 
     /**
      * Return every range field managed by the Map Gem form.
-     *
-     * @return array<int, string> Range field names.
      */
     private function rangeFields(): array
     {
@@ -88,11 +82,7 @@ class StoreMapGemRequest extends FormRequest
     }
 
     /**
-     * Build the shared range-field validation rule: nullable, a string of at most 255
-     * characters, and, when populated, exactly two nonnegative numeric values separated
-     * by one hyphen with no leading negative sign or extra values.
-     *
-     * @return array<int, mixed> Range field validation rule.
+     * Build the Map Gem range-field validation rule.
      */
     private function rangeRule(): array
     {

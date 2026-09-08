@@ -25,10 +25,6 @@ export const ITEM_CRAFTING_TYPE_VALUES: ItemCraftingType[] = [
   ItemCraftingType.ALCHEMY,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item crafting type, without a forced type assertion at each call site.
- */
 export const isItemCraftingType = (
   value: string | number
 ): value is ItemCraftingType => {

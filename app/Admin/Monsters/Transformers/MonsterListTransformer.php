@@ -9,9 +9,6 @@ class MonsterListTransformer extends TransformerAbstract
 {
     /**
      * Transform a Monster into its Admin list-row representation.
-     *
-     * @param  Monster  $monster  Monster to transform.
-     * @return array{id: int, name: string, game_map: array{id: int, name: string}|null, max_level: int, xp: int, gold: int, is_celestial_entity: bool, is_raid_monster: bool, is_raid_boss: bool} Admin Monster list-row representation.
      */
     public function transform(Monster $monster): array
     {

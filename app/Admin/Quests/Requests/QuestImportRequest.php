@@ -8,8 +8,6 @@ class QuestImportRequest extends FormRequest
 {
     /**
      * Allow the route middleware to own Admin authorization.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -18,8 +16,6 @@ class QuestImportRequest extends FormRequest
 
     /**
      * Return validation rules for the Quests workbook upload.
-     *
-     * @return array<string, array<int, string>>
      */
     public function rules(): array
     {
@@ -30,8 +26,6 @@ class QuestImportRequest extends FormRequest
 
     /**
      * Return Quests-specific workbook validation messages.
-     *
-     * @return array<string, string>
      */
     public function messages(): array
     {

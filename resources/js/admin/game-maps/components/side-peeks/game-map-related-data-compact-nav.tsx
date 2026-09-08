@@ -6,13 +6,6 @@ import GameMapRelatedDataNavigationProps from '../types/game-map-related-data-na
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 
-/**
- * Compact Game Map "Related Game Data" navigation for use inside the Game
- * Map factual SidePeek, which does not have the page-level side/bottom
- * navigation layout available to it. Wraps the same Glacier `IconButton`
- * treatment as the standalone responsive navigation, reusing the same
- * relation-open handlers, without a fixed bottom bar.
- */
 const GameMapRelatedDataCompactNav = ({
   game_map_id: gameMapId,
   on_open_related: onOpenRelated,

@@ -8,12 +8,6 @@ class MonsterFormTransformer
 {
     /**
      * Transform a Monster into its Admin save-response / form-value representation.
-     *
-     * `can_use_artifacts` is intentionally excluded: it is not a mass-assignable field on
-     * the Monster model and has no proven current form contract.
-     *
-     * @param  Monster  $monster  Monster to transform.
-     * @return array<string, mixed> Admin Monster form-value representation.
      */
     public function transform(Monster $monster): array
     {

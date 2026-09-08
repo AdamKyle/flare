@@ -15,14 +15,6 @@ class ClassesSheet implements ToCollection
 {
     /**
      * Import Class rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized and validated against the complete Class field contract,
-     * including workbook-level prerequisite identities, before any row is written. Validated rows
-     * are then persisted in dependency-safe order so a special Class may require another Class
-     * defined earlier in the very same workbook, even on a fresh database.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Classes are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -33,12 +25,6 @@ class ClassesSheet implements ToCollection
 
     /**
      * Normalize and validate every meaningful Class row before any row is written.
-     *
-     * A blank `name` marks the end of the workbook's meaningful data. A duplicate `name` within the
-     * workbook fails the entire import with the offending row number in the exception message.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>> Validated Class payloads, keyed by prerequisite name.
      */
     private function normalizeAndValidateRows(Collection $rows): array
     {
@@ -75,12 +61,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Resolve the required Class name cell, distinguishing a blank end-of-workbook row from an
-     * invalid non-string value.
-     *
-     * @param  mixed  $name  Raw Class name cell.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return string|null Trimmed Class name, or null when the workbook has no more data.
+     * Resolve the required Class name cell, distinguishing a blank end-of-workbook row from an invalid non-string value.
      */
     private function resolveRowName(mixed $name, int $rowNumber): ?string
     {
@@ -98,13 +79,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Normalize a single raw Class row, validating its field contract and resolving prerequisite
-     * Class names, without yet resolving those names to ids.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @param  string  $name  Resolved Class name.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return array<string, mixed> Normalized Class attributes, keyed by row number and prerequisite name.
+     * Normalize and validate one Class workbook row.
      */
     private function normalizeRow(array $rawRow, string $name, int $rowNumber): array
     {
@@ -140,12 +115,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Validate the Class stat/modifier field contract for one row using the same rules the Store
-     * request enforces.
-     *
-     * @param  array<string, mixed>  $classData  Normalized Class workbook row being validated.
-     * @param  int  $rowNumber  Workbook row number used for validation context.
-     * @return void No direct return value; validation either completes or raises the existing import failure.
+     * Validate the Class stat/modifier field contract for one row using the same rules the Store request enforces.
      */
     private function validateFieldContract(array $classData, int $rowNumber): void
     {
@@ -172,10 +142,6 @@ class ClassesSheet implements ToCollection
 
     /**
      * Resolve a prerequisite Class name cell into its trimmed name, without resolving it to an id.
-     *
-     * @param  mixed  $name  Prerequisite Class name from the workbook.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return string|null Trimmed prerequisite Class name, or null when no prerequisite was given.
      */
     private function resolvePrerequisiteName(mixed $name, int $rowNumber): ?string
     {
@@ -192,10 +158,6 @@ class ClassesSheet implements ToCollection
 
     /**
      * Resolve a required prerequisite Class rank level.
-     *
-     * @param  mixed  $level  Required Class rank level from the workbook.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return int|null Resolved level, or null when no level was given.
      */
     private function resolveLevel(mixed $level, int $rowNumber): ?int
     {
@@ -215,14 +177,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Enforce that unlock requirements are either fully absent or fully populated, that the two
-     * prerequisite Class names differ, that a Class cannot require itself by name, and that every
-     * populated prerequisite name resolves to an existing database Class or another unique Class
-     * name in this workbook.
-     *
-     * @param  array<string, mixed>  $classData  Row data with unlock fields resolved to names.
-     * @param  array<int, string>  $workbookNames  Normalized Class names available from the same workbook.
-     * @return void No direct return value; validation either completes or raises the existing import failure.
+     * Validate the Class unlock-requirement combination and referenced Class names.
      */
     private function validateUnlockRequirements(array $classData, array $workbookNames): void
     {
@@ -271,13 +226,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Resolve the Class description, preserving the existing value when an older workbook omits
-     * the `description` column or leaves it blank.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @param  GameClass|null  $existingClass  Existing Class being updated, when one exists.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return string|null Resolved Class description.
+     * Resolve the Class description while preserving older-workbook compatibility.
      */
     private function resolveDescription(array $rawRow, ?GameClass $existingClass, int $rowNumber): ?string
     {
@@ -293,11 +242,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Persist every validated Class row in dependency-safe order, so a row whose prerequisite
-     * Class is defined later in the same workbook still resolves once that Class has been created.
-     *
-     * @param  array<int, array<string, mixed>>  $validatedRows  Validated Class payloads.
-     * @return void Classes are created or updated in place.
+     * Persist Class rows in prerequisite-safe dependency order.
      */
     private function persistInDependencyOrder(array $validatedRows): void
     {
@@ -333,12 +278,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Determine whether a prerequisite Class name can currently be resolved to an id: it is either
-     * absent, already persisted earlier in this import run, or already exists in the database.
-     *
-     * @param  string|null  $name  Prerequisite Class name to check.
-     * @param  array<string, int>  $persistedIdsByName  Class ids persisted so far in this import run.
-     * @return bool Whether the prerequisite name can be resolved right now.
+     * Determine whether a prerequisite Class name can currently resolve to an id.
      */
     private function isNameResolvable(?string $name, array $persistedIdsByName): bool
     {
@@ -354,12 +294,7 @@ class ClassesSheet implements ToCollection
     }
 
     /**
-     * Resolve a prerequisite Class name to its id, preferring a Class already persisted earlier in
-     * this import run over a database lookup.
-     *
-     * @param  string|null  $name  Prerequisite Class name to resolve.
-     * @param  array<string, int>  $persistedIdsByName  Class ids persisted so far in this import run.
-     * @return int|null Resolved Class id, or null when no prerequisite name was given.
+     * Resolve a prerequisite Class name to its persisted id.
      */
     private function resolveNameToId(?string $name, array $persistedIdsByName): ?int
     {
@@ -376,12 +311,6 @@ class ClassesSheet implements ToCollection
 
     /**
      * Create or update the Class for one validated row, resolving its prerequisite names to ids.
-     *
-     * @param  array<string, mixed>  $classData  Validated Class payload, keyed by prerequisite name.
-     * @param  string|null  $primaryName  Resolved primary prerequisite Class name.
-     * @param  string|null  $secondaryName  Resolved secondary prerequisite Class name.
-     * @param  array<string, int>  $persistedIdsByName  Class ids persisted so far in this import run.
-     * @return GameClass Created or updated Class.
      */
     private function persistClass(array $classData, ?string $primaryName, ?string $secondaryName, array $persistedIdsByName): GameClass
     {

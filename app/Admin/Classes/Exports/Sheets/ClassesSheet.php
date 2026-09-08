@@ -14,8 +14,6 @@ class ClassesSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
 {
     /**
      * Return every Class, ordered deterministically by name.
-     *
-     * @return Collection<int, GameClass> Classes to export.
      */
     public function collection(): Collection
     {
@@ -28,8 +26,7 @@ class ClassesSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
     /**
      * Map a Class into its workbook row, using the prerequisite Classes' names rather than ids.
      *
-     * @param  GameClass  $gameClass  Class to map.
-     * @return array<int, mixed> Workbook row values.
+     * @param  mixed  $gameClass
      */
     public function map($gameClass): array
     {
@@ -59,8 +56,6 @@ class ClassesSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
 
     /**
      * Return the Classes workbook column headings.
-     *
-     * @return array<int, string> Workbook column headings.
      */
     public function headings(): array
     {
@@ -75,8 +70,6 @@ class ClassesSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
 
     /**
      * Return the Classes workbook sheet title.
-     *
-     * @return string Classes workbook sheet title.
      */
     public function title(): string
     {

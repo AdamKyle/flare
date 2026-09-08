@@ -6,6 +6,7 @@ use App\Flare\Models\AlchemyBagSlot;
 use App\Game\Automation\Values\AutomationType;
 use App\Game\Character\CharacterAttack\Events\UpdateCharacterAttackEvent;
 use App\Game\Character\CharacterInventory\Events\CharacterBoonsUpdateBroadcastEvent;
+use App\Game\Character\CharacterInventory\Services\CharacterInventoryService;
 use App\Game\Character\CharacterInventory\Services\UseItemService;
 use App\Game\Core\Events\UpdateBaseCharacterInformation;
 use App\Game\Core\Events\UpdateTopBarEvent;
@@ -15,6 +16,8 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateAlchemyBagSlot;
@@ -81,6 +84,7 @@ class UseItemServiceTest extends TestCase
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
         Event::assertDispatched(CharacterBoonsUpdateBroadcastEvent::class);
+        Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 1);
 
         $this->assertNotEmpty($character->boons);
         $this->assertEquals(0, AlchemyBagSlot::where('alchemy_bag_id', $character->alchemyBag->id)->where('item_id', $item->id)->count());
@@ -425,6 +429,7 @@ class UseItemServiceTest extends TestCase
 
         Event::assertDispatched(UpdateCharacterAttackEvent::class);
         Event::assertDispatched(UpdateTopBarEvent::class);
+        Event::assertDispatchedTimes(UpdateBaseCharacterInformation::class, 1);
 
         $character = $character->refresh();
 
@@ -1812,5 +1817,80 @@ class UseItemServiceTest extends TestCase
 
         $this->assertEquals(422, $result['status']);
         $this->assertEquals('Cannot use requested item. Items may stack to a multiple of 10 or a max of 8 hours. Non stacking items cannot be used more then once, while another one is running.', $result['message']);
+    }
+
+    public function test_single_alchemy_use_does_not_build_full_usable_inventory_response(): void
+    {
+        Event::fake();
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->getCharacter();
+
+        $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 1,
+        ]);
+
+        $this->instance(
+            CharacterInventoryService::class,
+            Mockery::mock(CharacterInventoryService::class, function (MockInterface $mock) {
+                $mock->shouldNotReceive('getInventoryForType');
+                $mock->shouldNotReceive('setCharacter');
+            })
+        );
+
+        $useItemService = resolve(UseItemService::class);
+
+        $result = $useItemService->useSingleItemFromInventory($character->refresh(), $item);
+
+        $this->assertEquals(200, $result['status']);
+        $this->assertEquals('Used selected item.', $result['message']);
+    }
+
+    public function test_use_item_rejects_when_existing_boon_amount_used_is_already_at_max(): void
+    {
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'type' => 'alchemy',
+            'can_stack' => true,
+        ]);
+
+        $character = (new CharacterFactory)->createBaseCharacter()
+            ->givePlayerLocation()
+            ->inventoryManagement()
+            ->giveItem($item)
+            ->getCharacter();
+
+        $boon = $this->createCharacterBoon([
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'started' => now(),
+            'complete' => now()->addMinutes(60),
+            'amount_used' => 10,
+            'last_for_minutes' => 60,
+        ]);
+
+        $character = $character->refresh();
+        $slot = $character->inventory->slots->where('item.type', 'alchemy')->first();
+
+        $result = $this->useItemService->useItem($slot, $character);
+
+        $this->assertFalse($result);
+        $this->assertEquals(10, $boon->fresh()->amount_used);
+        $this->assertEquals(60, $boon->fresh()->last_for_minutes);
+        $this->assertNotNull($character->refresh()->inventory->slots->where('item.type', 'alchemy')->first());
     }
 }

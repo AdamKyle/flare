@@ -8,44 +8,63 @@ import {
 import FactualLink from '../../quest-item/partials/factual-link';
 import MonsterGemEffectContextCardProps from '../types/monster-gem-effect-context-card-props';
 
-import Card from 'ui/cards/card';
 import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
+import Separator from 'ui/separator/separator';
 
-/**
- * Render one cached Gem effect context (a normal Map, a Gem-bearing
- * Location, a Map Gem World, or a Location Gem World) for the Monster
- * Special Location Effects tab. Every value is read from the cached
- * effective Monster payload; nothing here recalculates Gem math.
- */
+const formatValue = (
+  value: string | number | null,
+  displayType: 'number' | 'range' | 'percent'
+): string => {
+  if (value === null) {
+    return '';
+  }
+
+  if (displayType === 'percent' && typeof value === 'number') {
+    return formatPercent(value);
+  }
+
+  if (displayType === 'range' && typeof value === 'string') {
+    return formatRangeWithCommas(value);
+  }
+
+  if (typeof value === 'number') {
+    return formatNumberWithCommas(value);
+  }
+
+  return String(value);
+};
+
+const resolveEffectiveClassName = (
+  base: string | number | null,
+  effective: string | number | null,
+  displayType: 'number' | 'range' | 'percent'
+): string => {
+  if (
+    displayType === 'number' ||
+    (displayType === 'percent' &&
+      typeof base === 'number' &&
+      typeof effective === 'number')
+  ) {
+    if (typeof base === 'number' && typeof effective === 'number') {
+      if (effective > base) {
+        return 'text-de-york-600 dark:text-de-york-400 font-semibold';
+      }
+
+      if (effective < base) {
+        return 'text-mango-tango-600 dark:text-mango-tango-400 font-semibold';
+      }
+    }
+  }
+
+  return 'text-danube-700 dark:text-danube-300 font-semibold';
+};
+
 const MonsterGemEffectContextCard = ({
   context,
   navigation,
 }: MonsterGemEffectContextCardProps): ReactNode => {
-  const renderChangedValue = (
-    value: string | number | null,
-    displayType: 'number' | 'range' | 'percent'
-  ): ReactNode => {
-    if (value === null) {
-      return null;
-    }
-
-    if (displayType === 'percent' && typeof value === 'number') {
-      return formatPercent(value);
-    }
-
-    if (displayType === 'range' && typeof value === 'string') {
-      return formatRangeWithCommas(value);
-    }
-
-    if (typeof value === 'number') {
-      return formatNumberWithCommas(value);
-    }
-
-    return value;
-  };
-
   const renderSource = (
     source: (typeof context.sources)[number]
   ): ReactNode => {
@@ -83,43 +102,78 @@ const MonsterGemEffectContextCard = ({
     );
   };
 
+  const hasContextIdentity =
+    Boolean(context.game_map) ||
+    Boolean(context.location) ||
+    context.sources.length > 0 ||
+    context.character_power_reduction > 0;
+
+  const hasChangedValues = context.changed_values.length > 0;
+
   return (
-    <Card>
+    <div>
       <h3 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
         {context.label}
       </h3>
-      <Dl>
-        {context.game_map && (
-          <Fragment>
-            <Dt>Game Map</Dt>
-            <Dd>{context.game_map.name}</Dd>
-          </Fragment>
-        )}
-        {context.location && (
-          <Fragment>
-            <Dt>Location</Dt>
-            <Dd>{context.location.name}</Dd>
-          </Fragment>
-        )}
-        {context.sources.map(renderSource)}
-        {context.character_power_reduction > 0 && (
-          <Fragment>
-            <Dt>Character Power Reduction</Dt>
-            <Dd>{formatPercent(context.character_power_reduction)}</Dd>
-          </Fragment>
-        )}
-        {context.changed_values.map((change) => (
-          <Fragment key={change.field}>
-            <Dt>{change.label}</Dt>
-            <Dd>
-              {renderChangedValue(change.base_value, change.display_type)}
-              {' → '}
-              {renderChangedValue(change.effective_value, change.display_type)}
-            </Dd>
-          </Fragment>
-        ))}
-      </Dl>
-    </Card>
+
+      {hasContextIdentity && (
+        <Dl>
+          {context.game_map && (
+            <Fragment>
+              <Dt>Game Map</Dt>
+              <Dd>{context.game_map.name}</Dd>
+            </Fragment>
+          )}
+          {context.location && (
+            <Fragment>
+              <Dt>Location</Dt>
+              <Dd>{context.location.name}</Dd>
+            </Fragment>
+          )}
+          {context.sources.map(renderSource)}
+          {context.character_power_reduction > 0 && (
+            <Fragment>
+              <Dt>Character Power Reduction</Dt>
+              <Dd>{formatPercent(context.character_power_reduction)}</Dd>
+            </Fragment>
+          )}
+        </Dl>
+      )}
+
+      {hasContextIdentity && hasChangedValues && <Separator />}
+
+      {hasChangedValues && (
+        <Dl>
+          {context.changed_values.map((change) => {
+            const effectiveClassName = resolveEffectiveClassName(
+              change.base_value,
+              change.effective_value,
+              change.display_type
+            );
+
+            return (
+              <Fragment key={change.field}>
+                <Dt>{change.label}</Dt>
+                <Dd>
+                  <span aria-hidden="true">
+                    <span className="text-glacier-500 dark:text-glacier-400">
+                      {formatValue(change.base_value, change.display_type)}
+                    </span>
+                    <span className="text-glacier-500 mx-1">→</span>
+                    <span className={effectiveClassName}>
+                      {formatValue(change.effective_value, change.display_type)}
+                    </span>
+                  </span>
+                  <span className="sr-only">
+                    {`Base ${formatValue(change.base_value, change.display_type)}, effective ${formatValue(change.effective_value, change.display_type)}`}
+                  </span>
+                </Dd>
+              </Fragment>
+            );
+          })}
+        </Dl>
+      )}
+    </div>
   );
 };
 

@@ -10,15 +10,6 @@ import {
 } from '../styles/npc-card-styles';
 import NpcCardProps from '../types/npc-card-props';
 
-/**
- * Canonical, permission-neutral Terracotta NPC relationship card: showing
- * NPC name, optional Type label, coordinates when both X and Y are
- * available, and an optional Game Map name. Renders as a single full-width
- * interactive `button` when `on_open_npc` is supplied, or as a semantically
- * meaningful noninteractive `<article>` when no navigation callback is
- * supplied, for permission-neutral factual contexts with no navigation
- * available — matching the canonical `LocationCard` pattern.
- */
 const NpcCard = ({
   npc_id: npcId,
   name,

@@ -424,6 +424,48 @@ class CharacterInventoryControllerTest extends TestCase
         $response->assertOk();
     }
 
+    public function test_use_many_items_accepts_repeated_owned_alchemy_slot_ids(): void
+    {
+        Queue::fake();
+
+        $item = $this->createItem([
+            'usable' => true,
+            'lasts_for' => 30,
+            'can_stack' => true,
+            'type' => 'alchemy',
+            'affects_skill_type' => SkillTypeValue::TRAINING,
+            'damages_kingdoms' => false,
+            'can_use_on_other_items' => false,
+        ]);
+        $character = $this->character->getCharacter();
+        $alchemySlot = $this->createAlchemyBagSlot([
+            'alchemy_bag_id' => $character->alchemyBag->id,
+            'character_id' => $character->id,
+            'item_id' => $item->id,
+            'amount' => 2,
+        ]);
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/character/'.$character->id.'/inventory/use-many-items', [
+                'items_to_use' => [$alchemySlot->id, $alchemySlot->id],
+            ]);
+
+        $response->assertOk();
+        $this->assertNotNull($response->json('message'));
+    }
+
+    public function test_use_many_items_rejects_a_non_array_items_to_use_payload(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $response = $this->actingAs($character->user)
+            ->postJson('/api/character/'.$character->id.'/inventory/use-many-items', [
+                'items_to_use' => 'not-an-array',
+            ]);
+
+        $response->assertStatus(422);
+    }
+
     public function test_use_alchemy_item_uses_a_single_alchemy_item(): void
     {
         Queue::fake();

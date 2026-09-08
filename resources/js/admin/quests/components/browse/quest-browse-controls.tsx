@@ -8,11 +8,6 @@ import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import Dropdown from 'ui/drop-down/drop-down';
 
-/**
- * Admin Quest browse top controls: the plane-first Game Map selector and
- * the Import/Export actions. The Quest category is chosen separately via
- * the primary Base / One Offs / Raid tabs rendered below this row.
- */
 const QuestBrowseControls = ({
   game_maps: gameMaps,
   selected_game_map_id: selectedGameMapId,

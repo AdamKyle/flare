@@ -187,10 +187,7 @@ class BuildMonsterCacheService
     }
 
     /**
-     * Build the Gem-affected per-Location Monster cache entries for every nongenerated Location
-     * with a currently rolled Location Gem, reusing the parent Map's regular Monster population.
-     *
-     * @return array<string, array>
+     * Build Gem-affected Monster cache entries for eligible Locations.
      */
     private function buildGemAffectedLocationCache(): array
     {
@@ -223,11 +220,7 @@ class BuildMonsterCacheService
     }
 
     /**
-     * Build the Cave of Memories dedicated Monster population cache entries, keyed by the
-     * actual Cave of Memories Location id. These Monsters never receive Map/Location Gem
-     * combat effects.
-     *
-     * @return array<string, array>
+     * Build Cave of Memories Monster cache entries by Location id.
      */
     private function buildCaveOfMemoriesLocationCache(): array
     {
@@ -250,8 +243,6 @@ class BuildMonsterCacheService
 
     /**
      * Build the query for the regular, non-exempt persisted Monster population for a source Game Map.
-     *
-     * @return Builder<Monster>
      */
     private function regularMonsterQuery(int $gameMapId): Builder
     {
@@ -281,11 +272,7 @@ class BuildMonsterCacheService
     }
 
     /**
-     * Build the regular/easier Monster tiers for an event Game Map, applying the actual
-     * current Game Map's resolved Gem context to both the event Map's own Monsters and
-     * the easier Surface-derived Monsters.
-     *
-     * @return array<string, array>
+     * Build regular and easier Monster tiers for an event Game Map.
      */
     private function createMonstersForEventMaps(GameMap $gameMap, Collection $monsters): array
     {

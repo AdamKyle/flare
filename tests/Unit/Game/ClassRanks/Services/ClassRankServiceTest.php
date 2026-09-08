@@ -2,12 +2,14 @@
 
 namespace Tests\Unit\Game\ClassRanks\Services;
 
+use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
 use App\Game\Core\Items\Values\ItemType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterClassRank;
@@ -52,6 +54,118 @@ class ClassRankServiceTest extends TestCase
 
         $this->assertEquals(200, $response['status']);
         $this->assertNotEmpty($response['class_ranks']);
+
+        $classRank = $response['class_ranks'][0];
+
+        $this->assertArrayHasKey('class_detail', $classRank);
+        $this->assertArrayHasKey('weapon_masteries', $classRank);
+        $this->assertArrayHasKey('is_active', $classRank);
+        $this->assertArrayHasKey('is_locked', $classRank);
+        $this->assertFalse($classRank['is_mastered']);
+    }
+
+    public function test_get_class_ranks_identifies_mastered_class_and_weapon_mastery(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $classRank = $character->classRanks()->where('game_class_id', $character->game_class_id)->first();
+        $classRank->update(['level' => ClassRankValue::MAX_LEVEL]);
+
+        $weaponMastery = $classRank->weaponMasteries()->first();
+        $weaponMastery->update(['level' => WeaponMasteryValue::MAX_LEVEL]);
+
+        $character = $character->refresh();
+
+        $response = $this->classRankService->getClassRanks($character);
+        $rankData = collect($response['class_ranks'])->firstWhere('game_class_id', $character->game_class_id);
+
+        $this->assertTrue($rankData['is_mastered']);
+
+        $masteryData = collect($rankData['weapon_masteries'])->firstWhere('id', $weaponMastery->id);
+
+        $this->assertTrue($masteryData['is_mastered']);
+    }
+
+    public function test_class_rank_unlock_progress_returns_current_and_required_levels(): void
+    {
+        $primary = $this->createClass(['name' => 'Primary']);
+        $secondary = $this->createClass(['name' => 'Secondary']);
+        $lockedClass = $this->createClass([
+            'name' => 'Locked Class',
+            'primary_required_class_id' => $primary->id,
+            'secondary_required_class_id' => $secondary->id,
+            'primary_required_class_level' => 10,
+            'secondary_required_class_level' => 20,
+        ]);
+        $character = $this->character->addAdditionalClassRanks([$primary->id, $secondary->id, $lockedClass->id])->getCharacter();
+        $character->classRanks()->where('game_class_id', $primary->id)->update(['level' => 5]);
+        $character->classRanks()->where('game_class_id', $secondary->id)->update(['level' => 20]);
+
+        $response = $this->classRankService->getClassRanks($character->refresh());
+        $classRank = collect($response['class_ranks'])->firstWhere('game_class_id', $lockedClass->id);
+
+        $this->assertSame($primary->name, $classRank['unlock_progress']['primary']['name']);
+        $this->assertSame(5, $classRank['unlock_progress']['primary']['current_level']);
+        $this->assertSame(10, $classRank['unlock_progress']['primary']['required_level']);
+        $this->assertFalse($classRank['unlock_progress']['primary']['is_met']);
+
+        $this->assertSame($secondary->name, $classRank['unlock_progress']['secondary']['name']);
+        $this->assertSame(20, $classRank['unlock_progress']['secondary']['current_level']);
+        $this->assertSame(20, $classRank['unlock_progress']['secondary']['required_level']);
+        $this->assertTrue($classRank['unlock_progress']['secondary']['is_met']);
+    }
+
+    public function test_get_specials_includes_reusable_class_mastery_detail(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'requires_class_rank_level' => 5,
+        ]);
+
+        $response = $this->classRankService->getSpecials($character);
+
+        $specialty = collect($response['class_specialties'])->firstWhere('id', $classSpecial->id);
+
+        $this->assertSame($classSpecial->id, $specialty['class_mastery']['id']);
+        $this->assertSame($classSpecial->name, $specialty['class_mastery']['name']);
+        $this->assertSame($character->game_class_id, $specialty['class_mastery']['game_class']['id']);
+        $this->assertSame(5, $specialty['class_mastery']['requires_class_rank_level']);
+    }
+
+    public function test_get_specials_includes_is_mastered_flag_for_equipped_and_other_specials(): void
+    {
+        $character = $this->character->getCharacter();
+
+        $masteredSpecial = $this->createGameClassSpecial(['game_class_id' => $character->game_class_id]);
+        $inProgressSpecial = $this->createGameClassSpecial(['game_class_id' => $character->game_class_id]);
+
+        $this->createCharacterClassRankSpecial([
+            'character_id' => $character->id,
+            'game_class_special_id' => $masteredSpecial->id,
+            'level' => ClassSpecialValue::MAX_LEVEL,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $this->createCharacterClassRankSpecial([
+            'character_id' => $character->id,
+            'game_class_special_id' => $inProgressSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => false,
+        ]);
+
+        $response = $this->classRankService->getSpecials($character->refresh());
+
+        $equippedRow = collect($response['specials_equipped'])->firstWhere('game_class_special_id', $masteredSpecial->id);
+        $otherRow = collect($response['other_class_specials'])->firstWhere('game_class_special_id', $inProgressSpecial->id);
+
+        $this->assertTrue($equippedRow['is_mastered']);
+        $this->assertFalse($otherRow['is_mastered']);
     }
 
     public function test_one_of_the_classes_is_locked()
@@ -414,6 +528,189 @@ class ClassRankServiceTest extends TestCase
         $this->assertEquals(200, $response['status']);
         $this->assertEquals('Unequipped class special: '.$classSpecialEquipped->gameClassSpecial->name, $response['message']);
         $this->assertEmpty($response['specials_equipped']);
+    }
+
+    public function test_unequip_specialty_emits_update_character_base_details_event()
+    {
+        Event::fake([UpdateCharacterBaseDetailsEvent::class]);
+
+        $character = $this->character->getCharacter();
+
+        $classSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $classSpecialEquipped = $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $classSpecial->id,
+            'level' => 0,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->classRankService->unequipSpecial($character, $classSpecialEquipped);
+
+        Event::assertDispatched(UpdateCharacterBaseDetailsEvent::class);
+    }
+
+    public function test_swap_specialty_successfully_replaces_equipped_specialty()
+    {
+        $character = $this->character->getCharacter();
+
+        $currentlyEquipped = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $target = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $equipped = $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $currentlyEquipped->id,
+            'level' => 3,
+            'current_xp' => 10,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $response = $this->classRankService->swapSpecialty($character, $target, $equipped);
+
+        $this->assertEquals(200, $response['status']);
+
+        $character = $character->refresh();
+
+        $this->assertFalse($character->classSpecialsEquipped->where('game_class_special_id', $currentlyEquipped->id)->first()->equipped);
+        $this->assertTrue($character->classSpecialsEquipped->where('game_class_special_id', $target->id)->first()->equipped);
+    }
+
+    public function test_swap_specialty_preserves_existing_progress_for_previously_learned_target()
+    {
+        $character = $this->character->getCharacter();
+
+        $currentlyEquipped = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $target = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $equipped = $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $currentlyEquipped->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $existingProgress = $this->createCharacterClassRankSpecial([
+            'character_id' => $character->id,
+            'game_class_special_id' => $target->id,
+            'level' => 7,
+            'current_xp' => 42,
+            'required_xp' => 500,
+            'equipped' => false,
+        ]);
+
+        $character = $character->refresh();
+
+        $this->classRankService->swapSpecialty($character, $target, $equipped);
+
+        $existingProgress = $existingProgress->refresh();
+
+        $this->assertTrue($existingProgress->equipped);
+        $this->assertEquals(7, $existingProgress->level);
+        $this->assertEquals(42, $existingProgress->current_xp);
+    }
+
+    public function test_swap_specialty_automatically_replaces_equipped_damage_specialty()
+    {
+        $character = $this->character->getCharacter();
+
+        $equippedDamageSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 50000,
+            'increase_specialty_damage_per_level' => 50,
+            'specialty_damage_uses_damage_stat_amount' => 0.10,
+        ]);
+
+        $targetDamageSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+            'specialty_damage' => 60000,
+            'increase_specialty_damage_per_level' => 50,
+            'specialty_damage_uses_damage_stat_amount' => 0.10,
+        ]);
+
+        $equipped = $character->classSpecialsEquipped()->create([
+            'character_id' => $character->id,
+            'game_class_special_id' => $equippedDamageSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $character = $character->refresh();
+
+        $response = $this->classRankService->swapSpecialty($character, $targetDamageSpecial, $equipped);
+
+        $this->assertEquals(200, $response['status']);
+
+        $character = $character->refresh();
+
+        $this->assertFalse($character->classSpecialsEquipped->where('game_class_special_id', $equippedDamageSpecial->id)->first()->equipped);
+        $this->assertTrue($character->classSpecialsEquipped->where('game_class_special_id', $targetDamageSpecial->id)->first()->equipped);
+    }
+
+    public function test_swap_specialty_fails_when_replacement_belongs_to_another_character()
+    {
+        $character = $this->character->getCharacter();
+        $characterTwo = (new CharacterFactory)->createBaseCharacter()->getCharacter();
+
+        $target = $this->createGameClassSpecial([
+            'game_class_id' => $character->game_class_id,
+        ]);
+
+        $otherCharacterSpecial = $this->createGameClassSpecial([
+            'game_class_id' => $characterTwo->game_class_id,
+        ]);
+
+        $otherCharacterEquipped = $characterTwo->classSpecialsEquipped()->create([
+            'character_id' => $characterTwo->id,
+            'game_class_special_id' => $otherCharacterSpecial->id,
+            'level' => 1,
+            'current_xp' => 0,
+            'required_xp' => 100,
+            'equipped' => true,
+        ]);
+
+        $response = $this->classRankService->swapSpecialty($character, $target, $otherCharacterEquipped);
+
+        $this->assertEquals(422, $response['status']);
+        $this->assertEquals('You do not own that.', $response['message']);
+    }
+
+    public function test_equip_specialty_returns_requirement_error_when_class_rank_is_missing()
+    {
+        $character = $this->character->getCharacter();
+
+        $otherClass = $this->createClass(['name' => 'Unranked Class']);
+
+        $target = $this->createGameClassSpecial([
+            'game_class_id' => $otherClass->id,
+        ]);
+
+        $response = $this->classRankService->equipSpecialty($character, $target);
+
+        $this->assertEquals(422, $response['status']);
+        $this->assertEquals('You do not have the required class rank level for this.', $response['message']);
     }
 
     public function test_no_xp_for_max_level()

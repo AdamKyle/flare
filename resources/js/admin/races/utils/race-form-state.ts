@@ -24,9 +24,7 @@ export const createRaceFormState = (
 };
 
 /**
- * Build the multipart Race save request payload from validated form state.
- * Update requests are sent as `POST` with a spoofed `_method=PUT` field so the
- * Race image can be uploaded in the same multipart request.
+ * Updates use POST with `_method=PUT` so the image remains a multipart upload.
  */
 export const buildRaceFormData = (
   state: RaceFormStateDefinition,

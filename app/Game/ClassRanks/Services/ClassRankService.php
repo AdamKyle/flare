@@ -5,12 +5,15 @@ namespace App\Game\ClassRanks\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\CharacterClassRank;
 use App\Flare\Models\CharacterClassSpecialtiesEquipped;
+use App\Flare\Models\GameClass;
 use App\Flare\Models\GameClassSpecial;
 use App\Game\BattleRewardProcessing\Handlers\BattleMessageHandler;
 use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackTypesHandler;
 use App\Game\Character\CharacterInventory\Mappings\ItemTypeMapping;
 use App\Game\Character\CharacterSheet\Events\UpdateCharacterBaseDetailsEvent;
 use App\Game\Character\Concerns\FetchEquipped;
+use App\Game\ClassRanks\Transformers\ClassDetailTransformer;
+use App\Game\ClassRanks\Transformers\ClassMasteryDetailTransformer;
 use App\Game\ClassRanks\Values\ClassRankValue;
 use App\Game\ClassRanks\Values\ClassSpecialValue;
 use App\Game\ClassRanks\Values\WeaponMasteryValue;
@@ -21,15 +24,18 @@ use App\Game\Gems\Values\AreaGemRewardEffect;
 use App\Game\Messages\Events\ServerMessageEvent;
 use App\Game\Messages\Types\ClassRanksMessageTypes;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 
 class ClassRankService
 {
     use FetchEquipped, ResponseBuilder;
 
     public function __construct(
-        private UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
-        private BattleMessageHandler $battleMessageHandler,
+        private readonly UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
+        private readonly BattleMessageHandler $battleMessageHandler,
         private readonly AreaGemEffectService $areaGemEffectService,
+        private readonly ClassDetailTransformer $classDetailTransformer,
+        private readonly ClassMasteryDetailTransformer $classMasteryDetailTransformer,
     ) {}
 
     /**
@@ -57,14 +63,15 @@ class ClassRankService
      */
     public function getSpecials(Character $character): array
     {
-        $classSpecialsEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', true)->get();
-        $classSpecialsNotEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial')->where('equipped', '=', false)->get();
+        $classSpecialsEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial.gameClass')->where('equipped', '=', true)->get();
+        $classSpecialsNotEquipped = $character->classSpecialsEquipped()->with('gameClassSpecial.gameClass')->where('equipped', '=', false)->get();
 
         $damageStatAmount = $character->getInformation()->statMod($character->damage_stat);
 
         return [
-            'class_specialties' => GameClassSpecial::all()->transform(function ($special) {
+            'class_specialties' => GameClassSpecial::with('gameClass')->get()->transform(function ($special) {
                 $special->class_name = $special->gameClass->name;
+                $special->class_mastery = $this->classMasteryDetailTransformer->transform($special);
 
                 return $special;
             }),
@@ -73,6 +80,8 @@ class ClassRankService
                 $specialEquipped->specialty_damage = $specialEquipped->gameClassSpecial->specialty_damage
                     + $specialEquipped->gameClassSpecial->increase_specialty_damage_per_level * $specialEquipped->level
                     + $damageStatAmount * $specialEquipped->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
+                $specialEquipped->class_mastery = $this->classMasteryDetailTransformer->transform($specialEquipped->gameClassSpecial);
+                $specialEquipped->is_mastered = $specialEquipped->level >= ClassSpecialValue::MAX_LEVEL;
 
                 return $specialEquipped;
             })->toArray()),
@@ -82,6 +91,8 @@ class ClassRankService
                 $special->specialty_damage = $special->gameClassSpecial->specialty_damage
                     + $special->gameClassSpecial->increase_specialty_damage_per_level * $special->level
                     + $damageStatAmount * $special->gameClassSpecial->specialty_damage_uses_damage_stat_amount;
+                $special->class_mastery = $this->classMasteryDetailTransformer->transform($special->gameClassSpecial);
+                $special->is_mastered = $special->level >= ClassSpecialValue::MAX_LEVEL;
 
                 return $special;
             })->toArray()),
@@ -93,12 +104,20 @@ class ClassRankService
      */
     public function getClassRanks(Character $character): array
     {
-        $classRanks = $character->classRanks()->with(['gameClass', 'weaponMasteries'])->get();
+        $classRanks = $character->classRanks()->with([
+            'gameClass',
+            'gameClass.primaryClassRequired',
+            'gameClass.secondaryClassRequired',
+            'weaponMasteries',
+        ])->get();
 
-        $classRanks = $classRanks->transform(function ($classRank) use ($character) {
+        $characterClassRanks = $classRanks;
+
+        $classRanks = $classRanks->transform(function ($classRank) use ($character, $characterClassRanks) {
             $classRank->class_name = $classRank->gameClass->name;
             $classRank->is_active = $classRank->gameClass->id === $character->game_class_id;
             $classRank->is_locked = $this->isClassLocked($character, $classRank);
+            $classRank->is_mastered = $classRank->level >= ClassRankValue::MAX_LEVEL;
 
             $preferredType = ItemTypeMapping::getForClass($classRank->gameClass->name);
 
@@ -144,6 +163,7 @@ class ClassRankService
                     'required_xp' => $mastery->required_xp,
                     'mastery_name' => ucwords(str_replace('-', ' ', $mastery->weapon_type)),
                     'level' => $mastery->level,
+                    'is_mastered' => $mastery->level >= WeaponMasteryValue::MAX_LEVEL,
                 ];
 
                 $sortedWeaponMasteries[] = $masteryData;
@@ -158,6 +178,9 @@ class ClassRankService
             $classRank->secondary_class_name = ! is_null($secondaryClass) ? $secondaryClass->name : null;
             $classRank->primary_class_required_level = $classRank->gameClass->primary_required_class_level;
             $classRank->secondary_class_required_level = $classRank->gameClass->secondary_required_class_level;
+
+            $classRank->class_detail = $this->classDetailTransformer->transform($classRank->gameClass);
+            $classRank->unlock_progress = $this->resolveUnlockProgress($classRank->gameClass, $characterClassRanks);
 
             return $classRank;
         })->sortByDesc(fn ($item) => $item->is_active)
@@ -174,6 +197,39 @@ class ClassRankService
         return $this->successResult([
             'class_ranks' => $result,
         ]);
+    }
+
+    /**
+     * Resolve the display-only prerequisite unlock progress for a Class, or null when it has no prerequisite pair.
+     */
+    private function resolveUnlockProgress(GameClass $gameClass, Collection $characterClassRanks): ?array
+    {
+        if (is_null($gameClass->primary_required_class_id) || is_null($gameClass->secondary_required_class_id)) {
+            return null;
+        }
+
+        $primaryClassRank = $characterClassRanks->where('game_class_id', $gameClass->primary_required_class_id)->first();
+        $secondaryClassRank = $characterClassRanks->where('game_class_id', $gameClass->secondary_required_class_id)->first();
+
+        $primaryCurrentLevel = ! is_null($primaryClassRank) ? $primaryClassRank->level : 0;
+        $secondaryCurrentLevel = ! is_null($secondaryClassRank) ? $secondaryClassRank->level : 0;
+
+        return [
+            'primary' => [
+                'id' => $gameClass->primaryClassRequired->id,
+                'name' => $gameClass->primaryClassRequired->name,
+                'current_level' => $primaryCurrentLevel,
+                'required_level' => $gameClass->primary_required_class_level,
+                'is_met' => $primaryCurrentLevel >= $gameClass->primary_required_class_level,
+            ],
+            'secondary' => [
+                'id' => $gameClass->secondaryClassRequired->id,
+                'name' => $gameClass->secondaryClassRequired->name,
+                'current_level' => $secondaryCurrentLevel,
+                'required_level' => $gameClass->secondary_required_class_level,
+                'is_met' => $secondaryCurrentLevel >= $gameClass->secondary_required_class_level,
+            ],
+        ];
     }
 
     /**
@@ -195,7 +251,7 @@ class ClassRankService
 
         $classRank = $character->classRanks->where('game_class_id', $gameClassSpecial->game_class_id)->first();
 
-        if ($classRank->level < $gameClassSpecial->requires_class_rank_level) {
+        if (is_null($classRank) || $classRank->level < $gameClassSpecial->requires_class_rank_level) {
             return $this->errorResult('You do not have the required class rank level for this.');
         }
 
@@ -251,8 +307,80 @@ class ClassRankService
 
         $this->updateCharacterAttackTypes->updateCache($character);
 
+        event(new UpdateCharacterBaseDetailsEvent($character));
+
         return $this->successResult(array_merge([
             'message' => 'Unequipped class special: '.$classSpecialEquipped->gameClassSpecial->name,
+        ], $this->getSpecials($character)));
+    }
+
+    /**
+     * Swap a currently equipped Class Specialty for an accessible target one.
+     *
+     * @throws Exception
+     */
+    public function swapSpecialty(Character $character, GameClassSpecial $target, CharacterClassSpecialtiesEquipped $replacement): array
+    {
+        if ($replacement->character_id !== $character->id) {
+            return $this->errorResult('You do not own that.');
+        }
+
+        if (! $replacement->equipped) {
+            return $this->errorResult('You do not own that.');
+        }
+
+        $alreadyEquipped = $character->classSpecialsEquipped->where('game_class_special_id', $target->id)->where('equipped', true)->first();
+
+        if (! is_null($alreadyEquipped)) {
+            return $this->errorResult('That Class Specialty is already equipped.');
+        }
+
+        $classRank = $character->classRanks->where('game_class_id', $target->game_class_id)->first();
+
+        if (is_null($classRank) || $classRank->level < $target->requires_class_rank_level) {
+            return $this->errorResult('You do not have the required class rank level for this.');
+        }
+
+        if ($target->specialty_damage > 0) {
+            $otherEquippedDamageSpecialties = $character->classSpecialsEquipped
+                ->where('id', '!=', $replacement->id)
+                ->where('equipped', true)
+                ->where('gameClassSpecial.specialty_damage', '>', 0)
+                ->count();
+
+            if ($otherEquippedDamageSpecialties > 0) {
+                return $this->errorResult('You already have a damage specialty equipped and cannot equip another one.');
+            }
+        }
+
+        $replacement->update(['equipped' => false]);
+
+        $existingProgress = $character->classSpecialsEquipped()
+            ->where('game_class_special_id', $target->id)
+            ->where('equipped', false)
+            ->first();
+
+        if (! is_null($existingProgress)) {
+            $existingProgress->update(['equipped' => true]);
+        } else {
+            $character->classSpecialsEquipped()->create([
+                'character_id' => $character->id,
+                'game_class_special_id' => $target->id,
+                'level' => 1,
+                'current_xp' => 0,
+                'required_xp' => ClassSpecialValue::XP_PER_LEVEL,
+                'equipped' => true,
+            ]);
+        }
+
+        $character = $character->refresh();
+
+        $this->updateCharacterAttackTypes->updateCache($character);
+
+        event(new UpdateCharacterBaseDetailsEvent($character));
+
+        return $this->successResult(array_merge([
+            'message' => 'Equipped class special: '.$target->name,
         ], $this->getSpecials($character)));
     }
 

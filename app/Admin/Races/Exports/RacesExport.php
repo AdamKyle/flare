@@ -13,8 +13,6 @@ class RacesExport implements Export, WithMultipleSheets
 
     /**
      * Return the sheets included in the Races workbook.
-     *
-     * @return array<int, RacesSheet> Races workbook sheets.
      */
     public function sheets(): array
     {

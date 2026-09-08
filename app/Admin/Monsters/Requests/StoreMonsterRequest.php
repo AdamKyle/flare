@@ -13,8 +13,6 @@ class StoreMonsterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -23,8 +21,6 @@ class StoreMonsterRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -88,8 +84,6 @@ class StoreMonsterRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -102,8 +96,6 @@ class StoreMonsterRequest extends FormRequest
 
     /**
      * Normalize present boolean fields before validation.
-     *
-     * @return void Merges normalized boolean values into the request input.
      */
     protected function prepareForValidation(): void
     {
@@ -121,8 +113,6 @@ class StoreMonsterRequest extends FormRequest
 
     /**
      * Configure the validator instance to enforce raid Monster/boss mutual exclusion.
-     *
-     * @param  Validator  $validator  Validator instance to configure.
      */
     public function withValidator(Validator $validator): void
     {

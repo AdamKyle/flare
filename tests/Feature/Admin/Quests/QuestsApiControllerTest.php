@@ -828,19 +828,37 @@ class QuestsApiControllerTest extends TestCase
         $this->assertCount(0, $data);
     }
 
-    public function test_browse_options_returns_default_game_map_and_ordered_maps(): void
+    public function test_browse_options_returns_default_game_map_and_canonically_ordered_maps(): void
     {
         $admin = $this->createAdmin($this->createAdminRole());
-        $this->createGameMap(['name' => 'Zeta Map', 'default' => false]);
+        $this->createGameMap(['name' => 'Twisted Memories', 'default' => false]);
+        $this->createGameMap(['name' => 'Purgatory', 'default' => false]);
+        $this->createGameMap(['name' => 'Shadow Plane', 'default' => false]);
+        $this->createGameMap(['name' => 'Dungeons', 'default' => false]);
+        $this->createGameMap(['name' => 'Delusional Memories', 'default' => false]);
+        $this->createGameMap(['name' => 'Ice Plane', 'default' => false]);
+        $this->createGameMap(['name' => 'Labyrinth', 'default' => false]);
         $surface = $this->createGameMap(['name' => 'Surface', 'default' => true]);
-        $this->createGameMap(['name' => 'Alpha Map', 'default' => false]);
+        $this->createGameMap(['name' => 'Zeta Unknown Map', 'default' => false]);
+        $this->createGameMap(['name' => 'Alpha Unknown Map', 'default' => false]);
 
         $response = $this->actingAs($admin)->call('GET', '/api/admin/quests/browse-options', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
         $data = json_decode($response->getContent(), true);
 
         $response->assertStatus(200);
         $this->assertSame($surface->id, $data['default_game_map_id']);
-        $this->assertSame(['Alpha Map', 'Surface', 'Zeta Map'], array_column($data['game_maps'], 'name'));
+        $this->assertSame([
+            'Surface',
+            'Labyrinth',
+            'Dungeons',
+            'Shadow Plane',
+            'Purgatory',
+            'Ice Plane',
+            'Delusional Memories',
+            'Twisted Memories',
+            'Alpha Unknown Map',
+            'Zeta Unknown Map',
+        ], array_column($data['game_maps'], 'name'));
     }
 
     public function test_browse_options_returns_null_default_when_no_default_map_exists(): void

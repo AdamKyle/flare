@@ -29,12 +29,18 @@ class NpcQuestRewardHandler
         private readonly NpcServerMessageBuilder $npcServerMessageBuilder,
         private readonly UpdateFactionLoyaltyService $updateFactionLoyaltyService) {}
 
+    /**
+     * Process all rewards for the completed NPC Quest.
+     */
     public function processReward(Quest $quest, Npc $npc, Character $character): void
     {
         $this->processNonXpRewards($quest, $npc, $character);
         $this->processXpReward($quest, $character);
     }
 
+    /**
+     * Process the non-XP rewards for the completed NPC Quest.
+     */
     public function processNonXpRewards(Quest $quest, Npc $npc, Character $character): void
     {
         if ($this->questHasRewardItem($quest)) {
@@ -132,6 +138,9 @@ class NpcQuestRewardHandler
         }
     }
 
+    /**
+     * Process the XP reward for the completed NPC Quest.
+     */
     public function processXpReward(Quest $quest, Character $character): void
     {
         if ($this->questRewardsXP($quest)) {
@@ -139,41 +148,65 @@ class NpcQuestRewardHandler
         }
     }
 
+    /**
+     * Determine whether the Quest rewards an Item.
+     */
     public function questHasRewardItem(Quest $quest): bool
     {
         return ! is_null($quest->reward_item);
     }
 
+    /**
+     * Determine whether the Quest unlocks a Skill.
+     */
     public function questUnlocksSkill(Quest $quest): bool
     {
         return $quest->unlocks_skill;
     }
 
+    /**
+     * Determine whether the Quest rewards Gold.
+     */
     public function questRewardsGold(Quest $quest): bool
     {
         return ! is_null($quest->reward_gold);
     }
 
+    /**
+     * Determine whether the Quest rewards Gold Dust.
+     */
     public function questRewardsGoldDust(Quest $quest): bool
     {
         return ! is_null($quest->reward_gold_dust);
     }
 
+    /**
+     * Determine whether the Quest rewards Shards.
+     */
     public function questRewardsShards(Quest $quest): bool
     {
         return ! is_null($quest->reward_shards);
     }
 
+    /**
+     * Determine whether the Quest rewards XP.
+     */
     public function questRewardsXP(Quest $quest): bool
     {
         return ! is_null($quest->reward_xp);
     }
 
+    /**
+     * Determine whether the Quest rewards a Passive Skill.
+     */
     public function questRewardsPassive(Quest $quest): bool
     {
         return ! is_null($quest->unlocks_passive_id);
     }
 
+    /**
+     * Give the Quest XP reward to the character.
+     */
     public function giveXP(Character $character, Quest $quest): void
     {
         $character->update([
@@ -185,6 +218,9 @@ class NpcQuestRewardHandler
         $this->handlePossibleLevelUp($character);
     }
 
+    /**
+     * Give the Quest Item reward to the character.
+     */
     public function giveItem(Character $character, Quest $quest, Npc $npc): void
     {
 
@@ -226,6 +262,9 @@ class NpcQuestRewardHandler
         broadcast(new ServerMessageEvent($character->user, 'Received: '.$quest->rewardItem->name, $slot->id));
     }
 
+    /**
+     * Unlock the Quest Skill reward for the character.
+     */
     public function unlockSkill(Quest $quest, Character $character, Npc $npc): void
     {
         $gameSkill = GameSkill::where('type', $quest->unlocks_skill_type)->first();
@@ -249,6 +288,9 @@ class NpcQuestRewardHandler
         event(new UpdateCharacterStatus($character));
     }
 
+    /**
+     * Give the Quest Gold reward to the character.
+     */
     public function giveGold(Character $character, Quest $quest, Npc $npc): void
     {
 
@@ -267,6 +309,9 @@ class NpcQuestRewardHandler
         broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_gold).' gold from: '.$npc->real_name));
     }
 
+    /**
+     * Give the Quest Gold Dust reward to the character.
+     */
     public function giveGoldDust(Character $character, Quest $quest, Npc $npc): void
     {
 
@@ -285,6 +330,9 @@ class NpcQuestRewardHandler
         broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_gold_dust).' gold dust from: '.$npc->real_name));
     }
 
+    /**
+     * Give the Quest Shards reward to the character.
+     */
     public function giveShards(Character $character, Quest $quest, Npc $npc): void
     {
 
@@ -303,16 +351,25 @@ class NpcQuestRewardHandler
         broadcast(new ServerMessageEvent($character->user, 'Received: '.number_format($quest->reward_shards).' shards from: '.$npc->real_name));
     }
 
+    /**
+     * Send the NPC Quest reward message to the character.
+     */
     public function npcServerMessage(Npc $npc, Character $character, BaseMessageType $type): void
     {
         broadcast(new ServerMessageEvent($character->user, $this->npcServerMessageBuilder->build($type, $npc)));
     }
 
+    /**
+     * Refresh the character attack data cache after Quest rewards.
+     */
     public function updateCharacterAttackDataCache(Character $character): void
     {
         CharacterAttackTypesCacheBuilder::dispatch($character);
     }
 
+    /**
+     * Create the completed Quest log entry for the character.
+     */
     public function createquestQuestLog(Character $character, Quest $quest): void
     {
         $character->questsCompleted()->create([
@@ -327,6 +384,9 @@ class NpcQuestRewardHandler
         event(new UpdateCharacterBaseDetailsEvent($character));
     }
 
+    /**
+     * Give additional Item Sets unlocked by the Quest to the character.
+     */
     private function giveAdditionalSetsToCharacter(Character $character): Character
     {
         for ($i = 1; $i <= 10; $i++) {

@@ -11,15 +11,10 @@ class ItemsExport implements Export, WithMultipleSheets
 {
     use Exportable;
 
-    /**
-     * @param  array<int, string>  $itemTypes  Item `type`/`specialty_type` family values to export.
-     */
     public function __construct(private readonly array $itemTypes = []) {}
 
     /**
      * Return the sheets included in the Items family workbook.
-     *
-     * @return array<int, ItemsSheet> Items workbook sheets.
      */
     public function sheets(): array
     {

@@ -1,39 +1,24 @@
 import ApiErrorAlert from 'api-handler/components/api-error-alert';
 import clsx from 'clsx';
 import React, { ReactNode, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 
 import { GameMapSidePeekMessages } from './enums/game-map-side-peek-messages';
 import GameMapRelatedDataCompactNav from './game-map-related-data-compact-nav';
 import AdminGameMapDetailSidePeekProps from './types/admin-game-map-detail-side-peek-props';
 import { resolveSidePeekComponent } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-mapper';
 import { SidePeekComponentRegistrationEnum } from '../../../../game/components/side-peeks/base/component-registration/side-peek-component-registration-enum';
+import GameMapDetail from '../../../../game/reusable-components/game-map/components/game-map-detail';
 import { GameMapApiMessages } from '../../api/enums/game-map-api-messages';
 import { useGameMap } from '../../api/hooks/use-game-map';
-import { GAME_MAP_EVENT_TYPE_LABELS } from '../../enums/game-map-event-type';
 import { GameMapRelatedDataKey } from '../../types/game-map-related-data-entry';
-import { resolveGameMapBonusEntries } from '../../utils/resolve-game-map-bonus-entries';
-import { resolveRequiredQuestItemCopy } from '../../utils/resolve-required-quest-item-copy';
 import GameMapFormContent from '../forms/game-map-form-content';
-import GameMapKingdomColorSwatch from '../game-map-kingdom-color-swatch';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode';
 import StackedCard from 'ui/cards/stacked-card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Admin Game Map detail side-peek: stacks the same factual Game Map fields
- * the standalone Game Map show screen renders (map preview, description,
- * access/configuration, required Quest Item, bonuses) with an Admin-only
- * Edit action, so other modernized Admin resources (Quest, Monster,
- * Location, NPC) can open a real Game Map's identity without leaving their
- * own side-peek context.
- */
 const AdminGameMapDetailSidePeek = ({
   game_map_id: gameMapId,
   on_game_map_changed: onGameMapChanged,
@@ -69,146 +54,6 @@ const AdminGameMapDetailSidePeek = ({
     setRelatedSelection(null);
   };
 
-  const renderMapPreview = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    return (
-      <div className="border-glacier-200 bg-glacier-950 dark:border-glacier-800 aspect-square w-full overflow-hidden rounded-md border">
-        <img
-          src={gameMap.map_url}
-          alt={`${gameMap.name} map`}
-          className="h-full w-full object-contain"
-        />
-      </div>
-    );
-  };
-
-  const renderDescription = (): ReactNode => {
-    if (!gameMap?.description) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-          Description
-        </h2>
-        <div className="text-glacier-700 dark:text-glacier-300 min-w-0 text-sm break-words">
-          <ReactMarkdown>{gameMap.description}</ReactMarkdown>
-        </div>
-      </section>
-    );
-  };
-
-  const renderRequiredQuestItem = (): ReactNode => {
-    if (!gameMap?.required_quest_item) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-1 text-sm font-semibold">
-          Required Quest Item
-        </h2>
-        <p className="text-glacier-900 dark:text-glacier-100 font-medium">
-          {gameMap.required_quest_item.name}
-        </p>
-        <p className="text-glacier-700 dark:text-glacier-300 text-sm">
-          {resolveRequiredQuestItemCopy(gameMap.required_quest_item)}
-        </p>
-      </section>
-    );
-  };
-
-  const renderAccessConfiguration = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    const hasRows =
-      gameMap.default ||
-      gameMap.can_traverse ||
-      gameMap.event_restriction !== null ||
-      gameMap.required_location !== null ||
-      Boolean(gameMap.kingdom_color);
-
-    if (!hasRows) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Access and Configuration
-        </h2>
-        <Dl>
-          {gameMap.default && (
-            <>
-              <Dt>Default map</Dt>
-              <Dd>Yes</Dd>
-            </>
-          )}
-          {gameMap.can_traverse && (
-            <>
-              <Dt>Can traverse</Dt>
-              <Dd>Yes</Dd>
-            </>
-          )}
-          {gameMap.event_restriction !== null && (
-            <>
-              <Dt>Event restriction</Dt>
-              <Dd>{GAME_MAP_EVENT_TYPE_LABELS[gameMap.event_restriction]}</Dd>
-            </>
-          )}
-          {gameMap.required_location && (
-            <>
-              <Dt>Required Location</Dt>
-              <Dd>{gameMap.required_location.name}</Dd>
-            </>
-          )}
-          {gameMap.kingdom_color && (
-            <>
-              <Dt>Kingdom color</Dt>
-              <Dd>
-                <GameMapKingdomColorSwatch color={gameMap.kingdom_color} />
-              </Dd>
-            </>
-          )}
-        </Dl>
-      </section>
-    );
-  };
-
-  const renderMapBonuses = (): ReactNode => {
-    if (!gameMap) {
-      return null;
-    }
-
-    const bonusEntries = resolveGameMapBonusEntries(gameMap);
-
-    if (bonusEntries.length === 0) {
-      return null;
-    }
-
-    return (
-      <section>
-        <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-          Map Bonuses
-        </h2>
-        <Dl>
-          {bonusEntries.map((entry) => (
-            <React.Fragment key={entry.label}>
-              <Dt>{entry.label}</Dt>
-              <Dd>{entry.percentage}%</Dd>
-            </React.Fragment>
-          ))}
-        </Dl>
-      </section>
-    );
-  };
-
   const renderContent = (): ReactNode => {
     if (loading) {
       return <InfiniteLoader />;
@@ -235,15 +80,7 @@ const AdminGameMapDetailSidePeek = ({
           />
         </div>
 
-        {renderMapPreview()}
-
-        {renderDescription()}
-
-        {renderAccessConfiguration()}
-
-        {renderRequiredQuestItem()}
-
-        {renderMapBonuses()}
+        <GameMapDetail game_map={gameMap} />
 
         <section>
           <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">

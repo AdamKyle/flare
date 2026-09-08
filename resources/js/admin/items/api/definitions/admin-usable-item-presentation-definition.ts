@@ -1,10 +1,3 @@
-/**
- * Matches App\Game\Core\Items\Transformers\Api\UsableItemTransformer::transform()
- * exactly — the same canonical transformer the player-facing usable Item
- * presentation uses. `slot_id` is null for a bare catalog Item because the
- * transformer already supports being called with a bare `Item` instead of an
- * inventory slot.
- */
 export default interface AdminUsableItemPresentationDefinition {
   item_id: number;
   slot_id: number | null;

@@ -8,5 +8,6 @@ export default interface NumberFieldProps {
   error?: string | null;
   disabled?: boolean;
   min?: number;
+  max?: number;
   placeholder?: string;
 }

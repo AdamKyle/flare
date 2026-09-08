@@ -51,6 +51,8 @@ class CharacterStatBuilder
 
     private bool $ignoreReductions = false;
 
+    private float $areaGemCharacterPowerReduction = 0.0;
+
     public function __construct(
         DefenceBuilder $defenceBuilder,
         DamageBuilder $damageBuilder,
@@ -86,6 +88,10 @@ class CharacterStatBuilder
         $this->characterBoons = $this->fetchCharacterBoons($character);
 
         $this->map = $this->character->map?->gameMap;
+
+        $this->areaGemCharacterPowerReduction = ($ignoreReductions || is_null($this->map))
+            ? 0.0
+            : $this->areaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
 
         $this->skills = $this->character->skills;
 
@@ -223,7 +229,7 @@ class CharacterStatBuilder
         }
 
         return $this->getLegacyMapCharacterReductions()
-            + $this->areaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
+            + $this->areaGemCharacterPowerReduction;
     }
 
     /**

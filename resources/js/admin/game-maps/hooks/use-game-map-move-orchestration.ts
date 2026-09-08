@@ -9,10 +9,7 @@ import CoordinateDefinition from '../types/coordinate-definition';
 import { MovingRecordDefinition } from '../types/game-map-editor-canvas-props';
 
 /**
- * Own the Location/Npc move-in-progress state for one Game Map move orchestration
- * instance. Callers that must observe the same in-progress move across separately
- * mounted components (for example the editor screen and a side peek) seed this
- * hook's initial state from the last state they observed; see `useManageGameMapMove`.
+ * Preserve one move state across separately mounted editor and SidePeek consumers.
  */
 export const useGameMapMoveOrchestration = (
   initialMovingRecord?: MovingRecordDefinition | null,

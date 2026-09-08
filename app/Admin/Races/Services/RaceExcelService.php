@@ -14,7 +14,6 @@ class RaceExcelService
     /**
      * Download the Races workbook.
      *
-     * @return BinaryFileResponse Races workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class RaceExcelService
 
     /**
      * Import Races from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Races workbook.
-     * @return void Persists the imported Races.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

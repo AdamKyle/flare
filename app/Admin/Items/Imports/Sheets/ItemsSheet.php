@@ -13,22 +13,12 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 
 class ItemsSheet implements ToCollection
 {
-    /**
-     * @param  ItemService  $itemService  Canonical Item cross-field normalization service.
-     */
     public function __construct(
         private readonly ItemService $itemService,
     ) {}
 
     /**
      * Import catalog Item rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized and validated first; the workbook is written only when
-     * every meaningful row resolves successfully, so an invalid later row cannot leave an earlier
-     * row's write applied.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Catalog Items are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -57,13 +47,6 @@ class ItemsSheet implements ToCollection
 
     /**
      * Normalize and validate every meaningful Item row before any row is written.
-     *
-     * A blank `name` marks the end of the workbook's meaningful data. Any other row that cannot be
-     * fully resolved (an unrecognized Item type, unlocked Class, Item Skill, or drop Location)
-     * invalidates the entire import.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>>|null Validated Item payloads, or null when any row is invalid.
      */
     private function normalizeAndValidateRows(Collection $rows): ?array
     {
@@ -95,9 +78,6 @@ class ItemsSheet implements ToCollection
 
     /**
      * Normalize a single raw Item row, resolving related records by name.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed>|null Normalized Item attributes, or null when the row is invalid.
      */
     private function normalizeRow(array $rawRow): ?array
     {
@@ -127,9 +107,6 @@ class ItemsSheet implements ToCollection
 
     /**
      * Resolve the unlocked Class referenced by name, validating its paired Skill when given.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return int|null|false Resolved Class id, null when no Class was referenced, or false when the row is invalid.
      */
     private function resolveUnlocksClassId(array $rawRow): int|null|false
     {
@@ -155,9 +132,6 @@ class ItemsSheet implements ToCollection
 
     /**
      * Default the boolean columns the current Item catalog form always sends when a workbook omits them.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed> Row with missing boolean columns defaulted to false.
      */
     private function applyBooleanDefaults(array $rawRow): array
     {
@@ -182,9 +156,6 @@ class ItemsSheet implements ToCollection
 
     /**
      * Resolve the Item Skill and drop Location relationships referenced by name.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed>|null Row with relationships resolved to ids, or null when a referenced record does not exist.
      */
     private function resolveRowRelationships(array $rawRow): ?array
     {

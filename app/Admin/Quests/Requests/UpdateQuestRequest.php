@@ -17,8 +17,6 @@ class UpdateQuestRequest extends FormRequest
 
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -27,8 +25,6 @@ class UpdateQuestRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, mixed>
      */
     public function rules(): array
     {
@@ -72,8 +68,6 @@ class UpdateQuestRequest extends FormRequest
 
     /**
      * Get the error messages for the defined validation rules.
-     *
-     * @return array<string, string>
      */
     public function messages(): array
     {
@@ -87,8 +81,6 @@ class UpdateQuestRequest extends FormRequest
 
     /**
      * Normalize present boolean fields before validation.
-     *
-     * @return void Merges normalized boolean values into the request input.
      */
     protected function prepareForValidation(): void
     {
@@ -99,8 +91,6 @@ class UpdateQuestRequest extends FormRequest
 
     /**
      * Configure the validator instance to enforce Quest graph integrity against the Quest being updated.
-     *
-     * @param  Validator  $validator  Validator instance to configure.
      */
     public function withValidator(Validator $validator): void
     {

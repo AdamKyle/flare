@@ -5,15 +5,11 @@ namespace App\Admin\MapGems\Transformers;
 use App\Flare\Models\GameMap;
 use App\Flare\Models\GameSkill;
 use App\Game\Gems\Values\GemTypeValue;
-use Illuminate\Database\Eloquent\Collection;
 
 class MapGemFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Map Gem form option data into its Admin API representation.
-     *
-     * @param  array{game_maps: Collection<int, GameMap>, crafting_skills: Collection<int, GameSkill>}  $formOptions  Internal Map Gem form option data.
-     * @return array{game_maps: array<int,array{id:int,name:string}>, crafting_skills: array<int,array{id:int,name:string}>, gem_types: array<int,int>} Admin Map Gem form-options representation.
      */
     public function transform(array $formOptions): array
     {

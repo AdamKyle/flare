@@ -29,7 +29,7 @@ class PublicMessage
 
         $newMessage = $this->setUpCustomOverRides($user, $newMessage);
 
-        broadcast(new MessageSentEvent($user, $newMessage))->toOthers();
+        broadcast(new MessageSentEvent($user, $newMessage));
     }
 
     /**

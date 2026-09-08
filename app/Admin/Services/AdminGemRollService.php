@@ -13,6 +13,9 @@ class AdminGemRollService
 {
     public function __construct(private readonly RandomNumberGenerator $randomNumberGenerator) {}
 
+    /**
+     * Roll a new Gem for the Map Gem profile.
+     */
     public function rollMapGem(GameMapGemParamter $gameMapGemParamter, User $admin): Gem
     {
         return $this->roll(
@@ -23,6 +26,9 @@ class AdminGemRollService
         );
     }
 
+    /**
+     * Roll a new Gem for the Location Gem profile.
+     */
     public function rollLocationGem(GameLocationGemParamter $gameLocationGemParamter, User $admin): Gem
     {
         return $this->roll(
@@ -33,6 +39,9 @@ class AdminGemRollService
         );
     }
 
+    /**
+     * Roll and persist a Gem for the supplied Gem profile.
+     */
     private function roll(
         GameMapGemParamter|GameLocationGemParamter $profile,
         User $admin,
@@ -69,12 +78,7 @@ class AdminGemRollService
     }
 
     /**
-     * Resolve a stored Gem roll range into a rolled value, treating a zero-only scalar or a
-     * zero-only range (for example "0", "0.0", or "0-0") as an absent optional range rather than
-     * a range to roll, so legacy stored/imported zero values do not abort rolling.
-     *
-     * @param  string|null  $range  Stored range string, a zero-only scalar, or null.
-     * @return float|null Rolled value, or null when the range is absent/zero-only.
+     * Resolve an optional stored Gem roll range to a rolled value.
      */
     private function rollRange(?string $range): ?float
     {
@@ -113,11 +117,7 @@ class AdminGemRollService
     }
 
     /**
-     * Determine whether a trimmed scalar string represents only zero, such as "0", "0.0", or
-     * "0.00", with no other digits.
-     *
-     * @param  string  $value  Trimmed scalar string.
-     * @return bool Whether the value is a zero-only representation.
+     * Determine whether a trimmed scalar string represents only zero, such as "0", "0.0", or "0.00", with no other digits.
      */
     private function isZeroOnlyScalar(string $value): bool
     {

@@ -16,29 +16,21 @@ class CharacterBoonJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var CharacterBoon
-     */
-    protected $characterBoon;
+    protected int $characterBoonId;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param  CharacterBoon  $characterBoon
-     */
     public function __construct(int $characterBoonId)
     {
-        $this->characterBoon = $characterBoonId;
+        $this->characterBoonId = $characterBoonId;
     }
 
     /**
-     * Execute the job.
+     * Complete or reschedule the character's boon expiration.
      *
      * @return void
      */
     public function handle(UseItemService $useItemService)
     {
-        $boon = CharacterBoon::find($this->characterBoon);
+        $boon = CharacterBoon::find($this->characterBoonId);
 
         if (is_null($boon)) {
             return;

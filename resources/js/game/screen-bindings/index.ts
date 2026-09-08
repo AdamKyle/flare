@@ -7,6 +7,7 @@ import BindCharacterStatDetails from './character-bindings/bind-character-stat-d
 import BindDonationsSection from './donations-bindings/bind-donations-section';
 import BindGuideQuestsSection from './guide-quest-bindings/bind-guide-quests-section';
 import BindMonsterStatSection from './monster-bindings/bind-monster-stat-section';
+import BindQuestLog from './quest-bindings/bind-quest-log';
 import BindGoblinShop from './shop-bindings/bind-goblin-shop';
 import BindShop from './shop-bindings/bind-shop';
 
@@ -22,4 +23,5 @@ export const gameScreenBindings = [
   BindAnnouncementDetailsSection,
   BindDonationsSection,
   BindGuideQuestsSection,
+  BindQuestLog,
 ] as const;

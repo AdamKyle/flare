@@ -133,6 +133,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapGameMarketApiRoutes();
         $this->mapGameMessageApiRoutes();
         $this->mapMonstersApiRoutes();
+        $this->mapGameNpcsApiRoutes();
         $this->mapGameBattleApiRoutes();
         $this->mapGameMapApiRoutes();
         $this->mapGameSkillsApiRoutes();
@@ -201,6 +202,19 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['web', 'update.player-activity'])
             ->namespace('App\Game\Monsters\Controllers')
             ->group(base_path('routes/game/monsters/api.php'));
+    }
+
+    /**
+     * Define the Game Npcs api routes.
+     *
+     * @return void
+     */
+    protected function mapGameNpcsApiRoutes()
+    {
+        Route::prefix('api')
+            ->middleware(['web', 'update.player-activity'])
+            ->namespace('App\Game\Npcs\Controllers')
+            ->group(base_path('routes/game/npcs/api.php'));
     }
 
     /**

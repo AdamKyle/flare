@@ -220,13 +220,13 @@ Feature styles stay in the feature folder. Shared UI styles stay in the shared U
 
 ## Root feature file rules
 
-The root feature component should wire the feature together.
+The root feature component should wire the feature together. Apply `front-end-factual-presentation-and-context-adapters` whenever factual game data may be reused across Admin, Information/wiki, or Player/Character.
 
 It may:
 
 - call feature hooks;
 - call API hooks;
-- pass data to child components;
+- pass data and callbacks to presentational child components;
 - render top-level loading/error/empty/success states;
 - choose screens/sections.
 
@@ -239,6 +239,12 @@ It should not:
 - contain websocket subscription details;
 - contain long validation functions;
 - become a dumping ground for all JSX.
+
+## Presentational child rule
+
+Feature/domain child components are presentational by default when their output can be determined from props. Keep API loading/error/mutation, authorization/ownership, websocket state, route state, and other context state in the owning adapter/root/hook. Allow only genuinely local presentation/accessibility state in the child.
+
+Do not duplicate the same factual JSX between a show screen and a SidePeek wrapper. Extract one factual body and compose it from both adapters when the information is equivalent.
 
 ## Component extraction rule
 

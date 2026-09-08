@@ -1,8 +1,3 @@
-/**
- * Optional read-only navigation callbacks for the shared Quest tree/detail
- * presentation. Never checks Admin permission, imports Admin APIs, or
- * mutates data; the caller decides navigation behavior entirely.
- */
 export interface QuestTreeNavigationDefinition {
   on_open_quest?: (id: number) => void;
   on_open_npc?: (id: number) => void;

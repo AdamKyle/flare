@@ -5,17 +5,15 @@ import React, { ReactNode, useMemo, useState } from 'react';
 
 import BaseQuestItemDefinition from '../../../../api-definitions/items/quest-item-definitions/base-quest-item-definition';
 import { useInfiniteScroll } from '../../../character-sheet/partials/character-inventory/hooks/use-infinite-scroll';
-import QuestItemOwnershipState from '../../components/items/enums/quest-item-ownership-state';
 import GenericItemList from '../../components/items/generic-item-list';
 import GenericItemProps from '../../components/items/types/generic-item-props';
 import { CharacterInventoryApiUrls } from '../api/enums/character-inventory-api-urls';
-import QuestItem from '../inventory-item/quest-item';
+import QuestItemDetailStack from '../inventory-item/quest-item-detail-stack';
 
 import { GameDataError } from 'game-data/components/game-data-error';
 
 import Button from 'ui/buttons/button';
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
-import StackedCard from 'ui/cards/stacked-card';
 import Input from 'ui/input/input';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
@@ -87,9 +85,10 @@ const QuestItems = ({
     }
 
     return (
-      <StackedCard on_close={handleCloseQuestDetails}>
-        <QuestItem quest_item={itemToView} />
-      </StackedCard>
+      <QuestItemDetailStack
+        quest_item={itemToView}
+        on_close={handleCloseQuestDetails}
+      />
     );
   };
 
@@ -114,7 +113,6 @@ const QuestItems = ({
             on_scroll_to_end={handleQuestItemsScroll}
             on_click={handleOnItemClick}
             use_item_id
-            quest_item_ownership_state={QuestItemOwnershipState.HAS}
           />
         </div>
       </div>

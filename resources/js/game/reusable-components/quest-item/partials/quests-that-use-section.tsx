@@ -8,10 +8,6 @@ import { QuestIdentityDefinition } from '../types/quest-item-factual-definition'
 import { Alert } from 'ui/alerts/alert';
 import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 
-/**
- * Build the canonical "Required by quest" context label, including the
- * factual Map name when the Quest identity carries one.
- */
 const buildRequiredByContextLabel = (quest: QuestIdentityDefinition): string =>
   quest.game_map
     ? `Required by quest on ${quest.game_map.name}`

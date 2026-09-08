@@ -5,24 +5,14 @@ import NpcQuestRelationshipCard from './npc-quest-relationship-card';
 import NpcDetailBodyProps from './types/npc-detail-body-props';
 import ReadOnlyItemCardDensity from '../../../game/components/side-peeks/components/items/enums/read-only-item-card-density';
 import ReadOnlyItemCard from '../../../game/components/side-peeks/components/items/read-only-item-card';
+import NpcDetail from '../../../game/reusable-components/npc/components/npc-detail';
 import AdminQuestItemPresentationDefinition from '../../items/api/definitions/admin-quest-item-presentation-definition';
 import { NpcApiMessages } from '../api/enums/npc-api-messages';
-import { NPC_TYPE_LABELS } from '../enums/npc-type';
 
 import Card from 'ui/cards/card';
-import Dd from 'ui/dl/dd';
-import Dl from 'ui/dl/dl';
-import Dt from 'ui/dl/dt';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Render the canonical read-only NPC detail body: Identity, paginated
- * Quests with clickable required/secondary/reward Item identities, and a
- * paginated, deduplicated list of Quest Items given by this NPC. Reused by
- * both the standalone NPC show screen and the Game Map NPC side-peek so
- * every entry point renders the same factual content.
- */
 const NpcDetailBody = ({
   npc,
   quests,
@@ -31,22 +21,6 @@ const NpcDetailBody = ({
   on_open_quest: onOpenQuest,
   on_open_map: onOpenMap,
 }: NpcDetailBodyProps): ReactNode => {
-  const renderMap = (): ReactNode => {
-    if (!onOpenMap) {
-      return npc.game_map.name;
-    }
-
-    return (
-      <button
-        type="button"
-        onClick={() => onOpenMap(npc.game_map.id)}
-        className="text-danube-700 hover:text-danube-600 dark:text-danube-200 dark:hover:text-danube-100 decoration-danube-400 dark:decoration-danube-500 focus-visible:ring-danube-400 rounded-sm font-medium underline underline-offset-2 focus:outline-none focus-visible:ring-2"
-      >
-        {npc.game_map.name}
-      </button>
-    );
-  };
-
   const handleQuestsScroll = (event: React.UIEvent<HTMLDivElement>) => {
     const target = event.currentTarget;
     const nearBottom =
@@ -162,21 +136,7 @@ const NpcDetailBody = ({
       </h1>
 
       <Card>
-        <section>
-          <h2 className="text-glacier-900 dark:text-glacier-100 mb-2 text-sm font-semibold">
-            NPC Details
-          </h2>
-          <Dl>
-            <Dt>Map</Dt>
-            <Dd>{renderMap()}</Dd>
-            <Dt>Type</Dt>
-            <Dd>{NPC_TYPE_LABELS[npc.type]}</Dd>
-            <Dt>Coordinates</Dt>
-            <Dd>
-              X {npc.x_position}, Y {npc.y_position}
-            </Dd>
-          </Dl>
-        </section>
+        <NpcDetail npc={npc} navigation={{ on_open_map: onOpenMap }} />
       </Card>
 
       <Card>

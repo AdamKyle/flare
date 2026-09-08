@@ -1,11 +1,6 @@
 import MonsterFormErrorsDefinition from '../definitions/monster-form-errors-definition';
 import MonsterFormStateDefinition from '../definitions/monster-form-state-definition';
 
-/**
- * Every Monster form field's element id, grouped by wizard step in the
- * order each field appears on that step. Used to resolve the first invalid
- * field on the current step so it can be focused and scrolled into view.
- */
 export const MONSTER_STEP_FIELD_IDS: ReadonlyArray<
   ReadonlyArray<{ field: keyof MonsterFormStateDefinition; id: string }>
 > = [
@@ -71,10 +66,6 @@ export const MONSTER_STEP_FIELD_IDS: ReadonlyArray<
   ],
 ];
 
-/**
- * Resolve the first invalid Monster field's element id on the given wizard
- * step, in visible form order.
- */
 export const resolveFirstInvalidMonsterField = (
   errors: MonsterFormErrorsDefinition,
   stepIndex: number

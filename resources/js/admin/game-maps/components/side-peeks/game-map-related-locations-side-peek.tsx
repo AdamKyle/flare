@@ -17,13 +17,6 @@ import StackedCard from 'ui/cards/stacked-card';
 import InfiniteScroll from 'ui/infinite-scroll/infinite-scroll';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Bounded, append-paginated browser for the Locations on a Game Map,
- * opened from the Game Map's "Related Game Data" hub. Each result opens
- * the canonical Location detail inside a `StackedCard` while preserving
- * this relationship browser underneath (mounted, with its scroll position
- * intact) rather than replacing it through the global SidePeek emitter.
- */
 const GameMapRelatedLocationsSidePeek = ({
   game_map_id: gameMapId,
 }: GameMapRelatedLocationsSidePeekProps): ReactNode => {

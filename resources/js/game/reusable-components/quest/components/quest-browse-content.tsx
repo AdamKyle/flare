@@ -41,17 +41,6 @@ interface OneOffDisplayModel {
   npc_name: string | null;
 }
 
-/**
- * Shared, permission-neutral Quest browse content: renders the currently
- * active Quest category's already-fetched Quest trees using the
- * presentation appropriate to that category — the real top-to-bottom Quest
- * Tree for the normal parent/child story hierarchy, a compact single-column
- * card list for One Offs, and Raid-grouped Trees for Raid Quests, always
- * presented through nested `PillTabs` (even a single Raid gets its own
- * one-tab `PillTabs`). Never imports Admin or Information code; the caller
- * supplies data, navigation, and the factual selected Game Map name used to
- * build contextual Tree accessibility labels.
- */
 const QuestBrowseContent = ({
   active_tab: activeTab,
   quests,

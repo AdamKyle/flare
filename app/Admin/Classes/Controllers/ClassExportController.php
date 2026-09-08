@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ClassExportController extends Controller
 {
-    /**
-     * @param  ClassExcelService  $classExcelService  Class Excel export/import service.
-     */
     public function __construct(
         private readonly ClassExcelService $classExcelService,
     ) {}
@@ -18,7 +15,6 @@ class ClassExportController extends Controller
     /**
      * Download the Classes workbook.
      *
-     * @return BinaryFileResponse Classes workbook download response.
      *
      * @codeCoverageIgnore
      */

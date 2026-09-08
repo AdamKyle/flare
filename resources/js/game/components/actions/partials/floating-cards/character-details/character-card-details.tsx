@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 
+import CharacterAlchemyBoons from './alchemy-boons/character-alchemy-boons';
 import { useManageCharacterInventoryVisibility } from './hooks/use-manage-character-inventory-visibility';
 import CharacterCardDetailsProps from './types/character-card-details-props';
 import { shortenNumber } from '../../../../../util/format-number';
@@ -21,6 +22,10 @@ import Separator from 'ui/separator/separator';
 
 const CharacterCardDetails = ({
   characterData,
+  active_boons: activeBoons,
+  active_boons_loading: activeBoonsLoading,
+  on_open_active_boons: onOpenActiveBoons,
+  on_active_boons_complete: onActiveBoonsComplete,
 }: CharacterCardDetailsProps): ReactNode => {
   const { openCharacterSheet } = useManageCharacterSheetVisibility();
   const { openCharacterInventory } = useManageCharacterInventoryVisibility();
@@ -211,6 +216,12 @@ const CharacterCardDetails = ({
         }}
         variant={ButtonVariant.PRIMARY}
         additional_css="w-full"
+      />
+      <CharacterAlchemyBoons
+        boons={activeBoons}
+        loading={activeBoonsLoading}
+        on_open={onOpenActiveBoons}
+        on_complete={onActiveBoonsComplete}
       />
     </>
   );

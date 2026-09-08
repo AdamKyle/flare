@@ -9,9 +9,6 @@ class MapGemListTransformer extends TransformerAbstract
 {
     /**
      * Transform a Map Gem profile into its Admin list-row representation.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to transform.
-     * @return array{id: int, name: string, game_map: array{id: int, name: string}, roll_count: int, rolled_gem: array{id: int, name: string, roll_number: int}|null} Admin Map Gem list-row representation.
      */
     public function transform(GameMapGemParamter $gameMapGemParamter): array
     {

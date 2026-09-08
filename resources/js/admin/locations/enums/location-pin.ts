@@ -13,10 +13,6 @@ export const LOCATION_PIN_VALUES: LocationPin[] = [
   LocationPin.SNOWMAN,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Location pin, without a forced type assertion at each call site.
- */
 export const isLocationPin = (value: string | number): value is LocationPin => {
   if (typeof value !== 'string') {
     return false;

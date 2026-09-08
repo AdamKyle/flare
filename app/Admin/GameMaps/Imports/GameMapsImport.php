@@ -10,8 +10,6 @@ class GameMapsImport implements Import, WithMultipleSheets
 {
     /**
      * Map the first workbook sheet to the Game Maps settings importer.
-     *
-     * @return array<int, GameMapsSheet>
      */
     public function sheets(): array
     {

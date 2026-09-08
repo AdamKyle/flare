@@ -9,12 +9,6 @@ class ItemListTransformer extends TransformerAbstract
 {
     /**
      * Transform an Item into its Admin list-row representation.
-     *
-     * The row is a superset of every profile's compact columns; the frontend
-     * feature module selects which fields to render for the active profile.
-     *
-     * @param  Item  $item  Item to transform.
-     * @return array{id: int, name: string, type: string, can_craft: bool, usable: bool, market_sellable: bool, can_drop: bool, base_damage: int|null, base_ac: int|null, base_healing: int|null, base_damage_mod: float|null, base_ac_mod: float|null, base_healing_mod: float|null, cost: int|null, gold_bars_cost: int|null, gold_dust_cost: int|null, shards_cost: int|null, skill_level_required: int|null, skill_level_trivial: int|null, ambush_chance: float|null, ambush_resistance: float|null, counter_chance: float|null, counter_resistance: float|null, item_skill: array{id: int, name: string}|null, specialty_type: string|null, alchemy_type: string|null, drop_location: array{id: int, name: string}|null, effect: string|null, unlocks_class: array{id: int, name: string}|null} Admin Item list-row representation.
      */
     public function transform(Item $item): array
     {
@@ -53,9 +47,6 @@ class ItemListTransformer extends TransformerAbstract
 
     /**
      * Transform the related Item Skill into its compact identity representation.
-     *
-     * @param  Item  $item  Item whose Item Skill relationship is transformed.
-     * @return array{id: int, name: string}|null Compact Item Skill identity.
      */
     private function transformItemSkill(Item $item): ?array
     {
@@ -71,9 +62,6 @@ class ItemListTransformer extends TransformerAbstract
 
     /**
      * Transform the related drop Location into its compact identity representation.
-     *
-     * @param  Item  $item  Item whose drop Location relationship is transformed.
-     * @return array{id: int, name: string}|null Compact Location identity.
      */
     private function transformDropLocation(Item $item): ?array
     {
@@ -89,9 +77,6 @@ class ItemListTransformer extends TransformerAbstract
 
     /**
      * Transform the unlocked Class into its compact identity representation.
-     *
-     * @param  Item  $item  Item whose unlocked Class relationship is transformed.
-     * @return array{id: int, name: string}|null Compact Class identity.
      */
     private function transformUnlocksClass(Item $item): ?array
     {

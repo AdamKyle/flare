@@ -8,12 +8,6 @@ import QuestBrowseOptionsDefinition from '../../../../game/reusable-components/q
 import { QuestApiMessages } from '../enums/quest-api-messages';
 import { QuestApiUrls } from '../enums/quest-api-urls';
 
-/**
- * Load the factual Admin Quest browse options (the default Game Map and the
- * ordered Game Maps a plane-first Quest browser may select from), without
- * fetching the full Quest form-option graph (NPCs, Quest Items, Quests,
- * Raids, Passive Skills) just to populate one plane selector.
- */
 export const useQuestBrowseOptions = (): UseQuestBrowseOptionsDefinition => {
   const { apiHandler, getUrl } = useApiHandler();
 

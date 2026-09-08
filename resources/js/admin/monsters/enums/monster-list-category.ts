@@ -28,17 +28,9 @@ export const MONSTER_LIST_CATEGORY_VALUES: MonsterListCategory[] = [
   MonsterListCategory.WEEKLY_FIGHT,
 ];
 
-/**
- * Categories for which the Location Type filter is applicable.
- */
 export const MONSTER_LIST_CATEGORIES_WITH_LOCATION_TYPE: MonsterListCategory[] =
   [MonsterListCategory.WEEKLY_FIGHT];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Monster list category, without a forced type assertion at each call
- * site.
- */
 export const isMonsterListCategory = (
   value: string | number
 ): value is MonsterListCategory => {
@@ -49,11 +41,6 @@ export const isMonsterListCategory = (
   return MONSTER_LIST_CATEGORY_VALUES.some((category) => category === value);
 };
 
-/**
- * The fixed set of Location Types that make up the Weekly Fight category.
- * Cave of Memories is intentionally excluded. Mirrors
- * `LocationType::weeklyFightLocationTypes()` on the backend.
- */
 export const MONSTER_LIST_WEEKLY_FIGHT_LOCATION_TYPES: LocationType[] = [
   LocationType.ALCHEMY_CHURCH,
   LocationType.LORDS_STRONG_HOLD,

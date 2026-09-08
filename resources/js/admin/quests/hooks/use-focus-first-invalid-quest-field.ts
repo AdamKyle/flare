@@ -5,13 +5,6 @@ import { useQuestFieldFocus } from './use-quest-field-focus';
 import QuestFormErrorsDefinition from '../definitions/quest-form-errors-definition';
 import { resolveFirstInvalidQuestField } from '../utils/resolve-first-invalid-quest-field';
 
-/**
- * Focus and scroll to the first invalid field on the current Quest form
- * step whenever `record_attempt()` is called after a blocked step
- * transition. Never fires while the user is simply typing: the attempt
- * only advances on an explicit call, and re-running the same attempt again
- * (e.g. a re-render with unchanged errors) is a no-op.
- */
 export const useFocusFirstInvalidQuestField = (
   fieldErrors: QuestFormErrorsDefinition,
   currentStepIndex: number

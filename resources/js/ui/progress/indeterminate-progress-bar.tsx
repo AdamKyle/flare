@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import React, { ReactNode } from 'react';
 
+import { ProgressBarSize } from './enums/progress-bar-size';
 import { baseTrackStyles } from './styles/progress-bar/base-styles';
 import { fillVariantStyles } from './styles/progress-bar/fill-variant-styles';
 import { trackVariantStyles } from './styles/progress-bar/track-variant-styles';
@@ -19,7 +20,10 @@ const IndeterminateProgressBar = (
         {props.label}
       </div>
       <div
-        className={clsx(baseTrackStyles(), trackVariantStyles(props.variant))}
+        className={clsx(
+          baseTrackStyles(ProgressBarSize.DEFAULT),
+          trackVariantStyles(props.variant)
+        )}
       >
         <div
           className={clsx(

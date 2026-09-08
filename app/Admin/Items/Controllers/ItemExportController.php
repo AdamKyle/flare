@@ -9,20 +9,12 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ItemExportController extends Controller
 {
-    /**
-     * @param  ItemExcelService  $itemExcelService  Item Excel export/import service.
-     */
     public function __construct(
         private readonly ItemExcelService $itemExcelService,
     ) {}
 
     /**
      * Download the catalog Items workbook for the requested Item family profile.
-     *
-     * @param  ItemExportRequest  $request  Validated Item export request.
-     * @return BinaryFileResponse Item workbook download response.
-     *
-     * @codeCoverageIgnore
      */
     public function __invoke(ItemExportRequest $request): BinaryFileResponse
     {

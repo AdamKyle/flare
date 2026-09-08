@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { MonsterApiUrls } from '../enums/monster-api-urls';
 import SetMonsterPartsDefinition from './definitions/set-monster-params-definition';
 import UseFetchMonsterStatsApiDefinition from './definitions/use-fetch-monster-stats-api-definition';
-import MonsterDefinition from '../../../../../../api-definitions/monsters/monster-definition';
+import MonsterDetailDefinition from '../../../../../../reusable-components/monster/api/definitions/monster-detail-definition';
 
 export const useFetchMonsterStatsApi =
   (): UseFetchMonsterStatsApiDefinition => {
@@ -15,7 +15,7 @@ export const useFetchMonsterStatsApi =
     const [monsterId, setMonsterId] = useState<number | null>(null);
 
     const [loading, setLoading] = useState(false);
-    const [data, setData] = useState<MonsterDefinition | null>(null);
+    const [data, setData] = useState<MonsterDetailDefinition | null>(null);
     const [error, setError] =
       useState<UseFetchMonsterStatsApiDefinition['error']>(null);
 
@@ -47,8 +47,8 @@ export const useFetchMonsterStatsApi =
 
       try {
         const result = await apiHandler.get<
-          MonsterDefinition,
-          AxiosRequestConfig<AxiosResponse<MonsterDefinition>>
+          MonsterDetailDefinition,
+          AxiosRequestConfig<AxiosResponse<MonsterDetailDefinition>>
         >(url);
 
         setData(result);

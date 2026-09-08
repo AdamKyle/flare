@@ -10,18 +10,12 @@ use App\Flare\Models\Gem;
 
 class MapGemDetailTransformer
 {
-    /**
-     * @param  AdminGemRollTransformer  $adminGemRollTransformer  Shared Admin Gem roll transformer.
-     */
     public function __construct(
         private readonly AdminGemRollTransformer $adminGemRollTransformer,
     ) {}
 
     /**
      * Transform a Map Gem profile into its Admin detail representation.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to transform.
-     * @return array<string, mixed> Admin Map Gem detail representation.
      */
     public function transform(GameMapGemParamter $gameMapGemParamter): array
     {
@@ -46,9 +40,6 @@ class MapGemDetailTransformer
 
     /**
      * Build the configured range values section.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to describe.
-     * @return array<string, string|null> Configured range values.
      */
     private function transformRanges(GameMapGemParamter $gameMapGemParamter): array
     {
@@ -76,9 +67,6 @@ class MapGemDetailTransformer
 
     /**
      * Transform the configured crafting Skills into their compact identity representation.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to describe.
-     * @return array<int, array{id: int, name: string}> Configured crafting Skills.
      */
     private function transformCraftingSkills(GameMapGemParamter $gameMapGemParamter): array
     {
@@ -92,9 +80,6 @@ class MapGemDetailTransformer
 
     /**
      * Transform the profile's currently active rolled Gem into its Admin roll representation.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile whose active roll is transformed.
-     * @return array<string, mixed>|null Active Gem roll representation.
      */
     private function transformRolledGem(GameMapGemParamter $gameMapGemParamter): ?array
     {
@@ -107,9 +92,6 @@ class MapGemDetailTransformer
 
     /**
      * Transform every Gem roll ever created for this profile, newest first.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile whose roll history is transformed.
-     * @return array<int, array<string, mixed>> Every Gem roll for this profile.
      */
     private function transformRollHistory(GameMapGemParamter $gameMapGemParamter): array
     {
@@ -127,9 +109,6 @@ class MapGemDetailTransformer
 
     /**
      * Transform the generated Gem World Map associated with this profile, when one exists.
-     *
-     * @param  GameMap|null  $generatedMap  Generated Gem World Map, when one exists.
-     * @return array{id: int, name: string, generated_map_type: string|null, parent_map: array{id: int, name: string}|null}|null Generated Gem World association.
      */
     private function transformGeneratedGemWorld(?GameMap $generatedMap): ?array
     {

@@ -9,9 +9,6 @@ const parseOptionalInteger = (value: string): number | null => {
   return Number(value);
 };
 
-/**
- * Build the Location save request payload from validated wizard form state.
- */
 export const buildLocationRequest = (
   state: LocationFormState
 ): LocationRequestDefinition => {

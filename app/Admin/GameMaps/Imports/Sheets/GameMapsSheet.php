@@ -13,9 +13,6 @@ class GameMapsSheet implements ToCollection
 {
     /**
      * Validate all workbook rows before updating existing Game Maps.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Existing Game Maps are updated after every row validates.
      */
     public function collection(Collection $rows): void
     {
@@ -60,8 +57,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Return the exact supported workbook header sequence.
-     *
-     * @return array<int, string> Expected Game Maps workbook headers.
      */
     private function expectedHeader(): array
     {
@@ -83,10 +78,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize and validate one Game Map workbook row.
-     *
-     * @param  Collection<int, mixed>  $row  Workbook row to normalize.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @return array{name: string, description: string|null, default: bool, kingdom_color: string, xp_bonus: int|float, skill_training_bonus: int|float, drop_chance_bonus: int|float, enemy_stat_bonus: int|float, character_attack_reduction: int|float, required_location_id: int|null, only_during_event_type: int|null, can_traverse: bool} Normalized Game Map values.
      */
     private function normalizeRow(Collection $row, int $rowNumber): array
     {
@@ -125,11 +116,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize an explicitly supported spreadsheet boolean value.
-     *
-     * @param  mixed  $value  Spreadsheet cell value.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @param  string  $column  Spreadsheet column name.
-     * @return bool Normalized boolean value.
      */
     private function normalizeBoolean(mixed $value, int $rowNumber, string $column): bool
     {
@@ -152,11 +138,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize a required string cell.
-     *
-     * @param  mixed  $value  Spreadsheet cell value.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @param  string  $column  Spreadsheet column name.
-     * @return string Required string value.
      */
     private function normalizeRequiredString(mixed $value, int $rowNumber, string $column): string
     {
@@ -171,11 +152,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize optional Markdown text without changing its source formatting.
-     *
-     * @param  mixed  $value  Spreadsheet cell value.
-     * @param  int  $rowNumber  One-based spreadsheet row number.
-     * @param  string  $column  Spreadsheet column name.
-     * @return string|null Original Markdown text or null when empty.
      */
     private function normalizeNullableString(mixed $value, int $rowNumber, string $column): ?string
     {
@@ -194,10 +170,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize a Kingdom color that uses exact hexadecimal syntax.
-     *
-     * @param  mixed  $value  Spreadsheet color value.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @return string Valid hexadecimal Kingdom color.
      */
     private function normalizeKingdomColor(mixed $value, int $rowNumber): string
     {
@@ -212,11 +184,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize a numeric bonus cell without accepting non-numeric text.
-     *
-     * @param  mixed  $value  Spreadsheet numeric value.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @param  string  $column  Spreadsheet column name.
-     * @return int|float Normalized numeric bonus.
      */
     private function normalizeNumeric(mixed $value, int $rowNumber, string $column): int|float
     {
@@ -231,10 +198,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Resolve an optional exact Location name to its identifier.
-     *
-     * @param  mixed  $value  Spreadsheet Location name.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @return int|null Resolved Location identifier or null when omitted.
      */
     private function resolveRequiredLocationId(mixed $value, int $rowNumber): ?int
     {
@@ -261,10 +224,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Normalize an optional event type against the existing EventType values.
-     *
-     * @param  mixed  $value  Spreadsheet event type value.
-     * @param  int  $rowNumber  One-based workbook row number.
-     * @return int|null Valid event type value or null when omitted.
      */
     private function normalizeEventType(mixed $value, int $rowNumber): ?int
     {
@@ -285,9 +244,6 @@ class GameMapsSheet implements ToCollection
 
     /**
      * Return only fields the Game Maps workbook is permitted to update.
-     *
-     * @param  array{name: string, description: string|null, default: bool, kingdom_color: string, xp_bonus: int|float, skill_training_bonus: int|float, drop_chance_bonus: int|float, enemy_stat_bonus: int|float, character_attack_reduction: int|float, required_location_id: int|null, only_during_event_type: int|null, can_traverse: bool}  $normalizedRow  Normalized workbook row.
-     * @return array{description: string|null, default: bool, kingdom_color: string, xp_bonus: int|float, skill_training_bonus: int|float, drop_chance_bonus: int|float, enemy_stat_bonus: int|float, character_attack_reduction: int|float, required_location_id: int|null, only_during_event_type: int|null, can_traverse: bool} Supported Game Map updates.
      */
     private function supportedUpdates(array $normalizedRow): array
     {

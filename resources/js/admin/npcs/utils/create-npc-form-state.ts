@@ -1,10 +1,6 @@
 import NpcDefinition from '../api/definitions/npc-definition';
 import NpcFormState from '../types/npc-form-state';
 
-/**
- * Build the initial Npc form state for either a new Npc seeded from the selected
- * map coordinate, or an existing Npc being edited.
- */
 export const createNpcFormState = (
   npc: NpcDefinition | null,
   initialX: number | null,

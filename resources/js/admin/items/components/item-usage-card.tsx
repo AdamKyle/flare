@@ -13,25 +13,12 @@ import { AlertVariant } from 'ui/alerts/enums/alert-variant';
 import Card from 'ui/cards/card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Related-entity `resource` values that currently resolve to a real Admin
- * detail destination. `raid`/`guide_quest` blockers have no Phase 2B
- * canonical detail to open, so they render as plain factual text rather
- * than a dead button.
- */
 const NAVIGABLE_RELATED_ENTITY_RESOURCES = new Set([
   'quest',
   'monster',
   'location',
 ]);
 
-/**
- * Render the read-only Item deletion-impact usage report: every current
- * blocker category, its count, and the related entity identities where a
- * stable low-volume identity exists. Purely informational; deletion itself
- * is driven by the standalone Delete action, which the caller disables
- * whenever usage is loading, failed to load, or reports `deletable: false`.
- */
 const ItemUsageCard = ({
   usage,
   loading,

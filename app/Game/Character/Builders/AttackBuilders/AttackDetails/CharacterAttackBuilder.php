@@ -22,6 +22,8 @@ class CharacterAttackBuilder
 
     private ?float $damageStatAmount = null;
 
+    private float $areaGemCharacterPowerReduction = 0.0;
+
     public function __construct(
         CharacterStatBuilder $characterStatBuilder,
         private readonly AreaGemEffectService $areaGemEffectService,
@@ -38,6 +40,10 @@ class CharacterAttackBuilder
     {
         $this->character = $character;
         $this->damageStatAmount = $damageStatAmount;
+
+        $this->areaGemCharacterPowerReduction = $ignoreReductions
+            ? 0.0
+            : $this->areaGemEffectService->resolveForCharacter($character)->characterPowerReduction();
 
         $this->characterStatBuilder = $this->characterStatBuilder->setCharacter($character, $ignoreReductions);
 
@@ -120,7 +126,7 @@ class CharacterAttackBuilder
         $gameMap = GameMap::find($map->game_map_id);
 
         $characterReduction = ($gameMap->character_attack_reduction ?? 0.0)
-            + $this->areaGemEffectService->resolveForCharacter($this->character)->characterPowerReduction();
+            + $this->areaGemCharacterPowerReduction;
 
         return [
             'attack_type' => $attackType,

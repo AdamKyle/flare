@@ -17,14 +17,6 @@ use Illuminate\Http\JsonResponse;
 
 class MonstersController extends Controller
 {
-    /**
-     * @param  MonsterService  $monsterService  Admin Monster mutation service.
-     * @param  MonsterReadService  $monsterReadService  Shared factual Monster read service.
-     * @param  Pagination  $pagination  Paginator response transformer.
-     * @param  MonsterListTransformer  $monsterListTransformer  List-record transformer.
-     * @param  MonsterFormTransformer  $monsterFormTransformer  Form-value transformer.
-     * @param  MonsterFormOptionsTransformer  $monsterFormOptionsTransformer  Form-options transformer.
-     */
     public function __construct(
         private readonly MonsterService $monsterService,
         private readonly MonsterReadService $monsterReadService,
@@ -36,9 +28,6 @@ class MonstersController extends Controller
 
     /**
      * Return the paginated, searchable, sortable Monster list.
-     *
-     * @param  MonsterIndexRequest  $request  Validated Monster list request.
-     * @return JsonResponse Paginated Monster list JSON response.
      */
     public function index(MonsterIndexRequest $request): JsonResponse
     {
@@ -51,8 +40,6 @@ class MonstersController extends Controller
 
     /**
      * Return the Admin Monster form options.
-     *
-     * @return JsonResponse Monster form-options JSON response.
      */
     public function options(): JsonResponse
     {
@@ -64,9 +51,6 @@ class MonstersController extends Controller
 
     /**
      * Return the full factual detail representation for the given Monster.
-     *
-     * @param  Monster  $monster  Monster to transform.
-     * @return JsonResponse Monster detail JSON response.
      */
     public function show(Monster $monster): JsonResponse
     {
@@ -75,9 +59,6 @@ class MonstersController extends Controller
 
     /**
      * Return the current field values for the given Monster, for populating the edit form.
-     *
-     * @param  Monster  $monster  Monster to populate.
-     * @return JsonResponse Monster form-value JSON response.
      */
     public function edit(Monster $monster): JsonResponse
     {
@@ -86,9 +67,6 @@ class MonstersController extends Controller
 
     /**
      * Create a new Monster from the validated request.
-     *
-     * @param  StoreMonsterRequest  $request  Validated Monster creation request.
-     * @return JsonResponse Created Monster JSON response.
      */
     public function store(StoreMonsterRequest $request): JsonResponse
     {
@@ -99,10 +77,6 @@ class MonstersController extends Controller
 
     /**
      * Update an existing Monster from the validated request.
-     *
-     * @param  UpdateMonsterRequest  $request  Validated Monster update request.
-     * @param  Monster  $monster  Monster to update.
-     * @return JsonResponse Updated Monster JSON response.
      */
     public function update(UpdateMonsterRequest $request, Monster $monster): JsonResponse
     {

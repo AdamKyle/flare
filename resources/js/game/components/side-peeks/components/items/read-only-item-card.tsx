@@ -80,7 +80,7 @@ const ReadOnlyItemCard = ({
 
     if (ownershipState === QuestItemOwnershipState.HAS) {
       return (
-        <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+        <span className="bg-marigold-700 text-marigold-50 dark:bg-marigold-600 dark:text-marigold-50 mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
           <i className="fas fa-check" aria-hidden="true" />
           Has Item
         </span>
@@ -88,7 +88,7 @@ const ReadOnlyItemCard = ({
     }
 
     return (
-      <span className="bg-danube-100 text-danube-800 dark:bg-danube-900 dark:text-danube-200 mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
+      <span className="bg-marigold-200 text-marigold-900 dark:bg-marigold-900 dark:text-marigold-200 mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold">
         <i className="fas fa-history" aria-hidden="true" />
         Had Item
       </span>
@@ -114,19 +114,15 @@ const ReadOnlyItemCard = ({
     itemColor
   );
 
-  return (
-    <button
-      type="button"
-      className={clsx(
-        baseStyles,
-        backpackFocusRingStyles(styleShape),
-        backpackBorderStyles(styleShape),
-        backpackButtonBackground(styleShape)
-      )}
-      onClick={() => onClick(itemId)}
-      aria-labelledby={titleId}
-      aria-describedby={detailsId}
-    >
+  const cardClassName = clsx(
+    baseStyles,
+    backpackFocusRingStyles(styleShape),
+    backpackBorderStyles(styleShape),
+    backpackButtonBackground(styleShape)
+  );
+
+  const cardContent = (
+    <>
       <i className="ra ra-bone-knife text-2xl text-gray-800 dark:text-gray-600" />
       <div className={clsx('text-left', isCompact && 'min-w-0 flex-1')}>
         <div id={titleId} className={nameClassName}>
@@ -138,6 +134,30 @@ const ReadOnlyItemCard = ({
         </div>
         {renderOwnershipState()}
       </div>
+    </>
+  );
+
+  if (!onClick) {
+    return (
+      <div
+        className={cardClassName}
+        aria-labelledby={titleId}
+        aria-describedby={detailsId}
+      >
+        {cardContent}
+      </div>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      className={cardClassName}
+      onClick={() => onClick(itemId)}
+      aria-labelledby={titleId}
+      aria-describedby={detailsId}
+    >
+      {cardContent}
     </button>
   );
 };

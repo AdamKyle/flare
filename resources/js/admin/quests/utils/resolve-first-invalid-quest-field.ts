@@ -1,11 +1,6 @@
 import QuestFormErrorsDefinition from '../definitions/quest-form-errors-definition';
 import QuestFormStateDefinition from '../definitions/quest-form-state-definition';
 
-/**
- * Every Quest form field's element id, grouped by wizard step in the order
- * each field appears on that step. Used to resolve the first invalid field
- * on the current step so it can be focused and scrolled into view.
- */
 export const QUEST_STEP_FIELD_IDS: ReadonlyArray<
   ReadonlyArray<{ field: keyof QuestFormStateDefinition; id: string }>
 > = [
@@ -46,10 +41,6 @@ export const QUEST_STEP_FIELD_IDS: ReadonlyArray<
   ],
 ];
 
-/**
- * Resolve the first invalid Quest field's element id on the given wizard
- * step, in visible form order.
- */
 export const resolveFirstInvalidQuestField = (
   errors: QuestFormErrorsDefinition,
   stepIndex: number

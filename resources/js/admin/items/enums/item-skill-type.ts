@@ -55,10 +55,6 @@ export const ITEM_SKILL_TYPE_VALUES: ItemSkillType[] = [
   ItemSkillType.GEM_CRAFTING,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item skill type, without a forced type assertion at each call site.
- */
 export const isItemSkillType = (
   value: string | number
 ): value is ItemSkillType => {

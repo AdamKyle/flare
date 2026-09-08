@@ -8,9 +8,6 @@ class MapGemFormTransformer
 {
     /**
      * Transform a Map Gem profile into its Admin save-response / form-value representation.
-     *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to transform.
-     * @return array<string, mixed> Admin Map Gem form-value representation.
      */
     public function transform(GameMapGemParamter $gameMapGemParamter): array
     {

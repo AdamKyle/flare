@@ -4,10 +4,6 @@ import LocationFormState from '../types/location-form-state';
 const numberToString = (value: number | null): string =>
   value === null ? '' : String(value);
 
-/**
- * Build the initial Location wizard form state for either a new Location seeded
- * from the selected map coordinate, or an existing Location being edited.
- */
 export const createLocationFormState = (
   location: LocationDefinition | null,
   initialX: number | null,

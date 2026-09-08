@@ -3,10 +3,6 @@ import GameMapFormOptionsDefinition from '../definitions/game-map-form-options-d
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 
-/**
- * Validate the Game Map wizard's Access step: a selected required Location must
- * exist among the loaded Location options.
- */
 export const validateGameMapAccessStep = (
   state: GameMapFormStateDefinition,
   options: GameMapFormOptionsDefinition | null

@@ -14,7 +14,6 @@ class MapGemExcelService
     /**
      * Download the Map Gems workbook.
      *
-     * @return BinaryFileResponse Map Gems workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class MapGemExcelService
 
     /**
      * Import Map Gem profiles from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Map Gems workbook.
-     * @return void Persists the imported Map Gem profiles.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

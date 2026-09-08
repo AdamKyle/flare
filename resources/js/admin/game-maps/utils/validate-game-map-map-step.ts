@@ -2,10 +2,6 @@ import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-def
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 
-/**
- * Validate the Game Map wizard's Map step: name, Kingdom color, and a required map
- * image when creating a new Game Map.
- */
 export const validateGameMapMapStep = (
   state: GameMapFormStateDefinition,
   is_create: boolean

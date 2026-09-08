@@ -1,12 +1,3 @@
-/**
- * The smallest permission-neutral factual usable/alchemy Item shape rendered
- * by `ItemMetaSection` + `UsableItemEffects` and their partials. Deliberately
- * narrower than `BaseUsableItemDefinition` (which also carries inventory-slot
- * fields such as `slot_id` that this factual presentation never reads), so
- * both the player-facing inventory usable Item and the permission-neutral
- * Admin usable Item presentation can share this exact rendering without
- * fabricating inventory-slot state.
- */
 export default interface UsableItemFactualDefinition {
   name: string;
   description: string;

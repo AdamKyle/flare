@@ -3,15 +3,6 @@ import React, { ReactNode } from 'react';
 import { isLocationType, LOCATION_TYPE_LABELS } from '../enums/location-type';
 import MonsterCardProps from '../types/monster-card-props';
 
-/**
- * Resolve a Monster relation card's factual category label from the
- * relation response's own flags, in the same precedence the standalone
- * Game Map relation browser previously computed inline. Never invents a
- * category beyond what the response factually supports.
- *
- * @param  monster  Monster relation flags to resolve a category label for.
- * @return  Factual category label.
- */
 const resolveCategoryLabel = ({
   is_celestial_entity: isCelestialEntity,
   is_raid_boss: isRaidBoss,
@@ -39,14 +30,6 @@ const resolveCategoryLabel = ({
   return 'Regular';
 };
 
-/**
- * Canonical Monster relation card: the Monster-domain counterpart to the
- * Quest card, sharing its full-card click affordance. The Glacier surface
- * is intentionally light even in dark mode (the same established
- * light-card-on-dark-page treatment already used by the Quest and Quest
- * Item cards), so its own text stays fixed to the light-card palette
- * instead of the page's dark-mode text classes.
- */
 const MonsterCard = (props: MonsterCardProps): ReactNode => {
   const { monster_id: monsterId, name, on_open_monster: onOpenMonster } = props;
 

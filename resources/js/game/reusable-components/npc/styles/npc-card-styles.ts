@@ -1,8 +1,3 @@
-/**
- * Canonical Terracotta NPC-domain card visual language: a full-width
- * relationship card using the project's Terracotta palette, distinct from
- * the Location domain's Emerald cards and the Quest domain's Glacier cards.
- */
 export const npcCardBaseStyles = (): string =>
   'border-2 w-full flex items-start gap-3 p-3 rounded-lg shadow-sm text-left transition-colors';
 

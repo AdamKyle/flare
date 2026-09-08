@@ -9,7 +9,6 @@ use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Maps\Values\LocationType;
 use App\Game\Monsters\Values\MonsterCacheKey;
 use Illuminate\Support\Facades\Cache;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class MonsterListService
 {
@@ -17,12 +16,8 @@ class MonsterListService
 
     public function __construct(private readonly BuildMonsterCacheService $buildMonsterCacheService) {}
 
-    /*
-     * Build a simple list payload of monsters for the character's current context.
-     *
-     * @param Character $character
-     * @throws InvalidArgumentException
-     * @return array
+    /**
+     * Build the Monster list payload for the Character's current context.
      */
     public function getMonstersForCharacter(Character $character): array
     {
@@ -34,7 +29,7 @@ class MonsterListService
     }
 
     /**
-     * Get a straight list of monsters as an array
+     * Return the Monster list for the Character's current context.
      */
     public function getMonstersForCharacterAsList(Character $character): array
     {
@@ -44,7 +39,7 @@ class MonsterListService
     }
 
     /**
-     * Get the monster the character should fight.
+     * Return the selected Monster from the Character's current context.
      */
     public function getMonsterForFight(Character $character, int $monsterId): ?array
     {
@@ -54,15 +49,7 @@ class MonsterListService
     }
 
     /**
-     * Resolve the full Monster dataset for the Character's current Map/Location Gem context.
-     *
-     * The resolution order is: ensure required caches exist, prefer a Weekly Fight
-     * Location's cache, otherwise a Gem-bearing Location's cache, otherwise the
-     * normal current Game Map cache, preserving the existing event-map override.
-     *
-     * @return array<string, mixed>
-     *
-     * @throws InvalidArgumentException
+     * Resolve the Monster dataset for the Character's current Map and Location context.
      */
     public function resolveMonsterDataSetForCharacter(Character $character): array
     {
@@ -102,9 +89,7 @@ class MonsterListService
     }
 
     /**
-     * Ensure the required regular/Location/Weekly Monster caches exist for the Character's current context.
-     *
-     * @throws InvalidArgumentException
+     * Ensure the Monster caches required by the current context exist.
      */
     private function ensureMonsterCache(): void
     {
@@ -122,7 +107,7 @@ class MonsterListService
     }
 
     /**
-     * Find the actual Location at the given coordinates, regardless of Location Type.
+     * Find the Location at the supplied Map coordinates.
      */
     private function findCurrentLocation(int $x, int $y, int $gameMapId): ?Location
     {
@@ -133,9 +118,7 @@ class MonsterListService
     }
 
     /**
-     * Resolve the Weekly Fight Monster dataset for the current Location, when applicable.
-     *
-     * @return array<string, mixed>|null
+     * Resolve the Weekly Fight Monster dataset for the current Location.
      */
     private function resolveWeeklyMonsters(?Location $currentLocation): ?array
     {
@@ -158,9 +141,7 @@ class MonsterListService
     }
 
     /**
-     * Resolve the Location Gem-affected Monster dataset for the current Location, when it has a rolled Location Gem cache.
-     *
-     * @return array<string, mixed>|null
+     * Resolve the Location Gem Monster dataset for the current Location.
      */
     private function resolveLocationGemMonsters(?Location $currentLocation): ?array
     {
@@ -178,11 +159,8 @@ class MonsterListService
         return $dataset;
     }
 
-    /*
-     * Get the base monsters list for the given map key.
-     *
-     * @param string $monstersKey
-     * @return array
+    /**
+     * Return the base Monster dataset for the Map cache key.
      */
     private function baseMonsters(string $monstersKey): array
     {
@@ -191,15 +169,8 @@ class MonsterListService
         return $monstersCache[$monstersKey] ?? ['data' => []];
     }
 
-    /*
-     * Apply map-tier overrides (regular vs easier) for special maps and Purgatory access.
-     *
-     * @param array $current
-     * @param string $monstersKey
-     * @param bool $isTheIcePlane
-     * @param bool $isDelusionalMemories
-     * @param bool $hasPurgatoryAccess
-     * @return array
+    /**
+     * Apply the special-Map Monster tier override.
      */
     private function applyMapTierOverrides(
         array $current,
@@ -218,11 +189,8 @@ class MonsterListService
         return $monstersCache[$monstersKey][$tier] ?? $current;
     }
 
-    /*
-     * Convert a full monster dataset into a compact list payload for the API.
-     *
-     * @param array $monsters
-     * @return array
+    /**
+     * Convert the Monster dataset into the compact API list payload.
      */
     private function buildPayload(array $monsters): array
     {
@@ -235,11 +203,8 @@ class MonsterListService
         })->values()->toArray();
     }
 
-    /*
-     * Determine if the character has Purgatory access via equipped/held items.
-     *
-     * @param Character $character
-     * @return bool
+    /**
+     * Determine whether the Character has Purgatory access.
      */
     private function characterHasPurgatoryAccess(Character $character): bool
     {

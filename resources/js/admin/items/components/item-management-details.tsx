@@ -11,14 +11,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 
-/**
- * Shared factual Item management presentation: Special Acquisition (when
- * the Item's own management facts indicate one) followed by Catalog
- * Management. Reused by the standalone Item show screen and the Admin Item
- * detail SidePeek so neither entry point can disagree about which
- * management facts are shown. Pure presentation — no fetching, mutation, or
- * SidePeek/navigation awareness.
- */
 const ItemManagementDetails = ({
   type,
   management,

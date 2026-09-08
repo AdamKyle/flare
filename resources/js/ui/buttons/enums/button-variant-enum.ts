@@ -5,4 +5,5 @@ export enum ButtonVariant {
   SERVER_MESSAGE_LINK,
   DONATIONS,
   ACTIVE,
+  ALCHEMY,
 }

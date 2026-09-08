@@ -4,7 +4,13 @@ namespace Tests\Unit\Game\Character\Builders\AttackBuilders\AttackDetails;
 
 use App\Game\Character\Builders\AttackBuilders\AttackDetails\CharacterAttackBuilder;
 use App\Game\Core\Items\Values\ItemType;
+use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Gems\Values\ResolvedAreaGemEffects;
+use App\Game\Gems\Values\ResolvedAreaGemMonsterEffects;
+use App\Game\Gems\Values\ResolvedAreaGemRewardEffects;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Mockery\MockInterface;
 use Tests\Setup\Character\CharacterFactory;
 use Tests\TestCase;
 use Tests\Traits\CreateCharacterClassSpecialitiesEquipped;
@@ -248,5 +254,56 @@ class CharacterAttackBuilderTest extends TestCase
 
         $this->assertEquals($expectedDamage, $attack['special_damage']['damage']);
         $this->assertNotEquals(100 + 999999 * 1.0, $attack['special_damage']['damage']);
+    }
+
+    public function test_resolves_area_gem_character_power_reduction_once_per_set_character(): void
+    {
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
+
+        $resolved = new ResolvedAreaGemEffects(
+            ResolvedAreaGemMonsterEffects::none(),
+            ResolvedAreaGemRewardEffects::none(),
+            0.35,
+        );
+
+        // Twice per setCharacter(): once for CharacterAttackBuilder's own cached
+        // scalar, once for the nested CharacterStatBuilder's cached scalar. The
+        // regression this guards against is resolving again on every baseAttack()
+        // call, which would grow with each buildAttack/buildCastAttack/buildDefend
+        // call below instead of staying constant.
+        $this->instance(
+            AreaGemEffectService::class,
+            Mockery::mock(AreaGemEffectService::class, function (MockInterface $mock) use ($resolved) {
+                $mock->shouldReceive('resolveForCharacter')->twice()->andReturn($resolved);
+            })
+        );
+
+        $characterAttackBuilder = resolve(CharacterAttackBuilder::class);
+        $characterAttackBuilder->setCharacter($character);
+
+        $attack = $characterAttackBuilder->buildAttack();
+        $characterAttackBuilder->buildCastAttack();
+        $characterAttackBuilder->buildDefend();
+
+        $this->assertEquals(0.35, $attack['damage_deduction']);
+    }
+
+    public function test_ignoring_reductions_does_not_resolve_area_gem_character_power_reduction(): void
+    {
+        $character = $this->character->equipBasicAttackLoadout()->getCharacter();
+
+        $this->instance(
+            AreaGemEffectService::class,
+            Mockery::mock(AreaGemEffectService::class, function (MockInterface $mock) {
+                $mock->shouldReceive('resolveForCharacter')->never();
+            })
+        );
+
+        $characterAttackBuilder = resolve(CharacterAttackBuilder::class);
+        $characterAttackBuilder->setCharacter($character, true);
+
+        $attack = $characterAttackBuilder->buildAttack();
+
+        $this->assertEquals(0.0, $attack['damage_deduction']);
     }
 }

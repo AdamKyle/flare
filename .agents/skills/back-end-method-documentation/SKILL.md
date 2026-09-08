@@ -1,6 +1,6 @@
 ---
 name: back-end-method-documentation
-description: Use for every PHP application-code change to enforce consistent method docblocks, constructor documentation, parameter/return documentation, and accurate method contracts.
+description: Use for every PHP application-code change to enforce the repository's exact simple method-docblock format, constructor parameter documentation, and accurate method responsibility documentation.
 ---
 
 # Back End Method Documentation
@@ -11,70 +11,88 @@ Use this skill for PHP application code under `app/**`, route/provider classes, 
 
 This skill does not require docblocks on PHPUnit test methods; PHPUnit documentation rules remain owned by the PHPUnit skills.
 
-## Every class method is documented
+## Every touched application method is documented
 
 Every method in a touched PHP application class must have a docblock immediately above it.
 
-This includes:
-
-- public methods;
-- private methods;
-- protected methods when a protected method is explicitly permitted;
-- static methods;
-- magic/framework methods such as `boot`, `register`, `handle`, `rules`, `authorize`, `newFactory`, and relationship methods;
-- constructors.
+This includes public, private, permitted protected, static, framework/magic methods, and constructors.
 
 Do not leave undocumented methods in a touched application class. Clean existing missing method documentation in the touched class as part of clean-as-you-go.
 
-## Constructors
+## Constructors use the exact simple format
 
-Constructor docblocks contain ONLY `@param` tags.
+Constructor docblocks contain ONLY one `@param` tag per constructor parameter.
 
-Do not add a constructor summary or description.
+Do not add:
 
-Do not add prose such as `Create a new service instance.`
+- a constructor summary;
+- parameter descriptions;
+- alignment padding;
+- prose such as `Existing service.` or `Create a new service instance.`.
 
-Example:
+Use exactly one ASCII space between the type and variable:
 
 ```php
 /**
- * @param CraftingService $craftingService
- * @param BatchCraftingSetService $batchCraftingSetService
+ * @param AdminGemRollService $adminGemRollService
+ * @param AdminGemRollTransformer $adminGemRollTransformer
+ * @param BuildMonsterCacheService $buildMonsterCacheService
  */
 public function __construct(
-    private readonly CraftingService $craftingService,
-    private readonly BatchCraftingSetService $batchCraftingSetService,
+    private readonly AdminGemRollService $adminGemRollService,
+    private readonly AdminGemRollTransformer $adminGemRollTransformer,
+    private readonly BuildMonsterCacheService $buildMonsterCacheService,
 ) {}
 ```
 
 If a constructor has no parameters, do not add a parameterless constructor merely to satisfy this rule.
 
-## Non-constructor methods
+## Non-constructor methods use simple native/project types
 
 Every non-constructor method docblock starts with one concise sentence describing WHAT the method does in domain/application terms.
 
-The summary must add useful meaning. Do not narrate the implementation line by line.
+After the summary:
 
-Then document every parameter with `@param`.
+- document every parameter with `@param`;
+- document the return contract with `@return`, including `@return void` for void methods;
+- do not add prose descriptions to `@param` tags;
+- use the simple declared/native/project type in PHPDoc;
+- do not document array shapes or generic collection element types.
 
-Document the return contract with `@return`, including `@return void` for void methods.
-
-Example:
+Use the repository's non-constructor tag spacing:
 
 ```php
 /**
- * Build the Batch Crafting preview for the validated Craft Amount request.
+ * Paginate the Map Gems list for the validated Admin index request.
  *
- * @param Character $character
- * @param array $validated
- * @return array
+ * @param  MapGemIndexRequest  $request
+ * @return LengthAwarePaginator Paginated
  */
-private function buildPreview(Character $character, array $validated): array
+public function paginate(MapGemIndexRequest $request): LengthAwarePaginator
 ```
 
-For a meaningful array shape, document the shape instead of writing only `array` when the shape is stable and useful to callers/static analysis.
+For arrays, keep the return tag simple:
 
-For collection/generic types, use the project's existing PHPDoc generic syntax.
+```php
+/**
+ * Build the internal Admin Map Gem form option data.
+ *
+ * @return array
+ */
+public function formOptions(): array
+```
+
+The following are prohibited in touched method PHPDoc:
+
+- `array{...}` shapes;
+- `Collection<int, Model>` or other collection generics;
+- `array<int, Foo>` or other array generics;
+- PHPStan/Psalm pseudo-object shapes;
+- parameter prose after `$variable`;
+- constructor parameter prose;
+- verbose return-shape descriptions that restate every field.
+
+PHP signatures, typed value objects, interfaces, transformers, definitions, and tests own exact contracts. PHPDoc remains concise and readable.
 
 ## Exceptions
 
@@ -101,4 +119,4 @@ Bad summaries merely repeat syntax:
 
 Keep docblocks accurate when method behavior changes. A stale docblock is a code defect.
 
-Do not put implementation history, ticket references, temporary notes, debugging details, or future plans in method docblocks.
+Do not put implementation history, ticket references, temporary notes, debugging details, future plans, or architectural essays in method docblocks.

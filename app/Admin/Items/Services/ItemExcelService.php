@@ -15,11 +15,6 @@ class ItemExcelService
 {
     /**
      * Download the catalog Items workbook for the given Item family profile.
-     *
-     * @param  ItemProfile  $profile  Item family profile to export.
-     * @return BinaryFileResponse Catalog Items workbook download response.
-     *
-     * @codeCoverageIgnore
      */
     public function export(ItemProfile $profile): BinaryFileResponse
     {
@@ -28,11 +23,6 @@ class ItemExcelService
 
     /**
      * Import catalog Items from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Items workbook.
-     * @return void Persists the imported catalog Items.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {
@@ -41,9 +31,6 @@ class ItemExcelService
 
     /**
      * Resolve the `type`/`specialty_type` values that identify the given profile's Item family.
-     *
-     * @param  ItemProfile  $profile  Item family profile.
-     * @return array<int, string> Family type/specialty values, or an empty array for the full catalog.
      */
     private function familyValues(ItemProfile $profile): array
     {

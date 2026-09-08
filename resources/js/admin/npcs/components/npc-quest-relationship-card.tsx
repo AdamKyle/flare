@@ -11,13 +11,6 @@ import {
 } from '../../../game/reusable-components/quest/styles/quest-card-styles';
 import { NpcQuestRelatedItemDefinition } from '../api/definitions/npc-quest-definition';
 
-/**
- * NPC Quest relationship card: the Quest-domain Glacier card visual
- * language, showing the Quest this NPC gives alongside its Required,
- * Secondary, and Reward Item identities. The Quest name and each Item
- * identity are independent clickable controls (never nested inside one
- * another) so a screen reader user can activate any one of them directly.
- */
 const NpcQuestRelationshipCard = ({
   quest,
   on_open_quest: onOpenQuest,

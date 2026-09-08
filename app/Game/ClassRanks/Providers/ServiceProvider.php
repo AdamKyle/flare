@@ -7,7 +7,10 @@ use App\Game\Character\Builders\AttackBuilders\Handler\UpdateCharacterAttackType
 use App\Game\ClassRanks\Console\Commands\AssignNewClassRanks;
 use App\Game\ClassRanks\Services\ClassRankService;
 use App\Game\ClassRanks\Services\ManageClassService;
+use App\Game\ClassRanks\Transformers\ClassDetailTransformer;
+use App\Game\ClassRanks\Transformers\ClassMasteryDetailTransformer;
 use App\Game\Gems\Services\AreaGemEffectService;
+use App\Game\Skills\Builders\BaseSkillBuilder;
 use App\Game\Skills\Services\UpdateCharacterSkillsService;
 use Illuminate\Support\ServiceProvider as ApplicationServiceProvider;
 
@@ -28,6 +31,8 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(BattleMessageHandler::class),
                 $app->make(AreaGemEffectService::class),
+                $app->make(ClassDetailTransformer::class),
+                $app->make(ClassMasteryDetailTransformer::class),
             );
         });
 
@@ -36,6 +41,7 @@ class ServiceProvider extends ApplicationServiceProvider
                 $app->make(UpdateCharacterAttackTypesHandler::class),
                 $app->make(UpdateCharacterSkillsService::class),
                 $app->make(ClassRankService::class),
+                $app->make(BaseSkillBuilder::class),
             );
         });
     }

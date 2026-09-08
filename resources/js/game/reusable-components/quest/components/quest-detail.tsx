@@ -18,15 +18,11 @@ import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 import Separator from 'ui/separator/separator';
 
-/**
- * Shared, permission-neutral factual Quest detail presentation. Never
- * checks Admin permission, imports Admin APIs, or mutates data; navigation
- * is entirely driven by the optional callbacks in `navigation`.
- */
 const QuestDetail = ({
   quest,
   navigation,
   completed_quest_ids: completedQuestIds,
+  quest_item_ownership: questItemOwnership,
 }: QuestDetailProps): ReactNode => {
   const hasStory = Boolean(
     quest.story.before_completion_markdown ||
@@ -136,11 +132,23 @@ const QuestDetail = ({
     },
     {
       present: hasRequirements,
-      node: <QuestRequirementsSection quest={quest} navigation={navigation} />,
+      node: (
+        <QuestRequirementsSection
+          quest={quest}
+          navigation={navigation}
+          quest_item_ownership={questItemOwnership}
+        />
+      ),
     },
     {
       present: hasRewards,
-      node: <QuestRewardsSection quest={quest} navigation={navigation} />,
+      node: (
+        <QuestRewardsSection
+          quest={quest}
+          navigation={navigation}
+          quest_item_ownership={questItemOwnership}
+        />
+      ),
     },
     { present: hasRestrictions, node: renderRestrictionsContent() },
   ];

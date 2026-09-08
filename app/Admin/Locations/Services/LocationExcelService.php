@@ -14,7 +14,6 @@ class LocationExcelService
     /**
      * Download the Locations workbook.
      *
-     * @return BinaryFileResponse Locations workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class LocationExcelService
 
     /**
      * Import Locations from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Locations workbook.
-     * @return void Persists the imported Locations.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

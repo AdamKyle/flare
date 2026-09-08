@@ -5,16 +5,23 @@ namespace App\Game\Monsters\Services;
 use App\Flare\Models\Character;
 use App\Flare\Models\Monster;
 use App\Game\Core\Traits\ResponseBuilder;
+use App\Game\Monsters\Transformers\MonsterDetailTransformer;
 use Psr\SimpleCache\InvalidArgumentException;
 
 class MonsterStatsService
 {
     use ResponseBuilder;
 
-    public function __construct(private readonly MonsterListService $monsterListService) {}
+    public function __construct(
+        private readonly MonsterListService $monsterListService,
+        private readonly MonsterDetailTransformer $monsterDetailTransformer,
+        private readonly MonsterGemEffectContextService $monsterGemEffectContextService,
+    ) {}
 
     /**
-     * Get a single monster's full stats from the same dataset the list view would show for the character.
+     * Get a single monster's full shared detail representation, scoped to the
+     * Character's current Gem effect context, from the same dataset the list
+     * view would show for the character.
      *
      * @throws InvalidArgumentException
      */
@@ -29,6 +36,13 @@ class MonsterStatsService
             );
         }
 
-        return $this->successResult($match);
+        $currentContext = $this->monsterGemEffectContextService->forEffectiveMonster($monster, $match);
+
+        return $this->successResult(
+            $this->monsterDetailTransformer->transform(
+                $monster,
+                is_null($currentContext) ? [] : [$currentContext],
+            )
+        );
     }
 }

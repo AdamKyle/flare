@@ -15,11 +15,7 @@ import {
 import QuestTreeNodeProps from '../types/quest-tree-node-props';
 
 /**
- * Presentational-only Quest list-node content for the generic Tree's
- * `ONLY_WHATS_AVAILABLE` mobile fallback (`render_list_node`). Shares
- * `QuestCard`'s established visual language but renders no button of its
- * own — the generic `TreeList` owns the single interactive activation
- * target, so this component must never nest a second button inside it.
+ * TreeList owns the activation control; this content must not render a nested button.
  */
 const QuestTreeListNode = ({ quest, state }: QuestTreeNodeProps): ReactNode => {
   const npcName = quest.npc?.name ?? null;

@@ -8,9 +8,6 @@ class ClassFormTransformer
 {
     /**
      * Transform a Class into its Admin save-response / form-value representation.
-     *
-     * @param  GameClass  $gameClass  Class to transform.
-     * @return array{id: int, name: string, description: string|null, damage_stat: string, to_hit_stat: string, str_mod: int, dur_mod: int, dex_mod: int, chr_mod: int, int_mod: int, agi_mod: int, focus_mod: int, accuracy_mod: float, dodge_mod: float, defense_mod: float, looting_mod: float, primary_required_class_id: int|null, secondary_required_class_id: int|null, primary_required_class_level: int|null, secondary_required_class_level: int|null} Admin Class form-value representation.
      */
     public function transform(GameClass $gameClass): array
     {

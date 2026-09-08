@@ -24,20 +24,6 @@ use Illuminate\Http\JsonResponse;
 
 class GameMapsController extends Controller
 {
-    /**
-     * @param  GameMapService  $gameMapService  Admin Game Map application service.
-     * @param  Pagination  $pagination  Paginator response transformer.
-     * @param  GameMapListTransformer  $gameMapListTransformer  List-record transformer.
-     * @param  GameMapDetailTransformer  $gameMapDetailTransformer  Detail transformer.
-     * @param  GameMapEditorTransformer  $gameMapEditorTransformer  Editor transformer.
-     * @param  GameMapFormOptionsTransformer  $gameMapFormOptionsTransformer  Form-options transformer.
-     * @param  GameMapFormTransformer  $gameMapFormTransformer  Form-value transformer.
-     * @param  GameMapRelatedLocationTransformer  $gameMapRelatedLocationTransformer  Related-Location transformer.
-     * @param  GameMapRelatedNpcTransformer  $gameMapRelatedNpcTransformer  Related-NPC transformer.
-     * @param  GameMapRelatedMonsterTransformer  $gameMapRelatedMonsterTransformer  Related-Monster transformer.
-     * @param  GameMapRelatedQuestTransformer  $gameMapRelatedQuestTransformer  Related-Quest transformer.
-     * @param  QuestItemTransformer  $questItemTransformer  Canonical quest Item transformer.
-     */
     public function __construct(
         private readonly GameMapService $gameMapService,
         private readonly Pagination $pagination,
@@ -55,9 +41,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the paginated, searchable, sortable Game Maps list.
-     *
-     * @param  GameMapIndexRequest  $request  Validated Game Map list request.
-     * @return JsonResponse Paginated Game Map list JSON response.
      */
     public function index(GameMapIndexRequest $request): JsonResponse
     {
@@ -70,8 +53,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the Admin Game Map form options.
-     *
-     * @return JsonResponse Game Map form-options JSON response.
      */
     public function options(): JsonResponse
     {
@@ -82,9 +63,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the Admin detail representation for the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map to transform.
-     * @return JsonResponse Game Map detail JSON response.
      */
     public function show(GameMap $gameMap): JsonResponse
     {
@@ -95,9 +73,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the Game Map editor data for the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map to edit.
-     * @return JsonResponse Game Map editor JSON response.
      */
     public function editor(GameMap $gameMap): JsonResponse
     {
@@ -108,9 +83,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the current field values for the given Game Map, for populating the edit form.
-     *
-     * @param  GameMap  $gameMap  Game Map to populate.
-     * @return JsonResponse Game Map form-value JSON response.
      */
     public function edit(GameMap $gameMap): JsonResponse
     {
@@ -119,10 +91,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the paginated Locations belonging to the given Game Map.
-     *
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @param  GameMap  $gameMap  Game Map whose Locations are being listed.
-     * @return JsonResponse Paginated Locations JSON response.
      */
     public function relatedLocations(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
     {
@@ -135,10 +103,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the paginated NPCs belonging to the given Game Map.
-     *
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @param  GameMap  $gameMap  Game Map whose NPCs are being listed.
-     * @return JsonResponse Paginated NPCs JSON response.
      */
     public function relatedNpcs(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
     {
@@ -151,10 +115,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the paginated Monsters available on the given Game Map.
-     *
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @param  GameMap  $gameMap  Game Map whose Monsters are being listed.
-     * @return JsonResponse Paginated Monsters JSON response.
      */
     public function relatedMonsters(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
     {
@@ -167,10 +127,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the paginated Quests whose Quest-giver NPC belongs to the given Game Map.
-     *
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @param  GameMap  $gameMap  Game Map whose Quests are being listed.
-     * @return JsonResponse Paginated Quests JSON response.
      */
     public function relatedQuests(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
     {
@@ -183,10 +139,6 @@ class GameMapsController extends Controller
 
     /**
      * Return the paginated, deduplicated quest Items connected to the given Game Map.
-     *
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @param  GameMap  $gameMap  Game Map whose quest Items are being listed.
-     * @return JsonResponse Paginated quest Items JSON response.
      */
     public function relatedQuestItems(GameMapRelationIndexRequest $request, GameMap $gameMap): JsonResponse
     {
@@ -199,9 +151,6 @@ class GameMapsController extends Controller
 
     /**
      * Create a new Game Map from the validated request.
-     *
-     * @param  StoreGameMapRequest  $request  Validated Game Map creation request.
-     * @return JsonResponse Created Game Map JSON response.
      */
     public function store(StoreGameMapRequest $request): JsonResponse
     {
@@ -212,10 +161,6 @@ class GameMapsController extends Controller
 
     /**
      * Update an existing Game Map from the validated request.
-     *
-     * @param  UpdateGameMapRequest  $request  Validated Game Map update request.
-     * @param  GameMap  $gameMap  Game Map to update.
-     * @return JsonResponse Updated Game Map JSON response.
      */
     public function update(UpdateGameMapRequest $request, GameMap $gameMap): JsonResponse
     {

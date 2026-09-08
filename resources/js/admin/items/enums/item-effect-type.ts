@@ -109,10 +109,6 @@ export const ITEM_EFFECT_TYPE_VALUES: ItemEffectType[] = [
   ItemEffectType.DELVE_PACK_CHOICE,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item effect type, without a forced type assertion at each call site.
- */
 export const isItemEffectType = (
   value: string | number
 ): value is ItemEffectType => {

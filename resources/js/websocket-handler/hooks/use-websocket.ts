@@ -33,10 +33,19 @@ export const useWebsocket = <T>({
 
     const echo = echoInitialization.getEcho();
 
-    const channel =
-      type === ChannelType.PRIVATE
-        ? echo.private(resolvedUrl)
-        : echo.channel(resolvedUrl);
+    const resolveChannel = () => {
+      if (type === ChannelType.PRIVATE) {
+        return echo.private(resolvedUrl);
+      }
+
+      if (type === ChannelType.PRESENCE) {
+        return echo.join(resolvedUrl);
+      }
+
+      return echo.channel(resolvedUrl);
+    };
+
+    const channel = resolveChannel();
 
     channel.listen(channelName, listenerRef.current);
 

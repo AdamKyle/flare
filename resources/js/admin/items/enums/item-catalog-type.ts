@@ -91,10 +91,6 @@ export const ITEM_CATALOG_TYPE_VALUES: ItemCatalogType[] = [
   ItemCatalogType.ALCHEMY,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item catalog type, without a forced type assertion at each call site.
- */
 export const isItemCatalogType = (
   value: string | number
 ): value is ItemCatalogType => {

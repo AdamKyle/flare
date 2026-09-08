@@ -1,12 +1,7 @@
 import { GameMapCoordinateSize } from '../enums/game-map-coordinate-size';
 
 /**
- * Find the index of the coordinate whose 16-by-16 square contains the given position.
- *
- * Coordinates are contiguous, half-open 16px squares: `[values[index], values[index] + 16)`.
- * A position before the first coordinate, at or past the map's pixel bound, or landing in a
- * square that would extend past the map's pixel bound is outside the selectable grid and
- * returns `null` rather than rounding to the nearest or final coordinate.
+ * Coordinates are half-open 16px squares; positions outside a complete cell return null.
  */
 export const findCoordinateIndex = (
   position: number,

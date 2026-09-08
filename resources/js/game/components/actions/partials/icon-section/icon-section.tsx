@@ -1,5 +1,8 @@
 import React, { ReactNode } from 'react';
 
+import CharacterActiveBoonIndicator from './character-active-boon-indicator';
+import { useCharacterActiveBoonStatus } from './hooks/use-character-active-boon-status';
+import { useManageQuestLogVisibility } from '../../../quests/hooks/use-manage-quest-log-visibility';
 import { useManageCharacterCardVisibility } from '../floating-cards/character-details/hooks/use-manage-character-card-visibility';
 import { useManageCraftingCardVisibility } from '../floating-cards/crafting-section/hooks/use-manage-crafting-card-visibility';
 import { useManageMapSectionVisibility } from '../floating-cards/map-section/hooks/use-manage-map-section-visibility';
@@ -18,6 +21,10 @@ export const IconSection = (): ReactNode => {
 
   const { openShop } = useManageShopVisibility();
 
+  const { openQuestLog } = useManageQuestLogVisibility();
+
+  const { has_active_boons: hasActiveBoons } = useCharacterActiveBoonStatus();
+
   return (
     <IconContainer>
       <IconButton
@@ -26,6 +33,9 @@ export const IconSection = (): ReactNode => {
         variant={ButtonVariant.PRIMARY}
         on_click={openCharacterCard}
         additional_css="w-full lg:w-auto"
+        status_indicator={
+          <CharacterActiveBoonIndicator active={hasActiveBoons} />
+        }
       />
       <IconButton
         label="Craft"
@@ -38,7 +48,7 @@ export const IconSection = (): ReactNode => {
         label="Quests"
         icon={<i className="far fa-comments text-sm" aria-hidden="true"></i>}
         variant={ButtonVariant.PRIMARY}
-        on_click={() => {}}
+        on_click={openQuestLog}
         additional_css="w-full lg:w-auto"
       />
       <IconButton

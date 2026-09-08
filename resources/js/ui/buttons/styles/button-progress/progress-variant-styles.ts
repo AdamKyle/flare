@@ -7,5 +7,6 @@ export const progressVariantStyles = (variant: ButtonVariant): string => {
     .with(ButtonVariant.DANGER, () => 'bg-rose-600 hover:bg-rose-500')
     .with(ButtonVariant.SUCCESS, () => 'bg-emerald-600 hover:bg-emerald-500')
     .with(ButtonVariant.PRIMARY, () => 'bg-danube-600 hover:bg-danube-500')
+    .with(ButtonVariant.ALCHEMY, () => 'bg-wisp-pink-800 dark:bg-wisp-pink-800')
     .otherwise(() => '');
 };

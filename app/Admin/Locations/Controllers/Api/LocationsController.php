@@ -21,15 +21,6 @@ use Illuminate\Http\JsonResponse;
 
 class LocationsController extends Controller
 {
-    /**
-     * @param  LocationService  $locationService  Canonical Location application service.
-     * @param  LocationTransformer  $locationTransformer  Location transformer used by map-scoped routes.
-     * @param  LocationFormOptionsTransformer  $locationFormOptionsTransformer  Location form-options transformer.
-     * @param  LocationListTransformer  $locationListTransformer  Standalone Location list transformer.
-     * @param  LocationDetailTransformer  $locationDetailTransformer  Standalone Location detail transformer.
-     * @param  QuestItemTransformer  $questItemTransformer  Canonical quest Item transformer.
-     * @param  Pagination  $pagination  Paginator response transformer.
-     */
     public function __construct(
         private readonly LocationService $locationService,
         private readonly LocationTransformer $locationTransformer,
@@ -42,9 +33,6 @@ class LocationsController extends Controller
 
     /**
      * Return the paginated, searchable, sortable standalone Locations list.
-     *
-     * @param  LocationIndexRequest  $request  Validated Location list request.
-     * @return JsonResponse Paginated Location list JSON response.
      */
     public function index(LocationIndexRequest $request): JsonResponse
     {
@@ -57,9 +45,6 @@ class LocationsController extends Controller
 
     /**
      * Return the standalone Admin detail representation for the given Location.
-     *
-     * @param  Location  $location  Location to transform.
-     * @return JsonResponse Location detail JSON response.
      */
     public function showLocation(Location $location): JsonResponse
     {
@@ -70,10 +55,6 @@ class LocationsController extends Controller
 
     /**
      * Return the paginated quest Items dropped at the given Location.
-     *
-     * @param  LocationQuestItemIndexRequest  $request  Validated quest-Item list request.
-     * @param  Location  $location  Location whose quest-Item drops are being listed.
-     * @return JsonResponse Paginated quest-Item drops JSON response.
      */
     public function questItems(LocationQuestItemIndexRequest $request, Location $location): JsonResponse
     {
@@ -92,9 +73,6 @@ class LocationsController extends Controller
 
     /**
      * Return the Admin Location form options for the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map the Location form belongs to.
-     * @return JsonResponse Location form-options JSON response.
      */
     public function options(GameMap $gameMap): JsonResponse
     {
@@ -105,10 +83,6 @@ class LocationsController extends Controller
 
     /**
      * Return the Admin representation of a single Location on the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map the Location is expected to belong to.
-     * @param  Location  $location  Location to transform.
-     * @return JsonResponse Location JSON response.
      */
     public function show(GameMap $gameMap, Location $location): JsonResponse
     {
@@ -119,10 +93,6 @@ class LocationsController extends Controller
 
     /**
      * Create a new Location on the given Game Map.
-     *
-     * @param  StoreLocationRequest  $request  Validated Location creation request.
-     * @param  GameMap  $gameMap  Game Map the new Location belongs to.
-     * @return JsonResponse Created Location JSON response.
      */
     public function store(StoreLocationRequest $request, GameMap $gameMap): JsonResponse
     {
@@ -133,11 +103,6 @@ class LocationsController extends Controller
 
     /**
      * Update an existing Location on the given Game Map.
-     *
-     * @param  StoreLocationRequest  $request  Validated Location update request.
-     * @param  GameMap  $gameMap  Game Map the Location belongs to.
-     * @param  Location  $location  Location to update.
-     * @return JsonResponse Updated Location JSON response.
      */
     public function update(StoreLocationRequest $request, GameMap $gameMap, Location $location): JsonResponse
     {
@@ -148,11 +113,6 @@ class LocationsController extends Controller
 
     /**
      * Move an existing Location on the given Game Map to a new X/Y coordinate.
-     *
-     * @param  MoveLocationRequest  $request  Validated Location move request.
-     * @param  GameMap  $gameMap  Game Map the Location belongs to.
-     * @param  Location  $location  Location to move.
-     * @return JsonResponse Moved Location JSON response.
      */
     public function move(MoveLocationRequest $request, GameMap $gameMap, Location $location): JsonResponse
     {

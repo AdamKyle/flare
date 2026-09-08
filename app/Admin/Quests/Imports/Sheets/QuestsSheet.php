@@ -24,26 +24,12 @@ class QuestsSheet implements ToCollection
 
     private ?string $validationError = null;
 
-    /**
-     * @param  QuestService  $questService  Canonical Quest cross-field normalization/persistence service.
-     */
     public function __construct(
         private readonly QuestService $questService = new QuestService,
     ) {}
 
     /**
      * Import Quest rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized, every referenced record and finite-domain value is
-     * resolved, and the complete workbook Quest-name graph (parent, required Quest, and required
-     * Quest chain edges) is validated for cycles before any row is written. A same-workbook Quest
-     * may reference another new Quest defined later in the same workbook by name; both existing
-     * database Quests and workbook-local Quests are resolved through one combined name-to-id map.
-     * Writes only occur once every row in the workbook resolves and validates successfully, so an
-     * invalid row cannot leave an earlier row's write applied.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Quests are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -85,8 +71,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Determine whether the import completed and wrote every workbook row.
-     *
-     * @return bool Whether the import succeeded.
      */
     public function wasSuccessful(): bool
     {
@@ -95,8 +79,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Resolve the human-facing validation error for a failed import, when one occurred.
-     *
-     * @return string|null Validation error message, or null when the import succeeded.
      */
     public function validationError(): ?string
     {
@@ -105,8 +87,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Record why the import failed. Zero rows are written once this is called.
-     *
-     * @param  string  $message  Human-facing validation error message.
      */
     private function fail(string $message): void
     {
@@ -115,9 +95,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Extract every meaningful row (up to the first blank Quest name) from the uploaded workbook.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>> Raw spreadsheet rows keyed by header.
      */
     private function extractMeaningfulRows(Collection $rows): array
     {
@@ -143,9 +120,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Determine whether the uploaded workbook names the same Quest more than once.
-     *
-     * @param  array<int, array<string, mixed>>  $rawRows  Raw spreadsheet rows keyed by header.
-     * @return bool Whether a duplicate Quest name was found.
      */
     private function hasDuplicateNames(array $rawRows): bool
     {
@@ -155,12 +129,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Build the complete workbook Quest-name graph: every existing database Quest name mapped to
-     * its real id, overlaid with every new workbook-only Quest name mapped to a unique negative
-     * synthetic id, so name references can resolve against both without any writes yet occurring.
-     *
-     * @param  array<int, array<string, mixed>>  $rawRows  Raw spreadsheet rows keyed by header.
-     * @return array<string, int> Quest name to resolved id.
+     * Build the workbook Quest-name graph used to resolve Quest references before writes.
      */
     private function buildNameToId(array $rawRows): array
     {
@@ -180,11 +149,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Extract the parent/required-Quest/required-Quest-chain edges from every resolved row, keyed
-     * by the row's own resolved id, for graph-cycle validation.
-     *
-     * @param  array<int, array<string, mixed>>  $resolvedRowsById  Every resolved Quest row, keyed by resolved id.
-     * @return array<int, array{parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain: array<int, int>}> Graph edges keyed by resolved id.
+     * Build the Quest relationship edges used for graph-cycle validation.
      */
     private function graphRows(array $resolvedRowsById): array
     {
@@ -196,15 +161,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Persist every validated row in two passes so a Quest may reference another new Quest defined
-     * later in the same workbook: the first pass creates/updates every row with its Quest-reference
-     * fields held back (so a not-yet-existing synthetic id is never written to a real foreign key),
-     * then the second pass resolves those fields (translating synthetic ids to the real ids the
-     * first pass just created) and persists them, reconciling the `is_parent` flag against each
-     * row's real previous parent.
-     *
-     * @param  array<int, array<string, mixed>>  $resolvedRowsById  Every resolved Quest row, keyed by resolved id.
-     * @return void Every row is created or updated in place.
+     * Persist Quest rows in two passes so workbook-local Quest references resolve safely.
      */
     private function writeRows(array $resolvedRowsById): void
     {
@@ -252,13 +209,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Derive every imported/updated Quest's own `is_parent` flag purely from whether it actually has
-     * a child once every row in the workbook has finished writing its `parent_quest_id`, rather than
-     * trusting the workbook's own `is_parent` cell (already discarded in `resolveRow()`). This covers
-     * every row this import touched regardless of whether `reconcileParentFlags()` already corrected
-     * it as someone else's previous/new parent during the loop above.
-     *
-     * @param  array<int, Quest>  $questsById  Every Quest this import created or updated, keyed by its resolved workbook id.
+     * Derive imported Quest parent flags from the persisted parent-child hierarchy.
      */
     private function reconcileImportedParentFlags(array $questsById): void
     {
@@ -270,12 +221,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Translate a resolved reference id into the id actually written to the database: a negative
-     * synthetic id becomes the real id just created for it; any other id passes through unchanged.
-     *
-     * @param  int|null  $id  Resolved reference id.
-     * @param  array<int, int>  $syntheticToRealId  Synthetic id to real id, for every newly created workbook row.
-     * @return int|null Id safe to persist to a real foreign key.
+     * Resolve a workbook reference id to the persisted Quest id written to the database.
      */
     private function resolveWrittenId(?int $id, array $syntheticToRealId): ?int
     {
@@ -288,10 +234,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Resolve a single raw Quest row into normalized, validated Quest attributes.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @param  array<string, int>  $nameToId  Complete workbook Quest-name graph.
-     * @return array<string, mixed>|null Normalized Quest attributes, or null when the row is invalid.
      */
     private function resolveRow(array $rawRow, array $nameToId): ?array
     {
@@ -343,15 +285,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Validate the complete managed Quest field contract a workbook row may carry: the same
-     * numeric-minimum, string, and finite-domain constraints the live Admin Quest form enforces via
-     * `StoreQuestRequest`. Relationship fields are intentionally excluded here — they are already
-     * resolved to real (or workbook-synthetic) ids earlier in `resolveRow()`, and `required_quest_id`
-     * / `parent_quest_id` / `required_quest_chain` may legitimately hold a negative synthetic id that
-     * an `exists:quests,id` rule would incorrectly reject before the two-phase write resolves it.
-     *
-     * @param  array<string, mixed>  $data  Row data with relationships already resolved to ids.
-     * @return bool Whether every managed field value is valid.
+     * Validate the managed Quest workbook field contract.
      */
     private function hasValidManagedFields(array $data): bool
     {
@@ -381,10 +315,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Resolve a single Quest-name reference against the complete workbook Quest-name graph.
-     *
-     * @param  array<string, int>  $nameToId  Complete workbook Quest-name graph.
-     * @param  string|null  $value  Raw Quest-name value from the spreadsheet.
-     * @return int|false|null Resolved id, null when blank, or false when unresolvable.
      */
     private function resolveQuestReference(array $nameToId, ?string $value): int|false|null
     {
@@ -396,12 +326,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Resolve a comma-separated list of Quest names into their ids, preserving order, against the
-     * complete workbook Quest-name graph.
-     *
-     * @param  array<string, int>  $nameToId  Complete workbook Quest-name graph.
-     * @param  string|null  $value  Comma-separated required Quest chain names.
-     * @return array<int, int>|false|null Ordered Quest ids, null when blank, or false when any name is unresolvable.
+     * Resolve the ordered Quest names in a required Quest chain to ids.
      */
     private function resolveRequiredQuestChain(array $nameToId, ?string $value): array|false|null
     {
@@ -425,11 +350,6 @@ class QuestsSheet implements ToCollection
 
     /**
      * Resolve a related record's id by its display-name column.
-     *
-     * @param  class-string  $modelClass  Related Eloquent model class.
-     * @param  string  $nameColumn  Column holding the record's display name.
-     * @param  string|null  $value  Raw display-name value from the spreadsheet.
-     * @return int|false|null Resolved id, null when blank, or false when unresolvable.
      */
     private function resolveByName(string $modelClass, string $nameColumn, ?string $value): int|false|null
     {
@@ -447,13 +367,7 @@ class QuestsSheet implements ToCollection
     }
 
     /**
-     * Normalize the `unlocks_skill` boolean column the current Quest form always sends (defaulting a
-     * missing/blank cell to false, and converting any present cell through `FILTER_VALIDATE_BOOLEAN`
-     * so an arbitrary non-empty string such as `"FALSE"` cannot be treated as true), and normalize
-     * blank finite-domain cells to null.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @return array<string, mixed> Row with `unlocks_skill` normalized and blank domain cells nulled.
+     * Apply Quest workbook defaults and normalize finite-domain cells.
      */
     private function applyDefaults(array $rawRow): array
     {

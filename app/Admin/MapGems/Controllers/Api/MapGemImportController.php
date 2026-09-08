@@ -9,20 +9,12 @@ use Illuminate\Http\JsonResponse;
 
 class MapGemImportController extends Controller
 {
-    /**
-     * @param  MapGemExcelService  $mapGemExcelService  Map Gem Excel export/import service.
-     */
     public function __construct(
         private readonly MapGemExcelService $mapGemExcelService,
     ) {}
 
     /**
      * Import validated Map Gem profiles and return the success response.
-     *
-     * @param  MapGemImportRequest  $request  Validated Map Gem import request.
-     * @return JsonResponse Import success JSON response.
-     *
-     * @codeCoverageIgnore
      */
     public function __invoke(MapGemImportRequest $request): JsonResponse
     {

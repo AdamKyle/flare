@@ -17,14 +17,6 @@ import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Admin Quest detail side-peek: stacks the shared, permission-neutral factual Quest
- * presentation with Admin-only Edit/Add-Child actions and relationship navigation into other
- * modernized Admin resources. Relationship navigation opens the target's canonical detail
- * inside a `StackedCard` over this content (rather than replacing it through the global
- * SidePeek emitter), so this component can itself be reused as nested `StackedCard` content
- * and its own relationship clicks never destroy an ancestor's stack.
- */
 const AdminQuestDetailSidePeek = ({
   quest_id: questId,
   on_quest_changed: onQuestChanged,

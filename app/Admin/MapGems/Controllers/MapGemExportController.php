@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MapGemExportController extends Controller
 {
-    /**
-     * @param  MapGemExcelService  $mapGemExcelService  Map Gem Excel export/import service.
-     */
     public function __construct(
         private readonly MapGemExcelService $mapGemExcelService,
     ) {}
@@ -18,7 +15,6 @@ class MapGemExportController extends Controller
     /**
      * Download the Map Gems workbook.
      *
-     * @return BinaryFileResponse Map Gems workbook download response.
      *
      * @codeCoverageIgnore
      */

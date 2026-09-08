@@ -9,13 +9,6 @@ class GameMapRelatedQuestTransformer extends TransformerAbstract
 {
     /**
      * Transform a Quest into its compact Game Map relationship representation.
-     *
-     * `resolved_kind` is a non-persisted property `GameMapService::paginateRelatedQuests()`
-     * attaches to each Quest before transforming, since resolving `QuestKind` requires
-     * batch-checking which Quests in the page have children.
-     *
-     * @param  Quest  $quest  Quest to transform, carrying a `resolved_kind` property.
-     * @return array{id: int, name: string, kind: string, npc: array{id: int, name: string}|null} Compact Quest relationship representation.
      */
     public function transform(Quest $quest): array
     {

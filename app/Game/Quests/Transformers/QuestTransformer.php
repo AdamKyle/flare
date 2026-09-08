@@ -27,6 +27,9 @@ class QuestTransformer extends TransformerAbstract
         ];
     }
 
+    /**
+     * Include child Quests in the transformed Quest response.
+     */
     public function includeChildQuests(Quest $quest)
     {
         $children = $quest->childQuests;

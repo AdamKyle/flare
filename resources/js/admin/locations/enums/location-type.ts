@@ -49,10 +49,6 @@ export const LOCATION_TYPE_VALUES: LocationType[] = [
   LocationType.SPECIAL,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Location type, without a forced type assertion at each call site.
- */
 export const isLocationType = (
   value: string | number
 ): value is LocationType => {

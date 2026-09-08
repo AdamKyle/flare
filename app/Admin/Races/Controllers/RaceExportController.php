@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class RaceExportController extends Controller
 {
-    /**
-     * @param  RaceExcelService  $raceExcelService  Race Excel export/import service.
-     */
     public function __construct(
         private readonly RaceExcelService $raceExcelService,
     ) {}
@@ -18,7 +15,6 @@ class RaceExportController extends Controller
     /**
      * Download the Races workbook.
      *
-     * @return BinaryFileResponse Races workbook download response.
      *
      * @codeCoverageIgnore
      */

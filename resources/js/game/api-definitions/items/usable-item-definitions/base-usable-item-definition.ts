@@ -3,7 +3,8 @@ import { BaseItemDetails } from '../base-item-details';
 export default interface BaseUsableItemDefinition extends BaseItemDetails {
   id: number;
   item_id: number;
-  slot_id: number;
+  slot_id: number | null;
+  amount: number;
   damages_kingdoms: boolean;
   kingdom_damage: number | null;
   lasts_for: number | null;

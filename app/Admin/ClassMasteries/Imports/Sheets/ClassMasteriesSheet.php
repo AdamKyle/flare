@@ -15,13 +15,6 @@ class ClassMasteriesSheet implements ToCollection
 {
     /**
      * Import Class Mastery rows from the uploaded spreadsheet and persist them.
-     *
-     * Every meaningful row is normalized and validated first; the workbook is written only when
-     * every meaningful row resolves successfully, so an invalid later row cannot leave an earlier
-     * row's write applied.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return void Class Masteries are created or updated in place.
      */
     public function collection(Collection $rows): void
     {
@@ -42,9 +35,6 @@ class ClassMasteriesSheet implements ToCollection
 
     /**
      * Normalize and validate every meaningful Class Mastery row before any row is written.
-     *
-     * @param  Collection<int, Collection<int, mixed>>  $rows  Imported workbook rows.
-     * @return array<int, array<string, mixed>> Validated Class Mastery payloads.
      */
     private function normalizeAndValidateRows(Collection $rows): array
     {
@@ -71,12 +61,7 @@ class ClassMasteriesSheet implements ToCollection
     }
 
     /**
-     * Resolve the required Class Mastery name cell, distinguishing a blank end-of-workbook row
-     * from an invalid non-string value.
-     *
-     * @param  mixed  $name  Raw Class Mastery name cell.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return string|null Trimmed Class Mastery name, or null when the workbook has no more data.
+     * Resolve the required Class Mastery name cell.
      */
     private function resolveRowName(mixed $name, int $rowNumber): ?string
     {
@@ -95,11 +80,6 @@ class ClassMasteriesSheet implements ToCollection
 
     /**
      * Normalize a single raw Class Mastery row, validating its referenced Class id and field contract.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @param  string  $name  Resolved Class Mastery name.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return array<string, mixed> Normalized Class Mastery attributes.
      */
     private function normalizeRow(array $rawRow, string $name, int $rowNumber): array
     {
@@ -135,10 +115,6 @@ class ClassMasteriesSheet implements ToCollection
 
     /**
      * Validate the Class Mastery field contract for one row.
-     *
-     * @param  array<string, mixed>  $masteryData  Normalized Class Mastery data resolved so far.
-     * @param  int  $rowNumber  Workbook row number used for validation context.
-     * @return void No direct return value; validation either completes or raises the existing import failure.
      */
     private function validateFieldContract(array $masteryData, int $rowNumber): void
     {
@@ -167,12 +143,7 @@ class ClassMasteriesSheet implements ToCollection
     }
 
     /**
-     * Resolve the optional attack type, permitting either an existing AttackType value or the
-     * literal `any` domain value.
-     *
-     * @param  mixed  $attackType  Raw attack type cell.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return string|null Resolved attack type value, or null when omitted.
+     * Resolve the optional attack type, permitting either an existing AttackType value or the literal `any` domain value.
      */
     private function resolveAttackType(mixed $attackType, int $rowNumber): ?string
     {
@@ -195,14 +166,7 @@ class ClassMasteriesSheet implements ToCollection
     }
 
     /**
-     * Resolve the Class Mastery description, preserving the existing value when an older workbook
-     * omits the `description` column or leaves it blank, and never writing null to the non-null
-     * `description` column for a new Class Mastery.
-     *
-     * @param  array<string, mixed>  $rawRow  Raw spreadsheet row keyed by header.
-     * @param  GameClassSpecial|null  $existingMastery  Existing Class Mastery being updated, when one exists.
-     * @param  int  $rowNumber  One-based workbook row number, for error context.
-     * @return string Resolved Class Mastery description.
+     * Resolve the Class Mastery description while preserving older-workbook compatibility.
      */
     private function resolveDescription(array $rawRow, ?GameClassSpecial $existingMastery, int $rowNumber): string
     {

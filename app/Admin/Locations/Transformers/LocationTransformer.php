@@ -8,9 +8,6 @@ class LocationTransformer
 {
     /**
      * Transform a Location into its Admin API representation.
-     *
-     * @param  Location  $location  Location to transform.
-     * @return array{id: int, game_map_id: int, name: string, description: string|null, quest_reward_item_id: int|null, required_quest_item_id: int|null, is_port: bool, can_players_enter: bool, can_auto_battle: bool, x: int, y: int, type: int|null, pin_css_class: string|null, hours_to_drop: int|null, minutes_between_delve_fights: int|null} Admin Location representation.
      */
     public function transform(Location $location): array
     {

@@ -47,10 +47,6 @@ const LOCATION_FIELD_ORDER: Array<{
   },
 ];
 
-/**
- * Resolve the first invalid Location field in visible form order, along with the wizard
- * step and element id needed to focus it.
- */
 export const resolveFirstInvalidLocationField = (
   errors: LocationFormErrors
 ): LocationFieldDescriptor | null => {

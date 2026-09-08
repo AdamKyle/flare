@@ -10,18 +10,12 @@ use App\Flare\Models\Gem;
 
 class LocationGemDetailTransformer
 {
-    /**
-     * @param  AdminGemRollTransformer  $adminGemRollTransformer  Shared Admin Gem roll transformer.
-     */
     public function __construct(
         private readonly AdminGemRollTransformer $adminGemRollTransformer,
     ) {}
 
     /**
      * Transform a Location Gem profile into its Admin detail representation.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to transform.
-     * @return array<string, mixed> Admin Location Gem detail representation.
      */
     public function transform(GameLocationGemParamter $gameLocationGemParamter): array
     {
@@ -50,9 +44,6 @@ class LocationGemDetailTransformer
 
     /**
      * Build the configured range values section, excluding Character Power Reduction.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to describe.
-     * @return array<string, string|null> Configured range values.
      */
     private function transformRanges(GameLocationGemParamter $gameLocationGemParamter): array
     {
@@ -80,9 +71,6 @@ class LocationGemDetailTransformer
 
     /**
      * Transform the configured crafting Skills into their compact identity representation.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to describe.
-     * @return array<int, array{id: int, name: string}> Configured crafting Skills.
      */
     private function transformCraftingSkills(GameLocationGemParamter $gameLocationGemParamter): array
     {
@@ -96,9 +84,6 @@ class LocationGemDetailTransformer
 
     /**
      * Transform the profile's currently active rolled Gem into its Admin roll representation.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile whose active roll is transformed.
-     * @return array<string, mixed>|null Active Gem roll representation.
      */
     private function transformRolledGem(GameLocationGemParamter $gameLocationGemParamter): ?array
     {
@@ -111,9 +96,6 @@ class LocationGemDetailTransformer
 
     /**
      * Transform every Gem roll ever created for this profile, newest first.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile whose roll history is transformed.
-     * @return array<int, array<string, mixed>> Every Gem roll for this profile.
      */
     private function transformRollHistory(GameLocationGemParamter $gameLocationGemParamter): array
     {
@@ -131,9 +113,6 @@ class LocationGemDetailTransformer
 
     /**
      * Transform the generated Gem World Map associated with this profile, when one exists.
-     *
-     * @param  GameMap|null  $generatedMap  Generated Gem World Map, when one exists.
-     * @return array{id: int, name: string, generated_map_type: string|null, parent_map: array{id: int, name: string}|null}|null Generated Gem World association.
      */
     private function transformGeneratedGemWorld(?GameMap $generatedMap): ?array
     {

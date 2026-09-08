@@ -14,7 +14,6 @@ class NpcExcelService
     /**
      * Download the NPCs workbook.
      *
-     * @return BinaryFileResponse NPCs workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class NpcExcelService
 
     /**
      * Import NPCs from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded NPCs workbook.
-     * @return void Persists the imported NPCs.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

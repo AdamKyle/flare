@@ -87,11 +87,6 @@ const STEP_5_NUMERIC_FIELDS: NumericFieldRule[] = [
   { field: 'holy_level', label: 'Holy Level', integer: true, min: 0 },
 ];
 
-/**
- * Validate one optional numeric text field against its finite/integer/minimum
- * constraints, writing a specific error message into `errors` when invalid.
- * An empty string is treated as "not provided" and is always valid.
- */
 const validateNumericField = (
   state: ItemFormStateDefinition,
   rule: NumericFieldRule,
@@ -122,10 +117,6 @@ const validateNumericField = (
   }
 };
 
-/**
- * Validate every numeric field in the given rule set, merging any resulting
- * errors into a fresh errors object.
- */
 const validateNumericFields = (
   state: ItemFormStateDefinition,
   rules: NumericFieldRule[]
@@ -139,10 +130,6 @@ const validateNumericFields = (
   return errors;
 };
 
-/**
- * Validate the Basic/catalog step: required name, type, description, and
- * finite non-negative catalog costs.
- */
 const validateBasicStep = (
   state: ItemFormStateDefinition
 ): ItemFormErrorsDefinition => {
@@ -166,13 +153,6 @@ const validateBasicStep = (
   return errors;
 };
 
-/**
- * Validate one Item form wizard step and return the resulting field errors.
- *
- * @param stepIndex 1-indexed wizard step being validated.
- * @param state Current Item form state.
- * @return Field errors found for the given step; empty when the step is valid.
- */
 export const validateItemFormStep = (
   stepIndex: number,
   state: ItemFormStateDefinition
@@ -193,14 +173,6 @@ export const validateItemFormStep = (
   }
 };
 
-/**
- * Validate every Item form wizard step and return the combined field errors.
- * Used as a final guard immediately before submission so no step's fields
- * can be skipped regardless of which step the wizard is currently showing.
- *
- * @param state Current Item form state.
- * @return Combined field errors across every step; empty when the form is valid.
- */
 export const validateAllItemFormSteps = (
   state: ItemFormStateDefinition
 ): ItemFormErrorsDefinition => ({

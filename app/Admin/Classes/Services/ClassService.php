@@ -6,16 +6,12 @@ use App\Admin\Classes\Requests\ClassIndexRequest;
 use App\Admin\Classes\Requests\StoreClassRequest;
 use App\Admin\Classes\Requests\UpdateClassRequest;
 use App\Flare\Models\GameClass;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClassService
 {
     /**
      * Paginate the Classes list for the validated Admin index request.
-     *
-     * @param  ClassIndexRequest  $request  Validated Class list request.
-     * @return LengthAwarePaginator Paginated Class records.
      */
     public function paginate(ClassIndexRequest $request): LengthAwarePaginator
     {
@@ -45,8 +41,6 @@ class ClassService
 
     /**
      * Build the internal Admin Class form option data.
-     *
-     * @return array{classes: Collection<int, GameClass>} Internal Class form option data.
      */
     public function formOptions(): array
     {
@@ -57,9 +51,6 @@ class ClassService
 
     /**
      * Create a new Class from the validated form data.
-     *
-     * @param  StoreClassRequest  $request  Validated Class creation request.
-     * @return GameClass Created Class.
      */
     public function create(StoreClassRequest $request): GameClass
     {
@@ -68,10 +59,6 @@ class ClassService
 
     /**
      * Update an existing Class from the validated form data.
-     *
-     * @param  GameClass  $gameClass  Class to update.
-     * @param  UpdateClassRequest  $request  Validated Class update request.
-     * @return GameClass Updated Class.
      */
     public function update(GameClass $gameClass, UpdateClassRequest $request): GameClass
     {

@@ -12,15 +12,11 @@ use App\Flare\Models\Monster;
 use App\Game\Core\Items\Values\ItemCatalogType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 class MonsterService
 {
     /**
      * Paginate the Monster list for the validated Admin index request.
-     *
-     * @param  MonsterIndexRequest  $request  Validated Monster list request.
-     * @return LengthAwarePaginator Paginated Monster records.
      */
     public function paginate(MonsterIndexRequest $request): LengthAwarePaginator
     {
@@ -51,12 +47,7 @@ class MonsterService
     }
 
     /**
-     * Apply the Admin Monster list category filter, and its optional Location
-     * Type refinement, to the given query.
-     *
-     * @param  Builder<Monster>  $query  Monster query to constrain.
-     * @param  string|null  $category  Validated MonsterListCategory value, if any.
-     * @param  int|null  $locationType  Validated LocationType value, if any.
+     * Apply the Admin Monster list category filter, and its optional Location Type refinement, to the given query.
      */
     private function applyCategoryFilter(Builder $query, ?string $category, ?int $locationType): void
     {
@@ -97,8 +88,6 @@ class MonsterService
 
     /**
      * Build the internal Admin Monster form option data.
-     *
-     * @return array{game_maps: Collection<int, GameMap>, quest_items: Collection<int, Item>} Internal Monster form option data.
      */
     public function formOptions(): array
     {
@@ -110,9 +99,6 @@ class MonsterService
 
     /**
      * Create a new Monster from the validated form data.
-     *
-     * @param  StoreMonsterRequest  $request  Validated Monster creation request.
-     * @return Monster Created Monster.
      */
     public function create(StoreMonsterRequest $request): Monster
     {
@@ -121,10 +107,6 @@ class MonsterService
 
     /**
      * Update an existing Monster from the validated form data.
-     *
-     * @param  Monster  $monster  Monster to update.
-     * @param  UpdateMonsterRequest  $request  Validated Monster update request.
-     * @return Monster Updated Monster.
      */
     public function update(Monster $monster, UpdateMonsterRequest $request): Monster
     {
@@ -135,12 +117,6 @@ class MonsterService
 
     /**
      * Apply the current 2.0 cross-field normalization rules to validated Monster data.
-     *
-     * Shared by the Store/Update form path and the Monster import Sheet so both mutation
-     * paths apply the exact same cross-field business rules.
-     *
-     * @param  array<string, mixed>  $data  Validated Monster form data.
-     * @return array<string, mixed> Normalized Monster attributes.
      */
     public function normalize(array $data): array
     {

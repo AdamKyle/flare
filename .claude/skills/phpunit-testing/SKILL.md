@@ -7,7 +7,7 @@ description: Use this skill when writing, reviewing, reducing, or refactoring PH
 
 ## Scope
 
-Use this skill for PHPUnit tests and test infrastructure only. Also apply `repository-code-quality-and-clean-as-you-go`.
+Use this skill for PHPUnit tests and test infrastructure only. Also apply `repository-code-quality-and-clean-as-you-go` and `phpunit-business-behavior-testing`.
 
 Production backend rules belong to the `back-end-conventions` skill.
 
@@ -48,10 +48,17 @@ simplify/remove an impossible branch. Never change production visibility only fo
 
 ## Assertion Integrity
 
+Every retained test must pass the business-value gate in `phpunit-business-behavior-testing`.
+
 Never use `assertTrue(true)`, `assertFalse(false)`, assertions on values created entirely by the
 test, or another tautology to satisfy PHPUnit's assertion count. Tests must not exist only to prove
-container resolution, provider `register()`/`boot()`/`provides()` plumbing, framework plumbing, or
-direct constructor-to-property assignment.
+container resolution, provider `register()`/`boot()`/`provides()` plumbing, framework plumbing,
+direct constructor-to-property assignment, package-interface membership, or thin third-party adapter
+type structure.
+
+`assertInstanceOf()` is not a substitute for a business assertion. Retain it only when application
+behavior genuinely selects/returns a type and that type selection is the observable project contract.
+Do not instantiate imports/exports merely to prove Maatwebsite concern/interface membership.
 
 ## Shared Setup
 

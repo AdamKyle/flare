@@ -3,10 +3,6 @@ import GameMapFormErrorsDefinition from '../definitions/game-map-form-errors-def
 import GameMapFormStateDefinition from '../definitions/game-map-form-state-definition';
 import { GameMapFormValidationMessages } from '../enums/game-map-form-validation-messages';
 
-/**
- * Validate the Game Map wizard's Bonuses step: each percentage field must be a
- * valid numeric string.
- */
 export const validateGameMapBonusesStep = (
   state: GameMapFormStateDefinition
 ): GameMapFormErrorsDefinition => {

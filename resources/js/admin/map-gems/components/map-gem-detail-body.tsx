@@ -15,12 +15,6 @@ import Dd from 'ui/dl/dd';
 import Dl from 'ui/dl/dl';
 import Dt from 'ui/dl/dt';
 
-/**
- * Reusable factual/detail body for a Map Gem profile, shared by the Admin
- * Show screen and the Admin Map Gem detail SidePeek. Presents identity,
- * the currently active Gem roll, roll history, profile configuration
- * ranges, and the generated Gem World, in that order of importance.
- */
 const MapGemDetailBody = ({
   map_gem: mapGem,
   on_activate_roll: onActivateRoll,

@@ -10,9 +10,6 @@ class NpcQuestTransformer extends TransformerAbstract
 {
     /**
      * Transform a Quest into its compact NPC relationship representation.
-     *
-     * @param  Quest  $quest  Quest to transform.
-     * @return array{id: int, name: string, required_item: array{id: int, name: string}|null, secondary_required_item: array{id: int, name: string}|null, reward_item: array{id: int, name: string}|null} Compact NPC Quest relationship representation.
      */
     public function transform(Quest $quest): array
     {
@@ -27,9 +24,6 @@ class NpcQuestTransformer extends TransformerAbstract
 
     /**
      * Transform a related Item into its compact identity representation.
-     *
-     * @param  Item|null  $item  Related Item, when one is set.
-     * @return array{id: int, name: string}|null Compact Item identity.
      */
     private function transformItem(?Item $item): ?array
     {

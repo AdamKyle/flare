@@ -7,18 +7,6 @@ import ItemMetaSection from '../../components/side-peeks/character-inventory/inv
 
 import Separator from 'ui/separator/separator';
 
-/**
- * Render the complete permission-neutral factual usable/alchemy Item
- * presentation: identity/description header plus every applicable effect
- * section. Shared by the player-facing inventory usable Item wrapper (which
- * supplies its own rarity-based title styling) and any other read-only
- * context, such as Admin Item detail, that must render the exact same
- * factual content without inventing a second display.
- *
- * Callers that do not already own a rarity-aware title color (Admin
- * contexts) get the canonical Item color by default, rather than an
- * unstyled title falling back to browser-default black text.
- */
 const UsableItemFactualPresentation = ({
   item,
   title_class_name: titleClassName,

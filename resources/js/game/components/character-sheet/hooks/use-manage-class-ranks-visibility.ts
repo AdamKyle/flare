@@ -20,13 +20,13 @@ export const useManageClassRanksVisibility =
       };
 
       manageClassRanksEventEmitter.on(
-        CharacterSheet.OPEN_REINCARNATION_SYSTEM,
+        CharacterSheet.OPEN_CLASS_RANKS_SYSTEM,
         updateVisibility
       );
 
       return () => {
         manageClassRanksEventEmitter.off(
-          CharacterSheet.OPEN_REINCARNATION_SYSTEM,
+          CharacterSheet.OPEN_CLASS_RANKS_SYSTEM,
           updateVisibility
         );
       };
@@ -34,14 +34,14 @@ export const useManageClassRanksVisibility =
 
     const openClassRanks = () => {
       manageClassRanksEventEmitter.emit(
-        CharacterSheet.OPEN_REINCARNATION_SYSTEM,
+        CharacterSheet.OPEN_CLASS_RANKS_SYSTEM,
         true
       );
     };
 
     const closeClassRanks = () => {
       manageClassRanksEventEmitter.emit(
-        CharacterSheet.OPEN_REINCARNATION_SYSTEM,
+        CharacterSheet.OPEN_CLASS_RANKS_SYSTEM,
         false
       );
     };

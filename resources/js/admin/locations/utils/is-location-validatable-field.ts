@@ -15,9 +15,6 @@ const VALIDATABLE_LOCATION_FORM_FIELDS: readonly string[] = [
   LocationFormField.MinutesBetweenDelveFights,
 ];
 
-/**
- * Determine whether a Location wizard field participates in field-level validation.
- */
 export const isLocationValidatableField = (
   field: keyof LocationFormState
 ): field is keyof LocationFormErrors & keyof LocationFormState =>

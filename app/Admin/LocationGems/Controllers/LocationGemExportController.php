@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LocationGemExportController extends Controller
 {
-    /**
-     * @param  LocationGemExcelService  $locationGemExcelService  Location Gem Excel export/import service.
-     */
     public function __construct(
         private readonly LocationGemExcelService $locationGemExcelService,
     ) {}
@@ -18,7 +15,6 @@ class LocationGemExportController extends Controller
     /**
      * Download the Location Gems workbook.
      *
-     * @return BinaryFileResponse Location Gems workbook download response.
      *
      * @codeCoverageIgnore
      */

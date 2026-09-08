@@ -14,7 +14,6 @@ class ClassExcelService
     /**
      * Download the Classes workbook.
      *
-     * @return BinaryFileResponse Classes workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -25,11 +24,6 @@ class ClassExcelService
 
     /**
      * Import Classes from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Classes workbook.
-     * @return void Persists the imported Classes.
-     *
-     * @codeCoverageIgnore
      */
     public function import(UploadedFile $file): void
     {

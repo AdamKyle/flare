@@ -2,9 +2,7 @@ import { ItemCatalogType } from './item-catalog-type';
 import { ItemProfile } from './item-profile';
 
 /**
- * Mirrors `App\Game\Core\Items\Values\ItemType::validWeapons()` exactly:
- * every weapon `items.type` value except the generic `weapon` placeholder,
- * the legacy `censor` type, spells, rings, trinkets, and artifacts.
+ * Keep this list aligned with `ItemType::validWeapons()`.
  */
 export const WEAPON_SUBTYPES: ItemCatalogType[] = [
   ItemCatalogType.STAVE,
@@ -21,9 +19,6 @@ export const WEAPON_SUBTYPES: ItemCatalogType[] = [
   ItemCatalogType.SWORD,
 ];
 
-/**
- * Mirrors `App\Game\Core\Items\Values\ArmourType::allTypes()` exactly.
- */
 export const ARMOUR_SUBTYPES: ItemCatalogType[] = [
   ItemCatalogType.SHIELD,
   ItemCatalogType.BODY,
@@ -34,11 +29,6 @@ export const ARMOUR_SUBTYPES: ItemCatalogType[] = [
   ItemCatalogType.HELMET,
 ];
 
-/**
- * Return the valid subtype values for the given Item profile's secondary
- * subtype filter, or null when that profile does not support one. Only the
- * Weapons and Armour profiles support a subtype filter.
- */
 export const subtypesForProfile = (
   profile: ItemProfile
 ): ItemCatalogType[] | null => {

@@ -9,9 +9,6 @@ class RaceDetailTransformer
 {
     /**
      * Transform a Race into its Admin detail representation.
-     *
-     * @param  GameRace  $gameRace  Race to transform.
-     * @return array{id: int, name: string, description: string|null, image_url: string} Admin Race detail representation.
      */
     public function transform(GameRace $gameRace): array
     {
@@ -25,9 +22,6 @@ class RaceDetailTransformer
 
     /**
      * Resolve the Race's public image URL, falling back to the knight placeholder image.
-     *
-     * @param  GameRace  $gameRace  Race to resolve the image URL for.
-     * @return string Public Race image URL.
      */
     private function resolveImageUrl(GameRace $gameRace): string
     {

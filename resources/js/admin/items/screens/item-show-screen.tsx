@@ -119,10 +119,7 @@ const ItemShowScreen = ({
       handleOpenLocation(id);
     }
 
-    // `raid` and `guide_quest` have no Phase 2B canonical Admin detail
-    // destination and no current Admin/Information route resolves them by
-    // id; they render as non-interactive factual text in `ItemUsageCard`
-    // instead of a broken or list-redirecting link.
+    // Raid and guide-quest identities have no detail route and remain non-interactive.
   };
 
   const handleOpenItem = (relatedItemId: number): void => {

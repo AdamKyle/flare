@@ -8,13 +8,6 @@ class QuestFormTransformer
 {
     /**
      * Transform a Quest into its Admin save-response / form-value representation.
-     *
-     * Returns every current field managed by the modern Quest form.
-     * `is_parent` and `parent_chain_quest_id` are intentionally excluded; they
-     * are legacy/compatibility state maintained internally, not form fields.
-     *
-     * @param  Quest  $quest  Quest to transform.
-     * @return array<string, mixed> Admin Quest form-value representation.
      */
     public function transform(Quest $quest): array
     {

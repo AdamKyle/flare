@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class QuestExportController extends Controller
 {
-    /**
-     * @param  QuestExcelService  $questExcelService  Quest Excel export/import service.
-     */
     public function __construct(
         private readonly QuestExcelService $questExcelService,
     ) {}
@@ -18,7 +15,6 @@ class QuestExportController extends Controller
     /**
      * Download the Quests workbook.
      *
-     * @return BinaryFileResponse Quests workbook download response.
      *
      * @codeCoverageIgnore
      */

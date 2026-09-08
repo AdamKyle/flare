@@ -2,25 +2,19 @@
 
 namespace App\Admin\Quests\Controllers\Api;
 
-use App\Admin\Quests\Requests\QuestTreeRequest;
 use App\Admin\Quests\Requests\StoreQuestRequest;
 use App\Admin\Quests\Requests\UpdateQuestRequest;
 use App\Admin\Quests\Services\QuestService;
 use App\Admin\Quests\Transformers\QuestFormOptionsTransformer;
 use App\Admin\Quests\Transformers\QuestFormTransformer;
 use App\Flare\Models\Quest;
+use App\Game\Quests\Requests\QuestTreeRequest;
 use App\Game\Quests\Services\QuestReadService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 
 class QuestsController extends Controller
 {
-    /**
-     * @param  QuestService  $questService  Admin Quest mutation service.
-     * @param  QuestReadService  $questReadService  Shared factual Quest read service.
-     * @param  QuestFormTransformer  $questFormTransformer  Form-value transformer.
-     * @param  QuestFormOptionsTransformer  $questFormOptionsTransformer  Form-options transformer.
-     */
     public function __construct(
         private readonly QuestService $questService,
         private readonly QuestReadService $questReadService,
@@ -30,9 +24,6 @@ class QuestsController extends Controller
 
     /**
      * Return the factual, optionally Map- and Kind-filtered Quest tree.
-     *
-     * @param  QuestTreeRequest  $request  Validated Quest tree request.
-     * @return JsonResponse Quest tree JSON response.
      */
     public function tree(QuestTreeRequest $request): JsonResponse
     {
@@ -43,8 +34,6 @@ class QuestsController extends Controller
 
     /**
      * Return the Admin Quest form options.
-     *
-     * @return JsonResponse Quest form-options JSON response.
      */
     public function options(): JsonResponse
     {
@@ -56,8 +45,6 @@ class QuestsController extends Controller
 
     /**
      * Return the factual Quest browse options for the Admin Quest browser.
-     *
-     * @return JsonResponse Quest browse-options JSON response.
      */
     public function browseOptions(): JsonResponse
     {
@@ -66,9 +53,6 @@ class QuestsController extends Controller
 
     /**
      * Return the full factual detail representation for the given Quest.
-     *
-     * @param  Quest  $quest  Quest to transform.
-     * @return JsonResponse Quest detail JSON response.
      */
     public function show(Quest $quest): JsonResponse
     {
@@ -77,9 +61,6 @@ class QuestsController extends Controller
 
     /**
      * Return the current field values for the given Quest, for populating the edit form.
-     *
-     * @param  Quest  $quest  Quest to populate.
-     * @return JsonResponse Quest form-value JSON response.
      */
     public function edit(Quest $quest): JsonResponse
     {
@@ -88,9 +69,6 @@ class QuestsController extends Controller
 
     /**
      * Create a new Quest from the validated request.
-     *
-     * @param  StoreQuestRequest  $request  Validated Quest creation request.
-     * @return JsonResponse Created Quest JSON response.
      */
     public function store(StoreQuestRequest $request): JsonResponse
     {
@@ -101,10 +79,6 @@ class QuestsController extends Controller
 
     /**
      * Update an existing Quest from the validated request.
-     *
-     * @param  UpdateQuestRequest  $request  Validated Quest update request.
-     * @param  Quest  $quest  Quest to update.
-     * @return JsonResponse Updated Quest JSON response.
      */
     public function update(UpdateQuestRequest $request, Quest $quest): JsonResponse
     {

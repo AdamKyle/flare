@@ -12,17 +12,6 @@ import TreeBranchDefinition from 'ui/tree/definitions/tree-branch-definition';
 import TreeNodeDefinition from 'ui/tree/definitions/tree-node-definition';
 import TreeColor from 'ui/tree/enums/tree-color';
 
-/**
- * Build the factual accessible domain label for one Quest Tree node: Quest
- * name, full structural state label, Quest Giver when present, and child
- * Quest count. The generic Tree layer separately augments this with
- * hierarchy level/parent/child structure, so state is never exposed as
- * color alone.
- *
- * @param  quest  Source Quest tree node.
- * @param  state  Resolved structural Quest state.
- * @return  Factual accessible label for the Quest Tree node.
- */
 const buildQuestAccessibilityLabel = (
   quest: QuestTreeNodeDefinition,
   state: QuestTreeState
@@ -41,17 +30,6 @@ const buildQuestAccessibilityLabel = (
   return segments.join(' ');
 };
 
-/**
- * Convert the existing recursive Quest tree API response into the generic
- * Tree's flat nodes and explicit branches, built depth-first in the
- * existing API order. Branches represent the existing `parent_quest_id`
- * hierarchy only; no second hierarchy model is derived from required
- * Quests.
- *
- * @param  quests  Root-ordered Quest tree nodes from the existing API response.
- * @param  completedQuestIds  Completed Quest ids used to resolve structural state.
- * @return  Flat generic Tree nodes and explicit branches for the Quest tree.
- */
 export const buildQuestTreeData = (
   quests: QuestTreeNodeDefinition[],
   completedQuestIds: ReadonlySet<number>

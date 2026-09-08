@@ -13,8 +13,6 @@ class LocationsExport implements Export, WithMultipleSheets
 
     /**
      * Return the sheets included in the Locations workbook.
-     *
-     * @return array<int, LocationsSheet> Locations workbook sheets.
      */
     public function sheets(): array
     {

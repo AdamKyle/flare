@@ -10,9 +10,6 @@ import {
 import { GameMapMoveEvent } from '../enums/game-map-move-event';
 import { buildDefaultGameMapMoveState } from '../utils/build-default-game-map-move-state';
 
-/**
- * Subscribe to the authoritative editor movement state and emit movement commands.
- */
 export const useManageGameMapMove = (
   initial_state?: GameMapMoveStateDefinition | null
 ): UseManageGameMapMoveDefinition => {

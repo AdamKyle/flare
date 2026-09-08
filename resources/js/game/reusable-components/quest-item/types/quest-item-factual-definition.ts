@@ -32,13 +32,6 @@ export interface MonsterIdentityDefinition {
   quest_item_drop_chance: number | null;
 }
 
-/**
- * Optional read-only navigation callbacks accepted by the shared factual
- * Quest Item presentation and its partials. A relationship identity renders
- * as an accessible interactive control only when its callback is supplied;
- * otherwise it renders as plain factual text. Never checks Admin permission,
- * imports Admin APIs, or mutates data.
- */
 export interface QuestItemFactualNavigationDefinition {
   on_open_item?: (id: number) => void;
   on_open_location?: (id: number) => void;
@@ -48,19 +41,11 @@ export interface QuestItemFactualNavigationDefinition {
   on_open_monster?: (id: number) => void;
 }
 
-/**
- * The smallest permission-neutral factual Quest Item shape rendered by
- * `ItemMetaSection` + `QuestItemDetails` and their partials. Deliberately
- * narrower than `BaseQuestItemDefinition` (which also carries inventory-slot
- * fields such as `slot_id`/`min_list_price` that this factual presentation
- * never reads), so both the player-facing inventory Quest Item and the
- * permission-neutral Admin/Location Quest Item presentation can share this
- * exact rendering without fabricating inventory-slot state.
- */
 export default interface QuestItemFactualDefinition {
   name: string;
   description: string;
   type: string;
+  usable: boolean;
   effect: string | null;
   move_time_out_mod_bonus: number | null;
   fight_time_out_mod_bonus: number | null;

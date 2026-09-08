@@ -7,15 +7,11 @@ use App\Flare\Models\GameMap;
 use App\Flare\Models\Item;
 use App\Game\Core\Values\CoreStatType;
 use App\Game\Raids\Values\RaidAttackType;
-use Illuminate\Support\Collection;
 
 class MonsterFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Monster form option data into its Admin API representation.
-     *
-     * @param  array{game_maps: Collection<int, GameMap>, quest_items: Collection<int, Item>}  $formOptions  Internal Monster form option data.
-     * @return array<string, mixed> Admin Monster form-options representation.
      */
     public function transform(array $formOptions): array
     {

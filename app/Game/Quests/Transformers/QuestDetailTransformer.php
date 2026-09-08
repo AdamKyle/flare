@@ -9,21 +9,12 @@ use App\Game\Quests\Values\QuestKind;
 
 class QuestDetailTransformer
 {
-    /**
-     * @param  QuestItemTransformer  $questItemTransformer  Canonical quest Item factual transformer, shared with the Admin Item detail presentation.
-     */
     public function __construct(
         private readonly QuestItemTransformer $questItemTransformer,
     ) {}
 
     /**
      * Transform a Quest into its full factual detail representation.
-     *
-     * @param  Quest  $quest  Quest to transform; expects its full relation set eager-loaded via `loadRelations()` plus `childQuests`, `raid`, `factionLoyaltyNpc.gameMap`.
-     * @param  QuestKind  $kind  Already-resolved factual Quest kind.
-     * @param  array<int, array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}>  $requiredQuestChain  Already-resolved required Quest chain dependency identities, in stored order.
-     * @param  array{id: int, name: string, type: int}|null  $unlockedSkill  Already-resolved unlocked Game Skill identity.
-     * @return array<string, mixed> Full factual Quest detail representation.
      */
     public function transform(Quest $quest, QuestKind $kind, array $requiredQuestChain, ?array $unlockedSkill): array
     {
@@ -42,9 +33,6 @@ class QuestDetailTransformer
 
     /**
      * Build the raw Markdown story section.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @return array{before_completion_markdown: string|null, after_completion_markdown: string|null} Raw Markdown story text.
      */
     private function story(Quest $quest): array
     {
@@ -56,9 +44,6 @@ class QuestDetailTransformer
 
     /**
      * Build the Quest giver NPC section.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @return array{id: int, name: string, type: int, x_position: int, y_position: int, must_be_at_same_location: bool, game_map: array{id: int, name: string}|null}|null Quest giver NPC section.
      */
     private function npc(Quest $quest): ?array
     {
@@ -84,10 +69,6 @@ class QuestDetailTransformer
 
     /**
      * Build the hierarchy/dependency structure section.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @param  array<int, array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}>  $requiredQuestChain  Already-resolved required Quest chain dependency identities, in stored order.
-     * @return array<string, mixed> Structure section.
      */
     private function structure(Quest $quest, array $requiredQuestChain): array
     {
@@ -102,9 +83,6 @@ class QuestDetailTransformer
 
     /**
      * Build the availability section.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @return array{raid: array{id: int, name: string}|null, only_for_event: int|null} Availability section.
      */
     private function availability(Quest $quest): array
     {
@@ -116,9 +94,6 @@ class QuestDetailTransformer
 
     /**
      * Build the requirements section.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @return array<string, mixed> Requirements section.
      */
     private function requirements(Quest $quest): array
     {
@@ -143,9 +118,6 @@ class QuestDetailTransformer
 
     /**
      * Build the faction Map requirement, when the Quest has one.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @return array{game_map: array{id: int, name: string}, required_level: int|null}|null Faction requirement.
      */
     private function faction(Quest $quest): ?array
     {
@@ -161,9 +133,6 @@ class QuestDetailTransformer
 
     /**
      * Build the Faction Loyalty assisting NPC requirement, when the Quest has one.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @return array{npc: array{id: int, name: string, game_map: array{id: int, name: string}|null}, required_fame_level: int|null}|null Faction Loyalty requirement.
      */
     private function factionLoyalty(Quest $quest): ?array
     {
@@ -185,10 +154,6 @@ class QuestDetailTransformer
 
     /**
      * Build the rewards section.
-     *
-     * @param  Quest  $quest  Quest to describe.
-     * @param  array{id: int, name: string, type: int}|null  $unlockedSkill  Already-resolved unlocked Game Skill identity.
-     * @return array<string, mixed> Rewards section.
      */
     private function rewards(Quest $quest, ?array $unlockedSkill): array
     {
@@ -205,11 +170,7 @@ class QuestDetailTransformer
     }
 
     /**
-     * Build the compact factual Quest dependency identity, including the structural state facts
-     * the canonical frontend Quest-state resolver needs.
-     *
-     * @param  Quest|null  $quest  Related Quest, when one is set.
-     * @return array{id: int, name: string, parent_quest_id: int|null, required_quest_id: int|null, required_quest_chain_ids: array<int, int>}|null Compact Quest dependency identity.
+     * Build the factual Quest dependency identity used by the frontend state resolver.
      */
     private function questDependencyIdentity(?Quest $quest): ?array
     {
@@ -228,9 +189,6 @@ class QuestDetailTransformer
 
     /**
      * Delegate to the canonical quest Item factual transformer.
-     *
-     * @param  Item|null  $item  Quest Item, when one is set.
-     * @return array<string, mixed>|null Canonical quest Item factual payload.
      */
     private function questItem(?Item $item): ?array
     {

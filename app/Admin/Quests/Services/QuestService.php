@@ -11,15 +11,11 @@ use App\Flare\Models\PassiveSkill;
 use App\Flare\Models\Quest;
 use App\Flare\Models\Raid;
 use App\Game\Core\Items\Values\ItemCatalogType;
-use Illuminate\Support\Collection;
 
 class QuestService
 {
     /**
      * Create a new Quest from the validated form data.
-     *
-     * @param  StoreQuestRequest  $request  Validated Quest creation request.
-     * @return Quest Created Quest.
      */
     public function create(StoreQuestRequest $request): Quest
     {
@@ -32,10 +28,6 @@ class QuestService
 
     /**
      * Update an existing Quest from the validated form data.
-     *
-     * @param  Quest  $quest  Quest to update.
-     * @param  UpdateQuestRequest  $request  Validated Quest update request.
-     * @return Quest Updated Quest.
      */
     public function update(Quest $quest, UpdateQuestRequest $request): Quest
     {
@@ -50,8 +42,6 @@ class QuestService
 
     /**
      * Build the internal Admin Quest form option data.
-     *
-     * @return array{npcs: Collection<int, Npc>, quest_items: Collection<int, Item>, quests: Collection<int, Quest>, game_maps: Collection<int, GameMap>, raids: Collection<int, Raid>, passive_skills: Collection<int, PassiveSkill>} Internal Quest form option data.
      */
     public function formOptions(): array
     {
@@ -67,9 +57,6 @@ class QuestService
 
     /**
      * Apply cross-field normalization rules to validated Quest data before persistence.
-     *
-     * @param  array<string, mixed>  $data  Validated Quest form data.
-     * @return array<string, mixed> Normalized Quest attributes.
      */
     public function normalize(array $data): array
     {
@@ -85,13 +72,7 @@ class QuestService
     }
 
     /**
-     * Keep the legacy `is_parent` flag coherent with the actual parent/child hierarchy: the newly
-     * selected parent is flagged as a parent, and a previous parent that no longer has any
-     * remaining children is unflagged so the existing gameplay Quest-ordering algorithm does not
-     * keep seeding it as a chain root.
-     *
-     * @param  int|null  $previousParentId  The Quest's `parent_quest_id` value before this write, when it had one.
-     * @param  int|null  $newParentId  The Quest's `parent_quest_id` value just persisted, when set.
+     * Reconcile Quest parent flags with the persisted parent-child hierarchy.
      */
     public function reconcileParentFlags(?int $previousParentId, ?int $newParentId): void
     {

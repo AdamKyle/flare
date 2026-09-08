@@ -20,6 +20,8 @@ export enum SidePeekComponentRegistrationEnum {
    */
   LOCATION_DETAILS = 'LOCATION_DETAILS',
   CHARACTER_KINGDOM_DETAILS = 'CHARACTER_KINGDOM_DETAILS',
+  PLAYER_GAME_MAP_DETAIL = 'PLAYER_GAME_MAP_DETAIL',
+  PLAYER_NPC_DETAIL = 'PLAYER_NPC_DETAIL',
 
   /**
    * Server Chat Items
@@ -35,6 +37,14 @@ export enum SidePeekComponentRegistrationEnum {
    * Item Details
    */
   ITEM_DETAILS = 'ITEM_DETAILS',
+
+  /**
+   * Class / Class Mastery Details
+   */
+  CLASS_DETAIL = 'CLASS_DETAIL',
+  CLASS_MASTERY_DETAIL = 'CLASS_MASTERY_DETAIL',
+  CHARACTER_CLASS_RANK_DETAIL = 'CHARACTER_CLASS_RANK_DETAIL',
+  CHARACTER_CLASS_SPECIALTY_DETAIL = 'CHARACTER_CLASS_SPECIALTY_DETAIL',
 
   /**
    * Admin Monitoring

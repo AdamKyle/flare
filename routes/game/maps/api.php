@@ -20,6 +20,8 @@ Route::middleware(['auth', 'is.player.banned', 'is.character.who.they.say.they.a
 
     Route::get('/map/location-droppable-items/{location}', ['uses' => 'Api\MapController@getLocationDroppableQuestItems']);
 
+    Route::get('/map/details/{gameMap}', ['uses' => 'Api\MapController@gameMapDetails']);
+
     Route::group(['middleware' => 'throttle:moving'], function () {
 
         // Map Movement:

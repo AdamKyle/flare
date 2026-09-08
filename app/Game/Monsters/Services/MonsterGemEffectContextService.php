@@ -68,8 +68,6 @@ class MonsterGemEffectContextService
 
     /**
      * Build the deduplicated, sorted list of cached Gem effect contexts a Monster currently appears in.
-     *
-     * @return array<int, array<string, mixed>>
      */
     public function forMonster(Monster $monster): array
     {
@@ -86,6 +84,30 @@ class MonsterGemEffectContextService
     }
 
     /**
+     * Build the single current Gem effect context for an already-resolved effective Monster row, when one exists.
+     */
+    public function forEffectiveMonster(Monster $monster, array $effectiveMonster): ?array
+    {
+        if (! $this->isEligibleForGemContexts($monster)) {
+            return null;
+        }
+
+        $gemEffectContext = $effectiveMonster['gem_effect_context'] ?? null;
+
+        if (is_null($gemEffectContext) || ! ($gemEffectContext['has_effects'] ?? false)) {
+            return null;
+        }
+
+        $key = $this->buildContextKey($gemEffectContext);
+
+        if (is_null($key)) {
+            return null;
+        }
+
+        return $this->buildContext($key, $gemEffectContext, $effectiveMonster, $monster);
+    }
+
+    /**
      * Determine whether a Monster is eligible to carry Gem effect contexts at all.
      */
     private function isEligibleForGemContexts(Monster $monster): bool
@@ -98,9 +120,6 @@ class MonsterGemEffectContextService
 
     /**
      * Scan every cache entry (including the regular/easier event-map tiers) for the Monster.
-     *
-     * @param  array<string, mixed>  $cache
-     * @param  array<string, array<string, mixed>>  $contexts
      */
     private function collectFromCache(array $cache, Monster $monster, array &$contexts): void
     {
@@ -121,9 +140,6 @@ class MonsterGemEffectContextService
 
     /**
      * Collect the Monster's matching, Gem-affected cache row from a single cached data set.
-     *
-     * @param  array<int, array<string, mixed>>  $dataset
-     * @param  array<string, array<string, mixed>>  $contexts
      */
     private function collectFromDataset(array $dataset, Monster $monster, array &$contexts): void
     {
@@ -150,8 +166,6 @@ class MonsterGemEffectContextService
 
     /**
      * Build the stable deduplication key for a resolved Gem effect context.
-     *
-     * @param  array<string, mixed>  $gemEffectContext
      */
     private function buildContextKey(array $gemEffectContext): ?string
     {
@@ -170,10 +184,6 @@ class MonsterGemEffectContextService
 
     /**
      * Build one Monster Gem effect context row for the Admin/Info detail contract.
-     *
-     * @param  array<string, mixed>  $gemEffectContext
-     * @param  array<string, mixed>  $cachedMonster
-     * @return array<string, mixed>
      */
     private function buildContext(string $key, array $gemEffectContext, array $cachedMonster, Monster $monster): array
     {
@@ -191,9 +201,6 @@ class MonsterGemEffectContextService
 
     /**
      * Identify only the effective Monster fields that actually changed from the factual base.
-     *
-     * @param  array<string, mixed>  $cachedMonster
-     * @return array<int, array<string, mixed>>
      */
     private function buildChangedValues(Monster $monster, array $cachedMonster): array
     {
@@ -229,10 +236,7 @@ class MonsterGemEffectContextService
     }
 
     /**
-     * Build one changed-value row when the base and effective value factually differ and the
-     * effective value is meaningful; otherwise returns null.
-     *
-     * @return array<string, mixed>|null
+     * Build a changed-value row when the effective Monster value meaningfully differs.
      */
     private function buildChange(string $field, string $label, string $displayType, mixed $baseValue, mixed $effectiveValue): ?array
     {
@@ -283,9 +287,6 @@ class MonsterGemEffectContextService
 
     /**
      * Sort contexts: normal Map, then Locations by label, then Map Gem Worlds, then Location Gem Worlds.
-     *
-     * @param  array<int, array<string, mixed>>  $contexts
-     * @return array<int, array<string, mixed>>
      */
     private function sortContexts(array $contexts): array
     {

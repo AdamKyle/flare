@@ -9,8 +9,6 @@ class ClassIndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool Always true; authorization is enforced by route middleware.
      */
     public function authorize(): bool
     {
@@ -19,8 +17,6 @@ class ClassIndexRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string,mixed>
      */
     public function rules(): array
     {
@@ -35,8 +31,6 @@ class ClassIndexRequest extends FormRequest
 
     /**
      * Apply the Classes list defaults before validation runs.
-     *
-     * @return void Merges default list parameters into the request input.
      */
     protected function prepareForValidation(): void
     {
@@ -51,9 +45,6 @@ class ClassIndexRequest extends FormRequest
 
     /**
      * Configure the validator instance to enforce the allowed sort-key set.
-     *
-     * @param  Validator  $validator  Validator instance to configure.
-     * @return void Registers the allowed sort-key validation callback.
      */
     public function withValidator(Validator $validator): void
     {

@@ -2,13 +2,6 @@ import React, { ReactNode } from 'react';
 
 import FactualLinkProps from '../types/partials/factual-link-props';
 
-/**
- * Render a factual relationship identity as an accessible interactive
- * control when its navigation callback is supplied, otherwise render it as
- * plain factual text. Never checks Admin permission, imports Admin APIs, or
- * mutates data; the caller decides navigation behavior entirely through the
- * optional `on_click` callback.
- */
 const FactualLink = ({
   id,
   label,

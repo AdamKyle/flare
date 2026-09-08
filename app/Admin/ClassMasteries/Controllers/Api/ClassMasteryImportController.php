@@ -9,20 +9,12 @@ use Illuminate\Http\JsonResponse;
 
 class ClassMasteryImportController extends Controller
 {
-    /**
-     * @param  ClassMasteryExcelService  $classMasteryExcelService  Class Mastery Excel export/import service.
-     */
     public function __construct(
         private readonly ClassMasteryExcelService $classMasteryExcelService,
     ) {}
 
     /**
      * Import validated Class Masteries and return the success response.
-     *
-     * @param  ClassMasteryImportRequest  $request  Validated Class Mastery import request.
-     * @return JsonResponse Import success JSON response.
-     *
-     * @codeCoverageIgnore
      */
     public function __invoke(ClassMasteryImportRequest $request): JsonResponse
     {

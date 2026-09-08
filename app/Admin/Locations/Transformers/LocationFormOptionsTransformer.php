@@ -13,9 +13,6 @@ class LocationFormOptionsTransformer
 {
     /**
      * Transform the supplied internal Location form option data into its Admin API representation.
-     *
-     * @param  array{game_map: GameMap, quest_items: Collection<int, Item>, location_types: array<int, LocationType>, special_pins: array<int, LocationPin>, coordinates: Coordinates}  $formOptions  Internal Location form option data.
-     * @return array{game_map: array{id: int, name: string}, quest_items: array<int, array{value: int, label: string}>, location_types: array<int, int>, special_pins: array<int, string>, coordinates: array{x: array<int, int>, y: array<int, int>}} Admin Location form-options representation.
      */
     public function transform(array $formOptions): array
     {

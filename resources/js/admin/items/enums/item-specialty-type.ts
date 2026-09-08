@@ -31,10 +31,6 @@ export const ITEM_SPECIALTY_TYPE_VALUES: ItemSpecialtyType[] = [
   ItemSpecialtyType.LABYRINTH_CLOTH,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item specialty type, without a forced type assertion at each call site.
- */
 export const isItemSpecialtyType = (
   value: string | number
 ): value is ItemSpecialtyType => {

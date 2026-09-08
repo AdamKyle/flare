@@ -19,20 +19,6 @@ import { StackedCardContentMode } from 'ui/cards/enums/stacked-card-content-mode
 import StackedCard from 'ui/cards/stacked-card';
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Admin NPC detail side-peek: stacks the shared, permission-neutral factual
- * NPC presentation with an Admin-only Edit action and relationship
- * navigation into other modernized Admin resources. Reuses the exact same
- * `NpcDetailBody` the standalone NPC show screen and the Game Map NPC
- * side-peek already render, so every entry point shows identical content.
- * Relationship navigation opens the target's canonical detail inside a
- * `StackedCard` over this content (rather than replacing it through the
- * global SidePeek emitter), so this component can itself be reused as
- * nested `StackedCard` content and its own relationship clicks never
- * destroy an ancestor's stack. Edit is composed locally via `StackedCard`
- * and the embeddable `NpcFormScreen`, so opening Edit from a nested
- * context never destroys an ancestor's own stack.
- */
 const AdminNpcDetailSidePeek = ({
   npc_id: npcId,
   on_npc_changed: onNpcChanged,

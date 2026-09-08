@@ -1,10 +1,5 @@
 import CoordinateDefinition from '../types/coordinate-definition';
 
-/**
- * Build a CoordinateDefinition for a known X/Y map value where the pixel/index layout
- * fields are not needed by the caller (e.g. confirming a move to an already-selected
- * coordinate).
- */
 export const buildPlainCoordinate = (
   x: number,
   y: number

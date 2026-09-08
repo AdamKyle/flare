@@ -9,9 +9,6 @@ class LocationGemListTransformer extends TransformerAbstract
 {
     /**
      * Transform a Location Gem profile into its Admin list-row representation.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to transform.
-     * @return array{id: int, name: string, game_map: array{id: int, name: string}, location: array{id: int, name: string}, roll_count: int, rolled_gem: array{id: int, name: string, roll_number: int}|null} Admin Location Gem list-row representation.
      */
     public function transform(GameLocationGemParamter $gameLocationGemParamter): array
     {

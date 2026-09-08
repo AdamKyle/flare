@@ -11,8 +11,6 @@ class ItemsImport implements Import, WithMultipleSheets
 {
     /**
      * Return the sheets included in the Items workbook.
-     *
-     * @return array<int, ItemsSheet> Items workbook sheets.
      */
     public function sheets(): array
     {

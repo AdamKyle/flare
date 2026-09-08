@@ -54,10 +54,6 @@ export const ITEM_PROFILE_VALUES: ItemProfile[] = [
   ItemProfile.SPECIALTY,
 ];
 
-/**
- * Narrow a Dropdown's generic `string | number` selection value down to a
- * known Item profile, without a forced type assertion at each call site.
- */
 export const isItemProfile = (value: string | number): value is ItemProfile => {
   if (typeof value !== 'string') {
     return false;

@@ -5,9 +5,7 @@ import QuestStoryPanelProps from '../types/quest-story-panel-props';
 import { normalizeQuestStoryMarkdown } from '../utils/normalize-quest-story-markdown';
 
 /**
- * A single Quest story tab panel: bounded, internally-scrollable prose,
- * with legacy `<br>` tokens normalized to real line breaks for display only
- * (the persisted Quest description is never mutated).
+ * Legacy `<br>` tokens are normalized for display without changing persisted text.
  */
 const QuestStoryPanel = ({ markdown }: QuestStoryPanelProps): ReactNode => {
   if (!markdown) {

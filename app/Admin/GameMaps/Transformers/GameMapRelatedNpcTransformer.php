@@ -9,9 +9,6 @@ class GameMapRelatedNpcTransformer extends TransformerAbstract
 {
     /**
      * Transform an NPC into its compact Game Map relationship representation.
-     *
-     * @param  Npc  $npc  NPC to transform.
-     * @return array{id: int, name: string, type: int, x_position: int, y_position: int} Compact NPC relationship representation.
      */
     public function transform(Npc $npc): array
     {

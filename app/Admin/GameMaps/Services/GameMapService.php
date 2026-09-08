@@ -16,7 +16,6 @@ use App\Flare\Models\Npc;
 use App\Flare\Models\Quest;
 use App\Game\Events\Values\EventType;
 use App\Game\Maps\Contracts\CoordinatesQuery;
-use App\Game\Maps\Values\Coordinates;
 use App\Game\Quests\Values\QuestKind;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
@@ -30,18 +29,12 @@ use Throwable;
 
 class GameMapService
 {
-    /**
-     * @param  CoordinatesQuery  $coordinatesQuery  Map coordinate query contract.
-     */
     public function __construct(
         private readonly CoordinatesQuery $coordinatesQuery,
     ) {}
 
     /**
      * Paginate the Game Maps list for the validated Admin index request.
-     *
-     * @param  GameMapIndexRequest  $request  Validated Game Map list request.
-     * @return LengthAwarePaginator Paginated Game Map records.
      */
     public function paginate(GameMapIndexRequest $request): LengthAwarePaginator
     {
@@ -67,9 +60,6 @@ class GameMapService
 
     /**
      * Build the internal Admin detail data for the given Game Map, including its required quest Item and Quest.
-     *
-     * @param  GameMap  $gameMap  Game Map to describe.
-     * @return array{game_map: GameMap, required_item: Item|null, required_quest: Quest|null, required_location: Location|null} Internal Game Map detail data.
      */
     public function detailData(GameMap $gameMap): array
     {
@@ -85,9 +75,6 @@ class GameMapService
 
     /**
      * Build the internal editor data for the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map to edit.
-     * @return array{game_map: GameMap, coordinates: Coordinates, locations: Collection<int,Location>, npcs: Collection<int,Npc>, kingdoms: Collection<int,Kingdom>} Internal Game Map editor data.
      */
     public function editorData(GameMap $gameMap): array
     {
@@ -111,8 +98,6 @@ class GameMapService
 
     /**
      * Build the internal Admin Game Map form option data.
-     *
-     * @return array{event_types: array<int,int>, locations: Collection<int,Location>} Internal Game Map form options.
      */
     public function formOptions(): array
     {
@@ -126,10 +111,6 @@ class GameMapService
 
     /**
      * Paginate the Locations belonging to the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map whose Locations are being listed.
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @return LengthAwarePaginator Paginated Locations on the Game Map.
      */
     public function paginateRelatedLocations(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
     {
@@ -149,10 +130,6 @@ class GameMapService
 
     /**
      * Paginate the NPCs belonging to the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map whose NPCs are being listed.
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @return LengthAwarePaginator Paginated NPCs on the Game Map.
      */
     public function paginateRelatedNpcs(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
     {
@@ -172,14 +149,6 @@ class GameMapService
 
     /**
      * Paginate the Quests whose Quest-giver NPC belongs to the given Game Map.
-     *
-     * A Quest is related to a Map when its Quest-giver NPC lives there; the Quest's own
-     * `access_to_map_id`/`faction_game_map_id` are unrelated availability requirements, not its
-     * primary location, and are deliberately not used here.
-     *
-     * @param  GameMap  $gameMap  Game Map whose Quests are being listed.
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @return LengthAwarePaginator Paginated Quests given by an NPC on the Game Map.
      */
     public function paginateRelatedQuests(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
     {
@@ -203,13 +172,7 @@ class GameMapService
     }
 
     /**
-     * Paginate the Monsters actually available on the given Game Map: those persisted directly
-     * on the Map, plus special-location Monsters whose `only_for_location_type` matches a
-     * Location type that actually exists on the Map.
-     *
-     * @param  GameMap  $gameMap  Game Map whose Monsters are being listed.
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @return LengthAwarePaginator Paginated Monsters available on the Game Map.
+     * Paginate Monsters available on the Game Map and its applicable special Locations.
      */
     public function paginateRelatedMonsters(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
     {
@@ -236,13 +199,7 @@ class GameMapService
     }
 
     /**
-     * Paginate the unique quest Items connected to the given Game Map through its required
-     * Item, its Locations' drop/required/reward Items, its Quests' primary/secondary/reward
-     * Items, and its available Monsters' quest Item drops.
-     *
-     * @param  GameMap  $gameMap  Game Map whose quest Items are being listed.
-     * @param  GameMapRelationIndexRequest  $request  Validated relationship list request.
-     * @return LengthAwarePaginator Paginated, deduplicated quest Items connected to the Game Map.
+     * Paginate unique Quest Items related to the Game Map.
      */
     public function paginateRelatedQuestItems(GameMap $gameMap, GameMapRelationIndexRequest $request): LengthAwarePaginator
     {
@@ -264,10 +221,7 @@ class GameMapService
     /**
      * Apply a case-insensitive `LIKE` search filter to a query when search text is present.
      *
-     * @param  mixed  $query  Query builder to filter.
-     * @param  string  $column  Column to search.
-     * @param  string|null  $searchText  Raw search text, when supplied.
-     * @return void The query is filtered in place.
+     * @param  mixed  $query
      */
     private function applySearch($query, string $column, ?string $searchText): void
     {
@@ -278,9 +232,6 @@ class GameMapService
 
     /**
      * Resolve the distinct, non-null Location types actually present on the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map to inspect.
-     * @return SupportCollection<int, int> Distinct Location types present on the Game Map.
      */
     private function presentLocationTypes(GameMap $gameMap): SupportCollection
     {
@@ -291,11 +242,7 @@ class GameMapService
     }
 
     /**
-     * Attach a `resolved_kind` property to each Quest in the collection, resolved from its
-     * current persisted relationships via the canonical `QuestKind::resolve()`.
-     *
-     * @param  Collection<int, Quest>  $quests  Quests to annotate in place.
-     * @return void Each Quest gains a `resolved_kind` property.
+     * Attach the resolved Quest kind to each Quest in the collection.
      */
     private function attachResolvedKind(Collection $quests): void
     {
@@ -310,9 +257,6 @@ class GameMapService
 
     /**
      * Resolve every unique, non-null quest Item id connected to the given Game Map.
-     *
-     * @param  GameMap  $gameMap  Game Map to resolve quest Item ids for.
-     * @return SupportCollection<int, int> Unique quest Item ids connected to the Game Map.
      */
     private function relatedQuestItemIds(GameMap $gameMap): SupportCollection
     {
@@ -354,10 +298,6 @@ class GameMapService
 
     /**
      * Create a new Game Map from the validated form data and the uploaded map image.
-     *
-     * @param  array<string, mixed>  $validatedData  Validated Game Map form data.
-     * @param  UploadedFile  $map  Uploaded Game Map image.
-     * @return GameMap Created Game Map.
      */
     public function create(array $validatedData, UploadedFile $map): GameMap
     {
@@ -375,11 +315,6 @@ class GameMapService
 
     /**
      * Update an existing Game Map from the validated form data, replacing its map image when one is supplied.
-     *
-     * @param  GameMap  $gameMap  Game Map to update.
-     * @param  array<string, mixed>  $validatedData  Validated Game Map form data.
-     * @param  UploadedFile|null  $map  Replacement Game Map image, when supplied.
-     * @return GameMap Updated Game Map.
      */
     public function update(GameMap $gameMap, array $validatedData, ?UploadedFile $map): GameMap
     {
@@ -406,10 +341,6 @@ class GameMapService
 
     /**
      * Process initial Game Map tile generation outside the HTTP lifecycle.
-     *
-     * @param  GameMap  $gameMap  Game Map requiring initial tiles.
-     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile lifecycle service.
-     * @return bool Whether tile generation completed successfully.
      */
     public function processInitialTiles(
         GameMap $gameMap,
@@ -440,12 +371,6 @@ class GameMapService
 
     /**
      * Process and promote replacement Game Map tiles outside the HTTP lifecycle.
-     *
-     * @param  GameMap  $gameMap  Game Map carrying replacement source-image state.
-     * @param  string  $previousName  Previous Game Map name.
-     * @param  string  $previousPath  Previous source-image path.
-     * @param  MapTileGenerationService  $mapTileGenerationService  Map tile lifecycle service.
-     * @return bool Whether the replacement became authoritative.
      */
     public function processReplacementTiles(
         GameMap $gameMap,
@@ -505,11 +430,6 @@ class GameMapService
 
     /**
      * Log a replacement processing failure with Game Map context.
-     *
-     * @param  GameMap  $gameMap  Game Map being processed.
-     * @param  string  $stage  Replacement lifecycle stage.
-     * @param  Throwable  $failure  Operational failure.
-     * @return void Writes the failure to the application log.
      */
     private function logReplacementFailure(GameMap $gameMap, string $stage, Throwable $failure): void
     {
@@ -521,9 +441,6 @@ class GameMapService
 
     /**
      * Delete a required Game Map source image and surface storage failure.
-     *
-     * @param  string  $path  Source-image path to delete.
-     * @return void The source image is deleted.
      */
     private function deleteFile(string $path): void
     {
@@ -534,9 +451,6 @@ class GameMapService
 
     /**
      * Find the Quest that rewards the required Game Map access Item.
-     *
-     * @param  Item|null  $requiredItem  Required Game Map access Item.
-     * @return Quest|null Quest that rewards the required Item.
      */
     private function findQuestForRequiredItem(?Item $requiredItem): ?Quest
     {

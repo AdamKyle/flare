@@ -9,13 +9,6 @@ import MapGemDetailBody from '../map-gem-detail-body';
 
 import InfiniteLoader from 'ui/loading-bar/infinite-loader';
 
-/**
- * Admin Map Gem detail side-peek: a read-only view of the reusable Map Gem
- * detail body, addressable by profile ID, with roll activation wired in.
- * Used both for direct navigation and as nested `StackedCard` content from
- * other Admin detail surfaces (Bulk Roll results, Monster detail Gem effect
- * contexts).
- */
 const AdminMapGemDetailSidePeek = ({
   map_gem_id: mapGemId,
 }: AdminMapGemDetailSidePeekProps): ReactNode => {

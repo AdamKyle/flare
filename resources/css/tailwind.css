@@ -133,6 +133,19 @@
   --color-emerald-900: #064e3b;
   --color-emerald-950: #022c22;
 
+  /*- de-york -*/
+  --color-de-york-50: #f4faf3;
+  --color-de-york-100: #e6f3e5;
+  --color-de-york-200: #cde7cb;
+  --color-de-york-300: #94cb91;
+  --color-de-york-400: #74b771;
+  --color-de-york-500: #519a4d;
+  --color-de-york-600: #3f7d3c;
+  --color-de-york-700: #346332;
+  --color-de-york-800: #2c502b;
+  --color-de-york-900: #254225;
+  --color-de-york-950: #102310;
+
   /*— Danube Palette —*/
   --color-danube:    #f1f7fd;
   --color-danube-100: #e0eef9;

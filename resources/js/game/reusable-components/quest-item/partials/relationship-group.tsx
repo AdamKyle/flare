@@ -4,13 +4,6 @@ import RelationshipGroupProps from '../types/partials/relationship-group-props';
 
 import Separator from 'ui/separator/separator';
 
-/**
- * Group a set of compact Quest Item relationship rows under a titled
- * section, matching the visual title treatment of the shared `Section`
- * component. Uses a plain row list rather than `Section`'s `<Dl>` wrapper,
- * since these rows are compact clickable cards, not `Dt`/`Dd` definition
- * pairs.
- */
 const RelationshipGroup = ({
   title,
   children,

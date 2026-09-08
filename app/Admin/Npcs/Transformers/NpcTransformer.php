@@ -8,9 +8,6 @@ class NpcTransformer
 {
     /**
      * Transform an Npc into its Admin API representation.
-     *
-     * @param  Npc  $npc  NPC to transform.
-     * @return array{id: int, game_map_id: int, name: string, real_name: string, type: int, x_position: int, y_position: int} Admin NPC representation.
      */
     public function transform(Npc $npc): array
     {

@@ -13,6 +13,7 @@ const NumberField = ({
   error,
   disabled,
   min,
+  max,
   placeholder,
 }: NumberFieldProps): ReactNode => {
   return (
@@ -30,6 +31,7 @@ const NumberField = ({
           inputMode="numeric"
           value={value}
           min={min}
+          max={max}
           placeholder={placeholder}
           disabled={disabled}
           required={required}

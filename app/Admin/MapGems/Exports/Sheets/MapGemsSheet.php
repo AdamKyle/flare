@@ -16,8 +16,6 @@ class MapGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
 {
     /**
      * Return every Map Gem profile, ordered deterministically by name.
-     *
-     * @return Collection<int, GameMapGemParamter> Map Gem profiles to export.
      */
     public function collection(): Collection
     {
@@ -27,8 +25,7 @@ class MapGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
     /**
      * Map a Map Gem profile into its workbook row, using human-readable Map/Skill/atonement names.
      *
-     * @param  GameMapGemParamter  $gameMapGemParamter  Map Gem profile to map.
-     * @return array<int, mixed> Workbook row values.
+     * @param  mixed  $gameMapGemParamter
      */
     public function map($gameMapGemParamter): array
     {
@@ -78,8 +75,6 @@ class MapGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
 
     /**
      * Return the Map Gems workbook column headings.
-     *
-     * @return array<int, string> Workbook column headings.
      */
     public function headings(): array
     {
@@ -101,8 +96,6 @@ class MapGemsSheet implements FromCollection, ShouldAutoSize, WithHeadings, With
 
     /**
      * Return the Map Gems workbook sheet title.
-     *
-     * @return string Map Gems workbook sheet title.
      */
     public function title(): string
     {

@@ -17,7 +17,6 @@ class QuestExcelService
     /**
      * Download the Quests workbook.
      *
-     * @return BinaryFileResponse Quests workbook download response.
      *
      * @codeCoverageIgnore
      */
@@ -28,9 +27,6 @@ class QuestExcelService
 
     /**
      * Import Quests from the validated workbook upload.
-     *
-     * @param  UploadedFile  $file  Uploaded Quests workbook.
-     * @return array Import result: a success result, or an error result describing the exact validation failure.
      */
     public function import(UploadedFile $file): array
     {

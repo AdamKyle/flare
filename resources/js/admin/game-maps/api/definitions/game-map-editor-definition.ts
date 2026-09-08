@@ -1,43 +1,22 @@
 import GameMapKingdomMarkerDefinition from './game-map-kingdom-marker-definition';
 import GameMapLocationMarkerDefinition from './game-map-location-marker-definition';
 import GameMapNpcMarkerDefinition from './game-map-npc-marker-definition';
-import { GameMapEventType } from '../../enums/game-map-event-type';
+import GameMapFactualDefinition, {
+  GameMapRequiredLocationDefinition,
+  GameMapRequiredQuestItemDefinition,
+  GameMapRequiredQuestItemQuestDefinition,
+} from '../../../../game/reusable-components/game-map/types/game-map-factual-definition';
 
 export type GameMapTile = string[];
 
-export interface GameMapRequiredQuestItemQuestDefinition {
-  id: number;
-  name: string;
-}
+export {
+  GameMapRequiredLocationDefinition,
+  GameMapRequiredQuestItemDefinition,
+  GameMapRequiredQuestItemQuestDefinition,
+};
 
-export interface GameMapRequiredQuestItemDefinition {
-  id: number;
-  name: string;
-  quest: GameMapRequiredQuestItemQuestDefinition | null;
-}
-
-export interface GameMapDetailDefinition {
-  id: number;
-  name: string;
-  map_url: string;
+export interface GameMapDetailDefinition extends GameMapFactualDefinition {
   tiles: GameMapTile[];
-  description: string | null;
-  kingdom_color: string;
-  default: boolean;
-  can_traverse: boolean;
-  event_restriction: GameMapEventType | null;
-  xp_bonus: number | null;
-  skill_training_bonus: number | null;
-  drop_chance_bonus: number | null;
-  enemy_stat_bonus: number | null;
-  character_attack_reduction: number | null;
-  required_location: GameMapRequiredLocationDefinition | null;
-  required_quest_item: GameMapRequiredQuestItemDefinition | null;
-}
-
-export interface GameMapRequiredLocationDefinition {
-  id: number;
-  name: string;
 }
 
 export interface GameMapEditorMapDefinition {

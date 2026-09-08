@@ -6,17 +6,6 @@ import { useGameMapRelatedDataEntries } from '../hooks/use-game-map-related-data
 import { ButtonVariant } from 'ui/buttons/enums/button-variant-enum';
 import IconButton from 'ui/buttons/icon-button';
 
-/**
- * Game Map "Related Game Data" responsive navigation: opens a bounded
- * relationship browser SidePeek for each interconnected resource
- * (Locations, NPCs, Monsters, Quests, Quest Items). This is a feature-owned
- * composition (not the global `IconContainer`, whose narrow `lg:w-10` rail
- * is too small for labeled buttons and overlaps the Map image) with three
- * responsive treatments: a horizontal wrapping row above the content at
- * `sm`-`lg`, a full-width vertical rail beside the content at `lg+`, and a
- * fixed bottom navigation bar on mobile. Admin mutation actions (Edit Map,
- * Edit Locations) are rendered separately by the caller.
- */
 const GameMapRelatedDataNavigation = ({
   game_map_id: gameMapId,
 }: GameMapRelatedDataNavigationProps): ReactNode => {

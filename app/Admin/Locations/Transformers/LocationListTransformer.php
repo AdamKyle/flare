@@ -9,9 +9,6 @@ class LocationListTransformer extends TransformerAbstract
 {
     /**
      * Transform a Location into its Admin list-row representation.
-     *
-     * @param  Location  $location  Location to transform.
-     * @return array{id: int, name: string, map_name: string|null, type: int|null, x: int, y: int} Admin Location list-row representation.
      */
     public function transform(Location $location): array
     {

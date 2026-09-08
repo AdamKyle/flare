@@ -50,11 +50,6 @@ export type ItemPresentationKind =
   | ItemQuestPresentationDefinition
   | ItemUsablePresentationDefinition;
 
-/**
- * `presentation_kind` and `presentation` form a discriminated union so React
- * can narrow `item.presentation` to the correct shape by checking
- * `presentation_kind` alone, without a forced type assertion.
- */
 type ItemDetailDefinition = ItemDetailBaseDefinition & ItemPresentationKind;
 
 export default ItemDetailDefinition;

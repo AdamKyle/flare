@@ -19,14 +19,6 @@ use Illuminate\Http\Request;
 
 class LocationGemsController extends Controller
 {
-    /**
-     * @param  LocationGemService  $locationGemService  Admin Location Gem application service.
-     * @param  Pagination  $pagination  Paginator response transformer.
-     * @param  LocationGemListTransformer  $locationGemListTransformer  List-record transformer.
-     * @param  LocationGemDetailTransformer  $locationGemDetailTransformer  Detail transformer.
-     * @param  LocationGemFormTransformer  $locationGemFormTransformer  Form-value transformer.
-     * @param  LocationGemFormOptionsTransformer  $locationGemFormOptionsTransformer  Form-options transformer.
-     */
     public function __construct(
         private readonly LocationGemService $locationGemService,
         private readonly Pagination $pagination,
@@ -38,9 +30,6 @@ class LocationGemsController extends Controller
 
     /**
      * Return the paginated, searchable, filtered Location Gems list.
-     *
-     * @param  LocationGemIndexRequest  $request  Validated Location Gem list request.
-     * @return JsonResponse Paginated Location Gem list JSON response.
      */
     public function index(LocationGemIndexRequest $request): JsonResponse
     {
@@ -53,8 +42,6 @@ class LocationGemsController extends Controller
 
     /**
      * Return the Admin Location Gem form options.
-     *
-     * @return JsonResponse Location Gem form-options JSON response.
      */
     public function options(): JsonResponse
     {
@@ -65,9 +52,6 @@ class LocationGemsController extends Controller
 
     /**
      * Return the Admin detail representation for the given Location Gem profile.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to transform.
-     * @return JsonResponse Location Gem detail JSON response.
      */
     public function show(GameLocationGemParamter $gameLocationGemParamter): JsonResponse
     {
@@ -76,9 +60,6 @@ class LocationGemsController extends Controller
 
     /**
      * Return the current field values for the given Location Gem profile, for populating the edit form.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to populate.
-     * @return JsonResponse Location Gem form-value JSON response.
      */
     public function edit(GameLocationGemParamter $gameLocationGemParamter): JsonResponse
     {
@@ -87,9 +68,6 @@ class LocationGemsController extends Controller
 
     /**
      * Create a new Location Gem profile from the validated request.
-     *
-     * @param  StoreLocationGemRequest  $request  Validated Location Gem creation request.
-     * @return JsonResponse Created Location Gem profile JSON response.
      */
     public function store(StoreLocationGemRequest $request): JsonResponse
     {
@@ -100,10 +78,6 @@ class LocationGemsController extends Controller
 
     /**
      * Update an existing Location Gem profile from the validated request.
-     *
-     * @param  UpdateLocationGemRequest  $request  Validated Location Gem update request.
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to update.
-     * @return JsonResponse Updated Location Gem profile JSON response.
      */
     public function update(UpdateLocationGemRequest $request, GameLocationGemParamter $gameLocationGemParamter): JsonResponse
     {
@@ -114,10 +88,6 @@ class LocationGemsController extends Controller
 
     /**
      * Roll a new Gem for the given Location Gem profile and return the updated detail state.
-     *
-     * @param  Request  $request  Current authenticated Admin request.
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile to roll.
-     * @return JsonResponse Updated Location Gem detail JSON response.
      */
     public function roll(Request $request, GameLocationGemParamter $gameLocationGemParamter): JsonResponse
     {
@@ -128,9 +98,6 @@ class LocationGemsController extends Controller
 
     /**
      * Roll a Gem for every Location Gem profile that does not currently have a rolled Gem.
-     *
-     * @param  Request  $request  Current authenticated Admin request.
-     * @return JsonResponse Bulk roll result JSON response.
      */
     public function rollAll(Request $request): JsonResponse
     {
@@ -141,10 +108,6 @@ class LocationGemsController extends Controller
 
     /**
      * Activate an existing historical Gem roll as the given Location Gem profile's active roll.
-     *
-     * @param  GameLocationGemParamter  $gameLocationGemParamter  Location Gem profile whose active roll is changing.
-     * @param  Gem  $gem  Gem roll to activate.
-     * @return JsonResponse Updated Location Gem detail JSON response, or a validation error response.
      */
     public function activateRoll(GameLocationGemParamter $gameLocationGemParamter, Gem $gem): JsonResponse
     {

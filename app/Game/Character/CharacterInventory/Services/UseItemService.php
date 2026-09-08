@@ -20,7 +20,6 @@ use App\Game\Core\Events\UpdateCharacterInventoryCountEvent;
 use App\Game\Core\Events\UpdateTopBarEvent;
 use App\Game\Core\Traits\ResponseBuilder;
 use App\Game\Messages\Events\ServerMessageEvent;
-use Exception;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Item as ResourceItem;
 
@@ -40,18 +39,25 @@ class UseItemService
 
     private CharacterInventoryService $characterInventoryService;
 
+    private BuildCharacterAttackTypes $buildCharacterAttackTypes;
+
     public function __construct(
         Manager $manager,
         CharacterSheetBaseInfoTransformer $characterAttackTransformer,
         UpdateCharacterAttackTypesHandler $updateCharacterAttackTypes,
         CharacterInventoryService $characterInventoryService,
+        BuildCharacterAttackTypes $buildCharacterAttackTypes,
     ) {
         $this->manager = $manager;
         $this->characterAttackTransformer = $characterAttackTransformer;
         $this->updateCharacterAttackTypes = $updateCharacterAttackTypes;
         $this->characterInventoryService = $characterInventoryService;
+        $this->buildCharacterAttackTypes = $buildCharacterAttackTypes;
     }
 
+    /**
+     * Use several selected Alchemy Bag items for the character, applying boons up to the active limits.
+     */
     public function useManyItemsFromInventory(Character $character, array $itemsToUse): array
     {
         $automation = $this->activeAutomation($character);
@@ -105,22 +111,22 @@ class UseItemService
         $this->updateCharacterAttackTypes->updateCache($character);
         $character = $character->refresh();
 
+        $this->broadcastBaseCharacterInformation($character);
+
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
         $this->broadcastCharacterBoons($character);
 
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
         return $this->successResult([
             'message' => 'Used selected items.'.($removedSomeItems ? ' Some items were not able to be used because of the amount of boons you have. You can check your Alchemy Bag to see which ones are left.' : ''),
-            'inventory' => [
-                'usable_items' => $inventory->getInventoryForType('usable_items'),
-            ],
         ]);
     }
 
+    /**
+     * Use a single Alchemy Bag slot item owned by the character.
+     */
     public function useSingleAlchemyItem(Character $character, AlchemyBagSlot $slot): array
     {
         if (! $this->ownsAlchemyBagSlot($character, $slot)) {
@@ -130,6 +136,9 @@ class UseItemService
         return $this->useSingleItemFromInventory($character, $slot->item);
     }
 
+    /**
+     * Use as many stacked units of an owned Alchemy Bag slot item as the boon limits allow.
+     */
     public function useAllAlchemyItems(Character $character, AlchemyBagSlot $slot): array
     {
         if (! $this->ownsAlchemyBagSlot($character, $slot)) {
@@ -166,7 +175,7 @@ class UseItemService
     }
 
     /**
-     * @throws Exception
+     * Use a single selected Alchemy Bag or inventory item for the character.
      */
     public function useSingleItemFromInventory(Character $character, Item $item): array
     {
@@ -213,19 +222,16 @@ class UseItemService
         $this->updateCharacterAttackTypes->updateCache($character);
         $character = $character->refresh();
 
+        $this->broadcastBaseCharacterInformation($character);
+
         event(new UpdateTopBarEvent($character));
 
         event(new UpdateCharacterInventoryCountEvent($character));
 
         $this->broadcastCharacterBoons($character);
 
-        $inventory = $this->characterInventoryService->setCharacter($character);
-
         return $this->successResult([
             'message' => 'Used selected item.',
-            'inventory' => [
-                'usable_items' => $inventory->getInventoryForType('usable_items'),
-            ],
         ]);
     }
 
@@ -242,6 +248,10 @@ class UseItemService
 
         if (! is_null($foundBoon)) {
             if (! $slot->item->can_stack) {
+                return false;
+            }
+
+            if ($foundBoon->amount_used >= self::MAX_AMOUNT) {
                 return false;
             }
 
@@ -284,6 +294,9 @@ class UseItemService
         return true;
     }
 
+    /**
+     * Extend an active boon's remaining duration using available Alchemy Bag stock of its item.
+     */
     public function fillUpBoon(Character $character, CharacterBoon $boon): array
     {
         $boon = $character->boons()->active()->find($boon->id);
@@ -302,6 +315,10 @@ class UseItemService
         }
 
         $item = Item::find($boon->item_id);
+
+        if (is_null($item)) {
+            return $this->errorResult('You do not have any more of that item.');
+        }
 
         if (! $item->can_stack && $boon->amount_used !== 1) {
             return $this->errorResult(
@@ -330,6 +347,10 @@ class UseItemService
 
         $used = min($needed, $available);
 
+        if ($used <= 0) {
+            return $this->errorResult('You do not have any more of that item.');
+        }
+
         $timeAdded = min($missing, $used * $item->lasts_for);
 
         $newAmount = max(0, $alchemyBagSlot->amount - $used);
@@ -351,6 +372,9 @@ class UseItemService
         ]);
     }
 
+    /**
+     * Apply or stack an Alchemy Bag slot item as a boon on the character.
+     */
     private function useAlchemyBagItem(AlchemyBagSlot $slot, Character $character): bool
     {
         $foundBoon = $character->boons()
@@ -361,6 +385,10 @@ class UseItemService
 
         if (! is_null($foundBoon)) {
             if (! $slot->item->can_stack) {
+                return false;
+            }
+
+            if ($foundBoon->amount_used >= self::MAX_AMOUNT) {
                 return false;
             }
 
@@ -404,6 +432,9 @@ class UseItemService
         return true;
     }
 
+    /**
+     * Reduce an Alchemy Bag slot's amount by one, deleting the slot when it reaches zero.
+     */
     private function decrementAlchemyBagSlot(AlchemyBagSlot $slot): void
     {
         if ($slot->amount <= 1) {
@@ -413,6 +444,9 @@ class UseItemService
         }
     }
 
+    /**
+     * Determine whether the character owns the given Alchemy Bag slot.
+     */
     private function ownsAlchemyBagSlot(Character $character, AlchemyBagSlot $slot): bool
     {
         return ! is_null($character->alchemyBag)
@@ -421,6 +455,9 @@ class UseItemService
             && $slot->amount > 0;
     }
 
+    /**
+     * Resolve the character's currently active automation, if any.
+     */
     private function activeAutomation(Character $character): ?CharacterAutomation
     {
         return $character->currentAutomations()
@@ -430,6 +467,9 @@ class UseItemService
             ->first();
     }
 
+    /**
+     * Determine whether the item is a usable Alchemy boon item.
+     */
     public function isAlchemyBoonItem(Item $item): bool
     {
         return $item->type === 'alchemy'
@@ -439,11 +479,17 @@ class UseItemService
             && ! $item->can_use_on_other_items;
     }
 
+    /**
+     * Build the player-facing message explaining why item use is blocked by an active automation.
+     */
     private function automationItemUseMessage(CharacterAutomation $automation): string
     {
         return 'No you are busy, you can use Alchemy items that apply boons to your character. Please cancel your: '.$this->automationName($automation).', if you want to use this.';
     }
 
+    /**
+     * Resolve the player-facing name for the given automation's type.
+     */
     private function automationName(CharacterAutomation $automation): string
     {
         $automationType = AutomationType::from($automation->type);
@@ -459,13 +505,28 @@ class UseItemService
         return 'Faction Loyalty';
     }
 
+    /**
+     * Broadcast the character's currently active boons.
+     */
     private function broadcastCharacterBoons(Character $character): void
     {
         event(new CharacterBoonsUpdateBroadcastEvent($character->user, $character->boons()->active()->get()->toArray()));
     }
 
     /**
+     * Transform and broadcast the character's current base attack information.
+     */
+    private function broadcastBaseCharacterInformation(Character $character): void
+    {
+        $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
+
+        event(new UpdateBaseCharacterInformation($character->user, $this->manager->createData($characterAttack)->toArray()));
+    }
+
+    /**
      * Removes a boon from the character and updates their info.
+     *
+     * @return void
      */
     public function removeBoon(Character $character, CharacterBoon $boon)
     {
@@ -483,11 +544,10 @@ class UseItemService
      */
     public function updateCharacter(Character $character, ?Item $item = null)
     {
-        resolve(BuildCharacterAttackTypes::class)->buildCache($character->refresh());
+        $this->buildCharacterAttackTypes->buildCache($character->refresh());
 
-        $characterAttack = new ResourceItem($character, $this->characterAttackTransformer);
+        $this->broadcastBaseCharacterInformation($character);
 
-        event(new UpdateBaseCharacterInformation($character->user, $this->manager->createData($characterAttack)->toArray()));
         event(new UpdateTopBarEvent($character));
 
         if (! is_null($item)) {
